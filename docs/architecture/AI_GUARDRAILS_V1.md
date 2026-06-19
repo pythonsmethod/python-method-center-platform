@@ -1,6 +1,6 @@
 # AI_GUARDRAILS_V1
 
-**Status:** Normative document — defines the authority boundaries of AI inside the center "Реабилитация без границ" / Python Method.
+**Status:** Normative document — defines the authority boundaries of AI inside the center / platform Python Method.
 **Scope:** Norms only. No code, no prompts, no runtime logic. This document states *what is permitted, what must be escalated, and what is forbidden* — not how it is implemented.
 
 **Sources of grounding:**
