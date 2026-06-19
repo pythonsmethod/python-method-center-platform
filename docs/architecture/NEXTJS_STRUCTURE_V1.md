@@ -1,6 +1,6 @@
 # NEXTJS_STRUCTURE_V1
 
-**Status:** Architectural document — describes the structure of the Next.js web-first application for the center "Реабилитация без границ" / Python Method.
+**Status:** Architectural document — describes the structure of the Next.js web-first application for the center / platform Python Method.
 **Scope:** Architecture only. **No code is written, no application files are created, no dependencies are installed, Supabase is not connected, and Stripe is not connected.** The project tree below is illustrative.
 
 **Sources of grounding:**
