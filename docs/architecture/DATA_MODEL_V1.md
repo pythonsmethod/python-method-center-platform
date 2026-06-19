@@ -2,7 +2,7 @@
 
 Status: CONCEPTUAL DATA ARCHITECTURE ONLY (no SQL, no Supabase schema, no code, no infrastructure)
 Date: 2026-06-15
-Center: "Реабилитация без границ" (Rehabilitation Without Borders), web-first platform.
+Center / platform: Python Method (slogan: «Реабилитация без границ» — Rehabilitation Without Borders; the slogan is not the legal/platform name), web-first platform.
 
 Sources of truth used:
 - Constitution of the Center (purpose, values, Karen's role, AI role, boundaries, scaling)
