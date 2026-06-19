@@ -3,7 +3,7 @@
 Status: ARCHITECTURE / DOCUMENTATION ONLY (no code, no infrastructure)
 Date: 2026-06-15
 Module: web (public website)
-Center: "Реабилитация без границ" (Rehabilitation Without Borders)
+Center / platform: Python Method (slogan: «Реабилитация без границ» — Rehabilitation Without Borders; the slogan is not the legal/platform name)
 Sources of truth used:
 - docs/constitution/constitution_01_purpose_of_center.md (canonical purpose)
 - docs/constitution/constitution_08_boundaries_of_responsibility.md (boundaries)
