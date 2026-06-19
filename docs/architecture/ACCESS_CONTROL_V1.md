@@ -1,6 +1,6 @@
 # ACCESS_CONTROL_V1
 
-**Status:** Architectural access document — defines roles, access levels, and access restrictions for the web-first platform of the center "Реабилитация без границ" / Python Method.
+**Status:** Architectural access document — defines roles, access levels, and access restrictions for the web-first platform of the center / platform Python Method.
 **Scope:** Access architecture only. No code, no SQL, no Supabase RLS, no runtime logic.
 
 **Sources of grounding:**
