@@ -1,6 +1,6 @@
 # AUTHORITY_MATRIX_V1
 
-**Status:** Architectural document — defines the authority matrix of the web-first platform of the center "Реабилитация без границ" / Python Method.
+**Status:** Architectural document — defines the authority matrix of the web-first platform of the center / platform Python Method.
 **Scope:** Architecture only. No code, no SQL, no runtime logic. This document states *who may do what, who owns each decision, and what must be recorded in the Audit Log.*
 
 **Sources of grounding (only these):**
@@ -72,7 +72,7 @@ This document does **not** rely on any old project or Telegram logic. It is web-
 - **Cannot:** make case decisions; interpret state; answer case questions; set case status/urgency; approve knowledge; change legal texts or guardrails.
 - **Decisions it owns:** technical/organizational resolutions; refund execution.
 - **Needs confirmation from:** Karen for anything touching the case; Admin for governance-level changes.
-- **Audited actions:** refunds, user blocks, account-affecting support actions.
+- **Audited actions:** refunds, user blocks, account-affecting actions.
 
 ### 2.6 Admin
 - **Can:** govern the platform; approve Knowledge Entries; change legal texts (Offer/legal) through governance; change AI guardrails through governance; configure access; grant/revoke Audit Log access; oversee blocks.
