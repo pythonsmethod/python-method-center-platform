@@ -332,3 +332,36 @@ Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, the following are documented for **fut
 **No contradictions found** with ACCESS_CONTROL_V1 or AI_GUARDRAILS_V1. This document is an architectural schema description only — no database, no SQL files, no Supabase connection, no code.
 
 After this document, the physical-model architecture is defined and ready for a future, separately-authorized implementation step.
+
+---
+
+## 10. Data retention and deletion (future schema implications — synchronized with DATA_RETENTION_AND_DELETION_POLICY_V1)
+
+DATA_RETENTION_AND_DELETION_POLICY_V1 is canonical for archive, deletion, account closure, and case closure. The following are **future schema implications only** — no SQL is written, no database is created, no schema is implemented here. Where earlier conventions conflict (e.g. the §1 "soft archival" note), the policy governs and these implications extend it.
+
+### 10.1 Future fields (documented, not implemented)
+
+On the relevant case / account / deletion-tracking tables, future schema work will need to represent:
+
+- **archived_at** `timestamptz` — when a case became archived (set after the five-year inactivity threshold). Archival is a visibility state, not a delete.
+- **last_activity_at** `timestamptz` — last meaningful activity on the case; the basis for evaluating the **five-year archival rule**.
+- **deletion_requested_at** `timestamptz` — when the client initiated self-service deletion.
+- **deletion_reason** `text` — the reason captured at confirmed deletion (retained in non-identifying form; see audit treatment below).
+- **deleted_at** `timestamptz` — when the deletion cascade completed.
+- **deletion_actor** `uuid` / actor reference — who performed the deletion (normally the client; an authorized process actor if applicable).
+- **deletion_audit_event_id** `uuid` — FK to the immutable `audit_log` row recording the deletion event.
+- **account_recreated_as_new** `boolean` — marks that a returning person starts a brand-new account/onboarding; deletion is final and no old data is restored or merged.
+
+### 10.2 Deletion cascade (conceptual)
+
+On confirmed deletion, the cascade removes the account and all client-owned rows — cases (active and archived), assessments/questionnaire inputs, document_upload rows **and their Supabase Storage objects (storage_path)**, messages, support_tickets, ai_session content, and access — and revokes authentication. Archival status (`archived_at`) does not exempt rows from the cascade.
+
+### 10.3 Audit-log treatment for deletion events
+
+The `audit_log` table remains append-only and immutable. A deletion emits a single audit_log row capturing **actor, action, timestamp, and deletion_reason**, plus the affected account/case identifiers, but it must **not** retain the deleted personal content (no case substance, no questionnaire answers, no document bodies). The `deletion_audit_event_id` on the deletion-tracking record points to this row. The prior "Retention: indefinite ... subject to legal/Offer reconciliation" note (§3.14) is now bounded by the client's deletion right: personal data is removed on confirmed deletion regardless of indefinite-retention intent, while the non-identifying deletion-event record persists.
+
+### 10.4 No PII dependency
+
+Any future de-identification, analytics, or methodology tables must be designed so they do not depend on retaining personally identifiable client data after deletion (per the policy and DATA_MODEL_V1 §10.7).
+
+No SQL written, no schema modified by this note. See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
