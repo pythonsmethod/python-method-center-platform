@@ -289,4 +289,18 @@ See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
 
 ---
 
-*End of MVP_BUILD_PLAN_V1.*
+*## Refund policy and payment-state handling (MVP-required — synchronized with REFUND_POLICY_V1)
+
+Per REFUND_POLICY_V1 (canonical for refund/payment-refund architecture), the following are MVP-required and must be in place before real payments are processed (they join the Phase 6 "Payment flow" gate and the "before the first paying client" list). No final legal wording here; refund terms are Offer/legal-review-bound.
+
+- No-installment flow — checkout offers a single full payment only; no installments, partial payment, or partial activation in the payment UI or flow.
+- Full-payment activation — paid support activates only after confirmed full payment; nothing activates on pending/partial; activation is audited.
+- Policy visible before checkout — the refund/no-refund disclosure (full payment, immediate start, day-one work, refunds only as Offer exceptions, Offer link) is shown and acknowledged before the pay action, with acknowledgement recorded in the Audit Log.
+- Audit logging of refund exceptions — any refund is an authorized human/admin/legal exception under the Offer; every refund request, decision, and execution is written to the immutable Audit Log; AI never decides refunds.
+- Legal review before production payments — final refund wording (non-refundability statement, exception conditions, disclosure copy) must pass legal review and align with the Offer before real payments are enabled. This is a pre-production / pre-real-payment gate.
+
+These items are reflected in Payment Architecture, DATA_MODEL_V1, ACCESS_CONTROL_V1, AUTHORITY_MATRIX_V1, SUPABASE_SCHEMA_V1 (future fields), and NEXTJS_STRUCTURE_V1. AI has no refund authority; final refund authority is human/admin/legal and Offer-bound.
+
+See REFUND_POLICY_V1.md for the full canonical policy.
+
+End of MVP_BUILD_PLAN_V1.*
