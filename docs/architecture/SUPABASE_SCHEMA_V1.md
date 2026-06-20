@@ -365,3 +365,30 @@ The `audit_log` table remains append-only and immutable. A deletion emits a sing
 Any future de-identification, analytics, or methodology tables must be designed so they do not depend on retaining personally identifiable client data after deletion (per the policy and DATA_MODEL_V1 §10.7).
 
 No SQL written, no schema modified by this note. See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
+
+
+## 11. Refund and service-start (future schema implications — synchronized with REFUND_POLICY_V1)
+
+REFUND_POLICY_V1 is canonical for refund/payment-refund architecture. The following are future schema implications only — no SQL is written, no database is created, no schema is implemented here. Final refund wording is Offer/legal-review-bound.
+
+11.1 Future fields (documented, not implemented)
+
+On the relevant payment / case-period / refund-tracking tables, future schema work will need to represent:
+- service_start_at timestamptz — when the Center's work on the case begins after confirmed payment.
+- work_started_at timestamptz — when the most intensive analytical work begins (day one after payment); together with service_start_at this makes the "service already started" fact explicit and supports the standard no-refund principle.
+- refund_requested_at timestamptz — when a client raised a refund request/signal.
+- refund_reason text — the reason captured with a refund request / decision.
+- refund_decision_by uuid / actor reference — the authorized human (admin/legal) who decided the refund exception. Never AI, never System.
+- refund_decision_at timestamptz — when the refund-exception decision was made.
+- refund_audit_event_id uuid — FK to the immutable audit_log row recording the refund decision/execution.
+- partial_refund support — a partial_refunded payment status and an amount field for partial refunds, included only if legally allowed under the Offer; reachable solely via an authorized refund-exception path.
+
+11.2 Payment status enum implications
+
+The payment_status enum gains refunded and (optionally, if legally allowed) partially_refunded, reachable only through an authorized, human-approved refund exception under the Offer. There are no installment / partial-payment statuses. Activation keys strictly off a confirmed full-payment status.
+
+11.3 Linkage and audit treatment
+
+A refund links to the original payment and to the case_period / subscription it affects, so status changes are traceable. The audit_log remains append-only and immutable; a refund emits an audit_log row (actor, action, timestamp, Offer reference) and refund_audit_event_id points to it. Card/bank data stays with the processor (only processor_ref stored); refund execution happens in the provider, with the platform recording status and the deciding human actor. Refund status is never set by AI or by client action; System only executes an already-authorized refund.
+
+No SQL written, no schema modified by this note. See REFUND_POLICY_V1.md for the full canonical policy.
