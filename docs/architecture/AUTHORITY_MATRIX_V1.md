@@ -176,3 +176,17 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
 **No contradictions found** with the Constitution or AI_GUARDRAILS_V1. The document is architectural only — no code, SQL, or runtime logic.
 
 After this matrix, the platform's authority boundaries are defined and consistent with the data model, the guardrails, and the safety protocol.
+
+
+## 7. Refund authority (synchronized with REFUND_POLICY_V1)
+
+REFUND_POLICY_V1 is the canonical source of truth for refund authority. This section refines the "Refund of payment" row of §3 to match it. No final legal wording here; refund terms are Offer/legal-review-bound.
+
+- AI has no refund authority. Neither client-facing AI nor Karen-assistant AI may approve, deny, promise, estimate, or imply a refund. AI may only escalate a billing/refund request to the authorized human process; its output is non-authoritative (No / escalate).
+- Client may request and see status only. The Client may request a refund and view their own payment/refund status, but cannot approve or self-execute a refund (Request / view only).
+- Support/Admin may process authorized refund exceptions. Support/Admin (Anna at MVP) execute a refund only as an authorized exception under the Offer, after the refund-exception decision is made (Execute, audited).
+- Final refund authority is human/admin/legal and Offer-bound. The Decision Owner for a refund exception is the authorized human/admin/legal process interpreting the Offer — not Karen, not AI, not System. Karen may provide case context only; System may only execute an already-authorized refund and write the audit record. Every refund step is audited.
+
+Refined matrix row — Refund of payment: Client = Request / view status (No approve); Client-facing AI = No (escalate only); Karen-assistant AI = No; Karen = context only (No execute, not Decision Owner); Support/Anna = Execute authorized exception; Admin = Oversee / authorize per Offer governance; System = Auto-execute authorized refund only; Decision Owner = authorized human/admin/legal (Offer-bound); Audit Required = Yes.
+
+See REFUND_POLICY_V1.md for the full canonical policy.
