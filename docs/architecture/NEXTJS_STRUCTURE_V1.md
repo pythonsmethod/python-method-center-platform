@@ -304,3 +304,34 @@ Active operational queues and work views (Karen `/karen`, `/karen/urgent`; Suppo
 - No card/financial data involved; no client-side deletion authority; cascade + audit are server-side. ✔
 
 See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
+
+
+## 13. Refund and payment-disclosure UI/API (synchronized with REFUND_POLICY_V1)
+
+REFUND_POLICY_V1 is canonical for refund/payment-refund architecture. The following UI/API requirements extend §3 (routes) and §4 (API handlers). No code is written here; routes/handlers are described conceptually. No final legal wording; refund copy is Offer/legal-review-bound.
+
+13.1 Pre-payment refund/no-refund disclosure
+
+The checkout/offer surface ((public)/pricing and (client)/cabinet/billing/checkout) must present, before the pay action, a clear refund disclosure: payment is full (no installments), paid support activates only after full payment, work begins immediately with the most intensive work on day one, refunds are not standard and exist only as exceptions under the Offer, plus a link to the binding Offer. Acknowledgement is required and recorded (Audit Log) before the pay action can proceed.
+
+13.2 Immediate-start confirmation
+
+The checkout and post-payment screens must confirm that paid support starts immediately after full payment (case activation + onboarding next step), consistent with the service-start and day-one rules.
+
+13.3 Payment status display in cabinet
+
+The client cabinet ((client)/cabinet/billing) must display payment status and history, including any refund/refund-exception status for the client's own account (view only). The client may see status; the client cannot approve or execute a refund from the UI.
+
+13.4 Refund request/status surface — only if allowed
+
+A refund request/status surface is shown only if permitted by the Offer/legal terms. Where allowed, it lets the client submit a refund request (reason) and view its status; the request is routed to the authorized Support/Admin process (e.g. a billing/refund support ticket), never resolved client-side. Where the Offer does not allow client-initiated refund requests, the surface is omitted and billing questions route to Support.
+
+13.5 No AI refund-decision UI
+
+No AI surface (client-facing AI or Karen-assistant AI) may present, approve, deny, promise, or estimate a refund. AI billing/refund interactions are limited to neutral navigation and escalation to the human Support/Admin process. There is no AI-driven refund-decision UI and no self-service refund approval.
+
+13.6 API/server boundaries
+
+Any refund handler (e.g. /api/account/refund or a billing/refund support route, conceptual) validates the requester, routes to the authorized human process, and only executes an already-authorized refund server-side, writing the audit row. The UI never performs a refund decision or execution client-side.
+
+See REFUND_POLICY_V1.md for the full canonical policy.
