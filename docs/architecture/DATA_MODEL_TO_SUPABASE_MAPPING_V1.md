@@ -67,7 +67,7 @@ Legend for status column: mapped / missing / deferred / intentionally collapsed 
 | confidence_level (ai) | ai_session | confidence | mapped | high/medium/low present. | None. |
 | escalated | ai_session | escalated | mapped | boolean escalated-to-Karen present. | None. |
 | karen review draft/published | karen_review | released_to_client | mapped | Draft vs published expressed as released_to_client boolean; field-level access required. | Enforce access rule (section 9). |
-| knowledge approval owner | knowledge_entry | approved_by | naming mismatch / contradiction | Schema approved_by is documented as Admin; canonical rule is Karen approves methodology/knowledge substance. Contradiction to be corrected in schema/ACCESS_CONTROL/AUTHORITY_MATRIX (see section 8). | Re-designate approval owner = Karen; add separate Admin publication/visibility fields. |
+| knowledge approval owner | knowledge_entry | approved_by | resolved | Schema approved_by previously documented as Admin; canonical rule is Karen approves methodology/knowledge substance. Contradiction resolved by Knowledge Governance Synchronization Pass in schema/ACCESS_CONTROL/AUTHORITY_MATRIX (see section 8). | Done: approval owner = Karen; separate Admin publication/visibility fields. |
 | knowledge_status | knowledge_entry | knowledge_status | mapped | draft/approved/archived present. | None. |
 | audit metadata | audit_log | (fields) | mapped | Canonical consent/status-change source. | Confirm immutability. |
 | red_flag_event | (none) | (none) | missing | No table/structure. | Create red_flag_event model (section 5/7). |
@@ -136,9 +136,11 @@ Two clearly separated concepts:
 - **Karen approves methodology and knowledge substance.** Methodological/content approval (knowledge_status: draft -> approved) is Karen authority. Karen is the approval owner of knowledge.
 - **Admin manages publication, visibility, access, and technical governance** — where/whether approved knowledge is published and who can see it. Admin is **not** the owner of methodology approval.
 
-**Contradiction to correct in other documents:** SUPABASE_SCHEMA_V1 (knowledge_entry.approved_by = Admin), ACCESS_CONTROL_V1, and AUTHORITY_MATRIX_V1 currently state that **Admin approves Knowledge Entries**. Per the canonical rule above, this is a **contradiction to be corrected in those documents**, not an unresolved decision. Methodology approval ownership must be reassigned to Karen there; Admin retains publication/visibility/access/governance only.
+**Resolved (Knowledge Governance Synchronization Pass):** SUPABASE_SCHEMA_V1, ACCESS_CONTROL_V1, and AUTHORITY_MATRIX_V1 previously stated that **Admin approves Knowledge Entries**. That contradiction has now been **resolved** by the Knowledge Governance Synchronization Pass: **Karen is the canonical knowledge approver** (methodology/knowledge substance), and **Admin manages publication and visibility** (plus access, versioning, and technical governance) only. The three documents now correctly attribute approval to Karen and publication/visibility to Admin.
 
 **Action:** model an approval_owner = **Karen** on knowledge_entry, distinct from Admin-owned publication/visibility/access controls, so methodological approval and publication governance are not collapsed into one field. Update schema/ACCESS_CONTROL/AUTHORITY_MATRIX to reflect Karen as the methodology approver.
+
+**Synchronization status:** Knowledge governance is now synchronized across DATA_MODEL_V1, SUPABASE_SCHEMA_V1, ACCESS_CONTROL_V1, AUTHORITY_MATRIX_V1, Admin Panel Architecture, and AI & Karen Operational Roles. Karen is the canonical knowledge approver; Admin manages publication and visibility. No active knowledge-governance contradiction remains.
 
 ---
 
@@ -173,7 +175,7 @@ Before any SQL/RLS implementation, the physical schema must be updated to:
 - [ ] Add document_type, translation_ref, and a separate confidence_level on document_upload (quality_flag already exists).
 - [ ] Add ai_session purpose, inputs_ref, outputs_ref (summary/confidence/escalated already exist).
 - [ ] Create red_flag_event table (AI/System-created), separate from Karen-owned case urgency/status.
-- [ ] Re-designate knowledge_entry approval owner = Karen (methodology) and add separate Admin publication/visibility fields; correct schema/ACCESS_CONTROL/AUTHORITY_MATRIX accordingly.
+- [x] Re-designated knowledge_entry approval owner = Karen (methodology) and added separate Admin publication/visibility fields; schema/ACCESS_CONTROL/AUTHORITY_MATRIX corrected accordingly (Knowledge Governance Synchronization Pass).
 - [ ] Confirm processor_ref restricted access (column already exists).
 - [ ] Decide on delivery_address (defer unless shipping flow is licensed).
 
@@ -185,7 +187,7 @@ Before any SQL/RLS implementation, the physical schema must be updated to:
 - **case_status reconciliation:** rename schema enum to canonical, or maintain a mapping layer. Decision: Karen/Anna.
 - **Python Elixir as product entity:** blocked until legal/licensing resolved. Decision: Karen/Anna/legal.
 - **Consent/case-history retention period:** verify against legal text and privacy policy before persisting (per DATA_MODEL_OPEN_DECISIONS_V1). Decision: legal.
-> Note: Knowledge approval ownership is **no longer an open decision** — Karen approves methodology/knowledge substance; Admin owns publication/visibility/access/governance (see section 8). The "Admin approves" wording in schema/ACCESS_CONTROL/AUTHORITY_MATRIX is a contradiction to be corrected in those documents.
+> Note: Knowledge approval ownership is **not an open decision** — Karen approves methodology/knowledge substance; Admin owns publication/visibility/access/governance (see section 8). The former "Admin approves" wording in schema/ACCESS_CONTROL/AUTHORITY_MATRIX has now been **corrected** in those documents by the Knowledge Governance Synchronization Pass.
 
 ---
 
@@ -197,9 +199,9 @@ Before any SQL/RLS implementation, the physical schema must be updated to:
 - All mismatches are either mapped, partial, naming-mismatch, intentionally collapsed, deferred, or marked for decision. (ok)
 - Field-name accuracy corrected (processor_ref exists; ai_session purpose/inputs_ref/outputs_ref missing; document confidence_level missing while quality_flag exists; case_urgency is a schema-side addition). (ok)
 - Red flag separation (AI/System creates event; Karen owns durable urgency/status) preserved. (ok)
-- Knowledge approval set to canonical: Karen approves methodology/knowledge; Admin manages publication/visibility/access/governance; "Admin approves" flagged as contradiction to correct in other docs. (ok)
+- Knowledge approval set to canonical: Karen approves methodology/knowledge; Admin manages publication/visibility/access/governance; former "Admin approves" wording has been corrected in the other docs by the Knowledge Governance Synchronization Pass. (ok)
 - Brand/entity facts honored (Python Method platform; Pythons & Co. payee; Python Elixir not a product yet; slogan not a name). (ok)
 
-Open contradictions: Knowledge-approval ownership wording in SUPABASE_SCHEMA_V1 / ACCESS_CONTROL_V1 / AUTHORITY_MATRIX_V1 must be corrected to Karen (tracked above); all other items are mapped, deferred, or listed as open decisions.
+Resolved contradictions: Knowledge-approval ownership wording in SUPABASE_SCHEMA_V1 / ACCESS_CONTROL_V1 / AUTHORITY_MATRIX_V1 has been corrected to Karen (Knowledge Governance Synchronization Pass); all other items are mapped, deferred, or listed as open decisions. No active knowledge-governance contradictions remain.
 
 End of DATA_MODEL_TO_SUPABASE_MAPPING_V1.
