@@ -180,7 +180,21 @@ Legend: **R**=Read, **C**=Create, **U**=Update, **D**=Delete/Archive. **Y/N** ma
 
 ---
 
-## 5. Self-check against the Constitution, AI_GUARDRAILS_V1 and AUTHORITY_MATRIX_V1
+## 5. Age policy and Care Recipient access rules
+
+Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, access control enforces the adult-Client / Care-Recipient separation:
+
+- Only an authenticated adult **Client** (age 21+) may register, create, view, or act on a Case and its linked Care Recipient.
+- A person **under 21** cannot independently register, create a case, accept the offer, sign consent, purchase support, or communicate as the responsible Client.
+- A **Care Recipient** is not an account holder: no login, no independent access, no responsibility permissions.
+- Care Recipient personal data (name, date of birth, age, location, reason for representation) is sensitive and readable only by the owning Client and authorized internal roles (Karen / Admin per their existing scopes).
+- Responsibility-bearing actions (offer acceptance, consent, payment) may be performed only by the Client, never by or on behalf of a Care Recipient acting independently.
+
+See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
+
+---
+
+## 6. Self-check against the Constitution, AI_GUARDRAILS_V1 and AUTHORITY_MATRIX_V1
 
 | Principle | Source | Status |
 |---|---|---|
