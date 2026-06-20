@@ -255,7 +255,22 @@ No hard contradictions with the Constitution were found. The following are tensi
 
 ---
 
-## 8. Constraints honored
+## 8. Age policy and Client vs Care Recipient
+
+Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, the data model distinguishes the responsible **Client** from the **Care Recipient**:
+
+- **Client** — adult account holder (age 21+); owns account, consent, payment, and responsibility. Every case has exactly one responsible Client.
+- **Care Recipient** — the person whose condition / documents are being reviewed (may be a minor, dependent, or other person under the Client responsibility); not an account holder and never the responsible decision-maker.
+- **Case** links one Client and one Care Recipient and carries `case_for` (self / child / dependent) and a `self_case` flag.
+- Care Recipient attributes: full name, date of birth, age, relationship to client, country / location, reason for representation, plus Client confirmations (representative confirmation, data consent, responsibility acknowledgment).
+- For a self case, the Care Recipient may equal the Client or be represented by the `self_case` flag.
+- Consent, payment, and responsibility records always reference the **Client**, never the Care Recipient.
+
+See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full canonical age policy (independent registration 21+ only) and the Client / Care Recipient model.
+
+---
+
+## 9. Constraints honored
 
 - No SQL, no Supabase schema, no code, no infrastructure.
 - No Telegram model reused; no legacy agents carried over.
