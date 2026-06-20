@@ -392,3 +392,17 @@ The payment_status enum gains refunded and (optionally, if legally allowed) part
 A refund links to the original payment and to the case_period / subscription it affects, so status changes are traceable. The audit_log remains append-only and immutable; a refund emits an audit_log row (actor, action, timestamp, Offer reference) and refund_audit_event_id points to it. Card/bank data stays with the processor (only processor_ref stored); refund execution happens in the provider, with the platform recording status and the deciding human actor. Refund status is never set by AI or by client action; System only executes an already-authorized refund.
 
 No SQL written, no schema modified by this note. See REFUND_POLICY_V1.md for the full canonical policy.
+
+## 12. Field-level access implications (synchronized with FIELD_LEVEL_ACCESS_POLICY_V1)
+
+FIELD_LEVEL_ACCESS_POLICY_V1 is the canonical source of truth for field-level access to sensitive data. The following are future implementation implications only — no SQL is written, no database is created, no RLS is implemented here.
+
+- Column/field-level scoping: a single row may mix sensitivity levels (L0-L6), so column-level controls are required at implementation. For example, on document_upload the L1 delivery/technical metadata and quality_flag may be visible to Support while the L3 file content / translations / extracted summaries are not; this implies views, column privileges, or policy-enforced projections rather than row-only policies.
+- Substance vs metadata separation: L3 medical-substance columns and L4 internal-only columns (ai_session internal reasoning/prompts, karen_review drafts/internal notes) require stricter scoping than L1 operational columns on the same table.
+- Care Recipient (future care_recipient entity) data is scoped to the owning Client and authorized internal roles only; no independent Care Recipient identity/login.
+- Audit Log (audit_log) is append-only and immutable; no role has update/delete; read access is policy-scoped and itself audited (L5).
+- Payments store only processor_ref + amount/currency/status; no card/bank columns exist (L6 stays with the processor).
+- Red-flag events are append-only with routing-based read scoping (Karen vs Support); requires_immediate_review is a transient marker, never written into case urgency/status by AI/System.
+- Developer/non-production isolation and any exceptional production access are operational controls enforced outside row policies (environment separation, approvals, audit).
+
+These are implications only; actual RLS/column policies are a future, separately-authorized step. See FIELD_LEVEL_ACCESS_POLICY_V1.md for the full canonical policy.
