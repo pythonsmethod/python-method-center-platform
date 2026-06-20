@@ -298,7 +298,20 @@ Every mutable table carries `created_at / updated_at / created_by / updated_by`;
 
 ---
 
-## 8. Self-check against ACCESS_CONTROL_V1 and AI_GUARDRAILS_V1
+## 8. Age policy and Care Recipient (future schema)
+
+Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, the following are documented for **future** implementation only — no SQL is written and no schema file is changed here:
+
+- Future `care_recipient` entity with fields: `full_name`, `date_of_birth`, `age`, `relationship_to_client`, `country`, `reason_for_representation`, `client_is_authorized_representative` (bool), `care_recipient_data_consent` (bool), `responsibility_acknowledgment` (bool).
+- Future fields on the case / owning entity: `case_for` (enum: self / child / dependent), `self_case` (bool), `client_id` (responsible Client, age 21+), `care_recipient_id` (linked Care Recipient).
+- Future audit fields capturing who accepted the offer, signed consent, and made payment (always the Client).
+- Row-level access must restrict Care Recipient data to the owning Client and authorized internal roles (Karen / Admin).
+
+> No SQL written, no schema modified by this note. See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
+
+---
+
+## 9. Self-check against ACCESS_CONTROL_V1 and AI_GUARDRAILS_V1
 
 | Requirement | Source | Status |
 |---|---|---|
