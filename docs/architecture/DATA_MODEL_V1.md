@@ -136,10 +136,11 @@ Access roles referenced: Client, Karen, Karen-AI-Assistant, Client-AI, Admin/Sup
 ### 2.13 Knowledge Entry
 - Purpose: a unit of the Center's knowledge base — Karen-approved materials/templates and patterns derived from real cases; used by Karen-AI-Assistant.
 - Data owner: Karen / the Center (methodology belongs to Karen and the Center).
-- Key fields: knowledge_entry_id; type (approved_recommendation / instruction / link / message_template / organizational_answer / extracted_pattern); content; approved_by_karen (bool); source (case-derived / manually_authored); version; created_at.
+- Key fields: knowledge_entry_id; type (approved_recommendation / instruction / link / message_template / organizational_answer / extracted_pattern); content; status (Draft / Karen Review / Karen Approved / Published / Archived); created_by (author); reviewed_by (Karen); approved_by_karen (Karen owns content/methodology approval); published_by_admin (Admin owns publication/visibility only); source (case-derived / manually_authored); version; created_at.
 - Relationships: referenced by AI Sessions and Messages (as approved material); patterns may be derived from Cases/Karen Reviews.
-- Access: Karen (author/approve); Karen-AI-Assistant (use approved entries only); Client-AI (use only approved client-facing materials); Admin (manage library); Client (sees only material sent to them, not the library).
+- Access: Karen (create / modify / approve / revoke — owner of methodology and content approval); Admin (publish / unpublish / archive / version / manage visibility and access — publication and technical governance only, never content approval); Karen-AI-Assistant (use approved entries only); Client-AI (use only approved client-facing materials); Client (sees only material sent to them, not the library).
 - Constraint: AI must not create new methodological rules as Center knowledge; only Karen-approved content becomes Knowledge.
+- Governance (canonical): Karen owns knowledge and methodology approval (create / modify / approve / revoke); Admin owns only publication, visibility, access, and versioning and must not approve methodology, clinical logic, or knowledge content. Lifecycle: Draft → Karen Review → Karen Approved → Published → Archived. Every approval, revocation, publication, and archival action is auditable.
 
 ### 2.14 Audit Log
 - Purpose: an immutable record of significant actions for accountability, safety, and legal defensibility (e.g., consent capture, offer acceptance, payment status changes, Karen publications, escalations, access events).
