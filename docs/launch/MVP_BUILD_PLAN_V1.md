@@ -303,4 +303,21 @@ These items are reflected in Payment Architecture, DATA_MODEL_V1, ACCESS_CONTROL
 
 See REFUND_POLICY_V1.md for the full canonical policy.
 
-End of MVP_BUILD_PLAN_V1.*
+## Field-level access enforcement (MVP-required — synchronized with FIELD_LEVEL_ACCESS_POLICY_V1)
+
+Per FIELD_LEVEL_ACCESS_POLICY_V1 (canonical for field-level access to sensitive data), the following are MVP-required and must be in place before real client data is persisted (they join the Phase 3 / "before the first paying client" gates). Documentation-only; no code, no SQL, no RLS implemented here.
+
+- Substance vs metadata separation — Support sees account/payment/ticket/technical and document delivery/technical state only; interpretable medical substance (document content, translations, summaries, case conclusions) and internal-only content (AI reasoning, Karen drafts/internal notes) are excluded from Support and Admin routine views.
+- Per-role field projection — every UI surface (Client cabinet, Karen, Support, Admin) must project only the fields that role may see; internal-only fields are never sent to the client.
+- Developer non-production isolation — developers do not access production medical data by default; any exceptional production access is approved, time-bound, and audited.
+- AI/System task-scoping — AI/System processes only what the current task requires and never decides cases or refunds; internal AI reasoning is internal-only.
+- Audit of sensitive access — access to and changes of sensitive fields (consent, payment/refund, red-flag, deletion, admin/support actions) are written to the immutable, append-only Audit Log; access to the Audit Log is controlled and itself audited.
+- No card/bank data — payment card/bank details are never stored in platform tables; only a processor reference is kept.
+- Care Recipient / age — a Care Recipient (under 21 / dependent) gets no independent access; the responsible adult Client (21+) sees own data and the Care Recipient data they are responsible for.
+- Legal review of field-level access (data-protection, medical-confidentiality, and the definition of "explicitly authorized" exceptional substance access) is a pre-production gate.
+
+These items are reflected in ACCESS_CONTROL_V1, DATA_MODEL_V1, SUPABASE_SCHEMA_V1 (future implications), and NEXTJS_STRUCTURE_V1.
+
+See FIELD_LEVEL_ACCESS_POLICY_V1.md for the full canonical policy.
+
+End of MVP_BUILD_PLAN_V1.
