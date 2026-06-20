@@ -273,4 +273,20 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
 
 ---
 
+## Data retention and deletion (MVP-required — synchronized with DATA_RETENTION_AND_DELETION_POLICY_V1)
+
+Per **DATA_RETENTION_AND_DELETION_POLICY_V1** (canonical for archive, deletion, account closure, and case closure), the following data retention and deletion items are **MVP-required and must be in place before real client data is persisted** (they join the Phase 3 / "before the first paying client" gates):
+
+- **Five-year archival rule** — cases become archived after 5 years of inactivity (hidden from active queues/work views, excluded from active operational views, recoverable by authorized staff). Archived ≠ deleted.
+- **Self-service deletion** — the authenticated adult Client can delete their account and data from the client cabinet (Account Management), gated by confirmation, consequence explanation, and a deletion reason; on confirmation the account, all cases (active and archived), questionnaires, and uploaded documents are deleted and access is revoked.
+- **Deletion audit** — every deletion is an audited event (actor, timestamp, reason) written to the immutable Audit Log, without retaining the deleted personal content.
+- **Account recreation rule** — deletion is final; a returning person creates a new account and starts new onboarding (no restoration or merge).
+- **Legal review of audit-log vs deletion conflict** — before persisting real client data, legal review must reconcile the immutable consent/Audit Log records with the obligation to remove personal data on deletion (the Audit Log must prove process integrity without defeating deletion of personal data). This supersedes the prior open note that consent retention is merely "to re-verify"; it is now a required pre-persistence gate.
+
+These items are reflected in DATA_MODEL_V1 (§10), ACCESS_CONTROL_V1 (§7), SUPABASE_SCHEMA_V1 (§10 future fields), and NEXTJS_STRUCTURE_V1 (§12). AI/methodology must not depend on retaining personally identifiable client data.
+
+See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
+
+---
+
 *End of MVP_BUILD_PLAN_V1.*
