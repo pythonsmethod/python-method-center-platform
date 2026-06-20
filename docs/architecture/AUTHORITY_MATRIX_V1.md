@@ -105,7 +105,13 @@ Legend per cell: **A**=Allowed, **P**=Propose (Karen/Admin approves), **C**=Conf
 | View messages | Own only | Read for navigation | Read for Karen | A | Tech context only | Oversight | Auto (serves) | – | View of case msgs: Yes |
 | Reply to client | Ask | Organizational/support only | P (draft) | A (case replies) | Technical replies | No | Auto (delivers) | Karen (case) / Support (tech) | Case reply: Yes |
 | Escalation to Karen | – | A (auto) | A (flag) | Receives | A | – | Auto (routes) | Karen | Yes |
-| Red flag escalation | – | A (auto: direct to emergency + reassure + mark critical) | A (flag) | Receives critical | A | – | Auto (raises priority) | Karen (accompaniment) | Yes |
+| Red flag — immediate AI client response | – | A (auto: respond now + advise urgent help + explain concern, no diagnosis) | A (flag) | – | – | – | Auto | Client safety | Yes |
+| Create red_flag_event | – | A (auto) | A (auto) | – | – | – | Auto (stores, append-only) | AI/System (record) | Yes |
+| Mark requires_immediate_review | – | A (auto, transient) | A (auto, transient) | – | – | – | Auto | AI/System (priority marker only) | Yes |
+| Red flag — physical/medical routing | – | A (auto: notify) | A (flag) | **Receives + owns case decision** | – | – | Auto (routes to Karen) | Karen | Yes |
+| Red flag — psychological/crisis routing | – | A (auto: notify) | A (flag) | – | **Receives + responds** | – | Auto (routes to Anna/Support) | Anna/Support (crisis response) | Yes |
+| Assign case_urgency | No | No | No | **A** | No | No | Auto (applies) | Karen | Yes |
+| Change support route | No | No | No | **A** | No | No | Auto (applies) | Karen | Yes |
 | Create Karen Review | No | No | P (draft material) | A | No | No | Auto (stores) | Karen | Yes |
 | Change case status | No | No | No | A | No | No | Auto (applies) | Karen | Yes |
 | Create Knowledge Entry | No | No | P (draft) | Propose | Propose | Propose | Auto (stores draft) | Admin (approval) | Yes |
@@ -126,7 +132,7 @@ Legend per cell: **A**=Allowed, **P**=Propose (Karen/Admin approves), **C**=Conf
 - **Consent integrity:** consent is recorded by the System and anchored in the **Audit Log** as the canonical, immutable source; no role creates an independent or overriding consent record.
 - **Immutability of the Audit Log:** no role — not even Admin — edits or deletes Audit Log entries; Admin only controls *access*, which is itself audited.
 - **Governance separation:** legal texts and AI guardrails change only through Admin governance, never by Karen, Support, or AI acting alone.
-- **Emergency primacy:** red-flag handling is automatic and overrides normal flow; AI directs to emergency help, reassures, and marks critical for Karen — Karen accompanies but never replaces emergency services.
+- **Emergency primacy (dual routing):** red-flag handling is automatic and overrides normal flow. AI responds immediately, advises urgent professional help, explains the concern without diagnosis, creates a red_flag_event, and notifies the responsible human — **Karen for physical/medical**, **Anna/Support for psychological/crisis** (RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1). `requires_immediate_review` is a transient priority marker only; **only Karen** assigns durable `case_urgency`, changes `case_status`, or changes the support route. Notified humans accompany but never replace emergency services.
 - **No guessing:** wherever data is insufficient, the responsible AI says "I don't know" and escalates; it never fabricates values or decisions.
 
 ---
