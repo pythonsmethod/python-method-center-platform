@@ -45,7 +45,7 @@ Active data remains active until either the case is completed and becomes inacti
 
 A completed case is one where the active work is finished but the record is retained. Completion is a case-closure event (§23), not a deletion event.
 
-Because **one person = one account = one permanent case**, a completed case continues to belong to the account. The client keeps access to their historical record in the cabinet, and Karen retains full visibility of the historical support record so that a returning client is met with continuity rather than a blank slate (§13).
+Because **one person = one account = one continuous case**, a completed case continues to belong to the account. The client keeps access to their historical record in the cabinet, and Karen retains full visibility of the historical support record so that a returning client is met with continuity rather than a blank slate (§13).
 
 A completed case stays retained and visible until inactivity triggers archival (§6) or the client deletes the account (§7).
 
@@ -136,7 +136,7 @@ Archival status does not protect data from deletion — archived cases are delet
 
 Deletion is final. If the person returns later, **they create a new account and start a new onboarding process.**
 
-There is no restoration of a deleted account, no merging of a new account with a previously deleted one, and no recovery of previously deleted cases, questionnaires, or documents. A returning person is treated as a new client: new account, new permanent case, new onboarding, fresh consent.
+There is no restoration of a deleted account, no merging of a new account with a previously deleted one, and no recovery of previously deleted cases, questionnaires, or documents. A returning person is treated as a new client: new account, new continuous case, new onboarding, fresh consent.
 
 This is the deliberate consequence of honoring the deletion right: the platform does not secretly retain a shadow copy to "welcome back" a deleted client.
 
