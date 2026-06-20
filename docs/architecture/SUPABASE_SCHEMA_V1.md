@@ -30,7 +30,7 @@
 
 ---
 
-## 3. Tables (14 entities)
+## 3. Tables (14 entities + 1 required future entity)
 
 ### 3.1 client
 | Field | Type | Notes |
@@ -213,6 +213,34 @@
 
 ---
 
+### 3.15 red_flag_event (required future entity — not yet implemented)
+
+> **No SQL and no schema implementation here.** This documents a **required future entity** mandated by RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1 (canonical) and tracked in DATA_MODEL_TO_SUPABASE_MAPPING_V1. The table does not exist yet; the protocol makes it MVP-required. Created by AI/System; **append-only and immutable**.
+
+| Field | Type | Notes |
+|---|---|---|
+| id | uuid PK | |
+| case_id | uuid FK → case.id | event belongs to a case |
+| message_id | uuid FK → message.id | triggering message (nullable) |
+| detected_by | enum | client_facing_ai / system |
+| category | enum | physical_medical / psychological_crisis |
+| signals | jsonb | brief non-diagnostic observation only (no diagnosis/treatment) |
+| confidence | confidence_level enum | detection confidence, never medical certainty |
+| **requires_immediate_review** | boolean | transient priority marker; **NOT** durable case urgency/status |
+| **routing_target** | enum | karen (physical/medical) / support (psychological/crisis) |
+| **notification_status** | enum | pending / sent / acknowledged |
+| notified_at | timestamptz | when notification was emitted |
+| client_response_sent | boolean | whether immediate AI safety response was delivered |
+| created_at | timestamptz | append-only; event is immutable |
+| created_by | uuid | actor reference (AI/System) |
+
+- **Append-only.** Never edited to express a case decision; corrections are new events, not mutations.
+- **requires_immediate_review lives only on the event.** It must never be written into `case.case_urgency` or `case.case_status` by AI/System. **Only Karen** sets durable `case_urgency` / `case_status` / support route.
+- **routing_target** is mechanical: physical/medical → Karen, psychological/crisis → Support/Anna.
+- The event references the case but does **not** own or alter case state.
+
+---
+
 ## 4. Enums / status types
 
 - **client_status:** active, inactive
@@ -231,6 +259,10 @@
 - **ticket_status:** open, in_progress, resolved
 - **knowledge_status:** draft, approved, archived
 - **actor_role:** client, ai, karen, support, admin, system
+- **red_flag_category:** physical_medical, psychological_crisis _(required future entity — RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1)_
+- **red_flag_detected_by:** client_facing_ai, system _(required future)_
+- **red_flag_routing_target:** karen, support _(required future)_
+- **red_flag_notification_status:** pending, sent, acknowledged _(required future)_
 
 ---
 
