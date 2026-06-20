@@ -248,7 +248,7 @@ Cross-cutting:
 No hard contradictions with the Constitution were found. The following are tensions/decisions to confirm before physical modeling (not blockers):
 
 1. Subscription vs Case Period overlap: at MVP both represent the same bounded entitlement. Two entities were requested, so both are kept, but they are near-1:1. Decide whether to keep them separate (future recurring billing) or merge later. Flagged, not resolved here.
-2. Assessment cardinality: the free assessment is "one-time per client", but a permanent case may see future product changes. Modeled as one free Assessment per client; confirm whether any repeat orientational assessment is ever allowed.
+2. Assessment cardinality: the free assessment is "one-time per client", but a single continuous case may see future product changes. Modeled as one free Assessment per client; confirm whether any repeat orientational assessment is ever allowed.
 3. Message vs Support Ticket: the docs describe a single "обращение" system. Here Support Ticket is the thread and Message is the unit; case_question tickets route to Karen, technical to Support. Confirm this two-level split matches the intended single-window UX (it is a data split, not a UX split).
 4. Audit Log and client rights: the offer/privacy terms govern retention and deletion. The model keeps history indefinitely by default; confirm deletion/retention rules from the offer before physical design.
 5. Consent storage location: consent is referenced on Payment and in Audit Log and onboarding; confirm the canonical consent record so it is not duplicated inconsistently.
