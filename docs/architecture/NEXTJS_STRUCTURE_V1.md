@@ -335,3 +335,16 @@ No AI surface (client-facing AI or Karen-assistant AI) may present, approve, den
 Any refund handler (e.g. /api/account/refund or a billing/refund support route, conceptual) validates the requester, routes to the authorized human process, and only executes an already-authorized refund server-side, writing the audit row. The UI never performs a refund decision or execution client-side.
 
 See REFUND_POLICY_V1.md for the full canonical policy.
+
+## 14. Field-level access in UI surfaces (synchronized with FIELD_LEVEL_ACCESS_POLICY_V1)
+
+FIELD_LEVEL_ACCESS_POLICY_V1 is the canonical source of truth for field-level access to sensitive data. The application structure must project, per role and per field, only the data that role may see; internal-only fields are never sent to the client. No code is written here; routes/handlers are described conceptually.
+
+- Per-role projections: server components and the service layer must select only the fields a given surface may show. The Client cabinet ((client)/cabinet/*) exposes only the Client's own fields and the Care Recipient data they are responsible for; it never sends internal-only content (raw AI reasoning, Karen drafts/internal notes, raw confidence, raw red-flag event records, processor_ref, Audit Log internals).
+- Karen workspace ((karen)/*) surfaces case-scoped medical substance (document content, translations, summaries with confidence), case messages, and the Karen Review authoring surface (drafts, internal notes, final conclusions); payment is status-only.
+- Support workspace ((support)/*) surfaces account/payment/ticket/technical and document delivery/technical state only — never medical substance unless explicitly authorized and audited.
+- Admin panel ((admin)/*) surfaces governance fields (access, knowledge publication/visibility, legal/guardrail config, Audit Log read + access grants) and excludes routine medical substance; Admin can never edit/delete the Audit Log.
+- Public ((public)/*) surfaces only L0 public content and never any private field.
+- AI gateways (/api/ai/*) are scoped to task-needed fields; internal-only AI output is never returned to the client; AI never decides cases or refunds.
+
+See FIELD_LEVEL_ACCESS_POLICY_V1.md for the full canonical policy and the complete field-level access matrix.
