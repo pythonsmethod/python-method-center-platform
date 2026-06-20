@@ -61,11 +61,11 @@ This document does **not** rely on any old project or Telegram logic. It is web-
 - **Audited actions:** none on its own; the Karen Review built on its proposals is audited.
 
 ### 2.4 Karen
-- **Can:** review cases; create Karen Reviews; make recommendations/conclusions; set/change case status; set case urgency/criticality; approve or reject AI drafts; answer case questions; approve renewals/route changes; authorize a manual repeat assessment.
+- **Can:** review cases; create Karen Reviews; make recommendations/conclusions; set/change case status; set case urgency/criticality; approve or reject AI drafts; answer case questions; approve renewals/route changes; authorize a manual repeat assessment; **create, modify, approve, and revoke Knowledge Entries; approve methodology and clinical-logic changes** (Karen owns knowledge/methodology approval).
 - **Cannot:** replace emergency services; change legal texts or AI guardrails alone (governance change); issue refunds as a payment operation (that is Support/Admin) though Karen may decide a refund is warranted.
-- **Decisions it owns:** all case decisions, urgency, significance of new data, case status.
+- **Decisions it owns:** all case decisions, urgency, significance of new data, case status; **approval of knowledge content and methodology** (the substance of Knowledge Entries).
 - **Needs confirmation from:** Admin/Support for the operational execution of payment refunds.
-- **Audited actions:** Karen Reviews, status changes, urgency setting, case answers, route changes.
+- **Audited actions:** Karen Reviews, status changes, urgency setting, case answers, route changes; **knowledge approvals and revocations, methodology approvals.**
 
 ### 2.5 Support / Anna
 - **Can:** resolve payment/login/upload/technical issues; handle non-standard payment situations; execute refunds (operationally); assist registration; block/unblock a user for technical/abuse reasons (per policy).
@@ -75,11 +75,11 @@ This document does **not** rely on any old project or Telegram logic. It is web-
 - **Audited actions:** refunds, user blocks, account-affecting actions.
 
 ### 2.6 Admin
-- **Can:** govern the platform; approve Knowledge Entries; change legal texts (Offer/legal) through governance; change AI guardrails through governance; configure access; grant/revoke Audit Log access; oversee blocks.
-- **Cannot:** make case decisions for Karen; silently edit or delete the Audit Log (it is immutable); fabricate consent.
-- **Decisions it owns:** governance — legal texts, guardrails, knowledge approval, access control.
+- **Can:** govern the platform; **publish, unpublish, archive, and version Knowledge Entries; manage their visibility and access** (publication/technical governance only); change legal texts (Offer/legal) through governance; change AI guardrails through governance; configure access; grant/revoke Audit Log access; oversee blocks.
+- **Cannot:** **approve methodology, clinical logic, or knowledge content** (that authority belongs to Karen); make case decisions for Karen; silently edit or delete the Audit Log (it is immutable); fabricate consent.
+- **Decisions it owns:** governance — legal texts, guardrails, knowledge publication and visibility, access control. **Knowledge approval is not Admin-owned; it belongs to Karen.**
 - **Needs confirmation from:** appropriate governance/legal review for legal-text and guardrail changes.
-- **Audited actions:** legal-text changes, guardrail changes, knowledge approvals, access/permission changes, Audit Log access grants.
+- **Audited actions:** legal-text changes, guardrail changes, knowledge publication/unpublication/archival/versioning, access/permission changes, Audit Log access grants.
 
 ### 2.7 System
 - **Can:** execute mechanical actions once preconditions are met — record consent, store uploads, start a case period after valid payment, write Audit Log entries, surface statuses.
@@ -114,8 +114,9 @@ Legend per cell: **A**=Allowed, **P**=Propose (Karen/Admin approves), **C**=Conf
 | Change support route | No | No | No | **A** | No | No | Auto (applies) | Karen | Yes |
 | Create Karen Review | No | No | P (draft material) | A | No | No | Auto (stores) | Karen | Yes |
 | Change case status | No | No | No | A | No | No | Auto (applies) | Karen | Yes |
-| Create Knowledge Entry | No | No | P (draft) | Propose | Propose | Propose | Auto (stores draft) | Admin (approval) | Yes |
-| Approve Knowledge Entry | No | No | No | No | No | A | Auto (publishes) | Admin | Yes |
+| Create / modify Knowledge Entry | No | No | P (draft) | **A** | Propose | Propose | Auto (stores) | Karen | Yes |
+| Publish / unpublish / archive / version Knowledge Entry; manage visibility/access | No | No | No | No | No | **A** | Auto (applies) | Admin | Yes |
+| Approve / revoke Knowledge Entry (methodology + content) | No | No | No | **A** | No | No | Auto (records) | Karen | Yes |
 | Payment | A | No | No | No | Assist/non-standard | No | Auto (processes) | Client | Yes |
 | Refund of payment | Request | No | No | Decide warranted | Execute | Oversee | Auto (processes) | Karen decides / Support executes | Yes |
 | Technical support | Request | No | No | No | A | Oversight | Auto (logs) | Support | Account-affecting: Yes |
@@ -132,6 +133,7 @@ Legend per cell: **A**=Allowed, **P**=Propose (Karen/Admin approves), **C**=Conf
 - **Consent integrity:** consent is recorded by the System and anchored in the **Audit Log** as the canonical, immutable source; no role creates an independent or overriding consent record.
 - **Immutability of the Audit Log:** no role — not even Admin — edits or deletes Audit Log entries; Admin only controls *access*, which is itself audited.
 - **Governance separation:** legal texts and AI guardrails change only through Admin governance, never by Karen, Support, or AI acting alone.
+- **Knowledge governance separation:** **Karen** owns knowledge and methodology approval — create, modify, approve, and revoke Knowledge Entries and approve methodology/clinical-logic changes. **Admin** owns only publication, visibility, access, versioning, and technical governance (publish, unpublish, archive, version) and **must not** approve methodology, clinical logic, or knowledge content. Knowledge lifecycle: Draft → Karen Review → Karen Approved → Published → Archived. Every approval, revocation, publication, and archival action is audited.
 - **Emergency primacy (dual routing):** red-flag handling is automatic and overrides normal flow. AI responds immediately, advises urgent professional help, explains the concern without diagnosis, creates a red_flag_event, and notifies the responsible human — **Karen for physical/medical**, **Anna/Support for psychological/crisis** (RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1). `requires_immediate_review` is a transient priority marker only; **only Karen** assigns durable `case_urgency`, changes `case_status`, or changes the support route. Notified humans accompany but never replace emergency services.
 - **No guessing:** wherever data is insufficient, the responsible AI says "I don't know" and escalates; it never fabricates values or decisions.
 
@@ -151,6 +153,7 @@ Legend per cell: **A**=Allowed, **P**=Propose (Karen/Admin approves), **C**=Conf
 | Human override always available | AI_GUARDRAILS_V1 | **HELD** — Karen/Support/Admin override AI; AI overrides no human |
 | Governance of legal/guardrails is controlled | Constitution / Admin Arch | **HELD** — Admin-only, audited |
 | Audit Log access is controlled and recorded | DATA_MODEL_V1 | **HELD** — access grants audited; System writes only |
+| Knowledge/methodology approval owned by Karen; Admin only publishes/manages | Constitution / CANONICAL_LIFECYCLE_STATUS_MODEL_V1 | **HELD** — §2.4/§2.6 + matrix; Admin cannot approve content |
 
 **No contradictions found** with the Constitution or AI_GUARDRAILS_V1. The document is architectural only — no code, SQL, or runtime logic.
 
