@@ -214,3 +214,36 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
 **No contradictions found** with the Constitution, AI_GUARDRAILS_V1, or AUTHORITY_MATRIX_V1. The document is architectural only — no code, SQL, Supabase RLS, or runtime logic.
 
 After this document, the platform's access model is defined and consistent with the authority matrix, the guardrails, the data model, and the safety protocol.
+
+---
+
+## 7. Data retention and deletion access rules (synchronized with DATA_RETENTION_AND_DELETION_POLICY_V1)
+
+DATA_RETENTION_AND_DELETION_POLICY_V1 is the canonical source of truth for archive, deletion, account closure, and case closure. The access rules below extend §3 and the Access Matrix; where any earlier wording conflicts, the policy governs.
+
+### 7.1 Who may initiate deletion
+
+- **Only the authenticated adult Client** (the account owner, age 21+ per AGE_AND_CARE_RECIPIENT_POLICY_V1) may initiate self-service deletion of their own account and data. A Client may delete only their own account; they can never delete another client's data.
+- A Care Recipient is not an account holder and can never initiate deletion.
+- **Support/Admin may assist** a client (e.g. explain the flow, troubleshoot) but must **not delete client data without an explicit authorized process**. Support/Admin do not silently delete accounts or cases on a client's behalf; any staff-side removal follows an authorized, audited process and never substitutes for the client's own confirmed self-service deletion.
+
+### 7.2 Deletion flow must be audited
+
+The deletion flow is an access-sensitive action and must be audited. The Audit Log records that a deletion occurred, when, the actor, and the deletion reason — without retaining the deleted personal content. Audit Log remains immutable and append-only; the deletion-event record is the only durable trace.
+
+### 7.3 Access is revoked after deletion
+
+After confirmed deletion, **access is revoked**: the account no longer authenticates, and all client-scoped reads/writes for that account cease. Karen and staff lose access to the deleted client's historical record, because the record no longer exists. The client's deletion right takes priority over retaining a case for organizational history.
+
+### 7.4 Archive does not remove authorized access
+
+**Archive only hides a case from active views; it does not remove authorized access.** Archived cases (after 5 years of inactivity) are excluded from active operational queues and active work views but remain **recoverable by authorized staff**. Recovery from archive is an authorized, audited action governed by these access rules. Archival never deletes data and never, by itself, revokes a client's deletion right over the archived case.
+
+### 7.5 Access Matrix addenda
+
+- **Client — Account/Case (own):** add **D = self-service delete** (own account + all own cases, questionnaires, uploads; confirmation + reason required; audited). Client delete remains own-records only.
+- **Support/Anna:** assist with deletion only; **no delete of client case data** outside an explicit authorized, audited process.
+- **Karen / authorized staff:** **recover** archived cases (read/restore from archive); archival visibility change is staff-scoped and audited; no override of a confirmed client deletion.
+- **System:** executes the deletion cascade deterministically once the client confirms; writes the deletion-event audit row; never deletes the Audit Log itself.
+
+See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
