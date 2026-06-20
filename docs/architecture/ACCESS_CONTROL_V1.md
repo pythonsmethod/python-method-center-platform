@@ -247,3 +247,28 @@ After confirmed deletion, **access is revoked**: the account no longer authentic
 - **System:** executes the deletion cascade deterministically once the client confirms; writes the deletion-event audit row; never deletes the Audit Log itself.
 
 See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
+
+
+## 8. Refund access rules (synchronized with REFUND_POLICY_V1)
+
+REFUND_POLICY_V1 is the canonical source of truth for refund/payment-refund access. These rules extend §3 and the Access Matrix; where any earlier wording conflicts, the policy governs. No final legal wording here; refund terms are Offer/legal-review-bound.
+
+8.1 Client — view only
+- The Client may view their own payment and refund status (payment history, current status, and the status of any refund-exception request). The Client may request a refund but can never approve, grant, or self-execute one.
+
+8.2 AI cannot approve or refuse refunds
+- Client-facing AI and Karen-assistant AI cannot approve or refuse a refund, and cannot promise, estimate, or imply a refund outcome. AI may only recognize a billing/refund request and escalate it to the authorized human (Support/Admin) process. Any refund-related AI output is non-authoritative and logged as an escalation, never as a decision.
+
+8.3 Support/Admin process only authorized refund exceptions
+- Support/Admin (Anna at MVP) may process and execute a refund only as an authorized exception under the Offer, after the human/admin/legal refund-exception decision is made. Support/Admin do not grant standard refunds (there are none) and do not act outside the authorized Offer-based process. Karen may supply case context but does not own or execute the refund-exception decision.
+
+8.4 Refund actions require audit logging
+- Every refund-relevant action is audit-logged (append-only): the request/signal, the human review, the authorized decision with actor and Offer basis, and the executed status change. System may only execute an already-authorized refund and writes the audit record; it never decides. Access to refund actions follows least privilege.
+
+8.5 Access Matrix addendum
+- Client — Payment/Refund (own): R = view payment and refund status; request refund (no approve/execute).
+- Support/Admin — Refund: process/execute only an authorized exception; audited.
+- Karen — Refund: context only; no execution, no ownership of the decision.
+- AI/System — Refund: AI escalates only; System executes an authorized refund and writes audit; neither decides.
+
+See REFUND_POLICY_V1.md for the full canonical policy.
