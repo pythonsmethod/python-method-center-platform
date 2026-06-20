@@ -272,3 +272,15 @@ REFUND_POLICY_V1 is the canonical source of truth for refund/payment-refund acce
 - AI/System — Refund: AI escalates only; System executes an authorized refund and writes audit; neither decides.
 
 See REFUND_POLICY_V1.md for the full canonical policy.
+
+## 9. Field-level access (synchronized with FIELD_LEVEL_ACCESS_POLICY_V1)
+
+FIELD_LEVEL_ACCESS_POLICY_V1 is the canonical source of truth for field-level access to sensitive data. It refines the role-level access in this document down to individual fields and field groups. Where any earlier wording conflicts, the field-level policy governs for per-field decisions. No code, no SQL, no RLS here.
+
+- Support excludes medical substance by default. Support sees account/payment/ticket/technical and document delivery/technical state only; interpretable medical content (file content, translations, extracted summaries, case conclusions) is not visible to Support unless explicitly authorized and audited.
+- Admin governs access but does not get routine medical substance. Admin manages access, configuration, knowledge publication, and Audit Log access grants; the default Admin view excludes medical substance, and Admin can never edit/delete the Audit Log.
+- Substance vs metadata are separated. Operational/technical/delivery metadata is treated separately from L3 medical substance and L4 internal-only content (AI internal reasoning, Karen drafts/internal notes), so seeing one never implies seeing the other.
+- Developers are isolated from production medical data by default; AI/System is task-scoped and never decides; Public/Visitor sees no private field; the Client sees own data and the Care Recipient data they are responsible for; a Care Recipient (under 21 / dependent) gets no independent access.
+- Field sensitivity levels L0-L6 and the full field-level access matrix (identity, Care Recipient, medical documents, questionnaire, messages, Karen review, AI session, red-flag events, payment/refund, audit, delivery/shipping) live in FIELD_LEVEL_ACCESS_POLICY_V1.
+
+See FIELD_LEVEL_ACCESS_POLICY_V1.md for the full canonical policy.
