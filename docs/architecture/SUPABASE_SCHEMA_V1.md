@@ -191,11 +191,16 @@
 | id | uuid PK | |
 | title | text | |
 | body | text | |
-| status | knowledge_status enum | draft / approved / archived |
-| approved_by | uuid | Admin (approval authority) |
-| + audit fields | | |
+| status | knowledge_status enum | draft / approved / archived (lifecycle below) |
+| created_by | uuid | author (Karen; may be drafted via AI/Support proposal) |
+| reviewed_by | uuid | Karen reviewer (required future ownership field) |
+| approved_by_karen | uuid | **Karen** — owner of methodology/content approval (required future field) |
+| published_by_admin | uuid | **Admin** — publication/visibility only, not approval (required future field) |
+| + audit fields | | created_at / updated_at / archived_at / archived_by |
 
-- **RLS implication:** clients/AI read only `approved`; Admin approves; drafts may be proposed by Karen/Support/AI.
+- **Knowledge governance (canonical):** **Karen** owns create / modify / approve / revoke of knowledge content and methodology; **Admin** owns only publication, visibility, access, and versioning. Admin must not approve methodology, clinical logic, or knowledge content.
+- **Knowledge lifecycle:** Draft → Karen Review → Karen Approved → Published → Archived. (The current `knowledge_status` enum collapses this to draft/approved/archived; the richer lifecycle and the ownership fields above are documented as required future schema additions — no SQL here.)
+- **RLS implication:** clients/AI read only `approved`/`published`; **Karen approves content** (drafts may be proposed by Karen/Support/AI); **Admin publishes/unpublishes/archives/versions and manages visibility** but never approves content. Every approval, revocation, publication, and archival action emits an `audit_log` row.
 
 ### 3.14 audit_log
 | Field | Type | Notes |
@@ -287,7 +292,7 @@ Every mutable table carries `created_at / updated_at / created_by / updated_by`;
 - **Tenant isolation:** client-owned tables are scoped to `auth.uid() = client.auth_user_id` (described conceptually; no RLS policy is written here).
 - **Karen scope:** case-scoped read/write on case-related tables; payment status-only.
 - **Support scope:** account/payment/ticket/technical state; no case substance.
-- **Admin scope:** governance tables + Audit Log read/grant; cannot mutate Audit Log.
+- **Admin scope:** governance tables + Audit Log read/grant; cannot mutate Audit Log; for `knowledge_entry`, Admin publishes/unpublishes/archives/versions and manages visibility but does **not** approve content (Karen approves).
 - **AI scope:** client-facing AI → navigation/status + approved knowledge; Karen-assistant AI → case material read + propose; neither writes decisions; neither edits Audit Log.
 - **System:** sole writer of Audit Log; deterministic mechanical writes.
 
@@ -306,7 +311,7 @@ Every mutable table carries `created_at / updated_at / created_by / updated_by`;
 | Case Period separate from Subscription | DATA_MODEL_OPEN_DECISIONS_V1 | **HELD** — distinct tables, FK link only |
 | Message separate from Support Ticket | DATA_MODEL_OPEN_DECISIONS_V1 | **HELD** — separate tables |
 | Assessment one-time; repeat manual | DATA_MODEL_OPEN_DECISIONS_V1 | **HELD** — is_repeat + authorized_by |
-| Knowledge approved-only visible; Admin approves | ACCESS_CONTROL_V1 | **HELD** — knowledge_status + approved_by |
+| Knowledge approved-only visible; **Karen approves content**, Admin publishes/manages only | ACCESS_CONTROL_V1 / CANONICAL_LIFECYCLE_STATUS_MODEL_V1 | **HELD** — knowledge_status + approved_by_karen / published_by_admin |
 | Document deletion = archival, Karen-confirmed, audited | ACCESS_CONTROL_V1 | **HELD** — archived_at, audited |
 | Red-flag priority path | Safety Protocol / AI_GUARDRAILS_V1 | **HELD** — is_red_flag + urgency index |
 | Auth identity separate from domain data | ACCESS_CONTROL_V1 | **HELD** — auth.users vs public tables |
