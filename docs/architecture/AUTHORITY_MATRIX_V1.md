@@ -139,7 +139,25 @@ Legend per cell: **A**=Allowed, **P**=Propose (Karen/Admin approves), **C**=Conf
 
 ---
 
-## 5. Self-check against the Constitution and AI_GUARDRAILS_V1
+## 5. Age policy and Client / Care Recipient authority
+
+Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, responsibility authority is held by the adult Client, not the Care Recipient:
+
+| Actor | Authority |
+| --- | --- |
+| Client (age 21+) | register; accept offer; sign consent; make payment; communicate as responsible client; assert parent / legal guardian / authorized representative |
+| Care Recipient (any age) | none — subject of support only; never a responsible decision-maker |
+| AI / System | must never treat a minor as the responsible decision-maker; route all responsibility-bearing interactions to the adult Client |
+| Karen | remains single source of all case decisions (unchanged) |
+
+- A person under 21 cannot independently register, create a case, accept the offer, sign consent, purchase support, or communicate as the responsible Client.
+- All decisions, consent, payment, and communication responsibility remain with the adult Client.
+
+See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
+
+---
+
+## 6. Self-check against the Constitution and AI_GUARDRAILS_V1
 
 | Principle | Source | Status |
 |---|---|---|
