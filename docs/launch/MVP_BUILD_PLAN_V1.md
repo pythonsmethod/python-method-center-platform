@@ -233,7 +233,21 @@ Login → Admin area → manage users/operational settings within authority → 
 
 ---
 
-## 10. Self-check
+## 10. Age policy and Care Recipient (MVP-required)
+
+Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, the following are **MVP-required and not deferred**:
+
+- The **21+ age gate** for independent registration / acting as the responsible Client.
+- The onboarding **“Who is this case for?”** question (Myself / My child / Dependent) and the conditional **Care Recipient form**.
+- The **Client vs Care Recipient** data separation and the Case link (`case_for`, `self_case`, Client owns account / consent / payment / responsibility).
+- Enforcement that a minor (or person under another responsibility) is never treated as the responsible decision-maker; support is provided only through an adult responsible Client.
+- Auditable consent, offer-acceptance, payment, and responsibility-acknowledgment actions by the Client.
+
+See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
+
+---
+
+## 11. Self-check
 
 **Against the Constitution**
 - No oncology/medical claims, no diagnosis, no treatment, no result/remission guarantees anywhere in the plan. ✔
