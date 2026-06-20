@@ -44,7 +44,7 @@
 | status | client_status enum | active / inactive |
 | + audit fields | | |
 
-- **Relationships:** 1:1 with account; 1:1 with one permanent case (one person = one account = one case).
+- **Relationships:** 1:1 with account; 1:1 with one continuous case (one person = one account = one continuous case; archivable / deletable per DATA_RETENTION_AND_DELETION_POLICY_V1).
 - **Access/RLS implication:** a client row is readable/updatable only by its own `auth_user_id`; Karen/Support/Admin read per scope. No cross-client read.
 
 ### 3.2 account
@@ -61,7 +61,7 @@
 | Field | Type | Notes |
 |---|---|---|
 | id | uuid PK | |
-| client_id | uuid FK → client.id | unique (one permanent case) |
+| client_id | uuid FK → client.id | unique (one continuous case per person) |
 | status | case_status enum | intake / under_review / active / paused / closed |
 | urgency | case_urgency enum | normal / elevated / critical (set by Karen) |
 | + audit fields | | |
