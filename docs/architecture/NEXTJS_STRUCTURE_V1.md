@@ -64,12 +64,14 @@ Payment and legal surfaces live partly in `(public)` (legal, pricing) and partly
 
 ### 3.4 Karen workspace routes — `(karen)` (requires Karen role)
 - `/karen` — case queue (critical/red-flag at top)
+- `/karen/urgent` — **Karen urgent review queue**: physical/medical red_flag_events with `requires_immediate_review` at top; Karen-only. Karen alone assigns durable `case_urgency` / `case_status` / support route from here (RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1).
 - `/karen/case/[caseId]` — two-window view: client window + Karen-assistant AI window
 - `/karen/case/[caseId]/review` — create Karen Review (decision)
 - `/karen/case/[caseId]/documents` — case documents (read for case work)
 
 ### 3.5 Support/Anna workspace routes — `(support)` (requires Support role)
 - `/support` — ticket queue
+- `/support/crisis` — **Anna/Support crisis queue**: psychological/crisis red_flag_events routed to support; Support-only. Support responds to crisis routing but makes **no** case-level decisions and sets **no** durable urgency/status/route (Karen-only).
 - `/support/tickets/[ticketId]` — technical/organizational handling
 - `/support/payments` — payment/refund operations
 - `/support/accounts` — account status / block per policy
@@ -135,7 +137,7 @@ Route handlers validate role server-side and emit Audit Log events for sensitive
 
 ## 7. Error and red-flag UX boundaries
 - **Error UX:** `error.tsx` / `not-found.tsx` per route group; errors never leak privileged data or other-tenant content.
-- **Red-flag UX:** a red-flag detected in any client message triggers (automatically) an emergency-guidance surface that directs the client to emergency help without softening, reassures that the center is near, and marks the case critical for Karen. This path is always reachable, is never blocked by paywalls or onboarding state, and is audited (per AI_GUARDRAILS_V1 / Safety Protocol).
+- **Red-flag UX (dual routing):** a red-flag detected in any client message triggers (automatically) an emergency-guidance surface that responds immediately, advises urgent professional help, briefly explains the concern (no diagnosis), and confirms the message reached the responsible human team. The system creates a red_flag_event and routes it: **physical/medical → Karen urgent review queue (`/karen/urgent`)**, **psychological/crisis → Anna/Support crisis queue (`/support/crisis`)**. `requires_immediate_review` is a transient priority marker; **only Karen** sets durable case urgency/status/route. This path is always reachable, is never blocked by paywalls or onboarding state, and is audited (per AI_GUARDRAILS_V1 / RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1).
 
 ---
 
@@ -222,8 +224,8 @@ middleware.ts
 | `/cabinet`, onboarding, case, documents, messages, billing, ai | No | Yes | – | – | – | – | – |
 | `/cabinet/assessment`, active accompaniment messaging | No | Yes | Yes (active) | – | – | – | – |
 | `/cabinet/billing/checkout` | No | Yes | – | – | – | – | – |
-| `/karen/*` | No | – | – | Yes | – | – | – |
-| `/support/*` | No | – | – | – | Yes | – | – |
+| `/karen/*` (incl. `/karen/urgent`) | No | – | – | Yes | – | – | – |
+| `/support/*` (incl. `/support/crisis`) | No | – | – | – | Yes | – | – |
 | `/admin/*` | No | – | – | – | – | Yes | – |
 | `/admin/audit` (read+grant) | No | – | – | scoped read | scoped read | Yes | – |
 | `/api/webhooks/stripe`, `/api/auth/callback` | – | – | – | – | – | – | Yes |
