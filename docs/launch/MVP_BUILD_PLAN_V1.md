@@ -41,6 +41,7 @@ This plan does not introduce architecture decisions. It sequences decisions alre
 - Two paid products: Support 5 weeks and Support 15 weeks.
 - Payment flow for the two paid products.
 - Karen workspace: case review, status, red-flag handling, Karen Review records.
+- **Red-flag event workflow (MVP-required, not deferred):** immediate AI client response, red_flag_event creation, and dual human routing — **physical/medical → Karen**, **psychological/crisis → Anna/Support** (RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1). Includes a Karen urgent review queue and an Anna/Support crisis queue. `requires_immediate_review` is a transient marker; only Karen sets durable case urgency/status/route.
 - Support/Anna workspace (admin/support combined at MVP level).
 - Guarded AI interaction (client-facing AI + Karen-assistant AI) within AI_GUARDRAILS_V1 boundaries.
 - Audit Log for all consent, case-status, escalation, and access-sensitive actions.
@@ -165,15 +166,15 @@ This plan does not introduce architecture decisions. It sequences decisions alre
 
 ### Phase 7 — Karen workspace
 - **Goal:** Give Karen the single decision surface for cases.
-- **Result:** Case review, status changes, red-flag handling, Karen Review records.
-- **Input documents:** AUTHORITY_MATRIX_V1, AI_GUARDRAILS_V1, Safety Protocol, ACCESS_CONTROL_V1.
+- **Result:** Case review, status changes, red-flag handling, Karen Review records, and a **Karen urgent review queue** (`/karen/urgent`) surfacing physical/medical red_flag_events.
+- **Input documents:** AUTHORITY_MATRIX_V1, AI_GUARDRAILS_V1, RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1, Safety Protocol, ACCESS_CONTROL_V1.
 - **Can do:** Karen views cases, sets status/urgency, creates Karen Reviews, handles escalations.
 - **Cannot do:** Let AI decide for Karen; let Support/Admin make case decisions.
-- **Done criterion:** Karen is the single source of case decisions; urgency/criticality set only by Karen; all decisions audited.
+- **Done criterion:** Karen is the single source of case decisions; urgency/criticality set only by Karen; physical/medical red_flag_events route to the Karen urgent queue; all decisions audited.
 
 ### Phase 8 — Support / Admin MVP
 - **Goal:** Provide Support/Anna operational tools at MVP level.
-- **Result:** Support workspace (Anna = admin/support at MVP), tickets, user assistance, limited admin.
+- **Result:** Support workspace (Anna = admin/support at MVP), tickets, user assistance, limited admin, and an **Anna/Support crisis queue** (`/support/crisis`) surfacing psychological/crisis red_flag_events routed to support.
 - **Input documents:** Support System Architecture, Admin Panel Architecture, ACCESS_CONTROL_V1, AUTHORITY_MATRIX_V1.
 - **Can do:** Handle Support Tickets (technical/organizational), assist users, perform permitted admin tasks.
 - **Cannot do:** Make case decisions; change legal texts or AI guardrails without authority; permanent deletions outside policy.
@@ -182,10 +183,10 @@ This plan does not introduce architecture decisions. It sequences decisions alre
 ### Phase 9 — AI guarded interaction MVP
 - **Goal:** Enable AI within strict guardrails.
 - **Result:** Client-facing AI and Karen-assistant AI operating per AI_GUARDRAILS_V1.
-- **Input documents:** AI_GUARDRAILS_V1, Safety Protocol, AUTHORITY_MATRIX_V1, ACCESS_CONTROL_V1.
-- **Can do:** AI assists, uses center knowledge, says "I don't know" when data is missing, escalates red flags, hands off to humans.
+- **Input documents:** AI_GUARDRAILS_V1, RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1, Safety Protocol, AUTHORITY_MATRIX_V1, ACCESS_CONTROL_V1.
+- **Can do:** AI assists, uses center knowledge, says "I don't know" when data is missing, responds immediately to red flags, creates red_flag_event, routes physical/medical to Karen and psychological/crisis to Anna/Support, hands off to humans.
 - **Cannot do:** Diagnose, treat, promise results/remission, decide for Karen, invent facts, set urgency.
-- **Done criterion:** AI behavior matches AI_GUARDRAILS_V1 Action → Allowed/Escalate/Forbidden table; escalation and human override paths verified.
+- **Done criterion:** AI behavior matches AI_GUARDRAILS_V1 Action → Allowed/Escalate/Forbidden table; dual red-flag routing (Karen vs Anna/Support) per RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1 verified; AI never sets durable case urgency/status; escalation and human override paths verified.
 
 ### Phase 10 — Launch readiness audit
 - **Goal:** Confirm the MVP is safe and complete enough for the first paying client.
