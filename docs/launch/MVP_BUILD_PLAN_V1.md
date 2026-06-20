@@ -289,7 +289,7 @@ See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
 
 ---
 
-*## Refund policy and payment-state handling (MVP-required — synchronized with REFUND_POLICY_V1)
+## Refund policy and payment-state handling (MVP-required — synchronized with REFUND_POLICY_V1)
 
 Per REFUND_POLICY_V1 (canonical for refund/payment-refund architecture), the following are MVP-required and must be in place before real payments are processed (they join the Phase 6 "Payment flow" gate and the "before the first paying client" list). No final legal wording here; refund terms are Offer/legal-review-bound.
 
