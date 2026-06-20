@@ -335,3 +335,15 @@ REFUND_POLICY_V1 is the canonical source of truth for refund and payment-refund 
 - Refund eligibility and any refund/partial-refund decision must not be decided by AI. AI may only recognize a billing/refund request and escalate it; it never approves, denies, promises, or estimates a refund. The refund-exception decision is a human/admin/legal action governed by the Offer, recorded in the Audit Log. System may only execute an already-authorized refund and record it.
 
 See REFUND_POLICY_V1.md for the full canonical policy.
+
+## 12. Field-level sensitivity and access (synchronized with FIELD_LEVEL_ACCESS_POLICY_V1)
+
+FIELD_LEVEL_ACCESS_POLICY_V1 is the canonical source of truth for field-level access to sensitive data. The entities and fields in this data model are subject to that field-level policy in addition to the role-level access in ACCESS_CONTROL_V1. No SQL, no code; this is a documentation alignment note.
+
+- Sensitivity levels: fields carry sensitivity levels L0 public, L1 operational, L2 personal identity, L3 medical substance, L4 internal-only, L5 audit/immutable, L6 financial-sensitive (external). For example: Client identity (name/email/phone/DOB/location) and Care Recipient data are L2; Document Upload content, translations, extracted summaries, and Karen Review conclusions are L3; AI Session internal reasoning and Karen Review drafts/internal notes are L4; Audit Log is L5; card/bank data is L6 and is never stored (only processor reference).
+- Substance vs metadata: a single row may mix sensitivity levels (e.g. Document Upload separates L1 delivery/technical metadata and quality flags from L3 file content/translations/summaries), so access is decided per field, not per row.
+- Care Recipient data is readable only by the responsible Client and authorized internal roles; a Care Recipient (under 21 / dependent) gets no independent access.
+- AI Session and Karen Review internal fields are internal-only and never shown to the Client; only released Karen conclusions are client-visible.
+- Payment stores only processor_ref + status/amount; no card/bank fields exist in the model.
+
+See FIELD_LEVEL_ACCESS_POLICY_V1.md for the full canonical policy and the complete field-level access matrix.
