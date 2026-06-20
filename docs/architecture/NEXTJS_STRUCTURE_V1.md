@@ -269,3 +269,38 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
 **No contradictions found** with ACCESS_CONTROL_V1, AI_GUARDRAILS_V1, or WEB_ARCHITECTURE_V1. This document is architectural only — no code, no app files, no dependencies, no Supabase/Stripe connection.
 
 After this document, the Next.js application structure is defined and ready for a future, separately-authorized implementation step.
+
+---
+
+## 12. Account management and data deletion UI/API (synchronized with DATA_RETENTION_AND_DELETION_POLICY_V1)
+
+DATA_RETENTION_AND_DELETION_POLICY_V1 is canonical for archive, deletion, account closure, and case closure. The following UI/API requirements extend §3 (routes) and §4 (API handlers). No code is written here; routes/handlers are described conceptually.
+
+### 12.1 Client Cabinet → Account Management
+
+Add an **Account Management** area in the client cabinet, e.g. `(client)/cabinet/account`. It is the self-service surface where the authenticated adult Client manages their account and exercises the deletion right. Only the account owner can access it; it never exposes other clients' data.
+
+### 12.2 Delete account and data flow (required UX sequence)
+
+The Account Management area must implement a **“Delete account and data”** action that runs this ordered, irreversible flow:
+
+1. **Delete account and data button** — entry point in `(client)/cabinet/account`.
+2. **Confirmation screen** — a dedicated screen (e.g. `(client)/cabinet/account/delete`) that the client must deliberately reach; never a single accidental click.
+3. **Consequence explanation** — clearly states that deletion removes the account, all cases (active and archived), questionnaires/assessment inputs, and uploaded documents; that access will be revoked; and that the action is permanent and that returning later requires a new account and new onboarding.
+4. **Deletion reason field** — collects the client's reason (per policy; never used to block the deletion right).
+5. **Final confirmation** — an explicit confirm step before the cascade runs.
+6. **Access revocation** — on confirmation the session/account is invalidated and the client is signed out; subsequent auth for that account fails.
+
+A server-side handler (e.g. `/api/account/delete`, System/owner-scoped) performs the cascade and writes the deletion-event audit row; it validates that the requester is the authenticated account owner. The UI never performs the deletion client-side.
+
+### 12.3 Archived cases hidden from active views but recoverable
+
+Active operational queues and work views (Karen `/karen`, `/karen/urgent`; Support `/support`; case lists) must **exclude archived cases by default** (cases archived after 5 years of inactivity). Archived cases remain **recoverable by authorized staff** through an explicit, audited recovery affordance (e.g. an "archived/recover" view available only to authorized roles, server-gated per ACCESS_CONTROL_V1). Hiding is a visibility filter, not a delete; recovery never bypasses a client's confirmed deletion.
+
+### 12.4 Self-check addendum
+
+- Deletion is self-service, owner-only, confirmed, reasoned, and ends in access revocation. ✔
+- Archived cases excluded from active views; recoverable only by authorized staff; server-enforced. ✔
+- No card/financial data involved; no client-side deletion authority; cascade + audit are server-side. ✔
+
+See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
