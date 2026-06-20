@@ -34,7 +34,7 @@ This plan does not introduce architecture decisions. It sequences decisions alre
 ## 2. What is IN the MVP
 
 - Public website (informational pages, offer/legal pages, entry CTA).
-- Account / authentication (one person = one account = one permanent case).
+- Account / authentication (one person = one account = one continuous case).
 - Explicit, logged consent to the offer (Audit Log as canonical source of consent).
 - Client cabinet: case overview, document upload, message/communication window.
 - Free one-time preliminary assessment (manual repeat only with Karen/admin permission).
@@ -134,11 +134,11 @@ This plan does not introduce architecture decisions. It sequences decisions alre
 
 ### Phase 3 — Supabase / Auth foundation
 - **Goal:** Bring authentication and the physical data model online.
-- **Result:** Auth, account creation, one person = one account = one permanent case, consent + Audit Log writes.
+- **Result:** Auth, account creation, one person = one account = one continuous case, consent + Audit Log writes.
 - **Input documents:** SUPABASE_SCHEMA_V1, DATA_MODEL_V1, ACCESS_CONTROL_V1, AUTHORITY_MATRIX_V1.
 - **Can do:** Auth, account/case creation, consent logging, Audit Log foundation.
 - **Cannot do:** Charge; expose Karen/Admin data to clients; bypass access rules.
-- **Done criterion:** A user can register, consent (logged immutably), and get one permanent case per ACCESS_CONTROL_V1.
+- **Done criterion:** A user can register, consent (logged immutably), and get one continuous case per ACCESS_CONTROL_V1.
 
 ### Phase 4 — Client cabinet MVP
 - **Goal:** Give the client their authenticated workspace.
@@ -201,7 +201,7 @@ This plan does not introduce architecture decisions. It sequences decisions alre
 ## 7. Minimal role journeys
 
 ### 7.1 Minimal client path (site → cabinet)
-Public site → product/offer page → signup/auth → consent (logged) → permanent case created → cabinet → upload documents → free preliminary assessment → (optional) pay for Support 5w/15w → active client.
+Public site → product/offer page → signup/auth → consent (logged) → continuous case created → cabinet → upload documents → free preliminary assessment → (optional) pay for Support 5w/15w → active client.
 
 ### 7.2 Minimal Karen path
 Login → Karen workspace → review case/documents/assessment → set status/urgency → create Karen Review → handle red-flag escalations → respond / hand decisions back into the case (all audited).
@@ -215,7 +215,7 @@ Login → Admin area → manage users/operational settings within authority → 
 ---
 
 ## 8. Before the first paying client (must be ready)
-- Auth + one person = one account = one permanent case.
+- Auth + one person = one account = one continuous case.
 - Explicit consent captured immutably in Audit Log.
 - Client cabinet with document upload and communication window.
 - Free one-time preliminary assessment.
@@ -252,7 +252,7 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
 **Against the Constitution**
 - No oncology/medical claims, no diagnosis, no treatment, no result/remission guarantees anywhere in the plan. ✔
 - Center framed as rehabilitation/recovery support, not a medical organization. ✔
-- One person = one account = one permanent case preserved (Phase 3). ✔
+- One person = one account = one continuous case preserved (Phase 3). ✔
 - Karen is the single source of case decisions; urgency/criticality only by Karen (Phase 7). ✔
 - Consent explicit, logged, immutable; Audit Log canonical (Phases 3, 6). ✔
 - Brand identity correct: name = Python Method; slogan = «Реабилитация без границ» (not used as legal/platform name). ✔
