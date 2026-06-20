@@ -276,3 +276,42 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full canonical age policy (indep
 - No Telegram model reused; no legacy agents carried over.
 - Conceptual, web-first data architecture only.
 - No existing documents modified; this file only adds DATA_MODEL_V1.md.
+
+---
+
+## 10. Data retention, archival, and deletion (synchronized with DATA_RETENTION_AND_DELETION_POLICY_V1)
+
+DATA_RETENTION_AND_DELETION_POLICY_V1 is the canonical source of truth for archive, deletion, account closure, and case closure. Where any earlier statement in this document conflicts with that policy, the policy governs. In particular, the §1 wording that the case "is not closed or archived" and the §6 self-check line "Case is permanent, never archived" are superseded by the archival and deletion model below: a case is never *silently* lost, but it can be archived after inactivity and is fully removed on client self-service deletion.
+
+### 10.1 Archive vs deletion vs account closure vs case closure
+
+- **Case closure** — the operational end of case work (a support period ends or Karen marks the case complete). Closure changes status only; it does **not** remove data and does **not** close the account.
+- **Archive** — a case hidden from active operational queues and excluded from active work views after inactivity, but still stored and recoverable by authorized staff. **Archived does not mean deleted.**
+- **Account closure** — the lifecycle end-state of an account; for a departing client it is realized through self-service **deletion**.
+- **Deletion** — permanent, irreversible removal of the account and its case data, initiated by the client through self-service, after confirmation, consequence explanation, and a deletion reason.
+
+### 10.2 Five-year archival rule
+
+A case becomes **archived after 5 years of inactivity** (measured from the last meaningful activity on the case). Archival is a visibility/queue state, not a deletion event, and never auto-deletes client data.
+
+### 10.3 Client self-service deletion
+
+A client does **not** need to contact support to delete their account. Deletion is **self-service from the client cabinet**, gated by confirmation, consequence explanation, and a deletion reason.
+
+### 10.4 Deletion removes account / cases / questionnaires / uploads / access
+
+On confirmed deletion: the **account** is deleted, all **cases** (active and archived), **questionnaires/assessment inputs**, and **uploaded documents** are deleted, and **access is revoked**. Archival status does not protect data from deletion. Only a minimal, non-identifying deletion-event record (reason + timestamp) is retained in the Audit Log, never the deleted personal content.
+
+### 10.5 Returning user after deletion
+
+Deletion is final. If the person returns later, **they create a new account and start a new onboarding process**. There is no restoration, no merge with a previously deleted account, and no recovery of deleted cases, questionnaires, or documents.
+
+### 10.6 Karen historical access applies only to non-deleted clients
+
+Karen's full historical view (previous cases, documents, reviews, communication) — including for clients returning after months or years — applies **only while the account exists**. Once a client deletes their account, the historical record is gone and cannot be surfaced. The client's deletion right takes priority over retaining a case for organizational history.
+
+### 10.7 AI and methodology must not depend on retaining PII
+
+AI and methodology development must **not** depend on retaining personally identifiable client data. Methodology and AI value must survive the deletion of any individual client's identifiable data and derive only from non-identifying, aggregated, or de-identified signals. This resolves the prior open item (§7 / DATA_MODEL_OPEN_DECISIONS_V1) that consent/retention must be reconciled against legal text and the privacy policy before persisting.
+
+See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
