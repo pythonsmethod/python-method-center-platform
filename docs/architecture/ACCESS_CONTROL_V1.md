@@ -21,7 +21,7 @@ Does **not** rely on any old project or Telegram logic. Web-first only.
 - **AI never decides or guesses** (per AI_GUARDRAILS_V1); AI access is scoped to its function and is mostly read + propose.
 - **Audit Log is immutable and canonical for consent** (per DATA_MODEL_OPEN_DECISIONS_V1); no role can edit/delete it; access to it is itself audited.
 - **Data minimization:** sensitive medical and payment data are exposed only to roles that need them, and only at the needed granularity.
-- **One person = one account = one permanent case:** a client only ever accesses their own account, case, and data.
+- **One person = one account = one continuous case:** a client only ever accesses their own account, case, and data. (Continuity here means one ongoing case per person, not a case that can never be archived or deleted; see DATA_RETENTION_AND_DELETION_POLICY_V1.)
 
 ---
 
@@ -49,7 +49,7 @@ Does **not** rely on any old project or Telegram logic. Web-first only.
 - Same forbiddens as baseline client.
 
 ### 2.4 Inactive client (sub-state of client)
-- A client whose case exists permanently but has no active Case Period (between periods / after completion).
+- A client whose single ongoing case persists between periods (after completion / between paid periods) but has no active Case Period. Per DATA_RETENTION_AND_DELETION_POLICY_V1 the case may be archived after long inactivity (archived ≠ deleted) and is removed on client self-service deletion.
 - **Access:** read own history (case history, past conclusions as released, documents, payments); may reactivate case and pay for a new period.
 - **Restricted:** no active accompaniment messaging beyond reactivation/support; preliminary assessment is one-time and not re-triggered automatically (manual only, per DATA_MODEL_OPEN_DECISIONS_V1).
 
@@ -204,7 +204,7 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
 | AI never decides or guesses; read + propose; scoped | AI_GUARDRAILS_V1 | **HELD** — AI rows are read/propose, never decisive |
 | Two AI types with distinct boundaries | AI_GUARDRAILS_V1 | **HELD** — client-facing vs Karen-assistant scoped separately |
 | Consent explicit, logged, immutable; Audit Log canonical | DATA_MODEL_OPEN_DECISIONS_V1 | **HELD** — Audit Log read-only, append-only, access audited |
-| One person = one account = one permanent case | Constitution / DATA_MODEL | **HELD** — client own-data only, one account |
+| One person = one account = one continuous case (archivable / deletable per DATA_RETENTION_AND_DELETION_POLICY_V1) | Constitution / DATA_MODEL / DATA_RETENTION_AND_DELETION_POLICY_V1 | **HELD** — client own-data only, one account; case archivable after inactivity and removable on client deletion |
 | Safety above speed; red-flag escalation always available | Safety Protocol | **HELD** — §3.9 auto-escalation regardless of role state |
 | Least privilege / data minimization | AUTHORITY_MATRIX_V1 | **HELD** — §3.10 + scoped matrix |
 | No card/bank data handled in own UI; processor isolation | Payment Arch / privacy | **HELD** — §3.7 raw processor data never exposed |
