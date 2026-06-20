@@ -55,10 +55,10 @@ Does **not** rely on any old project or Telegram logic. Web-first only.
 
 ### 2.5 Karen
 - **Pages/zones:** Karen workspace (two-window: client window + Karen-assistant AI window).
-- **Data entities:** full case-scoped access — Client, Account (case-relevant), Case, Case Period, Assessment, AI Session (assistant outputs), Karen Review (own), Messages, Document Uploads, plus payment status (not raw processor data).
-- **Allowed:** review cases, create Karen Reviews, set/change case status and urgency, approve/reject AI drafts, answer case questions, authorize manual repeat assessment, decide refund warranted.
+- **Data entities:** full case-scoped access — Client, Account (case-relevant), Case, Case Period, Assessment, AI Session (assistant outputs), Karen Review (own), Messages, Document Uploads, plus payment status (not raw processor data); **Knowledge Entries (create / modify / approve / revoke — owner of methodology and content approval).**
+- **Allowed:** review cases, create Karen Reviews, set/change case status and urgency, approve/reject AI drafts, answer case questions, authorize manual repeat assessment, decide refund warranted; **create, modify, approve, and revoke Knowledge Entries; approve methodology and clinical-logic changes.**
 - **Forbidden:** change legal texts or AI guardrails alone; edit/delete Audit Log; execute payment refunds as an operation (Support/Admin executes); access unrelated administrative governance.
-- **Audit:** Karen Reviews, status/urgency changes, case answers, route changes.
+- **Audit:** Karen Reviews, status/urgency changes, case answers, route changes; **knowledge approvals/revocations, methodology approvals.**
 - **Hidden/read-only:** raw payment processor data (status only); governance settings.
 
 ### 2.6 Support / Anna
@@ -71,10 +71,10 @@ Does **not** rely on any old project or Telegram logic. Web-first only.
 
 ### 2.7 Admin
 - **Pages/zones:** Admin Panel.
-- **Data entities:** governance scope — Knowledge Entry (approve), legal texts, guardrail configuration, access/permission settings, Audit Log (read + grant access). Operational oversight of blocks.
-- **Allowed:** approve Knowledge Entries; change legal texts and AI guardrails through governance; configure access; grant/revoke Audit Log access; oversee blocks.
-- **Forbidden:** make case decisions for Karen; edit or delete Audit Log entries; fabricate consent.
-- **Audit:** legal-text changes, guardrail changes, knowledge approvals, access/permission changes, Audit Log access grants.
+- **Data entities:** governance scope — Knowledge Entry (publish / unpublish / archive / version / manage visibility / manage access — **not** approval), legal texts, guardrail configuration, access/permission settings, Audit Log (read + grant access). Operational oversight of blocks.
+- **Allowed:** publish, unpublish, archive, version Knowledge Entries and manage their visibility/access (publication and technical governance only); change legal texts and AI guardrails through governance; configure access; grant/revoke Audit Log access; oversee blocks.
+- **Forbidden:** approve methodology, clinical logic, or knowledge content (that authority belongs to Karen); make case decisions for Karen; edit or delete Audit Log entries; fabricate consent.
+- **Audit:** legal-text changes, guardrail changes, knowledge publication/unpublication/archival/versioning, access/permission changes, Audit Log access grants.
 - **Hidden/read-only:** Audit Log is read-only even for Admin.
 
 ### 2.8 System service
@@ -101,10 +101,10 @@ Does **not** rely on any old project or Telegram logic. Web-first only.
 Strictly own-data only. Client sees own profile, documents, messages, payments, statuses, and released case outputs (read-only). Internal AI session traces and raw Karen notes are hidden. Cross-account access is impossible by design.
 
 ### 3.2 Admin Panel access rules
-Governance only. Admin manages knowledge approval, legal texts, guardrails, access, and Audit Log access. Admin does not decide cases and cannot mutate the Audit Log. All governance actions are audited.
+Governance only. Admin manages knowledge **publication, visibility, access, and versioning** (not approval), legal texts, guardrails, access, and Audit Log access. **Knowledge and methodology approval is owned by Karen, not Admin.** Admin does not decide cases and cannot mutate the Audit Log. All governance actions are audited.
 
 ### 3.3 Karen workspace access rules
-Full case-scoped access in a two-window interface. Karen sees the client window (messages, documents, history) and the Karen-assistant AI window (summaries, drafts, confidence). Karen decides; payment processor internals are status-only.
+Full case-scoped access in a two-window interface. Karen sees the client window (messages, documents, history) and the Karen-assistant AI window (summaries, drafts, confidence). Karen decides; payment processor internals are status-only. Karen also owns the **Knowledge Entry lifecycle up to approval**: create, modify, approve, and revoke knowledge content and methodology; Admin publishes and manages visibility but never approves content. Knowledge lifecycle: Draft → Karen Review → Karen Approved → Published → Archived.
 
 ### 3.4 Support workspace access rules
 Organizational/technical scope only. Support sees account/payment/ticket/technical state, never medical case substance. Support executes refunds and blocks per policy; case matters are routed to Karen.
@@ -167,7 +167,8 @@ Legend: **R**=Read, **C**=Create, **U**=Update, **D**=Delete/Archive. **Y/N** ma
 | Support/Anna | Support Ticket | Y | Y | Y | N | technical scope | – |
 | Support/Anna | Document Upload | tech state | N | N | execute per policy | no medical reading | Yes |
 | Support/Anna | Audit Log | R (scope) | N | N | N | read-only scoped | access: Yes |
-| Admin | Knowledge Entry | Y | prop | approve | per policy | approval authority | Yes |
+| Karen | Knowledge Entry | Y | Y | approve/revoke | archive (content) | **owns methodology + content approval** | Yes |
+| Admin | Knowledge Entry | Y | N | publish/version | archive (publication) | **publication/visibility only; no content approval** | Yes |
 | Admin | Legal / Guardrails | Y | governance | governance | N | governance only | Yes |
 | Admin | Access / Permissions | Y | Y | Y | Y | controls access | Yes |
 | Admin | Audit Log | R + grant | N | N | N | cannot edit/delete | grants: Yes |
@@ -194,6 +195,7 @@ Legend: **R**=Read, **C**=Create, **U**=Update, **D**=Delete/Archive. **Y/N** ma
 | Least privilege / data minimization | AUTHORITY_MATRIX_V1 | **HELD** — §3.10 + scoped matrix |
 | No card/bank data handled in own UI; processor isolation | Payment Arch / privacy | **HELD** — §3.7 raw processor data never exposed |
 | Human override; AI overrides no human | AI_GUARDRAILS_V1 | **HELD** — Karen/Support/Admin override AI; AI cannot |
+| Knowledge/methodology approval is Karen-owned; Admin publishes/manages only | CANONICAL_LIFECYCLE_STATUS_MODEL_V1 | **HELD** — §2.5/§2.7 + matrix; no Admin content approval |
 
 **No contradictions found** with the Constitution, AI_GUARDRAILS_V1, or AUTHORITY_MATRIX_V1. The document is architectural only — no code, SQL, Supabase RLS, or runtime logic.
 
