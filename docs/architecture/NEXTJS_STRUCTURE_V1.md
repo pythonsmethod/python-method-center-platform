@@ -235,7 +235,21 @@ Inactive clients access history + reactivation only; active-client-only surfaces
 
 ---
 
-## 10. Self-check against ACCESS_CONTROL_V1, AI_GUARDRAILS_V1 and WEB_ARCHITECTURE_V1
+## 10. Age policy onboarding and Care Recipient UI
+
+Per **AGE_AND_CARE_RECIPIENT_POLICY_V1**, the onboarding UI must implement:
+
+- A required onboarding question — “Who is this case for?” — with options: **Myself**, **My child**, **A dependent / another person under my responsibility**.
+- If **My child** or **Dependent** is selected, a conditional **Care Recipient form** opens (full name, date of birth, age, relationship to client, country / location, reason for representation, representative confirmation, data consent, responsibility acknowledgment).
+- If **Myself** is selected, the case is a self case (`self_case` flag) and no Care Recipient form is shown.
+- An age gate ensuring only users age 21+ can register and proceed as the responsible Client; under-21 users are routed to the adult responsible-Client path.
+- UI must make clear that account, consent, payment, and communication are owned by the adult Client; the Care Recipient is never the responsible actor.
+
+See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full policy.
+
+---
+
+## 11. Self-check against ACCESS_CONTROL_V1, AI_GUARDRAILS_V1 and WEB_ARCHITECTURE_V1
 
 | Requirement | Source | Status |
 |---|---|---|
