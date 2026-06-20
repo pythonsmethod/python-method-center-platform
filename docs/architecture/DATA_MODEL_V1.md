@@ -25,13 +25,13 @@ Non-goals (explicit): no Telegram model is reused; no legacy agents are carried 
 ## 1. Modeling principles (derived from the Constitution)
 
 1. One person = one account = one continuous case. New accounts and new independent cases are never created on repeat engagement.
-2. The case is permanent. It is not closed or archived; only the support status changes.
+2. The case is the single continuous history of the person's journey; it is never silently lost. Support status changes over its life, and per DATA_RETENTION_AND_DELETION_POLICY_V1 a case may become archived after long inactivity (archived ≠ deleted; recoverable by authorized staff) and is fully removed on client self-service deletion. Updated to align with DATA_RETENTION_AND_DELETION_POLICY_V1.
 3. Karen is the single source of decisions about a case. AI never decides; it prepares, structures, translates, drafts, and escalates.
 4. No guessing. AI records confidence levels and must never invent data.
 5. No result guarantees. The model stores facts, statuses, and consent — never promises of outcomes.
 6. Not medical. The platform stores client-provided medical documents as data; it does not produce diagnoses or treatment as system output.
 7. Consent is explicit and logged. Document storage, AI processing, and case-history storage require recorded consent.
-8. History is preserved indefinitely. Deletion is governed by the offer/privacy terms and the person's rights, not by routine system behavior.
+8. History is preserved for as long as the account exists and is retained for historical continuity and recoverability, not discarded by routine system behavior. Archival after long inactivity hides a case from active views without deleting it, and the client's self-service deletion right (per DATA_RETENTION_AND_DELETION_POLICY_V1) permanently removes the account, cases, questionnaires, uploads, and access. Updated to align with DATA_RETENTION_AND_DELETION_POLICY_V1.
 
 ---
 
@@ -56,14 +56,14 @@ Access roles referenced: Client, Karen, Karen-AI-Assistant, Client-AI, Admin/Sup
 - Note: account creation and password handling are performed by the person via the auth provider; the model does not store raw credentials.
 
 ### 2.3 Case
-- Purpose: the single, permanent, continuous history of the person's journey in the Center.
+- Purpose: the single, continuous history of the person's journey in the Center (one ongoing case per person; archivable after long inactivity and removable on client deletion per DATA_RETENTION_AND_DELETION_POLICY_V1, not a case that can never be archived).
 - Data owner: shared — Client owns their submitted content; Karen owns the decisions/conclusions within it; the Center is custodian of the case as a whole.
 - Key fields: case_id; client_id; case_number; current_case_status (account_created / awaiting_onboarding / case_formed / ready_for_review / analysis_complete / support_active / support_inactive / support_resumed / support_completed); current_direction; created_at.
 - Relationships: one Case belongs to one Client; has many Case Periods, Assessments, Messages, Document Uploads, Karen Reviews, Payments, Subscriptions, Support Tickets, AI Sessions.
 - Access: Client (read own case surfaces in cabinet); Karen (full working view in admin panel); Karen-AI-Assistant (read to prepare summaries); Admin/Support (organizational/technical view, not case decisions).
 
 ### 2.4 Case Period
-- Purpose: a single bounded period of paid active support within the permanent case.
+- Purpose: a single bounded period of paid active support within the person's single continuous case.
 - Data owner: System (records facts); governed by Payment and Subscription.
 - Key fields: case_period_id; case_id; product_type (support_5_weeks / support_15_weeks); start_date; end_date; status (active / completed); linked_payment_id.
 - Relationships: many Case Periods belong to one Case; each links to a Payment; activity (messages to Karen) is allowed only while a Case Period is active.
@@ -231,7 +231,7 @@ Cross-cutting:
 ## 6. Self-check against the Constitution
 
 1. One person = one account = one case — HELD. Client 1:1 Account, Client 1:1 Case; repeat engagement adds Case Periods/Payments, never new accounts/cases.
-2. Case is permanent, never archived — HELD. Case has no "deleted/archived" status; only case/support statuses change; history preserved.
+2. Case continuity and recoverability — HELD. Each person has one continuous case; status changes over its life; history is preserved while the account exists. Per DATA_RETENTION_AND_DELETION_POLICY_V1 a case may be archived after long inactivity (archived ≠ deleted; recoverable by authorized staff) and is removed on confirmed client self-service deletion. Updated to align with DATA_RETENTION_AND_DELETION_POLICY_V1.
 3. Karen is the single source of case decisions — HELD. Karen Review is the only authoritative case output; AI Session is explicitly non-authoritative; Messages with case substance require Karen approval.
 4. AI does not decide; no guessing; transparent confidence — HELD. AI Session carries confidence_level and escalated_to_karen; Knowledge constraint forbids AI-created methodology.
 5. No result guarantees — HELD. No entity stores promises/guarantees; only facts, statuses, consent.
@@ -281,7 +281,7 @@ See AGE_AND_CARE_RECIPIENT_POLICY_V1.md for the full canonical age policy (indep
 
 ## 10. Data retention, archival, and deletion (synchronized with DATA_RETENTION_AND_DELETION_POLICY_V1)
 
-DATA_RETENTION_AND_DELETION_POLICY_V1 is the canonical source of truth for archive, deletion, account closure, and case closure. Where any earlier statement in this document conflicts with that policy, the policy governs. In particular, the §1 wording that the case "is not closed or archived" and the §6 self-check line "Case is permanent, never archived" are superseded by the archival and deletion model below: a case is never *silently* lost, but it can be archived after inactivity and is fully removed on client self-service deletion.
+DATA_RETENTION_AND_DELETION_POLICY_V1 is the canonical source of truth for archive, deletion, account closure, and case closure. Where any earlier statement in this document conflicts with that policy, the policy governs. The §1 modeling principles and the §6 self-check in this document have been rewritten to align with this policy (no contradictory wording remains): a case is never silently lost, but it can be archived after long inactivity (archived ≠ deleted; recoverable by authorized staff) and is fully removed on client self-service deletion.
 
 ### 10.1 Archive vs deletion vs account closure vs case closure
 
