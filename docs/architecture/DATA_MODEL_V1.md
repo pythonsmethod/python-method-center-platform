@@ -315,3 +315,23 @@ Karen's full historical view (previous cases, documents, reviews, communication)
 AI and methodology development must **not** depend on retaining personally identifiable client data. Methodology and AI value must survive the deletion of any individual client's identifiable data and derive only from non-identifying, aggregated, or de-identified signals. This resolves the prior open item (§7 / DATA_MODEL_OPEN_DECISIONS_V1) that consent/retention must be reconciled against legal text and the privacy policy before persisting.
 
 See DATA_RETENTION_AND_DELETION_POLICY_V1.md for the full canonical policy.
+
+
+## 11. Refund and payment-refund model (synchronized with REFUND_POLICY_V1)
+
+REFUND_POLICY_V1 is the canonical source of truth for refund and payment-refund architecture. This section aligns the data model with it. No SQL, no code; final refund wording is Offer/legal-review-bound.
+
+11.1 Payment status and refund states
+- The Payment entity's payment status supports refunded and (optionally) partially_refunded only as exception states — reachable solely through an authorized, human-approved refund-exception process under the Offer, never as routine or default outcomes.
+- There are no installment or partial-payment states; a product is a single full payment. Partial payment does not exist as an entitlement state.
+
+11.2 Support activation requires a paid / full-payment state
+- A Case Period / Subscription activates only when the associated Payment is in a confirmed full-payment state. Pending, partial, or unconfirmed payments never activate support. Activation is deterministic on confirmed full payment and is audited; it is never granted by AI or by client request.
+
+11.3 Service-start representation (future fields)
+- service_start_at and work_started_at are flagged as future fields (documented, not implemented here): they represent when the Center's work begins after confirmed payment. Per REFUND_POLICY_V1, Karen starts work immediately after confirmed payment and the most intensive analytical work begins on day one; these timestamps make the "service already started" fact explicit and support the standard no-refund principle.
+
+11.4 Refund eligibility is never decided by AI
+- Refund eligibility and any refund/partial-refund decision must not be decided by AI. AI may only recognize a billing/refund request and escalate it; it never approves, denies, promises, or estimates a refund. The refund-exception decision is a human/admin/legal action governed by the Offer, recorded in the Audit Log. System may only execute an already-authorized refund and record it.
+
+See REFUND_POLICY_V1.md for the full canonical policy.
