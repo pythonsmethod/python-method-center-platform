@@ -69,8 +69,8 @@ Legend for status column: mapped / missing / deferred / intentionally collapsed 
 | karen review draft/published | karen_review | released_to_client | mapped | Draft vs published expressed as released_to_client boolean; field-level access required. | Enforce access rule (section 9). |
 | knowledge approval owner | knowledge_entry | approved_by | naming mismatch / contradiction | Schema approved_by is documented as Admin; canonical rule is Karen approves methodology/knowledge substance. Contradiction to be corrected in schema/ACCESS_CONTROL/AUTHORITY_MATRIX (see section 8). | Re-designate approval owner = Karen; add separate Admin publication/visibility fields. |
 | knowledge_status | knowledge_entry | knowledge_status | mapped | draft/approved/archived present. | None. |
-| audit metadata | audit_log | (fields) | mapped | Canonical consent/status-change source; append-only. | Confirm immutability. |
-| red_flag_event | (none) | (none) | missing | No table/structure. | Create red_flag_event model (sections 5/7). |
+| audit metadata | audit_log | (fields) | mapped | Canonical consent/status-change source. | Confirm immutability. |
+| red_flag_event | (none) | (none) | missing | No table/structure. | Create red_flag_event model (section 5/7). |
 
 ---
 
@@ -133,7 +133,7 @@ Two clearly separated concepts:
 
 **Canonical rule (authoritative — not an open decision):**
 
-- **Karen approves methodology and knowledge substance.** Methodological/content approval (knowledge_status: draft -> approved) is **Karen's** authority. Karen is the approval owner of knowledge.
+- **Karen approves methodology and knowledge substance.** Methodological/content approval (knowledge_status: draft -> approved) is Karen authority. Karen is the approval owner of knowledge.
 - **Admin manages publication, visibility, access, and technical governance** — where/whether approved knowledge is published and who can see it. Admin is **not** the owner of methodology approval.
 
 **Contradiction to correct in other documents:** SUPABASE_SCHEMA_V1 (knowledge_entry.approved_by = Admin), ACCESS_CONTROL_V1, and AUTHORITY_MATRIX_V1 currently state that **Admin approves Knowledge Entries**. Per the canonical rule above, this is a **contradiction to be corrected in those documents**, not an unresolved decision. Methodology approval ownership must be reassigned to Karen there; Admin retains publication/visibility/access/governance only.
@@ -185,7 +185,6 @@ Before any SQL/RLS implementation, the physical schema must be updated to:
 - **case_status reconciliation:** rename schema enum to canonical, or maintain a mapping layer. Decision: Karen/Anna.
 - **Python Elixir as product entity:** blocked until legal/licensing resolved. Decision: Karen/Anna/legal.
 - **Consent/case-history retention period:** verify against legal text and privacy policy before persisting (per DATA_MODEL_OPEN_DECISIONS_V1). Decision: legal.
-
 > Note: Knowledge approval ownership is **no longer an open decision** — Karen approves methodology/knowledge substance; Admin owns publication/visibility/access/governance (see section 8). The "Admin approves" wording in schema/ACCESS_CONTROL/AUTHORITY_MATRIX is a contradiction to be corrected in those documents.
 
 ---
