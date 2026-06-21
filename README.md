@@ -1,10 +1,60 @@
 # Pythons Center — Platform
 
-A new, clean web-first project. This is NOT a continuation of the old Telegram-based system (python-method-center), which is preserved separately as legacy.
+A new, clean web-first project. This is not a continuation of the old Telegram-based system (`python-method-center`), which is preserved separately as legacy.
 
-## Important
+## Current implementation
 
-No legacy code, agents, Telegram logic, orchestration layer, or environment values are carried over into this repository. This is a fresh architectural foundation only.
+P0-001 initializes the first runnable application scaffold:
+
+- Next.js App Router
+- TypeScript
+- Basic platform layout
+- Scaffold routes for public, auth, client, admin, payment, and support areas
+- Supabase browser client placeholder
+
+No medical logic, AI decisions, Stripe integration, Supabase schema, or production access control is implemented yet.
+
+## Routes
+
+- `/`
+- `/login`
+- `/onboarding`
+- `/cabinet`
+- `/admin`
+- `/payment`
+- `/support`
+
+## Running locally
+
+Use Node.js 20 or newer.
+
+```bash
+npm install
+npm run dev
+```
+
+Then open:
+
+```text
+http://localhost:3000
+```
+
+TypeScript check:
+
+```bash
+npm run typecheck
+```
+
+## Environment
+
+Copy `.env.example` to `.env.local` when Supabase is ready:
+
+```bash
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+```
+
+Empty values are supported for the scaffold. Supabase is not connected yet.
 
 ## Planned modules
 
@@ -18,12 +68,6 @@ No legacy code, agents, Telegram logic, orchestration layer, or environment valu
 - database — data layer
 - app — application shell
 
-## Foundation
+## Documentation
 
-See docs/foundation/PROJECT_FOUNDATION_V1.md for the project foundation.
-
-## Technology stack: TBD
-
-## Running locally
-
-To be documented once the technology stack is selected.
+Architecture and foundation documents live in `docs/` and remain the source of truth for future implementation phases.
