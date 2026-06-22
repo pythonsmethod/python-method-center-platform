@@ -2,6 +2,30 @@ import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
+import type { OnboardingProfileDefaults } from "@/lib/onboarding/types";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { OnboardingForm } from "./OnboardingForm";
+
+async function getProfileDefaults(
+  userId: string
+): Promise<OnboardingProfileDefaults> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return { fullName: "", phone: "" };
+  }
+
+  const { data } = await supabase
+    .from("profiles")
+    .select("full_name, phone")
+    .eq("id", userId)
+    .maybeSingle();
+
+  return {
+    fullName: String(data?.full_name ?? ""),
+    phone: String(data?.phone ?? "")
+  };
+}
 
 export default async function OnboardingPage() {
   const auth = await getRequiredUser("/onboarding");
@@ -20,12 +44,14 @@ export default async function OnboardingPage() {
     );
   }
 
+  const profileDefaults = await getProfileDefaults(auth.userId);
+
   return (
     <div className="page-shell">
       <PageHeader
         eyebrow="Client intake"
         title="Onboarding"
-        description="Authenticated onboarding shell for future client information and document collection."
+        description="Create the first case shell by submitting basic onboarding information."
       />
 
       <section className="panel-grid">
@@ -33,21 +59,25 @@ export default async function OnboardingPage() {
           <span className="panel__label">Authenticated session</span>
           <h2>{auth.email ?? "Signed-in user"}</h2>
           <p>
-            Supabase Auth returned a user session. Intake forms and document
-            upload are not implemented yet.
+            Supabase Auth returned a user session. This onboarding step creates
+            profile, case, submission, and consent records only.
           </p>
           <div className="panel-actions">
             <LogoutButton />
           </div>
         </div>
         <div className="panel">
-          <span className="panel__label">Not implemented</span>
-          <h2>No case data is collected</h2>
+          <span className="panel__label">Scope boundary</span>
+          <h2>No document or decision logic</h2>
           <p>
-            This scaffold deliberately avoids intake forms, document upload,
-            and case assembly in this task.
+            Document upload, medical decisions, AI decisions, and payment steps
+            remain outside this task.
           </p>
         </div>
+      </section>
+
+      <section className="form-section" aria-label="Onboarding form">
+        <OnboardingForm profileDefaults={profileDefaults} />
       </section>
     </div>
   );

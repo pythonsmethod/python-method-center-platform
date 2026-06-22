@@ -315,6 +315,10 @@ p {
   border-color: #e1c289;
 }
 
+.notice--success {
+  border-color: #8cc7b2;
+}
+
 code {
   color: var(--accent-strong);
   font-family:
@@ -335,6 +339,62 @@ code {
   border-radius: 8px;
   color: var(--accent-strong);
   padding: 12px 14px;
+}
+
+.form-section {
+  margin-top: 24px;
+}
+
+.onboarding-form {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 18px;
+  max-width: 760px;
+  padding: 22px;
+}
+
+.field select,
+.field textarea {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  padding: 10px 12px;
+  width: 100%;
+}
+
+.field select {
+  min-height: 46px;
+}
+
+.field textarea {
+  min-height: 132px;
+  resize: vertical;
+}
+
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--accent);
+  outline: 3px solid rgba(47, 111, 94, 0.16);
+}
+
+.checkbox-field {
+  align-items: flex-start;
+  color: var(--accent-strong);
+  display: grid;
+  gap: 10px;
+  grid-template-columns: 20px 1fr;
+  line-height: 1.5;
+}
+
+.checkbox-field input {
+  accent-color: var(--accent);
+  height: 18px;
+  margin-top: 3px;
+  width: 18px;
 }
 
 @media (max-width: 720px) {

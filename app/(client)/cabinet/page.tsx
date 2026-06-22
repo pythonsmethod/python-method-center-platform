@@ -2,9 +2,23 @@ import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
+import { getClientCaseShell } from "@/lib/cases/queries";
 
-export default async function CabinetPage() {
+type CabinetPageProps = {
+  searchParams?: Promise<{
+    onboarding?: string | string[];
+  }>;
+};
+
+function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
+  return Array.isArray(value)
+    ? value.includes("submitted")
+    : value === "submitted";
+}
+
+export default async function CabinetPage({ searchParams }: CabinetPageProps) {
   const auth = await getRequiredUser("/cabinet");
+  const params = await searchParams;
 
   if (auth.status === "missing-env") {
     return (
@@ -20,6 +34,9 @@ export default async function CabinetPage() {
     );
   }
 
+  const caseResult = await getClientCaseShell(auth.userId);
+  const submitted = isOnboardingSubmitted(params?.onboarding);
+
   return (
     <div className="page-shell">
       <PageHeader
@@ -27,6 +44,17 @@ export default async function CabinetPage() {
         title="Cabinet"
         description="Authenticated cabinet shell for future case status, documents, messages, and billing surfaces."
       />
+
+      {submitted ? (
+        <div className="notice notice--success">
+          <span className="panel__label">Onboarding submitted</span>
+          <h2>Case shell created</h2>
+          <p>
+            Your onboarding submission was recorded and linked to your client
+            case shell.
+          </p>
+        </div>
+      ) : null}
 
       <section className="panel-grid">
         <div className="panel">
@@ -42,12 +70,35 @@ export default async function CabinetPage() {
         </div>
         <div className="panel">
           <span className="panel__label">Cabinet state</span>
-          <h2>Scaffold only</h2>
-          <ul className="status-list">
-            <li>Case lifecycle is not persisted.</li>
-            <li>Document upload is not connected.</li>
-            <li>Messages are not implemented.</li>
-          </ul>
+          {caseResult.status === "error" ? (
+            <>
+              <h2>Case status unavailable</h2>
+              <p>{caseResult.message}</p>
+            </>
+          ) : caseResult.case ? (
+            <>
+              <h2>{caseResult.case.status.replaceAll("_", " ")}</h2>
+              <ul className="status-list">
+                <li>Case ID: {caseResult.case.id}</li>
+                <li>
+                  Title: {caseResult.case.title ?? "Not set"}
+                </li>
+                <li>
+                  Urgency: {caseResult.case.urgency.replaceAll("_", " ")}
+                </li>
+                <li>
+                  Direction: {caseResult.case.direction.replaceAll("_", " ")}
+                </li>
+              </ul>
+            </>
+          ) : (
+            <>
+              <h2>No case yet</h2>
+              <p>
+                Submit onboarding to create the first client case shell.
+              </p>
+            </>
+          )}
         </div>
       </section>
     </div>
