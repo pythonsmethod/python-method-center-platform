@@ -7,7 +7,10 @@ import {
   validateDocumentFile
 } from "@/lib/documents/config";
 import { recordUploadedDocumentMetadata } from "@/lib/documents/actions";
-import type { UploadedDocument } from "@/lib/documents/types";
+import type {
+  DocumentIntakeStatus,
+  UploadedDocument
+} from "@/lib/documents/types";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type DocumentUploadPanelProps = {
@@ -53,6 +56,10 @@ function formatDate(value: string): string {
     dateStyle: "medium",
     timeStyle: "short"
   }).format(new Date(value));
+}
+
+function formatDocumentStatus(status: DocumentIntakeStatus): string {
+  return status.replaceAll("_", " ");
 }
 
 function stateClassName(state: UploadState): string {
@@ -213,11 +220,16 @@ export function DocumentUploadPanel({
                       {document.original_filename ?? "Untitled document"}
                     </strong>
                     <span>{formatDate(document.created_at)}</span>
+                    <span
+                      className={`status-badge status-badge--${document.document_status}`}
+                    >
+                      {formatDocumentStatus(document.document_status)}
+                    </span>
                   </div>
                   <dl>
                     <div>
                       <dt>Status</dt>
-                      <dd>{document.status.replaceAll("_", " ")}</dd>
+                      <dd>{formatDocumentStatus(document.document_status)}</dd>
                     </div>
                     <div>
                       <dt>Type</dt>

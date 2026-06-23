@@ -115,6 +115,7 @@ export async function recordUploadedDocumentMetadata(
       case_id: input.caseId,
       document_type: "other",
       status: "uploaded",
+      document_status: "uploaded",
       storage_path: input.storagePath,
       original_filename: input.originalFilename,
       metadata: {
@@ -126,7 +127,7 @@ export async function recordUploadedDocumentMetadata(
       }
     })
     .select(
-      "id, profile_id, case_id, document_type, status, storage_path, original_filename, metadata, created_at"
+      "id, profile_id, case_id, document_type, status, document_status, storage_path, original_filename, metadata, created_at"
     )
     .single();
 

@@ -27,7 +27,7 @@ export async function getUploadedDocumentsForCase(
   const { data, error } = await supabase
     .from("uploaded_documents")
     .select(
-      "id, profile_id, case_id, document_type, status, storage_path, original_filename, metadata, created_at"
+      "id, profile_id, case_id, document_type, status, document_status, storage_path, original_filename, metadata, created_at"
     )
     .eq("profile_id", profileId)
     .eq("case_id", caseId)

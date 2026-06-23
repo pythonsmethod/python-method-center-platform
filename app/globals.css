@@ -464,6 +464,37 @@ code {
   margin-top: 4px;
 }
 
+.document-list__item .status-badge {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-block;
+  font-size: 12px;
+  font-weight: 700;
+  margin-top: 10px;
+  padding: 4px 9px;
+  text-transform: capitalize;
+}
+
+.document-list__item .status-badge--uploaded {
+  background: #edf7f3;
+  color: var(--success);
+}
+
+.document-list__item .status-badge--queued {
+  background: #fff7e7;
+  color: var(--warning);
+}
+
+.document-list__item .status-badge--ready {
+  background: #eaf2ff;
+  color: #315f96;
+}
+
+.document-list__item .status-badge--archived {
+  background: #f0f1f0;
+  color: var(--muted);
+}
+
 .document-list__item dl {
   display: grid;
   gap: 10px;
