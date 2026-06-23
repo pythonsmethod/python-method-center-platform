@@ -5,6 +5,7 @@ import type {
   CareRecipientType,
   OnboardingActionState
 } from "@/lib/onboarding/types";
+import { writeAuditLogs, type AuditLogInput } from "@/lib/audit/log";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const careRecipientTypes: CareRecipientType[] = ["self", "family_member"];
@@ -88,6 +89,7 @@ export async function submitOnboarding(
   }
 
   let caseId = existingCase?.id as string | undefined;
+  let caseCreated = false;
 
   if (!caseId) {
     const { data: createdCase, error: caseCreateError } = await supabase
@@ -106,6 +108,7 @@ export async function submitOnboarding(
     }
 
     caseId = createdCase.id;
+    caseCreated = true;
   }
 
   const submittedAt = new Date().toISOString();
@@ -135,22 +138,71 @@ export async function submitOnboarding(
     return errorState(onboardingError.message);
   }
 
-  const { error: consentError } = await supabase.from("consent_records").insert({
-    profile_id: user.id,
-    case_id: caseId,
-    consent_type: "data_processing",
-    status: "accepted",
-    version: "onboarding-v1",
-    source: "onboarding_form",
-    metadata: {
-      onboarding_submission_id: onboardingSubmission.id,
-      care_recipient_type: careRecipientType
-    }
-  });
+  const { data: consentRecord, error: consentError } = await supabase
+    .from("consent_records")
+    .insert({
+      profile_id: user.id,
+      case_id: caseId,
+      consent_type: "data_processing",
+      status: "accepted",
+      version: "onboarding-v1",
+      source: "onboarding_form",
+      metadata: {
+        onboarding_submission_id: onboardingSubmission.id,
+        care_recipient_type: careRecipientType
+      }
+    })
+    .select("id")
+    .single();
 
   if (consentError) {
     return errorState(consentError.message);
   }
+
+  const auditLogs: AuditLogInput[] = [
+    {
+      profileId: user.id,
+      caseId,
+      actorId: user.id,
+      actorRole: "client",
+      action: "onboarding_submitted",
+      entityTable: "onboarding_submissions",
+      entityId: onboardingSubmission.id,
+      metadata: {
+        care_recipient_type: careRecipientType
+      }
+    },
+    {
+      profileId: user.id,
+      caseId,
+      actorId: user.id,
+      actorRole: "client",
+      action: "consent_captured",
+      entityTable: "consent_records",
+      entityId: consentRecord.id,
+      metadata: {
+        consent_type: "data_processing",
+        consent_version: "onboarding-v1"
+      }
+    }
+  ];
+
+  if (caseCreated) {
+    auditLogs.unshift({
+      profileId: user.id,
+      caseId,
+      actorId: user.id,
+      actorRole: "client",
+      action: "client_case_created",
+      entityTable: "client_cases",
+      entityId: caseId,
+      metadata: {
+        source: "onboarding_form"
+      }
+    });
+  }
+
+  await writeAuditLogs(auditLogs);
 
   redirect("/cabinet?onboarding=submitted");
 }
