@@ -1,35 +1,12 @@
 -- P0-005C: Storage and audit safety foundation before document upload.
--- This migration adds a private client document bucket, storage.objects RLS
--- policies, and a client tamper guard for uploaded_documents status fields.
-
-insert into storage.buckets (
-  id,
-  name,
-  public,
-  file_size_limit,
-  allowed_mime_types
-)
-values (
-  'client-documents',
-  'client-documents',
-  false,
-  52428800,
-  array[
-    'application/pdf',
-    'image/jpeg',
-    'image/png',
-    'image/webp',
-    'text/plain'
-  ]
-)
-on conflict (id) do update
-set
-  public = false,
-  file_size_limit = excluded.file_size_limit,
-  allowed_mime_types = excluded.allowed_mime_types;
-
-comment on table storage.objects is
-  'Supabase Storage object metadata. Client document objects are private and path-scoped to the authenticated profile.';
+-- SQL Editor-safe section only.
+--
+-- Supabase SQL Editor may reject direct DDL on storage.objects with:
+-- ERROR: 42501: must be owner of table objects
+--
+-- For that reason, this migration keeps only public-schema functions/triggers
+-- here. Create the private Storage bucket and storage.objects policies through
+-- the Supabase Dashboard using supabase/storage_manual_setup.md.
 
 create or replace function public.is_client_document_path_owner(object_name text)
 returns boolean
@@ -70,54 +47,6 @@ $$;
 
 comment on function public.is_client_document_path_owner(text) is
   'Checks client document object paths in the form {user_id}/{case_id}/{filename} against the authenticated user and case ownership.';
-
-drop policy if exists "client_documents_select_own"
-on storage.objects;
-
-create policy "client_documents_select_own"
-on storage.objects for select
-to authenticated
-using (
-  bucket_id = 'client-documents'
-  and public.is_client_document_path_owner(name)
-);
-
-drop policy if exists "client_documents_insert_own"
-on storage.objects;
-
-create policy "client_documents_insert_own"
-on storage.objects for insert
-to authenticated
-with check (
-  bucket_id = 'client-documents'
-  and public.is_client_document_path_owner(name)
-);
-
-drop policy if exists "client_documents_update_own"
-on storage.objects;
-
-create policy "client_documents_update_own"
-on storage.objects for update
-to authenticated
-using (
-  bucket_id = 'client-documents'
-  and public.is_client_document_path_owner(name)
-)
-with check (
-  bucket_id = 'client-documents'
-  and public.is_client_document_path_owner(name)
-);
-
-drop policy if exists "client_documents_delete_own"
-on storage.objects;
-
-create policy "client_documents_delete_own"
-on storage.objects for delete
-to authenticated
-using (
-  bucket_id = 'client-documents'
-  and public.is_client_document_path_owner(name)
-);
 
 create or replace function public.prevent_uploaded_document_client_tampering()
 returns trigger

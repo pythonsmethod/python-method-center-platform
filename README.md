@@ -80,6 +80,12 @@ The core schema migration lives at:
 supabase/migrations/20260621220000_create_core_schema.sql
 ```
 
+The storage/audit safety migration lives at:
+
+```text
+supabase/migrations/20260623010000_storage_audit_safety_foundation.sql
+```
+
 Apply it to a real Supabase project with one of these safe paths:
 
 1. Supabase CLI:
@@ -105,6 +111,11 @@ submit onboarding data. The onboarding flow writes to:
 
 RLS is intentionally scoped to the authenticated user (`auth.uid()`). Do not
 weaken RLS for client onboarding verification.
+
+For private client document storage, apply the storage/audit safety migration
+first, then follow `supabase/storage_manual_setup.md` to create the private
+Storage bucket and `storage.objects` policies in the Supabase Dashboard if SQL
+Editor cannot own `storage.objects`.
 
 ## Live Verification Checklist
 
