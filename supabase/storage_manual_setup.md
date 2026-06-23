@@ -25,23 +25,26 @@ Store client document objects inside the `client-documents` bucket with this
 object name pattern:
 
 ```text
-{user_id}/{case_id}/{filename}
+{user_id}/{case_id}/{document_id}/{filename}
 ```
 
 The full storage path is:
 
 ```text
-client-documents/{user_id}/{case_id}/{filename}
+client-documents/{user_id}/{case_id}/{document_id}/{filename}
 ```
 
-`{user_id}` must be the authenticated user's `auth.uid()`, and `{case_id}` must
-belong to that user in `public.client_cases`.
+`{user_id}` must be the authenticated user's `auth.uid()`.
 
 ## Policies
 
 Create custom policies for `storage.objects` through the Supabase Dashboard
 policy UI. Use role `authenticated` only. Do not create `anon`, `public`, or
 `true` policies for this bucket.
+
+Before creating the policies below, remove any broader authenticated
+`storage.objects` SELECT policy that allows downloads from `client-documents`
+without checking the first path segment against `auth.uid()`.
 
 ### Select Own Client Documents
 
@@ -61,7 +64,8 @@ USING expression:
 
 ```sql
 bucket_id = 'client-documents'
-and public.is_client_document_path_owner(name)
+and array_length(storage.foldername(name), 1) = 3
+and auth.uid()::text = (storage.foldername(name))[1]
 ```
 
 ### Insert Own Client Documents
@@ -82,57 +86,11 @@ WITH CHECK expression:
 
 ```sql
 bucket_id = 'client-documents'
-and public.is_client_document_path_owner(name)
+and array_length(storage.foldername(name), 1) = 3
+and auth.uid()::text = (storage.foldername(name))[1]
 ```
 
-### Update Own Client Documents
-
-Policy name:
-
-```text
-client_documents_update_own
-```
-
-Operation:
-
-```text
-UPDATE
-```
-
-USING expression:
-
-```sql
-bucket_id = 'client-documents'
-and public.is_client_document_path_owner(name)
-```
-
-WITH CHECK expression:
-
-```sql
-bucket_id = 'client-documents'
-and public.is_client_document_path_owner(name)
-```
-
-### Delete Own Client Documents
-
-Policy name:
-
-```text
-client_documents_delete_own
-```
-
-Operation:
-
-```text
-DELETE
-```
-
-USING expression:
-
-```sql
-bucket_id = 'client-documents'
-and public.is_client_document_path_owner(name)
-```
+Do not create authenticated UPDATE or DELETE policies for P0-006A.
 
 ## Verification
 
@@ -153,9 +111,7 @@ where schemaname = 'storage'
   and tablename = 'objects'
   and policyname in (
     'client_documents_select_own',
-    'client_documents_insert_own',
-    'client_documents_update_own',
-    'client_documents_delete_own'
+    'client_documents_insert_own'
   )
 order by policyname;
 ```
