@@ -1,10 +1,12 @@
+import Link from "next/link";
+import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
-import { getRequiredUser } from "@/lib/auth/require-user";
+import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 
 export default async function AdminPage() {
-  const auth = await getRequiredUser("/admin");
+  const auth = await getRequiredStaffUser("/admin");
 
   if (auth.status === "missing-env") {
     return (
@@ -16,6 +18,28 @@ export default async function AdminPage() {
         />
 
         <AuthSetupNotice title="Admin requires Supabase Auth setup" />
+      </div>
+    );
+  }
+
+  if (auth.status === "forbidden") {
+    notFound();
+  }
+
+  if (auth.status === "error") {
+    return (
+      <div className="page-shell">
+        <PageHeader
+          eyebrow="Admin workspace"
+          title="Admin"
+          description="Staff access could not be evaluated."
+        />
+
+        <div className="notice notice--warning">
+          <span className="panel__label">Access check failed</span>
+          <h2>Admin unavailable</h2>
+          <p>{auth.message}</p>
+        </div>
       </div>
     );
   }
@@ -32,21 +56,23 @@ export default async function AdminPage() {
         <div className="panel">
           <span className="panel__label">Authenticated session</span>
           <h2>{auth.email ?? "Signed-in user"}</h2>
-          <p>
-            Admin role claims and production authorization checks are not
-            implemented in this foundation task.
-          </p>
+          <p>Role: {auth.role}</p>
           <div className="panel-actions">
             <LogoutButton />
           </div>
         </div>
         <div className="panel">
-          <span className="panel__label">Boundaries</span>
-          <h2>No decision logic</h2>
+          <span className="panel__label">Document intake</span>
+          <h2>Review uploaded documents</h2>
           <p>
-            This page does not approve knowledge, change case state, or expose
-            protected data. It only reserves the route for future implementation.
+            Open the read-only staff intake view for uploaded document metadata
+            and lifecycle status.
           </p>
+          <div className="panel-actions">
+            <Link className="button button--secondary" href="/admin/documents">
+              Open document intake
+            </Link>
+          </div>
         </div>
       </section>
     </div>
