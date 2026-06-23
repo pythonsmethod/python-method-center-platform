@@ -3,6 +3,8 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
+import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
+import { DocumentUploadPanel } from "./DocumentUploadPanel";
 
 type CabinetPageProps = {
   searchParams?: Promise<{
@@ -36,6 +38,10 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
 
   const caseResult = await getClientCaseShell(auth.userId);
   const submitted = isOnboardingSubmitted(params?.onboarding);
+  const documentResult =
+    caseResult.status === "ready" && caseResult.case
+      ? await getUploadedDocumentsForCase(auth.userId, caseResult.case.id)
+      : null;
 
   return (
     <div className="page-shell">
@@ -101,6 +107,26 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           )}
         </div>
       </section>
+
+      {caseResult.status === "ready" && caseResult.case ? (
+        documentResult?.status === "ready" ? (
+          <DocumentUploadPanel
+            caseId={caseResult.case.id}
+            initialDocuments={documentResult.documents}
+            userId={auth.userId}
+          />
+        ) : (
+          <div className="notice notice--warning">
+            <span className="panel__label">Documents</span>
+            <h2>Documents unavailable</h2>
+            <p>
+              {documentResult?.status === "error"
+                ? documentResult.message
+                : "Documents require an active client case."}
+            </p>
+          </div>
+        )
+      ) : null}
     </div>
   );
 }
