@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Аудит готовности к запуску — Python Method</title>
+<style>
+  :root{
+    --ink:#1a1c1e; --muted:#5b6166; --line:#e2e5e8; --soft:#f5f7f8;
+    --crit:#b3261e; --critbg:#fdeceb; --v2:#8a6d00; --v2bg:#fbf3d9;
+    --ok:#1f6b3a; --okbg:#e7f3ec; --accent:#0b4f6c; --accentbg:#e8f1f5;
+  }
+  *{box-sizing:border-box}
+  html{-webkit-text-size-adjust:100%}
+  body{
+    margin:0 auto; max-width:960px; padding:48px 40px 80px;
+    font:16px/1.62 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+    color:var(--ink); background:#fff;
+  }
+  h1{font-size:30px; line-height:1.2; margin:0 0 6px; letter-spacing:-.01em}
+  h2{font-size:22px; margin:44px 0 12px; padding-bottom:8px; border-bottom:2px solid var(--ink); letter-spacing:-.01em}
+  h3{font-size:17px; margin:26px 0 8px}
+  p{margin:10px 0}
+  ul,ol{margin:10px 0; padding-left:22px}
+  li{margin:5px 0}
+  a{color:var(--accent)}
+  code{background:var(--soft); padding:1px 5px; border-radius:4px; font:13px/1.4 "SF Mono",ui-monospace,Menlo,Consolas,monospace}
+  strong{font-weight:650}
+  .lede{color:var(--muted); font-size:14.5px; margin:0 0 4px}
+  .meta{color:var(--muted); font-size:13px; border-left:3px solid var(--line); padding:6px 0 6px 14px; margin:14px 0 8px}
+  .verdict{background:var(--critbg); border:1px solid #f3c9c6; border-left:5px solid var(--crit); border-radius:8px; padding:16px 20px; margin:18px 0}
+  .verdict strong{color:var(--crit)}
+  .toc{background:var(--soft); border:1px solid var(--line); border-radius:8px; padding:14px 22px; margin:22px 0; font-size:14.5px}
+  .toc ol{padding-left:20px; margin:6px 0}
+  .table-wrap{overflow-x:auto; margin:14px 0; border:1px solid var(--line); border-radius:8px}
+  table{border-collapse:collapse; width:100%; font-size:13.5px; min-width:560px}
+  th,td{text-align:left; vertical-align:top; padding:9px 12px; border-bottom:1px solid var(--line)}
+  th{background:var(--soft); font-weight:650; white-space:nowrap}
+  tr:last-child td{border-bottom:none}
+  .tag{display:inline-block; font-size:11.5px; font-weight:650; padding:2px 8px; border-radius:999px; white-space:nowrap; letter-spacing:.01em}
+  .t-crit{background:var(--critbg); color:var(--crit)}
+  .t-v2{background:var(--v2bg); color:var(--v2)}
+  .t-ok{background:var(--okbg); color:var(--ok)}
+  .t-acc{background:var(--accentbg); color:var(--accent)}
+  .callout{background:var(--accentbg); border-left:4px solid var(--accent); border-radius:6px; padding:12px 18px; margin:16px 0; font-size:14.5px}
+  hr{border:none; border-top:1px solid var(--line); margin:34px 0}
+  .foot{color:var(--muted); font-size:13px; margin-top:36px; border-top:1px solid var(--line); padding-top:14px}
+  @media print{
+    body{padding:0; max-width:none; font-size:11.5pt}
+    h2{margin-top:24px}
+    .table-wrap{overflow:visible; border:none}
+    table{min-width:0; font-size:9.5pt}
+    th,td{padding:5px 7px}
+    .toc,.verdict,.callout,.meta{break-inside:avoid}
+    tr{break-inside:avoid}
+    h2,h3{break-after:avoid}
+    a{color:var(--ink); text-decoration:none}
+  }
+</style>
+</head>
+<body>
+
+<p class="lede">АУДИТ ГОТОВНОСТИ К ЗАПУСКУ</p>
+<h1>Python Method — аудит готовности к запуску</h1>
+<p class="meta">
+  <strong>Оптика:</strong> единственный вопрос — что отделяет проект от первого реального клиента и как это убрать.<br>
+  <strong>Дата:</strong> 2026-06-29 · <strong>Ветка:</strong> <code>claude/audit-fdq5jt</code><br>
+  <strong>Метод:</strong> полная инвентаризация <code>docs/</code> + чтение фактического кода (<code>app/</code>, <code>lib/</code>, <code>supabase/</code>, <code>package.json</code>). Код — источник истины о том, что <em>построено</em>; документы — о том, что <em>спроектировано</em>.
+</p>
+
+<div class="toc">
+  <strong>Содержание</strong>
+  <ol>
+    <li><a href="#v1">Краткий вердикт</a></li>
+    <li><a href="#v2">Инвентаризация</a></li>
+    <li><a href="#v3">Поартефактный аудит</a></li>
+    <li><a href="#v4">Дрейф цели</a></li>
+    <li><a href="#v5">Gap по шести пунктам</a></li>
+    <li><a href="#v6">План устранения (приоритизированный)</a></li>
+    <li><a href="#v7">Что откладываем в V2</a></li>
+  </ol>
+</div>
+
+<h2 id="v1">1. Краткий вердикт</h2>
+<div class="verdict">
+Проект <strong>не готов встретить первого клиента и далёк от этого</strong>. Главный разрыв — между документацией и продуктом: написано ~7 300 строк проектных документов (фактически готовые спецификации всех шести пунктов цели), но в коде реализовано примерно <strong>полтора пункта из шести</strong>.
+</div>
+<p>Построен аккуратный технический фундамент (Next.js, схема БД, аутентификация, загрузка документов, журнал аудита), однако <strong>пять из шести запускаемых поверхностей либо отсутствуют, либо являются заглушками</strong>: нет сайта (есть только список ссылок-заглушек), нет приёма оплат (нет даже зависимости Stripe), нет ни одного AI (нет AI-SDK в зависимостях), кабинет Карена сведён к read-only списку документов, рабочего места поддержки нет. Вдобавок продукт нигде не развёрнут и БД не подключена (намеренно), а оферта/политика возврата существуют только как PDF без юридической проверки перед первой оплатой.</p>
+
+<h3>Топ-3 блокера запуска</h3>
+<ol>
+  <li><strong>Нет публичного сайта и нет приёма оплат.</strong> Человеку буквально некуда прийти и нечем заплатить. Это не «доделать», это «построить».</li>
+  <li><strong>Нет ни одного AI и нет поверхности оценки Карена.</strong> Пункты 3/5/6 («анализ анализов», AI-ассистент Карена, AI для клиентов) не существуют в коде; нет таблиц <code>messages</code>, <code>karen_reviews</code>, <code>assessment</code>, <code>ai_session</code>, <code>red_flag_event</code>.</li>
+  <li><strong>Инфраструктура и юридическая база не введены в строй.</strong> Supabase не подключён, деплоя нет, оферта/возврат/приватность не прошли юридическую проверку — а без неё нельзя брать первую оплату.</li>
+</ol>
+<p>Вторая по важности проблема — <strong>дрейф цели</strong>: основной объём труда вложен в философию и методологию (Конституция из 11 разделов, «Видение на 20 лет», «Принципы масштабирования», Конституция центра знаний), то есть в задачи «послезавтра», тогда как пять из шести поверхностей «сегодня» не построены.</p>
+
+<h2 id="v2">2. Инвентаризация</h2>
+
+<h3>2.1 Фактический код (что реально работает)</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Артефакт</th><th>Что это</th></tr></thead>
+<tbody>
+<tr><td><code>package.json</code></td><td>Next.js 15 + React 19 + Supabase. <strong>Нет Stripe, нет AI-SDK.</strong></td></tr>
+<tr><td><code>app/(public)/page.tsx</code></td><td>Главная = заголовок «P0-001 scaffold» + сетка ссылок на маршруты. Не сайт.</td></tr>
+<tr><td><code>app/(auth)/login/*</code></td><td>Вход/регистрация через Supabase Auth (email/пароль). Работает.</td></tr>
+<tr><td><code>app/auth/callback/route.ts</code></td><td>Обработчик email-callback.</td></tr>
+<tr><td>Онбординг + <code>lib/onboarding/actions.ts</code></td><td>Рабочая форма: пишет <code>profiles</code>, <code>client_cases</code>, <code>onboarding_submissions</code>, <code>consent_records</code> + аудит.</td></tr>
+<tr><td><code>app/(client)/cabinet/*</code></td><td>Кабинет-оболочка: статус кейса + панель загрузки. Нет сообщений, оплат, заключений Карена, AI.</td></tr>
+<tr><td>Загрузка документов + <code>lib/documents/*</code></td><td>Рабочая загрузка в приватный Storage + метаданные + аудит.</td></tr>
+<tr><td><code>app/(admin)/admin/documents/*</code></td><td><strong>Единственная реальная «рабочая» функция персонала</strong>: read-only таблица документов + просмотр по подписанному URL. Нельзя вести кейс/писать заключение.</td></tr>
+<tr><td><code>payment/page.tsx</code></td><td>Заглушка: «Provider not connected».</td></tr>
+<tr><td><code>support/page.tsx</code></td><td>Заглушка: «No runtime flow yet».</td></tr>
+<tr><td><code>lib/auth/require-*.ts</code></td><td>Ролевые гварды (client/support/admin). Работают.</td></tr>
+<tr><td><code>lib/audit/log.ts</code></td><td>Запись в <code>audit_logs</code>. Работает.</td></tr>
+<tr><td>Миграции <code>supabase/</code></td><td>Ядро схемы: <strong>12 таблиц</strong> + энумы; 4 миграции упрочнения RLS/доступа/интейка; RLS приватного бакета.</td></tr>
+<tr><td><code>docs/deployment.md</code></td><td>План деплоя на Vercel (не выполнен).</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>2.2 Документы (проектные спецификации)</h3>
+<ul>
+<li><strong>Конституция (11 файлов):</strong> назначение, ценности, три направления, роль Карена, роль AI, принципы поддержки, границы ответственности, <em>принципы масштабирования</em>, <em>видение на 20 лет</em>, конституции кейсов и центра знаний.</li>
+<li><strong>Foundation (3):</strong> PROJECT_FOUNDATION_V1, аудит назначения v2, «основы методологии Карена».</li>
+<li><strong>Архитектура (24):</strong> TECH_STACK, WEB, DATA_MODEL (+OPEN_DECISIONS), SUPABASE_SCHEMA, NEXTJS_STRUCTURE, ACCESS_CONTROL, AUTHORITY_MATRIX, FIELD_LEVEL_ACCESS, AI_GUARDRAILS, RED_FLAG protocol, AGE_AND_CARE_RECIPIENT, DATA_RETENTION, REFUND, CANONICAL_LIFECYCLE_STATUS_MODEL, DATA_MODEL_TO_SUPABASE_MAPPING, Payment/Cabinet/Admin/Support Architecture, 07 AI&amp;Karen, 08 Onboarding, 09 Case Lifecycle, Launch_Architecture_Foundation, <strong>CODEX_ARCHITECTURE_AUDIT</strong>, DOCUMENT_INVENTORY.</li>
+<li><strong>Launch (3):</strong> MVP_BUILD_PLAN_V1, «10 MVP Launch Checklist», «Памятка до запуска.pdf».</li>
+<li><strong>Legal (1):</strong> «Оферта новая версия 2.pdf» — не проверена юридически под платёж.</li>
+<li><strong>Safety (1):</strong> «Протокол безопасности и красных флагов.pdf».</li>
+</ul>
+
+<h2 id="v3">3. Поартефактный аудит</h2>
+<p>Оценка строго относительно шести пунктов цели. Вердикты: <span class="tag t-crit">MVP-CRITICAL</span> <span class="tag t-v2">V2</span> <span class="tag t-acc">ИЗБЫТОК/БЛОКЕР</span></p>
+
+<h3>Код</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Артефакт</th><th>Статус</th><th>+ / −</th><th>Вердикт</th></tr></thead>
+<tbody>
+<tr><td>Next.js-скелет + auth + гварды</td><td>Готов</td><td>+ реальная аутентификация, роли, аудит &nbsp;· − сам по себе клиента не встречает</td><td><span class="tag t-ok">готов</span></td></tr>
+<tr><td>Схема БД (12 таблиц)</td><td>Частично</td><td>+ профили/кейсы/оплаты/периоды/документы/согласия &nbsp;· − <strong>нет</strong> <code>messages</code>, <code>karen_reviews</code>, <code>assessment</code>, <code>ai_session</code>, <code>red_flag_event</code></td><td><span class="tag t-crit">неполно</span></td></tr>
+<tr><td>Онбординг</td><td>Готов (узкий)</td><td>+ создаёт кейс/согласие/аудит &nbsp;· − <strong>нет гейта 21+ и Care Recipient</strong>, нет адреса, нет ОАК</td><td><span class="tag t-crit">неполно</span></td></tr>
+<tr><td>Загрузка документов + интейк</td><td>Половина п.3</td><td>+ приватный Storage, аудит, подписанные URL &nbsp;· − нет AI-структурирования, нет оценки Карена</td><td><span class="tag t-crit">неполно</span></td></tr>
+<tr><td>Публичный сайт</td><td>Заглушка</td><td>− список ссылок «scaffold», а не сайт</td><td><span class="tag t-crit">отсутствует</span></td></tr>
+<tr><td>Приём оплат</td><td>Заглушка</td><td>− нет Stripe, чекаута, вебхуков, активации, дисклеймера</td><td><span class="tag t-crit">отсутствует</span></td></tr>
+<tr><td>Кабинет Карена</td><td>≈10%</td><td>+ вход и список документов &nbsp;· − нет очередей, карточки кейса, заключений, статусов</td><td><span class="tag t-crit">≈10%</span></td></tr>
+<tr><td>Рабочее место поддержки</td><td>Заглушка</td><td>− нет тикетов, маршрутизации, кризисной очереди</td><td><span class="tag t-crit">отсутствует</span></td></tr>
+<tr><td>AI (Карена и клиентский)</td><td>Отсутствует</td><td>− <strong>ни строчки кода, нет AI-SDK</strong></td><td><span class="tag t-crit">отсутствует</span></td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Документы</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Артефакт</th><th>Статус</th><th>Вердикт</th></tr></thead>
+<tbody>
+<tr><td>WEB / Payment / Cabinet / Admin / Onboarding / AI-roles / AI_GUARDRAILS / DATA_MODEL / SUPABASE_SCHEMA / REFUND</td><td>Готовые спеки</td><td><span class="tag t-crit">MVP-CRITICAL</span> как вход в реализацию (но это планы, не продукт)</td></tr>
+<tr><td>CODEX_ARCHITECTURE_AUDIT</td><td>Готов; часть P0 не закрыта</td><td><span class="tag t-crit">MVP-CRITICAL</span> (см. §4)</td></tr>
+<tr><td>AGE_AND_CARE / DATA_RETENTION / FIELD_LEVEL_ACCESS / RED_FLAG</td><td>Спеки готовы, в коде нет</td><td><span class="tag t-crit">не реализовано</span></td></tr>
+<tr><td>Оферта.pdf, Протокол безопасности.pdf</td><td>Без юр-проверки под платёж</td><td><span class="tag t-crit">блокер оплаты</span></td></tr>
+<tr><td>Конституция 09/10, Центр знаний, «основы методологии»</td><td>Утверждены</td><td><span class="tag t-v2">V2 / ИЗБЫТОК сейчас</span></td></tr>
+<tr><td>DOCUMENT_INVENTORY, README-заглушки</td><td>Справочные</td><td>Не влияет на запуск</td></tr>
+</tbody>
+</table>
+</div>
+
+<h2 id="v4">4. Дрейф цели</h2>
+<p>Проект ушёл от запуска <strong>вниз — в глубину смысла</strong>, вместо того чтобы уйти <strong>вперёд — к рабочему продукту</strong>.</p>
+<ol>
+<li><strong>Философия вместо поверхностей.</strong> «Утверждены» разделы, не приближающие клиента: <code>constitution_10_vision_20_years</code>, <code>constitution_09_scaling_principles</code>, <code>constitution_of_knowledge_center</code>, «основы методологии». По эталонной цели — <strong>V2+</strong>. Параллельно сайт, оплаты и оба AI не существуют.</li>
+<li><strong>Решение завтрашних задач.</strong> Масштабирование, центр знаний, обучение AI на кейсах, версионирование базы знаний — про рост <em>после</em> первых клиентов.</li>
+<li><strong>Бесконечное углубление документации.</strong> Сигнатура дрейфа — ~7 300 строк документов к ~3 400 строкам кода, где код покрывает ~1,5 из 6 целей. Появились мета-документы об документах (DOCUMENT_INVENTORY, CODEX_AUDIT, DATA_MODEL_OPEN_DECISIONS, DATA_MODEL_TO_SUPABASE_MAPPING, CANONICAL_LIFECYCLE_STATUS_MODEL) — согласования спецификаций, ещё не превращённых в продукт.</li>
+<li><strong>Незакрытые противоречия из собственного аудита (CODEX):</strong>
+  <ul>
+  <li><strong>Конфликт имени бренда — НЕ ЗАКРЫТ.</strong> Заголовки Конституции до сих пор называют центр «РЕАБИЛИТАЦИЯ БЕЗ ГРАНИЦ», при том что бренд-идентичность фиксирует: имя = <strong>Python Method</strong>, а «Реабилитация без границ» — только слоган. Прямое брендово-юридическое противоречие перед публикацией сайта и оферты.</li>
+  <li><strong>Тройной дрейф статус-энумов.</strong> <code>case_status</code> различается в трёх местах: миграция (<code>created/awaiting_onboarding/ready_for_review/in_review/active_support/…</code>) ≠ DATA_MODEL_V1 (<code>account_created/…/analysis_complete/…</code>) ≠ SUPABASE_SCHEMA_V1 (<code>intake/under_review/active/paused/closed</code>). Код уже разошёлся со спеками.</li>
+  </ul>
+</li>
+</ol>
+<div class="callout"><strong>Вывод:</strong> глубина метода — не недостаток сама по себе, но как приоритет <em>сейчас</em> она и есть отклонение. Всё из п.1–3 нужно заморозить как V2 и не тратить на это внимание до первых клиентов.</div>
+
+<h2 id="v5">5. Gap по шести пунктам</h2>
+<div class="table-wrap">
+<table>
+<thead><tr><th>Пункт цели</th><th>Готово</th><th>Не хватает (критично)</th><th>Блокер</th></tr></thead>
+<tbody>
+<tr><td><strong>1. Веб-сайт</strong></td><td>Маршрут <code>/</code>; дизайн-спека WEB_ARCHITECTURE</td><td>Страницы: Главная, О центре, О Карене, Как это работает, Тарифы (5/15 нед. + бесплатный вход), Оферта/Приватность, FAQ, Контакты, CTA</td><td>Контент не написан; конфликт имени; нет деплоя</td></tr>
+<tr><td><strong>2. Приём оплат</strong></td><td>Энумы и таблицы <code>payments</code>/<code>service_periods</code></td><td>Stripe, чекаут, вебхуки+идемпотентность, активация периода, дисклеймер + чекбоксы согласий до оплаты</td><td>Нет Stripe-ключей; <strong>оферта/возврат без юр-проверки</strong></td></tr>
+<tr><td><strong>3. Анализ анализов</strong></td><td>Загрузка в приватный Storage + аудит + read-only вид</td><td>AI-структурирование (перевод, показатели, качество, confidence), таблица <code>assessment</code>, поверхность оценки Карена</td><td>Нет AI-слоя; нет <code>assessment</code>; негде формулировать оценку</td></tr>
+<tr><td><strong>4. Кабинет Карена</strong></td><td>Вход + read-only список документов</td><td>Очереди, карточка кейса, заключения (<code>karen_reviews</code>), статусы/срочность, двухоконный интерфейс</td><td>Нет <code>karen_reviews</code>/<code>messages</code></td></tr>
+<tr><td><strong>5. AI-Ассистент Карена</strong></td><td>—</td><td>Резюме, перевод/структурирование, черновики ответов/заключений, режимы, confidence</td><td>Нет AI-SDK, провайдера/бюджета, <code>ai_session</code></td></tr>
+<tr><td><strong>6. AI для клиентов</strong></td><td>—</td><td>Навигация, статусы, помощь в онбординге/оплате, поддержка в guardrails, <strong>красные флаги + <code>red_flag_event</code> + эскалация</strong></td><td>Нет AI-SDK; нет <code>red_flag_event</code>; протокол не в рантайме</td></tr>
+</tbody>
+</table>
+</div>
+<p><strong>Сквозные блокеры:</strong> Supabase не подключён · деплоя нет · возрастной гейт 21+/Care Recipient не реализован (MVP-обязательно) · юр-проверка оферты/возврата/приватности перед первой оплатой не пройдена.</p>
+
+<h2 id="v6">6. План устранения (приоритизированный)</h2>
+
+<h3>Уровень A — блокеры, требующие решения владельца</h3>
+<div class="table-wrap">
+<table>
+<thead><tr><th>#</th><th>Что делаем</th><th>Кто решает</th></tr></thead>
+<tbody>
+<tr><td>A1</td><td>Подключить Supabase, применить миграции, проверить вход+онбординг+загрузку на живой БД</td><td>Владелец → разработка</td></tr>
+<tr><td>A2</td><td>Завести Stripe; выбрать валюту и <strong>цены</strong> тарифов 5/15 недель</td><td>Владелец</td></tr>
+<tr><td>A3</td><td>Юр-проверка <strong>оферты, возврата, приватности</strong>; тексты дисклеймеров и чекбоксов</td><td>Владелец + юрист</td></tr>
+<tr><td>A4</td><td>Выбрать <strong>AI-провайдера и бюджет</strong> (пп. 3/5/6)</td><td>Владелец</td></tr>
+<tr><td>A5</td><td>Подтвердить <strong>сокращение объёма MVP</strong> (заморозить V2-философию)</td><td>Владелец</td></tr>
+<tr><td>A6</td><td>Закрыть конфликт имени бренда: заголовки Конституции → «Python Method»</td><td>Владелец → разработка</td></tr>
+</tbody>
+</table>
+</div>
+
+<h3>Уровень B — критично для запуска (стройка после A)</h3>
+<ol>
+<li><strong>Сайт</strong> (п.1): 8 контент-страниц по WEB_ARCHITECTURE без обещаний результата + CTA → регистрация. <em>(можно начинать сразу.)</em></li>
+<li><strong>Оплаты</strong> (п.2): Stripe Checkout + вебхуки с идемпотентностью + активация <code>service_period</code> по оплате + дисклеймер/чекбоксы + аудит.</li>
+<li><strong>Анализ анализов</strong> (п.3): сущность <code>assessment</code>; AI-структурирование документов; поверхность, где Карен формулирует и публикует оценку.</li>
+<li><strong>Кабинет Карена</strong> (п.4): <code>messages</code> + <code>karen_reviews</code>; карточка кейса; очереди; написание/публикация заключений; статусы (только Карен).</li>
+<li><strong>AI Карена</strong> (п.5) и <strong>AI для клиентов</strong> (п.6) в рамках AI_GUARDRAILS; <strong><code>red_flag_event</code> + двойная маршрутизация</strong> (физ./мед. → Карен, психол./кризис → Anna/Support).</li>
+<li><strong>Обязательные политики в рантайме:</strong> гейт 21+ и Care Recipient; ретеншн/удаление; field-level доступ.</li>
+<li><strong>Согласование статус-энумов</strong> кода с CANONICAL_LIFECYCLE_STATUS_MODEL.</li>
+<li><strong>Деплой</strong> на Vercel + домен + Supabase redirect URLs.</li>
+</ol>
+
+<h3>Уровень C — желательное (не блокирует первого клиента)</h3>
+<ul>
+<li>Сквозной smoke-тест по «10 MVP Launch Checklist» (18 шагов).</li>
+<li>Рабочее место поддержки (тикеты) — при MVP роль Anna частично вручную.</li>
+<li>PDF-выгрузка заключений, уведомления, расширенная аналитика — <strong>V2</strong>.</li>
+</ul>
+
+<h2 id="v7">7. Что откладываем в V2</h2>
+<ul>
+<li>Конституция р.10 «Видение на 20 лет», р.09 «Масштабирование», Конституция центра знаний, «основы методологии» как предмет доработки.</li>
+<li>База знаний, обучение AI на кейсах, версионирование/публикация знаний, извлечение паттернов.</li>
+<li>Будущие продукты (Python Elixir, Python Peptide), мультиязычный контент сверх принципа, полноценная CMS, брендинг-дизайн сверх минимума.</li>
+<li>Мобильное приложение, голосовой режим Карена, внутренние заметки, кнопка срочного звонка, автоприоритизация, командные роли, академия, семейные аккаунты, скидки, авто-PDF-отчёты.</li>
+<li>Авто-переоценка, авто-биллинг/подписки, рассрочки, авто-возвраты, расширенная аналитика.</li>
+</ul>
+
+<div class="callout">
+<strong>Итог.</strong> Технический фундамент — крепкий и честный (auth, RLS, аудит, приватный Storage). Но по эталонной цели проект на стадии «фундамент + один угол дома»: из шести поверхностей реально стоит полторы. Ближайший разумный шаг — <strong>решения владельца уровня A</strong>, после чего строить B1→B8 строго по готовым спекам, не углубляя документацию дальше.
+</div>
+
+<p class="foot">Сформировано в ходе аудита готовности к запуску. Источник: репозиторий <code>python-method-center-platform</code>, ветка <code>claude/audit-fdq5jt</code>. Markdown-версия: <code>docs/audit/LAUNCH_READINESS_AUDIT_V1.md</code>.</p>
+
+</body>
+</html>
