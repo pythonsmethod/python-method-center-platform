@@ -41,6 +41,34 @@ const supportStatusLabels: Record<string, string> = {
   closed: "Закрыт"
 };
 
+const lifecycleEventLabels: Record<string, string> = {
+  case_created: "Кейс создан",
+  onboarding_submitted: "Анкета отправлена",
+  status_changed: "Статус кейса изменён",
+  payment_recorded: "Оплата зафиксирована",
+  service_period_started: "Период сопровождения начат",
+  service_period_completed: "Период сопровождения завершён",
+  support_requested: "Отправлено обращение в поддержку",
+  escalation_created: "Создана эскалация",
+  consent_recorded: "Зафиксировано согласие",
+  admin_note_added: "Добавлена заметка команды"
+};
+
+const paymentProductLabels: Record<string, string> = {
+  preliminary_assessment: "Предварительная оценка",
+  support_5_weeks: "Сопровождение — 5 недель",
+  support_15_weeks: "Сопровождение — 15 недель"
+};
+
+const paymentStatusLabels: Record<string, string> = {
+  not_required: "Не требуется",
+  pending: "Ожидает оплаты",
+  paid: "Оплачен",
+  failed: "Не прошёл",
+  refunded: "Возвращён",
+  partially_refunded: "Возвращён частично"
+};
+
 function labelFor(map: Record<string, string>, value: string): string {
   return map[value] ?? value.replaceAll("_", " ");
 }
@@ -63,4 +91,16 @@ export function documentStatusLabel(value: string): string {
 
 export function supportStatusLabel(value: string): string {
   return labelFor(supportStatusLabels, value);
+}
+
+export function lifecycleEventLabel(value: string): string {
+  return labelFor(lifecycleEventLabels, value);
+}
+
+export function paymentProductLabel(value: string): string {
+  return labelFor(paymentProductLabels, value);
+}
+
+export function paymentStatusLabel(value: string): string {
+  return labelFor(paymentStatusLabels, value);
 }

@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import type { SupportRequestActionState } from "@/lib/support/types";
 import { writeAuditLog } from "@/lib/audit/log";
+import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -97,6 +98,17 @@ export async function createSupportRequest(
     entityTable: "support_requests",
     entityId: request.id
   });
+
+  if (clientCase?.id) {
+    await writeLifecycleEvent({
+      profileId: user.id,
+      caseId: clientCase.id,
+      eventType: "support_requested",
+      actorId: user.id,
+      actorRole: "client",
+      metadata: { support_request_id: request.id }
+    });
+  }
 
   revalidatePath("/cabinet");
 

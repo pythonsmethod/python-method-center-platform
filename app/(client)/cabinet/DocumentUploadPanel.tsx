@@ -78,7 +78,30 @@ export function DocumentUploadPanel({
     message: ""
   });
   const [isPending, startTransition] = useTransition();
+  const [openError, setOpenError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  async function handleOpenDocument(document: UploadedDocument) {
+    setOpenError("");
+
+    const supabase = getSupabaseBrowserClient();
+
+    if (!supabase) {
+      setOpenError("Сервис временно недоступен: не настроено подключение к базе данных.");
+      return;
+    }
+
+    const { data, error } = await supabase.storage
+      .from(DOCUMENT_STORAGE_BUCKET)
+      .createSignedUrl(document.storage_path, 60);
+
+    if (error || !data?.signedUrl) {
+      setOpenError(error?.message ?? "Не удалось открыть документ.");
+      return;
+    }
+
+    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+  }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -210,6 +233,10 @@ export function DocumentUploadPanel({
             <h2>Загруженные документы</h2>
           </div>
 
+          {openError ? (
+            <p className="form-message form-message--error">{openError}</p>
+          ) : null}
+
           {documents.length === 0 ? (
             <p className="empty-state">Документы ещё не загружены.</p>
           ) : (
@@ -226,6 +253,15 @@ export function DocumentUploadPanel({
                     >
                       {formatDocumentStatus(document.document_status)}
                     </span>
+                  </div>
+                  <div className="panel-actions">
+                    <button
+                      className="button button--secondary button--compact"
+                      onClick={() => handleOpenDocument(document)}
+                      type="button"
+                    >
+                      Открыть
+                    </button>
                   </div>
                   <dl>
                     <div>

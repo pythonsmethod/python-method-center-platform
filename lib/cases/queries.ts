@@ -1,3 +1,4 @@
+import type { CaseLifecycleEvent } from "@/lib/cases/lifecycle";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export type ClientCaseShell = {
@@ -52,5 +53,46 @@ export async function getClientCaseShell(
   return {
     status: "ready",
     case: data as ClientCaseShell | null
+  };
+}
+
+export type CaseLifecycleEventsResult =
+  | {
+      status: "ready";
+      events: CaseLifecycleEvent[];
+    }
+  | {
+      status: "error";
+      message: string;
+    };
+
+export async function getOwnCaseLifecycleEvents(
+  profileId: string,
+  caseId: string
+): Promise<CaseLifecycleEventsResult> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return {
+      status: "error",
+      message: "Сервис временно недоступен: не настроено подключение к базе данных."
+    };
+  }
+
+  const { data, error } = await supabase
+    .from("case_lifecycle_events")
+    .select("id, event_type, from_status, to_status, actor_role, notes, created_at")
+    .eq("profile_id", profileId)
+    .eq("case_id", caseId)
+    .order("created_at", { ascending: false })
+    .limit(50);
+
+  if (error) {
+    return { status: "error", message: error.message };
+  }
+
+  return {
+    status: "ready",
+    events: (data ?? []) as CaseLifecycleEvent[]
   };
 }

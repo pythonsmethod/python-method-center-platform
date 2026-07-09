@@ -6,6 +6,10 @@ import type {
   OnboardingActionState
 } from "@/lib/onboarding/types";
 import { writeAuditLogs, type AuditLogInput } from "@/lib/audit/log";
+import {
+  writeLifecycleEvents,
+  type LifecycleEventInput
+} from "@/lib/cases/lifecycle";
 import { OFFER_VERSION } from "@/lib/legal/offer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -115,6 +119,10 @@ export async function submitOnboarding(
 
     caseId = createdCase.id;
     caseCreated = true;
+  }
+
+  if (!caseId) {
+    return errorState("Не удалось создать кейс. Попробуйте ещё раз.");
   }
 
   const submittedAt = new Date().toISOString();
@@ -243,7 +251,44 @@ export async function submitOnboarding(
     });
   }
 
-  await writeAuditLogs(auditLogs);
+  const lifecycleEvents: LifecycleEventInput[] = [
+    {
+      profileId: user.id,
+      caseId,
+      eventType: "onboarding_submitted",
+      actorId: user.id,
+      actorRole: "client",
+      metadata: { onboarding_submission_id: onboardingSubmission.id }
+    },
+    {
+      profileId: user.id,
+      caseId,
+      eventType: "consent_recorded",
+      actorId: user.id,
+      actorRole: "client",
+      metadata: {
+        consent_types: ["offer_acceptance", "data_processing"],
+        offer_version: OFFER_VERSION
+      }
+    }
+  ];
+
+  if (caseCreated) {
+    lifecycleEvents.unshift({
+      profileId: user.id,
+      caseId,
+      eventType: "case_created",
+      toStatus: "ready_for_review",
+      actorId: user.id,
+      actorRole: "client",
+      metadata: { source: "onboarding_form" }
+    });
+  }
+
+  await Promise.all([
+    writeAuditLogs(auditLogs),
+    writeLifecycleEvents(lifecycleEvents)
+  ]);
 
   redirect("/cabinet?onboarding=submitted");
 }
