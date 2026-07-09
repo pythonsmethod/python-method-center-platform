@@ -1,10 +1,20 @@
+import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
+import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
+import {
+  caseDirectionLabel,
+  caseStatusLabel,
+  caseUrgencyLabel,
+  supportStatusLabel
+} from "@/lib/i18n/status-labels";
+import { getOwnSupportRequests } from "@/lib/support/queries";
 import { DocumentUploadPanel } from "./DocumentUploadPanel";
+import { SupportRequestForm } from "./SupportRequestForm";
 
 type CabinetPageProps = {
   searchParams?: Promise<{
@@ -18,6 +28,13 @@ function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
     : value === "submitted";
 }
 
+function formatDate(value: string): string {
+  return new Intl.DateTimeFormat("ru", {
+    dateStyle: "medium",
+    timeStyle: "short"
+  }).format(new Date(value));
+}
+
 export default async function CabinetPage({ searchParams }: CabinetPageProps) {
   const auth = await getRequiredUser("/cabinet");
   const params = await searchParams;
@@ -26,12 +43,12 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Client cabinet"
-          title="Cabinet"
-          description="This route requires Supabase Auth before cabinet data can be shown."
+          eyebrow="Личный кабинет"
+          title="Кабинет"
+          description="Для кабинета требуется настроенная аутентификация."
         />
 
-        <AuthSetupNotice title="Cabinet requires Supabase Auth setup" />
+        <AuthSetupNotice title="Кабинет требует настройки Supabase Auth" />
       </div>
     );
   }
@@ -42,67 +59,73 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     caseResult.status === "ready" && caseResult.case
       ? await getUploadedDocumentsForCase(auth.userId, caseResult.case.id)
       : null;
+  const supportResult = await getOwnSupportRequests(auth.userId);
 
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Client cabinet"
-        title="Cabinet"
-        description="Authenticated cabinet shell for future case status, documents, messages, and billing surfaces."
+        eyebrow="Личный кабинет"
+        title="Кабинет"
+        description="Ваш кейс, медицинские документы и связь с командой."
       />
 
       {submitted ? (
         <div className="notice notice--success">
-          <span className="panel__label">Onboarding submitted</span>
-          <h2>Case shell created</h2>
+          <span className="panel__label">Анкета отправлена</span>
+          <h2>Кейс создан</h2>
           <p>
-            Your onboarding submission was recorded and linked to your client
-            case shell.
+            Анкета сохранена и привязана к вашему кейсу. Загрузите медицинские
+            документы ниже — команда изучит кейс и свяжется с вами.
           </p>
         </div>
       ) : null}
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Authenticated session</span>
-          <h2>{auth.email ?? "Signed-in user"}</h2>
+          <span className="panel__label">Ваш аккаунт</span>
+          <h2>{auth.email ?? "Вы вошли в систему"}</h2>
           <p>
-            Supabase Auth returned a user session. Cabinet functionality is
-            still reserved for future implementation.
+            Один аккаунт — один непрерывный кейс. Все документы и сообщения
+            привязаны к нему.
           </p>
           <div className="panel-actions">
             <LogoutButton />
           </div>
         </div>
         <div className="panel">
-          <span className="panel__label">Cabinet state</span>
+          <span className="panel__label">Ваш кейс</span>
           {caseResult.status === "error" ? (
             <>
-              <h2>Case status unavailable</h2>
+              <h2>Статус кейса недоступен</h2>
               <p>{caseResult.message}</p>
             </>
           ) : caseResult.case ? (
             <>
-              <h2>{caseResult.case.status.replaceAll("_", " ")}</h2>
+              <h2>{caseStatusLabel(caseResult.case.status)}</h2>
               <ul className="status-list">
-                <li>Case ID: {caseResult.case.id}</li>
+                <li>Цель: {caseResult.case.title ?? "Не указана"}</li>
                 <li>
-                  Title: {caseResult.case.title ?? "Not set"}
+                  Срочность: {caseUrgencyLabel(caseResult.case.urgency)}
                 </li>
                 <li>
-                  Urgency: {caseResult.case.urgency.replaceAll("_", " ")}
+                  Направление:{" "}
+                  {caseDirectionLabel(caseResult.case.direction)}
                 </li>
-                <li>
-                  Direction: {caseResult.case.direction.replaceAll("_", " ")}
-                </li>
+                <li>Создан: {formatDate(caseResult.case.created_at)}</li>
               </ul>
             </>
           ) : (
             <>
-              <h2>No case yet</h2>
+              <h2>Кейса пока нет</h2>
               <p>
-                Submit onboarding to create the first client case shell.
+                Заполните анкету, чтобы создать кейс — после этого можно будет
+                загрузить документы.
               </p>
+              <div className="panel-actions">
+                <Link className="button" href="/onboarding">
+                  Заполнить анкету
+                </Link>
+              </div>
             </>
           )}
         </div>
@@ -117,16 +140,60 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           />
         ) : (
           <div className="notice notice--warning">
-            <span className="panel__label">Documents</span>
-            <h2>Documents unavailable</h2>
+            <span className="panel__label">Документы</span>
+            <h2>Документы недоступны</h2>
             <p>
               {documentResult?.status === "error"
                 ? documentResult.message
-                : "Documents require an active client case."}
+                : "Для загрузки документов нужен активный кейс."}
             </p>
           </div>
         )
       ) : null}
+
+      <section className="documents-section" aria-label="Связь с командой">
+        <div className="documents-layout">
+          <div className="document-upload">
+            <div>
+              <span className="panel__label">Связь с командой</span>
+              <h2>Написать команде</h2>
+            </div>
+            <SupportRequestForm />
+          </div>
+
+          <div className="documents-list-panel">
+            <div>
+              <span className="panel__label">Ваши обращения</span>
+              <h2>История сообщений</h2>
+            </div>
+
+            {supportResult.status === "error" ? (
+              <p className="empty-state">{supportResult.message}</p>
+            ) : supportResult.requests.length === 0 ? (
+              <p className="empty-state">
+                Обращений пока нет. Напишите нам, если есть вопрос.
+              </p>
+            ) : (
+              <ul className="document-list">
+                {supportResult.requests.map((request) => (
+                  <li className="document-list__item" key={request.id}>
+                    <div>
+                      <strong>{request.subject}</strong>
+                      <span>{formatDate(request.created_at)}</span>
+                      <span className="status-badge">
+                        {supportStatusLabel(request.status)}
+                      </span>
+                    </div>
+                    {request.body ? <p>{request.body}</p> : null}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </div>
+      </section>
+
+      <EmergencyNotice />
     </div>
   );
 }

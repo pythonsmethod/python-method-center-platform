@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useActionState } from "react";
 import { submitOnboarding } from "@/lib/onboarding/actions";
 import {
@@ -20,7 +21,7 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
   return (
     <form action={formAction} className="onboarding-form">
       <label className="field">
-        <span>Full name</span>
+        <span>Полное имя</span>
         <input
           autoComplete="name"
           defaultValue={profileDefaults.fullName}
@@ -31,7 +32,7 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
       </label>
 
       <label className="field">
-        <span>Phone</span>
+        <span>Телефон</span>
         <input
           autoComplete="tel"
           defaultValue={profileDefaults.phone}
@@ -42,32 +43,54 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
       </label>
 
       <label className="field">
-        <span>Care recipient type</span>
+        <span>Для кого запрос</span>
         <select defaultValue="self" name="careRecipientType" required>
-          <option value="self">Self</option>
-          <option value="family_member">Family member</option>
+          <option value="self">Для себя</option>
+          <option value="family_member">Для члена семьи</option>
         </select>
       </label>
 
       <label className="field">
-        <span>Primary goal</span>
-        <input name="primaryGoal" required type="text" />
+        <span>Основная цель</span>
+        <input
+          name="primaryGoal"
+          placeholder="Например: восстановление после операции"
+          required
+          type="text"
+        />
       </label>
 
       <label className="field">
-        <span>Short situation description</span>
-        <textarea name="situationDescription" required rows={5} />
+        <span>Краткое описание ситуации</span>
+        <textarea
+          name="situationDescription"
+          placeholder="Что произошло, какое состояние сейчас, что уже делали"
+          required
+          rows={5}
+        />
+      </label>
+
+      <label className="checkbox-field">
+        <input name="offerAccepted" required type="checkbox" />
+        <span>
+          Я принимаю условия{" "}
+          <Link href="/legal/offer" target="_blank">
+            публичной оферты
+          </Link>
+          .
+        </span>
       </label>
 
       <label className="checkbox-field">
         <input name="consentAccepted" required type="checkbox" />
         <span>
-          I consent to storing this onboarding information for case preparation.
+          Я даю согласие на обработку моих персональных данных и медицинской
+          информации для подготовки и ведения кейса.
         </span>
       </label>
 
       <button className="button" disabled={pending} type="submit">
-        {pending ? "Submitting..." : "Submit onboarding"}
+        {pending ? "Отправка..." : "Отправить анкету"}
       </button>
 
       {state.message ? (

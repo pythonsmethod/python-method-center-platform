@@ -43,13 +43,13 @@ export async function signInWithPassword(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Supabase is not configured. Add the public URL and anon key to the environment.");
+    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
   }
 
   const { email, password } = readCredentials(formData);
 
   if (!email || !password) {
-    return errorState("Enter both email and password.");
+    return errorState("Введите email и пароль.");
   }
 
   const { error } = await supabase.auth.signInWithPassword({
@@ -71,17 +71,17 @@ export async function signUpWithPassword(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Supabase is not configured. Add the public URL and anon key to the environment.");
+    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
   }
 
   const { email, password } = readCredentials(formData);
 
   if (!email || !password) {
-    return errorState("Enter both email and password.");
+    return errorState("Введите email и пароль.");
   }
 
   if (password.length < 6) {
-    return errorState("Password must be at least 6 characters.");
+    return errorState("Пароль должен быть не короче 6 символов.");
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -102,7 +102,7 @@ export async function signUpWithPassword(
 
   return {
     status: "success",
-    message: "Sign-up request sent. Check your email if confirmation is enabled."
+    message: "Заявка на регистрацию отправлена. Если включено подтверждение, проверьте почту."
   };
 }
 

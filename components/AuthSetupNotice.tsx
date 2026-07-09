@@ -5,7 +5,7 @@ type AuthSetupNoticeProps = {
 };
 
 export function AuthSetupNotice({
-  title = "Supabase Auth is not configured"
+  title = "Supabase Auth не настроен"
 }: AuthSetupNoticeProps) {
   const missingVars = getMissingSupabaseEnvVars();
 
@@ -15,11 +15,11 @@ export function AuthSetupNotice({
 
   return (
     <div className="notice notice--warning">
-      <span className="panel__label">Setup required</span>
+      <span className="panel__label">Требуется настройка</span>
       <h2>{title}</h2>
       <p>
-        Add the missing environment variables before authentication requests can
-        run:
+        Добавьте недостающие переменные окружения, чтобы аутентификация
+        заработала:
       </p>
       <ul className="status-list">
         {missingVars.map((name) => (

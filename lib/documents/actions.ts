@@ -39,7 +39,7 @@ export async function recordUploadedDocumentMetadata(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Supabase is not configured. Add the public URL and anon key to the environment.");
+    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
   }
 
   const {
@@ -52,7 +52,7 @@ export async function recordUploadedDocumentMetadata(
   }
 
   if (!isUuid(input.caseId) || !isUuid(input.documentId)) {
-    return errorState("Document upload metadata is invalid.");
+    return errorState("Данные загрузки документа некорректны.");
   }
 
   const validation = validateDocumentFile({
@@ -73,7 +73,7 @@ export async function recordUploadedDocumentMetadata(
   });
 
   if (input.storagePath !== expectedStoragePath) {
-    return errorState("Document storage path does not match the authenticated user and case.");
+    return errorState("Путь хранения документа не соответствует вашему аккаунту и кейсу.");
   }
 
   const { data: clientCase, error: caseError } = await supabase
@@ -88,7 +88,7 @@ export async function recordUploadedDocumentMetadata(
   }
 
   if (!clientCase) {
-    return errorState("Client case was not found for the authenticated user.");
+    return errorState("Кейс для вашего аккаунта не найден.");
   }
 
   const objectDirectory = `${user.id}/${input.caseId}/${input.documentId}`;
@@ -104,7 +104,7 @@ export async function recordUploadedDocumentMetadata(
   }
 
   if (!storedObjects?.some((object) => object.name === validation.safeFilename)) {
-    return errorState("Uploaded storage object was not found.");
+    return errorState("Загруженный файл не найден в хранилище.");
   }
 
   const { data: document, error: documentError } = await supabase

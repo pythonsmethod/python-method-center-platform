@@ -30,7 +30,7 @@ export async function getClientCaseShell(
   if (!supabase) {
     return {
       status: "error",
-      message: "Supabase is not configured."
+      message: "Сервис временно недоступен: не настроено подключение к базе данных."
     };
   }
 

@@ -6,6 +6,7 @@ import type {
   OnboardingActionState
 } from "@/lib/onboarding/types";
 import { writeAuditLogs, type AuditLogInput } from "@/lib/audit/log";
+import { OFFER_VERSION } from "@/lib/legal/offer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const careRecipientTypes: CareRecipientType[] = ["self", "family_member"];
@@ -29,7 +30,7 @@ export async function submitOnboarding(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Supabase is not configured. Add the public URL and anon key to the environment.");
+    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
   }
 
   const {
@@ -49,18 +50,23 @@ export async function submitOnboarding(
     formData,
     "situationDescription"
   );
+  const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
 
   if (!fullName || !phone || !primaryGoal || !situationDescription) {
-    return errorState("Complete all required onboarding fields.");
+    return errorState("Заполните все обязательные поля анкеты.");
   }
 
   if (!isCareRecipientType(careRecipientType)) {
-    return errorState("Choose who the care request is for.");
+    return errorState("Укажите, для кого запрос.");
+  }
+
+  if (!offerAccepted) {
+    return errorState("Для отправки анкеты необходимо принять условия публичной оферты.");
   }
 
   if (!consentAccepted) {
-    return errorState("Consent is required before onboarding can be submitted.");
+    return errorState("Для отправки анкеты необходимо согласие на обработку данных.");
   }
 
   const { error: profileError } = await supabase.from("profiles").upsert(
@@ -118,6 +124,8 @@ export async function submitOnboarding(
     care_recipient_type: careRecipientType,
     primary_goal: primaryGoal,
     situation_description: situationDescription,
+    offer_accepted: true,
+    offer_version: OFFER_VERSION,
     consent_accepted: true,
     submitted_at: submittedAt
   };
@@ -136,6 +144,26 @@ export async function submitOnboarding(
 
   if (onboardingError) {
     return errorState(onboardingError.message);
+  }
+
+  const { data: offerConsentRecord, error: offerConsentError } = await supabase
+    .from("consent_records")
+    .insert({
+      profile_id: user.id,
+      case_id: caseId,
+      consent_type: "offer_acceptance",
+      status: "accepted",
+      version: OFFER_VERSION,
+      source: "onboarding_form",
+      metadata: {
+        onboarding_submission_id: onboardingSubmission.id
+      }
+    })
+    .select("id")
+    .single();
+
+  if (offerConsentError) {
+    return errorState(offerConsentError.message);
   }
 
   const { data: consentRecord, error: consentError } = await supabase
@@ -170,6 +198,19 @@ export async function submitOnboarding(
       entityId: onboardingSubmission.id,
       metadata: {
         care_recipient_type: careRecipientType
+      }
+    },
+    {
+      profileId: user.id,
+      caseId,
+      actorId: user.id,
+      actorRole: "client",
+      action: "offer_accepted",
+      entityTable: "consent_records",
+      entityId: offerConsentRecord.id,
+      metadata: {
+        consent_type: "offer_acceptance",
+        consent_version: OFFER_VERSION
       }
     },
     {

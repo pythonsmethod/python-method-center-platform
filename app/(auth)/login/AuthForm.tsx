@@ -42,7 +42,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           onClick={() => setMode("login")}
           type="button"
         >
-          Sign in
+          Войти
         </button>
         <button
           aria-pressed={!isLogin}
@@ -50,7 +50,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           onClick={() => setMode("signup")}
           type="button"
         >
-          Create account
+          Создать аккаунт
         </button>
       </div>
 
@@ -70,7 +70,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           />
         </label>
         <label className="field">
-          <span>Password</span>
+          <span>Пароль</span>
           <input
             autoComplete={isLogin ? "current-password" : "new-password"}
             minLength={isLogin ? undefined : 6}
@@ -86,10 +86,10 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           type="submit"
         >
           {pending
-            ? "Submitting..."
+            ? "Отправка..."
             : isLogin
-              ? "Sign in"
-              : "Create account"}
+              ? "Войти"
+              : "Создать аккаунт"}
         </button>
 
         {activeState.message ? (

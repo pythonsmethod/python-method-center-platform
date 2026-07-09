@@ -76,6 +76,18 @@ main {
   padding: clamp(32px, 6vw, 72px) clamp(20px, 4vw, 48px);
 }
 
+.site-footer {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  display: flex;
+  flex-wrap: wrap;
+  font-size: 14px;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 18px clamp(20px, 4vw, 48px);
+}
+
 .page-shell {
   margin: 0 auto;
   max-width: 1120px;

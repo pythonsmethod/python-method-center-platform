@@ -11,6 +11,7 @@ import type {
   DocumentIntakeStatus,
   UploadedDocument
 } from "@/lib/documents/types";
+import { documentStatusLabel } from "@/lib/i18n/status-labels";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type DocumentUploadPanelProps = {
@@ -41,7 +42,7 @@ function formatFileSize(value: unknown): string {
   const bytes = typeof value === "number" ? value : Number(value);
 
   if (!Number.isFinite(bytes) || bytes <= 0) {
-    return "Size unavailable";
+    return "Размер неизвестен";
   }
 
   if (bytes < 1024 * 1024) {
@@ -52,14 +53,14 @@ function formatFileSize(value: unknown): string {
 }
 
 function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("en", {
+  return new Intl.DateTimeFormat("ru", {
     dateStyle: "medium",
     timeStyle: "short"
   }).format(new Date(value));
 }
 
 function formatDocumentStatus(status: DocumentIntakeStatus): string {
-  return status.replaceAll("_", " ");
+  return documentStatusLabel(status);
 }
 
 function stateClassName(state: UploadState): string {
@@ -87,7 +88,7 @@ export function DocumentUploadPanel({
     if (!file) {
       setState({
         status: "error",
-        message: "Choose a document file before uploading."
+        message: "Сначала выберите файл документа."
       });
       return;
     }
@@ -107,7 +108,7 @@ export function DocumentUploadPanel({
     if (!supabase) {
       setState({
         status: "error",
-        message: "Supabase is not configured. Add the public URL and anon key to the environment."
+        message: "Сервис временно недоступен: не настроено подключение к базе данных."
       });
       return;
     }
@@ -122,7 +123,7 @@ export function DocumentUploadPanel({
 
     setState({
       status: "uploading",
-      message: "Uploading document..."
+      message: "Загрузка документа..."
     });
 
     startTransition(async () => {
@@ -171,7 +172,7 @@ export function DocumentUploadPanel({
       }
       setState({
         status: "success",
-        message: "Document uploaded and linked to this case."
+        message: "Документ загружен и привязан к вашему кейсу."
       });
     });
   }
@@ -179,15 +180,15 @@ export function DocumentUploadPanel({
   const uploading = state.status === "uploading" || isPending;
 
   return (
-    <section className="documents-section" aria-label="Case documents">
+    <section className="documents-section" aria-label="Документы кейса">
       <div className="documents-layout">
         <form className="document-upload" onSubmit={handleSubmit}>
           <div>
-            <span className="panel__label">Documents</span>
-            <h2>Upload a case document</h2>
+            <span className="panel__label">Документы</span>
+            <h2>Загрузить документ</h2>
           </div>
           <label className="field">
-            <span>Document file</span>
+            <span>Файл документа</span>
             <input
               accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp"
               disabled={uploading}
@@ -196,7 +197,7 @@ export function DocumentUploadPanel({
             />
           </label>
           <button className="button" disabled={uploading} type="submit">
-            {uploading ? "Uploading..." : "Upload document"}
+            {uploading ? "Загрузка..." : "Загрузить документ"}
           </button>
           {state.message ? (
             <p className={stateClassName(state)}>{state.message}</p>
@@ -205,19 +206,19 @@ export function DocumentUploadPanel({
 
         <div className="documents-list-panel">
           <div>
-            <span className="panel__label">Current case</span>
-            <h2>Uploaded documents</h2>
+            <span className="panel__label">Ваш кейс</span>
+            <h2>Загруженные документы</h2>
           </div>
 
           {documents.length === 0 ? (
-            <p className="empty-state">No documents uploaded yet.</p>
+            <p className="empty-state">Документы ещё не загружены.</p>
           ) : (
             <ul className="document-list">
               {documents.map((document) => (
                 <li className="document-list__item" key={document.id}>
                   <div>
                     <strong>
-                      {document.original_filename ?? "Untitled document"}
+                      {document.original_filename ?? "Документ без названия"}
                     </strong>
                     <span>{formatDate(document.created_at)}</span>
                     <span
@@ -228,11 +229,11 @@ export function DocumentUploadPanel({
                   </div>
                   <dl>
                     <div>
-                      <dt>Status</dt>
+                      <dt>Статус</dt>
                       <dd>{formatDocumentStatus(document.document_status)}</dd>
                     </div>
                     <div>
-                      <dt>Type</dt>
+                      <dt>Тип</dt>
                       <dd>
                         {String(
                           document.metadata.mime_type ?? document.document_type
@@ -240,7 +241,7 @@ export function DocumentUploadPanel({
                       </dd>
                     </div>
                     <div>
-                      <dt>Size</dt>
+                      <dt>Размер</dt>
                       <dd>{formatFileSize(document.metadata.file_size)}</dd>
                     </div>
                   </dl>

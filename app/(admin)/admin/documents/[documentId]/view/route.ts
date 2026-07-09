@@ -48,7 +48,7 @@ export async function GET(
 
   const { data: document, error: documentError } = await supabase
     .from("uploaded_documents")
-    .select("id, storage_path, metadata")
+    .select("id, profile_id, storage_path")
     .eq("id", documentId)
     .maybeSingle();
 
@@ -60,13 +60,17 @@ export async function GET(
     return NextResponse.json({ error: "Not found." }, { status: 404 });
   }
 
-  const metadata = document.metadata as { storage_bucket?: unknown } | null;
-  const bucket =
-    typeof metadata?.storage_bucket === "string"
-      ? metadata.storage_bucket
-      : DOCUMENT_STORAGE_BUCKET;
+  // Client rows are inserted with client-controlled values, so never trust
+  // row metadata for the bucket and require the owner-folder path convention.
+  if (!document.storage_path.startsWith(`${document.profile_id}/`)) {
+    return NextResponse.json(
+      { error: "Document storage path is outside the owner folder." },
+      { status: 409 }
+    );
+  }
+
   const { data: signedUrl, error: signedUrlError } = await supabase.storage
-    .from(bucket)
+    .from(DOCUMENT_STORAGE_BUCKET)
     .createSignedUrl(document.storage_path, 60);
 
   if (signedUrlError) {

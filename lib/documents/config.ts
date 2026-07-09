@@ -80,21 +80,21 @@ export function validateDocumentFile(input: {
   if (!input.name.trim()) {
     return {
       status: "invalid",
-      message: "Choose a named document file."
+      message: "Выберите файл документа с названием."
     };
   }
 
   if (!Number.isFinite(input.size) || input.size <= 0) {
     return {
       status: "invalid",
-      message: "Choose a non-empty document file."
+      message: "Выберите непустой файл документа."
     };
   }
 
   if (input.size > MAX_DOCUMENT_FILE_SIZE_BYTES) {
     return {
       status: "invalid",
-      message: "Document files must be 25 MB or smaller."
+      message: "Файл документа должен быть не больше 25 МБ."
     };
   }
 
@@ -103,7 +103,7 @@ export function validateDocumentFile(input: {
   if (!mimeType) {
     return {
       status: "invalid",
-      message: "Upload a PDF, PNG, JPG, JPEG, or WEBP file."
+      message: "Загрузите файл PDF, PNG, JPG, JPEG или WEBP."
     };
   }
 

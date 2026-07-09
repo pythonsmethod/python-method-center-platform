@@ -27,9 +27,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Authentication"
-        title="Login"
-        description="Sign in or create an account with Supabase Auth email and password."
+        eyebrow="Вход"
+        title="Вход и регистрация"
+        description="Войдите в аккаунт или создайте новый, используя email и пароль."
       />
 
       <AuthSetupNotice />
@@ -40,11 +40,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           supabaseConfigured={supabaseConfigured}
         />
         <div className="panel">
-          <span className="panel__label">Auth foundation</span>
-          <h2>Supabase session flow</h2>
+          <span className="panel__label">Что дальше</span>
+          <h2>После входа</h2>
           <p>
-            This page sends email and password credentials to Supabase Auth.
-            It does not create fake sessions or hardcoded users.
+            Вы попадёте в личный кабинет, где можно заполнить анкету, создать
+            кейс, загрузить медицинские документы и написать команде.
           </p>
         </div>
       </section>

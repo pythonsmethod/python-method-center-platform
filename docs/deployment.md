@@ -35,6 +35,13 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
+Optional (payment buttons on `/payment` stay hidden until these are set):
+
+```text
+NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W
+NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W
+```
+
 Recommended after the production domain is selected:
 
 ```text
@@ -120,6 +127,13 @@ Run these checks after deployment:
 - `/admin` denies ordinary clients.
 - `/admin` allows active `support` or `admin` profiles.
 - `/admin/documents` lists uploaded document metadata for staff/admin.
+- `/admin/cases` lists client cases; a case page shows the onboarding payload.
+- `/admin/requests` lists client support requests with status controls.
+- `/legal/offer` serves the published offer PDF.
+- Onboarding requires both offer acceptance and data-processing consent and
+  writes `offer_acceptance` + `data_processing` consent records.
+- Cabinet "Написать команде" creates a `support_requests` row.
+- `/payment` shows Stripe Payment Link buttons when the env vars are set.
 - Document `Open` redirects through a short-lived signed URL.
 - Anonymous/public exact-path document access remains denied.
 - No public document URLs are used.

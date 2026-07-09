@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
+import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import type { OnboardingProfileDefaults } from "@/lib/onboarding/types";
@@ -34,12 +35,12 @@ export default async function OnboardingPage() {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Client intake"
-          title="Onboarding"
-          description="This route requires Supabase Auth before intake can begin."
+          eyebrow="Анкета"
+          title="Анкета"
+          description="Для заполнения анкеты требуется настроенная аутентификация."
         />
 
-        <AuthSetupNotice title="Onboarding requires Supabase Auth setup" />
+        <AuthSetupNotice title="Анкета требует настройки Supabase Auth" />
       </div>
     );
   }
@@ -49,34 +50,36 @@ export default async function OnboardingPage() {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Client intake"
-        title="Onboarding"
-        description="Create the first case shell by submitting basic onboarding information."
+        eyebrow="Анкета"
+        title="Расскажите о вашей ситуации"
+        description="Анкета создаёт ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам."
       />
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Authenticated session</span>
-          <h2>{auth.email ?? "Signed-in user"}</h2>
+          <span className="panel__label">Ваш аккаунт</span>
+          <h2>{auth.email ?? "Вы вошли в систему"}</h2>
           <p>
-            Supabase Auth returned a user session. This onboarding step creates
-            profile, case, submission, and consent records only.
+            Анкета сохраняется в вашем кейсе вместе с согласиями. После
+            отправки вы сможете загрузить медицинские документы в кабинете.
           </p>
           <div className="panel-actions">
             <LogoutButton />
           </div>
         </div>
         <div className="panel">
-          <span className="panel__label">Scope boundary</span>
-          <h2>No document or decision logic</h2>
+          <span className="panel__label">Что важно знать</span>
+          <h2>Анкета — не медицинская консультация</h2>
           <p>
-            Document upload, medical decisions, AI decisions, and payment steps
-            remain outside this task.
+            На основе анкеты не ставится диагноз и не назначается лечение. Она
+            нужна, чтобы Карен и команда поняли вашу ситуацию и цели.
           </p>
         </div>
       </section>
 
-      <section className="form-section" aria-label="Onboarding form">
+      <EmergencyNotice />
+
+      <section className="form-section" aria-label="Анкета">
         <OnboardingForm profileDefaults={profileDefaults} />
       </section>
     </div>
