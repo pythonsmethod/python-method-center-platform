@@ -32,8 +32,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <main>{children}</main>
         <footer className="site-footer">
           <span>© Python Method</span>
-          <nav aria-label="Документы">
+          <nav aria-label="Дополнительно">
             <Link href="/legal/offer">Публичная оферта</Link>
+            <Link href="/support">Поддержка</Link>
+            <Link href="/admin">Для команды</Link>
           </nav>
         </footer>
       </body>

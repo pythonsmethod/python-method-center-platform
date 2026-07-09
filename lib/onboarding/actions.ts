@@ -10,6 +10,7 @@ import {
   writeLifecycleEvents,
   type LifecycleEventInput
 } from "@/lib/cases/lifecycle";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { OFFER_VERSION } from "@/lib/legal/offer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -34,7 +35,7 @@ export async function submitOnboarding(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
   }
 
   const {
@@ -101,6 +102,18 @@ export async function submitOnboarding(
   let caseId = existingCase?.id as string | undefined;
   let caseCreated = false;
 
+  if (caseId) {
+    const { error: caseUpdateError } = await supabase
+      .from("client_cases")
+      .update({ title: primaryGoal, summary: situationDescription })
+      .eq("id", caseId)
+      .eq("profile_id", user.id);
+
+    if (caseUpdateError) {
+      return errorState(caseUpdateError.message);
+    }
+  }
+
   if (!caseId) {
     const { data: createdCase, error: caseCreateError } = await supabase
       .from("client_cases")
@@ -154,45 +167,48 @@ export async function submitOnboarding(
     return errorState(onboardingError.message);
   }
 
-  const { data: offerConsentRecord, error: offerConsentError } = await supabase
+  const { data: consentRows, error: consentError } = await supabase
     .from("consent_records")
-    .insert({
-      profile_id: user.id,
-      case_id: caseId,
-      consent_type: "offer_acceptance",
-      status: "accepted",
-      version: OFFER_VERSION,
-      source: "onboarding_form",
-      metadata: {
-        onboarding_submission_id: onboardingSubmission.id
+    .insert([
+      {
+        profile_id: user.id,
+        case_id: caseId,
+        consent_type: "offer_acceptance",
+        status: "accepted",
+        version: OFFER_VERSION,
+        source: "onboarding_form",
+        metadata: {
+          onboarding_submission_id: onboardingSubmission.id
+        }
+      },
+      {
+        profile_id: user.id,
+        case_id: caseId,
+        consent_type: "data_processing",
+        status: "accepted",
+        version: "onboarding-v1",
+        source: "onboarding_form",
+        metadata: {
+          onboarding_submission_id: onboardingSubmission.id,
+          care_recipient_type: careRecipientType
+        }
       }
-    })
-    .select("id")
-    .single();
-
-  if (offerConsentError) {
-    return errorState(offerConsentError.message);
-  }
-
-  const { data: consentRecord, error: consentError } = await supabase
-    .from("consent_records")
-    .insert({
-      profile_id: user.id,
-      case_id: caseId,
-      consent_type: "data_processing",
-      status: "accepted",
-      version: "onboarding-v1",
-      source: "onboarding_form",
-      metadata: {
-        onboarding_submission_id: onboardingSubmission.id,
-        care_recipient_type: careRecipientType
-      }
-    })
-    .select("id")
-    .single();
+    ])
+    .select("id, consent_type");
 
   if (consentError) {
     return errorState(consentError.message);
+  }
+
+  const offerConsentRecord = consentRows?.find(
+    (row) => row.consent_type === "offer_acceptance"
+  );
+  const consentRecord = consentRows?.find(
+    (row) => row.consent_type === "data_processing"
+  );
+
+  if (!offerConsentRecord || !consentRecord) {
+    return errorState("Не удалось зафиксировать согласия. Попробуйте ещё раз.");
   }
 
   const auditLogs: AuditLogInput[] = [

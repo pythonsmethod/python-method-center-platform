@@ -12,6 +12,7 @@ import type {
 } from "@/lib/documents/types";
 import { writeAuditLog } from "@/lib/audit/log";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
 type RecordUploadedDocumentInput = {
   caseId: string;
@@ -39,7 +40,7 @@ export async function recordUploadedDocumentMetadata(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
   }
 
   const {

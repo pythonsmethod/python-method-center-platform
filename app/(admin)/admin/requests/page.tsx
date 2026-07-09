@@ -3,46 +3,10 @@ import { notFound } from "next/navigation";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
+import { formatDateTime } from "@/lib/i18n/format";
 import { supportStatusLabel } from "@/lib/i18n/status-labels";
-import { updateSupportRequestStatus } from "@/lib/support/actions";
-import {
-  getStaffSupportRequests,
-  type StaffSupportRequestItem
-} from "@/lib/support/queries";
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("ru", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
-}
-
-function StatusActions({ request }: { request: StaffSupportRequestItem }) {
-  const nextStatuses: Array<{ value: string; label: string }> = [
-    { value: "in_progress", label: "В работу" },
-    { value: "resolved", label: "Решён" },
-    { value: "closed", label: "Закрыть" }
-  ];
-
-  return (
-    <div className="panel-actions">
-      {nextStatuses
-        .filter((status) => status.value !== request.status)
-        .map((status) => (
-          <form action={updateSupportRequestStatus} key={status.value}>
-            <input name="requestId" type="hidden" value={request.id} />
-            <input name="nextStatus" type="hidden" value={status.value} />
-            <button
-              className="button button--secondary button--compact"
-              type="submit"
-            >
-              {status.label}
-            </button>
-          </form>
-        ))}
-    </div>
-  );
-}
+import { getStaffSupportRequests } from "@/lib/support/queries";
+import { RequestStatusButtons } from "./RequestStatusButtons";
 
 export default async function StaffSupportRequestsPage() {
   const auth = await getRequiredStaffUser("/admin/requests");
@@ -108,7 +72,7 @@ export default async function StaffSupportRequestsPage() {
               <li className="document-list__item" key={request.id}>
                 <div>
                   <strong>{request.subject}</strong>
-                  <span>{formatDate(request.created_at)}</span>
+                  <span>{formatDateTime(request.created_at)}</span>
                   <span className="status-badge">
                     {supportStatusLabel(request.status)}
                   </span>
@@ -140,7 +104,10 @@ export default async function StaffSupportRequestsPage() {
                     </dd>
                   </div>
                 </dl>
-                <StatusActions request={request} />
+                <RequestStatusButtons
+                  currentStatus={request.status}
+                  requestId={request.id}
+                />
               </li>
             ))}
           </ul>

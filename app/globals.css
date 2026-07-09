@@ -128,47 +128,15 @@ p {
   margin: 16px 0 0;
 }
 
-.route-grid {
-  display: grid;
-  gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  margin-top: 42px;
-}
-
-.route-card,
 .panel {
   background: var(--surface);
   border: 1px solid var(--line);
   border-radius: 8px;
 }
 
-.route-card {
-  display: grid;
-  gap: 10px;
-  min-height: 150px;
-  padding: 18px;
-}
-
-.route-card:hover {
-  border-color: var(--accent);
-}
-
-.route-card__area,
-.route-card__status,
 .panel__label {
   color: var(--muted);
   font-size: 13px;
-}
-
-.route-card__label {
-  align-self: end;
-  color: var(--accent-strong);
-  font-size: 24px;
-  font-weight: 700;
-}
-
-.route-card__status {
-  color: var(--warning);
 }
 
 .panel-grid {

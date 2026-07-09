@@ -3,8 +3,8 @@ import { notFound } from "next/navigation";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
-import { recordCasePayment, updateCaseState } from "@/lib/cases/staff-actions";
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
+import { formatDateTime } from "@/lib/i18n/format";
 import {
   caseDirectionLabel,
   caseStatusLabel,
@@ -14,49 +14,14 @@ import {
   paymentProductLabel,
   paymentStatusLabel
 } from "@/lib/i18n/status-labels";
+import { isUuid } from "@/lib/utils/uuid";
+import { CaseManagementForm } from "./CaseManagementForm";
+import { PaymentRecordForm } from "./PaymentRecordForm";
 
 type StaffCasePageProps = {
   params: Promise<{
     caseId: string;
   }>;
-  searchParams?: Promise<{
-    notice?: string | string[];
-    error?: string | string[];
-  }>;
-};
-
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-const caseStatusOptions = [
-  "created",
-  "awaiting_onboarding",
-  "ready_for_review",
-  "in_review",
-  "active_support",
-  "inactive_support",
-  "completed",
-  "archived"
-];
-
-const caseUrgencyOptions = ["normal", "elevated", "critical"];
-
-const caseDirectionOptions = [
-  "not_set",
-  "recovery",
-  "rehabilitation",
-  "preservation"
-];
-
-const paymentProductOptions = [
-  "preliminary_assessment",
-  "support_5_weeks",
-  "support_15_weeks"
-];
-
-const noticeMessages: Record<string, string> = {
-  "case-updated": "Кейс обновлён.",
-  "payment-recorded": "Оплата зафиксирована."
 };
 
 const payloadFieldLabels: Record<string, string> = {
@@ -76,21 +41,6 @@ const careRecipientLabels: Record<string, string> = {
   family_member: "Для члена семьи"
 };
 
-function firstParam(value: string | string[] | undefined): string | null {
-  if (Array.isArray(value)) {
-    return value[0] ?? null;
-  }
-
-  return value ?? null;
-}
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("ru", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
-}
-
 function formatAmount(amountCents: number, currency: string): string {
   return `${(amountCents / 100).toFixed(2)} ${currency}`;
 }
@@ -107,18 +57,16 @@ function formatPayloadValue(key: string, value: unknown): string {
   }
 
   if (key === "submitted_at" && text !== "—") {
-    return formatDate(text);
+    return formatDateTime(text);
   }
 
   return text;
 }
 
 export default async function StaffCaseDetailPage({
-  params,
-  searchParams
+  params
 }: StaffCasePageProps) {
   const { caseId } = await params;
-  const query = await searchParams;
   const auth = await getRequiredStaffUser(`/admin/cases/${caseId}`);
 
   if (auth.status === "missing-env") {
@@ -157,7 +105,7 @@ export default async function StaffCaseDetailPage({
     );
   }
 
-  if (!uuidPattern.test(caseId)) {
+  if (!isUuid(caseId)) {
     notFound();
   }
 
@@ -187,10 +135,6 @@ export default async function StaffCaseDetailPage({
     notFound();
   }
 
-  const noticeKey = firstParam(query?.notice);
-  const noticeMessage = noticeKey ? noticeMessages[noticeKey] ?? null : null;
-  const errorMessage = firstParam(query?.error);
-
   const submissions = [...clientCase.onboarding_submissions].sort((a, b) =>
     (b.submitted_at ?? "").localeCompare(a.submitted_at ?? "")
   );
@@ -212,21 +156,6 @@ export default async function StaffCaseDetailPage({
         description={`Кейс ${clientCase.id}`}
       />
 
-      {noticeMessage ? (
-        <div className="notice notice--success">
-          <span className="panel__label">Готово</span>
-          <h2>{noticeMessage}</h2>
-        </div>
-      ) : null}
-
-      {errorMessage ? (
-        <div className="notice notice--warning">
-          <span className="panel__label">Ошибка</span>
-          <h2>Действие не выполнено</h2>
-          <p>{errorMessage}</p>
-        </div>
-      ) : null}
-
       <section className="panel-grid">
         <div className="panel">
           <span className="panel__label">Клиент</span>
@@ -242,8 +171,8 @@ export default async function StaffCaseDetailPage({
           <ul className="status-list">
             <li>Срочность: {caseUrgencyLabel(clientCase.urgency)}</li>
             <li>Направление: {caseDirectionLabel(clientCase.direction)}</li>
-            <li>Создан: {formatDate(clientCase.created_at)}</li>
-            <li>Обновлён: {formatDate(clientCase.updated_at)}</li>
+            <li>Создан: {formatDateTime(clientCase.created_at)}</li>
+            <li>Обновлён: {formatDateTime(clientCase.updated_at)}</li>
           </ul>
         </div>
         <div className="panel">
@@ -257,87 +186,18 @@ export default async function StaffCaseDetailPage({
         <div className="panel">
           <span className="panel__label">Управление</span>
           <h2>Обновить кейс</h2>
-          <form action={updateCaseState} className="onboarding-form">
-            <input name="caseId" type="hidden" value={clientCase.id} />
-            <label className="field">
-              <span>Статус</span>
-              <select defaultValue={clientCase.status} name="status">
-                {caseStatusOptions.map((status) => (
-                  <option key={status} value={status}>
-                    {caseStatusLabel(status)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Срочность</span>
-              <select defaultValue={clientCase.urgency} name="urgency">
-                {caseUrgencyOptions.map((urgency) => (
-                  <option key={urgency} value={urgency}>
-                    {caseUrgencyLabel(urgency)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Направление</span>
-              <select defaultValue={clientCase.direction} name="direction">
-                {caseDirectionOptions.map((direction) => (
-                  <option key={direction} value={direction}>
-                    {caseDirectionLabel(direction)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <button className="button" type="submit">
-              Сохранить изменения
-            </button>
-          </form>
+          <CaseManagementForm
+            caseId={clientCase.id}
+            direction={clientCase.direction}
+            status={clientCase.status}
+            urgency={clientCase.urgency}
+          />
         </div>
 
         <div className="panel">
           <span className="panel__label">Оплаты</span>
           <h2>Записать оплату</h2>
-          <form action={recordCasePayment} className="onboarding-form">
-            <input name="caseId" type="hidden" value={clientCase.id} />
-            <label className="field">
-              <span>Продукт</span>
-              <select defaultValue="support_5_weeks" name="product">
-                {paymentProductOptions.map((product) => (
-                  <option key={product} value={product}>
-                    {paymentProductLabel(product)}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <label className="field">
-              <span>Сумма</span>
-              <input
-                inputMode="decimal"
-                name="amount"
-                placeholder="Например: 490"
-                required
-                type="text"
-              />
-            </label>
-            <label className="field">
-              <span>Валюта</span>
-              <input
-                defaultValue="USD"
-                maxLength={3}
-                name="currency"
-                required
-                type="text"
-              />
-            </label>
-            <label className="field">
-              <span>Референс платежа (Stripe ID, № счёта)</span>
-              <input name="processorReference" type="text" />
-            </label>
-            <button className="button" type="submit">
-              Записать оплату
-            </button>
-          </form>
+          <PaymentRecordForm caseId={clientCase.id} />
           {payments.length === 0 ? (
             <p className="empty-state">Оплат пока нет.</p>
           ) : (
@@ -348,7 +208,7 @@ export default async function StaffCaseDetailPage({
                   {formatAmount(payment.amount_cents, payment.currency)} —{" "}
                   {paymentStatusLabel(payment.status)}
                   {payment.paid_at
-                    ? ` (${formatDate(payment.paid_at)})`
+                    ? ` (${formatDateTime(payment.paid_at)})`
                     : ""}
                   {payment.processor_reference
                     ? ` · ${payment.processor_reference}`
@@ -373,7 +233,7 @@ export default async function StaffCaseDetailPage({
               <span className="panel__label">
                 Анкета от{" "}
                 {submission.submitted_at
-                  ? formatDate(submission.submitted_at)
+                  ? formatDateTime(submission.submitted_at)
                   : "—"}
               </span>
               <h2>Ответы клиента</h2>
@@ -404,7 +264,7 @@ export default async function StaffCaseDetailPage({
                     <strong>
                       {document.original_filename ?? "Документ без названия"}
                     </strong>
-                    <span>{formatDate(document.created_at)}</span>
+                    <span>{formatDateTime(document.created_at)}</span>
                     <span className="status-badge">
                       {documentStatusLabel(document.document_status)}
                     </span>
@@ -436,7 +296,7 @@ export default async function StaffCaseDetailPage({
             <ul className="status-list">
               {events.map((event) => (
                 <li key={event.id}>
-                  {formatDate(event.created_at)} —{" "}
+                  {formatDateTime(event.created_at)} —{" "}
                   {lifecycleEventLabel(event.event_type)}
                   {event.from_status && event.to_status
                     ? `: ${caseStatusLabel(event.from_status)} → ${caseStatusLabel(event.to_status)}`

@@ -12,6 +12,8 @@ import type {
   UploadedDocument
 } from "@/lib/documents/types";
 import { documentStatusLabel } from "@/lib/i18n/status-labels";
+import { formatDateTime } from "@/lib/i18n/format";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
 
 type DocumentUploadPanelProps = {
@@ -52,13 +54,6 @@ function formatFileSize(value: unknown): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("ru", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
-}
-
 function formatDocumentStatus(status: DocumentIntakeStatus): string {
   return documentStatusLabel(status);
 }
@@ -87,20 +82,29 @@ export function DocumentUploadPanel({
     const supabase = getSupabaseBrowserClient();
 
     if (!supabase) {
-      setOpenError("Сервис временно недоступен: не настроено подключение к базе данных.");
+      setOpenError(SERVICE_UNAVAILABLE_MESSAGE);
       return;
     }
+
+    // Open the tab synchronously inside the click gesture: window.open after
+    // an await is blocked by Safari/iOS popup rules.
+    const documentWindow = window.open("about:blank", "_blank");
 
     const { data, error } = await supabase.storage
       .from(DOCUMENT_STORAGE_BUCKET)
       .createSignedUrl(document.storage_path, 60);
 
     if (error || !data?.signedUrl) {
+      documentWindow?.close();
       setOpenError(error?.message ?? "Не удалось открыть документ.");
       return;
     }
 
-    window.open(data.signedUrl, "_blank", "noopener,noreferrer");
+    if (documentWindow) {
+      documentWindow.location.replace(data.signedUrl);
+    } else {
+      window.location.assign(data.signedUrl);
+    }
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -131,7 +135,7 @@ export function DocumentUploadPanel({
     if (!supabase) {
       setState({
         status: "error",
-        message: "Сервис временно недоступен: не настроено подключение к базе данных."
+        message: SERVICE_UNAVAILABLE_MESSAGE
       });
       return;
     }
@@ -247,7 +251,7 @@ export function DocumentUploadPanel({
                     <strong>
                       {document.original_filename ?? "Документ без названия"}
                     </strong>
-                    <span>{formatDate(document.created_at)}</span>
+                    <span>{formatDateTime(document.created_at)}</span>
                     <span
                       className={`status-badge status-badge--${document.document_status}`}
                     >

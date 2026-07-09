@@ -4,17 +4,13 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
+import { formatDateTime } from "@/lib/i18n/format";
 import {
   getStaffDocumentIntakeItems,
   type StaffDocumentIntakeItem
 } from "@/lib/documents/staff-queries";
 
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("en", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
-}
+
 
 function formatStatus(value: string): string {
   return value.replaceAll("_", " ");
@@ -65,7 +61,7 @@ function DocumentTable({ documents }: { documents: StaffDocumentIntakeItem[] }) 
                   {formatStatus(document.document_status)}
                 </span>
               </td>
-              <td>{formatDate(document.created_at)}</td>
+              <td>{formatDateTime(document.created_at)}</td>
               <td>
                 <Link
                   className="button button--secondary button--compact"

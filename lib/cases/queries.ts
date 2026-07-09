@@ -1,5 +1,6 @@
 import type { CaseLifecycleEvent } from "@/lib/cases/lifecycle";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
 export type ClientCaseShell = {
   id: string;
@@ -31,7 +32,7 @@ export async function getClientCaseShell(
   if (!supabase) {
     return {
       status: "error",
-      message: "Сервис временно недоступен: не настроено подключение к базе данных."
+      message: SERVICE_UNAVAILABLE_MESSAGE
     };
   }
 
@@ -75,7 +76,7 @@ export async function getOwnCaseLifecycleEvents(
   if (!supabase) {
     return {
       status: "error",
-      message: "Сервис временно недоступен: не настроено подключение к базе данных."
+      message: SERVICE_UNAVAILABLE_MESSAGE
     };
   }
 

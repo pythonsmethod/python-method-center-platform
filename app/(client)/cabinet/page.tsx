@@ -9,6 +9,7 @@ import {
   getOwnCaseLifecycleEvents
 } from "@/lib/cases/queries";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
+import { formatDateTime } from "@/lib/i18n/format";
 import {
   caseDirectionLabel,
   caseStatusLabel,
@@ -35,13 +36,6 @@ function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
     : value === "submitted";
 }
 
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("ru", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
-}
-
 export default async function CabinetPage({ searchParams }: CabinetPageProps) {
   const auth = await getRequiredUser("/cabinet");
   const params = await searchParams;
@@ -60,18 +54,19 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     );
   }
 
-  const caseResult = await getClientCaseShell(auth.userId);
+  const [caseResult, supportResult, paymentsResult] = await Promise.all([
+    getClientCaseShell(auth.userId),
+    getOwnSupportRequests(auth.userId),
+    getOwnPayments(auth.userId)
+  ]);
   const submitted = isOnboardingSubmitted(params?.onboarding);
-  const documentResult =
+  const [documentResult, historyResult] =
     caseResult.status === "ready" && caseResult.case
-      ? await getUploadedDocumentsForCase(auth.userId, caseResult.case.id)
-      : null;
-  const supportResult = await getOwnSupportRequests(auth.userId);
-  const paymentsResult = await getOwnPayments(auth.userId);
-  const historyResult =
-    caseResult.status === "ready" && caseResult.case
-      ? await getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id)
-      : null;
+      ? await Promise.all([
+          getUploadedDocumentsForCase(auth.userId, caseResult.case.id),
+          getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id)
+        ])
+      : [null, null];
 
   return (
     <div className="page-shell">
@@ -115,6 +110,9 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
             <>
               <h2>{caseStatusLabel(caseResult.case.status)}</h2>
               <ul className="status-list">
+                <li>
+                  Номер кейса: <code>{caseResult.case.id}</code>
+                </li>
                 <li>Цель: {caseResult.case.title ?? "Не указана"}</li>
                 <li>
                   Срочность: {caseUrgencyLabel(caseResult.case.urgency)}
@@ -123,7 +121,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
                   Направление:{" "}
                   {caseDirectionLabel(caseResult.case.direction)}
                 </li>
-                <li>Создан: {formatDate(caseResult.case.created_at)}</li>
+                <li>Создан: {formatDateTime(caseResult.case.created_at)}</li>
               </ul>
             </>
           ) : (
@@ -181,7 +179,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
                   {paymentProductLabel(payment.product)} —{" "}
                   {(payment.amount_cents / 100).toFixed(2)} {payment.currency}{" "}
                   — {paymentStatusLabel(payment.status)}
-                  {payment.paid_at ? ` (${formatDate(payment.paid_at)})` : ""}
+                  {payment.paid_at ? ` (${formatDateTime(payment.paid_at)})` : ""}
                 </li>
               ))}
             </ul>
@@ -203,7 +201,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
             <ul className="status-list">
               {historyResult.events.map((event) => (
                 <li key={event.id}>
-                  {formatDate(event.created_at)} —{" "}
+                  {formatDateTime(event.created_at)} —{" "}
                   {lifecycleEventLabel(event.event_type)}
                   {event.from_status && event.to_status
                     ? `: ${caseStatusLabel(event.from_status)} → ${caseStatusLabel(event.to_status)}`
@@ -243,7 +241,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
                   <li className="document-list__item" key={request.id}>
                     <div>
                       <strong>{request.subject}</strong>
-                      <span>{formatDate(request.created_at)}</span>
+                      <span>{formatDateTime(request.created_at)}</span>
                       <span className="status-badge">
                         {supportStatusLabel(request.status)}
                       </span>

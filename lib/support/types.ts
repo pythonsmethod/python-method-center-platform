@@ -16,3 +16,13 @@ export type ClientSupportRequest = {
   created_at: string;
   updated_at: string;
 };
+
+export const STAFF_ASSIGNABLE_SUPPORT_STATUSES = [
+  "in_progress",
+  "waiting_on_client",
+  "resolved",
+  "closed"
+] as const;
+
+export type StaffAssignableSupportStatus =
+  (typeof STAFF_ASSIGNABLE_SUPPORT_STATUSES)[number];

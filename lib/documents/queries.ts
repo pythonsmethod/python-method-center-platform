@@ -1,5 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { UploadedDocument } from "@/lib/documents/types";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
 export type UploadedDocumentsResult =
   | {
@@ -20,7 +21,7 @@ export async function getUploadedDocumentsForCase(
   if (!supabase) {
     return {
       status: "error",
-      message: "Сервис временно недоступен: не настроено подключение к базе данных."
+      message: SERVICE_UNAVAILABLE_MESSAGE
     };
   }
 

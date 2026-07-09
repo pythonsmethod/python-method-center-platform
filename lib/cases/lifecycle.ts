@@ -64,8 +64,39 @@ export async function writeLifecycleEvent(
 
 export async function writeLifecycleEvents(
   inputs: LifecycleEventInput[]
-): Promise<LifecycleEventResult[]> {
-  return Promise.all(inputs.map((input) => writeLifecycleEvent(input)));
+): Promise<LifecycleEventResult> {
+  if (inputs.length === 0) {
+    return { status: "inserted" };
+  }
+
+  const supabase = createSupabaseServiceClient();
+
+  if (!supabase) {
+    return {
+      status: "skipped",
+      reason: "Supabase service role key is not configured."
+    };
+  }
+
+  const { error } = await supabase.from("case_lifecycle_events").insert(
+    inputs.map((input) => ({
+      profile_id: input.profileId,
+      case_id: input.caseId,
+      event_type: input.eventType,
+      from_status: input.fromStatus ?? null,
+      to_status: input.toStatus ?? null,
+      actor_id: input.actorId ?? null,
+      actor_role: input.actorRole ?? "system",
+      notes: input.notes ?? null,
+      metadata: input.metadata ?? {}
+    }))
+  );
+
+  if (error) {
+    return { status: "failed", reason: error.message };
+  }
+
+  return { status: "inserted" };
 }
 
 export type CaseLifecycleEvent = {

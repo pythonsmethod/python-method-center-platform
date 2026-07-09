@@ -1,3 +1,4 @@
+import type { CaseLifecycleEvent } from "@/lib/cases/lifecycle";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type StaffCaseListItem = {
@@ -78,15 +79,7 @@ export type StaffCasePayment = {
   created_at: string;
 };
 
-export type StaffCaseLifecycleEvent = {
-  id: string;
-  event_type: string;
-  from_status: string | null;
-  to_status: string | null;
-  actor_role: string;
-  notes: string | null;
-  created_at: string;
-};
+export type StaffCaseLifecycleEvent = CaseLifecycleEvent;
 
 export type StaffCaseDetail = {
   id: string;

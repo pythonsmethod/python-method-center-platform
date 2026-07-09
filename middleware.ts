@@ -10,6 +10,16 @@ export async function middleware(request: NextRequest) {
     return response;
   }
 
+  // Without a Supabase auth cookie there is no session to refresh — skip the
+  // network call to Supabase Auth for anonymous traffic.
+  const hasAuthCookie = request.cookies
+    .getAll()
+    .some((cookie) => cookie.name.startsWith("sb-"));
+
+  if (!hasAuthCookie) {
+    return response;
+  }
+
   const supabase = createServerClient(config.url, config.anonKey, {
     cookies: {
       getAll() {
@@ -41,5 +51,6 @@ export async function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"]
+  // Skip static assets (any path with a file extension) and Next internals.
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|.*\\..*).*)"]
 };

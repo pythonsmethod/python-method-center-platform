@@ -8,17 +8,11 @@ import {
   getStaffCases,
   type StaffCaseListItem
 } from "@/lib/cases/staff-queries";
+import { formatDateTime } from "@/lib/i18n/format";
 import {
   caseStatusLabel,
   caseUrgencyLabel
 } from "@/lib/i18n/status-labels";
-
-function formatDate(value: string): string {
-  return new Intl.DateTimeFormat("ru", {
-    dateStyle: "medium",
-    timeStyle: "short"
-  }).format(new Date(value));
-}
 
 function shortId(value: string): string {
   return value.slice(0, 8);
@@ -63,7 +57,7 @@ function CaseTable({ cases }: { cases: StaffCaseListItem[] }) {
                 </span>
               </td>
               <td>{caseUrgencyLabel(clientCase.urgency)}</td>
-              <td>{formatDate(clientCase.created_at)}</td>
+              <td>{formatDateTime(clientCase.created_at)}</td>
               <td>
                 <Link
                   className="button button--secondary button--compact"

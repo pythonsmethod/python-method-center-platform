@@ -4,6 +4,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { AuthActionState } from "@/lib/auth/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
 function errorState(message: string): AuthActionState {
   return { status: "error", message };
@@ -43,7 +44,7 @@ export async function signInWithPassword(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
   }
 
   const { email, password } = readCredentials(formData);
@@ -71,7 +72,7 @@ export async function signUpWithPassword(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Сервис временно недоступен: не настроено подключение к базе данных.");
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
   }
 
   const { email, password } = readCredentials(formData);
