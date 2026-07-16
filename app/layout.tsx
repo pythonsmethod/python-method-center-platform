@@ -1,7 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { navRoutes } from "@/lib/routes";
+
+const playfair = Playfair_Display({
+  subsets: ["cyrillic", "latin"],
+  weight: ["500", "600", "700"],
+  variable: "--font-playfair",
+  display: "swap"
+});
 
 export const metadata: Metadata = {
   title: "Python Method — сопровождение восстановления",
@@ -15,7 +23,7 @@ type RootLayoutProps = {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html lang="ru">
+    <html className={playfair.variable} lang="ru">
       <body>
         <header className="site-header">
           <Link className="brand" href="/">
