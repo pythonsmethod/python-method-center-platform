@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
 import {
@@ -115,27 +116,38 @@ export default function HomePage() {
   return (
     <div className="page-shell">
       <section className="hero">
-        <p className="eyebrow">Цифровой реабилитационный центр</p>
-        <h1>Python Method Center</h1>
-        <p className="hero__subtitle">
-          Индивидуальный путь к восстановлению, здоровью и новой жизни.
-        </p>
-        <ul className="hero__points">
-          {heroPoints.map((point) => {
-            const Icon = point.icon;
+        <div className="hero__content">
+          <p className="eyebrow">Цифровой реабилитационный центр</p>
+          <h1>Python Method Center</h1>
+          <p className="hero__subtitle">
+            Индивидуальный путь к восстановлению, здоровью и новой жизни.
+          </p>
+          <ul className="hero__points">
+            {heroPoints.map((point) => {
+              const Icon = point.icon;
 
-            return (
-              <li key={point.text}>
-                <Icon size={22} />
-                <span>{point.text}</span>
-              </li>
-            );
-          })}
-        </ul>
-        <div className="hero__cta">
-          <Link className="button" href="/login">
-            Начать путь
-          </Link>
+              return (
+                <li key={point.text}>
+                  <Icon size={22} />
+                  <span>{point.text}</span>
+                </li>
+              );
+            })}
+          </ul>
+          <div className="hero__cta">
+            <Link className="button" href="/login">
+              Начать путь
+            </Link>
+          </div>
+        </div>
+        <div className="hero__photo">
+          <Image
+            alt="Карен — основатель Python Method Center"
+            height={1200}
+            priority
+            src="/images/karen-hero.jpg"
+            width={525}
+          />
         </div>
       </section>
 
