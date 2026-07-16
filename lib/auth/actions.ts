@@ -53,7 +53,7 @@ export async function signInWithPassword(
     return errorState("Введите email и пароль.");
   }
 
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email,
     password
   });
@@ -62,7 +62,23 @@ export async function signInWithPassword(
     return errorState(error.message);
   }
 
-  redirect(sanitizeNextPath(formData.get("next")));
+  let nextPath = sanitizeNextPath(formData.get("next"));
+
+  // Staff land in their own workspace instead of the client cabinet unless
+  // they were explicitly heading somewhere else.
+  if (nextPath === "/cabinet" && data.user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", data.user.id)
+      .maybeSingle();
+
+    if (profile?.role === "admin" || profile?.role === "support") {
+      nextPath = "/admin";
+    }
+  }
+
+  redirect(nextPath);
 }
 
 export async function signUpWithPassword(

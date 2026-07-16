@@ -76,6 +76,46 @@ main {
   padding: clamp(32px, 6vw, 72px) clamp(20px, 4vw, 48px);
 }
 
+.admin-nav {
+  align-items: center;
+  background: var(--accent-strong);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: space-between;
+  padding: 10px clamp(20px, 4vw, 48px);
+}
+
+.admin-nav__label {
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.admin-nav nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.admin-nav a {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 6px 12px;
+}
+
+.admin-nav a:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: transparent;
+  color: #ffffff;
+}
+
 .site-footer {
   align-items: center;
   border-top: 1px solid var(--line);
