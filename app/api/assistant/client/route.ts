@@ -57,7 +57,10 @@ export async function POST(request: Request) {
   }
 
   const system = await buildClientSystemPrompt();
-  const result = await askAssistantTeam(system, messages, 700, "auto");
+
+  // One agent for visitors: both models answer, the arbiter picks the
+  // stronger reply. Degrades to single-model mode when only one key is set.
+  const result = await askAssistantTeam(system, messages, 700, "best");
 
   if (result.status === "unavailable") {
     return NextResponse.json(

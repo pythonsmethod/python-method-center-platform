@@ -40,7 +40,8 @@ export async function POST(request: Request) {
     system,
     messages,
     provider === "both" ? 1200 : 1500,
-    provider
+    provider,
+    { attribution: provider === "best" }
   );
 
   if (result.status === "unavailable") {

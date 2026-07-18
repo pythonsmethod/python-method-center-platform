@@ -15,7 +15,7 @@ type AssistantChatProps = {
   providerChoice?: boolean;
 };
 
-type Provider = "claude" | "gpt" | "both";
+type Provider = "best" | "claude" | "gpt" | "both";
 
 export function AssistantChat({
   endpoint,
@@ -28,7 +28,7 @@ export function AssistantChat({
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [provider, setProvider] = useState<Provider>("claude");
+  const [provider, setProvider] = useState<Provider>("best");
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -125,6 +125,7 @@ export function AssistantChat({
             onChange={(event) => setProvider(event.target.value as Provider)}
             value={provider}
           >
+            <option value="best">Лучший ответ (арбитр выбирает)</option>
             <option value="claude">Claude</option>
             <option value="gpt">GPT</option>
             <option value="both">Оба вместе (совет)</option>
