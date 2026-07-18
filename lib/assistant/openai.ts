@@ -18,9 +18,12 @@ export async function askOpenAi(
   }
 
   const model = process.env.OPENAI_MODEL?.trim() || DEFAULT_OPENAI_MODEL;
+  const baseUrl =
+    process.env.OPENAI_BASE_URL?.trim().replace(/\/$/, "") ||
+    "https://api.openai.com";
 
   try {
-    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
