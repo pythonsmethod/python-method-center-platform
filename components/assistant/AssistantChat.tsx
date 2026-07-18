@@ -13,6 +13,7 @@ type AssistantChatProps = {
   placeholder?: string;
   suggestions?: string[];
   providerChoice?: boolean;
+  caseId?: string;
 };
 
 type Provider = "best" | "claude" | "gpt" | "both";
@@ -22,7 +23,8 @@ export function AssistantChat({
   intro,
   placeholder = "Напишите сообщение…",
   suggestions = [],
-  providerChoice = false
+  providerChoice = false,
+  caseId
 }: AssistantChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -60,11 +62,11 @@ export function AssistantChat({
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(
-          providerChoice
-            ? { messages: nextMessages, provider }
-            : { messages: nextMessages }
-        )
+        body: JSON.stringify({
+          messages: nextMessages,
+          ...(providerChoice ? { provider } : {}),
+          ...(caseId ? { caseId } : {})
+        })
       });
 
       const data = (await response.json().catch(() => null)) as

@@ -4,8 +4,10 @@ import {
   askAssistantTeam,
   isAssistantProvider
 } from "@/lib/assistant/router";
+import { buildCaseContext } from "@/lib/assistant/case-context";
 import { buildStaffSystemPrompt } from "@/lib/assistant/prompts";
 import { getStaffUserState } from "@/lib/auth/require-staff";
+import { isUuid } from "@/lib/utils/uuid";
 
 export const runtime = "nodejs";
 
@@ -35,7 +37,20 @@ export async function POST(request: Request) {
   const rawProvider = (body as { provider?: unknown })?.provider;
   const provider = isAssistantProvider(rawProvider) ? rawProvider : "auto";
 
-  const system = await buildStaffSystemPrompt();
+  let system = await buildStaffSystemPrompt();
+
+  // Optional case binding: the assistant on a case page receives a live
+  // snapshot of that case from the database (metadata, questionnaire,
+  // documents list, payments, history).
+  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+
+  if (typeof rawCaseId === "string" && isUuid(rawCaseId)) {
+    const caseContext = await buildCaseContext(rawCaseId);
+
+    if (caseContext) {
+      system = `${system}\n\n${caseContext}`;
+    }
+  }
   const result = await askAssistantTeam(
     system,
     messages,

@@ -5,7 +5,9 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
+import { EscalationPanel } from "@/components/escalations/EscalationPanel";
 import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
+import { listOpenEscalations } from "@/lib/escalations/queries";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 
@@ -48,7 +50,10 @@ export default async function AdminPage() {
     );
   }
 
-  const knowledge = await listKnowledgeEntries();
+  const [knowledge, escalations] = await Promise.all([
+    listKnowledgeEntries(),
+    listOpenEscalations()
+  ]);
   const assistantConfigured = hasAssistantEnv();
 
   return (
@@ -61,6 +66,14 @@ export default async function AdminPage() {
 
       <div className="admin-split">
         <section aria-label="Рабочие разделы" className="admin-split__work">
+          <div className="panel panel--alert">
+            <span className="panel__label">Требует внимания</span>
+            <h2>Красные флаги</h2>
+            <EscalationPanel
+              escalations={escalations.escalations}
+              loadError={escalations.error}
+            />
+          </div>
           <div className="panel">
             <span className="panel__label">Сессия</span>
             <h2>{auth.email ?? "Сотрудник"}</h2>

@@ -15,6 +15,7 @@ import {
   paymentStatusLabel
 } from "@/lib/i18n/status-labels";
 import { isUuid } from "@/lib/utils/uuid";
+import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseManagementForm } from "./CaseManagementForm";
 import { PaymentRecordForm } from "./PaymentRecordForm";
 
@@ -308,6 +309,30 @@ export default async function StaffCaseDetailPage({
               ))}
             </ul>
           )}
+        </div>
+      </section>
+
+      <section className="intake-section" aria-label="ИИ-Ассистент по кейсу">
+        <div className="panel">
+          <span className="panel__label">ИИ-Ассистент Карена</span>
+          <h2>Помощник по этому кейсу</h2>
+          <p>
+            Ассистент видит снимок кейса из базы: анкету, список документов,
+            оплаты и историю. Содержимое файлов ему недоступно — при
+            необходимости вставьте текст документа в чат.
+          </p>
+          <AssistantChat
+            caseId={clientCase.id}
+            endpoint="/api/assistant/staff"
+            intro="Я вижу данные этого кейса: анкету, статусы, список документов, оплаты и историю. Спросите — сделаю выжимку, черновик ответа клиенту или предложу следующие шаги. Решения — за Кареном."
+            placeholder="Например: сделай выжимку кейса…"
+            providerChoice
+            suggestions={[
+              "Сделай выжимку кейса",
+              "Что не хватает в этом кейсе?",
+              "Составь черновик ответа клиенту"
+            ]}
+          />
         </div>
       </section>
 

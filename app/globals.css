@@ -1148,3 +1148,57 @@ code {
   border-color: var(--accent);
   outline: 3px solid rgba(212, 175, 55, 0.24);
 }
+
+/* --- Red-flag escalation panel --- */
+
+.panel--alert {
+  border-color: rgba(224, 133, 133, 0.55);
+}
+
+.escalation-empty {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.escalation-list ul {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.escalation-list li {
+  background: rgba(224, 133, 133, 0.08);
+  border: 1px solid rgba(224, 133, 133, 0.4);
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  padding: 12px;
+}
+
+.escalation-item__head {
+  align-items: baseline;
+  color: var(--danger);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.escalation-item__head span {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.escalation-item__meta {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 0;
+}
+
+.escalation-item__excerpt {
+  color: var(--text);
+  font-size: 13.5px;
+  font-style: italic;
+  margin: 0;
+}

@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam } from "@/lib/assistant/router";
 import { buildClientSystemPrompt } from "@/lib/assistant/prompts";
+import { extractRedFlag, recordRedFlagEvent } from "@/lib/assistant/red-flags";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
@@ -73,5 +75,37 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 502 });
   }
 
-  return NextResponse.json({ reply: result.reply });
+  // Red-flag auto-capture: the assistant tags emergencies with a hidden
+  // marker; we strip it and record an escalation_event for the team.
+  const { cleanedReply, category } = extractRedFlag(result.reply);
+
+  if (category) {
+    let profileId: string | null = null;
+
+    try {
+      const supabase = await createSupabaseServerClient();
+
+      if (supabase) {
+        const {
+          data: { user }
+        } = await supabase.auth.getUser();
+
+        profileId = user?.id ?? null;
+      }
+    } catch {
+      profileId = null;
+    }
+
+    try {
+      await recordRedFlagEvent({
+        category,
+        messageExcerpt: messages[messages.length - 1]?.content ?? "",
+        profileId
+      });
+    } catch {
+      // Logging must never break the safety reply itself.
+    }
+  }
+
+  return NextResponse.json({ reply: cleanedReply });
 }
