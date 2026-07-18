@@ -12,12 +12,12 @@ export type ChatMessage = {
 
 let client: Anthropic | null = null;
 
-export function hasAssistantEnv(): boolean {
+export function hasClaudeEnv(): boolean {
   return Boolean(process.env.ANTHROPIC_API_KEY?.trim());
 }
 
 function getClient(): Anthropic | null {
-  if (!hasAssistantEnv()) {
+  if (!hasClaudeEnv()) {
     return null;
   }
 
@@ -68,7 +68,7 @@ export type AssistantResult =
   | { status: "unavailable" }
   | { status: "error"; message: string };
 
-export async function askAssistant(
+export async function askClaude(
   system: string,
   messages: ChatMessage[],
   maxTokens: number

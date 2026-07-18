@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
-import {
-  askAssistant,
-  sanitizeChatMessages
-} from "@/lib/assistant/claude";
+import { sanitizeChatMessages } from "@/lib/assistant/claude";
+import { askAssistantTeam } from "@/lib/assistant/router";
 import { buildClientSystemPrompt } from "@/lib/assistant/prompts";
 
 export const runtime = "nodejs";
@@ -59,7 +57,7 @@ export async function POST(request: Request) {
   }
 
   const system = await buildClientSystemPrompt();
-  const result = await askAssistant(system, messages, 700);
+  const result = await askAssistantTeam(system, messages, 700, "auto");
 
   if (result.status === "unavailable") {
     return NextResponse.json(

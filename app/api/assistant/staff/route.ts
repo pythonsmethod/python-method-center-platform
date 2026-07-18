@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server";
+import { sanitizeChatMessages } from "@/lib/assistant/claude";
 import {
-  askAssistant,
-  sanitizeChatMessages
-} from "@/lib/assistant/claude";
+  askAssistantTeam,
+  isAssistantProvider
+} from "@/lib/assistant/router";
 import { buildStaffSystemPrompt } from "@/lib/assistant/prompts";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 
@@ -31,12 +32,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
   }
 
+  const rawProvider = (body as { provider?: unknown })?.provider;
+  const provider = isAssistantProvider(rawProvider) ? rawProvider : "auto";
+
   const system = await buildStaffSystemPrompt();
-  const result = await askAssistant(system, messages, 1500);
+  const result = await askAssistantTeam(
+    system,
+    messages,
+    provider === "both" ? 1200 : 1500,
+    provider
+  );
 
   if (result.status === "unavailable") {
     return NextResponse.json(
-      { error: "ИИ-помощник ещё не подключён: добавьте ANTHROPIC_API_KEY в переменные окружения." },
+      { error: "ИИ-помощник ещё не подключён: добавьте ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT) в переменные окружения." },
       { status: 503 }
     );
   }

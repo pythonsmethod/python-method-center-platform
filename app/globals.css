@@ -1125,3 +1125,26 @@ code {
   color: var(--muted);
   font-size: 13.5px;
 }
+
+.assistant-chat__provider {
+  align-items: center;
+  color: var(--muted);
+  display: flex;
+  font-size: 13px;
+  gap: 8px;
+}
+
+.assistant-chat__provider select {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  font-size: 13px;
+  padding: 6px 10px;
+}
+
+.assistant-chat__provider select:focus {
+  border-color: var(--accent);
+  outline: 3px solid rgba(212, 175, 55, 0.24);
+}

@@ -6,7 +6,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
 import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
-import { hasAssistantEnv } from "@/lib/assistant/claude";
+import { hasAssistantEnv } from "@/lib/assistant/router";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 
 export default async function AdminPage() {
@@ -114,8 +114,9 @@ export default async function AdminPage() {
             {assistantConfigured ? (
               <AssistantChat
                 endpoint="/api/assistant/staff"
-                intro="Здравствуйте, Карен! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Доступа к базе у меня нет: работаю с тем, что вставлено в чат."
+                intro="Здравствуйте, Карен! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Внизу можно выбрать, кто отвечает: Claude, GPT или оба вместе. Доступа к базе у меня нет: работаю с тем, что вставлено в чат."
                 placeholder="Вставьте вопрос клиента или задачу…"
+                providerChoice
                 suggestions={[
                   "Составь черновик ответа клиенту",
                   "Сделай выжимку анкеты",
@@ -124,8 +125,9 @@ export default async function AdminPage() {
               />
             ) : (
               <p className="form-message form-message--error">
-                ИИ-помощник ещё не подключён: добавьте переменную окружения
-                ANTHROPIC_API_KEY в Vercel и сделайте Redeploy.
+                ИИ-помощник ещё не подключён: добавьте в Vercel переменную
+                окружения ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT)
+                и сделайте Redeploy.
               </p>
             )}
           </div>

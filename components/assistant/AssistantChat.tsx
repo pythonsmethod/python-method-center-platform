@@ -12,18 +12,23 @@ type AssistantChatProps = {
   intro: string;
   placeholder?: string;
   suggestions?: string[];
+  providerChoice?: boolean;
 };
+
+type Provider = "claude" | "gpt" | "both";
 
 export function AssistantChat({
   endpoint,
   intro,
   placeholder = "Напишите сообщение…",
-  suggestions = []
+  suggestions = [],
+  providerChoice = false
 }: AssistantChatProps) {
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [provider, setProvider] = useState<Provider>("claude");
   const scrollRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
@@ -55,7 +60,11 @@ export function AssistantChat({
       const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: nextMessages })
+        body: JSON.stringify(
+          providerChoice
+            ? { messages: nextMessages, provider }
+            : { messages: nextMessages }
+        )
       });
 
       const data = (await response.json().catch(() => null)) as
@@ -107,6 +116,20 @@ export function AssistantChat({
             </button>
           ))}
         </div>
+      ) : null}
+
+      {providerChoice ? (
+        <label className="assistant-chat__provider">
+          Кто отвечает
+          <select
+            onChange={(event) => setProvider(event.target.value as Provider)}
+            value={provider}
+          >
+            <option value="claude">Claude</option>
+            <option value="gpt">GPT</option>
+            <option value="both">Оба вместе (совет)</option>
+          </select>
+        </label>
       ) : null}
 
       <form
