@@ -3,6 +3,10 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
+import { AssistantChat } from "@/components/assistant/AssistantChat";
+import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
+import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
+import { hasAssistantEnv } from "@/lib/assistant/claude";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 
 export default async function AdminPage() {
@@ -44,63 +48,100 @@ export default async function AdminPage() {
     );
   }
 
+  const knowledge = await listKnowledgeEntries();
+  const assistantConfigured = hasAssistantEnv();
+
   return (
-    <div className="page-shell">
+    <div className="page-shell page-shell--wide">
       <PageHeader
         eyebrow="Рабочее место команды"
         title="Админ-панель"
-        description="Кейсы клиентов, загруженные документы и обращения."
+        description="Слева — кейсы и обращения, справа — ИИ-помощник Карена."
       />
 
-      <section className="panel-grid">
-        <div className="panel">
-          <span className="panel__label">Сессия</span>
-          <h2>{auth.email ?? "Сотрудник"}</h2>
-          <p>Роль: {auth.role}</p>
-          <div className="panel-actions">
-            <LogoutButton />
+      <div className="admin-split">
+        <section aria-label="Рабочие разделы" className="admin-split__work">
+          <div className="panel">
+            <span className="panel__label">Сессия</span>
+            <h2>{auth.email ?? "Сотрудник"}</h2>
+            <p>Роль: {auth.role}</p>
+            <div className="panel-actions">
+              <LogoutButton />
+            </div>
           </div>
-        </div>
-        <div className="panel">
-          <span className="panel__label">Кейсы</span>
-          <h2>Кейсы клиентов</h2>
-          <p>
-            Список кейсов с анкетами онбординга, контактами клиента и
-            документами.
-          </p>
-          <div className="panel-actions">
-            <Link className="button button--secondary" href="/admin/cases">
-              Открыть кейсы
-            </Link>
+          <div className="panel">
+            <span className="panel__label">Кейсы</span>
+            <h2>Кейсы клиентов</h2>
+            <p>
+              Анкеты онбординга, статусы, история и управление каждым кейсом.
+            </p>
+            <div className="panel-actions">
+              <Link className="button button--secondary" href="/admin/cases">
+                Открыть кейсы
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="panel">
-          <span className="panel__label">Документы</span>
-          <h2>Входящие документы</h2>
-          <p>
-            Список всех загруженных документов с открытием файла по защищённой
-            ссылке.
-          </p>
-          <div className="panel-actions">
-            <Link className="button button--secondary" href="/admin/documents">
-              Открыть документы
-            </Link>
+          <div className="panel">
+            <span className="panel__label">Документы</span>
+            <h2>Входящие документы</h2>
+            <p>
+              Все загруженные документы с открытием файла по защищённой ссылке.
+            </p>
+            <div className="panel-actions">
+              <Link className="button button--secondary" href="/admin/documents">
+                Открыть документы
+              </Link>
+            </div>
           </div>
-        </div>
-        <div className="panel">
-          <span className="panel__label">Обращения</span>
-          <h2>Сообщения клиентов</h2>
-          <p>
-            Обращения из кабинета: вопрос, контакты клиента и управление
-            статусом.
-          </p>
-          <div className="panel-actions">
-            <Link className="button button--secondary" href="/admin/requests">
-              Открыть обращения
-            </Link>
+          <div className="panel">
+            <span className="panel__label">Обращения</span>
+            <h2>Сообщения клиентов</h2>
+            <p>
+              Вопросы из кабинета: контакты клиента и управление статусом.
+            </p>
+            <div className="panel-actions">
+              <Link className="button button--secondary" href="/admin/requests">
+                Открыть обращения
+              </Link>
+            </div>
           </div>
-        </div>
-      </section>
+        </section>
+
+        <section aria-label="ИИ-помощник Карена" className="admin-split__assistant">
+          <div className="panel">
+            <span className="panel__label">ИИ-помощник Карена</span>
+            <h2>Рабочий чат</h2>
+            {assistantConfigured ? (
+              <AssistantChat
+                endpoint="/api/assistant/staff"
+                intro="Здравствуйте, Карен! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Доступа к базе у меня нет: работаю с тем, что вставлено в чат."
+                placeholder="Вставьте вопрос клиента или задачу…"
+                suggestions={[
+                  "Составь черновик ответа клиенту",
+                  "Сделай выжимку анкеты",
+                  "Помоги сформулировать знание для ИИ клиентов"
+                ]}
+              />
+            ) : (
+              <p className="form-message form-message--error">
+                ИИ-помощник ещё не подключён: добавьте переменную окружения
+                ANTHROPIC_API_KEY в Vercel и сделайте Redeploy.
+              </p>
+            )}
+          </div>
+
+          <div className="panel">
+            <span className="panel__label">Обучение ИИ</span>
+            <h2>База знаний</h2>
+            <p>
+              Всё, что вы сохраните здесь, ИИ начнёт использовать в ответах:
+              «ИИ клиентов» отвечает посетителям на сайте, «ИИ Карена» — вам в
+              этом чате.
+            </p>
+            <KnowledgePanel entries={knowledge.entries} loadError={knowledge.error} />
+          </div>
+        </section>
+      </div>
     </div>
   );
 }
