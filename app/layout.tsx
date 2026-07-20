@@ -3,6 +3,7 @@ import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { navRoutes } from "@/lib/routes";
+import { socialLinks } from "@/lib/config/socials";
 
 const playfair = Playfair_Display({
   subsets: ["cyrillic", "latin"],
@@ -40,6 +41,20 @@ export default function RootLayout({ children }: RootLayoutProps) {
         <main>{children}</main>
         <footer className="site-footer">
           <span>© Python Method</span>
+          {socialLinks.length > 0 ? (
+            <nav aria-label="Социальные сети">
+              {socialLinks.map((link) => (
+                <a
+                  href={link.href}
+                  key={link.label}
+                  rel="noopener noreferrer"
+                  target="_blank"
+                >
+                  {link.label}
+                </a>
+              ))}
+            </nav>
+          ) : null}
           <nav aria-label="Дополнительно">
             <Link href="/legal/offer">Публичная оферта</Link>
             <Link href="/support">Поддержка</Link>
