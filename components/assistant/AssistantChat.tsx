@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -32,6 +33,9 @@ export function AssistantChat({
   const [error, setError] = useState<string | null>(null);
   const [provider, setProvider] = useState<Provider>("best");
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const voice = useVoiceInput((text) => {
+    setInput((current) => (current ? `${current} ${text}` : text));
+  });
 
   useEffect(() => {
     const node = scrollRef.current;
@@ -151,13 +155,31 @@ export function AssistantChat({
               void send(input);
             }
           }}
-          placeholder={placeholder}
+          placeholder={voice.listening ? "Говорите — я записываю…" : placeholder}
           rows={2}
-          value={input}
+          value={voice.interim ? `${input}${input ? " " : ""}${voice.interim}` : input}
         />
-        <button className="button" disabled={pending || !input.trim()} type="submit">
-          Отправить
-        </button>
+        {voice.listening ? (
+          <p className="assistant-chat__voice-hint">
+            🎤 Идёт запись — говорите. Нажмите микрофон ещё раз, чтобы
+            остановить, затем «Отправить».
+          </p>
+        ) : null}
+        <div className="assistant-chat__actions">
+          {voice.supported ? (
+            <button
+              aria-label={voice.listening ? "Остановить запись голоса" : "Надиктовать голосом"}
+              className={`assistant-chat__mic${voice.listening ? " assistant-chat__mic--on" : ""}`}
+              onClick={voice.toggle}
+              type="button"
+            >
+              🎤
+            </button>
+          ) : null}
+          <button className="button" disabled={pending || !input.trim()} type="submit">
+            Отправить
+          </button>
+        </div>
       </form>
     </div>
   );

@@ -1361,3 +1361,51 @@ code {
     grid-template-columns: 1fr;
   }
 }
+
+/* --- Voice input --- */
+
+.assistant-chat__actions {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.assistant-chat__mic {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  cursor: pointer;
+  display: flex;
+  font-size: 18px;
+  height: 44px;
+  justify-content: center;
+  width: 44px;
+}
+
+.assistant-chat__mic:hover {
+  border-color: var(--accent);
+}
+
+.assistant-chat__mic--on {
+  animation: mic-pulse 1.4s ease-in-out infinite;
+  background: rgba(224, 133, 133, 0.18);
+  border-color: var(--danger);
+}
+
+@keyframes mic-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(224, 133, 133, 0.45);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(224, 133, 133, 0);
+  }
+}
+
+.assistant-chat__voice-hint {
+  color: var(--danger);
+  font-size: 12.5px;
+  margin: 0;
+}
