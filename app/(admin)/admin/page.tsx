@@ -8,6 +8,7 @@ import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
 import { EscalationPanel } from "@/components/escalations/EscalationPanel";
 import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { listOpenEscalations } from "@/lib/escalations/queries";
+import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 
@@ -50,9 +51,10 @@ export default async function AdminPage() {
     );
   }
 
-  const [knowledge, escalations] = await Promise.all([
+  const [knowledge, escalations, unread] = await Promise.all([
     listKnowledgeEntries(),
-    listOpenEscalations()
+    listOpenEscalations(),
+    getStaffUnreadCounts()
   ]);
   const assistantConfigured = hasAssistantEnv();
 
@@ -84,9 +86,19 @@ export default async function AdminPage() {
           </div>
           <div className="panel">
             <span className="panel__label">Кейсы</span>
-            <h2>Кейсы клиентов</h2>
+            <h2>
+              Кейсы клиентов
+              {unread.total > 0 ? (
+                <span className="unread-badge unread-badge--inline">
+                  {unread.total} нов.
+                </span>
+              ) : null}
+            </h2>
             <p>
               Анкеты онбординга, статусы, история и управление каждым кейсом.
+              {unread.total > 0
+                ? " Есть непрочитанные сообщения от клиентов."
+                : ""}
             </p>
             <div className="panel-actions">
               <Link className="button button--secondary" href="/admin/cases">

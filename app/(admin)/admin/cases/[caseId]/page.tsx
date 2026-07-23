@@ -325,6 +325,7 @@ export default async function StaffCaseDetailPage({
           </p>
           <CaseMessageThread
             caseId={clientCase.id}
+            expandable
             loadError={caseMessages.error}
             messages={caseMessages.messages}
             viewer="staff"

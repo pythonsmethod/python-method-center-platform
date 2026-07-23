@@ -1548,3 +1548,81 @@ code {
   font-size: 13px;
   margin: 0;
 }
+
+/* --- Unread badges & fullscreen chat --- */
+
+.unread-badge {
+  background: var(--danger);
+  border-radius: 999px;
+  color: #2a0d0d;
+  display: inline-block;
+  font-size: 12.5px;
+  font-weight: 700;
+  min-width: 26px;
+  padding: 3px 8px;
+  text-align: center;
+}
+
+.unread-badge--empty {
+  background: transparent;
+  color: var(--muted);
+  font-weight: 400;
+}
+
+.unread-badge--inline {
+  font-family:
+    Inter, ui-sans-serif, system-ui, sans-serif;
+  margin-left: 10px;
+  vertical-align: middle;
+}
+
+.case-thread__toolbar {
+  align-items: center;
+  display: flex;
+  justify-content: space-between;
+}
+
+.case-thread__toolbar strong {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: 18px;
+}
+
+.case-thread--full {
+  background: var(--background);
+  border-radius: 0;
+  bottom: 0;
+  display: grid;
+  gap: 12px;
+  grid-template-rows: auto 1fr auto auto;
+  left: 0;
+  margin: 0;
+  overflow: hidden;
+  padding: 16px clamp(16px, 4vw, 60px) 18px;
+  position: fixed;
+  right: 0;
+  top: 0;
+  z-index: 90;
+}
+
+.case-thread--full .case-thread__messages {
+  max-height: none;
+  min-height: 0;
+}
+
+.case-thread--full .case-msg p {
+  font-size: 16px;
+  line-height: 1.65;
+}
+
+.case-thread--full .case-msg {
+  max-width: 760px;
+}
+
+.case-thread--full .case-thread__form textarea {
+  font-size: 16px;
+}
+
+.case-thread--full .case-thread__note {
+  display: none;
+}

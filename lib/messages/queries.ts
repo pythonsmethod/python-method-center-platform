@@ -18,6 +18,62 @@ export type CaseMessagesResult = {
   error: string | null;
 };
 
+// Marks counterpart messages as read for the viewing side. Fire-and-forget:
+// a failure here must never break rendering the thread.
+export async function markThreadRead(
+  caseId: string,
+  viewer: "client" | "staff"
+): Promise<void> {
+  const supabase = createSupabaseServiceClient();
+
+  if (!supabase) {
+    return;
+  }
+
+  const query = supabase
+    .from("case_messages")
+    .update({ read_at: new Date().toISOString() })
+    .eq("case_id", caseId)
+    .is("read_at", null);
+
+  if (viewer === "staff") {
+    await query.eq("sender_role", "client");
+  } else {
+    await query.neq("sender_role", "client");
+  }
+}
+
+// Unread client messages for staff: total and per case.
+export async function getStaffUnreadCounts(): Promise<{
+  total: number;
+  byCase: Record<string, number>;
+}> {
+  const supabase = createSupabaseServiceClient();
+
+  if (!supabase) {
+    return { total: 0, byCase: {} };
+  }
+
+  const { data, error } = await supabase
+    .from("case_messages")
+    .select("case_id")
+    .eq("sender_role", "client")
+    .is("read_at", null)
+    .limit(2000);
+
+  if (error || !data) {
+    return { total: 0, byCase: {} };
+  }
+
+  const byCase: Record<string, number> = {};
+
+  for (const row of data) {
+    byCase[row.case_id] = (byCase[row.case_id] ?? 0) + 1;
+  }
+
+  return { total: data.length, byCase };
+}
+
 // Loads a case thread and signs playback URLs for voice messages.
 // Callers are responsible for authorization (client owns the case / staff).
 export async function getCaseMessages(caseId: string): Promise<CaseMessagesResult> {

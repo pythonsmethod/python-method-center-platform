@@ -9,13 +9,14 @@ import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { CaseMessage } from "@/lib/messages/queries";
 import { VoiceRecorder } from "@/components/messages/VoiceRecorder";
 
-const POLL_INTERVAL_MS = 5000;
+const POLL_INTERVAL_MS = 3000;
 
 type CaseMessageThreadProps = {
   messages: CaseMessage[];
   viewer: "client" | "staff";
   caseId?: string;
   loadError?: string | null;
+  expandable?: boolean;
 };
 
 function senderLabel(role: string, viewer: "client" | "staff"): string {
@@ -47,8 +48,10 @@ export function CaseMessageThread({
   messages: initialMessages,
   viewer,
   caseId,
-  loadError
+  loadError,
+  expandable = false
 }: CaseMessageThreadProps) {
+  const [expanded, setExpanded] = useState(false);
   const action = viewer === "client" ? sendClientCaseMessage : sendStaffCaseMessage;
   const [state, formAction, pending] = useActionState(
     action,
@@ -80,7 +83,8 @@ export function CaseMessageThread({
     }
   }, [caseId]);
 
-  // Messenger-style live updates: poll while the tab is visible.
+  // Messenger-style live updates: poll while the tab is visible, refresh
+  // instantly when the user returns to the tab.
   useEffect(() => {
     if (loadError) {
       return;
@@ -92,8 +96,35 @@ export function CaseMessageThread({
       }
     }, POLL_INTERVAL_MS);
 
-    return () => clearInterval(interval);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") {
+        void refresh();
+      }
+    };
+
+    document.addEventListener("visibilitychange", onVisible);
+    window.addEventListener("focus", onVisible);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+      window.removeEventListener("focus", onVisible);
+    };
   }, [refresh, loadError]);
+
+  // Fullscreen mode: lock page scroll behind the overlay.
+  useEffect(() => {
+    if (!expanded) {
+      return;
+    }
+
+    const previous = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+
+    return () => {
+      document.body.style.overflow = previous;
+    };
+  }, [expanded]);
 
   // After a successful text send: clear the form and pull the new message in.
   useEffect(() => {
@@ -116,11 +147,24 @@ export function CaseMessageThread({
   }, [messages]);
 
   return (
-    <div className="case-thread">
+    <div className={`case-thread${expanded ? " case-thread--full" : ""}`}>
       {loadError ? (
         <p className="form-message form-message--error">
           Сообщения недоступны: {loadError}. Возможно, миграция ещё не применена.
         </p>
+      ) : null}
+
+      {expandable ? (
+        <div className="case-thread__toolbar">
+          {expanded ? <strong>Чат с клиентом</strong> : <span />}
+          <button
+            className="button button--secondary"
+            onClick={() => setExpanded((value) => !value)}
+            type="button"
+          >
+            {expanded ? "✕ Свернуть" : "⛶ Развернуть чат"}
+          </button>
+        </div>
       ) : null}
 
       <div className="case-thread__messages" ref={listRef}>

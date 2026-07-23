@@ -8,6 +8,7 @@ import {
   getStaffCases,
   type StaffCaseListItem
 } from "@/lib/cases/staff-queries";
+import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { formatDateTime } from "@/lib/i18n/format";
 import {
   caseStatusLabel,
@@ -18,7 +19,13 @@ function shortId(value: string): string {
   return value.slice(0, 8);
 }
 
-function CaseTable({ cases }: { cases: StaffCaseListItem[] }) {
+function CaseTable({
+  cases,
+  unreadByCase
+}: {
+  cases: StaffCaseListItem[];
+  unreadByCase: Record<string, number>;
+}) {
   if (cases.length === 0) {
     return <p className="empty-state">Кейсов пока нет.</p>;
   }
@@ -29,6 +36,7 @@ function CaseTable({ cases }: { cases: StaffCaseListItem[] }) {
         <thead>
           <tr>
             <th>Кейс</th>
+            <th>Чат</th>
             <th>Клиент</th>
             <th>Контакты</th>
             <th>Цель</th>
@@ -43,6 +51,15 @@ function CaseTable({ cases }: { cases: StaffCaseListItem[] }) {
             <tr key={clientCase.id}>
               <td>
                 <code title={clientCase.id}>{shortId(clientCase.id)}</code>
+              </td>
+              <td>
+                {unreadByCase[clientCase.id] ? (
+                  <span className="unread-badge">
+                    {unreadByCase[clientCase.id]}
+                  </span>
+                ) : (
+                  <span className="unread-badge unread-badge--empty">—</span>
+                )}
               </td>
               <td>{clientCase.profiles?.full_name ?? "Без имени"}</td>
               <td>
@@ -113,7 +130,10 @@ export default async function StaffCasesPage() {
     );
   }
 
-  const casesResult = await getStaffCases();
+  const [casesResult, unread] = await Promise.all([
+    getStaffCases(),
+    getStaffUnreadCounts()
+  ]);
 
   return (
     <div className="page-shell">
@@ -136,7 +156,7 @@ export default async function StaffCasesPage() {
 
       <section className="intake-section" aria-label="Кейсы клиентов">
         {casesResult.status === "ready" ? (
-          <CaseTable cases={casesResult.cases} />
+          <CaseTable cases={casesResult.cases} unreadByCase={unread.byCase} />
         ) : (
           <div className="notice notice--warning">
             <span className="panel__label">Кейсы недоступны</span>

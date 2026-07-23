@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { getStaffUserState } from "@/lib/auth/require-staff";
-import { getCaseMessages } from "@/lib/messages/queries";
+import { getCaseMessages, markThreadRead } from "@/lib/messages/queries";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -55,6 +55,9 @@ export async function GET(request: Request) {
   if (!caseId) {
     return NextResponse.json({ error: "Некорректный кейс." }, { status: 400 });
   }
+
+  // The thread is on screen — incoming messages count as seen.
+  await markThreadRead(caseId, staff.status === "authorized" ? "staff" : "client");
 
   const result = await getCaseMessages(caseId);
 
