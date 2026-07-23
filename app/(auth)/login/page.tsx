@@ -5,11 +5,18 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { AuthForm } from "./AuthForm";
 
+import Link from "next/link";
+
 type LoginPageProps = {
   searchParams?: Promise<{
     next?: string | string[];
+    message?: string | string[];
   }>;
 };
+
+function readParam(value: string | string[] | undefined): string | undefined {
+  return Array.isArray(value) ? value[0] : value;
+}
 
 function sanitizeNextPath(value: string | string[] | undefined): string {
   const nextPath = Array.isArray(value) ? value[0] : value;
@@ -38,20 +45,29 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
 
       <AuthSetupNotice />
 
+      {readParam(params?.message) === "link-invalid" ? (
+        <p className="form-message form-message--error">{t.linkInvalid}</p>
+      ) : null}
+
       <section className="auth-layout">
-        <AuthForm
-          labels={{
-            tabLogin: t.tabLogin,
-            tabSignup: t.tabSignup,
-            email: t.email,
-            password: t.password,
-            submitLogin: t.submitLogin,
-            submitSignup: t.submitSignup,
-            submitting: t.submitting
-          }}
-          nextPath={nextPath}
-          supabaseConfigured={supabaseConfigured}
-        />
+        <div>
+          <AuthForm
+            labels={{
+              tabLogin: t.tabLogin,
+              tabSignup: t.tabSignup,
+              email: t.email,
+              password: t.password,
+              submitLogin: t.submitLogin,
+              submitSignup: t.submitSignup,
+              submitting: t.submitting
+            }}
+            nextPath={nextPath}
+            supabaseConfigured={supabaseConfigured}
+          />
+          <p className="auth-help">
+            <Link href="/recovery">{t.forgot}</Link>
+          </p>
+        </div>
         <div className="panel">
           <span className="panel__label">{t.afterLabel}</span>
           <h2>{t.afterTitle}</h2>

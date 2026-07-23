@@ -8,6 +8,7 @@ import {
   type SupportRequestActionState
 } from "@/lib/support/types";
 import { writeAuditLog } from "@/lib/audit/log";
+import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
@@ -90,6 +91,17 @@ export async function createSupportRequest(
   }
 
   await Promise.all([
+    notifyTeam({
+      kind: "support_request",
+      dedupeKey: `support_request:${request.id}`,
+      title: "📨 Новое обращение из кабинета",
+      lines: [
+        `Клиент: ${user.email ?? user.id}`,
+        `Тема: ${subject.slice(0, 120)}`,
+        "Откройте раздел «Обращения», чтобы ответить."
+      ],
+      link: adminLink("/admin/requests")
+    }),
     writeAuditLog({
       profileId: user.id,
       caseId: clientCase?.id ?? null,

@@ -149,7 +149,7 @@ const ru = {
     description: "Ваш платёж успешно принят. Добро пожаловать в сопровождение Python Method.",
     whatNextLabel: "Что происходит дальше",
     steps: [
-      "Мы привяжем оплату к вашему кейсу по email, указанному при оплате (используйте тот же email, что и в аккаунте).",
+      "Оплата привязывается к вашему кейсу автоматически в течение нескольких минут (по аккаунту или email, указанному при оплате). Если через 10 минут её не видно в кабинете — напишите нам.",
       "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
       "Карен лично отправит вам свою формулу в подарок (200 капсул на тарифе «5 недель», 600 капсул на тарифе «100 дней»). На тарифе «5 недель» доставка уже оплачена вами, на «100 дней» доставку Карен берёт на себя. Трек-номер придёт в чат.",
       "Карен и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
@@ -164,12 +164,40 @@ const ru = {
   support: {
     eyebrow: "Поддержка",
     title: "Поддержка",
-    description: "Вопросы по платформе, документам и оплате.",
+    description:
+      "Вопросы по платформе, входу, документам и оплате. Отвечаем в течение 24 часов (в рабочие дни).",
     label: "Как связаться",
     cardTitle: "Напишите нам из кабинета",
     cardText1: "Форма «Написать команде» находится в",
     cabinetLink: "личном кабинете",
-    cardText2: ". Команда ответит по контактам, указанным в вашей анкете."
+    cardText2: ". Команда ответит по контактам, указанным в вашей анкете.",
+    emergencyLabel: "Экстренные ситуации",
+    emergencyTitle: "Платформа не оказывает экстренную помощь",
+    emergencyText:
+      "При угрозе жизни, резком ухудшении состояния или мыслях о причинении себе вреда немедленно звоните в местную службу экстренной помощи (112 в Европе, 911 в США) или обратитесь в ближайшую больницу. Не ждите ответа команды через платформу.",
+    guestLabel: "Нет аккаунта или не получается войти?",
+    guestTitle: "Напишите нам прямо здесь",
+    guestText:
+      "Форма ниже работает без входа в аккаунт. Ответим на указанный email в течение 24 часов (в рабочие дни).",
+    formEmail: "Email для ответа",
+    formCategory: "Тема обращения",
+    catLogin: "Не получается войти в аккаунт",
+    catPayment: "Вопрос по оплате",
+    catTechnical: "Техническая проблема",
+    catOther: "Другой вопрос",
+    formMessage: "Опишите вопрос",
+    formConsent:
+      "Соглашаюсь на обработку указанного email для ответа на моё обращение",
+    formSubmit: "Отправить сообщение",
+    formSubmitting: "Отправляю…",
+    helpLabel: "Частые ситуации",
+    helpLoginTitle: "Забыли пароль?",
+    helpLoginText: "Восстановите доступ за пару минут:",
+    helpLoginCta: "Восстановить пароль",
+    helpPaymentTitle: "Оплатили, но оплата не видна?",
+    helpPaymentText:
+      "Оплата появляется в кабинете автоматически в течение нескольких минут. Если её нет через 10 минут — напишите через форму, выбрав тему «Вопрос по оплате», и укажите email, с которым платили.",
+    loginCta: "Войти в аккаунт"
   },
   login: {
     eyebrow: "Вход",
@@ -185,7 +213,10 @@ const ru = {
     password: "Пароль",
     submitLogin: "Войти",
     submitSignup: "Создать аккаунт",
-    submitting: "Отправка..."
+    submitting: "Отправка...",
+    forgot: "Забыли пароль?",
+    linkInvalid:
+      "Ссылка из письма недействительна или устарела. Войдите с паролем или запросите новую ссылку через «Забыли пароль?»."
   }
 };
 
@@ -334,7 +365,7 @@ const en: typeof ru = {
     description: "Your payment has been received. Welcome to the Python Method support program.",
     whatNextLabel: "What happens next",
     steps: [
-      "We will link the payment to your case by the email used at checkout (use the same email as in your account).",
+      "The payment is linked to your case automatically within a few minutes (by your account or the email used at checkout). If you don't see it in your account after 10 minutes — write to us.",
       "The team will confirm the activation of your support program — you will get a message in your account chat.",
       "Karen will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On the “5 weeks” plan the delivery is already paid by you, on the “100 days” plan Karen covers the delivery himself. The tracking number will arrive in the chat.",
       "Karen and the team will study your case and begin the support program. All communication happens in your account."
@@ -349,12 +380,40 @@ const en: typeof ru = {
   support: {
     eyebrow: "Support",
     title: "Support",
-    description: "Questions about the platform, documents and payment.",
+    description:
+      "Questions about the platform, sign-in, documents and payment. We reply within 24 hours (on business days).",
     label: "How to reach us",
     cardTitle: "Write to us from your account",
     cardText1: "The “Write to the team” form is in your",
     cabinetLink: "personal account",
-    cardText2: ". The team will reply using the contacts from your questionnaire."
+    cardText2: ". The team will reply using the contacts from your questionnaire.",
+    emergencyLabel: "Emergencies",
+    emergencyTitle: "The platform does not provide emergency care",
+    emergencyText:
+      "If there is a threat to life, a sharp deterioration, or thoughts of self-harm, immediately call your local emergency service (112 in Europe, 911 in the USA) or go to the nearest hospital. Do not wait for the team to reply through the platform.",
+    guestLabel: "No account, or can't sign in?",
+    guestTitle: "Write to us right here",
+    guestText:
+      "The form below works without signing in. We will reply to the email you provide within 24 hours (on business days).",
+    formEmail: "Email for our reply",
+    formCategory: "Topic",
+    catLogin: "Can't sign in to my account",
+    catPayment: "Payment question",
+    catTechnical: "Technical problem",
+    catOther: "Other question",
+    formMessage: "Describe your question",
+    formConsent:
+      "I agree to the processing of this email address for the purpose of replying to my request",
+    formSubmit: "Send message",
+    formSubmitting: "Sending…",
+    helpLabel: "Common situations",
+    helpLoginTitle: "Forgot your password?",
+    helpLoginText: "Restore access in a couple of minutes:",
+    helpLoginCta: "Reset password",
+    helpPaymentTitle: "Paid, but the payment isn't visible?",
+    helpPaymentText:
+      "Payments appear in your account automatically within a few minutes. If it's not there after 10 minutes — write via the form, choosing the “Payment question” topic, and mention the email you paid with.",
+    loginCta: "Sign in"
   },
   login: {
     eyebrow: "Sign in",
@@ -370,7 +429,10 @@ const en: typeof ru = {
     password: "Password",
     submitLogin: "Sign in",
     submitSignup: "Create account",
-    submitting: "Sending..."
+    submitting: "Sending...",
+    forgot: "Forgot your password?",
+    linkInvalid:
+      "The link from the email is invalid or expired. Sign in with your password or request a new link via “Forgot your password?”."
   }
 };
 

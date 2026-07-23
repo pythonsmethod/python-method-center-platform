@@ -5,6 +5,23 @@ import { getPaymentPlans } from "@/lib/payments/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFreeReviewActive } from "@/lib/config/promo";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+// Signed-in clients get their profile id attached to the Stripe link as
+// client_reference_id, so the webhook can bind the payment to the account
+// without relying on email matching.
+function withClientReference(
+  url: string | null,
+  profileId: string | null
+): string | null {
+  if (!url || !profileId) {
+    return url;
+  }
+
+  const target = new URL(url);
+  target.searchParams.set("client_reference_id", profileId);
+  return target.toString();
+}
 
 export default async function PaymentPage() {
   const locale = await getLocale();
@@ -12,7 +29,22 @@ export default async function PaymentPage() {
   const t = dict.payment;
   const promo = dict.promo;
   const freeReview = isFreeReviewActive();
-  const plans = getPaymentPlans(locale);
+
+  let profileId: string | null = null;
+  const supabase = await createSupabaseServerClient();
+
+  if (supabase) {
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    profileId = user?.id ?? null;
+  }
+
+  const plans = getPaymentPlans(locale).map((plan) => ({
+    ...plan,
+    paymentLinkUrl: withClientReference(plan.paymentLinkUrl, profileId)
+  }));
 
   return (
     <div className="page-shell">

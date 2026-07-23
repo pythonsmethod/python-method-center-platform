@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
+import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -47,17 +48,34 @@ export async function sendClientCaseMessage(
     return errorState("Сначала заполните анкету — она создаст ваш кейс.");
   }
 
-  const { error } = await supabase.from("case_messages").insert({
-    case_id: caseRow.id,
-    profile_id: user.id,
-    sender_id: user.id,
-    sender_role: "client",
-    body
-  });
+  const { data: message, error } = await supabase
+    .from("case_messages")
+    .insert({
+      case_id: caseRow.id,
+      profile_id: user.id,
+      sender_id: user.id,
+      sender_role: "client",
+      body
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return errorState(`Не удалось отправить: ${error.message}`);
   }
+
+  // External ping to the team; message content stays in the platform.
+  await notifyTeam({
+    kind: "client_message",
+    dedupeKey: `client_message:${message.id}`,
+    title: "✉️ Новое сообщение от клиента",
+    lines: [
+      `Клиент: ${user.email ?? user.id}`,
+      `Кейс: ${caseRow.id}`,
+      "Откройте чат кейса, чтобы прочитать и ответить."
+    ],
+    link: adminLink(`/admin/cases/${caseRow.id}`)
+  });
 
   revalidatePath("/cabinet");
 

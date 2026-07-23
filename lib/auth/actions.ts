@@ -3,6 +3,10 @@
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import type { AuthActionState } from "@/lib/auth/types";
+import {
+  validateNewPassword,
+  validateRecoveryEmail
+} from "@/lib/auth/validation";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
@@ -120,6 +124,98 @@ export async function signUpWithPassword(
   return {
     status: "success",
     message: "Заявка на регистрацию отправлена. Если включено подтверждение, проверьте почту."
+  };
+}
+
+// Sends a recovery email. The response never reveals whether the email
+// exists in the system.
+export async function requestPasswordReset(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  }
+
+  const email = String(formData.get("email") ?? "").trim();
+  const validationError = validateRecoveryEmail(email);
+
+  if (validationError) {
+    return errorState(validationError);
+  }
+
+  const headerStore = await headers();
+  const origin =
+    headerStore.get("origin") ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000";
+
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`
+  });
+
+  // Deliberately ignore "user not found"-style errors: same message either
+  // way, so the form can't be used to probe which emails are registered.
+  if (error && /rate|limit/i.test(error.message)) {
+    return errorState(
+      "Слишком много запросов подряд. Подождите минуту и попробуйте ещё раз."
+    );
+  }
+
+  return {
+    status: "success",
+    message:
+      "Если такой аккаунт существует, мы отправили на этот email письмо со ссылкой для смены пароля. Проверьте почту (и папку «Спам»)."
+  };
+}
+
+// Sets a new password for the recovery session established by the emailed
+// link. Without a valid session the link is expired/used — the form says so.
+export async function updatePassword(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  }
+
+  const password = String(formData.get("password") ?? "");
+  const confirm = String(formData.get("confirm") ?? "");
+  const validationError = validateNewPassword(password, confirm);
+
+  if (validationError) {
+    return errorState(validationError);
+  }
+
+  const {
+    data: { user }
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return errorState(
+      "Ссылка для смены пароля недействительна или устарела. Запросите новую на странице «Забыли пароль?»."
+    );
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    if (/same password|different from the old/i.test(error.message)) {
+      return errorState("Новый пароль совпадает со старым — придумайте другой.");
+    }
+
+    return errorState(
+      "Не удалось обновить пароль. Запросите новую ссылку и попробуйте ещё раз."
+    );
+  }
+
+  return {
+    status: "success",
+    message: "Пароль обновлён. Теперь можно перейти в кабинет."
   };
 }
 

@@ -3,6 +3,7 @@ import { sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam } from "@/lib/assistant/router";
 import { buildClientSystemPrompt } from "@/lib/assistant/prompts";
 import { extractRedFlag, recordRedFlagEvent } from "@/lib/assistant/red-flags";
+import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
@@ -89,6 +90,7 @@ export async function POST(request: Request) {
 
   if (category) {
     let profileId: string | null = null;
+    let profileEmail: string | null = null;
 
     try {
       const supabase = await createSupabaseServerClient();
@@ -99,6 +101,7 @@ export async function POST(request: Request) {
         } = await supabase.auth.getUser();
 
         profileId = user?.id ?? null;
+        profileEmail = user?.email ?? null;
       }
     } catch {
       profileId = null;
@@ -108,10 +111,26 @@ export async function POST(request: Request) {
       await recordRedFlagEvent({
         category,
         messageExcerpt: messages[messages.length - 1]?.content ?? "",
-        profileId
+        profileId,
+        profileEmail
       });
-    } catch {
-      // Logging must never break the safety reply itself.
+    } catch (escalationError) {
+      // Logging must never break the safety reply itself — but a silent
+      // failure of the safety pipeline must still reach the team.
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `red-flag-pipeline-failed:${Date.now()}`,
+        title: "ОШИБКА ОБРАБОТКИ: сбой конвейера красного флага",
+        lines: [
+          `Ошибка: ${
+            escalationError instanceof Error
+              ? escalationError.message
+              : "неизвестно"
+          }`,
+          "Событие требует ручной проверки."
+        ],
+        link: adminLink()
+      });
     }
   }
 

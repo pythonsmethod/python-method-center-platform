@@ -280,6 +280,15 @@ p {
   margin-top: 22px;
 }
 
+.auth-help {
+  font-size: 14px;
+  margin: 12px 2px 0;
+}
+
+.auth-help a {
+  color: var(--accent-strong);
+}
+
 .field {
   display: grid;
   gap: 8px;

@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { CASE_AUDIO_BUCKET } from "@/lib/messages/queries";
+import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -133,22 +134,39 @@ export async function POST(request: Request) {
       ? Math.round(rawDuration)
       : null;
 
-  const { error: insertError } = await supabase.from("case_messages").insert({
-    case_id: caseId,
-    profile_id: profileId,
-    sender_id: senderId,
-    sender_role: senderRole,
-    audio_path: audioPath,
-    audio_duration_seconds: duration
-  });
+  const { data: message, error: insertError } = await supabase
+    .from("case_messages")
+    .insert({
+      case_id: caseId,
+      profile_id: profileId,
+      sender_id: senderId,
+      sender_role: senderRole,
+      audio_path: audioPath,
+      audio_duration_seconds: duration
+    })
+    .select("id")
+    .single();
 
-  if (insertError) {
+  if (insertError || !message) {
     await supabase.storage.from(CASE_AUDIO_BUCKET).remove([audioPath]);
 
     return NextResponse.json(
-      { error: `Не удалось отправить сообщение: ${insertError.message}` },
+      { error: `Не удалось отправить сообщение: ${insertError?.message ?? "ошибка"}` },
       { status: 502 }
     );
+  }
+
+  if (senderRole === "client") {
+    await notifyTeam({
+      kind: "client_message",
+      dedupeKey: `client_message:${message.id}`,
+      title: "🎙 Новое голосовое от клиента",
+      lines: [
+        `Кейс: ${caseId}`,
+        "Откройте чат кейса, чтобы прослушать и ответить."
+      ],
+      link: adminLink(`/admin/cases/${caseId}`)
+    });
   }
 
   return NextResponse.json({ ok: true });

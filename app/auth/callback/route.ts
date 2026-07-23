@@ -22,7 +22,18 @@ export async function GET(request: Request) {
   }
 
   if (code) {
-    await supabase.auth.exchangeCodeForSession(code);
+    const { error } = await supabase.auth.exchangeCodeForSession(code);
+
+    if (error) {
+      // Expired or already-used link: send the user to a page that explains
+      // it and lets them request a fresh one.
+      const target =
+        nextPath === "/reset-password"
+          ? "/recovery?message=link-invalid"
+          : "/login?message=link-invalid";
+
+      return NextResponse.redirect(new URL(target, requestUrl.origin));
+    }
   }
 
   return NextResponse.redirect(new URL(nextPath, requestUrl.origin));

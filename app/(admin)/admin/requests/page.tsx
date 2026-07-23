@@ -81,11 +81,16 @@ export default async function StaffSupportRequestsPage() {
                 <dl>
                   <div>
                     <dt>Клиент</dt>
-                    <dd>{request.profiles?.full_name ?? "Без имени"}</dd>
+                    <dd>
+                      {request.profiles?.full_name ??
+                        (request.profile_id ? "Без имени" : "Гость (без аккаунта)")}
+                    </dd>
                   </div>
                   <div>
                     <dt>Email</dt>
-                    <dd>{request.profiles?.email ?? "—"}</dd>
+                    <dd>
+                      {request.profiles?.email ?? request.contact_email ?? "—"}
+                    </dd>
                   </div>
                   <div>
                     <dt>Телефон</dt>

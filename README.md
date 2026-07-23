@@ -6,40 +6,63 @@ which is preserved separately.
 
 ## Current Implementation
 
-The launch-ready MVP includes:
-
-- Next.js App Router + TypeScript, Russian client-facing UI
-- Public landing page with the client journey and legal/emergency notices
-- Supabase Auth email/password (sign-up, sign-in, logout, callback route,
-  session-refresh middleware)
+- Next.js App Router + TypeScript; bilingual public site (RU default, EN via
+  the `pm-locale` cookie switcher); the client cabinet and staff workspace are
+  Russian-first
+- Public landing page with the client journey, first-clients promo
+  (`NEXT_PUBLIC_FREE_REVIEW`), and a footer legal/emergency line
+- Supabase Auth email/password: sign-up, sign-in, logout, callback route,
+  session-refresh middleware, and full password recovery
+  (`/recovery` → email link → `/reset-password`, expired links handled)
 - Onboarding form that creates the client case and records offer acceptance
-  (`offer_acceptance`) and data-processing consent with audit logs and
-  lifecycle events
+  and data-processing consent with audit logs and lifecycle events
 - Client cabinet: case status, document upload/open (private storage bucket,
-  signed URLs), payments list, case history, and "write to the team" support
-  requests
-- Published public offer at `/legal/offer` (PDF served from `public/legal/`)
-- Payment page with Stripe Payment Link buttons driven by env vars
-- Staff workspace (`/admin`, roles `support`/`admin` enforced via profile
-  role): case list and case detail with the onboarding payload, case
-  status/urgency/direction management, manual payment recording, document
-  intake with signed-URL viewing, and support request queue with status
-  controls
+  signed URLs), payments list, case history, support requests, and a
+  messenger-style case chat (text + voice messages, unread counters,
+  day separators, 3s polling)
+- AI runtime (Claude + OpenAI with a strongest-answer arbiter):
+  - public client assistant widget on all public pages (bilingual)
+  - staff assistant in `/admin` with optional per-case context
+  - knowledge base editable by staff, injected into both system prompts
+- Automated red-flag workflow: the client assistant tags emergencies with a
+  hidden marker; the server strips it, records an `escalation_events` row
+  (physical → Karen, psychological → support) and pushes an external
+  Telegram notification
+- External team notifications (Telegram, `notification_events` delivery log
+  with retry/dedupe/status): red flags, new client messages (text and voice),
+  new support requests, payments, processing errors
+- Payments: Stripe Payment Links on `/payment` behind a mandatory offer
+  checkbox, plus a server-side Stripe webhook
+  (`/api/stripe/webhook`) with signature verification and insert-first
+  idempotency that records payments automatically, activates the service
+  period, and alerts the team (unmatched payments go to manual review)
+- Public support page `/support`: guest contact form (no account needed,
+  honeypot + rate limiting + consent), prominent emergency notice, links to
+  password recovery and login
+- Staff workspace (`/admin`, roles `support`/`admin`): red-flag escalation
+  panel, case list/detail with chat and management controls, manual payment
+  recording (still available as fallback), document intake, support request
+  queue (guest requests show their reply-to email)
 - Audit log and case lifecycle event writing via the server-only service role
 
-Not implemented (post-launch): AI runtime, automated red-flag workflow,
-Stripe webhooks, threaded messaging.
+Known limitations (tracked in `docs/audits/`): the case AI assistant reads
+case metadata but not document file contents; assistant chat history is not
+persisted; admin UI is Russian-only; notification delivery requires the
+Telegram env vars to be set.
 
 ## Routes
 
 - `/` — landing
-- `/login` — auth
+- `/login`, `/recovery`, `/reset-password` — auth
 - `/onboarding` — client intake (creates the case)
 - `/cabinet` — client cabinet
-- `/payment` — tariffs and Stripe Payment Links
+- `/payment`, `/payment/success` — tariffs, Stripe Payment Links
 - `/legal/offer` — public offer
-- `/support` — support info
+- `/support` — public support (guest form + emergency notice)
 - `/admin`, `/admin/cases`, `/admin/documents`, `/admin/requests` — staff
+- `/api/assistant/client`, `/api/assistant/staff` — AI endpoints
+- `/api/stripe/webhook` — Stripe webhook (server-to-server only)
+- `/api/messages/*` — case chat polling and voice upload
 
 ## Running Locally
 
@@ -50,79 +73,58 @@ npm install
 npm run dev
 ```
 
-Then open:
-
-```text
-http://localhost:3000
-```
-
-TypeScript and production build checks:
+Checks:
 
 ```bash
 npm run typecheck
 npm run build
+npm test          # vitest unit tests
 ```
 
 ## Environment
 
-Copy `.env.example` to `.env.local` and set:
+Copy `.env.example` to `.env.local`. Key groups:
 
-```bash
-NEXT_PUBLIC_SUPABASE_URL=
-NEXT_PUBLIC_SUPABASE_ANON_KEY=
-SUPABASE_SERVICE_ROLE_KEY=        # server-only, never NEXT_PUBLIC_
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W=   # optional, shows the pay button
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W=  # optional, shows the pay button
-```
+- Supabase: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`,
+  `SUPABASE_SERVICE_ROLE_KEY` (server-only)
+- Stripe: `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W/_15W` (buttons),
+  `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` (webhook)
+- AI: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`
+- Notifications: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
+- `NEXT_PUBLIC_SITE_URL` — absolute origin for links in notifications and
+  auth redirects
 
-Empty Supabase values are supported for local scaffold rendering; protected
-pages show a setup notice instead of faking a connection.
-
-Do not commit `.env.local`, access tokens, database passwords, or service-role
-keys. Do not expose `SUPABASE_SERVICE_ROLE_KEY` or any service-role credential
-through `NEXT_PUBLIC_*` variables.
+Do not commit `.env.local` or expose any server-only key via `NEXT_PUBLIC_*`.
 
 ## Supabase Migration Setup
 
-Apply all migrations in `supabase/migrations/` in filename order:
-
-```text
-20260621220000_create_core_schema.sql
-20260623010000_storage_audit_safety_foundation.sql
-20260623030000_document_intake_queue_foundation.sql
-20260623033000_document_status_insert_hardening.sql
-20260623040000_staff_access_profile_role_hardening.sql
-20260709120000_launch_hardening.sql
-```
-
-Safe paths:
-
-1. Supabase CLI:
-
-```bash
-supabase login
-supabase link --project-ref <project-ref>
-supabase db push
-```
-
-2. Supabase SQL editor: run each migration file once, in order.
-
-For private client document storage, follow
-`supabase/storage_manual_setup.md` to create the private `client-documents`
-bucket and `storage.objects` policies in the Supabase Dashboard.
+Apply all migrations in `supabase/migrations/` in filename order (Supabase
+CLI `supabase db push`, or run each file once in the SQL editor). Storage
+buckets (`client-documents`, `case-audio`) follow
+`supabase/storage_manual_setup.md`.
 
 RLS is intentionally scoped to the authenticated user (`auth.uid()`); staff
 reads/writes go through the server-only service role. Do not weaken RLS.
 
+## Stripe Webhook Setup
+
+1. Stripe Dashboard → Developers → Webhooks → Add endpoint:
+   `https://pythonmethodcenter.com/api/stripe/webhook`
+2. Events: `checkout.session.completed`,
+   `checkout.session.async_payment_succeeded`,
+   `checkout.session.async_payment_failed`, `payment_intent.payment_failed`,
+   `charge.refunded`
+3. Put the signing secret into `STRIPE_WEBHOOK_SECRET` and redeploy.
+
 ## Deployment
 
-See `docs/deployment.md` for the Vercel deployment plan, required Supabase
-Auth redirect URLs, and the full post-deploy verification checklist
-(including staff access, document signed URLs, offer consent records, support
-requests, and payment link buttons).
+See `docs/deployment.md` for the Vercel deployment plan and Supabase Auth
+redirect URLs (must include `/auth/callback` on the production domain for
+sign-up confirmation and password recovery).
 
-The launch readiness audit lives at
-`docs/launch/LAUNCH_MVP_AUDIT_2026-07-09.md`.
+Audits live in `docs/audits/` — most recent:
+`CLAUDE_FINAL_LAUNCH_READINESS_AUDIT_V2.md` and
+`LAUNCH_CLOSURE_SPRINT_REPORT_V1.md`.
 
 ## Documentation
 
