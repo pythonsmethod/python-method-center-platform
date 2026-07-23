@@ -130,11 +130,11 @@ const ru = {
     feeNote: "К каждому тарифу добавляется сервисный сбор 5%.",
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
-      "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Карен отправляет свою формулу — вы оплачиваете только доставку ($180).",
+      "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Карен отправляет свою формулу — 200 капсул; вы оплачиваете только доставку ($180).",
     plan5Price: "$1 200 + 5% сбор + $180 доставка формулы = $1 440",
     plan100Title: "Сопровождение — 100 дней",
     plan100Desc:
-      "Расширенное сопровождение кейса командой Python Method на 100 дней. В подарок Карен отправляет свою формулу — доставку Карен берёт на себя.",
+      "Расширенное сопровождение кейса командой Python Method на 100 дней. В подарок Карен отправляет свою формулу — 600 капсул, и доставку Карен берёт на себя.",
     plan100Price: "$3 500 + 5% сбор = $3 675"
   },
   paymentSuccess: {
@@ -145,7 +145,7 @@ const ru = {
     steps: [
       "Мы привяжем оплату к вашему кейсу по email, указанному при оплате (используйте тот же email, что и в аккаунте).",
       "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
-      "Карен лично отправит вам свою формулу в подарок: на тарифе «5 недель» доставка уже оплачена вами, на тарифе «100 дней» доставку Карен берёт на себя. Трек-номер придёт в чат.",
+      "Карен лично отправит вам свою формулу в подарок (200 капсул на тарифе «5 недель», 600 капсул на тарифе «100 дней»). На тарифе «5 недель» доставка уже оплачена вами, на «100 дней» доставку Карен берёт на себя. Трек-номер придёт в чат.",
       "Карен и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
     ],
     cabinetCta: "Перейти в кабинет",
@@ -309,11 +309,11 @@ const en: typeof ru = {
     feeNote: "A 5% service fee is added to each plan.",
     plan5Title: "Support — 5 weeks",
     plan5Desc:
-      "Case review, plan and team support for 5 weeks. As a gift, Karen sends his formula — you only pay for delivery ($180).",
+      "Case review, plan and team support for 5 weeks. As a gift, Karen sends his formula — 200 capsules; you only pay for delivery ($180).",
     plan5Price: "$1,200 + 5% fee + $180 formula delivery = $1,440",
     plan100Title: "Support — 100 days",
     plan100Desc:
-      "Extended case support by the Python Method team for 100 days. As a gift, Karen sends his formula — with delivery at Karen's own expense.",
+      "Extended case support by the Python Method team for 100 days. As a gift, Karen sends his formula — 600 capsules, with delivery at Karen's own expense.",
     plan100Price: "$3,500 + 5% fee = $3,675"
   },
   paymentSuccess: {
@@ -324,7 +324,7 @@ const en: typeof ru = {
     steps: [
       "We will link the payment to your case by the email used at checkout (use the same email as in your account).",
       "The team will confirm the activation of your support program — you will get a message in your account chat.",
-      "Karen will personally send you his formula as a gift: on the “5 weeks” plan the delivery is already paid by you, on the “100 days” plan Karen covers the delivery himself. The tracking number will arrive in the chat.",
+      "Karen will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On the “5 weeks” plan the delivery is already paid by you, on the “100 days” plan Karen covers the delivery himself. The tracking number will arrive in the chat.",
       "Karen and the team will study your case and begin the support program. All communication happens in your account."
     ],
     cabinetCta: "Go to my account",
