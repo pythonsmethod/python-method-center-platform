@@ -1,0 +1,599 @@
+<title>Python Method Center — Pitch Deck</title>
+<style>
+  :root {
+    --bg: #17120a;
+    --surface: #211a0f;
+    --surface-muted: #2b2213;
+    --text: #f1e6cf;
+    --muted: #c3b18a;
+    --line: #4a3b24;
+    --gold: #d4af37;
+    --gold-bright: #e3c25f;
+    --parchment: #f0e6d2;
+    --parchment-ink: #3a2c16;
+    --parchment-line: #d8c8a8;
+    --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+    --sans: "Gill Sans", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  }
+
+  html { scroll-behavior: smooth; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--serif);
+    line-height: 1.55;
+  }
+
+  .deck { counter-reset: slide; }
+
+  .slide {
+    counter-increment: slide;
+    min-height: 100vh;
+    min-height: 100svh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4rem 1.5rem 5rem;
+    position: relative;
+    border-bottom: 1px solid var(--line);
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 0%, rgba(212, 175, 55, 0.06), transparent 70%),
+      var(--bg);
+  }
+
+  .slide__inner {
+    width: 100%;
+    max-width: 62rem;
+    position: relative;
+  }
+
+  .slide__num {
+    position: absolute;
+    bottom: 1.4rem;
+    right: 1.8rem;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.22em;
+    color: var(--muted);
+    font-variant-numeric: tabular-nums;
+  }
+  .slide__num::before { content: counter(slide, decimal-leading-zero) " / 13"; }
+
+  .eyebrow {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 600;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: var(--gold);
+    margin: 0 0 1.1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+  .eyebrow::after {
+    content: "";
+    height: 1px;
+    flex: 0 0 4.5rem;
+    background: linear-gradient(90deg, var(--gold), transparent);
+  }
+
+  h1, h2 {
+    font-weight: 600;
+    text-wrap: balance;
+    margin: 0 0 1.2rem;
+    color: var(--text);
+  }
+  h1 { font-size: clamp(2.4rem, 6vw, 4.2rem); line-height: 1.08; }
+  h2 { font-size: clamp(1.7rem, 4vw, 2.6rem); line-height: 1.15; }
+  h2 em { color: var(--gold-bright); font-style: normal; }
+
+  p.lead {
+    font-size: clamp(1.05rem, 2vw, 1.3rem);
+    color: var(--muted);
+    max-width: 42rem;
+    margin: 0 0 1.4rem;
+  }
+
+  .ankh {
+    color: var(--gold);
+    font-size: clamp(2.2rem, 5vw, 3.4rem);
+    line-height: 1;
+    display: block;
+    margin-bottom: 1.6rem;
+  }
+
+  .rule {
+    border: 0;
+    height: 1px;
+    margin: 2rem 0;
+    background: linear-gradient(90deg, var(--gold) 0%, var(--line) 40%, transparent 100%);
+  }
+
+  /* ---- cards & grids ---- */
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+    margin-top: 1.8rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.3rem 1.4rem;
+  }
+  .card h3 {
+    margin: 0 0 0.5rem;
+    font-size: 1.02rem;
+    color: var(--gold-bright);
+    font-weight: 600;
+  }
+  .card p { margin: 0; font-size: 0.94rem; color: var(--muted); }
+
+  .stat {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--gold);
+    border-radius: 4px;
+    padding: 1.4rem 1.5rem 1.2rem;
+  }
+  .stat b {
+    display: block;
+    font-size: clamp(2rem, 4.5vw, 3rem);
+    font-weight: 600;
+    color: var(--gold-bright);
+    font-variant-numeric: tabular-nums;
+    line-height: 1.1;
+    margin-bottom: 0.35rem;
+  }
+  .stat span { font-size: 0.92rem; color: var(--muted); }
+
+  ul.gold-list { list-style: none; padding: 0; margin: 1.4rem 0 0; max-width: 44rem; }
+  ul.gold-list li {
+    padding: 0.65rem 0 0.65rem 1.9rem;
+    position: relative;
+    border-bottom: 1px solid rgba(74, 59, 36, 0.55);
+    color: var(--text);
+    font-size: 1.02rem;
+  }
+  ul.gold-list li::before {
+    content: "☥";
+    position: absolute;
+    left: 0;
+    color: var(--gold);
+    font-size: 0.95rem;
+  }
+  ul.gold-list li strong { color: var(--gold-bright); font-weight: 600; }
+
+  /* ---- parchment (traction) ---- */
+  .parchment {
+    background: var(--parchment);
+    color: var(--parchment-ink);
+    border-radius: 4px;
+    padding: 2rem 2.2rem;
+    margin-top: 1.6rem;
+    border: 1px solid var(--parchment-line);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.45);
+  }
+  .parchment .eyebrow { color: #8a6a1f; }
+  .parchment .eyebrow::after { background: linear-gradient(90deg, #8a6a1f, transparent); }
+  .parchment .stat {
+    background: transparent;
+    border-color: var(--parchment-line);
+    border-top-color: #b8912a;
+  }
+  .parchment .stat b { color: #7a5c14; }
+  .parchment .stat span { color: #6d5a35; }
+  .parchment p { color: var(--parchment-ink); }
+
+  /* ---- fill-in placeholders ---- */
+  .fill {
+    border: 1px dashed var(--gold);
+    border-radius: 4px;
+    background: rgba(212, 175, 55, 0.07);
+    padding: 0.85rem 1.1rem;
+    margin-top: 1.1rem;
+    font-family: var(--sans);
+    font-size: 0.88rem;
+    color: var(--gold-bright);
+  }
+  .fill::before {
+    content: "ЗАПОЛНИТЬ · ";
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    font-size: 0.72rem;
+  }
+  .parchment .fill { color: #7a5c14; background: rgba(184, 145, 42, 0.1); border-color: #b8912a; }
+
+  /* ---- pricing ---- */
+  .plans { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); margin-top: 1.8rem; }
+  .plan {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-radius: 4px;
+    padding: 1.5rem 1.5rem 1.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+  }
+  .plan--main { border-color: var(--gold); box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.35); }
+  .plan .plan__name {
+    font-family: var(--sans);
+    font-size: 0.75rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--gold);
+  }
+  .plan .plan__price {
+    font-size: clamp(1.7rem, 3.5vw, 2.3rem);
+    color: var(--gold-bright);
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+  }
+  .plan .plan__note { font-size: 0.88rem; color: var(--muted); }
+  .plan .plan__gift {
+    margin-top: auto;
+    padding-top: 0.7rem;
+    border-top: 1px solid var(--line);
+    font-size: 0.88rem;
+    color: var(--text);
+  }
+  .plan .plan__gift strong { color: var(--gold-bright); }
+
+  /* ---- chart ---- */
+  .chart {
+    display: flex;
+    align-items: flex-end;
+    gap: 3px;
+    height: 9.5rem;
+    margin-top: 2rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--line);
+  }
+  .chart i {
+    flex: 1;
+    background: linear-gradient(180deg, var(--gold-bright), rgba(212, 175, 55, 0.25));
+    border-radius: 2px 2px 0 0;
+    min-width: 4px;
+  }
+  .chart i.y2 { background: linear-gradient(180deg, var(--gold), rgba(212, 175, 55, 0.15)); }
+  .chart__caption {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.12em;
+    color: var(--muted);
+    margin-top: 0.5rem;
+  }
+
+  table.unit {
+    width: 100%;
+    max-width: 44rem;
+    border-collapse: collapse;
+    margin-top: 1.6rem;
+    font-size: 0.98rem;
+  }
+  table.unit td {
+    padding: 0.7rem 0.4rem;
+    border-bottom: 1px solid var(--line);
+    vertical-align: top;
+  }
+  table.unit td:last-child {
+    text-align: right;
+    color: var(--gold-bright);
+    font-variant-numeric: tabular-nums;
+    white-space: nowrap;
+    font-weight: 600;
+  }
+  table.unit td small { display: block; color: var(--muted); font-size: 0.82rem; }
+
+  .footnote {
+    margin-top: 1.6rem;
+    font-family: var(--sans);
+    font-size: 0.8rem;
+    color: var(--muted);
+    max-width: 44rem;
+  }
+
+  .title-slide { text-align: center; }
+  .title-slide .eyebrow { justify-content: center; }
+  .title-slide .eyebrow::after { display: none; }
+  .title-slide p.lead { margin-inline: auto; }
+  .motto {
+    margin-top: 2.2rem;
+    font-size: clamp(1.05rem, 2.2vw, 1.35rem);
+    color: var(--gold-bright);
+    font-style: italic;
+  }
+
+  .hint {
+    position: fixed;
+    bottom: 1rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.16em;
+    color: var(--muted);
+    background: rgba(23, 18, 10, 0.85);
+    border: 1px solid var(--line);
+    border-radius: 999px;
+    padding: 0.35rem 1rem;
+    z-index: 10;
+  }
+
+  @media (max-width: 640px) {
+    .slide { padding: 3rem 1.1rem 4.5rem; }
+    .hint { display: none; }
+  }
+
+  @media print {
+    .hint { display: none; }
+    .slide {
+      min-height: auto;
+      page-break-after: always;
+      border-bottom: 0;
+      padding: 2.5rem 2rem;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    body { background: var(--bg); }
+  }
+</style>
+
+<div class="deck">
+
+  <!-- 01 · Титул -->
+  <section class="slide title-slide">
+    <div class="slide__inner">
+      <span class="ankh">☥</span>
+      <p class="eyebrow">Инвестиционная презентация · июль 2026</p>
+      <h1>Python Method Center</h1>
+      <p class="lead">«Реабилитация без границ» — цифровой реабилитационный центр:
+      метод Карена, усиленный искусственным интеллектом. Платформа запущена, платежи идут, клиенты — уже два года.</p>
+      <p class="motto">«Мы ведём. Вы восстанавливаетесь. Вместе — к результату.»</p>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 02 · Проблема -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Проблема</p>
+      <h2>Между визитами к врачам человек остаётся <em>один</em></h2>
+      <p class="lead">Люди с тяжёлыми и хроническими состояниями получают протокол лечения — но не получают сопровождения: некому задать вопрос сегодня, некому вести день за днём.</p>
+      <ul class="gold-list">
+        <li>Восстановление — это месяцы ежедневных решений: питание, режим, самочувствие, страхи. Классическая система на это не рассчитана.</li>
+        <li>Эксперты, которые умеют вести, — <strong>не масштабируются</strong>: их время ограничено, каждый клиент требует личного внимания.</li>
+        <li>Карен уже ведёт сотни людей вручную — в Telegram и WhatsApp. Спрос есть. Потолок ручной работы достигнут.</li>
+      </ul>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 03 · Решение -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Решение</p>
+      <h2>Платформа сопровождения: эксперт ведёт, <em>ИИ усиливает</em></h2>
+      <p class="lead">Python Method Center переносит проверенную практику Карена в цифровой контур — не заменяя эксперта, а умножая его.</p>
+      <div class="grid">
+        <div class="card"><h3>Личный кабинет клиента</h3><p>Анкета, защищённое хранилище медицинских документов, статусы кейса — один человек, один непрерывный кейс.</p></div>
+        <div class="card"><h3>Живой чат с Кареном</h3><p>Текст и голосовые сообщения, как в мессенджере. Карен отвечает голосом — клиент слышит своего эксперта.</p></div>
+        <div class="card"><h3>ИИ-сопровождающий 24/7</h3><p>Отвечает на вопросы о центре и шагах, поддерживает, ведёт к оплате. Работает на двух моделях (Claude + GPT) — система сама выбирает сильнейший ответ.</p></div>
+        <div class="card"><h3>Автоматические красные флаги</h3><p>ИИ распознаёт признаки экстренных состояний и мгновенно поднимает тревогу команде — безопасность выше скорости.</p></div>
+      </div>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 04 · Продукт сегодня -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Продукт · уже в работе</p>
+      <h2>Это не прототип — платформа <em>работает сегодня</em></h2>
+      <ul class="gold-list">
+        <li><strong>Сайт на двух языках</strong> (русский / английский), адаптирован под телефон и компьютер.</li>
+        <li><strong>ИИ-агенты запущены</strong> и отвечают клиентам в проде; отдельный ИИ-ассистент — в рабочем месте Карена.</li>
+        <li><strong>Приём платежей через Stripe</strong> — проверен живыми транзакциями из разных стран.</li>
+        <li><strong>Рабочее место Карена</strong>: кейсы, чаты с непрочитанными, голосовой ввод, база знаний для обучения ИИ, панель красных флагов.</li>
+        <li><strong>Инфраструктура</strong>: Vercel + Supabase (платный контур), защищённое хранилище документов, разграничение доступа.</li>
+      </ul>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 05 · Трекшн -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Трекшн</p>
+      <h2>Бизнес существует <em>два года</em> — платформа делает его масштабируемым</h2>
+      <div class="parchment">
+        <div class="grid" style="margin-top:0.4rem">
+          <div class="stat"><b>480</b><span>кейсов за 24 месяца — ещё до запуска платформы, через Telegram и WhatsApp</span></div>
+          <div class="stat"><b>2 года</b><span>действующая корпорация в США: все оплаты официально, налоговая отчётность сдана</span></div>
+          <div class="stat"><b>Ремиссии</b><span>клиенты, вышедшие в ремиссию по данным центра, — живые истории для инвестора</span></div>
+        </div>
+        <p style="margin:1.4rem 0 0; font-size:0.95rem;">Платёжная инфраструктура уже принимает деньги: Stripe подключён к тарифам, оплата проверена end-to-end.</p>
+        <div class="fill">выручка корпорации за 2 года (из налоговой отчётности) — главная цифра этого слайда.</div>
+      </div>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 06 · Рынок -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Рынок</p>
+      <h2>Реабилитация уходит в цифру — <em>без географии</em></h2>
+      <ul class="gold-list">
+        <li>Клиенты центра — русскоязычная и англоязычная аудитория по всему миру: платформа снимает границы, лицензионные и логистические барьеры офлайн-центров.</li>
+        <li>Цифровое здравоохранение и телемедицина растут двузначными темпами; ниша длительного сопровождения (а не разовых консультаций) почти пуста.</li>
+        <li>Вход через бесплатный разбор анализов даёт дешёвый канал привлечения, который конкуренты с офлайн-затратами повторить не могут.</li>
+      </ul>
+      <div class="fill">оценка объёма рынка (TAM / SAM / SOM) — подберём источники и цифры под конкретного инвестора.</div>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 07 · Бизнес-модель -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Бизнес-модель</p>
+      <h2>Два тарифа сопровождения + <em>платная воронка</em></h2>
+      <div class="plans">
+        <div class="plan">
+          <span class="plan__name">Сопровождение · 5 недель</span>
+          <span class="plan__price">$1 440</span>
+          <span class="plan__note">$1 200 + сервисный сбор 5% + $180 доставка формулы</span>
+          <span class="plan__gift">Подарок: <strong>200 капсул</strong> формулы Карена (доставку оплачивает клиент)</span>
+        </div>
+        <div class="plan plan--main">
+          <span class="plan__name">Сопровождение · 100 дней</span>
+          <span class="plan__price">$3 675</span>
+          <span class="plan__note">$3 500 + сервисный сбор 5% · доставка за счёт центра</span>
+          <span class="plan__gift">Подарок: <strong>600 капсул</strong> формулы Карена (доставка — за счёт Карена)</span>
+        </div>
+        <div class="plan">
+          <span class="plan__name">Разбор анализов</span>
+          <span class="plan__price">$500</span>
+          <span class="plan__note">Разовая услуга + день вопросов Карену. Сейчас — бесплатно как маркетинговая воронка первых клиентов.</span>
+          <span class="plan__gift">Конвертирует посетителя в кейс с анкетой и документами</span>
+        </div>
+      </div>
+      <p class="footnote">Плюс продления сопровождения (в модели — 20% клиентов). Все платежи — онлайн через Stripe.</p>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 08 · Почему сейчас -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Почему сейчас</p>
+      <h2>ИИ впервые позволяет масштабировать <em>личное ведение</em></h2>
+      <ul class="gold-list">
+        <li>Рутину первой линии — вопросы, навигацию, организацию, поддержку — берёт на себя ИИ; Карену остаются решения по кейсам.</li>
+        <li>Себестоимость ИИ — порядка <strong>$1 на активного клиента в месяц</strong>: качество личного центра при цифровой экономике.</li>
+        <li>База знаний обучает ИИ на методике Карена — с каждым месяцем платформа отвечает всё точнее, и это преимущество не копируется.</li>
+        <li>Бесплатный разбор анализов запущен именно сейчас — окно для набора первых сотен клиентов платформы из тёплой аудитории.</li>
+      </ul>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 09 · Финансовый прогноз -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Финансовый прогноз · базовый сценарий</p>
+      <h2>Путь к <em>$2.6M</em> выручки во второй год</h2>
+      <div class="grid">
+        <div class="stat"><b>≈ $1.0M</b><span>выручка, год 1 — старт с фактического темпа: 20 новых клиентов в месяц (480 / 24)</span></div>
+        <div class="stat"><b>≈ $2.6M</b><span>выручка, год 2 — при росте новых клиентов 8% в месяц</span></div>
+        <div class="stat"><b>≈ $1.9M</b><span>EBITDA, год 2 — модель прибыльна без дальнейших раундов</span></div>
+      </div>
+      <div class="chart" aria-label="Рост месячной выручки за 24 месяца">
+        <i style="height:28%"></i><i style="height:30%"></i><i style="height:33%"></i><i style="height:35%"></i><i style="height:38%"></i><i style="height:41%"></i><i style="height:44%"></i><i style="height:48%"></i><i style="height:52%"></i><i style="height:56%"></i><i style="height:60%"></i><i style="height:65%"></i><i class="y2" style="height:70%"></i><i class="y2" style="height:76%"></i><i class="y2" style="height:82%"></i><i class="y2" style="height:88%"></i><i class="y2" style="height:95%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i>
+      </div>
+      <div class="chart__caption"><span>МЕСЯЦ 1 · $46 680</span><span>ГОД 1</span><span>ГОД 2</span></div>
+      <p class="footnote">Полная модель — Excel на 24 месяца: помесячный прогноз, годовые итоги, юнит-экономика и три сценария роста. Прилагается к презентации.</p>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 10 · Юнит-экономика -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Юнит-экономика</p>
+      <h2>Каждый клиент окупает привлечение <em>многократно</em></h2>
+      <table class="unit">
+        <tr><td>Средний чек <small>60% тариф «5 недель» + 40% тариф «100 дней»</small></td><td>$2 334</td></tr>
+        <tr><td>LTV <small>чек × (1 + 20% продлений)</small></td><td>≈ $2 800</td></tr>
+        <tr><td>Переменные затраты на клиента <small>формула-подарок и доставка ($120), эквайринг, ИИ</small></td><td>≈ $200</td></tr>
+        <tr><td>CAC — стоимость привлечения <small>гипотеза; проверится фактом первых месяцев платформы</small></td><td>$60</td></tr>
+        <tr><td>LTV / CAC</td><td>&gt; 40×</td></tr>
+      </table>
+      <p class="footnote">Запас прочности: даже если привлечение окажется в десять раз дороже гипотезы, LTV/CAC остаётся выше 4× — порога здоровой юнит-экономики.</p>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 11 · Команда -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Команда</p>
+      <h2>Метод, проверенный практикой, и <em>операционная дисциплина</em></h2>
+      <div class="grid">
+        <div class="card">
+          <h3>Карен — основатель метода, ведущий эксперт</h3>
+          <p>Автор методики восстановления и собственной формулы. Лично провёл 480 кейсов за два года; клиенты в ремиссии. Ведёт каждого клиента платформы лично.</p>
+        </div>
+        <div class="card">
+          <h3>Анна — сооснователь, операции и финансы</h3>
+          <p>Построила юридический и финансовый контур: корпорация в США, два года налоговой отчётности, платёжная инфраструктура, запуск платформы.</p>
+        </div>
+      </div>
+      <div class="fill">история Карена — путь к методу в 2–3 предложениях: это самый сильный слайд для инвестора, расскажите её мне, и я впишу.</div>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 12 · Раунд -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Инвестиционный раунд</p>
+      <h2>Раунд для <em>масштабирования</em>, не для выживания</h2>
+      <div class="grid">
+        <div class="stat"><b>$150 000</b><span>запрашиваемый раунд (сумма из финансовой модели — подтвердите или измените)</span></div>
+        <div class="stat"><b>Прибыльность</b><span>модель выходит в положительный денежный поток без последующих раундов</span></div>
+      </div>
+      <ul class="gold-list">
+        <li><strong>Маркетинг</strong> — платное привлечение поверх бесплатной воронки разбора анализов.</li>
+        <li><strong>Команда</strong> — поддержка клиентов и операционка, чтобы Карен занимался только кейсами.</li>
+        <li><strong>Продукт</strong> — мобильное приложение, уведомления, контент-платформа (статьи, видео).</li>
+        <li><strong>Юридика и соответствие</strong> — сопровождение роста на международную аудиторию.</li>
+      </ul>
+      <div class="fill">точная сумма раунда и доля/условия — подтвердите сумму, распределение впишем вместе.</div>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 13 · Финал -->
+  <section class="slide title-slide">
+    <div class="slide__inner">
+      <span class="ankh">☥</span>
+      <h2>Реабилитация <em>без границ</em></h2>
+      <p class="lead">480 человек уже прошли этот путь с Кареном. Платформа готова провести тысячи.</p>
+      <p class="motto">«Мы ведём. Вы восстанавливаетесь. Вместе — к результату.»</p>
+      <hr class="rule" style="margin-inline:auto; background:linear-gradient(90deg, transparent, var(--gold), transparent)">
+      <p class="lead" style="font-size:1rem">pythonmethodcenter.com</p>
+      <div class="fill" style="max-width:28rem; margin-inline:auto; text-align:left">контакт для инвесторов — email и/или Telegram, который вы готовы указать.</div>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+</div>
+
+<div class="hint">↑ ↓ — листать · Ctrl/Cmd+P — сохранить в PDF</div>
+
+<script>
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "ArrowDown" && e.key !== "ArrowUp" && e.key !== "PageDown" && e.key !== "PageUp") return;
+    const slides = [...document.querySelectorAll(".slide")];
+    const y = window.scrollY + window.innerHeight / 2;
+    let idx = slides.findIndex(
+      (s) => s.offsetTop <= y && y < s.offsetTop + s.offsetHeight
+    );
+    if (idx === -1) idx = 0;
+    const next = e.key === "ArrowDown" || e.key === "PageDown" ? idx + 1 : idx - 1;
+    if (next < 0 || next >= slides.length) return;
+    e.preventDefault();
+    slides[next].scrollIntoView({ behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" });
+  });
+</script>
