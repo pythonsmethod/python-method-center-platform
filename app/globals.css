@@ -136,6 +136,14 @@ main {
   padding: 18px clamp(20px, 4vw, 48px);
 }
 
+.fine-print {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+  margin: 20px 0 0;
+  opacity: 0.75;
+}
+
 .site-footer__disclaimer {
   color: var(--muted);
   flex-basis: 100%;
