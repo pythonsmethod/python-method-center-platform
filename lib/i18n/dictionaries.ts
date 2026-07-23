@@ -127,6 +127,10 @@ const ru = {
     offerTitle: "Оферта",
     offerText:
       "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Указывайте при оплате тот же email, что и в аккаунте платформы, — по нему команда привяжет платёж к вашему кейсу.",
+    offerCheckboxPrefix: "Я ознакомился(лась) и принимаю условия ",
+    offerCheckboxLink: "публичной оферты",
+    offerHint:
+      "Чтобы перейти к оплате, отметьте согласие с условиями публичной оферты.",
     feeNote: "К каждому тарифу добавляется сервисный сбор 5%.",
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
@@ -306,6 +310,10 @@ const en: typeof ru = {
     offerTitle: "Public offer",
     offerText:
       "By paying for a plan you confirm acceptance of the public offer. Use the same email as in your platform account — the team links the payment to your case by it.",
+    offerCheckboxPrefix: "I have read and accept the terms of the ",
+    offerCheckboxLink: "public offer",
+    offerHint:
+      "To proceed to payment, please confirm your agreement with the public offer.",
     feeNote: "A 5% service fee is added to each plan.",
     plan5Title: "Support — 5 weeks",
     plan5Desc:

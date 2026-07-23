@@ -1677,6 +1677,58 @@ code {
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
 }
 
+/* --- Offer gate (payment consent checkbox) --- */
+
+.offer-gate {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  margin-top: 22px;
+  padding: 16px 20px;
+}
+
+.offer-gate--alert {
+  border-color: var(--warning);
+  box-shadow: 0 0 24px rgba(224, 169, 63, 0.15);
+}
+
+.offer-gate__label {
+  align-items: flex-start;
+  color: var(--text);
+  cursor: pointer;
+  display: flex;
+  font-size: 15px;
+  gap: 12px;
+  line-height: 1.5;
+}
+
+.offer-gate__label input[type="checkbox"] {
+  accent-color: var(--accent);
+  cursor: pointer;
+  flex-shrink: 0;
+  height: 18px;
+  margin-top: 2px;
+  width: 18px;
+}
+
+.offer-gate__label a {
+  color: var(--accent-strong);
+  text-decoration: underline;
+}
+
+.offer-gate__hint {
+  color: var(--warning);
+  font-size: 13px;
+  margin: 0 0 0 30px;
+}
+
+.button--locked {
+  cursor: not-allowed;
+  opacity: 0.45;
+}
+
 /* --- Payment success page --- */
 
 .success-steps {

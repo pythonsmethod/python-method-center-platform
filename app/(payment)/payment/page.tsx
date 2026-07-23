@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { PaymentPlans } from "@/components/payments/PaymentPlans";
 import { getPaymentPlans } from "@/lib/payments/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -21,7 +22,17 @@ export default async function PaymentPage() {
         description={t.description}
       />
 
-      <section className="panel-grid">
+      <PaymentPlans
+        labels={{
+          planLabel: t.planLabel,
+          payButton: t.payButton,
+          unavailable: t.unavailable,
+          offerCheckboxPrefix: t.offerCheckboxPrefix,
+          offerCheckboxLink: t.offerCheckboxLink,
+          offerHint: t.offerHint
+        }}
+        plans={plans}
+      >
         <div className="panel panel--promo">
           <span className="panel__label">{promo.badge}</span>
           <h2>{freeReview ? promo.titleFree : promo.titlePaid}</h2>
@@ -35,29 +46,7 @@ export default async function PaymentPage() {
             </Link>
           </div>
         </div>
-        {plans.map((plan) => (
-          <div className="panel" key={plan.product}>
-            <span className="panel__label">{t.planLabel}</span>
-            <h2>{plan.title}</h2>
-            <p>{plan.description}</p>
-            <p className="price-line">{plan.priceLine}</p>
-            <div className="panel-actions">
-              {plan.paymentLinkUrl ? (
-                <a
-                  className="button"
-                  href={plan.paymentLinkUrl}
-                  rel="noreferrer"
-                  target="_blank"
-                >
-                  {t.payButton}
-                </a>
-              ) : (
-                <span className="status-badge">{t.unavailable}</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </section>
+      </PaymentPlans>
 
       <section className="panel-grid" aria-label={t.howLabel}>
         <div className="panel">
