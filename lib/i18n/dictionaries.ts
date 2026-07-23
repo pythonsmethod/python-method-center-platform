@@ -67,6 +67,20 @@ const ru = {
       { title: "5. Сопровождение", text: "После согласования вы выбираете тариф сопровождения (5 недель или 100 дней) и оплачиваете его." }
     ]
   },
+  promo: {
+    badge: "🎁 Акция для первых клиентов",
+    titleFree: "Бесплатный разбор анализов от Карена",
+    textFree:
+      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — Карен лично изучит их и даст обратную связь по состоянию организма и рекомендации по восстановлению. Сейчас — бесплатно, для первых клиентов платформы.",
+    titlePaid: "Разбор анализов от Карена",
+    textPaid:
+      "Личный разбор ваших анализов Кареном без полного сопровождения: обратная связь по состоянию организма, рекомендации и один день, чтобы задать Карену любые вопросы.",
+    pricePaid: "$500 · разовая услуга",
+    priceFree: "Бесплатно · позже эта услуга будет стоить $500",
+    cta: "Получить разбор",
+    ctaFree: "Получить бесплатный разбор",
+    note: "Разбор является экспертным мнением и не заменяет консультацию врача."
+  },
   widget: {
     toggleOpen: "☥ Спросить",
     toggleClose: "✕",
@@ -213,6 +227,20 @@ const en: typeof ru = {
       { title: "4. Case review", text: "Karen and the team study your questionnaire and documents and contact you about next steps." },
       { title: "5. Support program", text: "After agreement you choose a support plan (5 weeks or 100 days) and pay for it." }
     ]
+  },
+  promo: {
+    badge: "🎁 Early clients offer",
+    titleFree: "Free analyses review by Karen",
+    textFree:
+      "Create an account, fill in the questionnaire and upload your test results — Karen will personally review them and give you feedback on your condition and recovery recommendations. Free right now, for the platform's first clients.",
+    titlePaid: "Analyses review by Karen",
+    textPaid:
+      "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations, and one day to ask Karen any questions.",
+    pricePaid: "$500 · one-time service",
+    priceFree: "Free · later this service will cost $500",
+    cta: "Get the review",
+    ctaFree: "Get the free review",
+    note: "The review is an expert opinion and does not replace a doctor's consultation."
   },
   widget: {
     toggleOpen: "☥ Ask me",

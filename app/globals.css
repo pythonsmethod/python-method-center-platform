@@ -1615,3 +1615,64 @@ code {
     gap: 8px;
   }
 }
+
+/* --- Promo banner (free analyses review) --- */
+
+.promo-banner {
+  background:
+    linear-gradient(150deg, rgba(212, 175, 55, 0.16), rgba(23, 18, 10, 0)),
+    var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  box-shadow: 0 0 40px rgba(212, 175, 55, 0.12);
+  display: grid;
+  gap: 10px;
+  justify-items: center;
+  margin: 34px auto 0;
+  max-width: 860px;
+  padding: clamp(20px, 4vw, 34px);
+  text-align: center;
+}
+
+.promo-banner__badge {
+  background: rgba(212, 175, 55, 0.18);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  font-size: 13px;
+  font-weight: 700;
+  padding: 6px 14px;
+}
+
+.promo-banner h2 {
+  font-size: clamp(22px, 3.4vw, 30px);
+  margin: 0;
+}
+
+.promo-banner p {
+  font-size: 15px;
+  margin: 0;
+  max-width: 640px;
+}
+
+.promo-banner__price {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.promo-banner__actions .button {
+  font-family: var(--font-serif);
+  letter-spacing: 0.08em;
+  padding: 12px 28px;
+  text-transform: uppercase;
+}
+
+.promo-banner__note {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.panel--promo {
+  border-color: var(--accent);
+  box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
+}

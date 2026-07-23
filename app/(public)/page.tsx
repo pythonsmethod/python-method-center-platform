@@ -2,6 +2,7 @@ import Link from "next/link";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
+import { isFreeReviewActive } from "@/lib/config/promo";
 import {
   IconAnkh,
   IconEye,
@@ -28,7 +29,10 @@ const whyIcons = [IconEye, IconScarab, IconLotus, IconPyramid, IconSun];
 
 export default async function HomePage() {
   const locale = await getLocale();
-  const t = getDictionary(locale).landing;
+  const dict = getDictionary(locale);
+  const t = dict.landing;
+  const promo = dict.promo;
+  const freeReview = isFreeReviewActive();
 
   return (
     <div className="page-shell">
@@ -53,6 +57,21 @@ export default async function HomePage() {
             {t.cta}
           </Link>
         </div>
+      </section>
+
+      <section aria-label={promo.badge} className="promo-banner">
+        <span className="promo-banner__badge">{promo.badge}</span>
+        <h2>{freeReview ? promo.titleFree : promo.titlePaid}</h2>
+        <p>{freeReview ? promo.textFree : promo.textPaid}</p>
+        <p className="promo-banner__price">
+          {freeReview ? promo.priceFree : promo.pricePaid}
+        </p>
+        <div className="promo-banner__actions">
+          <Link className="button" href="/login">
+            {freeReview ? promo.ctaFree : promo.cta}
+          </Link>
+        </div>
+        <p className="promo-banner__note">{promo.note}</p>
       </section>
 
       <p className="tagline">{t.tagline}</p>

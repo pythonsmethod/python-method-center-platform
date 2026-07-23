@@ -3,10 +3,14 @@ import { PageHeader } from "@/components/PageHeader";
 import { getPaymentPlans } from "@/lib/payments/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
+import { isFreeReviewActive } from "@/lib/config/promo";
 
 export default async function PaymentPage() {
   const locale = await getLocale();
-  const t = getDictionary(locale).payment;
+  const dict = getDictionary(locale);
+  const t = dict.payment;
+  const promo = dict.promo;
+  const freeReview = isFreeReviewActive();
   const plans = getPaymentPlans(locale);
 
   return (
@@ -18,6 +22,19 @@ export default async function PaymentPage() {
       />
 
       <section className="panel-grid">
+        <div className="panel panel--promo">
+          <span className="panel__label">{promo.badge}</span>
+          <h2>{freeReview ? promo.titleFree : promo.titlePaid}</h2>
+          <p>{freeReview ? promo.textFree : promo.textPaid}</p>
+          <p className="price-line">
+            {freeReview ? promo.priceFree : promo.pricePaid}
+          </p>
+          <div className="panel-actions">
+            <Link className="button" href="/login">
+              {freeReview ? promo.ctaFree : promo.cta}
+            </Link>
+          </div>
+        </div>
         {plans.map((plan) => (
           <div className="panel" key={plan.product}>
             <span className="panel__label">{t.planLabel}</span>
