@@ -137,6 +137,24 @@ const ru = {
       "Расширенное сопровождение кейса командой Python Method на 100 дней.",
     plan100Price: "$3 500 + 5% сбор = $3 675"
   },
+  paymentSuccess: {
+    eyebrow: "Оплата получена",
+    title: "Благодарим вас! ☥",
+    description: "Ваш платёж успешно принят. Добро пожаловать в сопровождение Python Method.",
+    whatNextLabel: "Что происходит дальше",
+    steps: [
+      "Мы привяжем оплату к вашему кейсу по email, указанному при оплате (используйте тот же email, что и в аккаунте).",
+      "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
+      "Если вы выбрали тариф «5 недель» — Карен лично отправит вам свою формулу в подарок. Доставка уже оплачена, трек-номер придёт в чат.",
+      "Карен и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
+    ],
+    cabinetCta: "Перейти в кабинет",
+    questionLabel: "Есть вопрос?",
+    questionTitle: "Мы на связи",
+    questionText:
+      "Если что-то пошло не так с оплатой или у вас есть вопрос — напишите нам в чате кабинета или через страницу поддержки, мы быстро разберёмся.",
+    supportCta: "Написать в поддержку"
+  },
   support: {
     eyebrow: "Поддержка",
     title: "Поддержка",
@@ -296,6 +314,24 @@ const en: typeof ru = {
     plan100Title: "Support — 100 days",
     plan100Desc: "Extended case support by the Python Method team for 100 days.",
     plan100Price: "$3,500 + 5% fee = $3,675"
+  },
+  paymentSuccess: {
+    eyebrow: "Payment received",
+    title: "Thank you! ☥",
+    description: "Your payment has been received. Welcome to the Python Method support program.",
+    whatNextLabel: "What happens next",
+    steps: [
+      "We will link the payment to your case by the email used at checkout (use the same email as in your account).",
+      "The team will confirm the activation of your support program — you will get a message in your account chat.",
+      "If you chose the “5 weeks” plan — Karen will personally send you his formula as a gift. Delivery is already paid; the tracking number will arrive in the chat.",
+      "Karen and the team will study your case and begin the support program. All communication happens in your account."
+    ],
+    cabinetCta: "Go to my account",
+    questionLabel: "Have a question?",
+    questionTitle: "We are here",
+    questionText:
+      "If something went wrong with the payment or you have a question — write to us in your account chat or via the support page, we will sort it out quickly.",
+    supportCta: "Contact support"
   },
   support: {
     eyebrow: "Support",

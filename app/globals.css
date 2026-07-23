@@ -1676,3 +1676,20 @@ code {
   border-color: var(--accent);
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
 }
+
+/* --- Payment success page --- */
+
+.success-steps {
+  color: var(--text);
+  display: grid;
+  gap: 10px;
+  font-size: 15px;
+  line-height: 1.6;
+  margin: 16px 0 0;
+  padding-left: 22px;
+}
+
+.success-steps li::marker {
+  color: var(--accent);
+  font-weight: 700;
+}
