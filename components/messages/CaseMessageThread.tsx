@@ -1,6 +1,13 @@
 "use client";
 
-import { useActionState, useCallback, useEffect, useRef, useState } from "react";
+import {
+  Fragment,
+  useActionState,
+  useCallback,
+  useEffect,
+  useRef,
+  useState
+} from "react";
 import {
   sendClientCaseMessage,
   sendStaffCaseMessage
@@ -35,12 +42,36 @@ function senderLabel(role: string, viewer: "client" | "staff"): string {
   return "Команда центра";
 }
 
-function formatWhen(value: string): string {
-  return new Date(value).toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
+function formatTime(value: string): string {
+  return new Date(value).toLocaleTimeString("ru-RU", {
     hour: "2-digit",
     minute: "2-digit"
+  });
+}
+
+function dayKey(value: string): string {
+  return new Date(value).toDateString();
+}
+
+function formatDay(value: string): string {
+  const date = new Date(value);
+  const today = new Date();
+  const yesterday = new Date();
+  yesterday.setDate(today.getDate() - 1);
+
+  if (date.toDateString() === today.toDateString()) {
+    return "Сегодня";
+  }
+
+  if (date.toDateString() === yesterday.toDateString()) {
+    return "Вчера";
+  }
+
+  return date.toLocaleDateString("ru-RU", {
+    day: "numeric",
+    month: "long",
+    year:
+      date.getFullYear() === today.getFullYear() ? undefined : "numeric"
   });
 }
 
@@ -176,27 +207,38 @@ export function CaseMessageThread({
           </p>
         ) : null}
 
-        {messages.map((message) => {
+        {messages.map((message, index) => {
           const own =
             (viewer === "client" && message.sender_role === "client") ||
             (viewer === "staff" && message.sender_role !== "client");
+          const day = dayKey(message.created_at);
+          const prevDay =
+            index > 0 ? dayKey(messages[index - 1].created_at) : null;
 
           return (
-            <div
-              className={`case-msg${own ? " case-msg--own" : ""}`}
-              key={message.id}
-            >
-              <span className="case-msg__meta">
-                {senderLabel(message.sender_role, viewer)} ·{" "}
-                {formatWhen(message.created_at)}
-              </span>
-              {message.body ? <p>{message.body}</p> : null}
-              {message.audioUrl ? (
-                <audio controls preload="metadata" src={message.audioUrl} />
-              ) : message.audio_path && !message.audioUrl ? (
-                <p className="case-msg__missing">Голосовое недоступно.</p>
+            <Fragment key={message.id}>
+              {day !== prevDay ? (
+                <div className="case-day">
+                  <span>{formatDay(message.created_at)}</span>
+                </div>
               ) : null}
-            </div>
+              <div className={`case-msg${own ? " case-msg--own" : ""}`}>
+                {!own ? (
+                  <span className="case-msg__sender">
+                    {senderLabel(message.sender_role, viewer)}
+                  </span>
+                ) : null}
+                {message.body ? <p>{message.body}</p> : null}
+                {message.audioUrl ? (
+                  <audio controls preload="metadata" src={message.audioUrl} />
+                ) : message.audio_path && !message.audioUrl ? (
+                  <p className="case-msg__missing">Голосовое недоступно.</p>
+                ) : null}
+                <span className="case-msg__time">
+                  {formatTime(message.created_at)}
+                </span>
+              </div>
+            </Fragment>
           );
         })}
       </div>
