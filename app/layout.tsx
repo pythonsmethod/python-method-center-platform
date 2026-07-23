@@ -69,6 +69,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <Link href="/support">{dict.footer.support}</Link>
             <Link href="/admin">{dict.footer.team}</Link>
           </nav>
+          <p className="site-footer__disclaimer">{dict.footer.disclaimer}</p>
         </footer>
       </body>
     </html>

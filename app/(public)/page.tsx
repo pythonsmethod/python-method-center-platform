@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFreeReviewActive } from "@/lib/config/promo";
@@ -133,19 +132,6 @@ export default async function HomePage() {
               </Link>
             </div>
           </div>
-        </div>
-      </section>
-
-      <EmergencyNotice />
-
-      <section className="panel-grid" aria-label={t.disclaimerLabel}>
-        <div className="panel">
-          <span className="panel__label">{t.disclaimerLabel}</span>
-          <h2>{t.disclaimerTitle}</h2>
-          <p>
-            {t.disclaimerText}{" "}
-            <Link href="/legal/offer">{t.disclaimerLink}</Link>.
-          </p>
         </div>
       </section>
 

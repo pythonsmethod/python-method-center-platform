@@ -15,7 +15,9 @@ const ru = {
     offer: "Публичная оферта",
     support: "Поддержка",
     team: "Для команды",
-    socials: "Социальные сети"
+    socials: "Социальные сети",
+    disclaimer:
+      "Платформа не является медицинским учреждением и не заменяет наблюдение лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи (112 / 911)."
   },
   landing: {
     eyebrow: "Цифровой реабилитационный центр",
@@ -199,7 +201,9 @@ const en: typeof ru = {
     offer: "Public offer",
     support: "Support",
     team: "For the team",
-    socials: "Social media"
+    socials: "Social media",
+    disclaimer:
+      "The platform is not a medical institution and does not replace your doctor's care. In an emergency, call your local emergency service (112 / 911)."
   },
   landing: {
     eyebrow: "Digital rehabilitation center",
