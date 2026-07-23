@@ -19,6 +19,8 @@ import {
   paymentStatusLabel,
   supportStatusLabel
 } from "@/lib/i18n/status-labels";
+import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { getCaseMessages } from "@/lib/messages/queries";
 import { getOwnPayments } from "@/lib/payments/queries";
 import { getOwnSupportRequests } from "@/lib/support/queries";
 import { DocumentUploadPanel } from "./DocumentUploadPanel";
@@ -60,13 +62,14 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     getOwnPayments(auth.userId)
   ]);
   const submitted = isOnboardingSubmitted(params?.onboarding);
-  const [documentResult, historyResult] =
+  const [documentResult, historyResult, messagesResult] =
     caseResult.status === "ready" && caseResult.case
       ? await Promise.all([
           getUploadedDocumentsForCase(auth.userId, caseResult.case.id),
-          getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id)
+          getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id),
+          getCaseMessages(caseResult.case.id)
         ])
-      : [null, null];
+      : [null, null, null];
 
   return (
     <div className="page-shell">
@@ -212,6 +215,24 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           )}
         </div>
       </section>
+
+      {caseResult.status === "ready" && caseResult.case && messagesResult ? (
+        <section className="documents-section" aria-label="Чат с Кареном и командой">
+          <div className="panel">
+            <span className="panel__label">Чат с Кареном и командой</span>
+            <h2>Ваша переписка</h2>
+            <p>
+              Здесь вы общаетесь с Кареном и командой центра — текстом или
+              голосовыми сообщениями.
+            </p>
+            <CaseMessageThread
+              loadError={messagesResult.error}
+              messages={messagesResult.messages}
+              viewer="client"
+            />
+          </div>
+        </section>
+      ) : null}
 
       <section className="documents-section" aria-label="Связь с командой">
         <div className="documents-layout">

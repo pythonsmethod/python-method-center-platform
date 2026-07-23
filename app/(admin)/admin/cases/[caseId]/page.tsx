@@ -16,6 +16,8 @@ import {
 } from "@/lib/i18n/status-labels";
 import { isUuid } from "@/lib/utils/uuid";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
+import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
 import { PaymentRecordForm } from "./PaymentRecordForm";
 
@@ -148,6 +150,7 @@ export default async function StaffCaseDetailPage({
   const events = [...clientCase.case_lifecycle_events].sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
+  const caseMessages = await getCaseMessages(clientCase.id);
 
   return (
     <div className="page-shell">
@@ -309,6 +312,23 @@ export default async function StaffCaseDetailPage({
               ))}
             </ul>
           )}
+        </div>
+      </section>
+
+      <section className="intake-section" aria-label="Чат с клиентом">
+        <div className="panel">
+          <span className="panel__label">Чат с клиентом</span>
+          <h2>Переписка по кейсу</h2>
+          <p>
+            Клиент видит эти сообщения в своём кабинете. Можно писать текстом
+            или записывать голосовые.
+          </p>
+          <CaseMessageThread
+            caseId={clientCase.id}
+            loadError={caseMessages.error}
+            messages={caseMessages.messages}
+            viewer="staff"
+          />
         </div>
       </section>
 

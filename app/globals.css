@@ -1409,3 +1409,142 @@ code {
   font-size: 12.5px;
   margin: 0;
 }
+
+/* --- Case message thread (Karen <-> client) --- */
+
+.case-thread {
+  display: grid;
+  gap: 14px;
+  margin-top: 12px;
+}
+
+.case-thread__messages {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  max-height: 420px;
+  min-height: 120px;
+  overflow-y: auto;
+  padding: 12px;
+}
+
+.case-thread__empty {
+  color: var(--muted);
+  font-size: 13.5px;
+  margin: 0;
+}
+
+.case-msg {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 6px;
+  justify-self: start;
+  max-width: 92%;
+  padding: 10px 12px;
+}
+
+.case-msg--own {
+  background: rgba(212, 175, 55, 0.14);
+  border-color: rgba(212, 175, 55, 0.4);
+  justify-self: end;
+}
+
+.case-msg p {
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.case-msg__meta {
+  color: var(--muted);
+  font-size: 12px;
+}
+
+.case-msg audio {
+  max-width: 100%;
+  width: 260px;
+}
+
+.case-msg__missing {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-style: italic;
+}
+
+.case-thread__form {
+  display: grid;
+  gap: 10px;
+}
+
+.case-thread__form textarea {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  font: inherit;
+  padding: 10px 12px;
+  resize: vertical;
+  width: 100%;
+}
+
+.case-thread__form textarea:focus {
+  border-color: var(--accent);
+  outline: 3px solid rgba(212, 175, 55, 0.24);
+}
+
+.case-thread__actions {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: space-between;
+}
+
+.case-thread__note {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 0;
+}
+
+.voice-recorder {
+  display: grid;
+  gap: 8px;
+}
+
+.voice-recorder__row {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.voice-recorder__live {
+  animation: mic-pulse 1.4s ease-in-out infinite;
+  border-radius: 999px;
+  color: var(--danger);
+  font-weight: 600;
+  padding: 6px 10px;
+}
+
+.voice-recorder__row--preview audio {
+  max-width: 100%;
+  width: 240px;
+}
+
+.voice-recorder__preview-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.voice-recorder__status {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 0;
+}
