@@ -7,9 +7,30 @@ import {
   type AuthActionState
 } from "@/lib/auth/types";
 
+type AuthFormLabels = {
+  tabLogin: string;
+  tabSignup: string;
+  email: string;
+  password: string;
+  submitLogin: string;
+  submitSignup: string;
+  submitting: string;
+};
+
+const defaultLabels: AuthFormLabels = {
+  tabLogin: "Войти",
+  tabSignup: "Создать аккаунт",
+  email: "Email",
+  password: "Пароль",
+  submitLogin: "Войти",
+  submitSignup: "Создать аккаунт",
+  submitting: "Отправка..."
+};
+
 type AuthFormProps = {
   nextPath: string;
   supabaseConfigured: boolean;
+  labels?: AuthFormLabels;
 };
 
 type AuthMode = "login" | "signup";
@@ -18,7 +39,11 @@ function messageClassName(state: AuthActionState): string {
   return `form-message form-message--${state.status}`;
 }
 
-export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
+export function AuthForm({
+  nextPath,
+  supabaseConfigured,
+  labels = defaultLabels
+}: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>("login");
   const [loginState, loginAction, loginPending] = useActionState(
     signInWithPassword,
@@ -42,7 +67,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           onClick={() => setMode("login")}
           type="button"
         >
-          Войти
+          {labels.tabLogin}
         </button>
         <button
           aria-pressed={!isLogin}
@@ -50,7 +75,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           onClick={() => setMode("signup")}
           type="button"
         >
-          Создать аккаунт
+          {labels.tabSignup}
         </button>
       </div>
 
@@ -60,7 +85,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
       >
         <input name="next" type="hidden" value={nextPath} />
         <label className="field">
-          <span>Email</span>
+          <span>{labels.email}</span>
           <input
             autoComplete="email"
             name="email"
@@ -70,7 +95,7 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           />
         </label>
         <label className="field">
-          <span>Пароль</span>
+          <span>{labels.password}</span>
           <input
             autoComplete={isLogin ? "current-password" : "new-password"}
             minLength={isLogin ? undefined : 6}
@@ -86,10 +111,10 @@ export function AuthForm({ nextPath, supabaseConfigured }: AuthFormProps) {
           type="submit"
         >
           {pending
-            ? "Отправка..."
+            ? labels.submitting
             : isLogin
-              ? "Войти"
-              : "Создать аккаунт"}
+              ? labels.submitLogin
+              : labels.submitSignup}
         </button>
 
         {activeState.message ? (

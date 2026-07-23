@@ -58,7 +58,15 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
   }
 
-  const system = await buildClientSystemPrompt();
+  let system = await buildClientSystemPrompt();
+
+  // Interface-language hint: the assistant already mirrors the visitor's
+  // language, this sets the default for short/ambiguous messages.
+  const rawLocale = (body as { locale?: unknown })?.locale;
+
+  if (rawLocale === "en") {
+    system += "\n\n## Язык интерфейса посетителя\nПосетитель использует английскую версию сайта — по умолчанию отвечай на английском (если он пишет на другом языке, отвечай на его языке).";
+  }
 
   // One agent for visitors: both models answer, the arbiter picks the
   // stronger reply. Degrades to single-model mode when only one key is set.

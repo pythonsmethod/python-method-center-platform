@@ -4,6 +4,9 @@ import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { navRoutes } from "@/lib/routes";
 import { socialLinks } from "@/lib/config/socials";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 const playfair = Playfair_Display({
   subsets: ["cyrillic", "latin"],
@@ -22,27 +25,33 @@ type RootLayoutProps = {
   children: React.ReactNode;
 };
 
-export default function RootLayout({ children }: RootLayoutProps) {
+export default async function RootLayout({ children }: RootLayoutProps) {
+  const locale = await getLocale();
+  const dict = getDictionary(locale);
+
   return (
-    <html className={playfair.variable} lang="ru">
+    <html className={playfair.variable} lang={locale}>
       <body>
         <header className="site-header">
           <Link className="brand" href="/">
             Python Method
           </Link>
-          <nav aria-label="Основная навигация">
-            {navRoutes.map((route) => (
-              <Link key={route.href} href={route.href}>
-                {route.label}
-              </Link>
-            ))}
-          </nav>
+          <div className="site-header__right">
+            <nav aria-label="Main navigation">
+              {navRoutes.map((route) => (
+                <Link key={route.href} href={route.href}>
+                  {dict.nav[route.href] ?? route.label}
+                </Link>
+              ))}
+            </nav>
+            <LanguageSwitcher locale={locale} />
+          </div>
         </header>
         <main>{children}</main>
         <footer className="site-footer">
           <span>© Python Method</span>
           {socialLinks.length > 0 ? (
-            <nav aria-label="Социальные сети">
+            <nav aria-label={dict.footer.socials}>
               {socialLinks.map((link) => (
                 <a
                   href={link.href}
@@ -55,10 +64,10 @@ export default function RootLayout({ children }: RootLayoutProps) {
               ))}
             </nav>
           ) : null}
-          <nav aria-label="Дополнительно">
-            <Link href="/legal/offer">Публичная оферта</Link>
-            <Link href="/support">Поддержка</Link>
-            <Link href="/admin">Для команды</Link>
+          <nav aria-label="More">
+            <Link href="/legal/offer">{dict.footer.offer}</Link>
+            <Link href="/support">{dict.footer.support}</Link>
+            <Link href="/admin">{dict.footer.team}</Link>
           </nav>
         </footer>
       </body>

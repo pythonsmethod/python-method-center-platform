@@ -2,16 +2,17 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
-
-const SUGGESTIONS = [
-  "Как проходит сопровождение?",
-  "С чего мне начать?",
-  "Какие документы нужно загрузить?"
-];
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/locale";
 
 const WELCOME_STORAGE_KEY = "pm-assistant-welcome-v1";
 
-export function AssistantWidget() {
+type AssistantWidgetProps = {
+  locale?: Locale;
+};
+
+export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
+  const t = getDictionary(locale).widget;
   const [open, setOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -54,55 +55,46 @@ export function AssistantWidget() {
     <div className="assistant-widget">
       {showWelcome && !open ? (
         <div
-          aria-label="Приветствие помощника"
+          aria-label={t.header}
           className="assistant-widget__welcome"
           role="dialog"
         >
           <button
-            aria-label="Закрыть приветствие"
+            aria-label={t.toggleClose}
             className="assistant-widget__welcome-close"
             onClick={() => dismissWelcome(false)}
             type="button"
           >
             ✕
           </button>
-          <p className="assistant-widget__welcome-title">
-            ☥ Привет! Добро пожаловать на платформу Python Method —
-            «Реабилитация без границ».
-          </p>
-          <p className="assistant-widget__welcome-text">
-            Я ИИ-помощник центра и рад вас приветствовать. Вы можете изучать
-            сайт самостоятельно — или перейти в общение со мной, и я проведу
-            вас, отвечая на все вопросы.
-          </p>
+          <p className="assistant-widget__welcome-title">{t.welcomeTitle}</p>
+          <p className="assistant-widget__welcome-text">{t.welcomeText}</p>
           <div className="assistant-widget__welcome-actions">
             <button
               className="button button--secondary"
               onClick={() => dismissWelcome(false)}
               type="button"
             >
-              Изучать сайт самостоятельно
+              {t.welcomeExplore}
             </button>
             <button
               className="button"
               onClick={() => dismissWelcome(true)}
               type="button"
             >
-              Общаться со мной — проведу вас
+              {t.welcomeChat}
             </button>
           </div>
-          <p className="assistant-widget__welcome-note">
-            Я всегда рядом — кнопка «☥ Спросить» внизу экрана.
-          </p>
+          <p className="assistant-widget__welcome-note">{t.welcomeNote}</p>
         </div>
       ) : null}
 
       {open ? (
-        <div className="assistant-widget__panel" role="dialog" aria-label="Чат с ИИ-помощником">
+        <div className="assistant-widget__panel" role="dialog" aria-label={t.header}>
           <div className="assistant-widget__header">
-            <span>☥ Помощник центра</span>
+            <span>{t.header}</span>
             <button
-              aria-label="Закрыть чат"
+              aria-label={t.toggleClose}
               onClick={() => setOpen(false)}
               type="button"
             >
@@ -111,14 +103,15 @@ export function AssistantWidget() {
           </div>
           <AssistantChat
             endpoint="/api/assistant/client"
-            intro="Здравствуйте! Я ИИ-помощник Python Method Center. Расскажу, как устроено сопровождение, и помогу сделать первый шаг. Помощник не даёт медицинских рекомендаций и не заменяет врача."
-            suggestions={SUGGESTIONS}
+            intro={t.intro}
+            locale={locale}
+            suggestions={t.suggestions}
           />
         </div>
       ) : null}
 
       <button
-        aria-label={open ? "Закрыть чат с помощником" : "Открыть чат с помощником"}
+        aria-label={open ? t.toggleClose : t.toggleOpen}
         className="assistant-widget__toggle"
         onClick={() => {
           if (showWelcome) {
@@ -130,7 +123,7 @@ export function AssistantWidget() {
         }}
         type="button"
       >
-        {open ? "✕" : "☥ Спросить"}
+        {open ? "✕" : t.toggleOpen}
       </button>
     </div>
   );

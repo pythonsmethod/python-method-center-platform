@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/locale";
 
 type ChatMessage = {
   role: "user" | "assistant";
@@ -15,6 +17,7 @@ type AssistantChatProps = {
   suggestions?: string[];
   providerChoice?: boolean;
   caseId?: string;
+  locale?: Locale;
 };
 
 type Provider = "best" | "claude" | "gpt" | "both";
@@ -22,11 +25,14 @@ type Provider = "best" | "claude" | "gpt" | "both";
 export function AssistantChat({
   endpoint,
   intro,
-  placeholder = "Напишите сообщение…",
+  placeholder,
   suggestions = [],
   providerChoice = false,
-  caseId
+  caseId,
+  locale = "ru"
 }: AssistantChatProps) {
+  const t = getDictionary(locale).widget;
+  const effectivePlaceholder = placeholder ?? t.placeholder;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
@@ -68,6 +74,7 @@ export function AssistantChat({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           messages: nextMessages,
+          locale,
           ...(providerChoice ? { provider } : {}),
           ...(caseId ? { caseId } : {})
         })
@@ -78,13 +85,13 @@ export function AssistantChat({
         | null;
 
       if (!response.ok || !data?.reply) {
-        setError(data?.error ?? "Не удалось получить ответ. Попробуйте ещё раз.");
+        setError(data?.error ?? t.errorGeneric);
         return;
       }
 
       setMessages([...nextMessages, { role: "assistant", content: data.reply }]);
     } catch {
-      setError("Нет связи с сервером. Проверьте интернет и попробуйте ещё раз.");
+      setError(t.errorNetwork);
     } finally {
       setPending(false);
     }
@@ -104,7 +111,7 @@ export function AssistantChat({
         ))}
         {pending ? (
           <div className="assistant-msg assistant-msg--assistant assistant-msg--pending">
-            Печатает…
+            {t.sending}
           </div>
         ) : null}
         {error ? <p className="form-message form-message--error">{error}</p> : null}
@@ -155,20 +162,19 @@ export function AssistantChat({
               void send(input);
             }
           }}
-          placeholder={voice.listening ? "Говорите — я записываю…" : placeholder}
+          placeholder={voice.listening ? t.listening : effectivePlaceholder}
           rows={2}
           value={voice.interim ? `${input}${input ? " " : ""}${voice.interim}` : input}
         />
         {voice.listening ? (
           <p className="assistant-chat__voice-hint">
-            🎤 Идёт запись — говорите. Нажмите микрофон ещё раз, чтобы
-            остановить, затем «Отправить».
+            {t.voiceHint}
           </p>
         ) : null}
         <div className="assistant-chat__actions">
           {voice.supported ? (
             <button
-              aria-label={voice.listening ? "Остановить запись голоса" : "Надиктовать голосом"}
+              aria-label={voice.listening ? t.micStop : t.micStart}
               className={`assistant-chat__mic${voice.listening ? " assistant-chat__mic--on" : ""}`}
               onClick={voice.toggle}
               type="button"
@@ -177,7 +183,7 @@ export function AssistantChat({
             </button>
           ) : null}
           <button className="button" disabled={pending || !input.trim()} type="submit">
-            Отправить
+            {t.send}
           </button>
         </div>
       </form>

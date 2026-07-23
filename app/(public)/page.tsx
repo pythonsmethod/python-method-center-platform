@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import {
   IconAnkh,
   IconEye,
@@ -11,144 +13,56 @@ import {
   IconSun
 } from "@/components/icons";
 
-const heroPoints = [
-  { icon: IconScarab, text: "Экспертное сопровождение под руководством Карена" },
-  { icon: IconAnkh, text: "Индивидуальный подход без шаблонов и протоколов" },
-  { icon: IconSun, text: "Платформа доступна 24/7 на каждом этапе" }
+const heroIcons = [IconScarab, IconAnkh, IconSun];
+const cabinetIcons = [
+  IconAnkh,
+  IconEye,
+  IconLotus,
+  IconScarab,
+  IconSun,
+  IconScroll,
+  IconFeather,
+  IconPyramid
 ];
+const whyIcons = [IconEye, IconScarab, IconLotus, IconPyramid, IconSun];
 
-const cabinets = [
-  {
-    icon: IconAnkh,
-    title: "Знакомство",
-    text: "Узнайте о центре и наших принципах."
-  },
-  {
-    icon: IconEye,
-    title: "Вопросы и доверие",
-    text: "Ответы на вопросы: оплата, условия, безопасность."
-  },
-  {
-    icon: IconLotus,
-    title: "Профилактика",
-    text: "Программы профилактики и поддержка."
-  },
-  {
-    icon: IconScarab,
-    title: "Индивидуальный путь",
-    text: "Глубокий разбор и персональная стратегия."
-  },
-  {
-    icon: IconSun,
-    title: "Формула",
-    text: "Формула и инструкции по сопровождению."
-  },
-  {
-    icon: IconScroll,
-    title: "Анализы",
-    text: "Сбор, проверка и анализ ваших данных."
-  },
-  {
-    icon: IconFeather,
-    title: "Дневник состояния",
-    text: "Отслеживание изменений и динамики."
-  },
-  {
-    icon: IconPyramid,
-    title: "Материалы",
-    text: "Рекомендации, образ жизни и поддержка."
-  }
-];
+export default async function HomePage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).landing;
 
-const whyCards = [
-  {
-    icon: IconEye,
-    title: "Индивидуальный подход",
-    text: "Нет шаблонов. Только ваша уникальная стратегия."
-  },
-  {
-    icon: IconScarab,
-    title: "Экспертное сопровождение",
-    text: "Карен лично ведёт сложные случаи и корректирует путь."
-  },
-  {
-    icon: IconLotus,
-    title: "Целостный подход",
-    text: "Работаем с причиной, а не только с симптомами."
-  },
-  {
-    icon: IconPyramid,
-    title: "Поддержка на каждом этапе",
-    text: "Вы не останетесь один — платформа и команда на связи."
-  },
-  {
-    icon: IconSun,
-    title: "Ваш результат — наша цель",
-    text: "Мы идём вместе с вами к устойчивому состоянию."
-  }
-];
-
-const steps = [
-  {
-    title: "1. Регистрация",
-    text: "Создайте аккаунт с email и паролем. Один человек — один аккаунт и один непрерывный кейс."
-  },
-  {
-    title: "2. Анкета",
-    text: "Расскажите, для кого запрос, какая цель и что происходит сейчас. Анкета создаёт ваш кейс."
-  },
-  {
-    title: "3. Документы",
-    text: "Загрузите медицинские документы (выписки, заключения, анализы) в защищённое хранилище."
-  },
-  {
-    title: "4. Изучение кейса",
-    text: "Карен и команда изучают анкету и документы и связываются с вами по дальнейшим шагам."
-  },
-  {
-    title: "5. Сопровождение",
-    text: "После согласования вы выбираете тариф сопровождения (5 или 15 недель) и оплачиваете его."
-  }
-];
-
-export default function HomePage() {
   return (
     <div className="page-shell">
       <section className="hero">
-        <p className="eyebrow">Цифровой реабилитационный центр</p>
-        <h1>Python Method Center</h1>
-        <p className="hero__subtitle">
-          Индивидуальный путь к восстановлению, здоровью и новой жизни.
-        </p>
+        <p className="eyebrow">{t.eyebrow}</p>
+        <h1>{t.title}</h1>
+        <p className="hero__subtitle">{t.subtitle}</p>
         <ul className="hero__points">
-          {heroPoints.map((point) => {
-            const Icon = point.icon;
+          {t.points.map((point, index) => {
+            const Icon = heroIcons[index] ?? IconAnkh;
 
             return (
-              <li key={point.text}>
+              <li key={point}>
                 <Icon size={22} />
-                <span>{point.text}</span>
+                <span>{point}</span>
               </li>
             );
           })}
         </ul>
         <div className="hero__cta">
           <Link className="button" href="/login">
-            Начать путь
+            {t.cta}
           </Link>
         </div>
       </section>
 
-      <p className="tagline">
-        Мы ведём. Вы восстанавливаетесь. Вместе — к результату.
-      </p>
+      <p className="tagline">{t.tagline}</p>
 
-      <section className="parchment" aria-label="Кабинеты центра">
+      <section className="parchment" aria-label={t.cabinetsTitle}>
         <p className="ornament">☥ ☥ ☥</p>
-        <h2 className="section-title">Кабинеты центра</h2>
+        <h2 className="section-title">{t.cabinetsTitle}</h2>
         <div className="pcard-grid">
-          {cabinets.map((cabinet) => {
-            const Icon = cabinet.icon;
+          {t.cabinets.map((cabinet, index) => {
+            const Icon = cabinetIcons[index] ?? IconAnkh;
 
             return (
               <div className="pcard" key={cabinet.title}>
@@ -161,12 +75,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-label="Почему с нами">
+      <section aria-label={t.whyTitle}>
         <p className="ornament">☥ ☥ ☥</p>
-        <h2 className="section-title">Почему с нами?</h2>
+        <h2 className="section-title">{t.whyTitle}</h2>
         <div className="why-grid">
-          {whyCards.map((card) => {
-            const Icon = card.icon;
+          {t.why.map((card, index) => {
+            const Icon = whyIcons[index] ?? IconAnkh;
 
             return (
               <div className="why-card" key={card.title}>
@@ -179,27 +93,24 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section aria-label="Как это работает">
+      <section aria-label={t.howTitle}>
         <p className="ornament">☥ ☥ ☥</p>
-        <h2 className="section-title">Как это работает</h2>
+        <h2 className="section-title">{t.howTitle}</h2>
         <div className="panel-grid" style={{ marginTop: 26 }}>
-          {steps.map((step) => (
+          {t.steps.map((step) => (
             <div className="panel" key={step.title}>
-              <span className="panel__label">Шаг за шагом</span>
+              <span className="panel__label">{t.stepLabel}</span>
               <h2>{step.title}</h2>
               <p>{step.text}</p>
             </div>
           ))}
           <div className="panel">
-            <span className="panel__label">Начать</span>
-            <h2>Готовы начать?</h2>
-            <p>
-              Зарегистрируйтесь и заполните анкету — это занимает около 10
-              минут.
-            </p>
+            <span className="panel__label">{t.startLabel}</span>
+            <h2>{t.startTitle}</h2>
+            <p>{t.startText}</p>
             <div className="panel-actions">
               <Link className="button" href="/login">
-                Начать путь
+                {t.cta}
               </Link>
             </div>
           </div>
@@ -208,22 +119,18 @@ export default function HomePage() {
 
       <EmergencyNotice />
 
-      <section className="panel-grid" aria-label="Важные ограничения">
+      <section className="panel-grid" aria-label={t.disclaimerLabel}>
         <div className="panel">
-          <span className="panel__label">Границы ответственности</span>
-          <h2>Платформа не заменяет врача</h2>
+          <span className="panel__label">{t.disclaimerLabel}</span>
+          <h2>{t.disclaimerTitle}</h2>
           <p>
-            Python Method не является медицинским учреждением, не ставит
-            диагнозы, не назначает и не отменяет лечение. Сопровождение не
-            заменяет наблюдение лечащего врача. Условия оказания услуг описаны
-            в <Link href="/legal/offer">публичной оферте</Link>.
+            {t.disclaimerText}{" "}
+            <Link href="/legal/offer">{t.disclaimerLink}</Link>.
           </p>
         </div>
       </section>
 
-      <p className="quote-strip">
-        «Исцеление — это не мгновение, это путь. Мы идём его вместе.»
-      </p>
+      <p className="quote-strip">{t.quote}</p>
     </div>
   );
 }

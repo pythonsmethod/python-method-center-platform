@@ -74,7 +74,7 @@ export function useVoiceInput(onFinalText: (text: string) => void) {
     }
 
     const recognition = new Ctor();
-    recognition.lang = document.documentElement.lang === "ru" ? "ru-RU" : "ru-RU";
+    recognition.lang = document.documentElement.lang === "en" ? "en-US" : "ru-RU";
     recognition.continuous = true;
     recognition.interimResults = true;
 

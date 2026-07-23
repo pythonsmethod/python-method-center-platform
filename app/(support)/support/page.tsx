@@ -1,24 +1,24 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 
-export default function SupportPage() {
+export default async function SupportPage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).support;
+
   return (
     <div className="page-shell">
-      <PageHeader
-        eyebrow="Поддержка"
-        title="Поддержка"
-        description="Вопросы по платформе, документам и оплате."
-      />
+      <PageHeader eyebrow={t.eyebrow} title={t.title} description={t.description} />
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Как связаться</span>
-          <h2>Напишите нам из кабинета</h2>
+          <span className="panel__label">{t.label}</span>
+          <h2>{t.cardTitle}</h2>
           <p>
-            Форма «Написать команде» находится в{" "}
-            <Link href="/cabinet">личном кабинете</Link>. Команда ответит по
-            контактам, указанным в вашей анкете.
+            {t.cardText1} <Link href="/cabinet">{t.cabinetLink}</Link>
+            {t.cardText2}
           </p>
         </div>
       </section>

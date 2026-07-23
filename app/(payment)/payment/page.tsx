@@ -1,24 +1,29 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { getPaymentPlans } from "@/lib/payments/config";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 
-export default function PaymentPage() {
-  const plans = getPaymentPlans();
+export default async function PaymentPage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).payment;
+  const plans = getPaymentPlans(locale);
 
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Оплата"
-        title="Тарифы сопровождения"
-        description="Оплата проходит через защищённую страницу Stripe. Платформа не хранит данные карт."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       <section className="panel-grid">
         {plans.map((plan) => (
           <div className="panel" key={plan.product}>
-            <span className="panel__label">Тариф</span>
+            <span className="panel__label">{t.planLabel}</span>
             <h2>{plan.title}</h2>
             <p>{plan.description}</p>
+            <p className="price-line">{plan.priceLine}</p>
             <div className="panel-actions">
               {plan.paymentLinkUrl ? (
                 <a
@@ -27,38 +32,30 @@ export default function PaymentPage() {
                   rel="noreferrer"
                   target="_blank"
                 >
-                  Перейти к оплате
+                  {t.payButton}
                 </a>
               ) : (
-                <span className="status-badge">
-                  Оплата по этому тарифу временно оформляется через команду
-                </span>
+                <span className="status-badge">{t.unavailable}</span>
               )}
             </div>
           </div>
         ))}
       </section>
 
-      <section className="panel-grid" aria-label="Как проходит оплата">
+      <section className="panel-grid" aria-label={t.howLabel}>
         <div className="panel">
-          <span className="panel__label">Как это работает</span>
-          <h2>Оплата после согласования</h2>
+          <span className="panel__label">{t.howLabel}</span>
+          <h2>{t.howTitle}</h2>
           <p>
-            Тариф выбирается после того, как команда изучит ваш кейс и
-            согласует с вами план сопровождения. Если кнопка оплаты недоступна
-            или вам нужен счёт — напишите команде через{" "}
-            <Link href="/cabinet">кабинет</Link>.
+            {t.howText} <Link href="/cabinet">{t.howLink}</Link>.
           </p>
         </div>
         <div className="panel">
-          <span className="panel__label">Условия</span>
-          <h2>Оферта</h2>
-          <p>
-            Оплачивая тариф, вы подтверждаете принятие условий{" "}
-            <Link href="/legal/offer">публичной оферты</Link>. Указывайте при
-            оплате тот же email, что и в аккаунте платформы, — по нему команда
-            привяжет платёж к вашему кейсу.
-          </p>
+          <span className="panel__label">{t.offerLabel}</span>
+          <h2>
+            <Link href="/legal/offer">{t.offerTitle}</Link>
+          </h2>
+          <p>{t.offerText}</p>
         </div>
       </section>
     </div>

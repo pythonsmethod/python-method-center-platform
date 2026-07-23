@@ -1572,3 +1572,46 @@ code {
 .case-thread--full .case-thread__note {
   display: none;
 }
+
+/* --- Language switcher & price line --- */
+
+.site-header__right {
+  align-items: center;
+  display: flex;
+  gap: 12px;
+}
+
+.lang-switch {
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: flex;
+  overflow: hidden;
+}
+
+.lang-switch__btn {
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font: inherit;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 6px 10px;
+}
+
+.lang-switch__btn--on {
+  background: rgba(212, 175, 55, 0.18);
+  color: var(--accent-strong);
+}
+
+.price-line {
+  color: var(--accent-strong);
+  font-size: 15px;
+  font-weight: 700;
+}
+
+@media (max-width: 640px) {
+  .site-header__right {
+    gap: 8px;
+  }
+}

@@ -57,7 +57,7 @@ const lifecycleEventLabels: Record<string, string> = {
 const paymentProductLabels: Record<string, string> = {
   preliminary_assessment: "Предварительная оценка",
   support_5_weeks: "Сопровождение — 5 недель",
-  support_15_weeks: "Сопровождение — 15 недель"
+  support_15_weeks: "Сопровождение — 100 дней"
 };
 
 const paymentStatusLabels: Record<string, string> = {
