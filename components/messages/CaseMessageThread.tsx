@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useCallback, useEffect, useRef, useState } from "react";
 import {
   sendClientCaseMessage,
   sendStaffCaseMessage
@@ -8,6 +8,8 @@ import {
 import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { CaseMessage } from "@/lib/messages/queries";
 import { VoiceRecorder } from "@/components/messages/VoiceRecorder";
+
+const POLL_INTERVAL_MS = 5000;
 
 type CaseMessageThreadProps = {
   messages: CaseMessage[];
@@ -42,7 +44,7 @@ function formatWhen(value: string): string {
 }
 
 export function CaseMessageThread({
-  messages,
+  messages: initialMessages,
   viewer,
   caseId,
   loadError
@@ -52,6 +54,66 @@ export function CaseMessageThread({
     action,
     initialStaffActionState
   );
+  const [messages, setMessages] = useState<CaseMessage[]>(initialMessages);
+  const listRef = useRef<HTMLDivElement | null>(null);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const lastCountRef = useRef(initialMessages.length);
+
+  const refresh = useCallback(async () => {
+    try {
+      const query = caseId ? `?caseId=${encodeURIComponent(caseId)}` : "";
+      const response = await fetch(`/api/messages/thread${query}`, {
+        cache: "no-store"
+      });
+
+      if (!response.ok) {
+        return;
+      }
+
+      const data = (await response.json()) as { messages?: CaseMessage[] };
+
+      if (Array.isArray(data.messages)) {
+        setMessages(data.messages);
+      }
+    } catch {
+      // Network hiccup: keep the current list, next poll will retry.
+    }
+  }, [caseId]);
+
+  // Messenger-style live updates: poll while the tab is visible.
+  useEffect(() => {
+    if (loadError) {
+      return;
+    }
+
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        void refresh();
+      }
+    }, POLL_INTERVAL_MS);
+
+    return () => clearInterval(interval);
+  }, [refresh, loadError]);
+
+  // After a successful text send: clear the form and pull the new message in.
+  useEffect(() => {
+    if (state.status === "success") {
+      formRef.current?.reset();
+      void refresh();
+    }
+  }, [state, refresh]);
+
+  // Keep the view pinned to the latest message.
+  useEffect(() => {
+    if (messages.length !== lastCountRef.current) {
+      lastCountRef.current = messages.length;
+      const node = listRef.current;
+
+      if (node) {
+        node.scrollTop = node.scrollHeight;
+      }
+    }
+  }, [messages]);
 
   return (
     <div className="case-thread">
@@ -61,7 +123,7 @@ export function CaseMessageThread({
         </p>
       ) : null}
 
-      <div className="case-thread__messages">
+      <div className="case-thread__messages" ref={listRef}>
         {messages.length === 0 && !loadError ? (
           <p className="case-thread__empty">
             {viewer === "client"
@@ -95,7 +157,7 @@ export function CaseMessageThread({
         })}
       </div>
 
-      <form action={formAction} className="case-thread__form">
+      <form action={formAction} className="case-thread__form" ref={formRef}>
         {caseId ? <input name="caseId" type="hidden" value={caseId} /> : null}
         <textarea
           maxLength={8000}
@@ -108,15 +170,13 @@ export function CaseMessageThread({
           rows={3}
         />
         <div className="case-thread__actions">
-          <VoiceRecorder caseId={caseId} />
+          <VoiceRecorder caseId={caseId} onSent={refresh} />
           <button className="button" disabled={pending} type="submit">
             {pending ? "Отправляю…" : "Отправить"}
           </button>
         </div>
-        {state.status !== "idle" ? (
-          <p className={`form-message form-message--${state.status}`}>
-            {state.message}
-          </p>
+        {state.status === "error" ? (
+          <p className="form-message form-message--error">{state.message}</p>
         ) : null}
       </form>
 

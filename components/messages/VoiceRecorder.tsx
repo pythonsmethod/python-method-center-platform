@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 
 type VoiceRecorderProps = {
   caseId?: string;
+  onSent?: () => void | Promise<void>;
 };
 
 type RecorderPhase = "idle" | "recording" | "preview" | "sending";
@@ -30,7 +31,7 @@ function formatSeconds(total: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function VoiceRecorder({ caseId }: VoiceRecorderProps) {
+export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<RecorderPhase>("idle");
   const [seconds, setSeconds] = useState(0);
@@ -164,7 +165,12 @@ export function VoiceRecorder({ caseId }: VoiceRecorderProps) {
       }
 
       discard();
-      router.refresh();
+
+      if (onSent) {
+        await onSent();
+      } else {
+        router.refresh();
+      }
     } catch {
       setError("Нет связи с сервером. Попробуйте ещё раз.");
       setPhase("preview");
