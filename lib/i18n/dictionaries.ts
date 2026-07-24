@@ -77,8 +77,8 @@ const ru = {
     titlePaid: "Разбор анализов от Карена",
     textPaid:
       "Личный разбор ваших анализов Кареном без полного сопровождения: обратная связь по состоянию организма, рекомендации и один день, чтобы задать Карену любые вопросы.",
-    pricePaid: "$500 · разовая услуга",
-    priceFree: "Бесплатно · позже эта услуга будет стоить $500",
+    pricePaid: "$1 000 · разовая услуга",
+    priceFree: "Бесплатно · позже эта услуга будет стоить $1 000",
     cta: "Получить разбор",
     ctaFree: "Получить бесплатный разбор",
     note: "Разбор является экспертным мнением и не заменяет консультацию врача."
@@ -293,8 +293,8 @@ const en: typeof ru = {
     titlePaid: "Analyses review by Karen",
     textPaid:
       "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations, and one day to ask Karen any questions.",
-    pricePaid: "$500 · one-time service",
-    priceFree: "Free · later this service will cost $500",
+    pricePaid: "$1,000 · one-time service",
+    priceFree: "Free · later this service will cost $1,000",
     cta: "Get the review",
     ctaFree: "Get the free review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
