@@ -13,6 +13,9 @@ const adminNavRoutes = [
   { href: "/admin/requests", label: "Обращения" }
 ];
 
+// Shown only to admins: the founder cabinet is an owner-level overview.
+const founderRoute = { href: "/admin/founder", label: "Обзор основателя" };
+
 // Defense in depth for every /admin/* page: a future page that forgets its
 // own getRequiredStaffUser call still fails closed here. Pages keep their
 // per-status UI (setup notices, error panels) for the non-forbidden states.
@@ -33,6 +36,11 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
               {route.label}
             </Link>
           ))}
+          {auth.status === "authorized" && auth.role === "admin" ? (
+            <Link className="admin-nav__founder" href={founderRoute.href}>
+              {founderRoute.label}
+            </Link>
+          ) : null}
         </nav>
       </div>
       {children}

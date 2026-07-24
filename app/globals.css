@@ -1736,6 +1736,184 @@ code {
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
 }
 
+/* --- Founder cabinet --- */
+
+.admin-nav__founder {
+  border: 1px solid var(--accent);
+  border-radius: 999px;
+  color: var(--accent-strong);
+}
+
+.founder-metrics {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  margin-top: 26px;
+}
+
+.founder-metric {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-top: 2px solid var(--accent);
+  border-radius: 10px;
+  display: grid;
+  gap: 4px;
+  padding: 16px 18px;
+}
+
+.founder-metric b {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: 28px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.15;
+}
+
+.founder-metric span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+.founder-metric--money b {
+  font-size: 24px;
+}
+
+.founder-metric--alert {
+  border-top-color: var(--danger);
+}
+
+.founder-metric--alert b {
+  color: var(--danger);
+}
+
+.founder-split {
+  display: grid;
+  gap: 18px;
+  grid-template-columns: minmax(0, 1.6fr) minmax(260px, 1fr);
+  margin-top: 22px;
+}
+
+.founder-side {
+  display: grid;
+  gap: 18px;
+  align-content: start;
+}
+
+.founder-timeline {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+  margin: 18px 0 0;
+  max-height: 620px;
+  overflow-y: auto;
+  padding: 0;
+}
+
+.founder-event {
+  border-left: 2px solid var(--line);
+  display: grid;
+  gap: 2px;
+  padding: 10px 12px;
+}
+
+.founder-event:hover {
+  background: var(--surface-muted);
+}
+
+.founder-event__time {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.founder-event__title {
+  font-size: 14.5px;
+  font-weight: 600;
+}
+
+.founder-event__title a {
+  color: var(--text);
+}
+
+.founder-event__title a:hover {
+  color: var(--accent-strong);
+}
+
+.founder-event__detail {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.founder-event--escalation {
+  border-left-color: var(--danger);
+}
+
+.founder-event--payment {
+  border-left-color: var(--success);
+}
+
+.founder-event--message {
+  border-left-color: var(--accent);
+}
+
+.founder-event--notification {
+  border-left-color: var(--warning);
+}
+
+.founder-systems {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.founder-systems li {
+  align-items: start;
+  display: flex;
+  gap: 10px;
+}
+
+.founder-systems strong {
+  display: block;
+  font-size: 14px;
+}
+
+.founder-systems em {
+  color: var(--muted);
+  font-size: 12.5px;
+  font-style: normal;
+}
+
+.founder-dot {
+  border-radius: 50%;
+  flex-shrink: 0;
+  height: 10px;
+  margin-top: 5px;
+  width: 10px;
+}
+
+.founder-dot--ok {
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(168, 214, 186, 0.5);
+}
+
+.founder-dot--off {
+  background: var(--warning);
+}
+
+.founder-hint {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+@media (max-width: 900px) {
+  .founder-split {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* --- Offer gate (payment consent checkbox) --- */
 
 .offer-gate {
