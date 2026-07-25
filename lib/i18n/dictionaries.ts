@@ -22,7 +22,7 @@ const ru = {
   landing: {
     eyebrow: "Цифровой реабилитационный центр",
     title: "Python Method Center",
-    subtitle: "Индивидуальный путь к восстановлению, здоровью и новой жизни.",
+    subtitle: "Реабилитация без границ",
     points: [
       "Экспертное сопровождение под руководством Карена",
       "Индивидуальный подход без шаблонов и протоколов",
@@ -239,7 +239,7 @@ const en: typeof ru = {
   landing: {
     eyebrow: "Digital rehabilitation center",
     title: "Python Method Center",
-    subtitle: "Your personalized path to recovery, health and a new life.",
+    subtitle: "Rehabilitation without borders",
     points: [
       "Expert guidance under Karen's leadership",
       "An individual approach without templates or protocols",

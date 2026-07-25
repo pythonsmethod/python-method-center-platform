@@ -666,10 +666,12 @@ code {
   letter-spacing: 0.04em;
 }
 
+/* Short brand slogan under the title — reads as a motto, not body copy. */
 .hero__subtitle {
-  color: var(--muted);
+  color: var(--accent-strong);
   font-family: var(--font-serif);
-  font-size: clamp(18px, 2.6vw, 22px);
+  font-size: clamp(19px, 2.8vw, 24px);
+  letter-spacing: 0.1em;
   margin: 0 auto;
   max-width: 680px;
 }
