@@ -20,7 +20,7 @@ const ru = {
       "Платформа не является медицинским учреждением и не заменяет наблюдение лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи (112 / 911)."
   },
   landing: {
-    eyebrow: "Цифровой реабилитационный центр",
+    eyebrow: "Цифровой центр восстановления",
     title: "Python Method Center",
     subtitle: "Реабилитация без границ",
     points: [
@@ -237,7 +237,7 @@ const en: typeof ru = {
       "The platform is not a medical institution and does not replace your doctor's care. In an emergency, call your local emergency service (112 / 911)."
   },
   landing: {
-    eyebrow: "Digital rehabilitation center",
+    eyebrow: "Digital recovery center",
     title: "Python Method Center",
     subtitle: "Rehabilitation without borders",
     points: [
