@@ -7,6 +7,7 @@ import {
   servicePeriodEnd
 } from "@/lib/payments/stripe";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 
 export const runtime = "nodejs";
@@ -262,7 +263,14 @@ async function handlePaidSession(
     }
   }
 
-  // 5) Team ping about the money.
+  // 5) Referral reward: if this client was invited by someone, the referrer
+  // earns tokens (once per invited person).
+  await awardReferralTokensForPayment({
+    payerProfileId: profileId,
+    paymentId: payment.id
+  });
+
+  // 6) Team ping about the money.
   await notifyTeam({
     kind: "payment",
     dedupeKey: `payment_recorded:${payment.id}`,

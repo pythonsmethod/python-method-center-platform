@@ -24,8 +24,11 @@ import { getCaseMessages } from "@/lib/messages/queries";
 import { getOwnPayments } from "@/lib/payments/queries";
 import { getOwnSupportRequests } from "@/lib/support/queries";
 import { ReferralPanel } from "@/components/referrals/ReferralPanel";
+import { TokenPanel } from "@/components/referrals/TokenPanel";
 import { referralLink } from "@/lib/referrals/code";
 import { getReferralSummary } from "@/lib/referrals/queries";
+import { TOKENS_PER_PAID_REFERRAL } from "@/lib/tokens/config";
+import { getTokenLedger } from "@/lib/tokens/queries";
 import { DocumentUploadPanel } from "./DocumentUploadPanel";
 import { SupportRequestForm } from "./SupportRequestForm";
 
@@ -59,12 +62,14 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     );
   }
 
-  const [caseResult, supportResult, paymentsResult, referral] = await Promise.all([
-    getClientCaseShell(auth.userId),
-    getOwnSupportRequests(auth.userId),
-    getOwnPayments(auth.userId),
-    getReferralSummary(auth.userId)
-  ]);
+  const [caseResult, supportResult, paymentsResult, referral, tokens] =
+    await Promise.all([
+      getClientCaseShell(auth.userId),
+      getOwnSupportRequests(auth.userId),
+      getOwnPayments(auth.userId),
+      getReferralSummary(auth.userId),
+      getTokenLedger(auth.userId)
+    ]);
   const submitted = isOnboardingSubmitted(params?.onboarding);
   const [documentResult, historyResult, messagesResult] =
     caseResult.status === "ready" && caseResult.case
@@ -240,7 +245,8 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
 
       {referral.status === "ready" && referral.code ? (
         <section className="documents-section" aria-label="Приглашение друзей">
-          <div className="document-upload">
+          <div className="documents-layout">
+            <div className="document-upload">
             <div>
               <span className="panel__label">Рекомендация</span>
               <h2>Пригласить того, кому это нужно</h2>
@@ -257,6 +263,23 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
               paid={referral.paid}
               started={referral.started}
             />
+          </div>
+
+          <div className="documents-list-panel">
+            <div>
+              <span className="panel__label">Токены</span>
+              <h2>Ваши токены и скидка</h2>
+              <p>
+                За каждого приглашённого, который начинает сопровождение, вам
+                начисляется {TOKENS_PER_PAID_REFERRAL} токенов. Токены копятся и
+                превращаются в скидку на любую покупку: 1 токен = 1 $.
+              </p>
+            </div>
+            <TokenPanel
+              balance={tokens.balance}
+              transactions={tokens.transactions}
+            />
+            </div>
           </div>
         </section>
       ) : null}

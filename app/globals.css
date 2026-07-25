@@ -1826,6 +1826,78 @@ code {
   margin: 0;
 }
 
+/* --- Referral tokens --- */
+
+.tokens {
+  display: grid;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.tokens__balance,
+.tokens__code {
+  background: var(--surface-muted);
+  border: 1px solid var(--accent);
+  border-radius: 10px;
+  display: grid;
+  gap: 6px;
+  padding: 16px;
+}
+
+.tokens__balance strong,
+.tokens__code strong {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: clamp(26px, 5vw, 34px);
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+
+.tokens__value {
+  color: var(--muted);
+  font-size: 13.5px;
+}
+
+.tokens__form {
+  display: grid;
+  gap: 12px;
+}
+
+.tokens__history {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 0;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.tokens__history li {
+  align-items: center;
+  border-bottom: 1px solid rgba(74, 59, 36, 0.5);
+  display: grid;
+  font-size: 13.5px;
+  gap: 10px;
+  grid-template-columns: auto 1fr auto;
+  padding: 9px 2px;
+}
+
+.tokens__history-when {
+  color: var(--muted);
+  font-size: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.tokens__plus {
+  color: var(--success);
+  font-weight: 700;
+}
+
+.tokens__minus {
+  color: var(--muted);
+  font-weight: 700;
+}
+
 /* --- Founder cabinet --- */
 
 .admin-nav__founder {
