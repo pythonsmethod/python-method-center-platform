@@ -62,7 +62,7 @@
     color: var(--muted);
     font-variant-numeric: tabular-nums;
   }
-  .slide__num::before { content: counter(slide, decimal-leading-zero) " / 13"; }
+  .slide__num::before { content: counter(slide, decimal-leading-zero) " / 15"; }
 
   .eyebrow {
     font-family: var(--sans);
@@ -335,16 +335,26 @@
   }
 
   @media print {
+    @page { size: A4 portrait; margin: 0; }
     .hint { display: none; }
-    .slide {
-      min-height: auto;
-      page-break-after: always;
-      border-bottom: 0;
-      padding: 2.5rem 2rem;
+    html, body {
+      background: var(--bg) !important;
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
-    body { background: var(--bg); }
+    .slide {
+      min-height: 297mm;
+      height: 297mm;
+      box-sizing: border-box;
+      page-break-after: always;
+      break-after: page;
+      border-bottom: 0;
+      padding: 18mm 16mm 16mm;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+    .slide:last-child { page-break-after: auto; break-after: auto; }
+    .slide__num { bottom: 9mm; right: 14mm; }
   }
 </style>
 
@@ -491,40 +501,57 @@
   <!-- 09 · Финансовый прогноз -->
   <section class="slide">
     <div class="slide__inner">
-      <p class="eyebrow">Финансовый прогноз · базовый сценарий</p>
-      <h2>Путь к <em>$2.6M</em> выручки во второй год</h2>
+      <p class="eyebrow">Финансовый прогноз · базовый сценарий с раундом</p>
+      <h2>От 20 к <em>120</em> новым клиентам в месяц за год</h2>
       <div class="grid">
-        <div class="stat"><b>≈ $1.0M</b><span>выручка, год 1 — старт с фактического темпа: 20 новых клиентов в месяц (480 / 24)</span></div>
-        <div class="stat"><b>≈ $2.6M</b><span>выручка, год 2 — при росте новых клиентов 8% в месяц</span></div>
-        <div class="stat"><b>≈ $1.9M</b><span>EBITDA, год 2 — модель прибыльна без дальнейших раундов</span></div>
+        <div class="stat"><b>$1.83M</b><span>выручка, год 1 — рост задан планом найма, а не процентом в месяц</span></div>
+        <div class="stat"><b>$3.6M</b><span>run-rate выручки на 12-й месяц</span></div>
+        <div class="stat"><b>+$676K</b><span>EBITDA года 1 — выручка не проедается на операции, она накапливается</span></div>
       </div>
-      <div class="chart" aria-label="Рост месячной выручки за 24 месяца">
-        <i style="height:28%"></i><i style="height:30%"></i><i style="height:33%"></i><i style="height:35%"></i><i style="height:38%"></i><i style="height:41%"></i><i style="height:44%"></i><i style="height:48%"></i><i style="height:52%"></i><i style="height:56%"></i><i style="height:60%"></i><i style="height:65%"></i><i class="y2" style="height:70%"></i><i class="y2" style="height:76%"></i><i class="y2" style="height:82%"></i><i class="y2" style="height:88%"></i><i class="y2" style="height:95%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i><i class="y2" style="height:100%"></i>
+      <div class="chart" aria-label="Рост месячной выручки за 12 месяцев">
+        <i style="height:15%"></i><i style="height:18%"></i><i style="height:22%"></i><i style="height:29%"></i><i style="height:35%"></i><i style="height:41%"></i><i class="y2" style="height:49%"></i><i class="y2" style="height:58%"></i><i class="y2" style="height:68%"></i><i class="y2" style="height:79%"></i><i class="y2" style="height:90%"></i><i class="y2" style="height:100%"></i>
       </div>
-      <div class="chart__caption"><span>МЕСЯЦ 1 · $46 680</span><span>ГОД 1</span><span>ГОД 2</span></div>
-      <p class="footnote">Полная модель — Excel на 24 месяца: помесячный прогноз, годовые итоги, юнит-экономика и три сценария роста. Прилагается к презентации.</p>
+      <div class="chart__caption"><span>МЕСЯЦ 1 · $46 680</span><span>ПОЛУГОДИЕ</span><span>МЕСЯЦ 12 · $303 696</span></div>
+      <p class="footnote">Темп роста не взят как процент: он ограничен ёмкостью команды сопровождения — 35–40 активных кейсов на специалиста. Полная модель на 12 месяцев с четырьмя сценариями прилагается к презентации.</p>
     </div>
     <span class="slide__num"></span>
   </section>
 
-  <!-- 10 · Юнит-экономика -->
+  <!-- 10 · Сценарии -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Сценарии · чем на самом деле рискует инвестор</p>
+      <h2>В худшем сценарии мы <em>не банкротимся</em></h2>
+      <table class="unit">
+        <tr><td>Худший <small>платное привлечение не работает вовсе, растём только органикой — 20 клиентов в месяц</small></td><td>$612K</td></tr>
+        <tr><td>Консервативный <small>стоимость привлечения вдвое хуже плана, найм медленнее — 55 в месяц к M12</small></td><td>$1.07M</td></tr>
+        <tr><td>Базовый <small>план: 120 новых клиентов в месяц к M12</small></td><td>$1.83M</td></tr>
+        <tr><td>Агрессивный <small>канал масштабируется, выручка реинвестируется — 200 в месяц</small></td><td>$2.64M</td></tr>
+      </table>
+      <p class="footnote">Выручка первого года по сценариям. Даже в худшем — на конец 12-го месяца на счетах остаётся более $660 тысяч: валовая маржа 91% и полная предоплата курса не оставляют сценария, в котором деньги инвестора сгорают. Есть сценарий, в котором рост медленнее обещанного.</p>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 11 · Юнит-экономика -->
   <section class="slide">
     <div class="slide__inner">
       <p class="eyebrow">Юнит-экономика</p>
-      <h2>Каждый клиент окупает привлечение <em>многократно</em></h2>
+      <h2>Клиент окупает привлечение <em>с первого платежа</em></h2>
       <table class="unit">
-        <tr><td>Средний чек <small>60% тариф «5 недель» + 40% тариф «100 дней»</small></td><td>$2 334</td></tr>
-        <tr><td>LTV <small>чек × (1 + 20% продлений)</small></td><td>≈ $2 800</td></tr>
-        <tr><td>Переменные затраты на клиента <small>формула-подарок и доставка ($120), эквайринг, ИИ</small></td><td>≈ $200</td></tr>
-        <tr><td>CAC — стоимость привлечения <small>гипотеза; проверится фактом первых месяцев платформы</small></td><td>$60</td></tr>
-        <tr><td>LTV / CAC</td><td>&gt; 40×</td></tr>
+        <tr><td>Средний чек <small>60% тариф «5 недель» + 40% тариф «100 дней»; оплата вперёд, до начала работы</small></td><td>$2 334</td></tr>
+        <tr><td>LTV <small>чек + 20% продлений по младшему тарифу — консервативно</small></td><td>$2 622</td></tr>
+        <tr><td>Переменные затраты на клиента <small>формула-подарок и доставка $120, эквайринг $75, ИИ $2.5</small></td><td>$198</td></tr>
+        <tr><td>CAC <small>blended $354 · только по платно привлечённым ≈ $590</small></td><td>$354</td></tr>
+        <tr><td>LTV / CAC <small>7.4× blended · 4.4× по платному каналу</small></td><td>7.4×</td></tr>
+        <tr><td>Точка слома <small>CAC, при котором экономика уходит в ноль</small></td><td>$2 137</td></tr>
       </table>
-      <p class="footnote">Запас прочности: даже если привлечение окажется в десять раз дороже гипотезы, LTV/CAC остаётся выше 4× — порога здоровой юнит-экономики.</p>
+      <p class="footnote">Стоимость привлечения — пока гипотеза, а не факт: платный канал не проверен ни одним долларом, и это один из трёх рисков, которые мы называем сами. Запас до точки слома — шестикратный по blended и 3.6× по платному каналу.</p>
     </div>
     <span class="slide__num"></span>
   </section>
 
-  <!-- 11 · Команда -->
+  <!-- 12 · Команда -->
   <section class="slide">
     <div class="slide__inner">
       <p class="eyebrow">Команда</p>
@@ -544,27 +571,49 @@
     <span class="slide__num"></span>
   </section>
 
-  <!-- 12 · Раунд -->
+  <!-- 13 · Раунд -->
   <section class="slide">
     <div class="slide__inner">
       <p class="eyebrow">Инвестиционный раунд</p>
-      <h2>Раунд для <em>масштабирования</em>, не для выживания</h2>
+      <h2>Раунд на <em>скорость</em>, не на выживание</h2>
       <div class="grid">
-        <div class="stat"><b>$150 000</b><span>запрашиваемый раунд (сумма из финансовой модели — подтвердите или измените)</span></div>
-        <div class="stat"><b>Прибыльность</b><span>модель выходит в положительный денежный поток без последующих раундов</span></div>
+        <div class="stat"><b>$1 000 000</b><span>на 12 месяцев — это $83 тысячи в месяц операционного плана, посчитанного снизу вверх</span></div>
+        <div class="stat"><b>56%</b><span>раунда идёт в две вещи, определяющие судьбу компании: снятие потолка эксперта и проверка канала привлечения</span></div>
       </div>
       <ul class="gold-list">
-        <li><strong>Маркетинг</strong> — платное привлечение поверх бесплатной воронки разбора анализов.</li>
-        <li><strong>Команда</strong> — поддержка клиентов и операционка, чтобы Professor Python занимался только кейсами.</li>
-        <li><strong>Продукт</strong> — мобильное приложение, уведомления, контент-платформа (статьи, видео).</li>
-        <li><strong>Юридика и соответствие</strong> — сопровождение роста на международную аудиторию.</li>
+        <li><strong>$300K · Команда сопровождения и качество метода</strong> — кодификация методики, обучение и сертификация специалистов под супервизией эксперта. Крупнейшая статья раунда — потому что главный потолок бизнеса человеческий, а не технологический.</li>
+        <li><strong>$260K · Маркетинг</strong> — проверка платного привлечения на объёме, а не на догадке.</li>
+        <li><strong>$140K · Продукт</strong> — уведомления, мобильный контур, ИИ-чтение медицинских документов.</li>
+        <li><strong>$120K · Основатели</strong> — по $5 000 в месяц каждому; ниже рынка, осознанно.</li>
+        <li><strong>$80K · Регуляторика, юридика, страхование</strong> — снятие главного риска сделки.</li>
+        <li><strong>$100K · Клиническая доказательность, операции, резерв</strong> — оцифровка исходов 480 кейсов превращает истории в данные.</li>
       </ul>
-      <div class="fill">точная сумма раунда и доля/условия — подтвердите сумму, распределение впишем вместе.</div>
+      <p class="footnote">Сумма посчитана из стоимости плана, а не из желаемой цифры. При меньшем раунде у нас есть готовый план сокращения с указанием, какие вехи и насколько сдвигаются.</p>
     </div>
     <span class="slide__num"></span>
   </section>
 
-  <!-- 13 · Финал -->
+  <!-- 14 · Вехи и условия -->
+  <section class="slide">
+    <div class="slide__inner">
+      <p class="eyebrow">Вехи и условия сделки</p>
+      <h2>Мы сами вешаем на себя <em>измеримые обязательства</em></h2>
+      <table class="unit">
+        <tr><td>Месяц 3 <small>платный канал запущен и измерен: ≥60 оплаченных клиентов, CAC ≤ $600</small></td><td>Канал</td></tr>
+        <tr><td>Месяц 4 <small>2 сертифицированных специалиста ведут кейсы; регуляторное заключение получено</small></td><td>Транш 2</td></tr>
+        <tr><td>Месяц 6 <small>≥50% активных кейсов ведутся не лично экспертом; ≥50 новых клиентов в месяц</small></td><td>Потолок снят</td></tr>
+        <tr><td>Месяц 8 <small>≥70 новых клиентов в месяц, CAC ≤ $400, продления подтверждены фактом</small></td><td>Транш 3</td></tr>
+        <tr><td>Месяц 12 <small>120 новых клиентов в месяц, run-rate $3.6M, EBITDA ≥ 0 на месячной основе</small></td><td>Цель</td></tr>
+      </table>
+      <ul class="gold-list">
+        <li><strong>Структура</strong> — $1M при оценке $6M post-money; готовы разбить на три транша по вехам месяцев 4 и 8.</li>
+        <li><strong>Что мы говорим сами, до вопроса</strong> — сегодня бизнес критически зависит от одного эксперта; стоимость привлечения пока гипотеза; регуляторное заключение в работе. На каждый из трёх пунктов есть строка в бюджете и веха в плане.</li>
+      </ul>
+    </div>
+    <span class="slide__num"></span>
+  </section>
+
+  <!-- 15 · Финал -->
   <section class="slide title-slide">
     <div class="slide__inner">
       <span class="ankh">☥</span>

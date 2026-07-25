@@ -130,3 +130,7 @@ Audits live in `docs/audits/` — most recent:
 
 Architecture and foundation documents live in `docs/` and remain the source of
 truth for future implementation phases.
+
+Investor materials for the $1M round live in `docs/investment/` — start with
+`README.md` there; the pitch deck itself is `docs/launch/pitch-deck.html`
+(PDF: `docs/launch/Pitch_Deck_1M.pdf`).
