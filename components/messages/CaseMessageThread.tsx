@@ -32,7 +32,7 @@ function senderLabel(role: string, viewer: "client" | "staff"): string {
   }
 
   if (role === "karen") {
-    return "Карен";
+    return "Professor Python";
   }
 
   if (viewer === "staff") {
@@ -268,8 +268,8 @@ export function CaseMessageThread({
 
       <p className="case-thread__note">
         {viewer === "client"
-          ? "Ответы по вашему состоянию и документам даёт лично Карен после изучения кейса."
-          : "Помните: ответы по состоянию, анализам и маршруту клиент получает только после решения Карена."}
+          ? "Ответы по вашему состоянию и документам даёт лично Professor Python после изучения кейса."
+          : "Помните: ответы по состоянию, анализам и маршруту клиент получает только после решения Professor Python."}
       </p>
     </div>
   );

@@ -38,7 +38,7 @@ export const caseStatusLabels: Record<string, string> = {
 
 export const actorRoleLabels: Record<string, string> = {
   client: "клиент",
-  karen: "Карен",
+  karen: "Professor Python",
   support: "поддержка",
   admin: "администратор",
   ai: "ИИ",

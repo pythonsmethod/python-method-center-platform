@@ -10,7 +10,7 @@ import type { KnowledgeEntry } from "@/lib/assistant/knowledge";
 
 const audienceLabels: Record<KnowledgeEntry["audience"], string> = {
   client: "ИИ клиентов",
-  staff: "ИИ Карена",
+  staff: "ИИ Professor Python",
   both: "Оба ИИ"
 };
 
@@ -40,7 +40,7 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
           Для кого это знание
           <select defaultValue="client" name="audience">
             <option value="client">Для ИИ клиентов (на сайте)</option>
-            <option value="staff">Для ИИ Карена (в админке)</option>
+            <option value="staff">Для ИИ Professor Python (в админке)</option>
             <option value="both">Для обоих</option>
           </select>
         </label>

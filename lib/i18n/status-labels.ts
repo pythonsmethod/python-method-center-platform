@@ -36,7 +36,7 @@ const supportStatusLabels: Record<string, string> = {
   open: "Открыт",
   in_progress: "В работе",
   waiting_on_client: "Ждёт вашего ответа",
-  escalated_to_karen: "Передан Карен",
+  escalated_to_karen: "Передан Professor Python",
   resolved: "Решён",
   closed: "Закрыт"
 };

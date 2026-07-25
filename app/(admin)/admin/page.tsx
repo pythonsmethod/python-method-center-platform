@@ -63,7 +63,7 @@ export default async function AdminPage() {
       <PageHeader
         eyebrow="Рабочее место команды"
         title="Админ-панель"
-        description="Слева — кейсы и обращения, справа — ИИ-помощник Карена."
+        description="Слева — кейсы и обращения, справа — ИИ-помощник Professor Python."
       />
 
       <div className="admin-split">
@@ -132,14 +132,14 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        <section aria-label="ИИ-помощник Карена" className="admin-split__assistant">
+        <section aria-label="ИИ-помощник Professor Python" className="admin-split__assistant">
           <div className="panel">
-            <span className="panel__label">ИИ-помощник Карена</span>
+            <span className="panel__label">ИИ-помощник Professor Python</span>
             <h2>Рабочий чат</h2>
             {assistantConfigured ? (
               <AssistantChat
                 endpoint="/api/assistant/staff"
-                intro="Здравствуйте, Карен! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Внизу можно выбрать, кто отвечает: Claude, GPT или оба вместе. Доступа к базе у меня нет: работаю с тем, что вставлено в чат."
+                intro="Здравствуйте, Professor Python! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Внизу можно выбрать, кто отвечает: Claude, GPT или оба вместе. Доступа к базе у меня нет: работаю с тем, что вставлено в чат."
                 placeholder="Вставьте вопрос клиента или задачу…"
                 providerChoice
                 suggestions={[
@@ -162,7 +162,7 @@ export default async function AdminPage() {
             <h2>База знаний</h2>
             <p>
               Всё, что вы сохраните здесь, ИИ начнёт использовать в ответах:
-              «ИИ клиентов» отвечает посетителям на сайте, «ИИ Карена» — вам в
+              «ИИ клиентов» отвечает посетителям на сайте, «ИИ Professor Python» — вам в
               этом чате.
             </p>
             <KnowledgePanel entries={knowledge.entries} loadError={knowledge.error} />

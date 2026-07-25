@@ -217,12 +217,12 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
       </section>
 
       {caseResult.status === "ready" && caseResult.case && messagesResult ? (
-        <section className="documents-section" aria-label="Чат с Кареном и командой">
+        <section className="documents-section" aria-label="Чат с Professor Python и командой">
           <div className="panel">
-            <span className="panel__label">Чат с Кареном и командой</span>
+            <span className="panel__label">Чат с Professor Python и командой</span>
             <h2>Ваша переписка</h2>
             <p>
-              Здесь вы общаетесь с Кареном и командой центра — текстом или
+              Здесь вы общаетесь с Professor Python и командой центра — текстом или
               голосовыми сообщениями.
             </p>
             <CaseMessageThread

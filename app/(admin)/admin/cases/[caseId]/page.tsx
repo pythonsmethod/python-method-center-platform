@@ -335,7 +335,7 @@ export default async function StaffCaseDetailPage({
 
       <section className="intake-section" aria-label="ИИ-Ассистент по кейсу">
         <div className="panel">
-          <span className="panel__label">ИИ-Ассистент Карена</span>
+          <span className="panel__label">ИИ-Ассистент Professor Python</span>
           <h2>Помощник по этому кейсу</h2>
           <p>
             Ассистент видит снимок кейса из базы: анкету, список документов,
@@ -345,7 +345,7 @@ export default async function StaffCaseDetailPage({
           <AssistantChat
             caseId={clientCase.id}
             endpoint="/api/assistant/staff"
-            intro="Я вижу данные этого кейса: анкету, статусы, список документов, оплаты и историю. Спросите — сделаю выжимку, черновик ответа клиенту или предложу следующие шаги. Решения — за Кареном."
+            intro="Я вижу данные этого кейса: анкету, статусы, список документов, оплаты и историю. Спросите — сделаю выжимку, черновик ответа клиенту или предложу следующие шаги. Решения — за Professor Python."
             placeholder="Например: сделай выжимку кейса…"
             providerChoice
             suggestions={[

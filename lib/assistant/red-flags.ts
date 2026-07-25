@@ -97,7 +97,7 @@ export async function recordRedFlagEvent(input: {
     dedupeKey: `red_flag:${event.id}`,
     title:
       input.category === "physical"
-        ? "🔴 КРАСНЫЙ ФЛАГ — физический/медицинский → Карен"
+        ? "🔴 КРАСНЫЙ ФЛАГ — физический/медицинский → Professor Python"
         : "🔴 КРАСНЫЙ ФЛАГ — психологический кризис → поддержка",
     lines: [
       `Событие: ${event.id}`,

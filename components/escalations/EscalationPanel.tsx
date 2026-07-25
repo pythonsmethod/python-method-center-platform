@@ -13,7 +13,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const routingLabels: Record<string, string> = {
-  karen: "Карен",
+  karen: "Professor Python",
   support: "Поддержка (Анна)",
   admin: "Админ"
 };

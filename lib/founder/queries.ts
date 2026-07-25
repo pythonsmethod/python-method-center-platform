@@ -295,7 +295,7 @@ export async function getFounderOverview(): Promise<FounderOverview> {
         row.category === "physical_medical"
           ? "🔴 Красный флаг — физический/медицинский"
           : "🔴 Красный флаг — психологический кризис",
-      detail: `Маршрут: ${row.routing_target === "karen" ? "Карен" : "поддержка"} · ${
+      detail: `Маршрут: ${row.routing_target === "karen" ? "Professor Python" : "поддержка"} · ${
         row.status === "open" ? "не обработан" : "обработан"
       }${row.profile_id ? "" : " · гость сайта"}`,
       href: row.case_id ? `/admin/cases/${row.case_id}` : "/admin"
