@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { getFounderState } from "@/lib/auth/require-founder";
 import { formatMoney, formatMoscowless } from "@/lib/founder/labels";
 import { getFounderOverview } from "@/lib/founder/queries";
+import { getReferralOverview } from "@/lib/referrals/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -44,7 +45,10 @@ export default async function FounderPage() {
     );
   }
 
-  const overview = await getFounderOverview();
+  const [overview, referrals] = await Promise.all([
+    getFounderOverview(),
+    getReferralOverview()
+  ]);
   const m = overview.metrics;
 
   return (
@@ -174,6 +178,33 @@ export default async function FounderPage() {
               «Не настроено» означает, что Telegram-бот ещё не подключён —
               событие записано в базу, но в телефон не ушло.
             </p>
+          </div>
+
+          <div className="panel">
+            <span className="panel__label">Рекомендации</span>
+            <h2>Реферальная программа</h2>
+            <p>
+              Пришли по ссылкам клиентов: <strong>{referrals.totalReferred}</strong>{" "}
+              · из них оплатили: <strong>{referrals.totalPaid}</strong>
+            </p>
+            {referrals.topReferrers.length > 0 ? (
+              <ul className="founder-systems">
+                {referrals.topReferrers.map((referrer, index) => (
+                  <li key={`${referrer.email ?? "anon"}-${index}`}>
+                    <span className="founder-dot founder-dot--ok" aria-hidden="true" />
+                    <span>
+                      <strong>{referrer.email ?? "клиент без email"}</strong>
+                      <em>пригласил(а): {referrer.invited}</em>
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="founder-hint">
+                Приглашений пока нет. Код появляется у каждого клиента в кабинете
+                автоматически.
+              </p>
+            )}
           </div>
 
           <div className="panel">

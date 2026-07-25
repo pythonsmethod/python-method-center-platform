@@ -1,7 +1,8 @@
 "use server";
 
-import { headers } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
+import { attachReferral, REFERRAL_COOKIE } from "@/lib/referrals/queries";
 import type { AuthActionState } from "@/lib/auth/types";
 import {
   validateNewPassword,
@@ -115,6 +116,16 @@ export async function signUpWithPassword(
 
   if (error) {
     return errorState(error.message);
+  }
+
+  // Referral attribution: the ?ref=CODE the visitor arrived with was stored
+  // in a cookie by the middleware. Best-effort — never blocks sign-up.
+  if (data.user) {
+    const cookieStore = await cookies();
+    await attachReferral({
+      referredProfileId: data.user.id,
+      rawCode: cookieStore.get(REFERRAL_COOKIE)?.value
+    });
   }
 
   if (data.session) {

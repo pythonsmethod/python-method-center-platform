@@ -1747,6 +1747,85 @@ code {
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
 }
 
+/* --- Referral panel (client cabinet) --- */
+
+.referral {
+  display: grid;
+  gap: 16px;
+  margin-top: 6px;
+}
+
+.referral__label {
+  color: var(--muted);
+  display: block;
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+}
+
+.referral__token,
+.referral__linkbox {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 10px;
+  padding: 14px 16px;
+}
+
+.referral__code {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: clamp(24px, 5vw, 32px);
+  letter-spacing: 0.12em;
+  white-space: nowrap;
+}
+
+.referral__link {
+  background: var(--background);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--text);
+  display: block;
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  padding: 10px 12px;
+}
+
+.referral__stats {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  margin: 0;
+}
+
+.referral__stats div {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+}
+
+.referral__stats dt {
+  color: var(--muted);
+  font-size: 12.5px;
+  line-height: 1.35;
+}
+
+.referral__stats dd {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: 26px;
+  margin: 4px 0 0;
+}
+
+.referral__note {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 0;
+}
+
 /* --- Founder cabinet --- */
 
 .admin-nav__founder {

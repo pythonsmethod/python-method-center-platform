@@ -2,11 +2,36 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/env";
 
+const REFERRAL_COOKIE = "pm-ref";
+const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 90; // 90 days
+
+// A visitor arriving with ?ref=CODE is remembered until they register, so
+// attribution survives reading the site, closing the tab and coming back.
+function captureReferral(request: NextRequest, response: NextResponse): void {
+  const code = request.nextUrl.searchParams.get("ref");
+
+  if (!code || code.length > 32) {
+    return;
+  }
+
+  // First touch wins: an existing attribution is never overwritten.
+  if (request.cookies.get(REFERRAL_COOKIE)) {
+    return;
+  }
+
+  response.cookies.set(REFERRAL_COOKIE, code, {
+    maxAge: REFERRAL_COOKIE_MAX_AGE,
+    sameSite: "lax",
+    path: "/"
+  });
+}
+
 export async function middleware(request: NextRequest) {
   const config = getSupabaseConfig();
   let response = NextResponse.next({ request });
 
   if (!config) {
+    captureReferral(request, response);
     return response;
   }
 
@@ -17,6 +42,7 @@ export async function middleware(request: NextRequest) {
     .some((cookie) => cookie.name.startsWith("sb-"));
 
   if (!hasAuthCookie) {
+    captureReferral(request, response);
     return response;
   }
 
@@ -46,6 +72,10 @@ export async function middleware(request: NextRequest) {
   // Refreshes the auth token when it is close to expiry so long-lived
   // sessions do not silently expire between server component renders.
   await supabase.auth.getUser();
+
+  // Set last: the Supabase cookie handler above may have replaced the
+  // response object, which would drop an earlier cookie write.
+  captureReferral(request, response);
 
   return response;
 }
