@@ -71,6 +71,7 @@ export default async function PaymentPage() {
           <p>{freeReview ? promo.textFree : promo.textPaid}</p>
           <p className="price-line">
             {freeReview ? promo.priceFree : promo.pricePaid}
+            <span className="price-amount">{promo.priceAmount}</span>
           </p>
           <div className="panel-actions">
             <Link className="button" href="/login">

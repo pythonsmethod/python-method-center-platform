@@ -1721,6 +1721,15 @@ code {
   font-weight: 700;
 }
 
+/* The amount always sits on its own line and never splits mid-number. */
+.price-amount {
+  display: block;
+  font-size: 1.35em;
+  letter-spacing: 0.02em;
+  margin-top: 4px;
+  white-space: nowrap;
+}
+
 .promo-banner__actions .button {
   font-family: var(--font-serif);
   letter-spacing: 0.08em;

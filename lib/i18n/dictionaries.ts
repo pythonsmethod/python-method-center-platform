@@ -77,8 +77,10 @@ const ru = {
     titlePaid: "Разбор анализов от Professor Python",
     textPaid:
       "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации и один день, чтобы задать любые вопросы.",
-    pricePaid: "$1 000 · разовая услуга",
-    priceFree: "Бесплатно · позже эта услуга будет стоить $1 000",
+    // The amount is rendered on its own line and never wraps mid-number.
+    pricePaid: "Разовая услуга — стоимость",
+    priceFree: "Бесплатно · позже эта услуга будет стоить",
+    priceAmount: "$1 000",
     cta: "Получить разбор",
     ctaFree: "Получить бесплатный разбор",
     note: "Разбор является экспертным мнением и не заменяет консультацию врача."
@@ -137,11 +139,11 @@ const ru = {
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
       "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Professor Python отправляет свою формулу — 200 капсул; вы оплачиваете только доставку ($180).",
-    plan5Price: "$1 200 + 5% сбор + $180 доставка формулы = $1 440",
+    plan5Price: "$1 200 + 5% сбор + $180 доставка формулы = $1 440",
     plan100Title: "Сопровождение — 100 дней",
     plan100Desc:
       "Расширенное сопровождение кейса командой Python Method на 100 дней. В подарок Professor Python отправляет свою формулу — 600 капсул, и доставку Professor Python берёт на себя.",
-    plan100Price: "$3 500 + 5% сбор = $3 675"
+    plan100Price: "$3 500 + 5% сбор = $3 675"
   },
   paymentSuccess: {
     eyebrow: "Оплата получена",
@@ -293,8 +295,9 @@ const en: typeof ru = {
     titlePaid: "Analyses review by Karen",
     textPaid:
       "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations, and one day to ask Karen any questions.",
-    pricePaid: "$1,000 · one-time service",
-    priceFree: "Free · later this service will cost $1,000",
+    pricePaid: "One-time service — price",
+    priceFree: "Free · later this service will cost",
+    priceAmount: "$1,000",
     cta: "Get the review",
     ctaFree: "Get the free review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."

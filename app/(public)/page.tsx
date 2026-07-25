@@ -64,6 +64,7 @@ export default async function HomePage() {
         <p>{freeReview ? promo.textFree : promo.textPaid}</p>
         <p className="promo-banner__price">
           {freeReview ? promo.priceFree : promo.pricePaid}
+          <span className="price-amount">{promo.priceAmount}</span>
         </p>
         <div className="promo-banner__actions">
           <Link className="button" href="/login">
