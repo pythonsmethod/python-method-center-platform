@@ -20,7 +20,9 @@ const TIER_SETTINGS: Record<
   AssistantTier,
   { provider: AssistantProvider; maxTokens: number; perMinute: number }
 > = {
-  guest: { provider: "claude", maxTokens: 500, perMinute: 8 },
+  // Slightly higher than a short answer needs: the guest level also has to
+  // fit the honest explanation of what the next two levels give.
+  guest: { provider: "claude", maxTokens: 650, perMinute: 8 },
   registered: { provider: "claude", maxTokens: 700, perMinute: 20 },
   client: { provider: "best", maxTokens: 900, perMinute: 30 }
 };

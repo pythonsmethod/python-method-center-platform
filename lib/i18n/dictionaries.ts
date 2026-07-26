@@ -94,7 +94,7 @@ const ru = {
     suggestions: [
       "Как проходит сопровождение?",
       "С чего мне начать?",
-      "Какие документы нужно загрузить?"
+      "Что умеет ваш ИИ?"
     ],
     // Level 2 and 3 of the assistant: the same window, but a different
     // helper — personal after sign-up, case-aware after payment.
@@ -335,7 +335,7 @@ const en: typeof ru = {
     suggestions: [
       "How does the support program work?",
       "Where do I start?",
-      "Which documents should I upload?"
+      "What can your AI do?"
     ],
     tiers: {
       registered: {
