@@ -1,20 +1,40 @@
 import { NextResponse } from "next/server";
 import { sanitizeChatMessages } from "@/lib/assistant/claude";
-import { askAssistantTeam } from "@/lib/assistant/router";
-import { buildClientSystemPrompt } from "@/lib/assistant/prompts";
+import { askAssistantTeam, type AssistantProvider } from "@/lib/assistant/router";
+import {
+  buildGuestSystemPrompt,
+  buildPaidClientSystemPrompt,
+  buildRegisteredSystemPrompt
+} from "@/lib/assistant/prompts";
 import { extractRedFlag, recordRedFlagEvent } from "@/lib/assistant/red-flags";
+import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 
-// Best-effort per-instance limiter for the public endpoint: serverless
-// instances don't share state, so this only smooths bursts, not a hard cap.
+// Three levels of the same endpoint. The tier decides how much the answer is
+// allowed to cost: a stranger on the public page gets one fast model and a
+// short answer; a paying client gets both models plus an arbiter.
+const TIER_SETTINGS: Record<
+  AssistantTier,
+  { provider: AssistantProvider; maxTokens: number; perMinute: number }
+> = {
+  guest: { provider: "claude", maxTokens: 500, perMinute: 8 },
+  registered: { provider: "claude", maxTokens: 700, perMinute: 20 },
+  client: { provider: "best", maxTokens: 900, perMinute: 30 }
+};
+
+// Hard ceiling applied by IP before anything else runs, so a flood cannot
+// even reach the database lookup that resolves the tier.
+const HARD_IP_LIMIT_PER_MINUTE = 40;
+
+// Best-effort per-instance limiter: serverless instances don't share state,
+// so this smooths bursts rather than enforcing a global cap.
 const WINDOW_MS = 60_000;
-const MAX_REQUESTS_PER_WINDOW = 20;
 const hits = new Map<string, { count: number; windowStart: number }>();
 
-function isRateLimited(key: string): boolean {
+function isRateLimited(key: string, limit: number): boolean {
   const now = Date.now();
   const entry = hits.get(key);
 
@@ -29,14 +49,14 @@ function isRateLimited(key: string): boolean {
     hits.clear();
   }
 
-  return entry.count > MAX_REQUESTS_PER_WINDOW;
+  return entry.count > limit;
 }
 
 export async function POST(request: Request) {
   const ip =
     request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
 
-  if (isRateLimited(ip)) {
+  if (isRateLimited(`ip:${ip}`, HARD_IP_LIMIT_PER_MINUTE)) {
     return NextResponse.json(
       { error: "Слишком много сообщений подряд. Подождите минуту." },
       { status: 429 }
@@ -59,7 +79,29 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
   }
 
-  let system = await buildClientSystemPrompt();
+  // Who is asking: a visitor, a registered person, or a paying client.
+  const audience = await resolveAssistantAudience();
+  const settings = TIER_SETTINGS[audience.tier];
+
+  if (isRateLimited(`tier:${audience.profileId ?? ip}`, settings.perMinute)) {
+    return NextResponse.json(
+      { error: "Слишком много сообщений подряд. Подождите минуту." },
+      { status: 429 }
+    );
+  }
+
+  let system: string;
+
+  if (audience.tier === "client") {
+    // Level 3 — personal AI of a paying client: works with their case.
+    system = await buildPaidClientSystemPrompt(audience.context);
+  } else if (audience.tier === "registered") {
+    // Level 2 — personal assistant inside the cabinet.
+    system = await buildRegisteredSystemPrompt(audience.context);
+  } else {
+    // Level 1 — public consultant of the center, strictly on topic.
+    system = await buildGuestSystemPrompt();
+  }
 
   // Interface-language hint: the assistant already mirrors the visitor's
   // language, this sets the default for short/ambiguous messages.
@@ -69,9 +111,12 @@ export async function POST(request: Request) {
     system += "\n\n## Язык интерфейса посетителя\nПосетитель использует английскую версию сайта — по умолчанию отвечай на английском (если он пишет на другом языке, отвечай на его языке).";
   }
 
-  // One agent for visitors: both models answer, the arbiter picks the
-  // stronger reply. Degrades to single-model mode when only one key is set.
-  const result = await askAssistantTeam(system, messages, 700, "best");
+  const result = await askAssistantTeam(
+    system,
+    messages,
+    settings.maxTokens,
+    settings.provider
+  );
 
   if (result.status === "unavailable") {
     return NextResponse.json(
@@ -89,22 +134,24 @@ export async function POST(request: Request) {
   const { cleanedReply, category } = extractRedFlag(result.reply);
 
   if (category) {
-    let profileId: string | null = null;
-    let profileEmail: string | null = null;
+    let profileId: string | null = audience.profileId;
+    let profileEmail: string | null = audience.email;
 
-    try {
-      const supabase = await createSupabaseServerClient();
+    if (!profileId) {
+      try {
+        const supabase = await createSupabaseServerClient();
 
-      if (supabase) {
-        const {
-          data: { user }
-        } = await supabase.auth.getUser();
+        if (supabase) {
+          const {
+            data: { user }
+          } = await supabase.auth.getUser();
 
-        profileId = user?.id ?? null;
-        profileEmail = user?.email ?? null;
+          profileId = user?.id ?? null;
+          profileEmail = user?.email ?? null;
+        }
+      } catch {
+        profileId = null;
       }
-    } catch {
-      profileId = null;
     }
 
     try {

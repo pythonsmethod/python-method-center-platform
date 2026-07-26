@@ -68,6 +68,26 @@ export type AssistantResult =
   | { status: "unavailable" }
   | { status: "error"; message: string };
 
+// Prompt caching: the system prompt (rules + knowledge base) is the biggest
+// and most repeated part of every request. Marking it as cacheable makes
+// repeat reads roughly ten times cheaper than fresh input tokens. Short
+// prompts are sent as-is — below the provider minimum caching does nothing.
+const CACHEABLE_SYSTEM_MIN_CHARS = 4000;
+
+function buildSystemParam(system: string) {
+  if (system.length < CACHEABLE_SYSTEM_MIN_CHARS) {
+    return system;
+  }
+
+  return [
+    {
+      type: "text" as const,
+      text: system,
+      cache_control: { type: "ephemeral" as const }
+    }
+  ];
+}
+
 export async function askClaude(
   system: string,
   messages: ChatMessage[],
@@ -83,7 +103,7 @@ export async function askClaude(
     const response = await anthropic.messages.create({
       model: ASSISTANT_MODEL,
       max_tokens: maxTokens,
-      system,
+      system: buildSystemParam(system),
       messages
     });
 

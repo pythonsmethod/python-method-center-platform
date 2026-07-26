@@ -9,10 +9,20 @@ const WELCOME_STORAGE_KEY = "pm-assistant-welcome-v1";
 
 type AssistantWidgetProps = {
   locale?: Locale;
+  // "guest" — public consultant of the center; "registered" — personal
+  // assistant inside the cabinet; "client" — personal AI of a paying client.
+  tier?: "guest" | "registered" | "client";
 };
 
-export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
+export function AssistantWidget({
+  locale = "ru",
+  tier = "guest"
+}: AssistantWidgetProps) {
   const t = getDictionary(locale).widget;
+  const tierCopy = tier === "guest" ? null : t.tiers[tier];
+  const header = tierCopy?.header ?? t.header;
+  const intro = tierCopy?.intro ?? t.intro;
+  const suggestions = tierCopy?.suggestions ?? t.suggestions;
   const [open, setOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -20,6 +30,11 @@ export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
   // First-visit greeting: the visitor chooses between exploring the site
   // on their own or being guided by the assistant. Shown once per browser.
   useEffect(() => {
+    // The first-visit greeting belongs to the public consultant only.
+    if (tier !== "guest") {
+      return;
+    }
+
     try {
       if (window.localStorage.getItem(WELCOME_STORAGE_KEY)) {
         return;
@@ -35,7 +50,7 @@ export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
         clearTimeout(welcomeTimer.current);
       }
     };
-  }, []);
+  }, [tier]);
 
   function dismissWelcome(openChat: boolean) {
     try {
@@ -55,7 +70,7 @@ export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
     <div className="assistant-widget">
       {showWelcome && !open ? (
         <div
-          aria-label={t.header}
+          aria-label={header}
           className="assistant-widget__welcome"
           role="dialog"
         >
@@ -90,9 +105,9 @@ export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
       ) : null}
 
       {open ? (
-        <div className="assistant-widget__panel" role="dialog" aria-label={t.header}>
+        <div className="assistant-widget__panel" role="dialog" aria-label={header}>
           <div className="assistant-widget__header">
-            <span>{t.header}</span>
+            <span>{header}</span>
             <button
               aria-label={t.toggleClose}
               onClick={() => setOpen(false)}
@@ -103,9 +118,9 @@ export function AssistantWidget({ locale = "ru" }: AssistantWidgetProps) {
           </div>
           <AssistantChat
             endpoint="/api/assistant/client"
-            intro={t.intro}
+            intro={intro}
             locale={locale}
-            suggestions={t.suggestions}
+            suggestions={suggestions}
           />
         </div>
       ) : null}

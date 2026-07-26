@@ -96,6 +96,30 @@ const ru = {
       "С чего мне начать?",
       "Какие документы нужно загрузить?"
     ],
+    // Level 2 and 3 of the assistant: the same window, but a different
+    // helper — personal after sign-up, case-aware after payment.
+    tiers: {
+      registered: {
+        header: "☥ Ваш личный помощник",
+        intro:
+          "Здравствуйте! Я ваш личный помощник в кабинете. Вижу, на каком шаге вы сейчас, подскажу, чего не хватает и что будет дальше. Медицинские вопросы — к Professor Python, он отвечает лично.",
+        suggestions: [
+          "Что мне сделать дальше?",
+          "На каком этапе мой кейс?",
+          "Какие документы ещё нужны?"
+        ]
+      },
+      client: {
+        header: "☥ Ваш персональный ИИ",
+        intro:
+          "Здравствуйте! Я ваш персональный ИИ и веду ваш кейс: помню вашу историю, ваши документы и сроки сопровождения. Помогу разобраться в материалах и подготовить вопрос — решения по состоянию принимает Professor Python лично.",
+        suggestions: [
+          "Что сейчас происходит с моим кейсом?",
+          "Помоги сформулировать вопрос для Professor Python",
+          "Сколько ещё длится моё сопровождение?"
+        ]
+      }
+    },
     welcomeTitle:
       "☥ Привет! Добро пожаловать на платформу Python Method — «Реабилитация без границ».",
     welcomeText:
@@ -313,6 +337,28 @@ const en: typeof ru = {
       "Where do I start?",
       "Which documents should I upload?"
     ],
+    tiers: {
+      registered: {
+        header: "☥ Your personal assistant",
+        intro:
+          "Hello! I am your personal assistant inside the cabinet. I can see where you are right now, what is missing and what comes next. Medical questions go to Professor Python — he answers personally.",
+        suggestions: [
+          "What should I do next?",
+          "What stage is my case at?",
+          "Which documents are still missing?"
+        ]
+      },
+      client: {
+        header: "☥ Your personal AI",
+        intro:
+          "Hello! I am your personal AI and I follow your case: your history, your documents and your support period. I can help you navigate your materials and prepare a question — decisions about your condition are made by Professor Python personally.",
+        suggestions: [
+          "What is happening with my case now?",
+          "Help me formulate a question for Professor Python",
+          "How long does my support period still run?"
+        ]
+      }
+    },
     welcomeTitle:
       "☥ Hello! Welcome to the Python Method platform — “Rehabilitation Without Borders”.",
     welcomeText:

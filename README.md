@@ -21,7 +21,18 @@ which is preserved separately.
   messenger-style case chat (text + voice messages, unread counters,
   day separators, 3s polling)
 - AI runtime (Claude + OpenAI with a strongest-answer arbiter):
-  - public client assistant widget on all public pages (bilingual)
+  - three levels of the client assistant on one endpoint, resolved on the
+    server from the visitor's session (`lib/assistant/tiers.ts`):
+    1. guest — public consultant of the center, strictly on topic (the
+       center, the method, registration, tariffs, the first step), one
+       model, short answers;
+    2. registered — personal assistant inside the cabinet, aware of the
+       person's own case status, documents and next step, one model;
+    3. client (paid) — personal AI of the case: documents by filename,
+       support period, lifecycle history; both models plus the arbiter
+  - the chat window title, greeting and suggestions follow the same three
+    levels; system prompts are cached (`cache_control`) so repeat reads of
+    the rules and knowledge base cost a fraction of fresh input tokens
   - staff assistant in `/admin` with optional per-case context
   - knowledge base editable by staff, injected into both system prompts
 - Automated red-flag workflow: the client assistant tags emergencies with a
