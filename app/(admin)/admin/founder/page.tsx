@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { TestNotificationButton } from "@/components/founder/TestNotificationButton";
 import { PageHeader } from "@/components/PageHeader";
 import { getFounderState } from "@/lib/auth/require-founder";
 import { formatMoney, formatMoscowless } from "@/lib/founder/labels";
@@ -178,6 +179,7 @@ export default async function FounderPage() {
               «Не настроено» означает, что Telegram-бот ещё не подключён —
               событие записано в базу, но в телефон не ушло.
             </p>
+            <TestNotificationButton />
           </div>
 
           <div className="panel">
