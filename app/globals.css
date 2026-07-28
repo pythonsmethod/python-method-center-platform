@@ -2144,3 +2144,48 @@ code {
   color: var(--accent);
   font-weight: 700;
 }
+
+/* Telegram setup helpers in the founder cabinet: find the chat id and
+   prove that alerts really arrive. */
+.telegram-setup {
+  display: grid;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.telegram-setup__chats {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.telegram-setup__chats li {
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 12px;
+  padding: 10px 12px;
+}
+
+.telegram-setup__chats code {
+  color: var(--accent-strong);
+  font-size: 15px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.telegram-setup__chats span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.telegram-setup__copy {
+  font-size: 12px;
+  margin-left: auto;
+  padding: 6px 12px;
+}

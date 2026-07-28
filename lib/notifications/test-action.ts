@@ -5,6 +5,138 @@ import { getFounderState } from "@/lib/auth/require-founder";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { isTelegramConfigured } from "@/lib/notifications/telegram";
 
+export type TelegramChat = {
+  id: string;
+  title: string;
+};
+
+export type TelegramChatsState = {
+  status: "idle" | "success" | "error";
+  message: string;
+  chats: TelegramChat[];
+};
+
+export const initialTelegramChatsState: TelegramChatsState = {
+  status: "idle",
+  message: "",
+  chats: []
+};
+
+type TelegramChatPayload = {
+  id?: number;
+  title?: string;
+  type?: string;
+  first_name?: string;
+  username?: string;
+};
+
+function describeChat(chat: TelegramChatPayload): TelegramChat | null {
+  if (typeof chat.id !== "number") {
+    return null;
+  }
+
+  const name =
+    chat.title ??
+    chat.first_name ??
+    (chat.username ? `@${chat.username}` : null) ??
+    "без названия";
+
+  const kind =
+    chat.type === "private"
+      ? "личная переписка"
+      : chat.type === "channel"
+        ? "канал"
+        : "группа";
+
+  return { id: String(chat.id), title: `${name} · ${kind}` };
+}
+
+// Finds the chat id for TELEGRAM_CHAT_ID without the owner having to build
+// an api.telegram.org URL by hand on a phone — the step where every setup
+// gets stuck. Needs only TELEGRAM_BOT_TOKEN to be set.
+export async function discoverTelegramChats(): Promise<TelegramChatsState> {
+  const auth = await getFounderState();
+
+  if (auth.status !== "authorized") {
+    return { status: "error", message: "Недостаточно прав.", chats: [] };
+  }
+
+  const token = process.env.TELEGRAM_BOT_TOKEN?.trim();
+
+  if (!token) {
+    return {
+      status: "error",
+      message:
+        "Сначала добавьте в Vercel переменную TELEGRAM_BOT_TOKEN (токен от BotFather) и нажмите Redeploy. Номер чата после этого найдётся сам.",
+      chats: []
+    };
+  }
+
+  try {
+    const response = await fetch(
+      `https://api.telegram.org/bot${token}/getUpdates`,
+      { cache: "no-store", signal: AbortSignal.timeout(8000) }
+    );
+    const payload = (await response.json()) as {
+      ok?: boolean;
+      error_code?: number;
+      description?: string;
+      result?: Array<Record<string, { chat?: TelegramChatPayload }>>;
+    };
+
+    if (!payload.ok) {
+      if (payload.error_code === 401) {
+        return {
+          status: "error",
+          message:
+            "Telegram не принял токен. Возьмите его заново: @BotFather → /mybots → ваш бот → API Token, вставьте в Vercel в TELEGRAM_BOT_TOKEN и нажмите Redeploy.",
+          chats: []
+        };
+      }
+
+      return {
+        status: "error",
+        message: `Telegram ответил: ${payload.description ?? "неизвестная ошибка"}.`,
+        chats: []
+      };
+    }
+
+    const found = new Map<string, TelegramChat>();
+
+    for (const update of payload.result ?? []) {
+      for (const value of Object.values(update)) {
+        const chat = value?.chat ? describeChat(value.chat) : null;
+
+        if (chat) {
+          found.set(chat.id, chat);
+        }
+      }
+    }
+
+    if (found.size === 0) {
+      return {
+        status: "error",
+        message:
+          "Токен верный, но чатов пока не видно. Добавьте бота в вашу группу и напишите в ней любое сообщение — потом нажмите кнопку ещё раз.",
+        chats: []
+      };
+    }
+
+    return {
+      status: "success",
+      message:
+        "Нашлись такие чаты. Возьмите номер нужной группы (он с минусом), вставьте его в Vercel в переменную TELEGRAM_CHAT_ID и нажмите Redeploy.",
+      chats: [...found.values()]
+    };
+  } catch {
+    return {
+      status: "error",
+      message: "Не удалось связаться с Telegram. Попробуйте ещё раз через минуту.",
+      chats: []
+    };
+  }
+}
+
 export type TestNotificationState = {
   status: "idle" | "success" | "error";
   message: string;
