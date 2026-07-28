@@ -33,6 +33,11 @@ which is preserved separately.
   - the chat window title, greeting and suggestions follow the same three
     levels; system prompts are cached (`cache_control`) so repeat reads of
     the rules and knowledge base cost a fraction of fresh input tokens
+  - abuse protection for the public level (`lib/assistant/guard.ts`):
+    shared daily caps per visitor and platform-wide, a Telegram alert when
+    the free level is spent, a founder-cabinet counter, and the
+    `PUBLIC_ASSISTANT_MODE` switch (`open` / `registered_only` / `off`) —
+    see `docs/safety/ЗАЩИТА_ПОМОЩНИКА_ОТ_НАПЛЫВА.md`
   - staff assistant in `/admin` with optional per-case context
   - knowledge base editable by staff, injected into both system prompts
 - Automated red-flag workflow: the client assistant tags emergencies with a
@@ -101,6 +106,10 @@ Copy `.env.example` to `.env.local`. Key groups:
 - Stripe: `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W/_15W` (buttons),
   `STRIPE_SECRET_KEY` + `STRIPE_WEBHOOK_SECRET` (webhook)
 - AI: `ANTHROPIC_API_KEY`, `OPENAI_API_KEY`
+- AI abuse protection (all optional, safe defaults): `PUBLIC_ASSISTANT_MODE`
+  (`open` | `registered_only` | `off`), `ASSISTANT_DAILY_LIMIT_GUEST` /
+  `_REGISTERED` / `_CLIENT`, `ASSISTANT_DAILY_TOTAL_GUEST`,
+  `ASSISTANT_USAGE_SALT`
 - Notifications: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
 - `NEXT_PUBLIC_SITE_URL` — absolute origin for links in notifications and
   auth redirects

@@ -6,6 +6,7 @@ import {
   buildPaidClientSystemPrompt,
   buildRegisteredSystemPrompt
 } from "@/lib/assistant/prompts";
+import { guardAssistantRequest } from "@/lib/assistant/guard";
 import { extractRedFlag, recordRedFlagEvent } from "@/lib/assistant/red-flags";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
@@ -90,6 +91,20 @@ export async function POST(request: Request) {
       { error: "Слишком много сообщений подряд. Подождите минуту." },
       { status: 429 }
     );
+  }
+
+  // Daily caps and the emergency switch. Unlike the per-minute limiter above
+  // these are shared across serverless instances, so they hold during a raid.
+  const guard = await guardAssistantRequest({
+    tier: audience.tier,
+    profileId: audience.profileId,
+    ip
+  });
+
+  if (!guard.allowed) {
+    // Delivered as a reply, not as an error: the person should read a warm
+    // invitation, not a red technical banner.
+    return NextResponse.json({ reply: guard.message }, { status: 200 });
   }
 
   let system: string;

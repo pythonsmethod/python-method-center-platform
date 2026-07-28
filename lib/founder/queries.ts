@@ -1,3 +1,7 @@
+import {
+  getGuestDailyTotalLimit,
+  getPublicAssistantMode
+} from "@/lib/assistant/guard";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import {
   isFreeReviewActive,
@@ -270,6 +274,38 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       .order("created_at", { ascending: false })
       .limit(TIMELINE_PER_SOURCE)
   ]);
+
+  // How much of the free assistant level has been spent today: the founder
+  // sees a raid as it happens, not on the invoice.
+  const today = new Date().toISOString().slice(0, 10);
+  const { data: usageRows } = await supabase
+    .from("assistant_usage")
+    .select("bucket_key, message_count")
+    .eq("window_date", today);
+
+  const guestMessagesToday =
+    (usageRows ?? []).find((row) => row.bucket_key === "total:guest")
+      ?.message_count ?? 0;
+  const visitorsToday = (usageRows ?? []).filter((row) =>
+    row.bucket_key.startsWith("v:")
+  ).length;
+  const guestLimit = getGuestDailyTotalLimit();
+  const assistantMode = getPublicAssistantMode();
+
+  systems.push({
+    name: "Гостевой ИИ на сайте (сегодня)",
+    ok: assistantMode === "open" && guestMessagesToday < guestLimit,
+    detail:
+      assistantMode === "off"
+        ? "Помощник выключен для всех (PUBLIC_ASSISTANT_MODE=off)"
+        : assistantMode === "registered_only"
+          ? "Гостям закрыт: помощник отвечает только зарегистрированным"
+          : `${guestMessagesToday} из ${guestLimit} бесплатных сообщений, посетителей: ${visitorsToday}${
+              guestMessagesToday >= guestLimit
+                ? " — дневной потолок исчерпан, гостям предлагается регистрация"
+                : ""
+            }`
+  });
 
   const paidPayments = paymentsAll.data ?? [];
   const revenueTotalCents = paidPayments.reduce(
