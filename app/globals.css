@@ -2189,3 +2189,17 @@ code {
   margin-left: auto;
   padding: 6px 12px;
 }
+
+/* A locked pay button explains itself right where it is: on a phone the
+   consent checkbox is a screen away, and a button that simply does
+   nothing reads as a broken site. */
+.plan-locked {
+  display: grid;
+  gap: 8px;
+}
+
+.plan-locked__note {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+}

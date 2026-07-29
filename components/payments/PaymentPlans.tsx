@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState, type ReactNode } from "react";
+import { useRef, useState, type ReactNode } from "react";
 import type { PaymentPlan } from "@/lib/payments/config";
 import { recordPaymentOfferAcceptance } from "@/lib/payments/actions";
 
@@ -25,6 +25,16 @@ export function PaymentPlans({
 }) {
   const [accepted, setAccepted] = useState(false);
   const [showHint, setShowHint] = useState(false);
+  const gateRef = useRef<HTMLDivElement | null>(null);
+
+  // The consent checkbox sits above the plans, so on a phone a locked
+  // button and the reason it is locked are on different screens. Clicking
+  // a locked button brings the visitor back to the checkbox instead of
+  // doing nothing.
+  function pointAtConsent() {
+    setShowHint(true);
+    gateRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }
 
   return (
     <>
@@ -32,6 +42,7 @@ export function PaymentPlans({
         className={`offer-gate${
           showHint && !accepted ? " offer-gate--alert" : ""
         }`}
+        ref={gateRef}
       >
         <label className="offer-gate__label">
           <input
@@ -81,14 +92,17 @@ export function PaymentPlans({
                     {labels.payButton}
                   </a>
                 ) : (
-                  <button
-                    aria-disabled="true"
-                    className="button button--locked"
-                    onClick={() => setShowHint(true)}
-                    type="button"
-                  >
-                    {labels.payButton}
-                  </button>
+                  <div className="plan-locked">
+                    <button
+                      aria-disabled="true"
+                      className="button button--locked"
+                      onClick={pointAtConsent}
+                      type="button"
+                    >
+                      {labels.payButton}
+                    </button>
+                    <span className="plan-locked__note">🔒 {labels.offerHint}</span>
+                  </div>
                 )
               ) : (
                 <span className="status-badge">{labels.unavailable}</span>
