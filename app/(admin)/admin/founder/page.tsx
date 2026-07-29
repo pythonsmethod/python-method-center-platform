@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ErrorIsland } from "@/components/ErrorIsland";
 import { TelegramSetupPanel } from "@/components/founder/TelegramSetupPanel";
 import { PageHeader } from "@/components/PageHeader";
 import { getFounderState } from "@/lib/auth/require-founder";
@@ -179,7 +180,9 @@ export default async function FounderPage() {
               «Не настроено» означает, что Telegram-бот ещё не подключён —
               событие записано в базу, но в телефон не ушло.
             </p>
-            <TelegramSetupPanel />
+            <ErrorIsland title="Проверка Telegram">
+              <TelegramSetupPanel />
+            </ErrorIsland>
           </div>
 
           <div className="panel">
