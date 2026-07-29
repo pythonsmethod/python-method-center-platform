@@ -56,8 +56,9 @@ export function getTestAccessPlan(locale: Locale = "ru"): PaymentPlan | null {
 
 export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
   const t = getDictionary(locale).payment;
+  const testPlan = getTestAccessPlan(locale);
 
-  return [
+  const plans: PaymentPlan[] = [
     {
       product: "support_5_weeks",
       title: t.plan5Title,
@@ -77,4 +78,14 @@ export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
       )
     }
   ];
+
+  // The test tariff stands among the real ones on purpose: testers should
+  // choose a plan exactly as a client does. It disappears the moment its
+  // Payment Link is removed from the environment — that is how it is
+  // switched off before the public launch.
+  if (testPlan) {
+    plans.push(testPlan);
+  }
+
+  return plans;
 }
