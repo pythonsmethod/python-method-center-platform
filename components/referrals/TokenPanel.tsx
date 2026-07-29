@@ -1,7 +1,8 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { initialRedeemState, redeemTokens } from "@/lib/tokens/actions";
+import { redeemTokens } from "@/lib/tokens/actions";
+import { initialRedeemState } from "@/lib/tokens/redeem-state";
 import { MIN_REDEEM_TOKENS, tokensToUsd } from "@/lib/tokens/config";
 import { pluralTokens } from "@/lib/tokens/config";
 import { reasonLabels, type TokenTransaction } from "@/lib/tokens/queries";

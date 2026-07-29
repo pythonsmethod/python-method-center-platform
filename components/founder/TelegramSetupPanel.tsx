@@ -3,12 +3,14 @@
 import { useActionState, useState } from "react";
 import {
   discoverTelegramChats,
+  sendTestNotification
+} from "@/lib/notifications/test-action";
+import {
   initialTelegramChatsState,
   initialTestNotificationState,
-  sendTestNotification,
   type TelegramChatsState,
   type TestNotificationState
-} from "@/lib/notifications/test-action";
+} from "@/lib/notifications/telegram-setup-state";
 
 async function runTest(): Promise<TestNotificationState> {
   return sendTestNotification();
@@ -83,7 +85,7 @@ export function TelegramSetupPanel() {
         </p>
       ) : null}
 
-      {chatsState.chats.length > 0 ? (
+      {chatsState.chats?.length ? (
         <ul className="telegram-setup__chats">
           {chatsState.chats.map((chat) => (
             <li key={chat.id}>

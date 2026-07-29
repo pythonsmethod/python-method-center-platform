@@ -12,15 +12,8 @@ import {
   TOKEN_REASONS,
   writeTokenTransaction
 } from "@/lib/tokens/queries";
+import type { RedeemState } from "@/lib/tokens/redeem-state";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-export type RedeemState = {
-  status: "idle" | "error" | "success";
-  message: string;
-  code?: string;
-};
-
-export const initialRedeemState: RedeemState = { status: "idle", message: "" };
 
 function errorState(message: string): RedeemState {
   return { status: "error", message };

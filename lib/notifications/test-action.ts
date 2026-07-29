@@ -4,23 +4,11 @@ import { revalidatePath } from "next/cache";
 import { getFounderState } from "@/lib/auth/require-founder";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { isTelegramConfigured } from "@/lib/notifications/telegram";
-
-export type TelegramChat = {
-  id: string;
-  title: string;
-};
-
-export type TelegramChatsState = {
-  status: "idle" | "success" | "error";
-  message: string;
-  chats: TelegramChat[];
-};
-
-export const initialTelegramChatsState: TelegramChatsState = {
-  status: "idle",
-  message: "",
-  chats: []
-};
+import type {
+  TelegramChat,
+  TelegramChatsState,
+  TestNotificationState
+} from "@/lib/notifications/telegram-setup-state";
 
 type TelegramChatPayload = {
   id?: number;
@@ -136,16 +124,6 @@ export async function discoverTelegramChats(): Promise<TelegramChatsState> {
     };
   }
 }
-
-export type TestNotificationState = {
-  status: "idle" | "success" | "error";
-  message: string;
-};
-
-export const initialTestNotificationState: TestNotificationState = {
-  status: "idle",
-  message: ""
-};
 
 // One-click proof that the Telegram channel really works, end to end:
 // the same code path a red flag uses, including the delivery log. Without
