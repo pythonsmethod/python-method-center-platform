@@ -2268,16 +2268,14 @@ code {
   font-style: normal;
 }
 
+/* The way back must be as visible as the way in: a muted line of text is
+   invisible to someone who is anxious and scanning the screen. */
 .back-link {
-  font-size: 14px;
-  margin: -8px 0 0;
+  display: flex;
+  margin: 4px 0 0;
 }
 
-.back-link a {
-  color: var(--muted);
-  text-decoration: none;
-}
-
-.back-link a:hover {
-  color: var(--accent-strong);
+.back-link--bottom {
+  justify-content: center;
+  margin-top: 8px;
 }

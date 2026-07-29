@@ -46,9 +46,11 @@ export default async function TokensPage() {
         description="Здесь всё о токенах: как они появляются, сколько их у вас и как превратить их в скидку. Достаточно прочитать один раз."
       />
 
-      <p className="back-link">
-        <Link href="/cabinet">← Вернуться в кабинет</Link>
-      </p>
+      <div className="back-link">
+        <Link className="button button--secondary" href="/cabinet">
+          ← Вернуться в кабинет
+        </Link>
+      </div>
 
       <section className="panel-grid" aria-label="Как это работает">
         <div className="panel">
@@ -112,6 +114,12 @@ export default async function TokensPage() {
           </div>
         </div>
       </section>
+
+      <div className="back-link back-link--bottom">
+        <Link className="button" href="/cabinet">
+          ← Вернуться в кабинет
+        </Link>
+      </div>
     </div>
   );
 }
