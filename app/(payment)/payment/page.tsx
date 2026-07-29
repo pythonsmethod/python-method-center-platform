@@ -90,6 +90,20 @@ export default async function PaymentPage() {
           </p>
         </div>
         <div className="panel">
+          <span className="panel__label">Другие способы оплаты</span>
+          <h2>Карта не проходит?</h2>
+          <p>
+            В некоторых странах карты просто не принимаются — и дело не в вас.
+            Мы примем оплату другим способом: банковский перевод, PayPal, Wise
+            или криптовалюта.
+          </p>
+          <div className="panel-actions">
+            <Link className="button button--secondary" href="/payment/other">
+              Выбрать другой способ
+            </Link>
+          </div>
+        </div>
+        <div className="panel">
           <span className="panel__label">{t.offerLabel}</span>
           <h2>
             <Link href="/legal/offer">{t.offerTitle}</Link>
