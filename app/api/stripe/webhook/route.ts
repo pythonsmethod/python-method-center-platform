@@ -234,6 +234,25 @@ async function handlePaidSession(
       return;
     }
 
+    // Money left the client's card and the platform could not record it.
+    // Silence here is the worst outcome: the client sees an empty cabinet
+    // and no one knows. Tell the team the exact reason, then fail so
+    // Stripe retries the delivery.
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `payment-insert-failed:${eventId}`,
+      title: "ОШИБКА: ОПЛАТА ПОЛУЧЕНА, НО НЕ ЗАПИСАНА",
+      lines: [
+        `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
+        customerEmail ? `Плательщик: ${customerEmail}` : null,
+        `Тариф: ${paymentProductLabel(product)}`,
+        `Ошибка базы: ${paymentError.message}`,
+        `Референс: ${reference}`,
+        "Клиент оплатил, но доступ не открылся — нужна ручная запись оплаты."
+      ],
+      link: adminLink("/admin/cases")
+    });
+
     throw new Error(`payment insert failed: ${paymentError.message}`);
   }
 
