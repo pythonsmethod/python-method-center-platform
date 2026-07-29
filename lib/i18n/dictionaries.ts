@@ -85,6 +85,25 @@ const ru = {
     ctaFree: "Получить бесплатный разбор",
     note: "Разбор является экспертным мнением и не заменяет консультацию врача."
   },
+  paymentTest: {
+    eyebrow: "Тестовый доступ",
+    title: "Пробная оплата — 3 $",
+    description:
+      "Эта страница только для приглашённых тестировщиков. Оплата в 3 $ открывает тот же путь, что и настоящий тариф: оплата, кабинет, персональный ИИ по вашему случаю. Это не тариф сопровождения и не разбор от Professor Python.",
+    planTitle: "Тестовый доступ на 14 дней",
+    planDesc:
+      "Полный доступ к платной части платформы для проверки: кабинет, загрузка документов, чат с командой и персональный ИИ. Сопровождение Professor Python в эту оплату не входит.",
+    planPrice: "Пробная оплата — 3 $",
+    howLabel: "Что проверить",
+    howTitle: "О чём нам написать",
+    howText:
+      "Пройдите путь как обычный человек: регистрация, анкета, загрузка документа, оплата, кабинет, общение с ИИ. Напишите нам, что было непонятно, что не открылось и где вы растерялись — именно это нам и нужно.",
+    noticeLabel: "Честно о деньгах",
+    noticeTitle: "3 $ — это проверка оплаты, а не услуга",
+    noticeText:
+      "Сумма нужна только для того, чтобы проверить приём платежей в вашей стране. Никаких обязательств у вас не возникает, доступ закроется через 14 дней. Если оплата не пройдёт — напишите нам, это тоже ценный результат теста.",
+    unavailable: "Тестовая оплата сейчас отключена"
+  },
   widget: {
     toggleOpen: "☥ Спросить",
     toggleClose: "✕",
@@ -325,6 +344,25 @@ const en: typeof ru = {
     cta: "Get the review",
     ctaFree: "Get the free review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
+  },
+  paymentTest: {
+    eyebrow: "Test access",
+    title: "Test payment — $3",
+    description:
+      "This page is for invited testers only. A $3 payment opens the same path as a real plan: checkout, the cabinet, the personal AI for your case. It is not a support plan and not a review by Professor Python.",
+    planTitle: "Test access for 14 days",
+    planDesc:
+      "Full access to the paid part of the platform for testing: the cabinet, document upload, the chat with the team and the personal AI. Support by Professor Python is not included.",
+    planPrice: "Test payment — $3",
+    howLabel: "What to check",
+    howTitle: "What to tell us",
+    howText:
+      "Walk the path as an ordinary person would: sign-up, questionnaire, document upload, payment, cabinet, talking to the AI. Tell us what was unclear, what did not open and where you got lost — that is exactly what we need.",
+    noticeLabel: "Honest about the money",
+    noticeTitle: "$3 is a payment check, not a service",
+    noticeText:
+      "The amount exists only to verify that payments work in your country. It creates no obligations for you, and access closes after 14 days. If the payment fails — tell us, that is a valuable test result too.",
+    unavailable: "Test payment is currently switched off"
   },
   widget: {
     toggleOpen: "☥ Ask me",

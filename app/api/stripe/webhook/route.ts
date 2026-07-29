@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
+import { paymentProductLabel } from "@/lib/i18n/status-labels";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import {
   getStripe,
@@ -276,7 +277,7 @@ async function handlePaidSession(
     dedupeKey: `payment_recorded:${payment.id}`,
     title: "💰 Оплата получена и записана автоматически",
     lines: [
-      `Тариф: ${product === "support_5_weeks" ? "Сопровождение — 5 недель" : "Сопровождение — 100 дней"}`,
+      `Тариф: ${paymentProductLabel(product)}`,
       `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
       customerEmail ? `Клиент: ${customerEmail}` : null,
       caseRow?.id

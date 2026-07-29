@@ -2,6 +2,8 @@ import Stripe from "stripe";
 import {
   PLAN_100D_TOTAL_USD,
   PLAN_5W_TOTAL_USD,
+  TEST_ACCESS_DAYS,
+  TEST_ACCESS_TOTAL_USD,
   type PaymentPlan
 } from "@/lib/payments/config";
 
@@ -11,7 +13,8 @@ export type PaymentProduct = PaymentPlan["product"];
 // enum id of the 100-day plan — the storefront label changed, the id didn't).
 export const PLAN_DURATION_DAYS: Record<PaymentProduct, number> = {
   support_5_weeks: 35,
-  support_15_weeks: 100
+  support_15_weeks: 100,
+  test_access: TEST_ACCESS_DAYS
 };
 
 export function getStripe(): Stripe | null {
@@ -41,6 +44,10 @@ export function productFromAmount(
 
   if (amountCents === PLAN_100D_TOTAL_USD * 100) {
     return "support_15_weeks";
+  }
+
+  if (amountCents === TEST_ACCESS_TOTAL_USD * 100) {
+    return "test_access";
   }
 
   return null;
