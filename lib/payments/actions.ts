@@ -3,7 +3,11 @@
 import { OFFER_VERSION } from "@/lib/legal/offer";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-const KNOWN_PRODUCTS = new Set(["support_5_weeks", "support_15_weeks"]);
+const KNOWN_PRODUCTS = new Set([
+  "support_5_weeks",
+  "support_15_weeks",
+  "test_access"
+]);
 
 // Records offer acceptance from the payment page for signed-in clients.
 // Guests can still pay (Stripe checkout references the offer), so this

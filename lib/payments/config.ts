@@ -1,5 +1,6 @@
 import type { Locale } from "@/lib/i18n/locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getPaypalLink } from "@/lib/payments/paypal";
 
 // Pricing set by the founder (23.07.2026): 5 weeks $1,200 (+5% service fee
 // + $180 formula delivery — Karen sends his formula as a gift with the
@@ -21,6 +22,9 @@ export type PaymentPlan = {
   description: string;
   priceLine: string;
   paymentLinkUrl: string | null;
+  // Second way to pay for the same plan. Confirmed by a human, so it is
+  // offered as an alternative, never as the main button.
+  paypalUrl?: string | null;
 };
 
 function readPaymentLink(value: string | undefined): string | null {
@@ -50,7 +54,8 @@ export function getTestAccessPlan(locale: Locale = "ru"): PaymentPlan | null {
     title: t.planTitle,
     description: t.planDesc,
     priceLine: t.planPrice,
-    paymentLinkUrl
+    paymentLinkUrl,
+    paypalUrl: getPaypalLink("test_access")
   };
 }
 
@@ -66,7 +71,8 @@ export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
       priceLine: t.plan5Price,
       paymentLinkUrl: readPaymentLink(
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W
-      )
+      ),
+      paypalUrl: getPaypalLink("support_5_weeks")
     },
     {
       product: "support_15_weeks",
@@ -75,7 +81,8 @@ export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
       priceLine: t.plan100Price,
       paymentLinkUrl: readPaymentLink(
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W
-      )
+      ),
+      paypalUrl: getPaypalLink("support_15_weeks")
     }
   ];
 

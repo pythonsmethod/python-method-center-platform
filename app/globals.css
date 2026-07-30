@@ -2296,3 +2296,29 @@ code {
   white-space: pre-wrap;
   word-break: break-word;
 }
+
+/* PayPal stands next to the card button, visibly secondary: it is a real
+   way to pay, but it is confirmed by a human. */
+.plan-paypal {
+  display: grid;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.button--paypal {
+  background: #0070ba;
+  border-color: #0070ba;
+  color: #ffffff;
+}
+
+.button--paypal:hover,
+.button--paypal:focus-visible {
+  background: #005a94;
+  border-color: #005a94;
+}
+
+.plan-paypal__note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.45;
+}

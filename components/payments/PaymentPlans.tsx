@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRef, useState, type ReactNode } from "react";
 import type { PaymentPlan } from "@/lib/payments/config";
 import { recordPaymentOfferAcceptance } from "@/lib/payments/actions";
+import { announcePaypalIntent } from "@/lib/payments/paypal-intent";
 
 type PaymentPlanLabels = {
   planLabel: string;
@@ -108,6 +109,38 @@ export function PaymentPlans({
                 <span className="status-badge">{labels.unavailable}</span>
               )}
             </div>
+
+            {plan.paypalUrl ? (
+              <div className="plan-paypal">
+                {accepted ? (
+                  <a
+                    className="button button--paypal"
+                    href={plan.paypalUrl}
+                    onClick={() => {
+                      void recordPaymentOfferAcceptance(plan.product);
+                      void announcePaypalIntent(plan.product);
+                    }}
+                    rel="noreferrer"
+                    target="_blank"
+                  >
+                    Оплатить через PayPal
+                  </a>
+                ) : (
+                  <button
+                    aria-disabled="true"
+                    className="button button--paypal button--locked"
+                    onClick={pointAtConsent}
+                    type="button"
+                  >
+                    Оплатить через PayPal
+                  </button>
+                )}
+                <span className="plan-paypal__note">
+                  Оплата через PayPal подтверждается человеком — доступ
+                  открывается после проверки, обычно в тот же рабочий день.
+                </span>
+              </div>
+            ) : null}
           </div>
         ))}
       </section>
