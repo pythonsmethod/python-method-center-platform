@@ -6,6 +6,7 @@ import type { Locale } from "@/lib/i18n/locale";
 const ru = {
   nav: {
     "/": "Главная",
+    "/shop": "Магазин",
     "/login": "Вход",
     "/cabinet": "Кабинет",
     "/payment": "Оплата",
@@ -268,6 +269,7 @@ const ru = {
 const en: typeof ru = {
   nav: {
     "/": "Home",
+    "/shop": "Shop",
     "/login": "Sign in",
     "/cabinet": "My account",
     "/payment": "Payment",
