@@ -2322,3 +2322,50 @@ code {
   font-size: 12px;
   line-height: 1.45;
 }
+
+/* Attachments in the team assistant: the chosen files stay visible until
+   they are sent, so nothing is attached by accident. */
+.assistant-chat__file-input {
+  display: none;
+}
+
+.assistant-chat__files {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 8px 0 0;
+  padding: 0;
+}
+
+.assistant-chat__files li {
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: inline-flex;
+  font-size: 12px;
+  gap: 8px;
+  max-width: 100%;
+  padding: 6px 10px 6px 12px;
+}
+
+.assistant-chat__files span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.assistant-chat__files button {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 13px;
+  line-height: 1;
+  padding: 0;
+}
+
+.assistant-chat__files button:hover {
+  color: var(--accent-strong);
+}

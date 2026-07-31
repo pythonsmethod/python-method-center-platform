@@ -1,4 +1,10 @@
 import Anthropic from "@anthropic-ai/sdk";
+import {
+  isImageType,
+  isTextType,
+  PDF_TYPE,
+  type ChatAttachment
+} from "@/lib/assistant/attachments";
 
 export const ASSISTANT_MODEL = "claude-opus-4-8";
 
@@ -88,10 +94,77 @@ function buildSystemParam(system: string) {
   ];
 }
 
+// Turns the last user message into content blocks so the attached photos,
+// PDFs and notes travel with the question they belong to.
+function withAttachments(
+  messages: ChatMessage[],
+  attachments: ChatAttachment[]
+): Anthropic.MessageParam[] {
+  const params: Anthropic.MessageParam[] = messages.map((message) => ({
+    role: message.role,
+    content: message.content
+  }));
+
+  const lastIndex = params.length - 1;
+  const last = params[lastIndex];
+
+  if (!last || last.role !== "user") {
+    return params;
+  }
+
+  const blocks: Anthropic.ContentBlockParam[] = [];
+
+  for (const file of attachments) {
+    if (isImageType(file.mediaType)) {
+      blocks.push({
+        type: "image",
+        source: {
+          type: "base64",
+          media_type: file.mediaType as "image/jpeg" | "image/png" | "image/webp" | "image/gif",
+          data: file.data
+        }
+      });
+      continue;
+    }
+
+    if (file.mediaType === PDF_TYPE) {
+      blocks.push({
+        type: "document",
+        title: file.name,
+        source: {
+          type: "base64",
+          media_type: "application/pdf",
+          data: file.data
+        }
+      });
+      continue;
+    }
+
+    if (isTextType(file.mediaType)) {
+      // Plain text goes in as text: it needs no document wrapper and stays
+      // readable in the transcript.
+      const decoded = Buffer.from(file.data, "base64")
+        .toString("utf8")
+        .slice(0, 100_000);
+
+      blocks.push({
+        type: "text",
+        text: `Содержимое приложенного файла «${file.name}»:\n${decoded}`
+      });
+    }
+  }
+
+  blocks.push({ type: "text", text: String(last.content) });
+  params[lastIndex] = { role: "user", content: blocks };
+
+  return params;
+}
+
 export async function askClaude(
   system: string,
   messages: ChatMessage[],
-  maxTokens: number
+  maxTokens: number,
+  attachments?: ChatAttachment[]
 ): Promise<AssistantResult> {
   const anthropic = getClient();
 
@@ -104,7 +177,10 @@ export async function askClaude(
       model: ASSISTANT_MODEL,
       max_tokens: maxTokens,
       system: buildSystemParam(system),
-      messages
+      messages:
+        attachments && attachments.length > 0
+          ? withAttachments(messages, attachments)
+          : messages
     });
 
     if (response.stop_reason === "refusal") {

@@ -38,7 +38,9 @@ which is preserved separately.
     the free level is spent, a founder-cabinet counter, and the
     `PUBLIC_ASSISTANT_MODE` switch (`open` / `registered_only` / `off`) —
     see `docs/safety/ЗАЩИТА_ПОМОЩНИКА_ОТ_НАПЛЫВА.md`
-  - staff assistant in `/admin` with optional per-case context
+  - staff assistant in `/admin` with optional per-case context, and file
+    attachments (photos, PDFs, text — up to 3 files, 2.5 MB each) that go
+    straight to Claude and are never stored anywhere
   - knowledge base editable by staff, injected into both system prompts
 - Automated red-flag workflow: the client assistant tags emergencies with a
   hidden marker; the server strips it, records an `escalation_events` row

@@ -2,6 +2,11 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
+import {
+  ACCEPT_ATTRIBUTE,
+  MAX_ATTACHMENTS,
+  MAX_ATTACHMENT_BYTES
+} from "@/lib/assistant/attachments";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
 
@@ -16,9 +21,35 @@ type AssistantChatProps = {
   placeholder?: string;
   suggestions?: string[];
   providerChoice?: boolean;
+  // Team-only: photos and files for the assistant to look at. Never
+  // enabled for the public widget.
+  attachments?: boolean;
   caseId?: string;
   locale?: Locale;
 };
+
+type PendingAttachment = {
+  id: string;
+  name: string;
+  mediaType: string;
+  data: string;
+};
+
+// Reads a file into base64 without the data: prefix, the form the models
+// expect.
+function readAsBase64(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+
+    reader.onerror = () => reject(new Error("read-failed"));
+    reader.onload = () => {
+      const result = String(reader.result ?? "");
+      const comma = result.indexOf(",");
+      resolve(comma >= 0 ? result.slice(comma + 1) : result);
+    };
+    reader.readAsDataURL(file);
+  });
+}
 
 type Provider = "best" | "claude" | "gpt" | "both";
 
@@ -28,6 +59,7 @@ export function AssistantChat({
   placeholder,
   suggestions = [],
   providerChoice = false,
+  attachments: allowAttachments = false,
   caseId,
   locale = "ru"
 }: AssistantChatProps) {
@@ -38,7 +70,9 @@ export function AssistantChat({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [provider, setProvider] = useState<Provider>("best");
+  const [files, setFiles] = useState<PendingAttachment[]>([]);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
   const voice = useVoiceInput((text) => {
     setInput((current) => (current ? `${current} ${text}` : text));
   });
@@ -51,20 +85,64 @@ export function AssistantChat({
     }
   }, [messages, pending]);
 
-  async function send(text: string) {
-    const trimmed = text.trim();
-
-    if (!trimmed || pending) {
+  async function addFiles(selected: FileList | null) {
+    if (!selected || selected.length === 0) {
       return;
     }
 
+    const room = MAX_ATTACHMENTS - files.length;
+
+    if (room <= 0) {
+      setError(`Больше ${MAX_ATTACHMENTS} файлов за раз отправить нельзя.`);
+      return;
+    }
+
+    const accepted: PendingAttachment[] = [];
+
+    for (const file of Array.from(selected).slice(0, room)) {
+      if (file.size > MAX_ATTACHMENT_BYTES) {
+        setError(`Файл «${file.name}» больше 2,5 МБ — уменьшите его и попробуйте снова.`);
+        continue;
+      }
+
+      try {
+        accepted.push({
+          id: `${file.name}-${file.size}-${accepted.length}`,
+          name: file.name,
+          mediaType: file.type,
+          data: await readAsBase64(file)
+        });
+      } catch {
+        setError(`Не удалось прочитать файл «${file.name}».`);
+      }
+    }
+
+    if (accepted.length > 0) {
+      setError(null);
+      setFiles((current) => [...current, ...accepted]);
+    }
+  }
+
+  async function send(text: string) {
+    const trimmed = text.trim();
+    const attached = files;
+
+    if ((!trimmed && attached.length === 0) || pending) {
+      return;
+    }
+
+    const visible = attached.length
+      ? `${trimmed}${trimmed ? "\n" : ""}📎 ${attached.map((file) => file.name).join(", ")}`
+      : trimmed;
+
     const nextMessages: ChatMessage[] = [
       ...messages,
-      { role: "user", content: trimmed }
+      { role: "user", content: visible }
     ];
 
     setMessages(nextMessages);
     setInput("");
+    setFiles([]);
     setError(null);
     setPending(true);
 
@@ -73,7 +151,20 @@ export function AssistantChat({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          messages: nextMessages,
+          // The model receives the plain question; the file names are only
+          // decoration for the transcript on screen.
+          messages: attached.length
+            ? [...messages, { role: "user" as const, content: trimmed || "Посмотри приложенные файлы." }]
+            : nextMessages,
+          ...(attached.length
+            ? {
+                attachments: attached.map((file) => ({
+                  name: file.name,
+                  mediaType: file.mediaType,
+                  data: file.data
+                }))
+              }
+            : {}),
           locale,
           ...(providerChoice ? { provider } : {}),
           ...(caseId ? { caseId } : {})
@@ -171,7 +262,52 @@ export function AssistantChat({
             {t.voiceHint}
           </p>
         ) : null}
+        {allowAttachments && files.length > 0 ? (
+          <ul className="assistant-chat__files">
+            {files.map((file) => (
+              <li key={file.id}>
+                <span>📎 {file.name}</span>
+                <button
+                  aria-label={`Убрать ${file.name}`}
+                  onClick={() =>
+                    setFiles((current) =>
+                      current.filter((item) => item.id !== file.id)
+                    )
+                  }
+                  type="button"
+                >
+                  ✕
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : null}
+
         <div className="assistant-chat__actions">
+          {allowAttachments ? (
+            <>
+              <input
+                accept={ACCEPT_ATTRIBUTE}
+                className="assistant-chat__file-input"
+                multiple
+                onChange={(event) => {
+                  void addFiles(event.target.files);
+                  event.target.value = "";
+                }}
+                ref={fileInputRef}
+                type="file"
+              />
+              <button
+                aria-label="Прикрепить файл или фото"
+                className="assistant-chat__mic"
+                onClick={() => fileInputRef.current?.click()}
+                title="Фото, PDF или текстовый файл — до 3 штук, до 2,5 МБ каждый. Файлы не сохраняются на платформе."
+                type="button"
+              >
+                📎
+              </button>
+            </>
+          ) : null}
           {voice.supported ? (
             <button
               aria-label={voice.listening ? t.micStop : t.micStart}
@@ -182,7 +318,11 @@ export function AssistantChat({
               🎤
             </button>
           ) : null}
-          <button className="button" disabled={pending || !input.trim()} type="submit">
+          <button
+            className="button"
+            disabled={pending || (!input.trim() && files.length === 0)}
+            type="submit"
+          >
             {t.send}
           </button>
         </div>

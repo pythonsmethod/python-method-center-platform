@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { sanitizeChatMessages } from "@/lib/assistant/claude";
+import { sanitizeAttachments } from "@/lib/assistant/attachments";
+import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
 import {
   askAssistantTeam,
   isAssistantProvider
@@ -34,6 +35,20 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
   }
 
+  const attachments = sanitizeAttachments(
+    (body as { attachments?: unknown })?.attachments
+  );
+
+  if (attachments === "invalid") {
+    return NextResponse.json(
+      {
+        error:
+          "Не удалось прочитать вложение. Поддерживаются фото (JPG, PNG, WEBP, GIF), PDF и текстовые файлы — не больше трёх штук и до 2,5 МБ каждый."
+      },
+      { status: 400 }
+    );
+  }
+
   const rawProvider = (body as { provider?: unknown })?.provider;
   const provider = isAssistantProvider(rawProvider) ? rawProvider : "auto";
 
@@ -51,13 +66,24 @@ export async function POST(request: Request) {
       system = `${system}\n\n${caseContext}`;
     }
   }
-  const result = await askAssistantTeam(
-    system,
-    messages,
-    provider === "both" ? 1200 : 1500,
-    provider,
-    { attribution: provider === "best" }
-  );
+  // Attachments go to Claude: it reads photos and PDFs directly. The
+  // arbiter and the GPT paths are skipped for such a question rather than
+  // answering it without seeing the file.
+  const result = attachments
+    ? hasClaudeEnv()
+      ? await askClaude(system, messages, 1500, attachments)
+      : ({
+          status: "error" as const,
+          message:
+            "Файлы и фото читает Claude — добавьте ANTHROPIC_API_KEY в переменные окружения."
+        })
+    : await askAssistantTeam(
+        system,
+        messages,
+        provider === "both" ? 1200 : 1500,
+        provider,
+        { attribution: provider === "best" }
+      );
 
   if (result.status === "unavailable") {
     return NextResponse.json(
