@@ -39,8 +39,9 @@ which is preserved separately.
     `PUBLIC_ASSISTANT_MODE` switch (`open` / `registered_only` / `off`) —
     see `docs/safety/ЗАЩИТА_ПОМОЩНИКА_ОТ_НАПЛЫВА.md`
   - staff assistant in `/admin` with optional per-case context, and file
-    attachments (photos, PDFs, text — up to 3 files, 2.5 MB each) that go
-    straight to Claude and are never stored anywhere
+    attachments — up to 30 photos/PDFs per message, downscaled in the
+    browser and read in batches when they exceed one request, then
+    analysed together; sent straight to Claude and never stored anywhere
   - knowledge base editable by staff, injected into both system prompts
 - Automated red-flag workflow: the client assistant tags emergencies with a
   hidden marker; the server strips it, records an `escalation_events` row

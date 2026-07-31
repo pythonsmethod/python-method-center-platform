@@ -2,11 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
+import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import {
-  ACCEPT_ATTRIBUTE,
-  MAX_ATTACHMENTS,
-  MAX_ATTACHMENT_BYTES
-} from "@/lib/assistant/attachments";
+  prepareFiles,
+  splitIntoBatches,
+  type PreparedFile
+} from "@/lib/assistant/prepare-files";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
 
@@ -28,28 +29,13 @@ type AssistantChatProps = {
   locale?: Locale;
 };
 
-type PendingAttachment = {
-  id: string;
-  name: string;
-  mediaType: string;
-  data: string;
-};
-
-// Reads a file into base64 without the data: prefix, the form the models
-// expect.
-function readAsBase64(file: File): Promise<string> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-
-    reader.onerror = () => reject(new Error("read-failed"));
-    reader.onload = () => {
-      const result = String(reader.result ?? "");
-      const comma = result.indexOf(",");
-      resolve(comma >= 0 ? result.slice(comma + 1) : result);
-    };
-    reader.readAsDataURL(file);
-  });
-}
+// When the files do not fit one request, they are read in parts: each part
+// is transcribed to the letter, and the full analysis is done afterwards on
+// everything together.
+const EXTRACT_INSTRUCTION = `Это часть присланных файлов (фотографии, сканы или PDF анализов и обследований).
+Выпиши из них МАКСИМАЛЬНО ПОЛНО и дословно всё, что там написано: названия исследований, показатели, значения, единицы измерения, референсные диапазоны, даты, заключения врачей, назначения.
+Ничего не интерпретируй, не оценивай и не добавляй от себя — только то, что действительно написано в файлах.
+Указывай, из какого файла что взято. Если фрагмент нечитаем — так и напиши.`;
 
 type Provider = "best" | "claude" | "gpt" | "both";
 
@@ -70,7 +56,8 @@ export function AssistantChat({
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [provider, setProvider] = useState<Provider>("best");
-  const [files, setFiles] = useState<PendingAttachment[]>([]);
+  const [files, setFiles] = useState<PreparedFile[]>([]);
+  const [progress, setProgress] = useState<string | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const voice = useVoiceInput((text) => {
@@ -90,37 +77,72 @@ export function AssistantChat({
       return;
     }
 
-    const room = MAX_ATTACHMENTS - files.length;
+    const room = MAX_ATTACHMENTS_TOTAL - files.length;
 
     if (room <= 0) {
-      setError(`Больше ${MAX_ATTACHMENTS} файлов за раз отправить нельзя.`);
+      setError(`За раз можно приложить не больше ${MAX_ATTACHMENTS_TOTAL} файлов.`);
       return;
     }
 
-    const accepted: PendingAttachment[] = [];
+    const picked = Array.from(selected).slice(0, room);
 
-    for (const file of Array.from(selected).slice(0, room)) {
-      if (file.size > MAX_ATTACHMENT_BYTES) {
-        setError(`Файл «${file.name}» больше 2,5 МБ — уменьшите его и попробуйте снова.`);
-        continue;
-      }
+    setError(null);
+    setProgress(
+      picked.length > 1
+        ? `Готовлю ${picked.length} файлов…`
+        : "Готовлю файл…"
+    );
 
-      try {
-        accepted.push({
-          id: `${file.name}-${file.size}-${accepted.length}`,
-          name: file.name,
-          mediaType: file.type,
-          data: await readAsBase64(file)
-        });
-      } catch {
-        setError(`Не удалось прочитать файл «${file.name}».`);
-      }
+    // Photos are downscaled here, in the browser: thirty phone snapshots
+    // would never fit a request at their original size.
+    const result = await prepareFiles(picked, files.length);
+
+    setProgress(null);
+
+    if (result.errors.length > 0) {
+      setError(result.errors.join(" "));
     }
 
-    if (accepted.length > 0) {
-      setError(null);
-      setFiles((current) => [...current, ...accepted]);
+    if (result.files.length > 0) {
+      setFiles((current) => [...current, ...result.files]);
     }
+  }
+
+  // One call to the API. Returns the reply or throws with a message the
+  // person can read.
+  async function ask(
+    history: ChatMessage[],
+    batch: PreparedFile[] | null
+  ): Promise<string> {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: history,
+        ...(batch && batch.length
+          ? {
+              attachments: batch.map((file) => ({
+                name: file.name,
+                mediaType: file.mediaType,
+                data: file.data
+              }))
+            }
+          : {}),
+        locale,
+        ...(providerChoice ? { provider } : {}),
+        ...(caseId ? { caseId } : {})
+      })
+    });
+
+    const data = (await response.json().catch(() => null)) as
+      | { reply?: string; error?: string }
+      | null;
+
+    if (!response.ok || !data?.reply) {
+      throw new Error(data?.error ?? t.errorGeneric);
+    }
+
+    return data.reply;
   }
 
   async function send(text: string) {
@@ -146,44 +168,76 @@ export function AssistantChat({
     setError(null);
     setPending(true);
 
+    const question = trimmed || "Посмотри приложенные файлы.";
+
     try {
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          // The model receives the plain question; the file names are only
-          // decoration for the transcript on screen.
-          messages: attached.length
-            ? [...messages, { role: "user" as const, content: trimmed || "Посмотри приложенные файлы." }]
-            : nextMessages,
-          ...(attached.length
-            ? {
-                attachments: attached.map((file) => ({
-                  name: file.name,
-                  mediaType: file.mediaType,
-                  data: file.data
-                }))
-              }
-            : {}),
-          locale,
-          ...(providerChoice ? { provider } : {}),
-          ...(caseId ? { caseId } : {})
-        })
-      });
-
-      const data = (await response.json().catch(() => null)) as
-        | { reply?: string; error?: string }
-        | null;
-
-      if (!response.ok || !data?.reply) {
-        setError(data?.error ?? t.errorGeneric);
+      if (attached.length === 0) {
+        const reply = await ask(nextMessages, null);
+        setMessages([...nextMessages, { role: "assistant", content: reply }]);
         return;
       }
 
-      setMessages([...nextMessages, { role: "assistant", content: data.reply }]);
-    } catch {
-      setError(t.errorNetwork);
+      const batches = splitIntoBatches(attached);
+
+      if (batches.length === 1) {
+        const reply = await ask(
+          [...messages, { role: "user", content: question }],
+          batches[0]
+        );
+        setMessages([...nextMessages, { role: "assistant", content: reply }]);
+        return;
+      }
+
+      // More files than one request can carry: read them part by part,
+      // then do the whole analysis on the collected data at once.
+      const extracts: string[] = [];
+      let read = 0;
+
+      for (const [index, batch] of batches.entries()) {
+        setProgress(
+          `Читаю файлы ${read + 1}–${read + batch.length} из ${attached.length}…`
+        );
+
+        const partReply = await ask(
+          [
+            {
+              role: "user",
+              content: `${EXTRACT_INSTRUCTION}\n\nЭто часть ${index + 1} из ${batches.length}. Файлы: ${batch
+                .map((file) => file.name)
+                .join(", ")}.`
+            }
+          ],
+          batch
+        );
+
+        extracts.push(`— Часть ${index + 1} (${batch.length} файлов) —\n${partReply}`);
+        read += batch.length;
+      }
+
+      setProgress("Собираю общий разбор…");
+
+      const reply = await ask(
+        [
+          ...messages,
+          {
+            role: "user",
+            content: `${question}\n\nНиже — выписки из ${attached.length} присланных файлов, прочитанных по частям. Работай с ними как с исходными данными кейса.\n\n${extracts.join(
+              "\n\n"
+            )}`
+          }
+        ],
+        null
+      );
+
+      setMessages([...nextMessages, { role: "assistant", content: reply }]);
+    } catch (sendError) {
+      setError(
+        sendError instanceof Error && sendError.message
+          ? sendError.message
+          : t.errorNetwork
+      );
     } finally {
+      setProgress(null);
       setPending(false);
     }
   }
@@ -200,9 +254,14 @@ export function AssistantChat({
             {message.content}
           </div>
         ))}
+        {!pending && progress ? (
+          <div className="assistant-msg assistant-msg--assistant assistant-msg--pending">
+            {progress}
+          </div>
+        ) : null}
         {pending ? (
           <div className="assistant-msg assistant-msg--assistant assistant-msg--pending">
-            {t.sending}
+            {progress ?? t.sending}
           </div>
         ) : null}
         {error ? <p className="form-message form-message--error">{error}</p> : null}
@@ -301,7 +360,7 @@ export function AssistantChat({
                 aria-label="Прикрепить файл или фото"
                 className="assistant-chat__mic"
                 onClick={() => fileInputRef.current?.click()}
-                title="Фото, PDF или текстовый файл — до 3 штук, до 2,5 МБ каждый. Файлы не сохраняются на платформе."
+                title="Фото, PDF или текстовый файл — до 30 штук за раз. Снимки сжимаются автоматически, файлы не сохраняются на платформе."
                 type="button"
               >
                 📎

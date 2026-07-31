@@ -12,12 +12,22 @@ export type ChatAttachment = {
   data: string;
 };
 
-export const MAX_ATTACHMENTS = 3;
+// How many files a person may attach to one message. A client who sends
+// thirty photos of their analyses is normal, not an edge case — the
+// browser compresses them and sends them to the model in batches.
+export const MAX_ATTACHMENTS_TOTAL = 30;
 
-// Serverless request bodies are capped around 4.5 MB and base64 inflates a
-// file by a third, so this is the honest ceiling per file.
+// Per request: serverless bodies are capped around 4.5 MB and base64
+// inflates a file by a third, so one batch stays well inside that.
+export const MAX_ATTACHMENTS = 12;
 export const MAX_ATTACHMENT_BYTES = 2_500_000;
 export const MAX_TOTAL_ATTACHMENT_BYTES = 3_200_000;
+
+// Photos from a phone are far larger than the model needs to read a lab
+// printout. Downscaling keeps the text legible and makes thirty files a
+// matter of seconds instead of minutes.
+export const IMAGE_MAX_DIMENSION = 1600;
+export const IMAGE_QUALITY = 0.72;
 
 export const IMAGE_TYPES = [
   "image/jpeg",
@@ -34,9 +44,13 @@ export const TEXT_TYPES = [
   "text/csv"
 ] as const;
 
-export const ACCEPT_ATTRIBUTE = [...IMAGE_TYPES, PDF_TYPE, ...TEXT_TYPES].join(
-  ","
-);
+// The picker also offers HEIC (the default on iPhone): such photos are
+// converted to JPEG in the browser before they are sent anywhere.
+export const ACCEPT_ATTRIBUTE = [
+  "image/*",
+  PDF_TYPE,
+  ...TEXT_TYPES
+].join(",");
 
 export function isImageType(mediaType: string): boolean {
   return (IMAGE_TYPES as readonly string[]).includes(mediaType);
