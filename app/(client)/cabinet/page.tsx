@@ -1,18 +1,21 @@
-import { PageHeader } from "@/components/PageHeader";
+import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
-import { EmergencyNotice } from "@/components/EmergencyNotice";
+import { PageHeader } from "@/components/PageHeader";
+import {
+  IconAnkh,
+  IconEyeOfHorus,
+  IconLotus,
+  IconPapyrus,
+  IconWater
+} from "@/components/icons/EgyptianIcons";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
-import { formatDateTime } from "@/lib/i18n/format";
-import { supportStatusLabel } from "@/lib/i18n/status-labels";
-import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { getCaseMessages } from "@/lib/messages/queries";
-import { getOwnSupportRequests } from "@/lib/support/queries";
-import { AccountBadge, TokenBadge } from "@/components/referrals/TokenBadge";
-import { getTokenLedger } from "@/lib/tokens/queries";
-import { DocumentUploadPanel } from "./DocumentUploadPanel";
-import { SupportRequestForm } from "./SupportRequestForm";
+import { formatDateTime } from "@/lib/i18n/format";
+import { caseStatusLabel } from "@/lib/i18n/status-labels";
+
+export const dynamic = "force-dynamic";
 
 type CabinetPageProps = {
   searchParams?: Promise<{
@@ -24,6 +27,49 @@ function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
   return Array.isArray(value)
     ? value.includes("submitted")
     : value === "submitted";
+}
+
+// The one thing to do next, computed from the person's real state. Never
+// invented: an empty cabinet that says "all good" is worse than one that
+// says plainly what is missing.
+function nextStep(input: {
+  hasCase: boolean;
+  documents: number;
+  status: string | null;
+}): { title: string; text: string; action: string; href: string } {
+  if (!input.hasCase) {
+    return {
+      title: "Заполните анкету",
+      text: "Первый шаг: анкета создаёт ваш кейс. Занимает около 10 минут.",
+      action: "Заполнить анкету",
+      href: "/onboarding"
+    };
+  }
+
+  if (input.documents === 0) {
+    return {
+      title: "Загрузите документы",
+      text: "Анализы, выписки, заключения. Без них Professor Python не сможет разобрать вашу ситуацию.",
+      action: "Загрузить документы",
+      href: "/cabinet/documents"
+    };
+  }
+
+  if (input.status === "active_support") {
+    return {
+      title: "Вы в сопровождении",
+      text: "Пишите в чат обо всём, что происходит: команда рядом каждый день.",
+      action: "Открыть переписку",
+      href: "/cabinet/chat"
+    };
+  }
+
+  return {
+    title: "Кейс у команды",
+    text: "Professor Python изучает ваши материалы. Ответ придёт в переписку.",
+    action: "Открыть переписку",
+    href: "/cabinet/chat"
+  };
 }
 
 export default async function CabinetPage({ searchParams }: CabinetPageProps) {
@@ -38,128 +84,157 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           title="Кабинет"
           description="Для кабинета требуется настроенная аутентификация."
         />
-
         <AuthSetupNotice title="Кабинет требует настройки Supabase Auth" />
       </div>
     );
   }
 
-  const [caseResult, supportResult, tokens] = await Promise.all([
-    getClientCaseShell(auth.userId),
-    getOwnSupportRequests(auth.userId),
-    getTokenLedger(auth.userId)
-  ]);
-  const submitted = isOnboardingSubmitted(params?.onboarding);
-  const [documentResult, messagesResult] =
-    caseResult.status === "ready" && caseResult.case
-      ? await Promise.all([
-          getUploadedDocumentsForCase(auth.userId, caseResult.case.id),
-          getCaseMessages(caseResult.case.id)
-        ])
-      : [null, null];
+  const caseResult = await getClientCaseShell(auth.userId);
+  const clientCase =
+    caseResult.status === "ready" && caseResult.case ? caseResult.case : null;
+
+  const [documentResult, messagesResult] = clientCase
+    ? await Promise.all([
+        getUploadedDocumentsForCase(auth.userId, clientCase.id),
+        getCaseMessages(clientCase.id)
+      ])
+    : [null, null];
+
+  const documents =
+    documentResult?.status === "ready" ? documentResult.documents : [];
+  const messages = messagesResult?.messages ?? [];
+  const lastFromTeam = [...messages]
+    .reverse()
+    .find((message) => message.sender_role !== "client");
+
+  const step = nextStep({
+    hasCase: Boolean(clientCase),
+    documents: documents.length,
+    status: clientCase?.status ?? null
+  });
 
   return (
-    <div className="page-shell">
-      <div className="cabinet-head">
-        <PageHeader eyebrow="Личный кабинет" title="Кабинет" />
-        <div className="cabinet-head__badges">
-          <AccountBadge />
-          <TokenBadge balance={tokens.balance} />
-        </div>
-      </div>
-
-      {submitted ? (
-        <div className="notice notice--success">
-          <span className="panel__label">Анкета отправлена</span>
-          <h2>Кейс создан</h2>
-          <p>
-            Анкета сохранена и привязана к вашему кейсу. Загрузите медицинские
-            документы ниже — команда изучит кейс и свяжется с вами.
-          </p>
+    <>
+      {isOnboardingSubmitted(params?.onboarding) ? (
+        <div className="cab-note">
+          <strong>Анкета отправлена</strong>
+          <span>Кейс создан. Следующий шаг — загрузить документы.</span>
         </div>
       ) : null}
 
-      {caseResult.status === "ready" && caseResult.case ? (
-        documentResult?.status === "ready" ? (
-          <DocumentUploadPanel
-            caseId={caseResult.case.id}
-            initialDocuments={documentResult.documents}
-            userId={auth.userId}
-          />
-        ) : (
-          <div className="notice notice--warning">
-            <span className="panel__label">Документы</span>
-            <h2>Документы недоступны</h2>
-            <p>
-              {documentResult?.status === "error"
-                ? documentResult.message
-                : "Для загрузки документов нужен активный кейс."}
-            </p>
-          </div>
-        )
-      ) : null}
+      <div className="cab-grid">
+        <article className="cab-card cab-card--wide cab-card--accent">
+          <span className="cab-card__label">Сейчас важно</span>
+          <h2>{step.title}</h2>
+          <p>{step.text}</p>
+          <Link className="button" href={step.href}>
+            {step.action}
+          </Link>
+        </article>
 
-      {caseResult.status === "ready" && caseResult.case && messagesResult ? (
-        <section className="documents-section" aria-label="Чат с Professor Python и командой">
-          <div className="panel">
-            <span className="panel__label">Чат с Professor Python и командой</span>
-            <h2>Ваша переписка</h2>
-            <p>
-              Здесь вы общаетесь с Professor Python и командой центра — текстом или
-              голосовыми сообщениями.
-            </p>
-            <CaseMessageThread
-              loadError={messagesResult.error}
-              messages={messagesResult.messages}
-              viewer="client"
-            />
-          </div>
-        </section>
-      ) : null}
-
-      <section className="documents-section" aria-label="Связь с командой">
-        <div className="documents-layout">
-          <div className="document-upload">
-            <div>
-              <span className="panel__label">Связь с командой</span>
-              <h2>Написать команде</h2>
-            </div>
-            <SupportRequestForm />
-          </div>
-
-          <div className="documents-list-panel">
-            <div>
-              <span className="panel__label">Ваши обращения</span>
-              <h2>История сообщений</h2>
-            </div>
-
-            {supportResult.status === "error" ? (
-              <p className="empty-state">{supportResult.message}</p>
-            ) : supportResult.requests.length === 0 ? (
-              <p className="empty-state">
-                Обращений пока нет. Напишите нам, если есть вопрос.
+        <article className="cab-card">
+          <span className="cab-card__icon">
+            <IconLotus />
+          </span>
+          <span className="cab-card__label">Ваш кейс</span>
+          {clientCase ? (
+            <>
+              <h2>{caseStatusLabel(clientCase.status)}</h2>
+              <p>
+                Открыт {formatDateTime(clientCase.created_at)}
+                {clientCase.case_number ? ` · № ${clientCase.case_number}` : ""}
               </p>
-            ) : (
-              <ul className="document-list">
-                {supportResult.requests.map((request) => (
-                  <li className="document-list__item" key={request.id}>
-                    <div>
-                      <strong>{request.subject}</strong>
-                      <span>{formatDateTime(request.created_at)}</span>
-                      <span className="status-badge">
-                        {supportStatusLabel(request.status)}
-                      </span>
-                    </div>
-                    {request.body ? <p>{request.body}</p> : null}
-                  </li>
-                ))}
-              </ul>
-            )}
-          </div>
-        </div>
-      </section>
+              <Link className="cab-card__more" href="/cabinet/account">
+                Подробнее о кейсе →
+              </Link>
+            </>
+          ) : (
+            <>
+              <h2>Кейса пока нет</h2>
+              <p>Он появится сразу после анкеты.</p>
+            </>
+          )}
+        </article>
 
-      <EmergencyNotice />
-    </div>
+        <article className="cab-card">
+          <span className="cab-card__icon">
+            <IconPapyrus />
+          </span>
+          <span className="cab-card__label">Мои документы</span>
+          <h2 className="cab-card__number">{documents.length}</h2>
+          <p>
+            {documents.length === 0
+              ? "Ещё ничего не загружено."
+              : `Последний: ${formatDateTime(documents[0].created_at)}`}
+          </p>
+          <Link className="cab-card__more" href="/cabinet/documents">
+            Открыть документы →
+          </Link>
+        </article>
+
+        <article className="cab-card cab-card--ai">
+          <span className="cab-card__icon">
+            <IconEyeOfHorus />
+          </span>
+          <span className="cab-card__label">ИИ-помощник</span>
+          <h2>Спросите что угодно</h2>
+          <p>
+            Он рядом круглосуточно: подскажет по кабинету, объяснит статус,
+            поможет сформулировать вопрос для Professor Python.
+          </p>
+          <ul className="cab-card__hints">
+            <li>«Что мне сделать дальше?»</li>
+            <li>«На каком этапе мой кейс?»</li>
+            <li>«Какие документы ещё нужны?»</li>
+          </ul>
+          <p className="cab-card__note">
+            Кнопка «☥ Спросить» — внизу экрана, на любой странице.
+          </p>
+        </article>
+
+        <article className="cab-card">
+          <span className="cab-card__icon">
+            <IconWater />
+          </span>
+          <span className="cab-card__label">Связь с центром</span>
+          <h2>Professor Python и команда</h2>
+          {lastFromTeam ? (
+            <p className="cab-card__quote">
+              {lastFromTeam.body
+                ? `«${lastFromTeam.body.slice(0, 110)}${
+                    lastFromTeam.body.length > 110 ? "…" : ""
+                  }»`
+                : "Голосовое сообщение"}
+            </p>
+          ) : (
+            <p>Здесь идёт вся переписка по вашему кейсу.</p>
+          )}
+          <Link className="cab-card__more" href="/cabinet/chat">
+            Открыть переписку →
+          </Link>
+        </article>
+
+        <article className="cab-card">
+          <span className="cab-card__icon">
+            <IconAnkh />
+          </span>
+          <span className="cab-card__label">Быстрые действия</span>
+          <ul className="cab-actions">
+            <li>
+              <Link href="/cabinet/documents">Загрузить анализ</Link>
+            </li>
+            <li>
+              <Link href="/cabinet/chat">Написать команде</Link>
+            </li>
+            <li>
+              <Link href="/cabinet/account">Оплаты и история</Link>
+            </li>
+            <li>
+              <Link href="/payment">Тарифы сопровождения</Link>
+            </li>
+          </ul>
+        </article>
+      </div>
+    </>
   );
 }

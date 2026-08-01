@@ -56,12 +56,6 @@ export default async function AccountPage() {
         description="Данные аккаунта, ваш кейс, оплаты и история."
       />
 
-      <div className="back-link">
-        <Link className="button button--secondary" href="/cabinet">
-          ← Вернуться в кабинет
-        </Link>
-      </div>
-
       <section className="panel-grid">
         <div className="panel">
           <span className="panel__label">Аккаунт</span>
@@ -167,12 +161,6 @@ export default async function AccountPage() {
           )}
         </div>
       </section>
-
-      <div className="back-link back-link--bottom">
-        <Link className="button" href="/cabinet">
-          ← Вернуться в кабинет
-        </Link>
-      </div>
     </div>
   );
 }

@@ -74,6 +74,29 @@ export async function getStaffUnreadCounts(): Promise<{
   return { total: data.length, byCase };
 }
 
+// How many messages from the team the client has not opened yet. Never
+// throws: a badge is not worth breaking a page for.
+export async function getUnreadForClient(caseId: string): Promise<number> {
+  try {
+    const supabase = createSupabaseServiceClient();
+
+    if (!supabase) {
+      return 0;
+    }
+
+    const { count } = await supabase
+      .from("case_messages")
+      .select("id", { count: "exact", head: true })
+      .eq("case_id", caseId)
+      .neq("sender_role", "client")
+      .is("read_at", null);
+
+    return count ?? 0;
+  } catch {
+    return 0;
+  }
+}
+
 // Loads a case thread and signs playback URLs for voice messages.
 // Callers are responsible for authorization (client owns the case / staff).
 export async function getCaseMessages(caseId: string): Promise<CaseMessagesResult> {
