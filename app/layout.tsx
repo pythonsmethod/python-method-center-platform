@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
-import { navRoutes } from "@/lib/routes";
 import { socialLinks } from "@/lib/config/socials";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { SiteNav } from "@/components/SiteNav";
 
 const playfair = Playfair_Display({
   subsets: ["cyrillic", "latin"],
@@ -37,13 +37,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             Python Method
           </Link>
           <div className="site-header__right">
-            <nav aria-label="Main navigation">
-              {navRoutes.map((route) => (
-                <Link key={route.href} href={route.href}>
-                  {dict.nav[route.href] ?? route.label}
-                </Link>
-              ))}
-            </nav>
+            <SiteNav labels={dict.nav} />
             <LanguageSwitcher locale={locale} />
           </div>
         </header>

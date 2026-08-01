@@ -79,6 +79,99 @@ nav a:hover {
   color: var(--accent-strong);
 }
 
+/* The top bar as a row of small signs: a first-time visitor should see
+   where to go without reading. */
+.site-nav {
+  gap: 8px;
+}
+
+.site-nav__item {
+  align-items: center;
+  background: linear-gradient(180deg, rgba(36, 29, 16, 0.55), rgba(14, 11, 6, 0.55));
+  border: 1px solid rgba(224, 169, 63, 0.28);
+  border-radius: 12px;
+  color: var(--text);
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 68px;
+  padding: 7px 12px 6px;
+  transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.site-nav__item:hover,
+.site-nav__item:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+  color: var(--accent-strong);
+  transform: translateY(-1px);
+}
+
+.site-nav__item--active {
+  background: linear-gradient(180deg, rgba(224, 169, 63, 0.22), rgba(224, 169, 63, 0.06));
+  border-color: var(--accent);
+  color: var(--accent-strong);
+}
+
+.site-nav__icon {
+  color: var(--accent);
+  height: 22px;
+  width: 22px;
+}
+
+.site-nav__item--active .site-nav__icon {
+  color: var(--accent-strong);
+}
+
+.site-nav__label {
+  font-size: 12px;
+  letter-spacing: 0.02em;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+  .site-header {
+    gap: 10px;
+    padding: 12px 14px;
+  }
+
+  .site-header__right {
+    gap: 8px;
+  }
+
+  /* All five signs stay on one line on a phone: a menu that wraps into
+     two rows reads as broken. */
+  .site-nav {
+    flex-wrap: nowrap;
+    gap: 4px;
+  }
+
+  .site-nav__item {
+    min-width: 0;
+    padding: 5px 6px 4px;
+  }
+
+  .site-nav__icon {
+    height: 18px;
+    width: 18px;
+  }
+
+  .site-nav__label {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 420px) {
+  .brand {
+    font-size: 15px;
+  }
+
+  .site-nav__label {
+    font-size: 9px;
+  }
+}
+
 main {
   padding: clamp(32px, 6vw, 72px) clamp(20px, 4vw, 48px);
 }

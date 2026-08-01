@@ -5,25 +5,13 @@ import { isFreeReviewActive } from "@/lib/config/promo";
 import {
   IconAnkh,
   IconEye,
-  IconFeather,
   IconLotus,
   IconPyramid,
   IconScarab,
-  IconScroll,
   IconSun
 } from "@/components/icons";
 
 const heroIcons = [IconScarab, IconAnkh, IconSun];
-const cabinetIcons = [
-  IconAnkh,
-  IconEye,
-  IconLotus,
-  IconScarab,
-  IconSun,
-  IconScroll,
-  IconFeather,
-  IconPyramid
-];
 const whyIcons = [IconEye, IconScarab, IconLotus, IconPyramid, IconSun];
 
 export default async function HomePage() {
@@ -90,28 +78,9 @@ export default async function HomePage() {
             {freeReview ? promo.ctaFree : promo.cta}
           </Link>
         </div>
-        <p className="promo-banner__note">{promo.note}</p>
       </section>
 
       <p className="tagline">{t.tagline}</p>
-
-      <section className="parchment" aria-label={t.cabinetsTitle}>
-        <p className="ornament">☥ ☥ ☥</p>
-        <h2 className="section-title">{t.cabinetsTitle}</h2>
-        <div className="pcard-grid">
-          {t.cabinets.map((cabinet, index) => {
-            const Icon = cabinetIcons[index] ?? IconAnkh;
-
-            return (
-              <div className="pcard" key={cabinet.title}>
-                <Icon />
-                <h3>{cabinet.title}</h3>
-                <p>{cabinet.text}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
 
       <section aria-label={t.whyTitle}>
         <p className="ornament">☥ ☥ ☥</p>
