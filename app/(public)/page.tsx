@@ -2,10 +2,9 @@ import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFreeReviewActive } from "@/lib/config/promo";
-import { IconAnkh, IconScarab, IconSun } from "@/components/icons";
+import { IconAnkh } from "@/components/icons";
 import { IconEyeOfHorus } from "@/components/icons/EgyptianIcons";
 
-const heroIcons = [IconScarab, IconAnkh, IconSun];
 
 export default async function HomePage() {
   const locale = await getLocale();
@@ -20,26 +19,26 @@ export default async function HomePage() {
         <p className="eyebrow">{t.eyebrow}</p>
         <h1>{t.title}</h1>
         <p className="hero__subtitle">{t.subtitle}</p>
-        <ul className="hero__points">
-          {t.points.map((point, index) => {
-            const Icon = heroIcons[index] ?? IconAnkh;
+        {/* Two pillars, side by side: the living expert and the AI. A
+            visitor must see both at once — that pairing is the platform. */}
+        <div className="hero-pillars">
+          <article className="hero-pillar hero-pillar--expert">
+            <span className="hero-pillar__icon">
+              <IconAnkh />
+            </span>
+            <span className="hero-pillar__label">{t.expertLabel}</span>
+            <h2 className="hero-pillar__title">{t.expertTitle}</h2>
+            <p className="hero-pillar__text">{t.expertText}</p>
+          </article>
 
-            return (
-              <li key={point}>
-                <Icon size={22} />
-                <span>{point}</span>
-              </li>
-            );
-          })}
-        </ul>
-        {/* The AI is the thing a visitor must notice first: it is what
-            makes this platform different from a clinic's website. */}
-        <aside aria-label={t.aiTitle} className="hero-ai">
-          <span className="hero-ai__pulse" aria-hidden="true" />
-          <div className="hero-ai__body">
-            <span className="hero-ai__label">{t.aiLabel}</span>
-            <p className="hero-ai__title">{t.aiTitle}</p>
-            <p className="hero-ai__text">{t.aiText}</p>
+          <article className="hero-pillar hero-pillar--ai">
+            <span className="hero-pillar__pulse" aria-hidden="true" />
+            <span className="hero-pillar__icon">
+              <IconEyeOfHorus />
+            </span>
+            <span className="hero-pillar__label">{t.aiLabel}</span>
+            <h2 className="hero-pillar__title">{t.aiTitle}</h2>
+            <p className="hero-pillar__text">{t.aiText}</p>
             <ol className="hero-ai__levels">
               {t.aiLevels.map((level) => (
                 <li key={level.title}>
@@ -48,8 +47,8 @@ export default async function HomePage() {
                 </li>
               ))}
             </ol>
-          </div>
-        </aside>
+          </article>
+        </div>
 
         <div className="hero__cta">
           <Link className="button" href="/login">
@@ -78,16 +77,17 @@ export default async function HomePage() {
       <section aria-label={t.howTitle}>
         <p className="ornament">☥ ☥ ☥</p>
         <h2 className="section-title">{t.howTitle}</h2>
-        {/* The AI sits apart from the numbered steps on purpose: it walks
-            with the person through all of them, it is not one of them. */}
-        <div className="how-ai">
-          <span className="how-ai__icon">
-            <IconEyeOfHorus />
-          </span>
-          <div>
-            <span className="panel__label">{t.aiStepLabel}</span>
-            <h3>{t.aiStepTitle}</h3>
-            <p>{t.aiStepText}</p>
+        <div className="how-paths">
+          <div className="how-path">
+            <span className="how-path__mark">{t.pathAiMark}</span>
+            <h3>{t.pathAiTitle}</h3>
+            <p>{t.pathAiText}</p>
+          </div>
+          <span className="how-paths__or">{t.pathsOr}</span>
+          <div className="how-path">
+            <span className="how-path__mark">{t.pathSelfMark}</span>
+            <h3>{t.pathSelfTitle}</h3>
+            <p>{t.pathSelfText}</p>
           </div>
         </div>
 

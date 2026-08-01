@@ -24,11 +24,10 @@ const ru = {
     eyebrow: "Цифровой центр восстановления",
     title: "Python Method Center",
     subtitle: "Реабилитация без границ",
-    points: [
-      "Экспертное сопровождение под руководством Professor Python",
-      "Индивидуальный подход без шаблонов и протоколов",
-      "Платформа доступна 24/7 на каждом этапе"
-    ],
+    expertLabel: "Эксперт центра",
+    expertTitle: "Экспертное сопровождение под руководством Professor Python",
+    expertText:
+      "Каждый кейс он смотрит лично: ваши анализы, вашу историю, ваш путь. Без шаблонов и протоколов.",
     aiLabel: "Искусственный интеллект центра",
     aiTitle: "ИИ рядом с вами 24/7 — на каждом шаге пути",
     aiText:
@@ -53,7 +52,16 @@ const ru = {
     whyTitle: "Почему с нами?",
     howTitle: "Как работает центр",
     stepLabel: "Шаг за шагом",
-    stepsLead: "Пять шагов — вы проходите их сами, в своём темпе.",
+    stepsLead: "Сами шаги одни и те же — вот они:",
+    pathsOr: "или",
+    pathAiMark: "☥",
+    pathAiTitle: "С ИИ-помощником",
+    pathAiText:
+      "Он проведёт через каждый шаг, ответит на вопросы и подскажет, чего не хватает.",
+    pathSelfMark: "✦",
+    pathSelfTitle: "Самостоятельно",
+    pathSelfText:
+      "Пройдите весь путь сами, в своём темпе. Помощник останется в стороне, пока не понадобится.",
     aiStepLabel: "С вами на каждом шаге",
     aiStepTitle: "ИИ-помощник центра",
     aiStepText:
@@ -313,11 +321,10 @@ const en: typeof ru = {
     eyebrow: "Digital recovery center",
     title: "Python Method Center",
     subtitle: "Rehabilitation without borders",
-    points: [
-      "Expert guidance under Karen's leadership",
-      "An individual approach without templates or protocols",
-      "The platform is with you 24/7 at every step"
-    ],
+    expertLabel: "The center's expert",
+    expertTitle: "Expert support led by Professor Python",
+    expertText:
+      "He looks at every case himself: your tests, your history, your path. No templates, no protocols.",
     aiLabel: "The center's artificial intelligence",
     aiTitle: "AI beside you 24/7 — at every step of the way",
     aiText:
@@ -342,7 +349,16 @@ const en: typeof ru = {
     whyTitle: "Why choose us?",
     howTitle: "How the center works",
     stepLabel: "Step by step",
-    stepsLead: "Five steps — you take them yourself, at your own pace.",
+    stepsLead: "The steps themselves are the same — here they are:",
+    pathsOr: "or",
+    pathAiMark: "☥",
+    pathAiTitle: "With the AI assistant",
+    pathAiText:
+      "It walks you through every step, answers questions and tells you what is missing.",
+    pathSelfMark: "✦",
+    pathSelfTitle: "On your own",
+    pathSelfText:
+      "Take the whole path yourself, at your own pace. The assistant stays aside until you need it.",
     aiStepLabel: "With you at every step",
     aiStepTitle: "The center's AI assistant",
     aiStepText:
