@@ -1,109 +1,188 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { packageArt, type PackageArtName } from "@/components/icons/PackageArt";
 import { egyptianIcons, type EgyptianIconName } from "@/components/icons/EgyptianIcons";
 
-// Preview of the future shop. Not indexed until it carries real products:
-// a store full of placeholders would cost trust rather than build it.
+// Preview of the future shop, in the black-and-gold Egyptian style
+// Professor Python wants for the line. Not indexed until it carries real
+// products: a store full of placeholders would cost trust, not build it.
 export const metadata: Metadata = {
   title: "Магазин — Python Method Center",
   robots: { index: false, follow: false }
 };
 
 type ShopItem = {
-  icon: EgyptianIconName;
+  art: PackageArtName;
   title: string;
+  latin: string;
   text: string;
   note: string;
 };
 
-const items: ShopItem[] = [
+type ShopSection = {
+  icon: EgyptianIconName;
+  label: string;
+  title: string;
+  text: string;
+  items: ShopItem[];
+};
+
+const sections: ShopSection[] = [
   {
     icon: "ankh",
-    title: "Формула Professor Python",
-    text: "Авторская формула центра. Сейчас она отправляется как подарок вместе с тарифами сопровождения — здесь появится возможность заказать её отдельно.",
-    note: "Готовится"
-  },
-  {
-    icon: "cobra",
-    title: "Программа восстановления",
-    text: "Пошаговая программа под ваш случай: что делать по неделям, за чем следить, когда сверяться с командой.",
-    note: "Готовится"
-  },
-  {
-    icon: "papyrus",
-    title: "Книга метода",
-    text: "Метод Professor Python, изложенный по порядку: принципы, логика, разобранные случаи. Для тех, кто хочет понять, а не просто выполнять.",
-    note: "Готовится"
-  },
-  {
-    icon: "scales",
-    title: "Разбор анализов",
-    text: "Личный разбор от Professor Python без полного сопровождения: обратная связь по состоянию и рекомендации.",
-    note: "Уже доступно"
-  },
-  {
-    icon: "lotus",
-    title: "Программа профилактики",
-    text: "Для тех, кто пока здоров и хочет таким остаться. Поддержка ритма, сна, питания и восстановления сил.",
-    note: "Готовится"
+    label: "Формулы",
+    title: "Формулы центра",
+    text: "То, что Professor Python составляет сам. Сейчас формула отправляется как подарок с тарифами сопровождения — здесь появится возможность заказать её отдельно.",
+    items: [
+      {
+        art: "jar",
+        title: "Формула Professor Python",
+        latin: "PYTHON'S ELIXIR",
+        text: "Авторская формула центра в капсулах. Та самая, что входит в сопровождение.",
+        note: "Готовится"
+      },
+      {
+        art: "dropper",
+        title: "Масло-концентрат",
+        latin: "ELIXIR OIL",
+        text: "Концентрат в каплях — для тех, кому удобнее не в капсулах.",
+        note: "Идея"
+      }
+    ]
   },
   {
     icon: "water",
-    title: "Дневник состояния",
-    text: "Бумажный и электронный дневник: ежедневные отметки, по которым видно динамику — и вам, и центру.",
-    note: "Готовится"
+    label: "Уход за телом",
+    title: "Линия ухода",
+    text: "Средства для ежедневного ухода в том же оформлении: чёрное стекло, золото, знаки центра.",
+    items: [
+      {
+        art: "cream",
+        title: "Крем",
+        latin: "ROYAL CREAM",
+        text: "Питательный крем для лица и рук.",
+        note: "Готовится"
+      },
+      {
+        art: "lotion",
+        title: "Лосьон для тела",
+        latin: "BODY LOTION",
+        text: "Лосьон для тела с лёгкой текстурой.",
+        note: "Готовится"
+      }
+    ]
   },
   {
-    icon: "scarab",
-    title: "Наборы для близких",
-    text: "Подарочный набор для того, кого вы хотите поддержать: доступ к платформе, дневник и первый шаг вместе.",
-    note: "Идея"
+    icon: "papyrus",
+    label: "Знание",
+    title: "Метод в руках",
+    text: "То, что остаётся у человека и после сопровождения.",
+    items: [
+      {
+        art: "book",
+        title: "Книга метода",
+        latin: "THE METHOD",
+        text: "Метод Professor Python по порядку: принципы, логика, разобранные случаи.",
+        note: "Готовится"
+      },
+      {
+        art: "diary",
+        title: "Дневник состояния",
+        latin: "DAILY LOG",
+        text: "Ежедневные отметки, по которым видна динамика — и вам, и центру.",
+        note: "Готовится"
+      }
+    ]
   },
   {
-    icon: "wingedSun",
-    title: "Сопровождение семьи",
-    text: "Когда восстанавливается один, меняется вся семья. Формат для тех, кто проходит путь рядом.",
-    note: "Идея"
+    icon: "cobra",
+    label: "Символы",
+    title: "Знаки центра",
+    text: "Для тех, кто прошёл путь и хочет носить его знак.",
+    items: [
+      {
+        art: "hoodie",
+        title: "Худи с Оком Гора",
+        latin: "PYTHON WEAR",
+        text: "Чёрное худи с золотым знаком центра.",
+        note: "Идея"
+      },
+      {
+        art: "pendant",
+        title: "Подвеска-анкх",
+        latin: "SIGN OF LIFE",
+        text: "Анкх — знак жизни и символ центра.",
+        note: "Идея"
+      }
+    ]
   }
 ];
 
 export default function ShopPage() {
   return (
-    <div className="page-shell">
+    <div className="page-shell shop-page">
       <PageHeader
         eyebrow="Магазин"
         title="Магазин центра"
-        description="Здесь будет всё, что центр предлагает помимо сопровождения: формула, программы, книга метода и материалы для тех, кто идёт этим путём. Витрина готовится — так она будет выглядеть."
+        description="Формулы, уход, книга метода и знаки центра — в одном оформлении: чёрное с золотом, знаки Египта, имя Professor Python. Витрина готовится — так она будет выглядеть."
       />
 
       <div className="shop-preview-note">
         <span className="shop-badge">Предпросмотр</span>
         <p>
-          Это макет для команды: названия и описания — черновые, цен пока нет,
-          купить ничего нельзя. Показываем, как магазин будет смотреться,
-          чтобы решить, что войдёт в первую линейку.
+          Макет для команды: упаковки нарисованы, названия и описания черновые,
+          цен пока нет и купить ничего нельзя. Когда появятся настоящие фото
+          продукции, они встанут на место этих рисунков.
         </p>
       </div>
 
-      <section aria-label="Товары" className="shop-grid">
-        {items.map((item) => {
-          const Icon = egyptianIcons[item.icon];
+      {sections.map((section) => {
+        const Icon = egyptianIcons[section.icon];
 
-          return (
-            <article className="shop-card" key={item.title}>
-              <div className="shop-card__icon">
-                <Icon title={item.title} />
-              </div>
-              <span className={`shop-card__note${item.note === "Уже доступно" ? " shop-card__note--live" : ""}`}>
-                {item.note}
+        return (
+          <section
+            aria-label={section.title}
+            className="shop-section"
+            key={section.label}
+          >
+            <div className="shop-section__head">
+              <span className="shop-section__icon">
+                <Icon />
               </span>
-              <h2>{item.title}</h2>
-              <p>{item.text}</p>
-            </article>
-          );
-        })}
-      </section>
+              <div>
+                <span className="panel__label">{section.label}</span>
+                <h2>{section.title}</h2>
+                <p>{section.text}</p>
+              </div>
+            </div>
+
+            <div className="shop-grid">
+              {section.items.map((item) => {
+                const Art = packageArt[item.art];
+
+                return (
+                  <article className="shop-card shop-card--product" key={item.title}>
+                    <span
+                      className={`shop-card__note${
+                        item.note === "Уже доступно" ? " shop-card__note--live" : ""
+                      }`}
+                    >
+                      {item.note}
+                    </span>
+                    <div className="shop-card__art">
+                      <Art id={`art-${item.art}`} title={item.title} />
+                    </div>
+                    <span className="shop-card__latin">{item.latin}</span>
+                    <h3>{item.title}</h3>
+                    <p>{item.text}</p>
+                  </article>
+                );
+              })}
+            </div>
+          </section>
+        );
+      })}
 
       <section className="panel-grid" aria-label="Что дальше">
         <div className="panel panel--promo">
@@ -127,7 +206,7 @@ export default function ShopPage() {
           <span className="panel__label">Границы ответственности</span>
           <h2>Не замена лечения</h2>
           <p>
-            Всё, что появится в магазине, — это поддержка восстановления, а не
+            Всё, что появится в магазине, — поддержка восстановления, а не
             лекарства и не медицинские услуги. Центр не ставит диагнозы и не
             назначает лечение; сопровождение не заменяет наблюдение лечащего
             врача.
