@@ -4,7 +4,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   IconAnkh,
-  IconEyeOfHorus,
   IconScales,
   IconScarab,
   IconWingedSun
@@ -13,31 +12,40 @@ import { navRoutes } from "@/lib/routes";
 
 const icons: Record<string, (props: { className?: string }) => React.ReactElement> = {
   "/": IconWingedSun,
-  "/shop": IconScarab,
-  "/cabinet": IconAnkh,
   "/payment": IconScales,
-  "/login": IconEyeOfHorus
+  "/shop": IconScarab
 };
 
-// The top bar is where a first-time visitor decides where to go. Words
-// alone in a muted colour are easy to miss, so every destination gets its
-// own sign and the current one is lit.
-export function SiteNav({ labels }: { labels: Record<string, string> }) {
+type SiteNavProps = {
+  labels: Record<string, string>;
+  // Decides the last item: one door, two names.
+  signedIn: boolean;
+};
+
+// The top bar is what a visitor returns to all day long, so it is built to
+// be aimed at: a sign, a word, and a lit frame on the page you are on.
+export function SiteNav({ labels, signedIn }: SiteNavProps) {
   const pathname = usePathname();
+
+  function isCurrent(href: string): boolean {
+    return href === "/"
+      ? pathname === "/"
+      : pathname === href || pathname.startsWith(`${href}/`);
+  }
+
+  const accountHref = signedIn ? "/cabinet" : "/login";
+  const accountActive = isCurrent("/cabinet") || isCurrent("/login");
 
   return (
     <nav aria-label="Разделы сайта" className="site-nav">
       {navRoutes.map((route) => {
         const Icon = icons[route.href] ?? IconAnkh;
-        const isActive =
-          route.href === "/"
-            ? pathname === "/"
-            : pathname === route.href || pathname.startsWith(`${route.href}/`);
+        const active = isCurrent(route.href);
 
         return (
           <Link
-            aria-current={isActive ? "page" : undefined}
-            className={`site-nav__item${isActive ? " site-nav__item--active" : ""}`}
+            aria-current={active ? "page" : undefined}
+            className={`site-nav__item${active ? " site-nav__item--active" : ""}`}
             href={route.href}
             key={route.href}
           >
@@ -50,6 +58,19 @@ export function SiteNav({ labels }: { labels: Record<string, string> }) {
           </Link>
         );
       })}
+
+      <Link
+        aria-current={accountActive ? "page" : undefined}
+        className={`site-nav__item${accountActive ? " site-nav__item--active" : ""}`}
+        href={accountHref}
+      >
+        <span className="site-nav__icon">
+          <IconAnkh />
+        </span>
+        <span className="site-nav__label">
+          {labels[accountHref] ?? (signedIn ? "Кабинет" : "Вход")}
+        </span>
+      </Link>
     </nav>
   );
 }

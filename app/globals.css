@@ -87,15 +87,15 @@ nav a:hover {
 
 .site-nav__item {
   align-items: center;
-  background: linear-gradient(180deg, rgba(36, 29, 16, 0.55), rgba(14, 11, 6, 0.55));
-  border: 1px solid rgba(224, 169, 63, 0.28);
-  border-radius: 12px;
-  color: var(--text);
+  background: linear-gradient(180deg, rgba(46, 36, 18, 0.75), rgba(18, 14, 8, 0.75));
+  border: 1px solid rgba(224, 169, 63, 0.45);
+  border-radius: 14px;
+  color: var(--accent-strong);
   display: flex;
   flex-direction: column;
-  gap: 3px;
-  min-width: 68px;
-  padding: 7px 12px 6px;
+  gap: 5px;
+  min-width: 92px;
+  padding: 10px 16px 9px;
   transition: border-color 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
@@ -108,15 +108,16 @@ nav a:hover {
 }
 
 .site-nav__item--active {
-  background: linear-gradient(180deg, rgba(224, 169, 63, 0.22), rgba(224, 169, 63, 0.06));
+  background: linear-gradient(180deg, rgba(224, 169, 63, 0.3), rgba(224, 169, 63, 0.08));
   border-color: var(--accent);
+  box-shadow: 0 0 22px rgba(224, 169, 63, 0.18);
   color: var(--accent-strong);
 }
 
 .site-nav__icon {
   color: var(--accent);
-  height: 22px;
-  width: 22px;
+  height: 30px;
+  width: 30px;
 }
 
 .site-nav__item--active .site-nav__icon {
@@ -124,7 +125,8 @@ nav a:hover {
 }
 
 .site-nav__label {
-  font-size: 12px;
+  font-size: 14px;
+  font-weight: 600;
   letter-spacing: 0.02em;
   line-height: 1;
   white-space: nowrap;
@@ -140,25 +142,43 @@ nav a:hover {
     gap: 8px;
   }
 
-  /* All five signs stay on one line on a phone: a menu that wraps into
-     two rows reads as broken. */
+  .site-header__right {
+    flex: 1;
+    min-width: 0;
+  }
+
+  /* On a phone the signs stay on one line and the line itself scrolls:
+     a menu that wraps into two rows reads as broken, and a language
+     switch pushed off the screen reads as a bug. */
   .site-nav {
+    flex: 1 1 auto;
     flex-wrap: nowrap;
-    gap: 4px;
+    gap: 6px;
+    min-width: 0;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .site-nav::-webkit-scrollbar {
+    display: none;
+  }
+
+  .site-nav__item {
+    flex-shrink: 0;
   }
 
   .site-nav__item {
     min-width: 0;
-    padding: 5px 6px 4px;
+    padding: 8px 10px 7px;
   }
 
   .site-nav__icon {
-    height: 18px;
-    width: 18px;
+    height: 24px;
+    width: 24px;
   }
 
   .site-nav__label {
-    font-size: 10px;
+    font-size: 12px;
   }
 }
 
@@ -167,8 +187,12 @@ nav a:hover {
     font-size: 15px;
   }
 
+  .site-nav__item {
+    padding: 7px 8px 6px;
+  }
+
   .site-nav__label {
-    font-size: 9px;
+    font-size: 11px;
   }
 }
 
@@ -2871,4 +2895,33 @@ code {
 .how-step h2,
 .how-step p {
   padding-left: 38px;
+}
+
+/* Header on a phone, final word: earlier rules leave the right-hand block
+   shrink-to-fit, which pushed the language switch past the screen edge.
+   The name takes the first row, the signs the second — full width, and
+   the row of signs scrolls sideways if it does not fit. */
+@media (max-width: 720px) {
+  .site-header {
+    align-items: stretch;
+  }
+
+  .site-header__right {
+    justify-content: space-between;
+    min-width: 0;
+    width: 100%;
+  }
+
+  .site-nav {
+    flex: 1 1 auto;
+    min-width: 0;
+    overflow-x: auto;
+  }
+}
+
+@media (max-width: 720px) {
+  /* The language switch never gets squeezed out by the row of signs. */
+  .lang-switch {
+    flex-shrink: 0;
+  }
 }

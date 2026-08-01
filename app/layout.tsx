@@ -7,6 +7,27 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SiteNav } from "@/components/SiteNav";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+// One door, two names: the last nav item needs to know whether anyone is
+// home. Never throws — a nav must render even if auth is unreachable.
+async function isSignedIn(): Promise<boolean> {
+  try {
+    const supabase = await createSupabaseServerClient();
+
+    if (!supabase) {
+      return false;
+    }
+
+    const {
+      data: { user }
+    } = await supabase.auth.getUser();
+
+    return Boolean(user);
+  } catch {
+    return false;
+  }
+}
 
 const playfair = Playfair_Display({
   subsets: ["cyrillic", "latin"],
@@ -28,6 +49,7 @@ type RootLayoutProps = {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
+  const signedIn = await isSignedIn();
 
   return (
     <html className={playfair.variable} lang={locale}>
@@ -37,7 +59,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             Python Method
           </Link>
           <div className="site-header__right">
-            <SiteNav labels={dict.nav} />
+            <SiteNav labels={dict.nav} signedIn={signedIn} />
             <LanguageSwitcher locale={locale} />
           </div>
         </header>

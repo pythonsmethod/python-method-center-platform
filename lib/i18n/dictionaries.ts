@@ -9,7 +9,7 @@ const ru = {
     "/shop": "Магазин",
     "/login": "Вход",
     "/cabinet": "Кабинет",
-    "/payment": "Оплата",
+    "/payment": "Сопровождение",
     "/support": "Поддержка"
   } as Record<string, string>,
   footer: {
@@ -298,7 +298,7 @@ const en: typeof ru = {
     "/shop": "Shop",
     "/login": "Sign in",
     "/cabinet": "My account",
-    "/payment": "Payment",
+    "/payment": "Support",
     "/support": "Support"
   },
   footer: {
