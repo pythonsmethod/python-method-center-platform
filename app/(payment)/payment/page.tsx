@@ -81,14 +81,7 @@ export default async function PaymentPage() {
         </div>
       </PaymentPlans>
 
-      <section className="panel-grid" aria-label={t.howLabel}>
-        <div className="panel">
-          <span className="panel__label">{t.howLabel}</span>
-          <h2>{t.howTitle}</h2>
-          <p>
-            {t.howText} <Link href="/cabinet">{t.howLink}</Link>.
-          </p>
-        </div>
+      <section className="panel-grid" aria-label={t.offerLabel}>
         <div className="panel">
           <span className="panel__label">Другие способы оплаты</span>
           <h2>Карта не проходит?</h2>
