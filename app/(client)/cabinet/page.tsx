@@ -23,7 +23,7 @@ import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { getOwnPayments } from "@/lib/payments/queries";
 import { getOwnSupportRequests } from "@/lib/support/queries";
-import { TokenBadge } from "@/components/referrals/TokenBadge";
+import { AccountBadge, TokenBadge } from "@/components/referrals/TokenBadge";
 import { getTokenLedger } from "@/lib/tokens/queries";
 import { DocumentUploadPanel } from "./DocumentUploadPanel";
 import { SupportRequestForm } from "./SupportRequestForm";
@@ -78,12 +78,11 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
   return (
     <div className="page-shell">
       <div className="cabinet-head">
-        <PageHeader
-          eyebrow="Личный кабинет"
-          title="Кабинет"
-          description="Ваш кейс, медицинские документы и связь с командой."
-        />
-        <TokenBadge balance={tokens.balance} />
+        <PageHeader eyebrow="Личный кабинет" title="Кабинет" />
+        <div className="cabinet-head__badges">
+          <AccountBadge />
+          <TokenBadge balance={tokens.balance} />
+        </div>
       </div>
 
       {submitted ? (
@@ -96,60 +95,6 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           </p>
         </div>
       ) : null}
-
-      <section className="panel-grid">
-        <div className="panel">
-          <span className="panel__label">Ваш аккаунт</span>
-          <h2>{auth.email ?? "Вы вошли в систему"}</h2>
-          <p>
-            Один аккаунт — один непрерывный кейс. Все документы и сообщения
-            привязаны к нему.
-          </p>
-          <div className="panel-actions">
-            <LogoutButton />
-          </div>
-        </div>
-        <div className="panel">
-          <span className="panel__label">Ваш кейс</span>
-          {caseResult.status === "error" ? (
-            <>
-              <h2>Статус кейса недоступен</h2>
-              <p>{caseResult.message}</p>
-            </>
-          ) : caseResult.case ? (
-            <>
-              <h2>{caseStatusLabel(caseResult.case.status)}</h2>
-              <ul className="status-list">
-                <li>
-                  Номер кейса: <code>{caseResult.case.id}</code>
-                </li>
-                <li>Цель: {caseResult.case.title ?? "Не указана"}</li>
-                <li>
-                  Срочность: {caseUrgencyLabel(caseResult.case.urgency)}
-                </li>
-                <li>
-                  Направление:{" "}
-                  {caseDirectionLabel(caseResult.case.direction)}
-                </li>
-                <li>Создан: {formatDateTime(caseResult.case.created_at)}</li>
-              </ul>
-            </>
-          ) : (
-            <>
-              <h2>Кейса пока нет</h2>
-              <p>
-                Заполните анкету, чтобы создать кейс — после этого можно будет
-                загрузить документы.
-              </p>
-              <div className="panel-actions">
-                <Link className="button" href="/onboarding">
-                  Заполнить анкету
-                </Link>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
 
       {caseResult.status === "ready" && caseResult.case ? (
         documentResult?.status === "ready" ? (
@@ -171,7 +116,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
         )
       ) : null}
 
-      <section className="panel-grid" aria-label="Оплаты и история">
+      <section className="panel-grid" aria-label="Оплаты">
         <div className="panel">
           <span className="panel__label">Оплаты</span>
           <h2>Ваши оплаты</h2>
@@ -196,31 +141,6 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           )}
         </div>
 
-        <div className="panel">
-          <span className="panel__label">История</span>
-          <h2>История кейса</h2>
-          {!historyResult ? (
-            <p className="empty-state">
-              История появится после создания кейса.
-            </p>
-          ) : historyResult.status === "error" ? (
-            <p className="empty-state">{historyResult.message}</p>
-          ) : historyResult.events.length === 0 ? (
-            <p className="empty-state">Событий пока нет.</p>
-          ) : (
-            <ul className="status-list">
-              {historyResult.events.map((event) => (
-                <li key={event.id}>
-                  {formatDateTime(event.created_at)} —{" "}
-                  {lifecycleEventLabel(event.event_type)}
-                  {event.from_status && event.to_status
-                    ? `: ${caseStatusLabel(event.from_status)} → ${caseStatusLabel(event.to_status)}`
-                    : ""}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
       </section>
 
       {caseResult.status === "ready" && caseResult.case && messagesResult ? (

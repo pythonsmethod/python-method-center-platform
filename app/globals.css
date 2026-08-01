@@ -3064,3 +3064,15 @@ code {
     text-align: center;
   }
 }
+
+/* Two badges beside the cabinet title: the account, and the tokens. */
+.cabinet-head__badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.token-badge__coin--account {
+  background: radial-gradient(circle at 35% 30%, #f4d58d, #b9832a);
+  font-size: 14px;
+}

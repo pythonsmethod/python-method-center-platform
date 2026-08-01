@@ -1,7 +1,9 @@
 type PageHeaderProps = {
   eyebrow: string;
   title: string;
-  description: string;
+  // Optional: some pages need only the title, and an empty paragraph
+  // leaves a gap that reads as a mistake.
+  description?: string;
 };
 
 export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
@@ -9,7 +11,7 @@ export function PageHeader({ eyebrow, title, description }: PageHeaderProps) {
     <section className="page-header">
       <p className="eyebrow">{eyebrow}</p>
       <h1>{title}</h1>
-      <p>{description}</p>
+      {description ? <p>{description}</p> : null}
     </section>
   );
 }
