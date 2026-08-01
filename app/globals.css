@@ -2562,3 +2562,137 @@ code {
   line-height: 1.5;
   margin: 0;
 }
+
+/* The AI block in the hero: the one thing that must be noticed before
+   anything else, because it is what makes this platform different from a
+   clinic's website. */
+.hero-ai {
+  background:
+    radial-gradient(140% 120% at 0% 0%, rgba(224, 169, 63, 0.16), transparent 55%),
+    linear-gradient(180deg, rgba(26, 21, 12, 0.9), rgba(12, 10, 6, 0.9));
+  border: 1px solid rgba(224, 169, 63, 0.45);
+  border-radius: 16px;
+  display: flex;
+  gap: 16px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 28px;
+  max-width: 720px;
+  padding: 22px 24px;
+  position: relative;
+  /* The hero is centred; this block reads as a paragraph and needs the
+     ordinary left edge. */
+  text-align: left;
+}
+
+.hero-ai::before {
+  border-radius: 16px;
+  box-shadow: 0 0 40px rgba(224, 169, 63, 0.12);
+  content: "";
+  inset: 0;
+  pointer-events: none;
+  position: absolute;
+}
+
+.hero-ai__pulse {
+  background: var(--accent);
+  border-radius: 50%;
+  box-shadow: 0 0 0 0 rgba(224, 169, 63, 0.6);
+  flex-shrink: 0;
+  height: 10px;
+  margin-top: 8px;
+  width: 10px;
+  animation: hero-ai-pulse 2.4s ease-out infinite;
+}
+
+@keyframes hero-ai-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(224, 169, 63, 0.55);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(224, 169, 63, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(224, 169, 63, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .hero-ai__pulse {
+    animation: none;
+  }
+}
+
+.hero-ai__body {
+  display: grid;
+  gap: 6px;
+}
+
+.hero-ai__label {
+  color: var(--accent);
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.hero-ai__title {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: clamp(19px, 2.4vw, 24px);
+  line-height: 1.25;
+  margin: 0;
+}
+
+.hero-ai__text {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.hero-ai__levels {
+  counter-reset: ai-level;
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+}
+
+.hero-ai__levels li {
+  counter-increment: ai-level;
+  display: grid;
+  gap: 2px;
+  padding-left: 34px;
+  position: relative;
+}
+
+.hero-ai__levels li::before {
+  align-items: center;
+  border: 1px solid rgba(224, 169, 63, 0.5);
+  border-radius: 50%;
+  color: var(--accent);
+  content: counter(ai-level);
+  display: flex;
+  font-size: 12px;
+  height: 24px;
+  justify-content: center;
+  left: 0;
+  position: absolute;
+  top: 1px;
+  width: 24px;
+}
+
+.hero-ai__levels strong {
+  color: var(--accent-strong);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.hero-ai__levels span {
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.5;
+}

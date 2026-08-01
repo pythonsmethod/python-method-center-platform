@@ -51,6 +51,25 @@ export default async function HomePage() {
             );
           })}
         </ul>
+        {/* The AI is the thing a visitor must notice first: it is what
+            makes this platform different from a clinic's website. */}
+        <aside aria-label={t.aiTitle} className="hero-ai">
+          <span className="hero-ai__pulse" aria-hidden="true" />
+          <div className="hero-ai__body">
+            <span className="hero-ai__label">{t.aiLabel}</span>
+            <p className="hero-ai__title">{t.aiTitle}</p>
+            <p className="hero-ai__text">{t.aiText}</p>
+            <ol className="hero-ai__levels">
+              {t.aiLevels.map((level) => (
+                <li key={level.title}>
+                  <strong>{level.title}</strong>
+                  <span>{level.text}</span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </aside>
+
         <div className="hero__cta">
           <Link className="button" href="/login">
             {t.cta}

@@ -29,6 +29,24 @@ const ru = {
       "Индивидуальный подход без шаблонов и протоколов",
       "Платформа доступна 24/7 на каждом этапе"
     ],
+    aiLabel: "Искусственный интеллект центра",
+    aiTitle: "ИИ рядом с вами 24/7 — на каждом шаге пути",
+    aiText:
+      "Это не просто сайт центра. Здесь работает искусственный интеллект, который растёт вместе с вами: сначала отвечает на вопросы, потом ведёт по кабинету, а после начала сопровождения — работает уже с вашим случаем.",
+    aiLevels: [
+      {
+        title: "Знакомство",
+        text: "Спросите что угодно о центре и методе — прямо сейчас, без регистрации."
+      },
+      {
+        title: "Личный помощник",
+        text: "После регистрации ИИ видит ваш путь и ведёт шаг за шагом."
+      },
+      {
+        title: "Персональный ИИ",
+        text: "После начала сопровождения работает с вашим случаем и вашими материалами."
+      }
+    ],
     cta: "Начать путь",
     tagline: "Мы ведём. Вы восстанавливаетесь. Вместе — к результату.",
     cabinetsTitle: "Кабинеты центра",
@@ -291,6 +309,24 @@ const en: typeof ru = {
       "Expert guidance under Karen's leadership",
       "An individual approach without templates or protocols",
       "The platform is with you 24/7 at every step"
+    ],
+    aiLabel: "The center's artificial intelligence",
+    aiTitle: "AI beside you 24/7 — at every step of the way",
+    aiText:
+      "This is not just a center's website. An artificial intelligence works here and grows with you: first it answers questions, then it guides you through your cabinet, and once your support begins it works with your own case.",
+    aiLevels: [
+      {
+        title: "First contact",
+        text: "Ask anything about the center and the method — right now, no sign-up."
+      },
+      {
+        title: "Personal assistant",
+        text: "After sign-up the AI sees your journey and guides you step by step."
+      },
+      {
+        title: "Personal AI",
+        text: "Once support begins it works with your case and your materials."
+      }
     ],
     cta: "Start your journey",
     tagline: "We guide. You recover. Together — towards the result.",
