@@ -2,17 +2,10 @@ import Link from "next/link";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFreeReviewActive } from "@/lib/config/promo";
-import {
-  IconAnkh,
-  IconEye,
-  IconLotus,
-  IconPyramid,
-  IconScarab,
-  IconSun
-} from "@/components/icons";
+import { IconAnkh, IconScarab, IconSun } from "@/components/icons";
+import { IconEyeOfHorus } from "@/components/icons/EgyptianIcons";
 
 const heroIcons = [IconScarab, IconAnkh, IconSun];
-const whyIcons = [IconEye, IconScarab, IconLotus, IconPyramid, IconSun];
 
 export default async function HomePage() {
   const locale = await getLocale();
@@ -82,31 +75,28 @@ export default async function HomePage() {
 
       <p className="tagline">{t.tagline}</p>
 
-      <section aria-label={t.whyTitle}>
-        <p className="ornament">☥ ☥ ☥</p>
-        <h2 className="section-title">{t.whyTitle}</h2>
-        <div className="why-grid">
-          {t.why.map((card, index) => {
-            const Icon = whyIcons[index] ?? IconAnkh;
-
-            return (
-              <div className="why-card" key={card.title}>
-                <Icon />
-                <h3>{card.title}</h3>
-                <p>{card.text}</p>
-              </div>
-            );
-          })}
-        </div>
-      </section>
-
       <section aria-label={t.howTitle}>
         <p className="ornament">☥ ☥ ☥</p>
         <h2 className="section-title">{t.howTitle}</h2>
-        <div className="panel-grid" style={{ marginTop: 26 }}>
-          {t.steps.map((step) => (
-            <div className="panel" key={step.title}>
-              <span className="panel__label">{t.stepLabel}</span>
+        {/* The AI sits apart from the numbered steps on purpose: it walks
+            with the person through all of them, it is not one of them. */}
+        <div className="how-ai">
+          <span className="how-ai__icon">
+            <IconEyeOfHorus />
+          </span>
+          <div>
+            <span className="panel__label">{t.aiStepLabel}</span>
+            <h3>{t.aiStepTitle}</h3>
+            <p>{t.aiStepText}</p>
+          </div>
+        </div>
+
+        <p className="how-steps__lead">{t.stepsLead}</p>
+
+        <div className="panel-grid how-steps">
+          {t.steps.map((step, index) => (
+            <div className="panel how-step" key={step.title}>
+              <span className="how-step__num">{index + 1}</span>
               <h2>{step.title}</h2>
               <p>{step.text}</p>
             </div>

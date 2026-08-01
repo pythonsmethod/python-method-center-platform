@@ -51,8 +51,13 @@ const ru = {
     tagline: "Мы ведём. Вы восстанавливаетесь. Вместе — к результату.",
     cabinetsTitle: "Кабинеты центра",
     whyTitle: "Почему с нами?",
-    howTitle: "Как это работает",
+    howTitle: "Как работает центр",
     stepLabel: "Шаг за шагом",
+    stepsLead: "Пять шагов — вы проходите их сами, в своём темпе.",
+    aiStepLabel: "С вами на каждом шаге",
+    aiStepTitle: "ИИ-помощник центра",
+    aiStepText:
+      "Задайте вопрос ещё до регистрации. Дальше помощник проведёт через регистрацию, анкету и документы и останется рядом на всём сопровождении.",
     startLabel: "Начать",
     startTitle: "Готовы начать?",
     startText:
@@ -81,11 +86,14 @@ const ru = {
       { title: "Ваш результат — наша цель", text: "Мы идём вместе с вами к устойчивому состоянию." }
     ],
     steps: [
-      { title: "1. Регистрация", text: "Создайте аккаунт с email и паролем. Один человек — один аккаунт и один непрерывный кейс." },
-      { title: "2. Анкета", text: "Расскажите, для кого запрос, какая цель и что происходит сейчас. Анкета создаёт ваш кейс." },
-      { title: "3. Документы", text: "Загрузите медицинские документы (выписки, заключения, анализы) в защищённое хранилище." },
-      { title: "4. Изучение кейса", text: "Professor Python и команда изучают анкету и документы и связываются с вами по дальнейшим шагам." },
-      { title: "5. Сопровождение", text: "После согласования вы выбираете тариф сопровождения (5 недель или 100 дней) и оплачиваете его." }
+      { title: "Регистрация", text: "Создайте аккаунт." },
+      { title: "Анкета", text: "Заполните данные о себе." },
+      { title: "Документы", text: "Загрузите медицинские документы." },
+      { title: "Тариф", text: "Выберите тариф сопровождения." },
+      {
+        title: "Разбор и сопровождение",
+        text: "После выбранного тарифа вы получаете разбор кейса и начинаете сопровождение."
+      }
     ]
   },
   promo: {
@@ -332,8 +340,13 @@ const en: typeof ru = {
     tagline: "We guide. You recover. Together — towards the result.",
     cabinetsTitle: "Center cabinets",
     whyTitle: "Why choose us?",
-    howTitle: "How it works",
+    howTitle: "How the center works",
     stepLabel: "Step by step",
+    stepsLead: "Five steps — you take them yourself, at your own pace.",
+    aiStepLabel: "With you at every step",
+    aiStepTitle: "The center's AI assistant",
+    aiStepText:
+      "Ask a question before you even sign up. From there the assistant guides you through registration, the questionnaire and documents, and stays with you for the whole support program.",
     startLabel: "Start",
     startTitle: "Ready to begin?",
     startText: "Create an account and fill in the questionnaire — it takes about 10 minutes.",
@@ -361,11 +374,14 @@ const en: typeof ru = {
       { title: "Your result is our goal", text: "We walk with you towards a stable condition." }
     ],
     steps: [
-      { title: "1. Registration", text: "Create an account with email and password. One person — one account and one continuous case." },
-      { title: "2. Questionnaire", text: "Tell us who the request is for, the goal, and what is happening now. The questionnaire creates your case." },
-      { title: "3. Documents", text: "Upload medical documents (reports, conclusions, test results) to secure storage." },
-      { title: "4. Case review", text: "Karen and the team study your questionnaire and documents and contact you about next steps." },
-      { title: "5. Support program", text: "After agreement you choose a support plan (5 weeks or 100 days) and pay for it." }
+      { title: "Registration", text: "Create an account." },
+      { title: "Questionnaire", text: "Fill in your details." },
+      { title: "Documents", text: "Upload your medical documents." },
+      { title: "Plan", text: "Choose a support plan." },
+      {
+        title: "Review and support",
+        text: "Once your plan is chosen you receive the case review and the support program begins."
+      }
     ]
   },
   promo: {

@@ -2789,3 +2789,86 @@ code {
   font-size: 13px;
   line-height: 1.5;
 }
+
+/* "How the center works": the AI stands apart from the numbered steps —
+   it walks with the person through all of them rather than being one. */
+.how-ai {
+  align-items: flex-start;
+  background:
+    radial-gradient(130% 120% at 0% 0%, rgba(224, 169, 63, 0.14), transparent 55%),
+    linear-gradient(180deg, rgba(28, 22, 12, 0.9), rgba(12, 10, 6, 0.9));
+  border: 1px solid rgba(224, 169, 63, 0.45);
+  border-radius: 16px;
+  display: flex;
+  gap: 16px;
+  margin-top: 26px;
+  padding: 20px 22px;
+}
+
+.how-ai__icon {
+  color: var(--accent);
+  flex-shrink: 0;
+  height: 34px;
+  width: 34px;
+}
+
+.how-ai h3 {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: 20px;
+  margin: 4px 0 6px;
+}
+
+.how-ai p {
+  color: var(--text);
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 0;
+  opacity: 0.9;
+}
+
+.how-steps__lead {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 26px 0 0;
+  text-align: center;
+}
+
+.how-steps {
+  margin-top: 14px;
+}
+
+.how-step {
+  padding-top: 30px;
+  position: relative;
+}
+
+.how-step h2 {
+  font-size: 20px;
+  margin: 0 0 6px;
+}
+
+.how-step p {
+  color: var(--muted);
+  margin: 0;
+}
+
+.how-step__num {
+  align-items: center;
+  border: 1px solid rgba(224, 169, 63, 0.55);
+  border-radius: 50%;
+  color: var(--accent);
+  display: flex;
+  font-size: 13px;
+  height: 26px;
+  justify-content: center;
+  left: 22px;
+  position: absolute;
+  top: 18px;
+  width: 26px;
+}
+
+.how-step h2,
+.how-step p {
+  padding-left: 38px;
+}
