@@ -8,11 +8,14 @@ import {
   getOwnCaseLifecycleEvents
 } from "@/lib/cases/queries";
 import { formatDateTime } from "@/lib/i18n/format";
+import { getOwnPayments } from "@/lib/payments/queries";
 import {
   caseDirectionLabel,
   caseStatusLabel,
   caseUrgencyLabel,
-  lifecycleEventLabel
+  lifecycleEventLabel,
+  paymentProductLabel,
+  paymentStatusLabel
 } from "@/lib/i18n/status-labels";
 
 export const dynamic = "force-dynamic";
@@ -36,7 +39,10 @@ export default async function AccountPage() {
     );
   }
 
-  const caseResult = await getClientCaseShell(auth.userId);
+  const [caseResult, paymentsResult] = await Promise.all([
+    getClientCaseShell(auth.userId),
+    getOwnPayments(auth.userId)
+  ]);
   const historyResult =
     caseResult.status === "ready" && caseResult.case
       ? await getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id)
@@ -47,7 +53,7 @@ export default async function AccountPage() {
       <PageHeader
         eyebrow="Аккаунт"
         title="Ваш аккаунт"
-        description="Данные аккаунта, ваш кейс и его история."
+        description="Данные аккаунта, ваш кейс, оплаты и история."
       />
 
       <div className="back-link">
@@ -108,7 +114,33 @@ export default async function AccountPage() {
         </div>
       </section>
 
-      <section className="panel-grid" aria-label="История кейса">
+      <section className="panel-grid" aria-label="Оплаты и история">
+        <div className="panel">
+          <span className="panel__label">Оплаты</span>
+          <h2>Ваши оплаты</h2>
+          {paymentsResult.status === "error" ? (
+            <p className="empty-state">{paymentsResult.message}</p>
+          ) : paymentsResult.payments.length === 0 ? (
+            <p className="empty-state">
+              Оплат пока нет. Тарифы описаны на странице{" "}
+              <Link href="/payment">«Сопровождение»</Link>.
+            </p>
+          ) : (
+            <ul className="status-list">
+              {paymentsResult.payments.map((payment) => (
+                <li key={payment.id}>
+                  {paymentProductLabel(payment.product)} —{" "}
+                  {(payment.amount_cents / 100).toFixed(2)} {payment.currency} —{" "}
+                  {paymentStatusLabel(payment.status)}
+                  {payment.paid_at
+                    ? ` (${formatDateTime(payment.paid_at)})`
+                    : ""}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
         <div className="panel">
           <span className="panel__label">История</span>
           <h2>История кейса</h2>

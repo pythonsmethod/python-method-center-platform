@@ -1,27 +1,13 @@
-import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
-import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
-import {
-  getClientCaseShell,
-  getOwnCaseLifecycleEvents
-} from "@/lib/cases/queries";
+import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
 import { formatDateTime } from "@/lib/i18n/format";
-import {
-  caseDirectionLabel,
-  caseStatusLabel,
-  caseUrgencyLabel,
-  lifecycleEventLabel,
-  paymentProductLabel,
-  paymentStatusLabel,
-  supportStatusLabel
-} from "@/lib/i18n/status-labels";
+import { supportStatusLabel } from "@/lib/i18n/status-labels";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { getCaseMessages } from "@/lib/messages/queries";
-import { getOwnPayments } from "@/lib/payments/queries";
 import { getOwnSupportRequests } from "@/lib/support/queries";
 import { AccountBadge, TokenBadge } from "@/components/referrals/TokenBadge";
 import { getTokenLedger } from "@/lib/tokens/queries";
@@ -58,22 +44,19 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     );
   }
 
-  const [caseResult, supportResult, paymentsResult, tokens] =
-    await Promise.all([
-      getClientCaseShell(auth.userId),
-      getOwnSupportRequests(auth.userId),
-      getOwnPayments(auth.userId),
-      getTokenLedger(auth.userId)
-    ]);
+  const [caseResult, supportResult, tokens] = await Promise.all([
+    getClientCaseShell(auth.userId),
+    getOwnSupportRequests(auth.userId),
+    getTokenLedger(auth.userId)
+  ]);
   const submitted = isOnboardingSubmitted(params?.onboarding);
-  const [documentResult, historyResult, messagesResult] =
+  const [documentResult, messagesResult] =
     caseResult.status === "ready" && caseResult.case
       ? await Promise.all([
           getUploadedDocumentsForCase(auth.userId, caseResult.case.id),
-          getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id),
           getCaseMessages(caseResult.case.id)
         ])
-      : [null, null, null];
+      : [null, null];
 
   return (
     <div className="page-shell">
@@ -115,33 +98,6 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           </div>
         )
       ) : null}
-
-      <section className="panel-grid" aria-label="Оплаты">
-        <div className="panel">
-          <span className="panel__label">Оплаты</span>
-          <h2>Ваши оплаты</h2>
-          {paymentsResult.status === "error" ? (
-            <p className="empty-state">{paymentsResult.message}</p>
-          ) : paymentsResult.payments.length === 0 ? (
-            <p className="empty-state">
-              Оплат пока нет. Тарифы описаны на странице{" "}
-              <Link href="/payment">«Оплата»</Link>.
-            </p>
-          ) : (
-            <ul className="status-list">
-              {paymentsResult.payments.map((payment) => (
-                <li key={payment.id}>
-                  {paymentProductLabel(payment.product)} —{" "}
-                  {(payment.amount_cents / 100).toFixed(2)} {payment.currency}{" "}
-                  — {paymentStatusLabel(payment.status)}
-                  {payment.paid_at ? ` (${formatDateTime(payment.paid_at)})` : ""}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-      </section>
 
       {caseResult.status === "ready" && caseResult.case && messagesResult ? (
         <section className="documents-section" aria-label="Чат с Professor Python и командой">
