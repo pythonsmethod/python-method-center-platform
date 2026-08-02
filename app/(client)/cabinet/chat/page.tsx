@@ -1,68 +1,52 @@
+import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { PageHeader } from "@/components/PageHeader";
-import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
 import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { getRequiredUser } from "@/lib/auth/require-user";
-import { getClientCaseShell } from "@/lib/cases/queries";
 import { formatDateTime } from "@/lib/i18n/format";
 import { supportStatusLabel } from "@/lib/i18n/status-labels";
-import { getCaseMessages } from "@/lib/messages/queries";
 import { getOwnSupportRequests } from "@/lib/support/queries";
 import { SupportRequestForm } from "../SupportRequestForm";
 
 export const dynamic = "force-dynamic";
 
+// Everything that is not the conversation with Professor Python: questions
+// about payment and access, and whatever the person already asked the AI.
+// His own thread is the home page of the cabinet.
 export default async function CabinetChatPage() {
   const auth = await getRequiredUser("/cabinet/chat");
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
-        <PageHeader eyebrow="Связь с центром" title="Переписка" />
+        <PageHeader eyebrow="Связь с центром" title="Поддержка" />
         <AuthSetupNotice title="Раздел требует настройки Supabase Auth" />
       </div>
     );
   }
 
-  const [caseResult, supportResult, assistantResult] = await Promise.all([
-    getClientCaseShell(auth.userId),
+  const [supportResult, assistantResult] = await Promise.all([
     getOwnSupportRequests(auth.userId),
     getOwnAssistantHistory(auth.userId)
   ]);
-  const clientCase =
-    caseResult.status === "ready" && caseResult.case ? caseResult.case : null;
-  const messagesResult = clientCase
-    ? await getCaseMessages(clientCase.id)
-    : null;
 
   return (
     <>
       <PageHeader
         eyebrow="Связь с центром"
-        title="Переписка"
-        description="Здесь вы общаетесь с Professor Python и командой — текстом или голосом."
+        title="Поддержка и ИИ-помощник"
+        description="Вопросы про оплату, доступ и сайт — и вся ваша переписка с помощником."
       />
 
-      {clientCase && messagesResult ? (
-        <section className="documents-section" aria-label="Переписка по кейсу">
-          <div className="panel">
-            <span className="panel__label">Чат по вашему кейсу</span>
-            <h2>Professor Python и команда</h2>
-            <CaseMessageThread
-              loadError={messagesResult.error}
-              messages={messagesResult.messages}
-              viewer="client"
-            />
-          </div>
-        </section>
-      ) : (
-        <div className="cab-note">
-          <strong>Чат откроется вместе с кейсом</strong>
-          <span>Заполните анкету — и переписка станет доступна.</span>
-        </div>
-      )}
+      <div className="cab-note">
+        <strong>Про ваш кейс — на главной</strong>
+        <span>
+          Переписка с Professor Python открывается сразу при входе.{" "}
+          <Link href="/cabinet">Открыть переписку</Link>
+        </span>
+      </div>
 
       <section className="documents-section" aria-label="Переписка с ИИ-помощником">
         <div className="panel">

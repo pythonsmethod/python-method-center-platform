@@ -326,7 +326,7 @@ p {
 .panel-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
   margin-top: 36px;
 }
 
@@ -502,6 +502,9 @@ code {
   font-family:
     "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
   font-size: 0.95em;
+  /* Case numbers and keys have no spaces to break at; without this one of
+     them widens the whole page on a phone. */
+  overflow-wrap: anywhere;
 }
 
 .status-list {
@@ -720,7 +723,7 @@ code {
 .document-list__item dl {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(120px, 100%), 1fr));
   margin: 0;
 }
 
@@ -767,6 +770,10 @@ code {
 .hero {
   display: grid;
   gap: 18px;
+  /* A grid track sized by its content will happily grow past the phone
+     screen. Pinning the column to the available width is what keeps the
+     landing page from needing two fingers to read. */
+  grid-template-columns: minmax(0, 1fr);
   margin: 0 auto;
   max-width: 920px;
   padding: clamp(16px, 4vw, 40px) 0 8px;
@@ -777,8 +784,13 @@ code {
   letter-spacing: 0.28em;
 }
 
+/* Centring a grid child with `margin: 0 auto` turns off the stretch that
+   normally holds it inside its column, and the child then grows to fit its
+   longest line — off the side of a phone. Every auto-centred child in the
+   hero is therefore capped at the width it actually has. */
 .hero h1 {
   margin: 0 auto;
+  max-width: 100%;
   text-transform: uppercase;
   letter-spacing: 0.04em;
 }
@@ -790,7 +802,7 @@ code {
   font-size: clamp(19px, 2.8vw, 24px);
   letter-spacing: 0.1em;
   margin: 0 auto;
-  max-width: 680px;
+  max-width: min(680px, 100%);
 }
 
 .hero__points {
@@ -877,7 +889,7 @@ code {
 .pcard-grid {
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(200px, 100%), 1fr));
   margin-top: 26px;
 }
 
@@ -912,7 +924,7 @@ code {
 .why-grid {
   display: grid;
   gap: 14px;
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(190px, 100%), 1fr));
   margin-top: 26px;
 }
 
@@ -1953,7 +1965,7 @@ code {
 .referral__stats {
   display: grid;
   gap: 10px;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(150px, 100%), 1fr));
   margin: 0;
 }
 
@@ -2066,7 +2078,7 @@ code {
 .founder-metrics {
   display: grid;
   gap: 12px;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(180px, 100%), 1fr));
   margin-top: 26px;
 }
 
@@ -2567,7 +2579,7 @@ code {
 .shop-grid {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
   margin-top: 24px;
 }
 
@@ -2628,7 +2640,7 @@ code {
 /* Shop in the black-and-gold Egyptian style of the line: cards read as
    objects on a shelf, not as rows in a list. */
 .shop-page .shop-grid {
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(230px, 100%), 1fr));
 }
 
 .shop-section {
@@ -2971,10 +2983,17 @@ code {
 .hero-pillars {
   display: grid;
   gap: 18px;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr));
   margin: 30px auto 0;
-  max-width: 960px;
+  max-width: min(960px, 100%);
+  /* A grid item defaults to never shrinking below its content. On a phone
+     that is exactly what pushes the page wider than the screen. */
+  min-width: 0;
   text-align: left;
+}
+
+.hero > * {
+  min-width: 0;
 }
 
 .hero-pillar {
@@ -3125,6 +3144,10 @@ code {
   min-height: calc(100vh - 90px);
 }
 
+.cab__link-icon {
+  position: relative;
+}
+
 .cab__side {
   background: linear-gradient(180deg, #0e0b06, #070603);
   border-right: 1px solid var(--line);
@@ -3187,12 +3210,16 @@ code {
 }
 
 .cab__sos {
+  align-items: center;
   background: linear-gradient(180deg, #6b1f1f, #481212);
   border: 1px solid rgba(255, 120, 120, 0.4);
   border-radius: 12px;
   color: #ffd9d9;
+  display: flex;
+  flex-direction: column;
   font-size: 14px;
   font-weight: 600;
+  gap: 2px;
   margin-top: auto;
   padding: 12px 14px;
   text-align: center;
@@ -3217,18 +3244,6 @@ code {
   padding: 16px clamp(16px, 3vw, 32px);
 }
 
-.cab__burger {
-  background: none;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  color: var(--accent);
-  cursor: pointer;
-  display: none;
-  font-size: 18px;
-  line-height: 1;
-  padding: 8px 12px;
-}
-
 .cab__hello {
   display: grid;
   gap: 2px;
@@ -3240,6 +3255,10 @@ code {
   color: var(--accent-strong);
   font-family: var(--font-serif);
   font-size: clamp(17px, 2.2vw, 22px);
+  /* A long name is a long word: without this it refuses to shrink and
+     slides under the buttons on its right. */
+  min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 .cab__hello span {
@@ -3299,6 +3318,14 @@ code {
   padding: 1px 7px;
 }
 
+/* New messages are counted on the sign itself, so the number is visible
+   even when the strip is only wide enough for icons. */
+.cab__link-icon .cab__badge {
+  position: absolute;
+  right: -8px;
+  top: -6px;
+}
+
 .cab__chip-user {
   display: grid;
   gap: 1px;
@@ -3338,10 +3365,44 @@ code {
   font-size: 14px;
 }
 
+/* The conversation is the page: it takes the height that is left and never
+   makes the person scroll the page to reach the input field. */
+.cab-thread {
+  display: grid;
+  gap: 12px;
+}
+
+.cab-thread__head h1 {
+  font-size: clamp(20px, 3vw, 26px);
+  margin: 2px 0 0;
+}
+
+/* Before the questionnaire there is no case and no thread — one clear step
+   instead of an empty screen. */
+.cab-start {
+  background: linear-gradient(180deg, rgba(30, 24, 13, 0.85), rgba(12, 10, 6, 0.85));
+  border: 1px solid rgba(224, 169, 63, 0.4);
+  border-radius: 18px;
+  display: grid;
+  gap: 10px;
+  justify-items: start;
+  max-width: 620px;
+  padding: clamp(20px, 4vw, 32px);
+}
+
+.cab-start h2 {
+  margin: 0;
+}
+
+.cab-start p {
+  color: var(--muted);
+  margin: 0;
+}
+
 .cab-grid {
   display: grid;
   gap: 16px;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(min(280px, 100%), 1fr));
 }
 
 .cab-card {
@@ -3451,26 +3512,139 @@ code {
   color: var(--accent-strong);
 }
 
+/* On a phone the column of destinations does not disappear — it narrows to
+   a strip of signs with their names underneath. Everything stays one tap
+   away, and the work itself keeps the rest of the screen. */
 @media (max-width: 900px) {
   .cab {
-    grid-template-columns: minmax(0, 1fr);
+    grid-template-columns: 90px minmax(0, 1fr);
   }
 
   .cab__side {
-    border-bottom: 1px solid var(--line);
-    border-right: none;
+    gap: 14px;
+    padding: 14px 6px;
+  }
+
+  .cab__nav {
+    gap: 4px;
+  }
+
+  .cab__link {
+    flex-direction: column;
+    gap: 4px;
+    padding: 9px 4px;
+    text-align: center;
+  }
+
+  .cab__link-body {
+    justify-items: center;
+  }
+
+  .cab__link-body strong {
+    /* Small enough that "документы" keeps to one line inside the strip:
+       a word broken in half reads as a mistake. */
+    font-size: 10px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+  }
+
+  /* The explanations are for a wide screen; the names alone carry the
+     strip. */
+  .cab__link-body em {
     display: none;
   }
 
-  .cab__side--open {
-    display: flex;
+  .cab__sos {
+    font-size: 20px;
+    padding: 10px 4px;
   }
 
-  .cab__burger {
-    display: block;
+  .cab__sos-text {
+    font-size: 10px;
+    line-height: 1.2;
   }
 
-  .cab__chip--user .cab__chip-user {
+  .cab__top {
+    padding: 12px 14px;
+  }
+
+  .cab__hello span {
     display: none;
+  }
+
+  .cab__hello strong {
+    font-size: 15px;
+  }
+
+  /* The account already has its own sign in the strip on the left; a second,
+     wordless one only takes room from the greeting. */
+  .cab__chip--user {
+    display: none;
+  }
+
+  .cab__content {
+    padding: 16px 14px 40px;
+  }
+}
+
+
+/* ==========================================================================
+   The top bar on a phone — the final word.
+
+   Earlier attempts kept the row of signs on one line and let it scroll
+   sideways. On a real phone that hid the last sign completely: the way in
+   and the way to the cabinet were behind a gesture nobody guesses, and the
+   language switch sat on top of the last visible sign. So the bar becomes
+   two honest rows: the name and the language on top, every sign below,
+   two per line. Nothing scrolls, nothing overlaps, nothing is hidden.
+   ========================================================================== */
+
+@media (max-width: 720px) {
+  .site-header {
+    align-items: center;
+    display: grid;
+    gap: 10px;
+    grid-template-areas:
+      "brand lang"
+      "nav nav";
+    grid-template-columns: minmax(0, 1fr) auto;
+    padding: 12px 14px;
+  }
+
+  .brand {
+    grid-area: brand;
+    overflow-wrap: anywhere;
+    white-space: normal;
+  }
+
+  /* The wrapper steps aside so its two children can be placed by the bar
+     itself. */
+  .site-header__right {
+    display: contents;
+  }
+
+  .lang-switch {
+    grid-area: lang;
+  }
+
+  .site-nav {
+    display: grid;
+    gap: 6px;
+    grid-area: nav;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    overflow: visible;
+  }
+
+  .site-nav__item {
+    justify-content: center;
+    min-width: 0;
+    padding: 9px 6px 8px;
+  }
+
+  .site-nav__label {
+    font-size: 12.5px;
+    overflow-wrap: anywhere;
+    text-align: center;
+    white-space: normal;
   }
 }
