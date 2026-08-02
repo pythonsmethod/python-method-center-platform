@@ -118,6 +118,11 @@ export function AssistantWidget({
           </div>
           <AssistantChat
             endpoint="/api/assistant/client"
+            // Saved conversations exist only for people with an account;
+            // a visitor's chat is never stored, so there is nothing to load.
+            historyEndpoint={
+              tier === "guest" ? undefined : "/api/assistant/history"
+            }
             intro={intro}
             locale={locale}
             suggestions={suggestions}

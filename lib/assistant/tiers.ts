@@ -16,6 +16,9 @@ export type AssistantAudience = {
   tier: AssistantTier;
   profileId: string | null;
   email: string | null;
+  // The person's case, when they already have one — saved conversations are
+  // attached to it so the team sees them next to the rest of the case.
+  caseId: string | null;
   // Human-readable snapshot of the person's own journey, injected into the
   // system prompt for registered and paying clients only.
   context: string | null;
@@ -86,6 +89,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
     tier: "guest",
     profileId: null,
     email: null,
+    caseId: null,
     context: null
   };
 
@@ -107,7 +111,13 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
     const supabase = createSupabaseServiceClient();
 
     if (!supabase) {
-      return { tier: "registered", profileId: user.id, email: user.email ?? null, context: null };
+      return {
+        tier: "registered",
+        profileId: user.id,
+        email: user.email ?? null,
+        caseId: null,
+        context: null
+      };
     }
 
     const [caseResult, paymentsResult] = await Promise.all([
@@ -163,6 +173,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
         tier: hasPaid ? "client" : "registered",
         profileId: user.id,
         email: user.email ?? null,
+        caseId: null,
         context: lines.join("\n")
       };
     }
@@ -228,6 +239,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
       tier: hasPaid ? "client" : "registered",
       profileId: user.id,
       email: user.email ?? null,
+      caseId: caseRow.id,
       context: lines.join("\n")
     };
   } catch {

@@ -2,6 +2,8 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
+import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { formatDateTime } from "@/lib/i18n/format";
@@ -24,9 +26,10 @@ export default async function CabinetChatPage() {
     );
   }
 
-  const [caseResult, supportResult] = await Promise.all([
+  const [caseResult, supportResult, assistantResult] = await Promise.all([
     getClientCaseShell(auth.userId),
-    getOwnSupportRequests(auth.userId)
+    getOwnSupportRequests(auth.userId),
+    getOwnAssistantHistory(auth.userId)
   ]);
   const clientCase =
     caseResult.status === "ready" && caseResult.case ? caseResult.case : null;
@@ -60,6 +63,30 @@ export default async function CabinetChatPage() {
           <span>Заполните анкету — и переписка станет доступна.</span>
         </div>
       )}
+
+      <section className="documents-section" aria-label="Переписка с ИИ-помощником">
+        <div className="panel">
+          <span className="panel__label">ИИ-помощник</span>
+          <h2>Ваша переписка с помощником</h2>
+          <p>
+            Всё, что вы спрашивали у помощника, сохраняется здесь — можно
+            перечитать и не задавать один и тот же вопрос дважды. Переписка
+            видна вам и команде центра.
+          </p>
+          <SavedAssistantThread
+            emptyText="Вы ещё не общались с помощником. Откройте окно чата в правом нижнем углу — переписка сохранится здесь."
+            loadError={
+              assistantResult.status === "error"
+                ? assistantResult.message
+                : null
+            }
+            messages={
+              assistantResult.status === "ready" ? assistantResult.messages : []
+            }
+            viewer="client"
+          />
+        </div>
+      </section>
 
       <section className="documents-section" aria-label="Обращения в поддержку">
         <div className="documents-layout">

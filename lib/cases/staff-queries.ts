@@ -83,6 +83,7 @@ export type StaffCaseLifecycleEvent = CaseLifecycleEvent;
 
 export type StaffCaseDetail = {
   id: string;
+  profile_id: string;
   status: string;
   urgency: string;
   direction: string;
@@ -127,7 +128,7 @@ export async function getStaffCaseDetail(
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      `id, status, urgency, direction, title, summary, created_at, updated_at,
+      `id, profile_id, status, urgency, direction, title, summary, created_at, updated_at,
        profiles(email, full_name, phone),
        onboarding_submissions(id, status, submitted_at, payload),
        uploaded_documents(id, original_filename, document_status, created_at),

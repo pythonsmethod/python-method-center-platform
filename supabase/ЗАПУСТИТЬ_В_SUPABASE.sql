@@ -5,11 +5,12 @@
 --  не ломает и не стирает данные.
 -- ============================================================
 --
---  Что внутри (4 части):
+--  Что внутри (5 частей):
 --    1. Запуск: уведомления команде, Stripe-вебхук, гостевая поддержка
 --    2. Реферальная программа: кто кого пригласил
 --    3. Токены: начисление и списание как скидка
 --    4. Защита ИИ-помощника от наплыва: суточные счётчики
+--    5. Сохранение переписки с ИИ — только у тех, кто в аккаунте
 --
 --  В самом конце файл сам покажет таблицу с проверкой: что создано.
 -- ============================================================
@@ -213,6 +214,43 @@ $$;
 
 
 -- ============================================================
+-- ЧАСТЬ 5. СОХРАНЕНИЕ ПЕРЕПИСКИ С ИИ
+-- Переписка сохраняется только у тех, кто вошёл в аккаунт:
+-- зарегистрировался или оплатил. У обычного посетителя сайта
+-- не сохраняется ничего.
+-- ============================================================
+
+create table if not exists public.assistant_messages (
+  id uuid primary key default gen_random_uuid(),
+  profile_id uuid not null references public.profiles(id) on delete cascade,
+  case_id uuid references public.client_cases(id) on delete set null,
+  role text not null check (role in ('user', 'assistant')),
+  content text not null,
+  tier text not null default 'registered',
+  created_at timestamptz not null default now()
+);
+
+comment on table public.assistant_messages is
+  'Сохранённые переписки с ИИ у тех, кто в аккаунте. Гости не сохраняются.';
+
+create index if not exists assistant_messages_profile_idx
+  on public.assistant_messages (profile_id, created_at);
+
+create index if not exists assistant_messages_case_idx
+  on public.assistant_messages (case_id, created_at);
+
+alter table public.assistant_messages enable row level security;
+
+-- Человек читает только свою переписку. Пишет её сервер, команда
+-- центра читает через служебный доступ.
+drop policy if exists "assistant_messages_select_own" on public.assistant_messages;
+create policy "assistant_messages_select_own"
+on public.assistant_messages for select
+to authenticated
+using (profile_id = auth.uid());
+
+
+-- ============================================================
 -- ПРОВЕРКА. Результат этого запроса вы увидите на экране.
 -- Всё должно быть «✅ есть».
 -- ============================================================
@@ -264,5 +302,9 @@ select "Что проверяем", "Статус" from (
       select 1 from pg_proc p join pg_namespace n on n.oid = p.pronamespace
       where n.nspname = 'public' and p.proname = 'bump_assistant_usage'
     ) then '✅ есть' else '❌ НЕТ' end
+  union all select 10,
+    'Сохранение переписки с ИИ (assistant_messages)',
+    case when to_regclass('public.assistant_messages') is not null
+      then '✅ есть' else '❌ НЕТ' end
 ) as checks
 order by n;

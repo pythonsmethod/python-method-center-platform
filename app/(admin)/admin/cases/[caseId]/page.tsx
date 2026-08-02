@@ -17,6 +17,8 @@ import {
 import { isUuid } from "@/lib/utils/uuid";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
+import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
 import { PaymentRecordForm } from "./PaymentRecordForm";
@@ -150,7 +152,10 @@ export default async function StaffCaseDetailPage({
   const events = [...clientCase.case_lifecycle_events].sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
-  const caseMessages = await getCaseMessages(clientCase.id);
+  const [caseMessages, assistantHistory] = await Promise.all([
+    getCaseMessages(clientCase.id),
+    getAssistantHistoryForCase(clientCase.profile_id)
+  ]);
 
   return (
     <div className="page-shell">
@@ -328,6 +333,34 @@ export default async function StaffCaseDetailPage({
             expandable
             loadError={caseMessages.error}
             messages={caseMessages.messages}
+            viewer="staff"
+          />
+        </div>
+      </section>
+
+      <section
+        className="intake-section"
+        aria-label="Переписка клиента с ИИ-помощником"
+      >
+        <div className="panel">
+          <span className="panel__label">Клиент и ИИ-помощник</span>
+          <h2>О чём клиент уже спрашивал помощника</h2>
+          <p>
+            Сохраняется переписка только тех, кто зарегистрирован. Прочитайте
+            её перед ответом — так вы не повторите то, что человек уже узнал.
+          </p>
+          <SavedAssistantThread
+            emptyText="Клиент ещё не обращался к ИИ-помощнику."
+            loadError={
+              assistantHistory.status === "error"
+                ? assistantHistory.message
+                : null
+            }
+            messages={
+              assistantHistory.status === "ready"
+                ? assistantHistory.messages
+                : []
+            }
             viewer="staff"
           />
         </div>

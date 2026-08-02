@@ -1,8 +1,9 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
+import { contextWindow } from "@/lib/assistant/context-window";
 import {
   prepareFiles,
   splitIntoBatches,
@@ -27,6 +28,10 @@ type AssistantChatProps = {
   attachments?: boolean;
   caseId?: string;
   locale?: Locale;
+  // Where to read the previous conversation from. Passed only for people
+  // with an account — for everyone else the thread starts empty every time,
+  // because nothing about them is stored.
+  historyEndpoint?: string;
 };
 
 // When the files do not fit one request, they are read in parts: each part
@@ -47,7 +52,8 @@ export function AssistantChat({
   providerChoice = false,
   attachments: allowAttachments = false,
   caseId,
-  locale = "ru"
+  locale = "ru",
+  historyEndpoint
 }: AssistantChatProps) {
   const t = getDictionary(locale).widget;
   const effectivePlaceholder = placeholder ?? t.placeholder;
@@ -58,6 +64,9 @@ export function AssistantChat({
   const [provider, setProvider] = useState<Provider>("best");
   const [files, setFiles] = useState<PreparedFile[]>([]);
   const [progress, setProgress] = useState<string | null>(null);
+  // How many of the messages on screen came from a previous visit — they get
+  // a divider so it is clear where today's conversation starts.
+  const [restored, setRestored] = useState(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const voice = useVoiceInput((text) => {
@@ -71,6 +80,43 @@ export function AssistantChat({
       node.scrollTop = node.scrollHeight;
     }
   }, [messages, pending]);
+
+  // Previous conversation of a signed-in person, so they can re-read what
+  // they were told instead of asking again. Failures are silent: an empty
+  // thread is a normal starting point, not an error worth showing.
+  useEffect(() => {
+    if (!historyEndpoint) {
+      return;
+    }
+
+    let cancelled = false;
+
+    void (async () => {
+      try {
+        const response = await fetch(historyEndpoint);
+
+        if (!response.ok) {
+          return;
+        }
+
+        const data = (await response.json()) as { messages?: ChatMessage[] };
+        const saved = Array.isArray(data.messages) ? data.messages : [];
+
+        if (cancelled || saved.length === 0) {
+          return;
+        }
+
+        setMessages((current) => (current.length > 0 ? current : saved));
+        setRestored(saved.length);
+      } catch {
+        // Nothing to restore — the conversation simply starts fresh.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [historyEndpoint]);
 
   async function addFiles(selected: FileList | null) {
     if (!selected || selected.length === 0) {
@@ -112,13 +158,16 @@ export function AssistantChat({
   // person can read.
   async function ask(
     history: ChatMessage[],
-    batch: PreparedFile[] | null
+    batch: PreparedFile[] | null,
+    // What to keep in the saved conversation: the text the person actually
+    // typed, or nothing at all for the technical file-reading requests.
+    save?: { displayText?: string; transient?: boolean }
   ): Promise<string> {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        messages: history,
+        messages: contextWindow(history),
         ...(batch && batch.length
           ? {
               attachments: batch.map((file) => ({
@@ -130,7 +179,9 @@ export function AssistantChat({
           : {}),
         locale,
         ...(providerChoice ? { provider } : {}),
-        ...(caseId ? { caseId } : {})
+        ...(caseId ? { caseId } : {}),
+        ...(save?.transient ? { transient: true } : {}),
+        ...(save?.displayText ? { displayText: save.displayText } : {})
       })
     });
 
@@ -182,7 +233,8 @@ export function AssistantChat({
       if (batches.length === 1) {
         const reply = await ask(
           [...messages, { role: "user", content: question }],
-          batches[0]
+          batches[0],
+          { displayText: visible }
         );
         setMessages([...nextMessages, { role: "assistant", content: reply }]);
         return;
@@ -207,7 +259,9 @@ export function AssistantChat({
                 .join(", ")}.`
             }
           ],
-          batch
+          batch,
+          // A working step, not part of the conversation: nothing to re-read.
+          { transient: true }
         );
 
         extracts.push(`— Часть ${index + 1} (${batch.length} файлов) —\n${partReply}`);
@@ -226,7 +280,8 @@ export function AssistantChat({
             )}`
           }
         ],
-        null
+        null,
+        { displayText: visible }
       );
 
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
@@ -246,13 +301,18 @@ export function AssistantChat({
     <div className="assistant-chat">
       <div className="assistant-chat__messages" ref={scrollRef}>
         <div className="assistant-msg assistant-msg--assistant">{intro}</div>
+        {restored > 0 ? (
+          <p className="assistant-chat__divider">Ваша прошлая переписка</p>
+        ) : null}
         {messages.map((message, index) => (
-          <div
-            className={`assistant-msg assistant-msg--${message.role}`}
-            key={`${index}-${message.role}`}
-          >
-            {message.content}
-          </div>
+          <Fragment key={`${index}-${message.role}`}>
+            {restored > 0 && index === restored ? (
+              <p className="assistant-chat__divider">Сегодня</p>
+            ) : null}
+            <div className={`assistant-msg assistant-msg--${message.role}`}>
+              {message.content}
+            </div>
+          </Fragment>
         ))}
         {!pending && progress ? (
           <div className="assistant-msg assistant-msg--assistant assistant-msg--pending">

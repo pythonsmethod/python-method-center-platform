@@ -43,6 +43,13 @@ which is preserved separately.
     browser and read in batches when they exceed one request, then
     analysed together; sent straight to Claude and never stored anywhere
   - knowledge base editable by staff, injected into both system prompts
+  - saved conversations for people with an account only (registered and
+    paying): the exchange is written to `assistant_messages`, restored into
+    the chat window on the next visit, readable in the cabinet and on the
+    case page so the team does not repeat what the person already asked.
+    A visitor without an account leaves no record anywhere; only the last
+    twelve messages are replayed to the model, so a long history costs
+    nothing extra per question
 - Automated red-flag workflow: the client assistant tags emergencies with a
   hidden marker; the server strips it, records an `escalation_events` row
   (physical → Karen, psychological → support) and pushes an external
@@ -65,8 +72,9 @@ which is preserved separately.
 - Audit log and case lifecycle event writing via the server-only service role
 
 Known limitations (tracked in `docs/audits/`): the case AI assistant reads
-case metadata but not document file contents; assistant chat history is not
-persisted; admin UI is Russian-only; notification delivery requires the
+case metadata but not document file contents; the staff assistant's own
+chat in `/admin` is not persisted; admin UI is Russian-only; notification
+delivery requires the
 Telegram env vars to be set.
 
 ## Routes
@@ -80,6 +88,7 @@ Telegram env vars to be set.
 - `/support` — public support (guest form + emergency notice)
 - `/admin`, `/admin/cases`, `/admin/documents`, `/admin/requests` — staff
 - `/api/assistant/client`, `/api/assistant/staff` — AI endpoints
+- `/api/assistant/history` — the signed-in person's saved AI conversation
 - `/api/stripe/webhook` — Stripe webhook (server-to-server only)
 - `/api/messages/*` — case chat polling and voice upload
 

@@ -7,6 +7,7 @@ import {
   buildRegisteredSystemPrompt
 } from "@/lib/assistant/prompts";
 import { guardAssistantRequest } from "@/lib/assistant/guard";
+import { saveAssistantExchange } from "@/lib/assistant/history";
 import { extractRedFlag, recordRedFlagEvent } from "@/lib/assistant/red-flags";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
@@ -194,6 +195,28 @@ export async function POST(request: Request) {
           "Событие требует ручной проверки."
         ],
         link: adminLink()
+      });
+    }
+  }
+
+  // Saved conversation — only for people who have an account. Someone who
+  // is just looking around the site leaves nothing behind.
+  if (audience.tier !== "guest" && audience.profileId) {
+    // Reading a large set of files takes several technical requests; only
+    // the conversation itself is worth keeping, so those are marked as
+    // transient by the chat window. `displayText` is what the person
+    // actually saw in the window, without the machine-readable padding.
+    const transient = (body as { transient?: unknown })?.transient === true;
+    const rawDisplay = (body as { displayText?: unknown })?.displayText;
+    const displayText = typeof rawDisplay === "string" ? rawDisplay.trim() : "";
+
+    if (!transient) {
+      await saveAssistantExchange({
+        profileId: audience.profileId,
+        caseId: audience.caseId,
+        tier: audience.tier,
+        question: displayText || messages[messages.length - 1]?.content || "",
+        answer: cleanedReply
       });
     }
   }
