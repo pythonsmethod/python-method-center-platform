@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
+import { logoutAction } from "@/lib/auth/actions";
 import {
   IconAnkh,
   IconEyeOfHorus,
@@ -117,6 +118,15 @@ export function CabinetShell({
           <span aria-hidden="true">☎</span>
           <span className="cab__sos-text">Экстренная помощь</span>
         </Link>
+
+        {/* Leaving must never require searching. Quiet on purpose: an exit,
+            not an invitation. */}
+        <form action={logoutAction}>
+          <button className="cab__logout" type="submit">
+            <span aria-hidden="true">⎋</span>
+            <span className="cab__logout-text">Выйти из аккаунта</span>
+          </button>
+        </form>
       </aside>
 
       <div className="cab__main">
