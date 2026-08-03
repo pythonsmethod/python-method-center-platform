@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { SITE_URL } from "@/lib/config/site";
 import { socialLinks } from "@/lib/config/socials";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -37,9 +38,22 @@ const playfair = Playfair_Display({
 });
 
 export const metadata: Metadata = {
+  // One canonical address per page ("./" resolves to the current path), so
+  // search engines never index the same page under two names.
+  metadataBase: new URL(SITE_URL),
+  alternates: { canonical: "./" },
   title: "Python Method — сопровождение восстановления",
   description:
-    "Клиентская платформа Python Method: анкета, медицинские документы, связь с командой и оплата сопровождения."
+    "Клиентская платформа Python Method: анкета, медицинские документы, связь с командой и оплата сопровождения.",
+  openGraph: {
+    siteName: "Python Method Center",
+    title: "Python Method Center — реабилитация без границ",
+    description:
+      "Цифровой центр восстановления: экспертное сопровождение Professor Python и ИИ-помощник рядом на каждом шаге пути.",
+    url: "./",
+    type: "website",
+    locale: "ru_RU"
+  }
 };
 
 type RootLayoutProps = {
