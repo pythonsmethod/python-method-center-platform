@@ -51,6 +51,7 @@ const ru = {
       }
     ],
     cta: "Начать путь",
+    ctaLearn: "Как всё устроено — 2 минуты",
     tagline: "Мы ведём. Вы восстанавливаетесь. Вместе — к результату.",
     cabinetsTitle: "Кабинеты центра",
     whyTitle: "Почему с нами?",
@@ -123,6 +124,48 @@ const ru = {
     cta: "Получить разбор",
     ctaFree: "Получить бесплатный разбор",
     note: "Разбор является экспертным мнением и не заменяет консультацию врача."
+  },
+  // Ступенька перед регистрацией. Человек, который тревожится за здоровье,
+  // не отдаёт email сайту, которому ещё не поверил, — сначала ему нужны
+  // ответы: кто вы, что входит, сколько стоит, кто увидит его документы.
+  path: {
+    eyebrow: "Прежде чем создавать аккаунт",
+    title: "Как всё устроено",
+    lead: "Семь честных ответов — чтобы вы решали спокойно, зная всё заранее. Регистрация подождёт.",
+    sections: [
+      {
+        q: "Кто мы?",
+        a: "Python Method Center — цифровой центр восстановления. Ведущий эксперт — Professor Python: каждый кейс он разбирает лично, без шаблонов и протоколов. Операционная поддержка — Анна. Мы не больница и не заменяем вашего врача — мы экспертное сопровождение восстановления по авторскому методу."
+      },
+      {
+        q: "Что входит в сопровождение?",
+        a: "Личный разбор ваших анализов и истории от Professor Python, план восстановления под вашу ситуацию и ежедневная связь с командой в чате кабинета — текстом или голосом. На обоих тарифах Professor Python отправляет свою формулу в подарок. Рядом круглосуточно работает ИИ-помощник: подсказывает по кабинету и готовит ваши материалы к разбору."
+      },
+      {
+        q: "Сколько это стоит?",
+        a: "Сейчас первый шаг бесплатный: разбор анализов от Professor Python — акция для первых клиентов. Дальше по желанию: сопровождение «5 недель» — $1 440 или «100 дней» — $3 675, всё включено, без скрытых доплат. Цены открыто стоят на странице «Сопровождение» — их не прячут за звонком менеджера."
+      },
+      {
+        q: "Каких результатов ждать?",
+        a: "Честный ответ: мы не обещаем исцеления — обещать такое не имеет права никто. Мы обещаем то, что в наших руках: внимательный личный разбор, план, выстроенный под вас, и команду рядом на каждом шаге. Разбор — экспертное мнение Professor Python; оно не заменяет консультацию врача и работает вместе с ней, а не вместо."
+      },
+      {
+        q: "Как используется моя медицинская информация?",
+        a: "Только для вашего кейса. Документы лежат в закрытом хранилище: доступ к файлу возможен только по временной защищённой ссылке, публичного доступа нет. Мы не передаём и не продаём данные никому и не используем их ни для чего, кроме работы над вашим восстановлением. Полные условия — в публичной оферте."
+      },
+      {
+        q: "Кто увидит мои документы?",
+        a: "Professor Python и команда центра — и никто больше. ИИ-помощник видит только список названий ваших файлов; содержимое он прочитает лишь в одном случае — если вы сами приложите файл в его чат. Другие клиенты и посторонние не видят ничего: каждый аккаунт наглухо отделён от остальных на уровне базы данных."
+      },
+      {
+        q: "Сколько длится работа?",
+        a: "Разбор анализов — до трёх рабочих дней после загрузки, ответ приходит файлом в кабинет, затем три рабочих дня открыт чат с Professor Python для вопросов. Сопровождение — на выбор: пять недель или сто дней. Всё это время команда с вами на связи."
+      }
+    ],
+    ctaTitle: "Теперь — когда всё ясно",
+    ctaText: "Регистрация занимает минуту: email и пароль. Дальше анкета, документы — и Professor Python берёт ваш кейс в работу.",
+    cta: "Создать аккаунт",
+    ctaSecondary: "Остались вопросы? Спросите ИИ-помощника — кнопка «☥ Спросить» внизу экрана, — или напишите в поддержку."
   },
   // Подарок без объяснений читается как уловка. Здесь — ответы на вопросы,
   // которые человек задаёт себе молча и уходит, не задав.
@@ -389,6 +432,7 @@ const en: typeof ru = {
       }
     ],
     cta: "Start your journey",
+    ctaLearn: "How it all works — 2 minutes",
     tagline: "We guide. You recover. Together — towards the result.",
     cabinetsTitle: "Center cabinets",
     whyTitle: "Why choose us?",
@@ -459,6 +503,45 @@ const en: typeof ru = {
     cta: "Get the review",
     ctaFree: "Get the free review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
+  },
+  path: {
+    eyebrow: "Before you create an account",
+    title: "How it all works",
+    lead: "Seven honest answers — so you can decide calmly, knowing everything upfront. Registration can wait.",
+    sections: [
+      {
+        q: "Who are we?",
+        a: "Python Method Center is a digital recovery centre. The leading expert is Professor Python: he reviews every case personally, without templates or protocols. Operational support — Anna. We are not a hospital and we do not replace your doctor — we are expert recovery support built on an original method."
+      },
+      {
+        q: "What does the support include?",
+        a: "A personal review of your test results and history by Professor Python, a recovery plan built for your situation, and daily contact with the team in the cabinet chat — by text or voice. On both plans Professor Python sends his formula as a gift. An AI assistant is there around the clock: it guides you through the cabinet and prepares your materials for the review."
+      },
+      {
+        q: "How much does it cost?",
+        a: "Right now the first step is free: a review of your test results by Professor Python — an offer for the centre's first clients. After that, if you choose: the 5-week plan at $1,440 or the 100-day plan at $3,675, everything included, no hidden extras. Prices are stated openly on the Support page — never hidden behind a sales call."
+      },
+      {
+        q: "What results can I expect?",
+        a: "The honest answer: we do not promise a cure — nobody has the right to promise that. We promise what is in our hands: an attentive personal review, a plan built around you, and a team beside you at every step. The review is Professor Python's expert opinion; it does not replace a doctor's consultation — it works alongside it, not instead of it."
+      },
+      {
+        q: "How is my medical information used?",
+        a: "Only for your case. Documents live in private storage: a file can be opened only through a temporary protected link, and there is no public access. We never pass on or sell your data, and we use it for nothing except the work on your recovery. The full terms are in the public offer."
+      },
+      {
+        q: "Who will see my documents?",
+        a: "Professor Python and the centre's team — no one else. The AI assistant sees only the list of your file names; it reads a file's contents in one case only — if you attach it in its chat yourself. Other clients and outsiders see nothing: every account is walled off from the rest at the database level."
+      },
+      {
+        q: "How long does the work take?",
+        a: "The review of your test results — up to three working days after upload, delivered as a file in your cabinet, followed by three working days of open chat with Professor Python for questions. The support itself is your choice: five weeks or one hundred days. The team stays in touch the whole time."
+      }
+    ],
+    ctaTitle: "Now that everything is clear",
+    ctaText: "Registration takes a minute: email and password. Then the questionnaire, your documents — and Professor Python takes your case.",
+    cta: "Create an account",
+    ctaSecondary: "Questions left? Ask the AI assistant — the “☥ Ask” button at the bottom of the screen — or write to support."
   },
   promoDetails: {
     title: "What exactly you get",

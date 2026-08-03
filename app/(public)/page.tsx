@@ -51,8 +51,15 @@ export default async function HomePage() {
           </article>
         </div>
 
-        <div className="hero__cta">
-          <Link className="button" href="/login">
+        {/* Clarity before commitment: the primary door leads to the page
+            that answers who we are, what it costs and who sees the
+            documents. Registration is the second button — for those who
+            already know. */}
+        <div className="hero__cta hero__cta--pair">
+          <Link className="button" href="/path">
+            {t.ctaLearn}
+          </Link>
+          <Link className="button button--secondary" href="/login">
             {t.cta}
           </Link>
         </div>
