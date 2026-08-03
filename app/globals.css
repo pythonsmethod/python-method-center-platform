@@ -830,13 +830,6 @@ code {
   margin-top: 14px;
 }
 
-.hero__cta--pair {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px;
-  justify-content: center;
-}
-
 .hero__cta .button {
   font-family: var(--font-serif);
   font-size: 17px;
@@ -1989,30 +1982,6 @@ code {
   color: var(--text);
   line-height: 1.6;
   margin: 0;
-}
-
-/* The trust page reads top to bottom, one answer at a time — a single
-   column keeps the order of the questions intact. */
-.promo-faq__list--single {
-  grid-template-columns: minmax(0, 1fr);
-  margin: 24px auto 0;
-  max-width: 760px;
-}
-
-.path-cta {
-  margin: 34px auto 0;
-  max-width: 760px;
-  text-align: center;
-}
-
-.path-cta .panel-actions {
-  justify-content: center;
-}
-
-.path-cta__note {
-  color: var(--muted);
-  font-size: 14px;
-  margin: 14px 0 0;
 }
 
 .promo-faq__note {
