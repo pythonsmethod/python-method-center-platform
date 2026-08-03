@@ -1,0 +1,226 @@
+.assistant-widget {
+  --anham-glow: rgba(227, 194, 95, 0.42);
+  --anham-core: #f5d77c;
+  bottom: 24px;
+  display: grid;
+  gap: 12px;
+  justify-items: end;
+  position: fixed;
+  right: 24px;
+  z-index: 70;
+}
+
+.assistant-widget--registered {
+  --anham-glow: rgba(126, 202, 255, 0.46);
+  --anham-core: #9ed8ff;
+}
+
+.assistant-widget--client {
+  --anham-glow: rgba(227, 194, 95, 0.68);
+  --anham-core: #ffe39a;
+}
+
+.anham {
+  align-items: center;
+  background:
+    radial-gradient(circle at 35% 28%, rgba(255, 255, 255, 0.28), transparent 20%),
+    linear-gradient(145deg, #4a3a1f, #0d1119 58%, #8b6b26);
+  border: 1px solid rgba(255, 224, 139, 0.72);
+  border-radius: 50%;
+  box-shadow:
+    0 0 0 8px rgba(10, 13, 19, 0.72),
+    0 0 34px var(--anham-glow),
+    0 18px 40px rgba(0, 0, 0, 0.55);
+  color: var(--anham-core);
+  cursor: pointer;
+  display: flex;
+  height: 76px;
+  justify-content: center;
+  position: relative;
+  transition: transform 180ms ease, box-shadow 180ms ease;
+  width: 76px;
+}
+
+.anham:hover,
+.anham:focus-visible {
+  box-shadow:
+    0 0 0 8px rgba(10, 13, 19, 0.82),
+    0 0 48px var(--anham-glow),
+    0 22px 46px rgba(0, 0, 0, 0.62);
+  outline: none;
+  transform: translateY(-3px) scale(1.02);
+}
+
+.anham::before,
+.anham::after {
+  background: linear-gradient(180deg, #cda94c, #5e4619);
+  border: 1px solid rgba(255, 226, 145, 0.55);
+  border-radius: 50%;
+  content: "";
+  height: 22px;
+  position: absolute;
+  top: 27px;
+  width: 12px;
+}
+
+.anham::before { left: -8px; }
+.anham::after { right: -8px; }
+
+.anham__face {
+  align-items: center;
+  background: radial-gradient(circle at 50% 35%, #18243a, #05070b 70%);
+  border: 1px solid rgba(255, 226, 145, 0.45);
+  border-radius: 50%;
+  display: flex;
+  flex-direction: column;
+  height: 54px;
+  justify-content: center;
+  position: relative;
+  width: 54px;
+}
+
+.anham__ankh {
+  font-family: var(--font-serif);
+  font-size: 20px;
+  line-height: 1;
+  text-shadow: 0 0 12px var(--anham-core);
+}
+
+.anham__eyes {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.anham__eyes span {
+  background: var(--anham-core);
+  border-radius: 50%;
+  box-shadow: 0 0 8px var(--anham-core);
+  height: 4px;
+  width: 4px;
+}
+
+.anham__smile {
+  border-bottom: 2px solid var(--anham-core);
+  border-radius: 50%;
+  height: 8px;
+  margin-top: 2px;
+  width: 16px;
+}
+
+.anham__ring {
+  animation: anhamOrbit 7s linear infinite;
+  border: 1px solid var(--anham-glow);
+  border-radius: 50%;
+  inset: -15px;
+  pointer-events: none;
+  position: absolute;
+}
+
+.anham__ring::after {
+  background: var(--anham-core);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--anham-core);
+  content: "";
+  height: 5px;
+  left: 50%;
+  position: absolute;
+  top: -3px;
+  width: 5px;
+}
+
+.anham__badge {
+  background: rgba(7, 10, 15, 0.94);
+  border: 1px solid rgba(227, 194, 95, 0.45);
+  border-radius: 14px;
+  color: #f1e6cf;
+  font-size: 12px;
+  line-height: 1.35;
+  max-width: 168px;
+  padding: 10px 12px;
+  position: absolute;
+  right: 88px;
+  top: 4px;
+  width: max-content;
+}
+
+.anham__badge strong {
+  color: var(--anham-core);
+  display: block;
+  font-size: 13px;
+  margin-bottom: 2px;
+}
+
+.assistant-widget__toggle {
+  background: transparent;
+  border: 0;
+  height: 76px;
+  padding: 0;
+  width: 76px;
+}
+
+.assistant-widget__panel,
+.assistant-widget__welcome {
+  backdrop-filter: blur(18px);
+  background: linear-gradient(180deg, rgba(15, 20, 30, 0.98), rgba(8, 10, 15, 0.98));
+  border: 1px solid rgba(227, 194, 95, 0.45);
+  border-radius: 20px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.62);
+  max-height: min(720px, calc(100vh - 130px));
+  overflow: hidden;
+  width: min(390px, calc(100vw - 32px));
+}
+
+.assistant-widget__header {
+  align-items: center;
+  border-bottom: 1px solid rgba(227, 194, 95, 0.24);
+  display: flex;
+  justify-content: space-between;
+  padding: 15px 17px;
+}
+
+.assistant-widget__header span::before {
+  color: var(--anham-core);
+  content: "Анхам · ";
+  font-weight: 800;
+}
+
+.assistant-widget__welcome {
+  padding: 20px;
+}
+
+.assistant-widget__welcome-title::before {
+  color: var(--anham-core);
+  content: "Анхам · ";
+  font-weight: 800;
+}
+
+@keyframes anhamOrbit {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anham__ring { animation: none; }
+}
+
+@media (max-width: 720px) {
+  .assistant-widget {
+    bottom: 18px;
+    right: 16px;
+  }
+
+  .anham,
+  .assistant-widget__toggle {
+    height: 64px;
+    width: 64px;
+  }
+
+  .anham__face {
+    height: 46px;
+    width: 46px;
+  }
+
+  .anham__badge {
+    display: none;
+  }
+}
