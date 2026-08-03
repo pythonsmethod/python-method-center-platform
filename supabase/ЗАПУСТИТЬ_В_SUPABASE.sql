@@ -5,13 +5,14 @@
 --  не ломает и не стирает данные.
 -- ============================================================
 --
---  Что внутри (6 частей):
+--  Что внутри (7 частей):
 --    1. Запуск: уведомления команде, Stripe-вебхук, гостевая поддержка
 --    2. Реферальная программа: кто кого пригласил
 --    3. Токены: начисление и списание как скидка
 --    4. Защита ИИ-помощника от наплыва: суточные счётчики
 --    5. Сохранение переписки с ИИ — только у тех, кто в аккаунте
 --    6. Тестовый доступ за 3 $ — отдельный вид оплаты
+--    7. Данные клиента: адрес доставки формулы и заказов
 --
 --  В самом конце файл сам покажет таблицу с проверкой: что создано.
 --  Две последние строки таблицы — про хранилища файлов. Их создают
@@ -265,6 +266,17 @@ alter type public.payment_product add value if not exists 'test_access';
 
 
 -- ============================================================
+-- ЧАСТЬ 7. ДАННЫЕ КЛИЕНТА
+-- Адрес доставки: клиент сам вносит и правит его в кабинете,
+-- в разделе «Мой кейс» → «Мои данные». Нужен для доставки
+-- формулы Professor Python и заказов из магазина.
+-- ============================================================
+
+alter table public.profiles
+  add column if not exists delivery_address text;
+
+
+-- ============================================================
 -- ПРОВЕРКА. Результат этого запроса вы увидите на экране.
 -- Всё должно быть «✅ есть».
 -- ============================================================
@@ -326,14 +338,21 @@ select "Что проверяем", "Статус" from (
       select 1 from pg_enum e join pg_type t on t.oid = e.enumtypid
       where t.typname = 'payment_product' and e.enumlabel = 'test_access'
     ) then '✅ есть' else '❌ НЕТ' end
+  union all select 12,
+    'Адрес доставки клиента (profiles.delivery_address)',
+    case when exists (
+      select 1 from information_schema.columns
+      where table_schema = 'public' and table_name = 'profiles'
+        and column_name = 'delivery_address'
+    ) then '✅ есть' else '❌ НЕТ' end
   -- Хранилища создаются не этим файлом, а в разделе Storage. Проверка
   -- здесь для того, чтобы не забыть их создать.
-  union all select 12,
+  union all select 13,
     'Хранилище документов (Storage: client-documents)',
     case when exists (
       select 1 from storage.buckets where id = 'client-documents'
     ) then '✅ есть' else '❌ НЕТ — создать в разделе Storage' end
-  union all select 13,
+  union all select 14,
     'Хранилище голосовых (Storage: case-audio)',
     case when exists (
       select 1 from storage.buckets where id = 'case-audio'

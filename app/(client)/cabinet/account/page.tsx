@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
+import { ProfileDetailsForm } from "@/components/cabinet/ProfileDetailsForm";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import {
@@ -39,6 +41,15 @@ export default async function AccountPage() {
     );
   }
 
+  const supabase = await createSupabaseServerClient();
+  const { data: profileRow } = supabase
+    ? await supabase
+        .from("profiles")
+        .select("full_name, phone, delivery_address")
+        .eq("id", auth.userId)
+        .maybeSingle()
+    : { data: null };
+
   const [caseResult, paymentsResult] = await Promise.all([
     getClientCaseShell(auth.userId),
     getOwnPayments(auth.userId)
@@ -58,12 +69,20 @@ export default async function AccountPage() {
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Аккаунт</span>
-          <h2>{auth.email ?? "Вы вошли в систему"}</h2>
+          <span className="panel__label">Мои данные</span>
+          <h2>Как с вами связаться и куда доставлять</h2>
           <p>
-            Один аккаунт — один непрерывный кейс. Все документы и сообщения
-            привязаны к нему.
+            Эти данные видит только команда центра. Адрес нужен для доставки
+            формулы Professor Python и заказов из магазина.
           </p>
+          <ProfileDetailsForm
+            deliveryAddress={
+              (profileRow?.delivery_address as string | null) ?? null
+            }
+            email={auth.email}
+            fullName={profileRow?.full_name ?? null}
+            phone={profileRow?.phone ?? null}
+          />
           <div className="panel-actions">
             <LogoutButton />
           </div>

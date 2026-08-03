@@ -3383,6 +3383,11 @@ code {
   background: linear-gradient(180deg, #7d2525, #571616);
 }
 
+.field__hint {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
 .cab__logout {
   align-items: center;
   background: none;
