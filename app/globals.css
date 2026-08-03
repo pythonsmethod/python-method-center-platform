@@ -1055,6 +1055,95 @@ code {
   font-style: italic;
 }
 
+/* Upload history: one block per round, a golden thread down the left —
+   the case as it unfolded in time. */
+.doc-rounds {
+  display: grid;
+  gap: 18px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.doc-round {
+  border-left: 2px solid rgba(224, 169, 63, 0.45);
+  display: grid;
+  gap: 10px;
+  padding-left: 16px;
+  position: relative;
+}
+
+.doc-round::before {
+  background: var(--accent);
+  border-radius: 50%;
+  content: "";
+  height: 9px;
+  left: -5.5px;
+  position: absolute;
+  top: 5px;
+  width: 9px;
+}
+
+.doc-round__head {
+  display: grid;
+  gap: 2px;
+}
+
+.doc-round__head strong {
+  color: var(--accent-strong);
+}
+
+.doc-round__head span {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.doc-round__files {
+  display: grid;
+  gap: 8px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.doc-round__file {
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  padding: 10px 14px;
+}
+
+.doc-round__file-body {
+  display: grid;
+  flex: 1;
+  gap: 2px;
+  min-width: 0;
+}
+
+.doc-round__file-body strong {
+  overflow-wrap: anywhere;
+}
+
+.doc-round__file-body span {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.doc-round__version {
+  background: rgba(224, 169, 63, 0.16);
+  border: 1px solid rgba(224, 169, 63, 0.5);
+  border-radius: 999px;
+  color: var(--accent-strong);
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 10px;
+  white-space: nowrap;
+}
+
 /* Saved conversation, read-only: the cabinet and the case page. */
 .assistant-log {
   align-content: start;

@@ -17,6 +17,7 @@ import {
 import { isUuid } from "@/lib/utils/uuid";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
@@ -262,36 +263,25 @@ export default async function StaffCaseDetailPage({
       <section className="intake-section" aria-label="Документы кейса">
         <div className="panel">
           <span className="panel__label">Документы</span>
-          <h2>Загруженные документы</h2>
-          {documents.length === 0 ? (
-            <p className="empty-state">Документы ещё не загружены.</p>
-          ) : (
-            <ul className="document-list">
-              {documents.map((document) => (
-                <li className="document-list__item" key={document.id}>
-                  <div>
-                    <strong>
-                      {document.original_filename ?? "Документ без названия"}
-                    </strong>
-                    <span>{formatDateTime(document.created_at)}</span>
-                    <span className="status-badge">
-                      {documentStatusLabel(document.document_status)}
-                    </span>
-                  </div>
-                  <div className="panel-actions">
-                    <Link
-                      className="button button--secondary button--compact"
-                      href={`/admin/documents/${document.id}/view`}
-                      rel="noreferrer"
-                      target="_blank"
-                    >
-                      Открыть файл
-                    </Link>
-                  </div>
-                </li>
-              ))}
-            </ul>
-          )}
+          <h2>История загрузок</h2>
+          <p>
+            По загрузкам, от свежих к ранним. Повторная загрузка файла с тем
+            же названием помечена как новая версия — это динамика клиента.
+          </p>
+          <DocumentTimeline
+            documents={documents}
+            emptyText="Документы ещё не загружены."
+            renderAction={(document) => (
+              <Link
+                className="button button--secondary button--compact"
+                href={`/admin/documents/${document.id}/view`}
+                rel="noreferrer"
+                target="_blank"
+              >
+                Открыть файл
+              </Link>
+            )}
+          />
         </div>
       </section>
 

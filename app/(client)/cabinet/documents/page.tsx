@@ -3,6 +3,7 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
+import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
 import { DocumentUploadPanel } from "../DocumentUploadPanel";
 
@@ -44,11 +45,34 @@ export default async function CabinetDocumentsPage() {
           </span>
         </div>
       ) : documentResult?.status === "ready" ? (
-        <DocumentUploadPanel
-          caseId={clientCase.id}
-          initialDocuments={documentResult.documents}
-          userId={auth.userId}
-        />
+        <>
+          <DocumentUploadPanel
+            caseId={clientCase.id}
+            initialDocuments={documentResult.documents}
+            userId={auth.userId}
+          />
+
+          {documentResult.documents.length > 0 ? (
+            <section
+              aria-label="История загрузок"
+              className="documents-section"
+            >
+              <div className="panel">
+                <span className="panel__label">История загрузок</span>
+                <h2>Как менялись ваши документы</h2>
+                <p>
+                  Каждая загрузка — отдельный шаг вашей истории. Если вы
+                  присылаете свежую версию того же анализа, она помечается
+                  как новая версия — так видно динамику, а не просто список.
+                </p>
+                <DocumentTimeline
+                  documents={documentResult.documents}
+                  emptyText="Загрузок пока не было."
+                />
+              </div>
+            </section>
+          ) : null}
+        </>
       ) : (
         <div className="cab-note">
           <strong>Документы недоступны</strong>

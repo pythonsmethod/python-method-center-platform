@@ -1,3 +1,4 @@
+import { buildDocumentTimeline } from "@/lib/documents/timeline";
 import { caseStatusLabel } from "@/lib/i18n/status-labels";
 import { caseStatusLabels } from "@/lib/founder/labels";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -181,7 +182,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
     const [documentsResult, eventsResult, periodResult] = await Promise.all([
       supabase
         .from("uploaded_documents")
-        .select("original_filename, created_at")
+        .select("id, original_filename, created_at")
         .eq("case_id", caseRow.id)
         .order("created_at", { ascending: false })
         .limit(20),
@@ -206,8 +207,18 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
         "Документы НЕ загружены. Без них Professor Python не сможет разобрать ситуацию — это следующий шаг."
       );
     } else {
+      // Rounds and repeat versions matter to the conversation: "you sent
+      // fresh blood work on the 15th" is a different sentence from "you
+      // have 7 files".
+      const rounds = buildDocumentTimeline(documents);
+      const updates = rounds.reduce((sum, round) => sum + round.updateCount, 0);
+
       lines.push(
-        `Загружено документов: ${documents.length}. Названия файлов: ${documents
+        `Загружено документов: ${documents.length} (загрузок по датам: ${rounds.length}${
+          updates > 0
+            ? `, из них повторных версий ранее присланных файлов: ${updates} — клиент присылает динамику`
+            : ""
+        }). Названия файлов: ${documents
           .map((row) => row.original_filename)
           .filter(Boolean)
           .slice(0, 10)
