@@ -106,7 +106,7 @@ const ru = {
   path: {
     eyebrow: "Прежде чем создавать аккаунт",
     title: "Как всё устроено",
-    lead: "Семь честных ответов — чтобы вы решали спокойно, зная всё заранее. Регистрация подождёт.",
+    lead: "Семь честных ответов — чтобы вы решали спокойно, зная всё заранее.",
     sections: [
       {
         q: "Кто мы?",
@@ -457,7 +457,7 @@ const en: typeof ru = {
   path: {
     eyebrow: "Before you create an account",
     title: "How it all works",
-    lead: "Seven honest answers — so you can decide calmly, knowing everything upfront. Registration can wait.",
+    lead: "Seven honest answers — so you can decide calmly, knowing everything upfront.",
     sections: [
       {
         q: "Who are we?",
