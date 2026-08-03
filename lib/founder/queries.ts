@@ -190,6 +190,31 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     };
   }
 
+  // Keys being set is not the same as events arriving. A webhook can be
+  // configured perfectly and still point at a different address entirely —
+  // which is exactly how a real payment can go missing. So the panel says
+  // whether anything has actually reached us.
+  const { data: lastStripeEvent } = await supabase
+    .from("stripe_events")
+    .select("type, created_at")
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  systems.splice(
+    systems.findIndex((item) => item.name.startsWith("Автозапись оплат")) + 1,
+    0,
+    {
+      name: "События от Stripe доходят",
+      ok: Boolean(lastStripeEvent),
+      detail: lastStripeEvent
+        ? `Последнее: ${lastStripeEvent.type} — ${new Date(
+            lastStripeEvent.created_at
+          ).toLocaleString("ru-RU")}`
+        : "Ни одного события не получено. В Stripe адрес вебхука должен быть https://pythonmethodcenter.com/api/stripe/webhook"
+    }
+  );
+
   const since7d = daysAgo(7);
   const since30d = daysAgo(30);
 
