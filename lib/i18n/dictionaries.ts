@@ -66,7 +66,7 @@ const ru = {
     startLabel: "Начать",
     startTitle: "Готовы начать?",
     startText:
-      "Зарегистрируйтесь и заполните анкету — это занимает около 10 минут.",
+      "Зарегистрируйтесь и заполните анкету.",
     disclaimerLabel: "Границы ответственности",
     disclaimerTitle: "Платформа не заменяет врача",
     disclaimerText:
@@ -382,7 +382,7 @@ const en: typeof ru = {
       "Take the whole path yourself, at your own pace. The assistant stays aside until you need it.",
     startLabel: "Start",
     startTitle: "Ready to begin?",
-    startText: "Create an account and fill in the questionnaire — it takes about 10 minutes.",
+    startText: "Create an account and fill in the questionnaire.",
     disclaimerLabel: "Boundaries of responsibility",
     disclaimerTitle: "The platform does not replace your doctor",
     disclaimerText:
