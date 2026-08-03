@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFreeReviewActive } from "@/lib/config/promo";
@@ -41,12 +42,12 @@ export default async function HomePage() {
         <div className="hv2-actions"><Link className="hv2-button hv2-button--gold" href="/login">{copy.self}</Link><a className="hv2-button" href="#anham">{copy.anham} ↗</a></div>
         <div className="hv2-trust"><span>{copy.private}</span><span>{copy.human}</span><span>{copy.pace}</span></div>
       </div>
-      <div className="hv2-professor" aria-label="Professor Python"><div className="hv2-professor__light"/><div className="hv2-professor__figure"><span>PP</span></div><div className="hv2-professor__caption"><strong>Professor Python</strong><span>{t.expertLabel}</span></div></div>
+      <div className="hv2-professor" aria-label="Professor Python"><div className="hv2-professor__light"/><Image className="hv2-professor__image" src="/images/professor-python-temp-v2.png" alt="Professor Python" fill priority sizes="(max-width: 900px) 100vw, 42vw"/><div className="hv2-professor__caption"><strong>Professor Python</strong><span>{t.expertLabel}</span></div></div>
     </section>
 
     <section className="hv2-section"><header className="hv2-heading"><p>{copy.foundations}</p><h2>{copy.foundationTitle}</h2></header>
-      <div className="hv2-foundations"><article className="hv2-foundation"><span className="hv2-index">I</span><div className="hv2-mark">P</div><div><p className="hv2-kicker">{copy.expert}</p><h3>Professor Python</h3><p>{t.expertText}</p></div></article>
-      <article className={`hv2-foundation hv2-foundation--anham hv2-foundation--${tier}`} id="anham"><span className="hv2-index">II</span><div className="hv2-mark">A</div><div><p className="hv2-kicker">{copy.companion}</p><h3>Anham</h3><p>{copy.anhamText}</p></div></article></div>
+      <div className="hv2-foundations"><article className="hv2-foundation hv2-foundation--professor"><span className="hv2-index">I</span><div className="hv2-foundation-professor"><Image src="/images/professor-python-temp-v2.png" alt="Professor Python" fill sizes="(max-width: 900px) 100vw, 42vw"/></div><div className="hv2-foundation__copy"><p className="hv2-kicker">{copy.expert}</p><h3>Professor Python</h3><p>{t.expertText}</p></div></article>
+      <article className={`hv2-foundation hv2-foundation--anham hv2-foundation--${tier}`} id="anham"><span className="hv2-index">II</span><div className="hv2-anham-portrait"><Image src="/images/anham-character-v2.png" alt="Anham, your platform companion" fill sizes="(max-width: 900px) 100vw, 42vw"/></div><div className="hv2-foundation__copy"><p className="hv2-kicker">{copy.companion}</p><h3>Anham</h3><p>{copy.anhamText}</p><span className="hv2-state-label">{tier === "guest" ? (isRu ? "Знакомство" : "First meeting") : tier === "registered" ? (isRu ? "Личный спутник" : "Personal companion") : (isRu ? "Сопровождение кейса" : "Beside your case")}</span></div></article></div>
     </section>
 
     <section className="hv2-gift"><div className="hv2-seal"><span>{promo.badge}</span><b>01</b></div><div><p className="hv2-kicker">{copy.gift}</p><h2>{freeReview ? copy.giftTitle : promo.titlePaid}</h2><p>{freeReview ? promo.textFree : promo.textPaid}</p><strong>{freeReview ? promo.priceFree : promo.pricePaid} <span>{promo.priceAmount}</span></strong></div><Link className="hv2-button hv2-button--gold" href="/review">{freeReview ? copy.giftCta : promo.cta}</Link></section>

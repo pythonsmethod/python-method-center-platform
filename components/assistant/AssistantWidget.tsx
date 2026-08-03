@@ -67,7 +67,7 @@ export function AssistantWidget({
   }
 
   return (
-    <div className="assistant-widget">
+    <div className={`assistant-widget assistant-widget--${tier}${open ? " is-open" : ""}`}>
       {showWelcome && !open ? (
         <div
           aria-label={header}
