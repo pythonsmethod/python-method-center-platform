@@ -6,6 +6,7 @@ import { SITE_URL } from "@/lib/config/site";
 // them entirely.
 const PUBLIC_PATHS: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
+  { path: "/review", priority: 0.9 },
   { path: "/payment", priority: 0.9 },
   { path: "/shop", priority: 0.7 },
   { path: "/payment/other", priority: 0.5 },

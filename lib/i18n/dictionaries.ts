@@ -137,7 +137,11 @@ const ru = {
         q: "Какие анализы подойдут?",
         a: "Любые анализы и чек-апы, сданные за последние 30 дней."
       }
-    ]
+    ],
+    pageCtaTitle: "Как получить разбор",
+    pageCtaText:
+      "Создайте аккаунт, заполните анкету и загрузите анализы — Professor Python возьмёт их в работу.",
+    pageCta: "Создать аккаунт и получить разбор"
   },
   paymentTest: {
     eyebrow: "Тестовый доступ",
@@ -446,7 +450,11 @@ const en: typeof ru = {
         q: "Which test results are suitable?",
         a: "Any tests and check-ups taken within the last 30 days."
       }
-    ]
+    ],
+    pageCtaTitle: "How to get the review",
+    pageCtaText:
+      "Create an account, fill in the questionnaire and upload your test results — Professor Python will take them from there.",
+    pageCta: "Create an account and get the review"
   },
   paymentTest: {
     eyebrow: "Test access",

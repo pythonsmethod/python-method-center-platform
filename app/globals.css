@@ -1984,6 +1984,17 @@ code {
   margin: 0;
 }
 
+/* The closing step on the review page. */
+.review-cta {
+  margin: 34px auto 0;
+  max-width: 760px;
+  text-align: center;
+}
+
+.review-cta .panel-actions {
+  justify-content: center;
+}
+
 .promo-faq__note {
   color: var(--muted);
   font-size: 14px;
