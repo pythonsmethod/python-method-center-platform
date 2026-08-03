@@ -57,6 +57,14 @@ export default function CabinetScreen() {
           <Text style={styles.next}>{nextStepForCase(clientCase ?? null)}</Text>
         </View>
 
+        <Pressable style={styles.chatButton} onPress={() => router.push('/team-chat')}>
+          <View style={styles.chatCopy}>
+            <Text style={styles.chatTitle}>Чат с командой</Text>
+            <Text style={styles.chatText}>Сообщения синхронизируются с веб-кабинетом</Text>
+          </View>
+          <Text style={styles.chatArrow}>›</Text>
+        </Pressable>
+
         <View style={styles.card}>
           <Text style={styles.label}>Текущий кейс</Text>
           <Text style={styles.cardTitle}>{clientCase ? caseStatusLabels[clientCase.status] ?? clientCase.status : 'Кейс ещё не создан'}</Text>
@@ -91,6 +99,8 @@ const styles = StyleSheet.create({
   highlight: { backgroundColor: '#211C13', borderColor: '#7A6130', borderWidth: 1, borderRadius: 20, padding: 20, gap: 8 },
   label: { color: '#AFA89C', fontSize: 12, textTransform: 'uppercase' }, cardTitle: { color: '#FFF', fontSize: 20, fontWeight: '700' },
   meta: { color: '#D8D0C4', fontSize: 15 }, next: { color: '#F6E7BA', fontSize: 18, lineHeight: 27, fontWeight: '600' },
+  chatButton: { backgroundColor: '#2A2112', borderColor: '#8A6C32', borderWidth: 1, borderRadius: 18, padding: 17, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  chatCopy: { flex: 1, gap: 4 }, chatTitle: { color: '#F6E7BA', fontSize: 18, fontWeight: '800' }, chatText: { color: '#BDB5A8', fontSize: 13, lineHeight: 18 }, chatArrow: { color: '#E6C978', fontSize: 32, marginLeft: 12 },
   menuRow: { flexDirection: 'row', gap: 12 }, menuButton: { flex: 1, backgroundColor: '#151515', borderColor: '#755F35', borderWidth: 1, borderRadius: 18, padding: 16, gap: 5 },
   menuTitle: { color: '#F6E7BA', fontSize: 16, fontWeight: '700' }, menuText: { color: '#AFA89C', fontSize: 12 },
   logout: { borderColor: '#755F35', borderWidth: 1, borderRadius: 14, alignItems: 'center', paddingVertical: 14 }, logoutText: { color: '#E6C978', fontWeight: '700' },
