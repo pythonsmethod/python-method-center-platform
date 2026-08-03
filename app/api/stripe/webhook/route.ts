@@ -3,7 +3,9 @@ import type Stripe from "stripe";
 import { paymentProductLabel } from "@/lib/i18n/status-labels";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import {
+  emailExactMatchPattern,
   getStripe,
+  normalizePayerEmail,
   productFromAmount,
   servicePeriodEnd
 } from "@/lib/payments/stripe";
@@ -145,7 +147,7 @@ async function handlePaidSession(
 ) {
   const amountCents = session.amount_total ?? 0;
   const currency = (session.currency ?? "usd").toUpperCase();
-  const customerEmail = session.customer_details?.email ?? null;
+  const customerEmail = normalizePayerEmail(session.customer_details?.email);
   const reference =
     typeof session.payment_intent === "string"
       ? session.payment_intent
@@ -166,10 +168,13 @@ async function handlePaidSession(
   }
 
   if (!profileId && customerEmail) {
+    // P2-01: the pattern is fully escaped, so this is case-insensitive
+    // EQUALITY — "%" and "_" in a payer-typed email can no longer match a
+    // different client's address. No match → manual review, never a guess.
     const { data: byEmail } = await supabase
       .from("profiles")
       .select("id")
-      .ilike("email", customerEmail)
+      .ilike("email", emailExactMatchPattern(customerEmail))
       .maybeSingle();
 
     profileId = byEmail?.id ?? null;
