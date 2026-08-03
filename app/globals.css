@@ -3761,9 +3761,9 @@ code {
     font-size: 15px;
   }
 
-  /* The account already has its own sign in the strip on the left; a second,
-     wordless one only takes room from the greeting. */
-  .cab__chip--user {
+  /* On a phone the account chip keeps its sign but drops the name and
+     email — the door stays visible, only the caption goes. */
+  .cab__chip--user .cab__chip-user {
     display: none;
   }
 
