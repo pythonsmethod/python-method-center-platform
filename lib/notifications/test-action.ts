@@ -104,8 +104,10 @@ export async function discoverTelegramChats(): Promise<TelegramChatsState> {
     if (found.size === 0) {
       return {
         status: "error",
+        // The simple path first: a private chat needs no permissions, a
+        // group needs the bot to be allowed to read messages.
         message:
-          "Токен верный, но чатов пока не видно. Добавьте бота в вашу группу и напишите в ней любое сообщение — потом нажмите кнопку ещё раз.",
+          "Токен верный, но чатов пока не видно. Откройте бота в Telegram, нажмите «Запустить» и напишите ему любое слово — потом нажмите кнопку ещё раз. Для группы: добавьте туда бота и напишите сообщение в ней.",
         chats: []
       };
     }
