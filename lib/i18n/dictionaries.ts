@@ -118,7 +118,7 @@ const ru = {
       },
       {
         q: "Сколько это стоит?",
-        a: "Сейчас первый шаг бесплатный: разбор анализов от Professor Python — акция для первых клиентов. Дальше по желанию: сопровождение «5 недель» — $1 440 или «100 дней» — $3 675, всё включено, без скрытых доплат. Цены открыто стоят на странице «Сопровождение» — их не прячут за звонком менеджера."
+        a: "Сейчас первый шаг бесплатный: разбор анализов от Professor Python — акция для первых клиентов. Сопровождение — два тарифа: «5 недель» — $1 440 и «100 дней» — $3 675, всё включено, без скрытых доплат. Цены открыто стоят на странице «Сопровождение» — их не прячут за звонком менеджера."
       },
       {
         q: "Каких результатов ждать?",
@@ -469,7 +469,7 @@ const en: typeof ru = {
       },
       {
         q: "How much does it cost?",
-        a: "Right now the first step is free: a review of your test results by Professor Python — an offer for the centre's first clients. After that, if you choose: the 5-week plan at $1,440 or the 100-day plan at $3,675, everything included, no hidden extras. Prices are stated openly on the Support page — never hidden behind a sales call."
+        a: "Right now the first step is free: a review of your test results by Professor Python — an offer for the centre's first clients. The support comes in two plans: 5 weeks at $1,440 and 100 days at $3,675, everything included, no hidden extras. Prices are stated openly on the Support page — never hidden behind a sales call."
       },
       {
         q: "What results can I expect?",
