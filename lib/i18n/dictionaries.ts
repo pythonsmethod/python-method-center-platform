@@ -115,7 +115,7 @@ const ru = {
       "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — Professor Python лично изучит их и даст обратную связь по состоянию организма и рекомендации по восстановлению. Сейчас — бесплатно, для первых клиентов платформы.",
     titlePaid: "Разбор анализов от Professor Python",
     textPaid:
-      "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации и один день, чтобы задать любые вопросы.",
+      "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации и три рабочих дня открытого чата, чтобы задать любые вопросы.",
     // The amount is rendered on its own line and never wraps mid-number.
     pricePaid: "Разовая услуга — стоимость",
     priceFree: "Бесплатно · позже эта услуга будет стоить",
@@ -451,7 +451,7 @@ const en: typeof ru = {
       "Create an account, fill in the questionnaire and upload your test results — Karen will personally review them and give you feedback on your condition and recovery recommendations. Free right now, for the platform's first clients.",
     titlePaid: "Analyses review by Karen",
     textPaid:
-      "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations, and one day to ask Karen any questions.",
+      "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations, and three working days of open chat to ask any questions.",
     pricePaid: "One-time service — price",
     priceFree: "Free · later this service will cost",
     priceAmount: "$1,000",
