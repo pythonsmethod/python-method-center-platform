@@ -69,6 +69,27 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* The free tools, announced where a visitor decides whether an
+          account is worth it: they get real value even before any plan. */}
+      <section aria-label={t.freeTools.title} className="free-tools">
+        <span className="free-tools__badge">{t.freeTools.badge}</span>
+        <h2>{t.freeTools.title}</h2>
+        <p className="free-tools__lead">{t.freeTools.lead}</p>
+        <div className="free-tools__grid">
+          {t.freeTools.items.map((item) => (
+            <article className="free-tools__card" key={item.title}>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+        <div className="free-tools__actions">
+          <Link className="button" href="/login">
+            {t.freeTools.cta}
+          </Link>
+        </div>
+      </section>
+
       <p className="tagline">{t.tagline}</p>
 
       <section aria-label={t.howTitle}>

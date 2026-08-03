@@ -7,6 +7,7 @@ import { logoutAction } from "@/lib/auth/actions";
 import {
   IconAnkh,
   IconEyeOfHorus,
+  IconLotus,
   IconPapyrus,
   IconScales,
   IconScarab,
@@ -35,6 +36,18 @@ const sections: CabinetSection[] = [
     icon: IconPapyrus
   },
   {
+    href: "/cabinet/metrics",
+    title: "Динамика",
+    hint: "Ваши показатели на графике",
+    icon: IconEyeOfHorus
+  },
+  {
+    href: "/cabinet/supplements",
+    title: "Мои добавки",
+    hint: "Чек-лист приёма на день",
+    icon: IconLotus
+  },
+  {
     href: "/cabinet/chat",
     title: "Связь с центром",
     hint: "Поддержка и ИИ-помощник",
@@ -60,6 +73,7 @@ type CabinetShellProps = {
   greetingName: string;
   unread: number;
   tokens: number;
+  supplementsDue: number;
 };
 
 // The cabinet as a workspace. The column of destinations is always on the
@@ -71,7 +85,8 @@ export function CabinetShell({
   email,
   greetingName,
   unread,
-  tokens
+  tokens,
+  supplementsDue
 }: CabinetShellProps) {
   const pathname = usePathname();
 
@@ -88,9 +103,14 @@ export function CabinetShell({
           {sections.map((section) => {
             const Icon = section.icon;
             const active = isCurrent(section.href);
-            // The count of new messages belongs next to the place the
-            // messages actually are: the home page.
-            const badge = section.href === "/cabinet" ? unread : 0;
+            // Badges live where the action is: unread messages on the home
+            // page, doses waiting to be taken on the tracker.
+            const badge =
+              section.href === "/cabinet"
+                ? unread
+                : section.href === "/cabinet/supplements"
+                  ? supplementsDue
+                  : 0;
 
             return (
               <Link

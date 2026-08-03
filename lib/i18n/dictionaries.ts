@@ -81,7 +81,23 @@ const ru = {
         title: "Разбор и сопровождение",
         text: "После выбранного тарифа вы получаете разбор кейса и начинаете сопровождение."
       }
-    ]
+    ],
+    freeTools: {
+      badge: "Бесплатно для всех, у кого есть аккаунт",
+      title: "Два инструмента — сразу после регистрации",
+      lead: "Это не тариф и не акция. Просто создайте аккаунт — и оба инструмента останутся с вами бесплатно.",
+      items: [
+        {
+          title: "Динамика показателей",
+          text: "Вносите цифры из анализов — и смотрите на живом графике, что было полгода назад и что стало сейчас. Только ваши настоящие цифры, ничего придуманного."
+        },
+        {
+          title: "Мои добавки",
+          text: "Запишите, что и когда вы решили принимать, — кабинет соберёт дневной чек-лист и напомнит, что пора. ИИ подскажет удачное время приёма: что утром, что вечером, что разнести."
+        }
+      ],
+      cta: "Создать аккаунт и пользоваться"
+    }
   },
   promo: {
     badge: "🎁 Акция для первых клиентов",
@@ -397,7 +413,23 @@ const en: typeof ru = {
         title: "Review and support",
         text: "Once your plan is chosen you receive the case review and the support program begins."
       }
-    ]
+    ],
+    freeTools: {
+      badge: "Free for everyone with an account",
+      title: "Two tools — right after sign-up",
+      lead: "Not a plan and not a promotion. Simply create an account — and both tools stay with you for free.",
+      items: [
+        {
+          title: "Progress chart",
+          text: "Enter the numbers from your test results — and see on a live chart what they were half a year ago and what they are now. Only your real numbers, nothing invented."
+        },
+        {
+          title: "My supplements",
+          text: "Write down what you decided to take and when — the cabinet builds a daily checklist and reminds you when it's time. The AI suggests good timing: what in the morning, what in the evening, what to space apart."
+        }
+      ],
+      cta: "Create an account and use them"
+    }
   },
   promo: {
     badge: "🎁 Early clients offer",
