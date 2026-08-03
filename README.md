@@ -42,6 +42,9 @@ which is preserved separately.
     attachments — up to 30 photos/PDFs per message, downscaled in the
     browser and read in batches when they exceed one request, then
     analysed together; sent straight to Claude and never stored anywhere
+  - the same paperclip is available to paying clients in their personal AI
+    chat, enforced server-side by tier — guests and registered users get a
+    warm pointer to the paid level instead
   - knowledge base editable by staff, injected into both system prompts
   - saved conversations for people with an account only (registered and
     paying): the exchange is written to `assistant_messages`, restored into
@@ -71,11 +74,12 @@ which is preserved separately.
   queue (guest requests show their reply-to email)
 - Audit log and case lifecycle event writing via the server-only service role
 
-Known limitations (tracked in `docs/audits/`): the case AI assistant reads
-case metadata but not document file contents; the staff assistant's own
-chat in `/admin` is not persisted; admin UI is Russian-only; notification
-delivery requires the
-Telegram env vars to be set.
+Known limitations (tracked in `docs/audits/`): the AI reads case metadata
+and files attached directly in the chat (paying clients and staff), but
+not the contents of files in cabinet storage — the prompts tell it to say
+so and offer the paperclip instead of pretending; the staff assistant's
+own chat in `/admin` is not persisted; admin UI is Russian-only;
+notification delivery requires the Telegram env vars to be set.
 
 ## Routes
 

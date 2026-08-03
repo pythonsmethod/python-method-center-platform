@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { sanitizeChatMessages } from "@/lib/assistant/claude";
+import { sanitizeAttachments } from "@/lib/assistant/attachments";
+import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam, type AssistantProvider } from "@/lib/assistant/router";
 import {
   buildGuestSystemPrompt,
@@ -87,6 +88,27 @@ export async function POST(request: Request) {
   const audience = await resolveAssistantAudience();
   const settings = TIER_SETTINGS[audience.tier];
 
+  // Files in the chat are a paying-client capability: their AI reads the
+  // analyses they attach. The interface only shows the paperclip on that
+  // level, but the check lives here, where it cannot be bypassed.
+  const attachments = sanitizeAttachments(
+    (body as { attachments?: unknown })?.attachments
+  );
+
+  if (attachments === "invalid") {
+    return NextResponse.json(
+      { error: "Файлы не прошли проверку. Обновите страницу и попробуйте ещё раз." },
+      { status: 400 }
+    );
+  }
+
+  if (attachments && audience.tier !== "client") {
+    return NextResponse.json({
+      reply:
+        "Чтение приложенных файлов доступно персональному ИИ после начала сопровождения. Сейчас вы можете загрузить анализы в кабинете — их лично разберёт Professor Python."
+    });
+  }
+
   if (isRateLimited(`tier:${audience.profileId ?? ip}`, settings.perMinute)) {
     return NextResponse.json(
       { error: "Слишком много сообщений подряд. Подождите минуту." },
@@ -129,12 +151,18 @@ export async function POST(request: Request) {
     system += "\n\n## Язык интерфейса посетителя\nПосетитель использует английскую версию сайта — по умолчанию отвечай на английском (если он пишет на другом языке, отвечай на его языке).";
   }
 
-  const result = await askAssistantTeam(
-    system,
-    messages,
-    settings.maxTokens,
-    settings.provider
-  );
+  // Attached files go to Claude, which reads photos and PDFs directly;
+  // the arbiter path is skipped rather than answering without seeing them.
+  const result = attachments
+    ? hasClaudeEnv()
+      ? await askClaude(system, messages, settings.maxTokens, attachments)
+      : ({ status: "unavailable" } as const)
+    : await askAssistantTeam(
+        system,
+        messages,
+        settings.maxTokens,
+        settings.provider
+      );
 
   if (result.status === "unavailable") {
     return NextResponse.json(

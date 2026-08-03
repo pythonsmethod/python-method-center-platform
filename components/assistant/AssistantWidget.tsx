@@ -117,6 +117,10 @@ export function AssistantWidget({
             </button>
           </div>
           <AssistantChat
+            // The paperclip belongs to the paid level: a client's personal
+            // AI reads the analyses they attach. The server enforces the
+            // same rule — this only controls what the window shows.
+            attachments={tier === "client"}
             endpoint="/api/assistant/client"
             // Saved conversations exist only for people with an account;
             // a visitor's chat is never stored, so there is nothing to load.

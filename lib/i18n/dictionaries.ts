@@ -47,7 +47,7 @@ const ru = {
       },
       {
         title: "Персональный ИИ",
-        text: "После начала сопровождения работает с вашим случаем и вашими материалами."
+        text: "После начала сопровождения знает ваш кейс и его историю, а приложенные в чат анализы читает сам."
       }
     ],
     cta: "Начать путь",
@@ -210,9 +210,10 @@ const ru = {
       client: {
         header: "☥ Ваш персональный ИИ",
         intro:
-          "Здравствуйте! Я ваш персональный ИИ и веду ваш кейс: помню вашу историю, ваши документы и сроки сопровождения. Помогу разобраться в материалах и подготовить вопрос — решения по состоянию принимает Professor Python лично.",
+          "Здравствуйте! Я ваш персональный ИИ: знаю вашу анкету, статус кейса, список загруженных документов и сроки сопровождения. Содержимое файлов из хранилища мне не видно — его лично разбирает Professor Python, — но фото и PDF анализов можно приложить скрепкой прямо сюда, и я их прочитаю. Решения по состоянию принимает Professor Python.",
         suggestions: [
           "Что сейчас происходит с моим кейсом?",
+          "Разбери анализы, которые я приложу",
           "Помоги сформулировать вопрос для Professor Python",
           "Сколько ещё длится моё сопровождение?"
         ]
@@ -384,7 +385,7 @@ const en: typeof ru = {
       },
       {
         title: "Personal AI",
-        text: "Once support begins it works with your case and your materials."
+        text: "Once support begins it knows your case and its history, and reads the test results you attach in the chat."
       }
     ],
     cta: "Start your journey",
@@ -541,9 +542,10 @@ const en: typeof ru = {
       client: {
         header: "☥ Your personal AI",
         intro:
-          "Hello! I am your personal AI and I follow your case: your history, your documents and your support period. I can help you navigate your materials and prepare a question — decisions about your condition are made by Professor Python personally.",
+          "Hello! I am your personal AI: I know your questionnaire, your case status, the list of uploaded documents and your support period. I cannot see inside the files in storage — Professor Python reviews those personally — but you can attach photos and PDFs of test results right here with the paperclip, and I will read them. Decisions about your condition are made by Professor Python.",
         suggestions: [
           "What is happening with my case now?",
+          "Review the test results I attach",
           "Help me formulate a question for Professor Python",
           "How long does my support period still run?"
         ]

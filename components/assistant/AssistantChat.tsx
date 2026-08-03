@@ -23,8 +23,8 @@ type AssistantChatProps = {
   placeholder?: string;
   suggestions?: string[];
   providerChoice?: boolean;
-  // Team-only: photos and files for the assistant to look at. Never
-  // enabled for the public widget.
+  // Photos and files for the assistant to read directly. Enabled for the
+  // team and for paying clients; never for the public widget.
   attachments?: boolean;
   caseId?: string;
   locale?: Locale;
