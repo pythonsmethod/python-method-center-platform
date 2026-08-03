@@ -11,6 +11,7 @@ export default async function HomePage() {
   const dict = getDictionary(locale);
   const t = dict.landing;
   const promo = dict.promo;
+  const details = dict.promoDetails;
   const freeReview = isFreeReviewActive();
 
   return (
@@ -71,6 +72,25 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* A thousand-dollar service given away has to explain itself, or it
+          reads as bait. These are the questions people ask themselves
+          silently and then leave without asking. */}
+      {freeReview ? (
+        <section aria-label={details.title} className="promo-faq">
+          <h2 className="section-title">{details.title}</h2>
+          <p className="promo-faq__lead">{details.lead}</p>
+          <dl className="promo-faq__list">
+            {details.items.map((item) => (
+              <div className="promo-faq__item" key={item.q}>
+                <dt>{item.q}</dt>
+                <dd>{item.a}</dd>
+              </div>
+            ))}
+          </dl>
+          <p className="promo-faq__note">{promo.note}</p>
+        </section>
+      ) : null}
 
       <p className="tagline">{t.tagline}</p>
 

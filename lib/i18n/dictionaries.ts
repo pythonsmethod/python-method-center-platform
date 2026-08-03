@@ -1,3 +1,7 @@
+import {
+  FREE_REVIEW_DEADLINE_EN,
+  FREE_REVIEW_DEADLINE_RU
+} from "@/lib/config/promo";
 import type { Locale } from "@/lib/i18n/locale";
 
 // Public-site copy in both languages. The client cabinet and the admin
@@ -119,6 +123,46 @@ const ru = {
     cta: "Получить разбор",
     ctaFree: "Получить бесплатный разбор",
     note: "Разбор является экспертным мнением и не заменяет консультацию врача."
+  },
+  // Подарок без объяснений читается как уловка. Здесь — ответы на вопросы,
+  // которые человек задаёт себе молча и уходит, не задав.
+  promoDetails: {
+    title: "Что именно вы получите",
+    lead: "Без мелкого шрифта. Восемь вопросов, которые обычно не решаются задать.",
+    items: [
+      {
+        q: "Почему это бесплатно?",
+        a: `Это предложение для первых клиентов центра — до ${FREE_REVIEW_DEADLINE_RU}. Позже та же услуга будет стоить $1 000.`
+      },
+      {
+        q: "Что входит?",
+        a: "Разбор ваших анализов и рекомендации Professor Python по восстановлению показателей."
+      },
+      {
+        q: "В каком виде придёт ответ?",
+        a: "Отдельным файлом — он появится в вашем личном кабинете."
+      },
+      {
+        q: "Сколько ждать?",
+        a: "До трёх рабочих дней после того, как вы загрузили анализы."
+      },
+      {
+        q: "Можно ли задать вопросы?",
+        a: "Да. В течение трёх рабочих дней после разбора открыт чат с Professor Python — вопросы идут напрямую ему."
+      },
+      {
+        q: "Придётся ли потом покупать сопровождение?",
+        a: "Нет. Это остаётся на ваше усмотрение — разбор ни к чему не обязывает."
+      },
+      {
+        q: "Это полный разбор или предварительный?",
+        a: "Это аналитика ваших анализов и рекомендации по восстановлению."
+      },
+      {
+        q: "Какие анализы подойдут?",
+        a: "Любые анализы и чек-апы, сданные за последние 30 дней."
+      }
+    ]
   },
   paymentTest: {
     eyebrow: "Тестовый доступ",
@@ -414,6 +458,44 @@ const en: typeof ru = {
     cta: "Get the review",
     ctaFree: "Get the free review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
+  },
+  promoDetails: {
+    title: "What exactly you get",
+    lead: "No small print. The eight questions people usually don't dare to ask.",
+    items: [
+      {
+        q: "Why is it free?",
+        a: `This is an offer for the centre's first clients — until ${FREE_REVIEW_DEADLINE_EN}. Later the same service will cost $1,000.`
+      },
+      {
+        q: "What is included?",
+        a: "A review of your test results and Professor Python's recommendations on restoring your markers."
+      },
+      {
+        q: "In what form does the answer come?",
+        a: "As a separate file — it appears in your personal cabinet."
+      },
+      {
+        q: "How long does it take?",
+        a: "Up to three working days after you upload your test results."
+      },
+      {
+        q: "Can I ask questions?",
+        a: "Yes. For three working days after the review, a chat with Professor Python is open — your questions go straight to him."
+      },
+      {
+        q: "Will I have to buy a support plan afterwards?",
+        a: "No. That stays entirely up to you — the review commits you to nothing."
+      },
+      {
+        q: "Is this a full review or a preliminary one?",
+        a: "It is an analysis of your test results with recommendations for recovery."
+      },
+      {
+        q: "Which test results are suitable?",
+        a: "Any tests and check-ups taken within the last 30 days."
+      }
+    ]
   },
   paymentTest: {
     eyebrow: "Test access",

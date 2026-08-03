@@ -1848,6 +1848,54 @@ code {
 
 /* --- Promo banner (free analyses review) --- */
 
+/* The answers under the offer. Plain, quiet, easy to scan — the opposite
+   of small print. */
+.promo-faq {
+  margin: 34px auto 0;
+  max-width: min(920px, 100%);
+}
+
+.promo-faq__lead {
+  color: var(--muted);
+  margin: 0 0 20px;
+  text-align: center;
+}
+
+.promo-faq__list {
+  display: grid;
+  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(min(320px, 100%), 1fr));
+  margin: 0;
+}
+
+.promo-faq__item {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-left: 2px solid var(--accent);
+  border-radius: 12px;
+  padding: 16px 18px;
+}
+
+.promo-faq__item dt {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: 17px;
+  margin-bottom: 6px;
+}
+
+.promo-faq__item dd {
+  color: var(--text);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.promo-faq__note {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 18px 0 0;
+  text-align: center;
+}
+
 .promo-banner {
   background:
     linear-gradient(150deg, rgba(212, 175, 55, 0.16), rgba(23, 18, 10, 0)),
