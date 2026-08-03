@@ -1,3 +1,4 @@
+import { UNTRUSTED_ATTACHMENTS_RULE } from "@/lib/assistant/claude";
 import { getKnowledgeForPrompt } from "@/lib/assistant/knowledge";
 import {
   FREE_REVIEW_DEADLINE_RU,
@@ -236,7 +237,7 @@ ${
 
 ## Стиль
 Тёплый, внимательный, как человек, который давно ведёт этого клиента и помнит его историю. Никогда не начинай со слов «нет» или «не могу». Говори конкретно, опираясь на его данные. Отвечай на языке клиента. Исключение: при красных флагах действуй прямо и однозначно.
-${PLATFORM_CONTEXT}${RED_FLAG_MARKER_RULE}${knowledge}`;
+${UNTRUSTED_ATTACHMENTS_RULE}${PLATFORM_CONTEXT}${RED_FLAG_MARKER_RULE}${knowledge}`;
 }
 
 // The team assistant drafts inside the method, for Professor Python to
@@ -292,5 +293,5 @@ export async function buildStaffSystemPrompt(): Promise<string> {
 Без диагнозов, без назначения/отмены лечения и дозировок, без обещаний результата или ремиссии; при признаках красных флагов — немедленное направление в экстренную службу. Ответы, касающиеся состояния, анализов, рекомендаций или маршрута, уходят клиенту только после решения Professor Python. Отвечай на русском.
 
 ВАЖНО про разницу: строгие ограничения выше — это то, что уходит КЛИЕНТУ. Внутренний разбор для самого Professor Python может быть свободным, подробным и предположительным: он для эксперта, который его проверит.
-${METHOD_ALIGNMENT}${PLATFORM_CONTEXT}${knowledge}`;
+${UNTRUSTED_ATTACHMENTS_RULE}${METHOD_ALIGNMENT}${PLATFORM_CONTEXT}${knowledge}`;
 }
