@@ -159,7 +159,7 @@ const ru = {
     unavailable: "Тестовая оплата сейчас отключена"
   },
   widget: {
-    toggleOpen: "☥ Спросить",
+    toggleOpen: "☥ Спросить ИИ-помощника",
     toggleClose: "✕",
     header: "☥ Помощник центра",
     intro:
@@ -200,7 +200,7 @@ const ru = {
       "Я ИИ-помощник центра и рад вас приветствовать. Вы можете изучать сайт самостоятельно — или перейти в общение со мной, и я проведу вас, отвечая на все вопросы.",
     welcomeExplore: "Изучать сайт самостоятельно",
     welcomeChat: "Общаться со мной — проведу вас",
-    welcomeNote: "Я всегда рядом — кнопка «☥ Спросить» внизу экрана.",
+    welcomeNote: "Я всегда рядом — кнопка «☥ Спросить ИИ-помощника» внизу экрана.",
     send: "Отправить",
     sending: "Печатает…",
     placeholder: "Напишите сообщение…",
@@ -468,7 +468,7 @@ const en: typeof ru = {
     unavailable: "Test payment is currently switched off"
   },
   widget: {
-    toggleOpen: "☥ Ask me",
+    toggleOpen: "☥ Ask the AI assistant",
     toggleClose: "✕",
     header: "☥ Center assistant",
     intro:
@@ -507,7 +507,7 @@ const en: typeof ru = {
       "I am the center's AI assistant and I'm glad to greet you. You can explore the site on your own — or talk to me, and I will guide you and answer all your questions.",
     welcomeExplore: "Explore the site on my own",
     welcomeChat: "Talk to me — I'll guide you",
-    welcomeNote: "I'm always nearby — the “☥ Ask me” button at the bottom of the screen.",
+    welcomeNote: "I'm always nearby — the “☥ Ask the AI assistant” button at the bottom of the screen.",
     send: "Send",
     sending: "Typing…",
     placeholder: "Write a message…",
