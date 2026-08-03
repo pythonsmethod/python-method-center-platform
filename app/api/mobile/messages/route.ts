@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { CASE_AUDIO_BUCKET } from "@/lib/messages/queries";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -34,6 +35,20 @@ export async function GET(request: Request) {
   if (!user) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
   if (!caseRow) return NextResponse.json({ messages: [], unread: 0 });
 
+  const url = new URL(request.url);
+  const peek = url.searchParams.get("peek") === "1";
+
+  const { count: unread } = await supabase
+    .from("case_messages")
+    .select("id", { count: "exact", head: true })
+    .eq("case_id", caseRow.id)
+    .neq("sender_role", "client")
+    .is("read_at", null);
+
+  if (peek) {
+    return NextResponse.json({ messages: [], unread: unread ?? 0 });
+  }
+
   await supabase
     .from("case_messages")
     .update({ read_at: new Date().toISOString() })
@@ -50,7 +65,20 @@ export async function GET(request: Request) {
 
   if (error) return NextResponse.json({ error: error.message }, { status: 502 });
 
-  return NextResponse.json({ messages: data ?? [], unread: 0 });
+  const messages = await Promise.all(
+    (data ?? []).map(async (message) => {
+      let audio_url: string | null = null;
+      if (message.audio_path) {
+        const { data: signed } = await supabase.storage
+          .from(CASE_AUDIO_BUCKET)
+          .createSignedUrl(message.audio_path, 3600);
+        audio_url = signed?.signedUrl ?? null;
+      }
+      return { ...message, audio_url };
+    })
+  );
+
+  return NextResponse.json({ messages, unread: 0 });
 }
 
 export async function POST(request: Request) {
