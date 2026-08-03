@@ -47,7 +47,7 @@ const ru = {
       },
       {
         title: "Персональный ИИ",
-        text: "После начала сопровождения знает ваш кейс и его историю, а приложенные в чат анализы читает сам."
+        text: "После начала сопровождения знает ваш кейс и его историю, а приложенные в чат анализы готовит к разбору Professor Python."
       }
     ],
     cta: "Начать путь",
@@ -210,10 +210,10 @@ const ru = {
       client: {
         header: "☥ Ваш персональный ИИ",
         intro:
-          "Здравствуйте! Я ваш персональный ИИ: знаю вашу анкету, статус кейса, список загруженных документов и сроки сопровождения. Содержимое файлов из хранилища мне не видно — его лично разбирает Professor Python, — но фото и PDF анализов можно приложить скрепкой прямо сюда, и я их прочитаю. Решения по состоянию принимает Professor Python.",
+          "Здравствуйте! Я ваш персональный ИИ: знаю вашу анкету, статус кейса, список загруженных документов и сроки сопровождения. Фото и PDF анализов можно приложить скрепкой прямо сюда — я выпишу показатели, помогу собрать всё для Professor Python и составить ему точные вопросы. Сам разбор анализов и выводы о состоянии даёт только Professor Python, лично.",
         suggestions: [
           "Что сейчас происходит с моим кейсом?",
-          "Разбери анализы, которые я приложу",
+          "Подготовь мои анализы к разбору Professor Python",
           "Помоги сформулировать вопрос для Professor Python",
           "Сколько ещё длится моё сопровождение?"
         ]
@@ -385,7 +385,7 @@ const en: typeof ru = {
       },
       {
         title: "Personal AI",
-        text: "Once support begins it knows your case and its history, and reads the test results you attach in the chat."
+        text: "Once support begins it knows your case and its history, and prepares the test results you attach in the chat for Professor Python's review."
       }
     ],
     cta: "Start your journey",
@@ -542,10 +542,10 @@ const en: typeof ru = {
       client: {
         header: "☥ Your personal AI",
         intro:
-          "Hello! I am your personal AI: I know your questionnaire, your case status, the list of uploaded documents and your support period. I cannot see inside the files in storage — Professor Python reviews those personally — but you can attach photos and PDFs of test results right here with the paperclip, and I will read them. Decisions about your condition are made by Professor Python.",
+          "Hello! I am your personal AI: I know your questionnaire, your case status, the list of uploaded documents and your support period. You can attach photos and PDFs of test results right here with the paperclip — I will transcribe the values, help gather everything for Professor Python and shape precise questions for him. The review itself and any conclusions about your condition come only from Professor Python, personally.",
         suggestions: [
           "What is happening with my case now?",
-          "Review the test results I attach",
+          "Prepare my test results for Professor Python's review",
           "Help me formulate a question for Professor Python",
           "How long does my support period still run?"
         ]

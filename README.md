@@ -44,7 +44,11 @@ which is preserved separately.
     analysed together; sent straight to Claude and never stored anywhere
   - the same paperclip is available to paying clients in their personal AI
     chat, enforced server-side by tier — guests and registered users get a
-    warm pointer to the paid level instead
+    warm pointer to the paid level instead. The client-facing AI transcribes
+    and organises attached results and shapes questions, but never gives its
+    own interpretation: conclusions about a person's condition come only
+    from Professor Python, and the AI explains his answer only after he has
+    given it
   - knowledge base editable by staff, injected into both system prompts
   - saved conversations for people with an account only (registered and
     paying): the exchange is written to `assistant_messages`, restored into
