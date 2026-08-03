@@ -35,21 +35,33 @@ The native application must not create a second business system.
 
 ## 4. Delivery sequence
 
-### Phase M0 — foundation
+### Phase M0 — foundation — implemented
 
-- create the Expo project inside the existing repository;
-- connect persistent authentication to the existing Supabase project;
-- document environment boundaries;
-- prove that the same account session can be used on the native client.
+- Expo project inside the existing repository;
+- persistent authentication connected to the existing Supabase project;
+- environment boundaries documented;
+- shared-session foundation established.
 
-### Phase M1 — identity and shell
+### Phase M1 — identity and shell — implemented in code
 
-- sign in;
-- sign up;
-- password recovery and deep-link callback;
-- authenticated navigation shell;
-- profile and logout;
-- Russian/English locale selection.
+- shared persistent session provider;
+- automatic routing to login or protected cabinet;
+- email/password sign-in through the existing Supabase Auth project;
+- registration into the same account system as the website;
+- email-confirmation state;
+- password-recovery request using `pythonmethod://reset-password`;
+- protected cabinet shell;
+- logout.
+
+Still required before M1 is considered complete end-to-end:
+
+1. install dependencies in `/mobile`;
+2. run `npm run typecheck`;
+3. start Expo and verify iOS and Android rendering;
+4. add `pythonmethod://reset-password` to the Supabase Auth redirect allowlist;
+5. implement the reset-password landing screen;
+6. test an existing website account in the app;
+7. test sign-up, confirmation, sign-in, session restoration, recovery and logout.
 
 ### Phase M2 — unified client cabinet
 
@@ -94,14 +106,6 @@ The native application must not create a second business system.
 6. Mobile-only caching may improve usability but cannot become authoritative storage.
 7. Feature releases must include a parity decision: web, mobile web and native availability must be documented before merge.
 
-## 6. First implemented slice
+## 6. Next implementation slice
 
-The initial branch establishes:
-
-- a standalone Expo application under `/mobile`;
-- application identifiers for iOS and Android;
-- strict TypeScript configuration;
-- shared Supabase connection using persistent mobile sessions;
-- a foundation screen that reports whether the shared account session is active.
-
-The next implementation slice is M1: sign-in, sign-up and authenticated routing.
+M2 starts by replacing the cabinet shell with the real shared client profile, current case, status, next step, unread counts and active support period.
