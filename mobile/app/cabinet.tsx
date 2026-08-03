@@ -5,6 +5,7 @@ import { ActivityIndicator, Pressable, RefreshControl, SafeAreaView, ScrollView,
 import { useAuth } from '@/lib/auth-context';
 import { caseStatusLabels, directionLabels, loadCabinetSnapshot, nextStepForCase, type CabinetSnapshot } from '@/lib/cabinet-data';
 import { supabase } from '@/lib/supabase';
+import { loadUnreadTeamMessages } from '@/lib/team-chat';
 
 const formatDate = (value?: string | null) => value ? new Date(value).toLocaleDateString('ru-RU') : '—';
 const productLabel = (value: string) => value === 'support_5_weeks' ? '5 недель' : value === 'support_15_weeks' ? '100 дней' : value;
@@ -12,6 +13,7 @@ const productLabel = (value: string) => value === 'support_5_weeks' ? '5 нед�
 export default function CabinetScreen() {
   const { session, loading: authLoading } = useAuth();
   const [snapshot, setSnapshot] = useState<CabinetSnapshot | null>(null);
+  const [unread, setUnread] = useState(0);
   const [busy, setBusy] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,7 +22,12 @@ export default function CabinetScreen() {
     if (!session) return;
     try {
       setError(null);
-      setSnapshot(await loadCabinetSnapshot(session.user.id));
+      const [cabinet, unreadCount] = await Promise.all([
+        loadCabinetSnapshot(session.user.id),
+        loadUnreadTeamMessages().catch(() => 0),
+      ]);
+      setSnapshot(cabinet);
+      setUnread(unreadCount);
     } catch (value) {
       setError(value instanceof Error ? value.message : 'Не удалось загрузить кабинет.');
     } finally {
@@ -29,7 +36,12 @@ export default function CabinetScreen() {
     }
   }, [session]);
 
-  useEffect(() => { void load(); }, [load]);
+  useEffect(() => {
+    void load();
+    const interval = setInterval(() => void loadUnreadTeamMessages().then(setUnread).catch(() => undefined), 15000);
+    return () => clearInterval(interval);
+  }, [load]);
+
   if (!authLoading && !session) return <Redirect href="/login" />;
   if (authLoading || busy) return <SafeAreaView style={styles.center}><ActivityIndicator /><Text style={styles.meta}>Загружаем кабинет…</Text></SafeAreaView>;
 
@@ -57,10 +69,13 @@ export default function CabinetScreen() {
           <Text style={styles.next}>{nextStepForCase(clientCase ?? null)}</Text>
         </View>
 
-        <Pressable style={styles.chatButton} onPress={() => router.push('/team-chat')}>
+        <Pressable style={styles.chatButton} onPress={() => { setUnread(0); router.push('/team-chat'); }}>
           <View style={styles.chatCopy}>
-            <Text style={styles.chatTitle}>Чат с командой</Text>
-            <Text style={styles.chatText}>Сообщения синхронизируются с веб-кабинетом</Text>
+            <View style={styles.chatTitleRow}>
+              <Text style={styles.chatTitle}>Чат с командой</Text>
+              {unread > 0 ? <View style={styles.badge}><Text style={styles.badgeText}>{unread > 99 ? '99+' : unread}</Text></View> : null}
+            </View>
+            <Text style={styles.chatText}>{unread > 0 ? 'Есть новые сообщения от команды' : 'Сообщения синхронизируются с веб-кабинетом'}</Text>
           </View>
           <Text style={styles.chatArrow}>›</Text>
         </Pressable>
@@ -100,7 +115,9 @@ const styles = StyleSheet.create({
   label: { color: '#AFA89C', fontSize: 12, textTransform: 'uppercase' }, cardTitle: { color: '#FFF', fontSize: 20, fontWeight: '700' },
   meta: { color: '#D8D0C4', fontSize: 15 }, next: { color: '#F6E7BA', fontSize: 18, lineHeight: 27, fontWeight: '600' },
   chatButton: { backgroundColor: '#2A2112', borderColor: '#8A6C32', borderWidth: 1, borderRadius: 18, padding: 17, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  chatCopy: { flex: 1, gap: 4 }, chatTitle: { color: '#F6E7BA', fontSize: 18, fontWeight: '800' }, chatText: { color: '#BDB5A8', fontSize: 13, lineHeight: 18 }, chatArrow: { color: '#E6C978', fontSize: 32, marginLeft: 12 },
+  chatCopy: { flex: 1, gap: 4 }, chatTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 }, chatTitle: { color: '#F6E7BA', fontSize: 18, fontWeight: '800' },
+  chatText: { color: '#BDB5A8', fontSize: 13, lineHeight: 18 }, chatArrow: { color: '#E6C978', fontSize: 32, marginLeft: 12 },
+  badge: { minWidth: 24, height: 24, borderRadius: 12, paddingHorizontal: 7, backgroundColor: '#A7463A', alignItems: 'center', justifyContent: 'center' }, badgeText: { color: '#FFF', fontSize: 12, fontWeight: '800' },
   menuRow: { flexDirection: 'row', gap: 12 }, menuButton: { flex: 1, backgroundColor: '#151515', borderColor: '#755F35', borderWidth: 1, borderRadius: 18, padding: 16, gap: 5 },
   menuTitle: { color: '#F6E7BA', fontSize: 16, fontWeight: '700' }, menuText: { color: '#AFA89C', fontSize: 12 },
   logout: { borderColor: '#755F35', borderWidth: 1, borderRadius: 14, alignItems: 'center', paddingVertical: 14 }, logoutText: { color: '#E6C978', fontWeight: '700' },
