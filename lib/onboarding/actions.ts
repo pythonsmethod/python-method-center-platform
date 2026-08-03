@@ -12,7 +12,9 @@ import {
 } from "@/lib/cases/lifecycle";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { OFFER_VERSION } from "@/lib/legal/offer";
+import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 const careRecipientTypes: CareRecipientType[] = ["self", "family_member"];
 
@@ -103,14 +105,23 @@ export async function submitOnboarding(
   let caseCreated = false;
 
   if (caseId) {
-    const { error: caseUpdateError } = await supabase
-      .from("client_cases")
-      .update({ title: primaryGoal, summary: situationDescription })
-      .eq("id", caseId)
-      .eq("profile_id", user.id);
+    // P1-01: this update must NOT run under the client's own session —
+    // client_cases has no client UPDATE policy (case decisions are
+    // staff-owned), so RLS silently updates zero rows and the client's
+    // corrected answers vanish behind a success message. The narrow sync
+    // goes through the service role with an explicit ownership check.
+    const syncResult = await syncCaseFromOnboarding(
+      createSupabaseServiceClient(),
+      {
+        caseId,
+        profileId: user.id,
+        primaryGoal,
+        situationDescription
+      }
+    );
 
-    if (caseUpdateError) {
-      return errorState(caseUpdateError.message);
+    if (syncResult.status === "error") {
+      return errorState(syncResult.message);
     }
   }
 
