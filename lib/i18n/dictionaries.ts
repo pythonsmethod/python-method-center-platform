@@ -31,7 +31,7 @@ const ru = {
     expertLabel: "Эксперт центра",
     expertTitle: "Экспертное сопровождение под руководством Professor Python",
     expertText:
-      "Каждый кейс Professor Python разбирает лично. Ответ по анализам приходит файлом в ваш кабинет — до трёх рабочих дней, затем три дня открытого чата для вопросов.",
+      "Каждый кейс Professor Python разбирает лично: ваши анализы и вашу историю.",
     aiLabel: "Искусственный интеллект центра",
     aiTitle: "Вы не останетесь одни",
     aiText:
@@ -88,10 +88,10 @@ const ru = {
     badge: "🎁 Акция для первых клиентов",
     titleFree: "Бесплатный разбор анализов от Professor Python",
     textFree:
-      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — Professor Python лично изучит их и даст обратную связь по состоянию организма и рекомендации по восстановлению. Сейчас — бесплатно, для первых клиентов платформы.",
+      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — Professor Python лично изучит их и даст обратную связь по состоянию организма и рекомендации по восстановлению. Ответ придёт файлом в ваш личный кабинет — до трёх рабочих дней, затем три дня открытого чата для вопросов. Сейчас — бесплатно, для первых клиентов платформы.",
     titlePaid: "Разбор анализов от Professor Python",
     textPaid:
-      "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации и три рабочих дня открытого чата, чтобы задать любые вопросы.",
+      "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
     // The amount is rendered on its own line and never wraps mid-number.
     pricePaid: "Разовая услуга — стоимость",
     priceFree: "Бесплатно · позже эта услуга будет стоить",
@@ -387,7 +387,7 @@ const en: typeof ru = {
     expertLabel: "The center's expert",
     expertTitle: "Expert support led by Professor Python",
     expertText:
-      "Professor Python reviews every case personally. The answer on your tests arrives as a file in your cabinet — within three working days, followed by three days of open chat for questions.",
+      "Professor Python reviews every case personally: your test results and your history.",
     aiLabel: "The center's artificial intelligence",
     aiTitle: "You will not be left alone",
     aiText:
@@ -443,10 +443,10 @@ const en: typeof ru = {
     badge: "🎁 Early clients offer",
     titleFree: "Free analyses review by Karen",
     textFree:
-      "Create an account, fill in the questionnaire and upload your test results — Karen will personally review them and give you feedback on your condition and recovery recommendations. Free right now, for the platform's first clients.",
+      "Create an account, fill in the questionnaire and upload your test results — Karen will personally review them and give you feedback on your condition and recovery recommendations. The answer arrives as a file in your personal cabinet — within three working days, followed by three days of open chat for questions. Free right now, for the platform's first clients.",
     titlePaid: "Analyses review by Karen",
     textPaid:
-      "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations, and three working days of open chat to ask any questions.",
+      "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
     pricePaid: "One-time service — price",
     priceFree: "Free · later this service will cost",
     priceAmount: "$1,000",
