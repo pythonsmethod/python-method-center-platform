@@ -1,9 +1,11 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 
+import { AuthProvider } from '@/lib/auth-context';
+
 export default function RootLayout() {
   return (
-    <>
+    <AuthProvider>
       <StatusBar style="light" />
       <Stack
         screenOptions={{
@@ -12,8 +14,12 @@ export default function RootLayout() {
           contentStyle: { backgroundColor: '#0B0B0B' },
         }}
       >
-        <Stack.Screen name="index" options={{ title: 'Python Method Center' }} />
+        <Stack.Screen name="index" options={{ headerShown: false }} />
+        <Stack.Screen name="login" options={{ title: 'Вход' }} />
+        <Stack.Screen name="sign-up" options={{ title: 'Регистрация' }} />
+        <Stack.Screen name="recovery" options={{ title: 'Восстановление доступа' }} />
+        <Stack.Screen name="cabinet" options={{ title: 'Мой кабинет', headerBackVisible: false }} />
       </Stack>
-    </>
+    </AuthProvider>
   );
 }
