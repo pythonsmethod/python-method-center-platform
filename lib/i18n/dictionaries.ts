@@ -52,7 +52,7 @@ const ru = {
       }
     ],
     cta: "Начать путь",
-    ctaLearn: "Как всё устроено — 2 минуты",
+    ctaLearn: "Как всё устроено",
     tagline: "Мы ведём. Вы восстанавливаетесь. Вместе — к результату.",
     howTitle: "Как работает центр",
     stepLabel: "Шаг за шагом",
@@ -408,7 +408,7 @@ const en: typeof ru = {
       }
     ],
     cta: "Start your journey",
-    ctaLearn: "How it all works — 2 minutes",
+    ctaLearn: "How it all works",
     tagline: "We guide. You recover. Together — towards the result.",
     howTitle: "How the center works",
     stepLabel: "Step by step",
