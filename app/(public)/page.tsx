@@ -37,17 +37,12 @@ export default async function HomePage() {
             <span className="hero-pillar__icon">
               <IconEyeOfHorus />
             </span>
+            {/* Benefit first, technology later: the three levels of the
+                assistant moved further down the page — a worried visitor
+                needs "you will not be left alone", not an architecture. */}
             <span className="hero-pillar__label">{t.aiLabel}</span>
             <h2 className="hero-pillar__title">{t.aiTitle}</h2>
             <p className="hero-pillar__text">{t.aiText}</p>
-            <ol className="hero-ai__levels">
-              {t.aiLevels.map((level) => (
-                <li key={level.title}>
-                  <strong>{level.title}</strong>
-                  <span>{level.text}</span>
-                </li>
-              ))}
-            </ol>
           </article>
         </div>
 
@@ -102,17 +97,14 @@ export default async function HomePage() {
       <p className="tagline">{t.tagline}</p>
 
       <section aria-label={t.howTitle}>
-        <p className="ornament">☥ ☥ ☥</p>
         <h2 className="section-title">{t.howTitle}</h2>
         <div className="how-paths">
           <div className="how-path">
-            <span className="how-path__mark">{t.pathAiMark}</span>
             <h3>{t.pathAiTitle}</h3>
             <p>{t.pathAiText}</p>
           </div>
           <span className="how-paths__or">{t.pathsOr}</span>
           <div className="how-path">
-            <span className="how-path__mark">{t.pathSelfMark}</span>
             <h3>{t.pathSelfTitle}</h3>
             <p>{t.pathSelfText}</p>
           </div>
@@ -139,9 +131,21 @@ export default async function HomePage() {
             </div>
           </div>
         </div>
-      </section>
 
-      <p className="quote-strip">{t.quote}</p>
+        {/* The three levels live here, below the fold: by now the visitor
+            knows the benefit, so the mechanics read as depth, not as a
+            technology pitch. */}
+        <h2 className="section-title section-title--sub">{t.levelsTitle}</h2>
+        <div className="panel-grid">
+          {t.aiLevels.map((level, index) => (
+            <div className="panel how-step" key={level.title}>
+              <span className="how-step__num">{index + 1}</span>
+              <h2>{level.title}</h2>
+              <p>{level.text}</p>
+            </div>
+          ))}
+        </div>
+      </section>
     </div>
   );
 }

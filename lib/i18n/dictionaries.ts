@@ -31,11 +31,12 @@ const ru = {
     expertLabel: "Эксперт центра",
     expertTitle: "Экспертное сопровождение под руководством Professor Python",
     expertText:
-      "Каждый кейс он смотрит лично: ваши анализы, вашу историю, ваш путь. Без шаблонов и протоколов.",
+      "Каждый кейс Professor Python разбирает лично. Ответ по анализам приходит файлом в ваш кабинет — до трёх рабочих дней, затем три дня открытого чата для вопросов.",
     aiLabel: "Искусственный интеллект центра",
-    aiTitle: "ИИ рядом с вами 24/7 — на каждом шаге пути",
+    aiTitle: "Вы не останетесь одни",
     aiText:
-      "Это не просто сайт центра. Здесь работает искусственный интеллект, который растёт вместе с вами: сначала отвечает на вопросы, потом ведёт по кабинету, а после начала сопровождения — работает уже с вашим случаем.",
+      "Помощник отвечает круглосуточно: подскажет следующий шаг, поможет с анкетой и документами, подготовит вопрос. Ключевые решения по вашему кейсу принимает живой эксперт — Professor Python.",
+    levelsTitle: "Помощник растёт вместе с вами",
     aiLevels: [
       {
         title: "Знакомство",
@@ -53,24 +54,16 @@ const ru = {
     cta: "Начать путь",
     ctaLearn: "Как всё устроено — 2 минуты",
     tagline: "Мы ведём. Вы восстанавливаетесь. Вместе — к результату.",
-    cabinetsTitle: "Кабинеты центра",
-    whyTitle: "Почему с нами?",
     howTitle: "Как работает центр",
     stepLabel: "Шаг за шагом",
     stepsLead: "Сами шаги одни и те же — вот они:",
     pathsOr: "или",
-    pathAiMark: "☥",
     pathAiTitle: "С ИИ-помощником",
     pathAiText:
       "Он проведёт через каждый шаг, ответит на вопросы и подскажет, чего не хватает.",
-    pathSelfMark: "✦",
     pathSelfTitle: "Самостоятельно",
     pathSelfText:
       "Пройдите весь путь сами, в своём темпе. Помощник останется в стороне, пока не понадобится.",
-    aiStepLabel: "С вами на каждом шаге",
-    aiStepTitle: "ИИ-помощник центра",
-    aiStepText:
-      "Задайте вопрос ещё до регистрации. Дальше помощник проведёт через регистрацию, анкету и документы и останется рядом на всём сопровождении.",
     startLabel: "Начать",
     startTitle: "Готовы начать?",
     startText:
@@ -80,24 +73,6 @@ const ru = {
     disclaimerText:
       "Python Method не является медицинским учреждением, не ставит диагнозы, не назначает и не отменяет лечение. Сопровождение не заменяет наблюдение лечащего врача. Условия оказания услуг описаны в",
     disclaimerLink: "публичной оферте",
-    quote: "«Исцеление — это не мгновение, это путь. Мы идём его вместе.»",
-    cabinets: [
-      { title: "Знакомство", text: "Узнайте о центре и наших принципах." },
-      { title: "Вопросы и доверие", text: "Ответы на вопросы: оплата, условия, безопасность." },
-      { title: "Профилактика", text: "Программы профилактики и поддержка." },
-      { title: "Индивидуальный путь", text: "Глубокий разбор и персональная стратегия." },
-      { title: "Формула", text: "Формула и инструкции по сопровождению." },
-      { title: "Анализы", text: "Сбор, проверка и анализ ваших данных." },
-      { title: "Дневник состояния", text: "Отслеживание изменений и динамики." },
-      { title: "Материалы", text: "Рекомендации, образ жизни и поддержка." }
-    ],
-    why: [
-      { title: "Индивидуальный подход", text: "Нет шаблонов. Только ваша уникальная стратегия." },
-      { title: "Экспертное сопровождение", text: "Professor Python лично ведёт сложные случаи и корректирует путь." },
-      { title: "Целостный подход", text: "Работаем с причиной, а не только с симптомами." },
-      { title: "Поддержка на каждом этапе", text: "Вы не останетесь один — платформа и команда на связи." },
-      { title: "Ваш результат — наша цель", text: "Мы идём вместе с вами к устойчивому состоянию." }
-    ],
     steps: [
       { title: "Регистрация", text: "Создайте аккаунт." },
       { title: "Анкета", text: "Заполните данные о себе." },
@@ -135,7 +110,7 @@ const ru = {
     sections: [
       {
         q: "Кто мы?",
-        a: "Python Method Center — цифровой центр восстановления. Ведущий эксперт — Professor Python: каждый кейс он разбирает лично, без шаблонов и протоколов. Операционная поддержка — Анна. Мы не больница и не заменяем вашего врача — мы экспертное сопровождение восстановления по авторскому методу."
+        a: "Python Method Center — цифровой центр восстановления. Ведущий эксперт — Professor Python: каждый кейс он разбирает лично. Операционная поддержка — Анна. Мы не больница и не заменяем вашего врача — мы экспертное сопровождение восстановления по авторскому методу."
       },
       {
         q: "Что входит в сопровождение?",
@@ -412,11 +387,12 @@ const en: typeof ru = {
     expertLabel: "The center's expert",
     expertTitle: "Expert support led by Professor Python",
     expertText:
-      "He looks at every case himself: your tests, your history, your path. No templates, no protocols.",
+      "Professor Python reviews every case personally. The answer on your tests arrives as a file in your cabinet — within three working days, followed by three days of open chat for questions.",
     aiLabel: "The center's artificial intelligence",
-    aiTitle: "AI beside you 24/7 — at every step of the way",
+    aiTitle: "You will not be left alone",
     aiText:
-      "This is not just a center's website. An artificial intelligence works here and grows with you: first it answers questions, then it guides you through your cabinet, and once your support begins it works with your own case.",
+      "The assistant answers around the clock: it suggests the next step, helps with the questionnaire and documents, and shapes your questions. The key decisions about your case are made by a living expert — Professor Python.",
+    levelsTitle: "The assistant grows with you",
     aiLevels: [
       {
         title: "First contact",
@@ -434,24 +410,16 @@ const en: typeof ru = {
     cta: "Start your journey",
     ctaLearn: "How it all works — 2 minutes",
     tagline: "We guide. You recover. Together — towards the result.",
-    cabinetsTitle: "Center cabinets",
-    whyTitle: "Why choose us?",
     howTitle: "How the center works",
     stepLabel: "Step by step",
     stepsLead: "The steps themselves are the same — here they are:",
     pathsOr: "or",
-    pathAiMark: "☥",
     pathAiTitle: "With the AI assistant",
     pathAiText:
       "It walks you through every step, answers questions and tells you what is missing.",
-    pathSelfMark: "✦",
     pathSelfTitle: "On your own",
     pathSelfText:
       "Take the whole path yourself, at your own pace. The assistant stays aside until you need it.",
-    aiStepLabel: "With you at every step",
-    aiStepTitle: "The center's AI assistant",
-    aiStepText:
-      "Ask a question before you even sign up. From there the assistant guides you through registration, the questionnaire and documents, and stays with you for the whole support program.",
     startLabel: "Start",
     startTitle: "Ready to begin?",
     startText: "Create an account and fill in the questionnaire — it takes about 10 minutes.",
@@ -460,24 +428,6 @@ const en: typeof ru = {
     disclaimerText:
       "Python Method is not a medical institution; it does not diagnose, prescribe or discontinue treatment. The support program does not replace supervision by your physician. The terms of service are described in the",
     disclaimerLink: "public offer",
-    quote: "“Healing is not a moment, it is a journey. We walk it together.”",
-    cabinets: [
-      { title: "Welcome", text: "Learn about the center and our principles." },
-      { title: "Questions & trust", text: "Answers about payment, terms and safety." },
-      { title: "Prevention", text: "Prevention programs and ongoing support." },
-      { title: "Individual path", text: "In-depth review and a personal strategy." },
-      { title: "Formula", text: "The formula and guidance for your program." },
-      { title: "Analyses", text: "Collection, review and analysis of your data." },
-      { title: "Health journal", text: "Tracking changes and progress." },
-      { title: "Resources", text: "Recommendations, lifestyle and support." }
-    ],
-    why: [
-      { title: "Individual approach", text: "No templates. Only your unique strategy." },
-      { title: "Expert guidance", text: "Karen personally handles complex cases and adjusts the path." },
-      { title: "Holistic approach", text: "We work with the root cause, not just the symptoms." },
-      { title: "Support at every step", text: "You are never alone — the platform and the team stay in touch." },
-      { title: "Your result is our goal", text: "We walk with you towards a stable condition." }
-    ],
     steps: [
       { title: "Registration", text: "Create an account." },
       { title: "Questionnaire", text: "Fill in your details." },
@@ -511,7 +461,7 @@ const en: typeof ru = {
     sections: [
       {
         q: "Who are we?",
-        a: "Python Method Center is a digital recovery centre. The leading expert is Professor Python: he reviews every case personally, without templates or protocols. Operational support — Anna. We are not a hospital and we do not replace your doctor — we are expert recovery support built on an original method."
+        a: "Python Method Center is a digital recovery centre. The leading expert is Professor Python: he reviews every case personally. Operational support — Anna. We are not a hospital and we do not replace your doctor — we are expert recovery support built on an original method."
       },
       {
         q: "What does the support include?",
