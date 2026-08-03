@@ -13,6 +13,14 @@
         {
           "launchMode": "most-recent"
         }
+      ],
+      [
+        "expo-audio",
+        {
+          "microphonePermission": "Разрешите Python Method Center записывать голосовые сообщения для команды центра.",
+          "enableBackgroundRecording": false,
+          "enableBackgroundPlayback": false
+        }
       ]
     ],
     "experiments": {
