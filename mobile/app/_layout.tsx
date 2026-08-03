@@ -19,6 +19,9 @@ export default function RootLayout() {
         <Stack.Screen name="sign-up" options={{ title: 'Регистрация' }} />
         <Stack.Screen name="recovery" options={{ title: 'Восстановление доступа' }} />
         <Stack.Screen name="cabinet" options={{ title: 'Мой кабинет', headerBackVisible: false }} />
+        <Stack.Screen name="documents" options={{ title: 'Документы' }} />
+        <Stack.Screen name="history" options={{ title: 'История кейса' }} />
+        <Stack.Screen name="team-chat" options={{ title: 'Чат с командой' }} />
       </Stack>
     </AuthProvider>
   );
