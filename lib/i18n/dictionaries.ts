@@ -33,9 +33,9 @@ const ru = {
     expertText:
       "Каждый кейс Professor Python разбирает лично: ваши анализы и вашу историю.",
     aiLabel: "Искусственный интеллект центра",
-    aiTitle: "Вы не останетесь одни",
+    aiTitle: "ИИ рядом с вами 24/7 — на каждом шаге пути",
     aiText:
-      "Помощник отвечает круглосуточно: подскажет следующий шаг, поможет с анкетой и документами, подготовит вопрос. Ключевые решения по вашему кейсу принимает живой эксперт — Professor Python.",
+      "Это не просто сайт центра. Здесь работает искусственный интеллект, который растёт вместе с вами: сначала отвечает на вопросы, потом ведёт по кабинету, а после начала сопровождения — работает уже с вашим случаем.",
     levelsTitle: "Помощник растёт вместе с вами",
     aiLevels: [
       {
@@ -389,9 +389,9 @@ const en: typeof ru = {
     expertText:
       "Professor Python reviews every case personally: your test results and your history.",
     aiLabel: "The center's artificial intelligence",
-    aiTitle: "You will not be left alone",
+    aiTitle: "AI beside you 24/7 — at every step of the way",
     aiText:
-      "The assistant answers around the clock: it suggests the next step, helps with the questionnaire and documents, and shapes your questions. The key decisions about your case are made by a living expert — Professor Python.",
+      "This is not just a center's website. An artificial intelligence works here and grows with you: first it answers questions, then it guides you through your cabinet, and once your support begins it works with your own case.",
     levelsTitle: "The assistant grows with you",
     aiLevels: [
       {
