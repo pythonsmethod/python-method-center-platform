@@ -30,6 +30,102 @@ export function extractRedFlag(reply: string): {
   return { cleanedReply, category };
 }
 
+// P1-04: the marker is one strand — the model appending a token sequence.
+// A prompt injection, a long multi-topic message or an unusual language can
+// snap it. This screen reads the PERSON'S message, not the model's output,
+// so the safety net has a second, deterministic strand.
+//
+// Tuned deliberately toward false positives: a spurious alert costs the
+// team thirty seconds; a missed crisis costs far more. Patterns are scoped
+// to first-person crisis language, not to any mention of a symptom word.
+const CRISIS_PATTERNS_PSYCHOLOGICAL: RegExp[] = [
+  /не\s+хочу\s+(больше\s+)?жить/i,
+  /не\s+вижу\s+смысла\s+жить/i,
+  /покончить\s+с\s+собой/i,
+  /покончу\s+с\s+собой/i,
+  /суицид/i,
+  /убить\s+себя/i,
+  /убью\s+себя/i,
+  /свести\s+счёты\s+с\s+жизнью/i,
+  /наложить\s+на\s+себя\s+руки/i,
+  /причинить\s+себе\s+вред/i,
+  /режу\s+себя/i,
+  /kill\s+myself/i,
+  /end\s+my\s+life/i,
+  /suicid/i,
+  /self.?harm/i,
+  /hurt\s+myself/i,
+  /don'?t\s+want\s+to\s+live/i,
+  /no\s+reason\s+to\s+live/i
+];
+
+const CRISIS_PATTERNS_PHYSICAL: RegExp[] = [
+  /боль\s+в\s+груди/i,
+  /давит\s+в\s+груди/i,
+  /не\s+могу\s+дышать/i,
+  /нечем\s+дышать/i,
+  /задыхаюсь/i,
+  /теряю\s+сознание/i,
+  /потерял[аи]?\s+сознание/i,
+  /сильное\s+кровотечение/i,
+  /кровотечение\s+не\s+останавливается/i,
+  /рвота\s+с\s+кровью/i,
+  /кровь\s+в\s+рвоте/i,
+  /немеет\s+(рука|лицо|нога|половина)/i,
+  /онемел[аио]?\s+(рука|лицо|нога|половина)/i,
+  /перекосило\s+лицо/i,
+  /нарушилась\s+речь/i,
+  /chest\s+pain/i,
+  /can'?t\s+breathe/i,
+  /cannot\s+breathe/i,
+  /losing\s+consciousness/i,
+  /passed\s+out/i,
+  /severe\s+bleeding/i,
+  /vomiting\s+blood/i,
+  /face\s+droop/i,
+  /slurred\s+speech/i
+];
+
+// Reads the person's own words. Physical wins a tie: a medical emergency
+// with psychological language still needs the ambulance first.
+export function detectRedFlagInMessage(
+  message: string
+): RedFlagCategory | null {
+  if (CRISIS_PATTERNS_PHYSICAL.some((pattern) => pattern.test(message))) {
+    return "physical";
+  }
+
+  if (CRISIS_PATTERNS_PSYCHOLOGICAL.some((pattern) => pattern.test(message))) {
+    return "psychological";
+  }
+
+  return null;
+}
+
+// Combines the two strands. The model's marker carries context, so its
+// category wins when both fire; the deterministic screen guarantees the
+// escalation exists even when the marker was suppressed or forgotten.
+export function resolveRedFlag(
+  markerCategory: RedFlagCategory | null,
+  userMessage: string
+): { category: RedFlagCategory; source: RedFlagSource } | null {
+  const detected = detectRedFlagInMessage(userMessage);
+
+  if (markerCategory && detected) {
+    return { category: markerCategory, source: "both" };
+  }
+
+  if (markerCategory) {
+    return { category: markerCategory, source: "marker" };
+  }
+
+  if (detected) {
+    return { category: detected, source: "deterministic" };
+  }
+
+  return null;
+}
+
 // The row exactly as it is inserted. Extracted so a test can pin the shape
 // — including profile_id staying null for a guest — without a database.
 export function buildEscalationInsert(
