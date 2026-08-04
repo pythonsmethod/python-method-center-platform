@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { submitOnboarding } from "@/lib/onboarding/actions";
 import {
@@ -24,6 +24,11 @@ export function OnboardingForm({
     submitOnboarding,
     initialOnboardingActionState
   );
+  // Clause 7 of the offer: under 21 only with a parent or legal guardian.
+  // Choosing that path swaps the age confirmation for the participant's own
+  // details, so the person filling the form is never the person described.
+  const [recipient, setRecipient] = useState("self");
+  const isGuardian = recipient === "minor";
 
   return (
     <form action={formAction} className="onboarding-form">
@@ -51,11 +56,44 @@ export function OnboardingForm({
 
       <label className="field">
         <span>{labels.recipient}</span>
-        <select defaultValue="self" name="careRecipientType" required>
+        <select
+          name="careRecipientType"
+          onChange={(event) => setRecipient(event.target.value)}
+          required
+          value={recipient}
+        >
           <option value="self">{labels.recipientSelf}</option>
           <option value="family_member">{labels.recipientFamily}</option>
+          <option value="minor">{labels.recipientMinor}</option>
         </select>
       </label>
+
+      {isGuardian ? (
+        <fieldset className="onboarding-guardian">
+          <legend>{labels.guardianLabel}</legend>
+          <p className="onboarding-guardian__note">{labels.guardianNote}</p>
+
+          <label className="field">
+            <span>{labels.minorName}</span>
+            <input name="minorFullName" required type="text" />
+          </label>
+
+          <label className="field">
+            <span>{labels.minorBirthDate}</span>
+            <input name="minorBirthDate" required type="date" />
+          </label>
+
+          <label className="checkbox-field">
+            <input name="guardianConfirmed" required type="checkbox" />
+            <span>{labels.guardianConfirm}</span>
+          </label>
+        </fieldset>
+      ) : (
+        <label className="checkbox-field">
+          <input name="ageConfirmed" required type="checkbox" />
+          <span>{labels.ageConfirm}</span>
+        </label>
+      )}
 
       <label className="field">
         <span>{labels.goal}</span>

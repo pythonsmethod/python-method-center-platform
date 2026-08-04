@@ -22,7 +22,34 @@ import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
-const careRecipientTypes: CareRecipientType[] = ["self", "family_member"];
+const careRecipientTypes: CareRecipientType[] = [
+  "self",
+  "family_member",
+  "minor"
+];
+
+// Clause 7 of the offer. Computed from the date of birth rather than
+// trusted from a checkbox, because the guardian path exists precisely for
+// people who cannot tick one for themselves.
+const MIN_PARTICIPANT_AGE = 21;
+
+function yearsSince(isoDate: string): number | null {
+  const born = new Date(isoDate);
+
+  if (Number.isNaN(born.getTime())) {
+    return null;
+  }
+
+  const now = new Date();
+  let years = now.getFullYear() - born.getFullYear();
+  const monthDelta = now.getMonth() - born.getMonth();
+
+  if (monthDelta < 0 || (monthDelta === 0 && now.getDate() < born.getDate())) {
+    years -= 1;
+  }
+
+  return years;
+}
 
 function errorState(message: string): OnboardingActionState {
   return { status: "error", message };
@@ -72,6 +99,11 @@ export async function submitOnboarding(
   // Russian.
   const t = getDictionary(uiLocale).onboarding;
   const offerLocale = getOfferDocumentLocale(uiLocale);
+  const isGuardianPath = careRecipientType === "minor";
+  const ageConfirmed = formData.get("ageConfirmed") === "on";
+  const guardianConfirmed = formData.get("guardianConfirmed") === "on";
+  const minorFullName = readRequiredText(formData, "minorFullName");
+  const minorBirthDate = readRequiredText(formData, "minorBirthDate");
   const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
 
@@ -81,6 +113,30 @@ export async function submitOnboarding(
 
   if (!isCareRecipientType(careRecipientType)) {
     return errorState(t.errorRecipient);
+  }
+
+  // Age, before anything is written down.
+  if (isGuardianPath) {
+    if (!minorFullName || !minorBirthDate) {
+      return errorState(t.errorMinorFields);
+    }
+
+    const age = yearsSince(minorBirthDate);
+
+    if (age === null || age < 0) {
+      return errorState(t.errorMinorFields);
+    }
+
+    if (age >= MIN_PARTICIPANT_AGE) {
+      // Not a refusal: this person can simply register in their own name.
+      return errorState(t.errorMinorTooOld);
+    }
+
+    if (!guardianConfirmed) {
+      return errorState(t.errorGuardian);
+    }
+  } else if (!ageConfirmed) {
+    return errorState(t.errorAge);
   }
 
   if (!offerAccepted) {
@@ -171,6 +227,11 @@ export async function submitOnboarding(
     care_recipient_type: careRecipientType,
     primary_goal: primaryGoal,
     situation_description: situationDescription,
+    age_confirmed: isGuardianPath ? false : ageConfirmed,
+    guardian_confirmed: isGuardianPath ? guardianConfirmed : false,
+    minor_full_name: isGuardianPath ? minorFullName : null,
+    minor_birth_date: isGuardianPath ? minorBirthDate : null,
+    minor_age_years: isGuardianPath ? yearsSince(minorBirthDate) : null,
     offer_accepted: true,
     offer_version: OFFER_VERSION,
     offer_document_locale: offerLocale,
@@ -227,6 +288,27 @@ export async function submitOnboarding(
       }
     ])
     .select("id, consent_type");
+
+  // A guardian accepting on a minor's behalf is a distinct consent, and the
+  // record has to name whose behalf it was given on.
+  if (isGuardianPath && !consentError) {
+    await supabase.from("consent_records").insert({
+      profile_id: user.id,
+      case_id: caseId,
+      consent_type: "offer_acceptance",
+      status: "accepted",
+      version: OFFER_VERSION,
+      source: "onboarding_guardian",
+      metadata: {
+        guardian_for: minorFullName,
+        minor_birth_date: minorBirthDate,
+        minor_age_years: yearsSince(minorBirthDate),
+        offer_document_locale: offerLocale,
+        offer_binding_locale: OFFER_BINDING_LOCALE,
+        ui_locale: uiLocale
+      }
+    });
+  }
 
   if (consentError) {
     return errorState(consentError.message);

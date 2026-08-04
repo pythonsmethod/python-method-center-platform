@@ -48,6 +48,20 @@ const ru = {
     recipient: "Для кого запрос",
     recipientSelf: "Для себя",
     recipientFamily: "Для члена семьи",
+    recipientMinor: "Для участника младше 21 года — я родитель или законный представитель",
+    ageLabel: "Возраст участника",
+    ageConfirm: "Подтверждаю, что участнику 21 год или больше.",
+    guardianLabel: "Данные участника",
+    guardianNote:
+      "Программа рассчитана на участников старше 21 года. Участие младше 21 возможно только вместе с родителем или законным представителем — заполните данные участника, а согласия ниже вы даёте от его имени.",
+    minorName: "Полное имя участника",
+    minorBirthDate: "Дата рождения участника",
+    guardianConfirm:
+      "Я родитель или законный представитель участника и принимаю условия договора от его имени.",
+    errorAge: "Подтвердите возраст участника или укажите, что вы родитель либо законный представитель.",
+    errorMinorFields: "Укажите имя и дату рождения участника.",
+    errorGuardian: "Для участника младше 21 года требуется подтверждение родителя или законного представителя.",
+    errorMinorTooOld: "Участнику 21 год или больше — выберите вариант «для себя» или «для члена семьи».",
     goal: "Основная цель",
     goalPlaceholder: "Например: восстановление после операции",
     situation: "Краткое описание ситуации",
@@ -227,9 +241,9 @@ const ru = {
   },
   promo: {
     badge: "🎁 Акция для первых клиентов",
-    titleFree: "Бесплатный разбор анализов от Professor Python",
+    titleFree: "Бесплатная предварительная оценка от Professor Python",
     textFree:
-      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — Professor Python лично изучит их и даст обратную связь по состоянию организма и рекомендации по восстановлению. Ответ придёт файлом в ваш личный кабинет — до трёх рабочих дней, затем три дня открытого чата для вопросов. Сейчас — бесплатно, для первых клиентов платформы.",
+      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — помощник центра соберёт и структурирует их в готовый файл, а Professor Python лично сформирует предварительную ориентирующую оценку вашего ресурсного состояния. Ответ придёт файлом в личный кабинет с пометкой, что это ответ Professor Python, — до трёх рабочих дней, затем три дня открытого чата для вопросов. Это ориентирующая оценка, а не полный разбор: она помогает понять направление. Предоставляется один раз и бесплатно.",
     titlePaid: "Разбор анализов от Professor Python",
     textPaid:
       "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
@@ -238,8 +252,8 @@ const ru = {
     priceFree: "Бесплатно · позже эта услуга будет стоить",
     priceAmount: "$1 000",
     cta: "Получить разбор",
-    ctaFree: "Получить бесплатный разбор",
-    note: "Разбор является экспертным мнением и не заменяет консультацию врача."
+    ctaFree: "Получить бесплатную оценку",
+    note: "Предварительная оценка является экспертным мнением и не заменяет консультацию врача."
   },
   // Подарок без объяснений читается как уловка. Здесь — ответы на вопросы,
   // которые человек задаёт себе молча и уходит, не задав.
@@ -253,7 +267,7 @@ const ru = {
       },
       {
         q: "Что входит?",
-        a: "Разбор ваших анализов и рекомендации Professor Python по восстановлению показателей."
+        a: "Предварительная ориентирующая оценка вашего ресурсного состояния от Professor Python: она помогает понять направление и решить, нужно ли вам сопровождение. Полный разбор и рекомендации по восстановлению входят в платные форматы."
       },
       {
         q: "В каком виде придёт ответ?",
@@ -273,17 +287,17 @@ const ru = {
       },
       {
         q: "Это полный разбор или предварительный?",
-        a: "Это аналитика ваших анализов и рекомендации по восстановлению."
+        a: "Предварительный. Это ориентирующая оценка состояния, а не полный разбор с рекомендациями — полный разбор входит в платные форматы сопровождения. Предоставляется один раз."
       },
       {
         q: "Какие анализы подойдут?",
         a: "Любые анализы и чек-апы, сданные за последние 30 дней."
       }
     ],
-    pageCtaTitle: "Как получить разбор",
+    pageCtaTitle: "Как получить предварительную оценку",
     pageCtaText:
       "Создайте аккаунт, заполните анкету и загрузите анализы — Professor Python возьмёт их в работу.",
-    pageCta: "Создать аккаунт и получить разбор"
+    pageCta: "Создать аккаунт и получить оценку"
   },
   paymentTest: {
     eyebrow: "Тестовый доступ",
@@ -512,6 +526,20 @@ const en: typeof ru = {
     recipient: "Who is this request for",
     recipientSelf: "For myself",
     recipientFamily: "For a family member",
+    recipientMinor: "For a participant under 21 — I am a parent or legal guardian",
+    ageLabel: "Participant's age",
+    ageConfirm: "I confirm the participant is 21 or older.",
+    guardianLabel: "Participant's details",
+    guardianNote:
+      "The programme is intended for participants over 21. Participation under 21 is possible only together with a parent or legal guardian — fill in the participant's details, and the consents below are given by you on their behalf.",
+    minorName: "Participant's full name",
+    minorBirthDate: "Participant's date of birth",
+    guardianConfirm:
+      "I am the parent or legal guardian of the participant and accept the terms of the contract on their behalf.",
+    errorAge: "Please confirm the participant's age, or state that you are a parent or legal guardian.",
+    errorMinorFields: "Please give the participant's name and date of birth.",
+    errorGuardian: "A parent's or legal guardian's confirmation is required for a participant under 21.",
+    errorMinorTooOld: "The participant is 21 or older — choose \"for myself\" or \"for a family member\".",
     goal: "Main goal",
     goalPlaceholder: "For example: recovery after surgery",
     situation: "A short description of the situation",
@@ -693,9 +721,9 @@ const en: typeof ru = {
   },
   promo: {
     badge: "🎁 Early clients offer",
-    titleFree: "Free analyses review by Professor Python",
+    titleFree: "Free preliminary assessment by Professor Python",
     textFree:
-      "Create an account, fill in the questionnaire and upload your test results — Professor Python will personally review them and give you feedback on your condition and recovery recommendations. The answer arrives as a file in your personal cabinet — within three working days, followed by three days of open chat for questions. Free right now, for the platform's first clients.",
+      "Create an account, fill in the questionnaire and upload your test results — the center's assistant collects and structures them into a prepared file, and Professor Python personally forms a preliminary orienting assessment of your resource state. The answer arrives as a file in your personal cabinet, marked as Professor Python's answer, within three working days, followed by three days of open chat for questions. This is an orienting assessment, not a full review: it helps you understand the direction. Provided once, free of charge.",
     titlePaid: "Analyses review by Professor Python",
     textPaid:
       "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
@@ -736,7 +764,7 @@ const en: typeof ru = {
       },
       {
         q: "Is this a full review or a preliminary one?",
-        a: "It is an analysis of your test results with recommendations for recovery."
+        a: "Preliminary. It is an orienting assessment of your state, not a full review with recommendations — the full review is part of the paid support formats. Provided once."
       },
       {
         q: "Which test results are suitable?",

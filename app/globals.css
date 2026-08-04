@@ -9325,3 +9325,32 @@ code {
   font-size: 0.85rem;
   margin-top: 1rem;
 }
+
+/* The guardian branch of the questionnaire. Set apart because the person
+   filling it in is describing someone else, and mixing those fields with
+   their own would invite filling the wrong name. */
+.onboarding-guardian {
+  border: 1px solid var(--accent);
+  border-radius: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin: 0;
+  padding: 1.25rem;
+}
+
+.onboarding-guardian legend {
+  color: var(--accent);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  padding: 0 0.5rem;
+  text-transform: uppercase;
+}
+
+.onboarding-guardian__note {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin: 0;
+}
