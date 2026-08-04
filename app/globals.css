@@ -1,4 +1,10 @@
 :root {
+  /* The horizontal inset every full-width band shares: the header, the
+     page body and the footer. It exists because they used to disagree —
+     the header sat at 14px on a phone while the page sat at 20px and the
+     homepage at 32px, so all the text looked pushed to the right of the
+     site's own name. */
+  --page-inset: clamp(16px, 4vw, 48px);
   --background: #17120a;
   --surface: #211a0f;
   --surface-muted: #2b2213;
@@ -43,7 +49,7 @@ a {
   display: flex;
   gap: 24px;
   justify-content: space-between;
-  padding: 18px clamp(20px, 4vw, 48px);
+  padding: 18px var(--page-inset);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -135,7 +141,9 @@ nav a:hover {
 @media (max-width: 720px) {
   .site-header {
     gap: 10px;
-    padding: 12px 14px;
+    /* Vertical only. The horizontal inset stays --page-inset so the name
+       lines up with the page title underneath it. */
+    padding: 12px var(--page-inset);
   }
 
   .site-header__right {
@@ -197,7 +205,7 @@ nav a:hover {
 }
 
 main {
-  padding: clamp(32px, 6vw, 72px) clamp(20px, 4vw, 48px);
+  padding: clamp(32px, 6vw, 72px) var(--page-inset);
 }
 
 .admin-nav {
@@ -250,7 +258,7 @@ main {
   font-size: 14px;
   gap: 16px;
   justify-content: space-between;
-  padding: 18px clamp(20px, 4vw, 48px);
+  padding: 18px var(--page-inset);
 }
 
 .fine-print {
@@ -289,7 +297,10 @@ main {
    dictionaries would then start breaking headings that were never meant
    to break — a page-title problem must not become a site-wide one. */
 @media (max-width: 520px) {
-  .page-header h1 {
+  .page-header h1,
+  /* The legal documents repeat their title inside the article, in caps.
+     "ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ" is one word wider than a narrow phone. */
+  .offer-doc__title {
     font-size: clamp(26px, 7.6vw, 36px);
     overflow-wrap: break-word;
   }
@@ -1428,7 +1439,7 @@ code {
 @media (max-width: 640px) {
   .site-header {
     gap: 10px;
-    padding: 12px 16px;
+    padding: 12px var(--page-inset);
   }
 
   .brand {
@@ -1441,7 +1452,7 @@ code {
   }
 
   main {
-    padding: 26px 16px 40px;
+    padding: 26px var(--page-inset) 40px;
   }
 
   h1 {
@@ -1492,7 +1503,7 @@ code {
   .site-footer {
     flex-direction: column;
     gap: 10px;
-    padding: 16px;
+    padding: 16px var(--page-inset);
     text-align: center;
   }
 
@@ -3764,7 +3775,7 @@ code {
       "brand lang"
       "nav nav";
     grid-template-columns: minmax(0, 1fr) auto;
-    padding: 12px 14px;
+    padding: 12px var(--page-inset);
   }
 
   .brand {
@@ -4629,7 +4640,16 @@ code {
 @media (max-width: 560px) {
   .anham-companion {
     bottom: 12px;
+    /* Pinned on both sides rather than sized from 100vw: vw counts the
+       scrollbar, so the panel used to hang past the right edge on a
+       narrow window and widen the page. */
+    left: 12px;
     right: 12px;
+  }
+
+  .anham-companion__welcome {
+    max-width: 100%;
+    width: auto;
   }
 
   .anham-companion__figure .anham {
@@ -4708,7 +4728,7 @@ a {
   display: flex;
   gap: 24px;
   justify-content: space-between;
-  padding: 18px clamp(20px, 4vw, 48px);
+  padding: 18px var(--page-inset);
   position: sticky;
   top: 0;
   z-index: 10;
@@ -4800,7 +4820,9 @@ nav a:hover {
 @media (max-width: 720px) {
   .site-header {
     gap: 10px;
-    padding: 12px 14px;
+    /* Vertical only. The horizontal inset stays --page-inset so the name
+       lines up with the page title underneath it. */
+    padding: 12px var(--page-inset);
   }
 
   .site-header__right {
@@ -4862,7 +4884,7 @@ nav a:hover {
 }
 
 main {
-  padding: clamp(32px, 6vw, 72px) clamp(20px, 4vw, 48px);
+  padding: clamp(32px, 6vw, 72px) var(--page-inset);
 }
 
 .admin-nav {
@@ -4915,7 +4937,7 @@ main {
   font-size: 14px;
   gap: 16px;
   justify-content: space-between;
-  padding: 18px clamp(20px, 4vw, 48px);
+  padding: 18px var(--page-inset);
 }
 
 .fine-print {
@@ -4954,7 +4976,10 @@ main {
    dictionaries would then start breaking headings that were never meant
    to break — a page-title problem must not become a site-wide one. */
 @media (max-width: 520px) {
-  .page-header h1 {
+  .page-header h1,
+  /* The legal documents repeat their title inside the article, in caps.
+     "ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ" is one word wider than a narrow phone. */
+  .offer-doc__title {
     font-size: clamp(26px, 7.6vw, 36px);
     overflow-wrap: break-word;
   }
@@ -6093,7 +6118,7 @@ code {
 @media (max-width: 640px) {
   .site-header {
     gap: 10px;
-    padding: 12px 16px;
+    padding: 12px var(--page-inset);
   }
 
   .brand {
@@ -6106,7 +6131,7 @@ code {
   }
 
   main {
-    padding: 26px 16px 40px;
+    padding: 26px var(--page-inset) 40px;
   }
 
   h1 {
@@ -6157,7 +6182,7 @@ code {
   .site-footer {
     flex-direction: column;
     gap: 10px;
-    padding: 16px;
+    padding: 16px var(--page-inset);
     text-align: center;
   }
 
@@ -8429,7 +8454,7 @@ code {
       "brand lang"
       "nav nav";
     grid-template-columns: minmax(0, 1fr) auto;
-    padding: 12px 14px;
+    padding: 12px var(--page-inset);
   }
 
   .brand {
@@ -9294,7 +9319,16 @@ code {
 @media (max-width: 560px) {
   .anham-companion {
     bottom: 12px;
+    /* Pinned on both sides rather than sized from 100vw: vw counts the
+       scrollbar, so the panel used to hang past the right edge on a
+       narrow window and widen the page. */
+    left: 12px;
     right: 12px;
+  }
+
+  .anham-companion__welcome {
+    max-width: 100%;
+    width: auto;
   }
 
   .anham-companion__figure .anham {

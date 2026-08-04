@@ -12,7 +12,10 @@
   gap: clamp(3rem, 7vw, 6rem);
   margin: 0 auto;
   max-width: 1240px;
-  padding: clamp(1.25rem, 4vw, 2.5rem) clamp(1rem, 4vw, 2rem) 4rem;
+  /* Vertical only. <main> already applies --page-inset horizontally, and
+     adding a second inset here pushed the whole homepage about 16px
+     further right than every other page and than the header above it. */
+  padding: clamp(1.25rem, 4vw, 2.5rem) 0 4rem;
   width: 100%;
 }
 
