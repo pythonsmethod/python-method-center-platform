@@ -698,7 +698,7 @@ const ru = {
     badge: "🎁 Акция для первых клиентов",
     titleFree: "Бесплатная предварительная оценка от Professor Python",
     textFree:
-      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — помощник центра соберёт и структурирует их в готовый файл, а Professor Python лично сформирует предварительную ориентирующую оценку вашего ресурсного состояния. Ответ придёт файлом в личный кабинет с пометкой, что это ответ Professor Python, — до трёх рабочих дней, затем три дня открытого чата для вопросов. Это ориентирующая оценка, а не полный разбор: она помогает понять направление. Предоставляется один раз и бесплатно.",
+      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — помощник центра соберёт и структурирует их в готовый файл, а Professor Python лично сформирует предварительную аналитику вашего ресурсного состояния: где вы находитесь сейчас и что происходит с показателями вашего организма. Ответ придёт файлом в личный кабинет с пометкой, что это ответ Professor Python, — до трёх рабочих дней, затем три дня открытого чата для вопросов. Это картина вашего состояния на сегодня, а не полный разбор с рекомендациями. Предоставляется один раз и бесплатно.",
     titlePaid: "Разбор анализов от Professor Python",
     textPaid:
       "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
@@ -722,7 +722,7 @@ const ru = {
       },
       {
         q: "Что входит?",
-        a: "Предварительная ориентирующая оценка вашего ресурсного состояния от Professor Python: она помогает понять направление и решить, нужно ли вам сопровождение. Полный разбор и рекомендации по восстановлению входят в платные форматы."
+        a: "Предварительная аналитика вашего ресурсного состояния от Professor Python: где вы находитесь сейчас и что происходит с показателями вашего организма. Полный разбор с рекомендациями по восстановлению входит в платные форматы."
       },
       {
         q: "В каком виде придёт ответ?",
@@ -742,7 +742,7 @@ const ru = {
       },
       {
         q: "Это полный разбор или предварительный?",
-        a: "Предварительный. Это ориентирующая оценка состояния, а не полный разбор с рекомендациями — полный разбор входит в платные форматы сопровождения. Предоставляется один раз."
+        a: "Предварительный. Это картина вашего состояния на сегодня, а не полный разбор с рекомендациями — полный разбор входит в платные форматы сопровождения. Предоставляется один раз."
       },
       {
         q: "Какие анализы подойдут?",
@@ -1637,7 +1637,7 @@ const en: typeof ru = {
     badge: "🎁 Early clients offer",
     titleFree: "Free preliminary assessment by Professor Python",
     textFree:
-      "Create an account, fill in the questionnaire and upload your test results — the center's assistant collects and structures them into a prepared file, and Professor Python personally forms a preliminary orienting assessment of your resource state. The answer arrives as a file in your personal cabinet, marked as Professor Python's answer, within three working days, followed by three days of open chat for questions. This is an orienting assessment, not a full review: it helps you understand the direction. Provided once, free of charge.",
+      "Create an account, fill in the questionnaire and upload your test results — the center's assistant collects and structures them into a prepared file, and Professor Python personally forms a preliminary analysis of your resource state: where you stand today and what is happening with your body's markers. The answer arrives as a file in your personal cabinet, marked as Professor Python's answer, within three working days, followed by three days of open chat for questions. This is a picture of your state today, not a full review with recommendations. Provided once, free of charge.",
     titlePaid: "Analyses review by Professor Python",
     textPaid:
       "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
@@ -1658,7 +1658,7 @@ const en: typeof ru = {
       },
       {
         q: "What is included?",
-        a: "A review of your test results and Professor Python's recommendations on restoring your markers."
+        a: "A preliminary analysis of your resource state by Professor Python: where you stand today and what is happening with your body's markers. A full review with recommendations for recovery is part of the paid formats."
       },
       {
         q: "In what form does the answer come?",
@@ -1678,7 +1678,7 @@ const en: typeof ru = {
       },
       {
         q: "Is this a full review or a preliminary one?",
-        a: "Preliminary. It is an orienting assessment of your state, not a full review with recommendations — the full review is part of the paid support formats. Provided once."
+        a: "Preliminary. It is a picture of where your state stands today, not a full review with recommendations — the full review is part of the paid support formats. Provided once."
       },
       {
         q: "Which test results are suitable?",
