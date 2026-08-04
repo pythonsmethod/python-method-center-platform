@@ -14,6 +14,7 @@ type PaymentPlanLabels = {
   offerCheckboxPrefix: string;
   offerCheckboxLink: string;
   offerHint: string;
+  refundLink: string;
 };
 
 export function PaymentPlans({
@@ -83,6 +84,16 @@ export function PaymentPlans({
           />
           <span>{labels.startCheckbox}</span>
         </label>
+
+        {/* The tick above is where the refusal of refunds is agreed to, so
+            the terms it rests on are one click away from it — not only in
+            the footer. */}
+        <p className="offer-gate__aside">
+          <Link href="/legal/refund" target="_blank">
+            {labels.refundLink}
+          </Link>
+        </p>
+
         {showHint && !accepted ? (
           <p className="offer-gate__hint" role="alert">
             {labels.offerHint}

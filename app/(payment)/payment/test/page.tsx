@@ -62,7 +62,8 @@ export default async function TestPaymentPage() {
           startCheckbox: payment.startCheckbox,
           offerCheckboxPrefix: payment.offerCheckboxPrefix,
           offerCheckboxLink: payment.offerCheckboxLink,
-          offerHint: payment.offerHint
+          offerHint: payment.offerHint,
+          refundLink: payment.refundLink
         }}
         plans={plans}
       />

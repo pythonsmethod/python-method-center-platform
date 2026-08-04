@@ -131,6 +131,17 @@ export function OnboardingForm({
         <span>{labels.consent}</span>
       </label>
 
+      {/* A consent to processing that does not say what the processing is
+          is not informed consent. The policy sits next to the tick, not
+          only in the footer. */}
+      <p className="onboarding-form__aside">
+        {labels.privacyPrefix}
+        <Link href="/legal/privacy" target="_blank">
+          {labels.privacyLink}
+        </Link>
+        .
+      </p>
+
       <button className="button" disabled={pending} type="submit">
         {pending ? labels.submitting : labels.submit}
       </button>

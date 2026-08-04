@@ -62,7 +62,8 @@ export default async function PaymentPage() {
           startCheckbox: t.startCheckbox,
           offerCheckboxPrefix: t.offerCheckboxPrefix,
           offerCheckboxLink: t.offerCheckboxLink,
-          offerHint: t.offerHint
+          offerHint: t.offerHint,
+          refundLink: t.refundLink
         }}
         plans={plans}
       >

@@ -354,6 +354,8 @@ const ru = {
     offerLink: "публичной оферты",
     consent:
       "Я даю согласие на обработку моих персональных данных и медицинской информации для подготовки и ведения кейса.",
+    privacyPrefix: "Что именно мы храним и кому передаём — ",
+    privacyLink: "политика конфиденциальности",
     submit: "Отправить анкету",
     submitting: "Отправка...",
     errorFields: "Заполните все обязательные поля анкеты.",
@@ -373,6 +375,28 @@ const ru = {
     archiveLink: "Предыдущая редакция договора (oferta-v2, PDF)",
     questionsPrefix: "Если что-то в условиях непонятно — ",
     questionsLink: "напишите нам до оплаты",
+  },
+  privacy: {
+    eyebrow: "Юридические документы",
+    title: "Политика конфиденциальности",
+    description:
+      "Что мы храним, где, кто это видит и какие сервисы получают часть ваших данных.",
+    updatedLabel: "Редакция от",
+    questionsPrefix: "Есть вопрос о ваших данных — ",
+    questionsLink: "напишите нам",
+    relatedOffer: "Договор-оферта",
+    relatedRefund: "Условия оплаты и возврата"
+  },
+  refund: {
+    eyebrow: "Юридические документы",
+    title: "Условия оплаты и возврата",
+    description:
+      "Когда начинается работа, почему возврат не предусмотрен и что делать при ошибке списания.",
+    updatedLabel: "Редакция от",
+    questionsPrefix: "Есть вопрос об оплате — ",
+    questionsLink: "напишите нам до оплаты",
+    relatedOffer: "Договор-оферта",
+    relatedPrivacy: "Политика конфиденциальности"
   },
   meta: {
     title: "Python Method — сопровождение восстановления",
@@ -399,6 +423,8 @@ const ru = {
   } as Record<string, string>,
   footer: {
     offer: "Публичная оферта",
+    privacy: "Конфиденциальность",
+    refund: "Оплата и возврат",
     support: "Поддержка",
     team: "Для команды",
     socials: "Социальные сети",
@@ -769,6 +795,7 @@ const ru = {
     offerCheckboxLink: "публичной оферты",
     offerHint:
       "Чтобы перейти к оплате, отметьте оба пункта выше.",
+    refundLink: "Подробные условия оплаты и возврата",
     feeNote: "К каждому тарифу добавляется сервисный сбор 5%.",
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
@@ -1202,6 +1229,8 @@ const en: typeof ru = {
     offerLink: "public offer",
     consent:
       "I consent to the processing of my personal data and medical information for the preparation and handling of my case.",
+    privacyPrefix: "What exactly we keep and who we pass it to — ",
+    privacyLink: "the privacy policy",
     submit: "Submit the questionnaire",
     submitting: "Sending...",
     errorFields: "Please fill in every required field.",
@@ -1221,6 +1250,28 @@ const en: typeof ru = {
     archiveLink: "Previous edition of the contract (oferta-v2, PDF)",
     questionsPrefix: "If anything in the terms is unclear, ",
     questionsLink: "write to us before you pay",
+  },
+  privacy: {
+    eyebrow: "Legal documents",
+    title: "Privacy policy",
+    description:
+      "What we keep, where, who sees it, and which services receive part of your data.",
+    updatedLabel: "Revision of",
+    questionsPrefix: "If you have a question about your data, ",
+    questionsLink: "write to us",
+    relatedOffer: "Offer agreement",
+    relatedRefund: "Payment and refund terms"
+  },
+  refund: {
+    eyebrow: "Legal documents",
+    title: "Payment and refund terms",
+    description:
+      "When the work begins, why no refund is provided, and what to do about a billing error.",
+    updatedLabel: "Revision of",
+    questionsPrefix: "If you have a question about payment, ",
+    questionsLink: "write to us before you pay",
+    relatedOffer: "Offer agreement",
+    relatedPrivacy: "Privacy policy"
   },
   meta: {
     title: "Python Method — recovery support",
@@ -1247,6 +1298,8 @@ const en: typeof ru = {
   },
   footer: {
     offer: "Public offer",
+    privacy: "Privacy",
+    refund: "Payment and refunds",
     support: "Support",
     team: "For the team",
     socials: "Social media",
@@ -1614,6 +1667,7 @@ const en: typeof ru = {
     offerCheckboxLink: "public offer",
     offerHint:
       "To proceed to payment, please tick both boxes above.",
+    refundLink: "Full payment and refund terms",
     feeNote: "A 5% service fee is added to each plan.",
     plan5Title: "Support — 5 weeks",
     plan5Desc:

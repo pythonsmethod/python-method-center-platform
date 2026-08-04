@@ -279,6 +279,17 @@ main {
   max-width: 760px;
 }
 
+/* A page title can be one long word — "конфиденциальности" — and at the
+   36px floor of the h1 clamp it was wider than a phone, pushing the whole
+   page sideways. Titled pages take a smaller floor on a narrow screen so
+   the word fits whole; break-word on h1 stays as a backstop, because a
+   break with no hyphen reads worse than a slightly smaller heading. */
+@media (max-width: 520px) {
+  .page-header h1 {
+    font-size: clamp(26px, 7.6vw, 36px);
+  }
+}
+
 .eyebrow {
   color: var(--accent);
   font-size: 13px;
@@ -292,9 +303,11 @@ h1 {
   color: var(--accent-strong);
   font-family: var(--font-serif);
   font-size: clamp(36px, 7vw, 72px);
+  hyphens: auto;
   line-height: 1;
   margin: 0;
   max-width: 920px;
+  overflow-wrap: break-word;
 }
 
 h2 {
@@ -4874,6 +4887,17 @@ main {
   max-width: 760px;
 }
 
+/* A page title can be one long word — "конфиденциальности" — and at the
+   36px floor of the h1 clamp it was wider than a phone, pushing the whole
+   page sideways. Titled pages take a smaller floor on a narrow screen so
+   the word fits whole; break-word on h1 stays as a backstop, because a
+   break with no hyphen reads worse than a slightly smaller heading. */
+@media (max-width: 520px) {
+  .page-header h1 {
+    font-size: clamp(26px, 7.6vw, 36px);
+  }
+}
+
 .eyebrow {
   color: var(--accent);
   font-size: 13px;
@@ -4887,9 +4911,11 @@ h1 {
   color: var(--accent-strong);
   font-family: var(--font-serif);
   font-size: clamp(36px, 7vw, 72px);
+  hyphens: auto;
   line-height: 1;
   margin: 0;
   max-width: 920px;
+  overflow-wrap: break-word;
 }
 
 h2 {
@@ -9324,6 +9350,29 @@ code {
 .offer-doc__archive {
   font-size: 0.85rem;
   margin-top: 1rem;
+}
+
+/* The privacy policy and the refund terms point at each other and at the
+   offer, so this line can hold more than one link. */
+.offer-doc__archive a + a {
+  margin-left: 1.25rem;
+}
+
+/* A quiet line under a checkbox: the document the tick above rests on.
+   Indented to the checkbox label so it reads as belonging to it. */
+.offer-gate__aside,
+.onboarding-form__aside {
+  color: var(--muted);
+  font-size: 13px;
+  margin: -0.25rem 0 0 30px;
+}
+
+/* The link has to look like one: it is the document the tick above rests
+   on, and a grey unmarked phrase is not something anyone clicks. */
+.offer-gate__aside a,
+.onboarding-form__aside a {
+  color: var(--accent);
+  text-decoration: underline;
 }
 
 /* The guardian branch of the questionnaire. Set apart because the person
