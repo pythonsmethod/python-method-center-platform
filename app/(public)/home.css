@@ -653,3 +653,18 @@
 .home-hero__trust-ankh {
   color: var(--accent);
 }
+
+/* These two open Анхам in place rather than navigating anywhere, so they
+   are buttons. Buttons carry browser chrome that links do not — strip it
+   so they look exactly like the links beside them. */
+.home-button,
+.home-more--button {
+  cursor: pointer;
+  font: inherit;
+}
+
+.home-more--button {
+  background: none;
+  border: 0;
+  padding: 0;
+}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
+import { AnhamOpenButton } from "@/components/assistant/AnhamOpenButton";
 import { IconAnkh } from "@/components/icons/EgyptianIcons";
 import { isFreeReviewActive } from "@/lib/config/promo";
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
@@ -69,10 +70,10 @@ export default async function HomePage() {
               {t.heroCtaSelf}
               <span aria-hidden="true">→</span>
             </Link>
-            <Link className="home-button" href="/support">
+            <AnhamOpenButton className="home-button">
               {t.heroCtaAnham}
               <IconAnkh className="home-button__ankh" />
-            </Link>
+            </AnhamOpenButton>
           </div>
 
           <p className="home-hero__trust">
@@ -126,10 +127,10 @@ export default async function HomePage() {
             <h2>{anhamName}</h2>
             <p className="home-figure__role">{t.aiLabel}</p>
             <p>{t.aiText}</p>
-            <Link className="home-more" href="/support">
+            <AnhamOpenButton className="home-more home-more--button">
               {t.cardMore}
               <span aria-hidden="true">→</span>
-            </Link>
+            </AnhamOpenButton>
           </div>
           <AnhamAvatar className="home-figure__avatar" size={200} state={tier} />
         </article>
@@ -234,9 +235,9 @@ export default async function HomePage() {
               {t.finalCtaStart}
               <span aria-hidden="true">→</span>
             </Link>
-            <Link className="home-button" href="/support">
+            <AnhamOpenButton className="home-button">
               {t.finalCtaAsk}
-            </Link>
+            </AnhamOpenButton>
           </div>
         </div>
         <AnhamAvatar className="home-final__anham" size={190} state={tier} />

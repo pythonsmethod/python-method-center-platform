@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
+import { ANHAM_OPEN_EVENT } from "@/components/assistant/AnhamOpenButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
@@ -56,6 +57,26 @@ export function AssistantWidget({
       }
     };
   }, [tier]);
+
+  // Anything on the page can ask him to open: the hero buttons, a card, the
+  // closing call. They were sending people to the support page instead,
+  // which is a different thing entirely — a human queue, not him.
+  //
+  // #anham does the same for a link arriving from another page.
+  useEffect(() => {
+    function open() {
+      setShowWelcome(false);
+      setOpen(true);
+    }
+
+    window.addEventListener(ANHAM_OPEN_EVENT, open);
+
+    if (window.location.hash === "#anham") {
+      open();
+    }
+
+    return () => window.removeEventListener(ANHAM_OPEN_EVENT, open);
+  }, []);
 
   // Escape closes the panel and returns focus to Анхам, so a keyboard user
   // is never stranded inside it.
