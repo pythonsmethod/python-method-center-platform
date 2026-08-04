@@ -1,13 +1,11 @@
-import Image from "next/image";
 import Link from "next/link";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
+import { IconAnkh } from "@/components/icons/EgyptianIcons";
 import { isFreeReviewActive } from "@/lib/config/promo";
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import "./home.css";
-
-const PROFESSOR_IMAGE = "/images/professor-python-temp-v2.png";
 
 // The number a person reads is their position on the whole path, not inside
 // one column: the shared start is 01–02, so each branch continues from 03
@@ -81,15 +79,11 @@ export default async function HomePage() {
         </div>
 
         <div className="home-hero__art">
-          <div aria-hidden="true" className="home-hero__glow" />
-          <Image
-            alt="Professor Python"
-            className="home-hero__professor"
-            height={640}
-            priority
-            src={PROFESSOR_IMAGE}
-            width={520}
-          />
+          <div aria-hidden="true" className="home-hero__gate">
+            <span className="home-hero__gate-ring" />
+            <span className="home-hero__gate-ring" />
+            <IconAnkh className="home-hero__gate-ankh" />
+          </div>
           <div className="home-hero__anham">
             <p className="home-bubble">{t.heroBubble}</p>
             <AnhamAvatar size={230} state={tier} title={anhamName} />
@@ -108,13 +102,9 @@ export default async function HomePage() {
               <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <Image
-            alt=""
-            className="home-figure__image"
-            height={320}
-            src={PROFESSOR_IMAGE}
-            width={280}
-          />
+          <span aria-hidden="true" className="home-figure__seal">
+            <IconAnkh />
+          </span>
         </article>
 
         <article className="home-figure home-figure--anham">

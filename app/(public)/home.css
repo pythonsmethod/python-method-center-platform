@@ -118,38 +118,64 @@
 }
 
 .home-hero__art {
-  align-items: end;
+  align-items: center;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.72fr);
+  justify-items: center;
+  min-height: 22rem;
   position: relative;
 }
 
-/* The glow sits behind both figures and never intercepts a click. */
-.home-hero__glow {
-  background: radial-gradient(
-    circle at 60% 45%,
-    rgba(212, 175, 55, 0.28),
-    transparent 62%
-  );
-  inset: -12%;
+/* The light gate: the center's sign, built from gradients rather than
+   from a photograph. Nothing here needs an asset, so nothing here can
+   quietly become a stock image of someone who does not exist. */
+.home-hero__gate {
+  align-items: center;
+  aspect-ratio: 1;
+  display: flex;
+  inset: 0;
+  justify-content: center;
   pointer-events: none;
   position: absolute;
 }
 
-.home-hero__professor,
-.home-hero__anham img,
-.home-figure__image,
-.home-final__anham {
-  height: auto;
-  max-width: 100%;
-  object-fit: contain;
+.home-hero__gate::before {
+  background: radial-gradient(
+    circle at 50% 50%,
+    rgba(227, 194, 95, 0.38),
+    rgba(212, 175, 55, 0.12) 45%,
+    transparent 70%
+  );
+  border-radius: 50%;
+  content: "";
+  inset: 4%;
+  position: absolute;
+}
+
+.home-hero__gate-ring {
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 50%;
+  inset: 14%;
+  position: absolute;
+}
+
+.home-hero__gate-ring:last-of-type {
+  border-color: rgba(212, 175, 55, 0.18);
+  inset: 2%;
+}
+
+.home-hero__gate-ankh {
+  color: var(--accent-strong);
+  height: 46%;
+  opacity: 0.9;
   position: relative;
+  width: auto;
 }
 
 .home-hero__anham {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  position: relative;
 }
 
 .home-bubble {
@@ -530,7 +556,7 @@
     padding: 1.25rem 0 0;
   }
 
-  .home-figure__image,
+  .home-figure__seal,
   .home-final__anham {
     justify-self: center;
     order: -1;
@@ -570,4 +596,28 @@
 .home-figure__avatar,
 .home-final__anham {
   justify-self: center;
+}
+
+/* Until a real photograph of Professor Python exists, his card carries the
+   center's seal. Swap this span for an <Image> when the photo arrives. */
+.home-figure__seal {
+  align-items: center;
+  aspect-ratio: 1;
+  background: radial-gradient(
+    circle at 50% 40%,
+    rgba(212, 175, 55, 0.22),
+    transparent 68%
+  );
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--accent);
+  display: flex;
+  justify-content: center;
+  justify-self: center;
+  width: min(180px, 60%);
+}
+
+.home-figure__seal svg {
+  height: 46%;
+  width: auto;
 }
