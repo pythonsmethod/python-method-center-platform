@@ -113,12 +113,17 @@
   max-width: 34rem;
 }
 
+/* Deliberately not a flex row. As a flex row the ankh and the sentence are
+   two items, so the whole sentence is pushed right by the icon's width and
+   every wrapped line starts under the first — on a phone that put this
+   line about 23px to the right of everything else in the hero column,
+   which reads as text that has slipped sideways. Kept as ordinary text
+   with the ankh set inline, so the second line returns flush to the left
+   edge the eyebrow, the title and the buttons all share. */
 .home-hero__trust {
-  align-items: center;
   color: var(--muted);
-  display: flex;
   font-size: 0.9rem;
-  gap: 0.5rem;
+  line-height: 1.6;
   margin: 1.5rem 0 0;
 }
 
@@ -652,13 +657,22 @@
    back to a dagger, which is the wrong symbol on a health platform. */
 .home-button__ankh,
 .home-hero__trust-ankh {
-  flex: 0 0 auto;
   height: 1.05em;
   width: auto;
 }
 
+/* Inside a button, which is inline-flex: stays a flex item. */
+.home-button__ankh {
+  flex: 0 0 auto;
+}
+
+/* In the trust line, which is plain text: sits in the sentence rather than
+   beside it, so wrapped lines stay flush left. */
 .home-hero__trust-ankh {
   color: var(--accent);
+  display: inline-block;
+  margin-right: 0.45rem;
+  vertical-align: -0.14em;
 }
 
 /* These two open Анхам in place rather than navigating anywhere, so they
