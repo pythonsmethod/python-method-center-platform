@@ -105,7 +105,7 @@ export default async function HomePage() {
             <h2>Professor Python</h2>
             <p className="home-figure__role">{t.expertLabel}</p>
             <p>{t.expertText}</p>
-            <Link className="home-more" href="/review">
+            <Link className="home-more" href="/professor">
               {t.cardMore}
               <span aria-hidden="true">→</span>
             </Link>

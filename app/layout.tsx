@@ -120,6 +120,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             </nav>
           ) : null}
           <nav aria-label="More">
+            <Link href="/professor">{dict.footer.professor}</Link>
             <Link href="/legal/offer">{dict.footer.offer}</Link>
             <Link href="/legal/privacy">{dict.footer.privacy}</Link>
             <Link href="/legal/refund">{dict.footer.refund}</Link>

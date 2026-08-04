@@ -7,6 +7,7 @@ import { SITE_URL } from "@/lib/config/site";
 const PUBLIC_PATHS: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
   { path: "/review", priority: 0.9 },
+  { path: "/professor", priority: 0.8 },
   { path: "/payment", priority: 0.9 },
   // /shop is deliberately absent: it asks search engines not to index it
   // while the line has nothing for sale, and a sitemap entry for a

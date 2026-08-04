@@ -511,6 +511,7 @@ const ru = {
     sections: "Разделы сайта"
   } as Record<string, string>,
   footer: {
+    professor: "Professor Python",
     offer: "Публичная оферта",
     privacy: "Конфиденциальность",
     refund: "Оплата и возврат",
@@ -722,6 +723,35 @@ const ru = {
     securityTextPrefix:
       "Вы останетесь в аккаунте на этом устройстве и сможете сразу перейти в кабинет. Если пароль меняли не вы — напишите нам через ",
     supportLink: "страницу поддержки"
+  },
+  professor: {
+    eyebrow: "Эксперт центра",
+    title: "Professor Python",
+    subtitle: "Карен — автор метода и ведущий специалист центра",
+    lead: "Тридцать лет практики сопровождения людей в восстановлении. Каждый кейс он разбирает лично: ваши анализы, вашу историю, вашу ситуацию — не по шаблону и не через помощника.",
+    // Всё ниже — из договора-оферты, пункт 2. Ничего сверх того, что
+    // подтверждено документом, который принимает клиент.
+    yearsLabel: "Практика",
+    yearsValue: "30 лет",
+    yearsText: "Сопровождение людей в восстановлении.",
+    methodLabel: "Метод",
+    methodValue: "Авторский",
+    methodText: "Python Method — его собственный метод, по которому работает центр.",
+    personalLabel: "Как он работает",
+    personalValue: "Лично",
+    personalText: "Разбор вашего случая делает он сам, а не ассистент и не команда.",
+    howTitle: "Что значит «разбирает лично»",
+    howText: "Вы заполняете анкету и загружаете свои анализы. Professor Python читает их сам и отвечает вам в переписке вашего кабинета. Искусственный интеллект центра помогает вам ориентироваться и вести дневник, но ответы по вашему состоянию, анализам и восстановлению даёт только он.",
+    boundaryLabel: "Границы",
+    boundaryTitle: "Чем он не является",
+    boundaryText: "Professor Python — специалист по восстановлению организма и автор метода. Он не врач, платформа не является медицинским учреждением, и сопровождение не заменяет наблюдение вашего лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи.",
+    companyTitle: "Кто стоит за центром",
+    companyText: "Программа предоставляется компанией Pythons & Co, зарегистрированной в США: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. Условия работы — в договоре-оферте.",
+    offerLink: "Читать договор",
+    ctaTitle: "Начать с ним работать",
+    ctaText: "Первый шаг не требует оплаты: заполните анкету и загрузите анализы — он посмотрит вашу ситуацию.",
+    ctaFree: "Бесплатный разбор",
+    ctaPlans: "Тарифы сопровождения"
   },
   promo: {
     badge: "🎁 Акция для первых клиентов",
@@ -1483,6 +1513,7 @@ const en: typeof ru = {
     sections: "Site sections"
   },
   footer: {
+    professor: "Professor Python",
     offer: "Public offer",
     privacy: "Privacy",
     refund: "Payment and refunds",
@@ -1696,6 +1727,33 @@ const en: typeof ru = {
     securityTextPrefix:
       "You stay signed in on this device and can go straight to your cabinet. If it was not you who changed the password, write to us through ",
     supportLink: "the support page"
+  },
+  professor: {
+    eyebrow: "The centre's expert",
+    title: "Professor Python",
+    subtitle: "Karen — the author of the method and the centre's lead specialist",
+    lead: "Thirty years of practice supporting people through recovery. He reviews every case himself: your test results, your history, your situation — not to a template and not through an assistant.",
+    yearsLabel: "Practice",
+    yearsValue: "30 years",
+    yearsText: "Supporting people through recovery.",
+    methodLabel: "The method",
+    methodValue: "His own",
+    methodText: "Python Method is his own method, and the centre works by it.",
+    personalLabel: "How he works",
+    personalValue: "Personally",
+    personalText: "Your case is reviewed by him, not by an assistant and not by the team.",
+    howTitle: "What \"reviews personally\" means",
+    howText: "You fill in the questionnaire and upload your test results. Professor Python reads them himself and answers you in your cabinet. The centre's AI helps you find your way and keep your notes, but the answers about your state, your results and your recovery come from him alone.",
+    boundaryLabel: "The limits",
+    boundaryTitle: "What he is not",
+    boundaryText: "Professor Python is a specialist in the recovery of the body and the author of the method. He is not a physician, the platform is not a medical institution, and the support programme does not replace your own doctor's care. In an emergency, call your local emergency service.",
+    companyTitle: "Who stands behind the centre",
+    companyText: "The programme is provided by Pythons & Co, registered in the USA: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. The terms of the work are in the offer agreement.",
+    offerLink: "Read the contract",
+    ctaTitle: "Start working with him",
+    ctaText: "The first step costs nothing: fill in the questionnaire and upload your results — he will look at your situation.",
+    ctaFree: "Free review",
+    ctaPlans: "Support plans"
   },
   promo: {
     badge: "🎁 Early clients offer",
