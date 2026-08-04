@@ -10,6 +10,7 @@ type PaymentPlanLabels = {
   planLabel: string;
   payButton: string;
   unavailable: string;
+  startCheckbox: string;
   offerCheckboxPrefix: string;
   offerCheckboxLink: string;
   offerHint: string;
@@ -24,7 +25,12 @@ export function PaymentPlans({
   labels: PaymentPlanLabels;
   children?: ReactNode;
 }) {
-  const [accepted, setAccepted] = useState(false);
+  const [offerAccepted, setOfferAccepted] = useState(false);
+  // Clause 8 of the offer requires a separate confirmation that the work
+  // begin immediately — the refusal of refunds rests on it. One combined
+  // tick cannot carry two different statements.
+  const [startAccepted, setStartAccepted] = useState(false);
+  const accepted = offerAccepted && startAccepted;
   const [showHint, setShowHint] = useState(false);
   const gateRef = useRef<HTMLDivElement | null>(null);
 
@@ -47,10 +53,10 @@ export function PaymentPlans({
       >
         <label className="offer-gate__label">
           <input
-            checked={accepted}
+            checked={offerAccepted}
             onChange={(event) => {
-              setAccepted(event.target.checked);
-              if (event.target.checked) {
+              setOfferAccepted(event.target.checked);
+              if (event.target.checked && startAccepted) {
                 setShowHint(false);
               }
             }}
@@ -62,6 +68,20 @@ export function PaymentPlans({
               {labels.offerCheckboxLink}
             </Link>
           </span>
+        </label>
+
+        <label className="offer-gate__label">
+          <input
+            checked={startAccepted}
+            onChange={(event) => {
+              setStartAccepted(event.target.checked);
+              if (event.target.checked && offerAccepted) {
+                setShowHint(false);
+              }
+            }}
+            type="checkbox"
+          />
+          <span>{labels.startCheckbox}</span>
         </label>
         {showHint && !accepted ? (
           <p className="offer-gate__hint" role="alert">
@@ -86,6 +106,7 @@ export function PaymentPlans({
                     href={plan.paymentLinkUrl}
                     onClick={() => {
                       void recordPaymentOfferAcceptance(plan.product);
+                      void recordPaymentOfferAcceptance(plan.product, true);
                     }}
                     rel="noreferrer"
                     target="_blank"
@@ -118,6 +139,7 @@ export function PaymentPlans({
                     href={plan.paypalUrl}
                     onClick={() => {
                       void recordPaymentOfferAcceptance(plan.product);
+                      void recordPaymentOfferAcceptance(plan.product, true);
                       void announcePaypalIntent(plan.product);
                     }}
                     rel="noreferrer"

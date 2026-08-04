@@ -394,10 +394,12 @@ const ru = {
     altText:
       "В некоторых странах карты просто не принимаются — и дело не в вас. Мы примем оплату другим способом: банковский перевод, PayPal, Wise или криптовалюта.",
     altCta: "Выбрать другой способ",
+    startCheckbox:
+      "Я прошу начать работу немедленно и понимаю, что в связи с немедленным началом исполнения право отказа от договора, предусмотренное законодательством некоторых стран, не применяется, а возврат средств после оплаты не предусмотрен.",
     offerCheckboxPrefix: "Я ознакомился(лась) и принимаю условия ",
     offerCheckboxLink: "публичной оферты",
     offerHint:
-      "Чтобы перейти к оплате, отметьте согласие с условиями публичной оферты.",
+      "Чтобы перейти к оплате, отметьте оба пункта выше.",
     feeNote: "К каждому тарифу добавляется сервисный сбор 5%.",
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
@@ -869,10 +871,12 @@ const en: typeof ru = {
     altText:
       "In some countries cards are simply not accepted — and it is not your fault. We will take payment another way: bank transfer, PayPal, Wise or cryptocurrency.",
     altCta: "Choose another way",
+    startCheckbox:
+      "I ask for the work to begin immediately, and I understand that because performance begins immediately the right of withdrawal provided for by the legislation of some countries does not apply, and that no refund is provided after payment.",
     offerCheckboxPrefix: "I have read and accept the terms of the ",
     offerCheckboxLink: "public offer",
     offerHint:
-      "To proceed to payment, please confirm your agreement with the public offer.",
+      "To proceed to payment, please tick both boxes above.",
     feeNote: "A 5% service fee is added to each plan.",
     plan5Title: "Support — 5 weeks",
     plan5Desc:

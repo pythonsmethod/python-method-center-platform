@@ -59,6 +59,7 @@ export default async function TestPaymentPage() {
           planLabel: payment.planLabel,
           payButton: payment.payButton,
           unavailable: t.unavailable,
+          startCheckbox: payment.startCheckbox,
           offerCheckboxPrefix: payment.offerCheckboxPrefix,
           offerCheckboxLink: payment.offerCheckboxLink,
           offerHint: payment.offerHint
