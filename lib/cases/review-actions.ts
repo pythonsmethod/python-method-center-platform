@@ -8,7 +8,7 @@ import {
 } from "@/lib/assistant/case-review";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { getStaffUserState } from "@/lib/auth/require-staff";
-import { loadCaseDocuments, type CaseDocumentRow } from "@/lib/cases/case-documents";
+import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
 import type { CaseReviewActionState } from "@/lib/cases/review-state";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -54,20 +54,32 @@ export async function generateCaseReview(
 
   const { data: documents, error: documentsError } = await supabase
     .from("uploaded_documents")
-    .select("id, storage_path, original_filename, mime_type, created_at")
+    // metadata carries the mime type the browser reported at upload;
+    // there is no mime_type column on this table.
+    .select("id, storage_path, original_filename, metadata, created_at")
     .eq("case_id", caseId)
     .order("created_at", { ascending: true })
     .limit(60);
 
   if (documentsError) {
-    return errorState("Не удалось получить список документов кейса.");
+    return errorState(
+      `Не удалось получить список документов кейса: ${documentsError.message}`
+    );
   }
 
   if (!documents || documents.length === 0) {
     return errorState("В кейсе пока нет загруженных документов.");
   }
 
-  const loaded = await loadCaseDocuments(documents as CaseDocumentRow[]);
+  const loaded = await loadCaseDocuments(
+    (documents ?? []).map((row) => ({
+      id: String(row.id),
+      storage_path: String(row.storage_path),
+      original_filename: String(row.original_filename ?? ""),
+      mimeType: readMimeType(row.metadata),
+      created_at: String(row.created_at)
+    }))
+  );
 
   if (!loaded) {
     return errorState("Хранилище документов недоступно.");

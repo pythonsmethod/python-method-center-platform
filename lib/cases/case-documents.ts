@@ -24,9 +24,22 @@ export type CaseDocumentRow = {
   id: string;
   storage_path: string;
   original_filename: string;
-  mime_type: string | null;
+  // From the row's metadata, not from a column: uploaded_documents has no
+  // mime_type column, and asking for one fails the whole query.
+  mimeType: string | null;
   created_at: string;
 };
+
+// The browser's reported type, stored at upload inside metadata.
+export function readMimeType(metadata: unknown): string | null {
+  if (typeof metadata !== "object" || metadata === null) {
+    return null;
+  }
+
+  const value = (metadata as Record<string, unknown>).mime_type;
+
+  return typeof value === "string" && value.trim() ? value.trim() : null;
+}
 
 export type CaseDocumentsResult = {
   attachments: ChatAttachment[];
@@ -37,8 +50,8 @@ export type CaseDocumentsResult = {
 };
 
 function guessMediaType(row: CaseDocumentRow): string {
-  if (row.mime_type) {
-    return row.mime_type;
+  if (row.mimeType) {
+    return row.mimeType;
   }
 
   const name = row.original_filename.toLowerCase();
