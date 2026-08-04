@@ -1,3 +1,4 @@
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { ReactNode } from "react";
 import {
   buildDocumentTimeline,
@@ -6,6 +7,7 @@ import {
 import { documentStatusLabel } from "@/lib/i18n/status-labels";
 
 type DocumentTimelineProps<T extends TimelineDocument> = {
+  labels: Dictionary["cabinet"]["timeline"];
   documents: T[];
   emptyText: string;
   // The staff view adds an "open file" button; the client view adds
@@ -35,7 +37,8 @@ function timeLabel(createdAt: string): string {
 export function DocumentTimeline<T extends TimelineDocument>({
   documents,
   emptyText,
-  renderAction
+  renderAction,
+  labels: t
 }: DocumentTimelineProps<T>) {
   const rounds = buildDocumentTimeline(documents);
 
@@ -49,14 +52,14 @@ export function DocumentTimeline<T extends TimelineDocument>({
         <li className="doc-round" key={round.dayKey}>
           <div className="doc-round__head">
             <strong>
-              Загрузка от {dayLabel(round.dayKey)}
-              {index === 0 ? " · последняя" : ""}
+              {t.uploadFrom} {dayLabel(round.dayKey)}
+              {index === 0 ? ` · ${t.latest}` : ""}
             </strong>
             <span>
               {round.totalCount}{" "}
-              {round.totalCount === 1 ? "файл" : round.totalCount < 5 ? "файла" : "файлов"}
+              {t.files(round.totalCount)}
               {round.updateCount > 0
-                ? ` · обновлений ранее загруженных: ${round.updateCount}`
+                ? ` · ${t.updatesPrefix} ${round.updateCount}`
                 : ""}
             </span>
           </div>
@@ -65,7 +68,7 @@ export function DocumentTimeline<T extends TimelineDocument>({
               <li className="doc-round__file" key={document.id}>
                 <div className="doc-round__file-body">
                   <strong>
-                    {document.original_filename ?? "Документ без названия"}
+                    {document.original_filename ?? t.untitled}
                   </strong>
                   <span>
                     {timeLabel(document.created_at)}
@@ -75,7 +78,9 @@ export function DocumentTimeline<T extends TimelineDocument>({
                   </span>
                 </div>
                 {isUpdate ? (
-                  <span className="doc-round__version">версия {version}</span>
+                  <span className="doc-round__version">
+                    {t.version} {version}
+                  </span>
                 ) : null}
                 {renderAction ? renderAction(document) : null}
               </li>

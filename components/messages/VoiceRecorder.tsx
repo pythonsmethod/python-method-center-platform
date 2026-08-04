@@ -1,9 +1,12 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 
 type VoiceRecorderProps = {
+  labels: Dictionary["cabinet"]["voice"];
   caseId?: string;
   onSent?: () => void | Promise<void>;
 };
@@ -31,7 +34,7 @@ function formatSeconds(total: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
+export function VoiceRecorder({ caseId, onSent, labels: t }: VoiceRecorderProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<RecorderPhase>("idle");
   const [seconds, setSeconds] = useState(0);
@@ -103,7 +106,7 @@ export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
         }
       }, 1000);
     } catch {
-      setError("Нет доступа к микрофону. Разрешите доступ в настройках браузера.");
+      setError(t.errorMic);
       setPhase("idle");
     }
   }
@@ -159,7 +162,7 @@ export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
         | null;
 
       if (!response.ok || !data?.ok) {
-        setError(data?.error ?? "Не удалось отправить голосовое.");
+        setError(data?.error ?? t.errorSend);
         setPhase("preview");
         return;
       }
@@ -172,7 +175,7 @@ export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
         router.refresh();
       }
     } catch {
-      setError("Нет связи с сервером. Попробуйте ещё раз.");
+      setError(t.errorNetwork);
       setPhase("preview");
     }
   }
@@ -189,15 +192,15 @@ export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
           onClick={() => void startRecording()}
           type="button"
         >
-          🎙️ Записать голосовое
+          {`🎙️ ${t.record}`}
         </button>
       ) : null}
 
       {phase === "recording" ? (
         <div className="voice-recorder__row">
-          <span className="voice-recorder__live">● Запись {formatSeconds(seconds)}</span>
+          <span className="voice-recorder__live">● {t.recording} {formatSeconds(seconds)}</span>
           <button className="button" onClick={stopRecording} type="button">
-            ⏹ Стоп
+            {`⏹ ${t.stop}`}
           </button>
         </div>
       ) : null}
@@ -207,21 +210,21 @@ export function VoiceRecorder({ caseId, onSent }: VoiceRecorderProps) {
           <audio controls preload="metadata" src={previewUrl} />
           <div className="voice-recorder__preview-actions">
             <button className="button" onClick={() => void sendVoice()} type="button">
-              Отправить
+              {t.send}
             </button>
             <button
               className="button button--secondary"
               onClick={discard}
               type="button"
             >
-              Удалить
+              {t.discard}
             </button>
           </div>
         </div>
       ) : null}
 
       {phase === "sending" ? (
-        <p className="voice-recorder__status">Отправляю голосовое…</p>
+        <p className="voice-recorder__status">{t.sending}</p>
       ) : null}
 
       {error ? <p className="form-message form-message--error">{error}</p> : null}

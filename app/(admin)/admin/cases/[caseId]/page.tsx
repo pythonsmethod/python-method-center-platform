@@ -271,6 +271,7 @@ export default async function StaffCaseDetailPage({
             же названием помечена как новая версия — это динамика клиента.
           </p>
           <DocumentTimeline
+            labels={getDictionary("ru").cabinet.timeline}
             documents={documents}
             emptyText="Документы ещё не загружены."
             renderAction={(document) => (
@@ -322,6 +323,7 @@ export default async function StaffCaseDetailPage({
           </p>
           <CaseMessageThread
             labels={getDictionary("ru").cabinet.thread}
+            voiceLabels={getDictionary("ru").cabinet.voice}
             caseId={clientCase.id}
             expandable
             loadError={caseMessages.error}

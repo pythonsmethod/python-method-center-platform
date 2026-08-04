@@ -257,6 +257,57 @@ const ru = {
       notePlaceholder: "После еды, запить водой",
       addCta: "Добавить в расписание",
       saving: "Сохраняю…"
+    },
+    tokens: {
+      eyebrow: "Токены",
+      title: "Токены и приглашения",
+      setupDescription: "Для этого раздела требуется настроенная аутентификация.",
+      setupNotice: "Раздел требует настройки Supabase Auth",
+      description:
+        "Здесь всё о токенах: как они появляются, сколько их и как обменять на скидку.",
+      howAria: "Как это работает",
+      howLabel: "Как это работает",
+      howTitle: "Откуда берутся токены",
+      howTextPrefix: "Вы приглашаете человека по своей ссылке. Если он начинает сопровождение, вам начисляется ",
+      howTextSuffix:
+        " токенов. Не за регистрацию — именно за начатое сопровождение: в этой программе нет места пустым аккаунтам.",
+      useLabel: "Что с ними делать",
+      useTitle: "1 токен = 1 доллар скидки",
+      useTextPrefix:
+        "Токены копятся и превращаются в скидку на любую оплату на платформе. Обменять можно от ",
+      useTextSuffix:
+        " токенов: платформа выдаст код, который вводится на странице оплаты. Срок жизни кода — 60 дней, использовать его можно один раз.",
+      balanceAria: "Ваши токены",
+      balanceLabel: "Ваш баланс",
+      balanceTitle: "Токены и обмен на скидку",
+      inviteLabel: "Рекомендация",
+      inviteTitle: "Пригласить того, кому это нужно",
+      inviteText:
+        "Если наш путь вам подходит — поделитесь им с человеком, который сейчас ищет поддержку. По вашей ссылке он попадёт на платформу и увидит, что вы уже здесь: это снимает главный страх новичка.",
+      codeSoon: "Ваш код приглашения появится здесь после создания кейса."
+    },
+    voice: {
+      record: "Записать голосовое",
+      recording: "Запись",
+      stop: "Стоп",
+      send: "Отправить",
+      discard: "Удалить",
+      sending: "Отправляю голосовое…",
+      errorMic:
+        "Нет доступа к микрофону. Разрешите доступ в настройках браузера.",
+      errorSend: "Не удалось отправить голосовое.",
+      errorNetwork: "Нет связи с сервером. Попробуйте ещё раз."
+    },
+    timeline: {
+      uploadFrom: "Загрузка от",
+      latest: "последняя",
+      // Russian counts in three forms; English in two. Both go through one
+      // function so the shape stays identical across languages.
+      files: (n: number): string =>
+        n === 1 ? "файл" : n < 5 ? "файла" : "файлов",
+      updatesPrefix: "обновлений ранее загруженных:",
+      untitled: "Документ без названия",
+      version: "версия"
     }
   },
   onboarding: {
@@ -972,6 +1023,54 @@ const en: typeof ru = {
       notePlaceholder: "After food, with water",
       addCta: "Add to the schedule",
       saving: "Saving…"
+    },
+    tokens: {
+      eyebrow: "Tokens",
+      title: "Tokens and invitations",
+      setupDescription: "This section needs authentication to be configured.",
+      setupNotice: "This section needs Supabase Auth configured",
+      description:
+        "Everything about tokens: where they come from, how many you have, and how to turn them into a discount.",
+      howAria: "How it works",
+      howLabel: "How it works",
+      howTitle: "Where tokens come from",
+      howTextPrefix: "You invite someone with your link. If they begin a support programme, you receive ",
+      howTextSuffix:
+        " tokens. Not for registering — for a programme actually begun: there is no room for empty accounts in this one.",
+      useLabel: "What to do with them",
+      useTitle: "1 token = 1 dollar off",
+      useTextPrefix:
+        "Tokens accumulate and turn into a discount on any payment on the platform. You can exchange them from ",
+      useTextSuffix:
+        " tokens: the platform issues a code that you enter on the payment page. The code lasts 60 days and can be used once.",
+      balanceAria: "Your tokens",
+      balanceLabel: "Your balance",
+      balanceTitle: "Tokens and exchange for a discount",
+      inviteLabel: "Recommendation",
+      inviteTitle: "Invite someone who needs this",
+      inviteText:
+        "If our path suits you, share it with someone who is looking for support right now. Arriving through your link, they will see that you are already here — which removes the biggest fear.",
+      codeSoon: "Your invitation code will appear here once your case is created."
+    },
+    voice: {
+      record: "Record a voice message",
+      recording: "Recording",
+      stop: "Stop",
+      send: "Send",
+      discard: "Discard",
+      sending: "Sending the voice message…",
+      errorMic:
+        "No access to the microphone. Please allow it in your browser settings.",
+      errorSend: "The voice message could not be sent.",
+      errorNetwork: "No connection to the server. Please try again."
+    },
+    timeline: {
+      uploadFrom: "Upload of",
+      latest: "latest",
+      files: (n: number): string => (n === 1 ? "file" : "files"),
+      updatesPrefix: "updates to earlier uploads:",
+      untitled: "Untitled document",
+      version: "version"
     }
   },
   onboarding: {

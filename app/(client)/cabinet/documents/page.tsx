@@ -69,6 +69,7 @@ export default async function CabinetDocumentsPage() {
                   {t.timelineText}
                 </p>
                 <DocumentTimeline
+                  labels={dict.timeline}
                   documents={documentResult.documents}
                   emptyText={t.timelineEmpty}
                 />

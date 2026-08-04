@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { ReferralPanel } from "@/components/referrals/ReferralPanel";
 import { TokenPanel } from "@/components/referrals/TokenPanel";
@@ -18,17 +20,18 @@ export const dynamic = "force-dynamic";
 // coin in the cabinet header. Read once — and the cabinet itself stays
 // about the person's own case, not about a bonus programme.
 export default async function TokensPage() {
+  const t = getDictionary(await getLocale()).cabinet.tokens;
   const auth = await getRequiredUser("/cabinet/tokens");
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Токены"
-          title="Токены и приглашения"
-          description="Для этого раздела требуется настроенная аутентификация."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.setupDescription}
         />
-        <AuthSetupNotice title="Раздел требует настройки Supabase Auth" />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -41,40 +44,38 @@ export default async function TokensPage() {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Токены"
-        title="Токены и приглашения"
-        description="Здесь всё о токенах: как они появляются, сколько их у вас и как превратить их в скидку. Достаточно прочитать один раз."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
-      <section className="panel-grid" aria-label="Как это работает">
+      <section className="panel-grid" aria-label={t.howAria}>
         <div className="panel">
-          <span className="panel__label">Как это работает</span>
-          <h2>Откуда берутся токены</h2>
+          <span className="panel__label">{t.howLabel}</span>
+          <h2>{t.howTitle}</h2>
           <p>
-            Вы приглашаете человека по своей ссылке. Если он начинает
-            сопровождение, вам начисляется {TOKENS_PER_PAID_REFERRAL} токенов.
-            Не за регистрацию — именно за начатое сопровождение: так в
-            программе нет места пустым аккаунтам.
+            {t.howTextPrefix}
+            {TOKENS_PER_PAID_REFERRAL}
+            {t.howTextSuffix}
           </p>
         </div>
         <div className="panel">
-          <span className="panel__label">Что с ними делать</span>
-          <h2>1 токен = 1 доллар скидки</h2>
+          <span className="panel__label">{t.useLabel}</span>
+          <h2>{t.useTitle}</h2>
           <p>
-            Токены копятся и превращаются в скидку на любую покупку на
-            платформе. Обменять можно от {MIN_REDEEM_TOKENS} токенов: платформа
-            выдаст код, который вводится на странице оплаты. Срок действия
-            кода — 60 дней, использовать его можно один раз.
+            {t.useTextPrefix}
+            {MIN_REDEEM_TOKENS}
+            {t.useTextSuffix}
           </p>
         </div>
       </section>
 
-      <section className="documents-section" aria-label="Ваши токены">
+      <section className="documents-section" aria-label={t.balanceAria}>
         <div className="documents-layout">
           <div className="document-upload">
             <div>
-              <span className="panel__label">Ваш баланс</span>
-              <h2>Токены и обмен на скидку</h2>
+              <span className="panel__label">{t.balanceLabel}</span>
+              <h2>{t.balanceTitle}</h2>
             </div>
             <TokenPanel
               balance={tokens.balance}
@@ -84,12 +85,10 @@ export default async function TokensPage() {
 
           <div className="documents-list-panel">
             <div>
-              <span className="panel__label">Рекомендация</span>
-              <h2>Пригласить того, кому это нужно</h2>
+              <span className="panel__label">{t.inviteLabel}</span>
+              <h2>{t.inviteTitle}</h2>
               <p>
-                Если наш путь вам подходит — поделитесь им с человеком, который
-                сейчас ищет поддержку. По вашей ссылке он попадёт на платформу и
-                увидит, что вы уже здесь: это снимает главный страх новичка.
+                {t.inviteText}
               </p>
             </div>
             {referral.status === "ready" && referral.code ? (
@@ -102,7 +101,7 @@ export default async function TokensPage() {
               />
             ) : (
               <p className="empty-state">
-                Ваш код приглашения появится здесь после создания кейса.
+                {t.codeSoon}
               </p>
             )}
           </div>

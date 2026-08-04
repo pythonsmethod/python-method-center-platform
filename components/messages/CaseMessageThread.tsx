@@ -30,6 +30,7 @@ type CaseMessageThreadProps = {
   // its wording is handed in rather than read: only the cabinet side is
   // localized, and the workspace stays Russian for the team.
   labels: Dictionary["cabinet"]["thread"];
+  voiceLabels: Dictionary["cabinet"]["voice"];
 };
 
 function senderLabel(role: string, viewer: "client" | "staff",
@@ -93,7 +94,8 @@ export function CaseMessageThread({
   caseId,
   loadError,
   expandable = false,
-  labels: t
+  labels: t,
+  voiceLabels
 }: CaseMessageThreadProps) {
   // Dates follow the reader, not the server.
   const dateLocale = t.today === "Today" ? "en-GB" : "ru-RU";
@@ -270,7 +272,8 @@ export function CaseMessageThread({
           rows={3}
         />
         <div className="case-thread__actions">
-          <VoiceRecorder caseId={caseId} onSent={refresh} />
+          <VoiceRecorder
+              labels={voiceLabels} caseId={caseId} onSent={refresh} />
           <button className="button" disabled={pending} type="submit">
             {pending ? t.sending : t.send}
           </button>
