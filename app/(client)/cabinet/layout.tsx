@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { CabinetShell } from "@/components/cabinet/CabinetShell";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUnreadForClient } from "@/lib/messages/queries";
@@ -9,7 +11,9 @@ import { getTokenLedger } from "@/lib/tokens/queries";
 
 // The name a person gave us, not the front half of their email address.
 // Falls back quietly: a greeting is never worth an error page.
-async function greetingFor(userId: string, email: string | null): Promise<string> {
+async function greetingFor(userId: string, email: string | null,
+  fallback: string
+): Promise<string> {
   try {
     const supabase = createSupabaseServiceClient();
 
@@ -32,7 +36,7 @@ async function greetingFor(userId: string, email: string | null): Promise<string
     // Fall through to the email.
   }
 
-  return email ? email.split("@")[0] : "друг";
+  return email ? email.split("@")[0] : fallback;
 }
 
 // The shell is shared by every cabinet page, so the person keeps the same
@@ -43,6 +47,7 @@ export default async function CabinetLayout({
   children: ReactNode;
 }) {
   const auth = await getRequiredUser("/cabinet");
+  const dict = getDictionary(await getLocale()).cabinet;
 
   if (auth.status === "missing-env") {
     return <>{children}</>;
@@ -55,13 +60,14 @@ export default async function CabinetLayout({
   const [unread, tokens, greetingName, supplementsDue] = await Promise.all([
     caseId ? getUnreadForClient(caseId) : Promise.resolve(0),
     getTokenLedger(auth.userId),
-    greetingFor(auth.userId, auth.email),
+    greetingFor(auth.userId, auth.email, dict.friend),
     getSupplementsDueCount()
   ]);
 
   return (
     <CabinetShell
       email={auth.email}
+      labels={dict}
       greetingName={greetingName}
       supplementsDue={supplementsDue}
       tokens={tokens.balance}

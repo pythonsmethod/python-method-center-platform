@@ -8,6 +8,24 @@ import type { Locale } from "@/lib/i18n/locale";
 // workspace stay Russian for now (team-facing).
 
 const ru = {
+  cabinet: {
+    navLabel: "Разделы кабинета",
+    sections: {
+      home: { title: "Главная", hint: "Переписка с Professor Python" },
+      documents: { title: "Мои документы", hint: "Анализы и выписки" },
+      metrics: { title: "Динамика", hint: "Ваши показатели на графике" },
+      supplements: { title: "Мои добавки", hint: "Чек-лист приёма на день" },
+      chat: { title: "Связь с центром", hint: "Поддержка и ИИ-помощник" },
+      account: { title: "Мой кейс", hint: "Аккаунт, оплаты, история" },
+      tokens: { title: "Токены", hint: "Приглашения и скидки" }
+    },
+    sos: "Экстренная помощь",
+    logout: "Выйти из аккаунта",
+    greeting: "Здравствуйте",
+    greetingNote: "Мы рады видеть вас сегодня",
+    clientFallback: "Клиент центра",
+    friend: "друг"
+  },
   onboarding: {
     eyebrow: "Анкета",
     title: "Расскажите о вашей ситуации",
@@ -463,6 +481,24 @@ const ru = {
 };
 
 const en: typeof ru = {
+  cabinet: {
+    navLabel: "Cabinet sections",
+    sections: {
+      home: { title: "Home", hint: "Your thread with Professor Python" },
+      documents: { title: "My documents", hint: "Test results and records" },
+      metrics: { title: "Progress", hint: "Your values on a chart" },
+      supplements: { title: "My supplements", hint: "Today's intake checklist" },
+      chat: { title: "Contact the center", hint: "Support and the AI assistant" },
+      account: { title: "My case", hint: "Account, payments, history" },
+      tokens: { title: "Tokens", hint: "Invitations and discounts" }
+    },
+    sos: "Emergency help",
+    logout: "Sign out",
+    greeting: "Hello",
+    greetingNote: "Good to see you today",
+    clientFallback: "Client of the center",
+    friend: "friend"
+  },
   onboarding: {
     eyebrow: "Questionnaire",
     title: "Tell us about your situation",
