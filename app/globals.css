@@ -9311,3 +9311,17 @@ code {
 .offer-doc__ask {
   margin-top: 2rem;
 }
+
+.offer-doc__version {
+  color: var(--muted);
+  font-size: 0.85rem;
+  letter-spacing: 0.08em;
+  margin: 0 0 2.5rem;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.offer-doc__archive {
+  font-size: 0.85rem;
+  margin-top: 1rem;
+}

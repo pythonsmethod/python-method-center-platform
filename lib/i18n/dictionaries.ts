@@ -71,17 +71,10 @@ const ru = {
     title: "Публичная оферта",
     description:
       "Действующая редакция договора публичной оферты Python Method. Принятие оферты фиксируется при отправке анкеты.",
-    docLabel: "Документ",
     docHeading: "Оферта, версия",
-    docText:
-      "Ознакомьтесь с полным текстом оферты до отправки анкеты и оплаты услуг. Отправляя анкету, вы подтверждаете принятие условий этой редакции документа.",
-    openOriginal: "Открыть оригинал (PDF, рус.)",
+    archiveLink: "Предыдущая редакция договора (oferta-v2, PDF)",
     questionsPrefix: "Если что-то в условиях непонятно — ",
     questionsLink: "напишите нам до оплаты",
-    viewLabel: "Просмотр документа",
-    pdfAlt: "Текст публичной оферты",
-    pdfFallback:
-      "Встроенный просмотр PDF недоступен в этом браузере — используйте кнопку «Открыть оферту (PDF)» выше.",
   },
   meta: {
     title: "Python Method — сопровождение восстановления",
@@ -542,17 +535,10 @@ const en: typeof ru = {
     title: "Public offer",
     description:
       "The current edition of the Python Method public offer agreement. Acceptance is recorded when you submit the questionnaire.",
-    docLabel: "Document",
     docHeading: "Offer, version",
-    docText:
-      "Please read the full text of the offer before submitting the questionnaire and before paying. Submitting the questionnaire confirms that you accept the terms of this edition.",
-    openOriginal: "Open the Russian original (PDF)",
+    archiveLink: "Previous edition of the contract (oferta-v2, PDF)",
     questionsPrefix: "If anything in the terms is unclear, ",
     questionsLink: "write to us before you pay",
-    viewLabel: "Document viewer",
-    pdfAlt: "Text of the public offer",
-    pdfFallback:
-      "This browser cannot display the PDF inline — use the \u00abOpen the offer (PDF)\u00bb button above.",
   },
   meta: {
     title: "Python Method — recovery support",
