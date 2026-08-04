@@ -266,6 +266,125 @@ main {
   white-space: nowrap;
 }
 
+/* Attaching a printout, and the comparison of the last two sets. */
+.metrics-upload__input {
+  display: none;
+}
+
+.metrics-upload__actions {
+  margin-top: 12px;
+}
+
+.metrics-upload__clip {
+  align-items: center;
+  display: inline-flex;
+  gap: 8px;
+}
+
+/* Said twice on this page, and meant both times: the machine copies
+   figures, the reading of them belongs to Professor Python. */
+.metrics-upload__boundary,
+.metrics-compare__boundary {
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.55;
+  margin: 16px 0 0;
+  padding-left: 12px;
+}
+
+.metrics-upload__found {
+  color: var(--text);
+  font-size: 14px;
+  margin: 20px 0 8px;
+}
+
+.metrics-upload__rows {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.metrics-upload__confirm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.metrics-upload__check {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 10px 0 0;
+}
+
+.metrics-compare__list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.metrics-compare__row {
+  align-items: baseline;
+  border-bottom: 1px solid var(--line);
+  display: grid;
+  gap: 4px 12px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  padding-bottom: 10px;
+}
+
+.metrics-compare__name {
+  color: var(--text);
+  font-weight: 600;
+}
+
+.metrics-compare__values {
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.metrics-compare__delta {
+  font-size: 14px;
+  font-weight: 600;
+  justify-self: end;
+  white-space: nowrap;
+}
+
+/* Both directions take the same accent. Colouring a rise green and a fall
+   red would be a verdict, and this block does not give verdicts. */
+.metrics-compare__delta--up,
+.metrics-compare__delta--down {
+  color: var(--accent);
+}
+
+.metrics-compare__delta--same {
+  color: var(--muted);
+}
+
+.metrics-compare__dates {
+  color: var(--muted);
+  font-size: 12px;
+  grid-column: 1 / -1;
+}
+
+.metrics-compare__first {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 14px 0 0;
+}
+
+@media (max-width: 560px) {
+  .metrics-compare__row {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+}
+
 .site-footer {
   align-items: center;
   border-top: 1px solid var(--line);

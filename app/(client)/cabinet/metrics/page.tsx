@@ -2,7 +2,9 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
+import { MetricsComparison } from "@/components/cabinet/MetricsComparison";
 import { MetricsPanel } from "@/components/cabinet/MetricsPanel";
+import { MetricsUpload } from "@/components/cabinet/MetricsUpload";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getHealthMetrics } from "@/lib/metrics/queries";
 
@@ -37,8 +39,19 @@ export default async function CabinetMetricsPage() {
       />
 
       {result.status === "ready" ? (
-        <MetricsPanel
-          labels={t} dateLocale={dict.dateLocale} rows={result.rows} />
+        <>
+          {/* The paperclip comes before the chart: a person arriving with a
+              fresh printout wants to put it in, not to look at last
+              month's line first. */}
+          <MetricsUpload labels={dict.metricsUpload} />
+          <MetricsComparison
+            dateLocale={dict.dateLocale}
+            labels={dict.metricsCompare}
+            rows={result.rows}
+          />
+          <MetricsPanel
+            labels={t} dateLocale={dict.dateLocale} rows={result.rows} />
+        </>
       ) : (
         <div className="cab-note">
           <strong>{t.errorTitle}</strong>

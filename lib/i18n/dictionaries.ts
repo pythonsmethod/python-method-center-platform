@@ -215,6 +215,34 @@ const ru = {
       addCta: "Добавить на график",
       saving: "Сохраняю…"
     },
+    metricsUpload: {
+      aria: "Загрузка анализа",
+      label: "Анализы файлом",
+      title: "Прикрепите анализ — таблицу соберёт помощник",
+      text: "Сфотографируйте бланк или приложите PDF. Помощник прочитает, что на нём напечатано, и предложит показатели для вашей таблицы. Файл нигде не сохраняется — он уходит на распознавание и исчезает.",
+      pick: "Прикрепить анализ",
+      reading: "Читаю бланк...",
+      found: "Вот что помощник разобрал. Снимите галочку с того, что не нужно или прочитано неверно:",
+      save: "Внести отмеченные",
+      saving: "Сохраняю...",
+      cancel: "Отменить",
+      checkNote: "Сверьте цифры с бланком перед сохранением: распознавание не бывает безошибочным, а неверное число на графике хуже, чем его отсутствие.",
+      boundary: "Помощник только переносит цифры из бланка в таблицу. Он не оценивает показатели и не даёт рекомендаций — разбор и рекомендации даёт лично Professor Python.",
+      errorRead: "Не удалось прочитать файл. Попробуйте другой формат или снимок получше.",
+      errorService: "Сервис распознавания сейчас недоступен. Попробуйте позже или внесите показатели вручную.",
+      errorUnreadable: "Не получилось разобрать бланк. Попробуйте снимок покрупнее или внесите показатели вручную.",
+      errorNothingFound: "На этом файле не нашлось показателей с числом и датой. Внесите их вручную ниже.",
+      errorTooOften: "Слишком много файлов подряд. Подождите минуту и попробуйте снова."
+    },
+    metricsCompare: {
+      aria: "Сравнение с прошлым разом",
+      label: "Сравнение",
+      title: "Что изменилось с прошлого раза",
+      text: "Два последних измерения по каждому показателю — рядом. Это арифметика: разница между тем, что было, и тем, что стало.",
+      same: "без изменений",
+      firstTime: "Впервые внесены, сравнивать пока не с чем:",
+      boundary: "Здесь нет оценки «хорошо» или «плохо» — и не будет. Что означают эти изменения именно для вас, скажет Professor Python: платформа считает разницу, читает её человек."
+    },
     supplements: {
       eyebrow: "Добавки",
       title: "Мои добавки",
@@ -1157,6 +1185,34 @@ const en: typeof ru = {
       fieldDate: "Date of test",
       addCta: "Add to the chart",
       saving: "Saving…"
+    },
+    metricsUpload: {
+      aria: "Uploading a test result",
+      label: "Test results as a file",
+      title: "Attach a result — the assistant builds the table",
+      text: "Photograph the form or attach a PDF. The assistant reads what is printed on it and proposes the values for your table. The file is not stored anywhere — it goes for reading and is gone.",
+      pick: "Attach a result",
+      reading: "Reading the form...",
+      found: "Here is what the assistant read. Untick anything you do not need or that was read wrongly:",
+      save: "Add the ticked ones",
+      saving: "Saving...",
+      cancel: "Cancel",
+      checkNote: "Check the figures against the form before saving: reading is never faultless, and a wrong number on a chart is worse than a missing one.",
+      boundary: "The assistant only copies the figures from the form into the table. It does not assess them and gives no recommendations — the review and the recommendations come from Professor Python personally.",
+      errorRead: "The file could not be read. Try another format or a clearer photograph.",
+      errorService: "The reading service is unavailable right now. Try later, or enter the values by hand.",
+      errorUnreadable: "The form could not be read. Try a closer photograph, or enter the values by hand.",
+      errorNothingFound: "No values with a number and a date were found in this file. Enter them by hand below.",
+      errorTooOften: "Too many files in a row. Wait a minute and try again."
+    },
+    metricsCompare: {
+      aria: "Comparison with last time",
+      label: "Comparison",
+      title: "What changed since last time",
+      text: "The last two measurements of each indicator, side by side. This is arithmetic: the difference between what was and what is.",
+      same: "unchanged",
+      firstTime: "Entered for the first time, nothing to compare yet:",
+      boundary: "There is no verdict of \"good\" or \"bad\" here, and there will not be. What these changes mean for you is Professor Python's to say: the platform does the subtraction, a person does the reading."
     },
     supplements: {
       eyebrow: "Supplements",
