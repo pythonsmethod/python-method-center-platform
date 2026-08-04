@@ -16,6 +16,7 @@ import {
 } from "@/lib/i18n/status-labels";
 import { isUuid } from "@/lib/utils/uuid";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
@@ -320,6 +321,7 @@ export default async function StaffCaseDetailPage({
             или записывать голосовые.
           </p>
           <CaseMessageThread
+            labels={getDictionary("ru").cabinet.thread}
             caseId={clientCase.id}
             expandable
             loadError={caseMessages.error}

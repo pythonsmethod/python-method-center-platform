@@ -2,6 +2,8 @@ import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
 import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { getRequiredUser } from "@/lib/auth/require-user";
@@ -16,13 +18,15 @@ export const dynamic = "force-dynamic";
 // about payment and access, and whatever the person already asked the AI.
 // His own thread is the home page of the cabinet.
 export default async function CabinetChatPage() {
+  const dict = getDictionary(await getLocale()).cabinet;
+  const t = dict.chat;
   const auth = await getRequiredUser("/cabinet/chat");
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
-        <PageHeader eyebrow="Связь с центром" title="Поддержка" />
-        <AuthSetupNotice title="Раздел требует настройки Supabase Auth" />
+        <PageHeader eyebrow={t.eyebrow} title={t.title} />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -35,30 +39,28 @@ export default async function CabinetChatPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Связь с центром"
-        title="Поддержка и ИИ-помощник"
-        description="Вопросы про оплату, доступ и сайт — и вся ваша переписка с помощником."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       <div className="cab-note">
-        <strong>Про ваш кейс — на главной</strong>
+        <strong>{t.caseNoticeTitle}</strong>
         <span>
-          Переписка с Professor Python открывается сразу при входе.{" "}
-          <Link href="/cabinet">Открыть переписку</Link>
+          {t.caseNoticeText}{" "}
+          <Link href="/cabinet">{t.caseNoticeCta}</Link>
         </span>
       </div>
 
-      <section className="documents-section" aria-label="Переписка с ИИ-помощником">
+      <section className="documents-section" aria-label={t.assistantAria}>
         <div className="panel">
-          <span className="panel__label">ИИ-помощник</span>
-          <h2>Ваша переписка с помощником</h2>
+          <span className="panel__label">{t.assistantLabel}</span>
+          <h2>{t.assistantTitle}</h2>
           <p>
-            Всё, что вы спрашивали у помощника, сохраняется здесь — можно
-            перечитать и не задавать один и тот же вопрос дважды. Переписка
-            видна вам и команде центра.
+            {t.assistantText}
           </p>
           <SavedAssistantThread
-            emptyText="Вы ещё не общались с помощником. Откройте окно чата в правом нижнем углу — переписка сохранится здесь."
+            emptyText={t.assistantEmpty}
             loadError={
               assistantResult.status === "error"
                 ? assistantResult.message
@@ -72,30 +74,30 @@ export default async function CabinetChatPage() {
         </div>
       </section>
 
-      <section className="documents-section" aria-label="Обращения в поддержку">
+      <section className="documents-section" aria-label={t.requestsAria}>
         <div className="documents-layout">
           <div className="document-upload">
             <div>
-              <span className="panel__label">Другой вопрос</span>
-              <h2>Написать в поддержку</h2>
+              <span className="panel__label">{t.requestLabel}</span>
+              <h2>{t.requestTitle}</h2>
               <p>
-                Технические вопросы, оплата, доступ — всё, что не про ваш кейс.
+                {t.requestText}
               </p>
             </div>
-            <SupportRequestForm />
+            <SupportRequestForm labels={dict.supportForm} />
           </div>
 
           <div className="documents-list-panel">
             <div>
-              <span className="panel__label">Ваши обращения</span>
-              <h2>История обращений</h2>
+              <span className="panel__label">{t.requestsLabel}</span>
+              <h2>{t.requestsTitle}</h2>
             </div>
 
             {supportResult.status === "error" ? (
               <p className="empty-state">{supportResult.message}</p>
             ) : supportResult.requests.length === 0 ? (
               <p className="empty-state">
-                Обращений пока нет. Напишите нам, если есть вопрос.
+                {t.requestsEmpty}
               </p>
             ) : (
               <ul className="document-list">

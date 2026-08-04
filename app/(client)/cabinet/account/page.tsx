@@ -4,6 +4,8 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { ProfileDetailsForm } from "@/components/cabinet/ProfileDetailsForm";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import {
   getClientCaseShell,
@@ -26,17 +28,19 @@ export const dynamic = "force-dynamic";
 // what their case is, and how it got there. The cabinet itself stays for
 // the daily work — documents, chat, payments.
 export default async function AccountPage() {
+  const dict = getDictionary(await getLocale()).cabinet;
+  const t = dict.account;
   const auth = await getRequiredUser("/cabinet/account");
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Аккаунт"
-          title="Ваш аккаунт"
-          description="Для этого раздела требуется настроенная аутентификация."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.setupDescription}
         />
-        <AuthSetupNotice title="Раздел требует настройки Supabase Auth" />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -62,20 +66,20 @@ export default async function AccountPage() {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Аккаунт"
-        title="Ваш аккаунт"
-        description="Данные аккаунта, ваш кейс, оплаты и история."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Мои данные</span>
-          <h2>Как с вами связаться и куда доставлять</h2>
+          <span className="panel__label">{t.detailsLabel}</span>
+          <h2>{t.detailsTitle}</h2>
           <p>
-            Эти данные видит только команда центра. Адрес нужен для доставки
-            формулы Professor Python и заказов из магазина.
+{t.detailsText}
           </p>
           <ProfileDetailsForm
+            labels={dict.profileForm}
             deliveryAddress={
               (profileRow?.delivery_address as string | null) ?? null
             }
@@ -89,10 +93,10 @@ export default async function AccountPage() {
         </div>
 
         <div className="panel">
-          <span className="panel__label">Ваш кейс</span>
+          <span className="panel__label">{t.caseLabel}</span>
           {caseResult.status === "error" ? (
             <>
-              <h2>Статус кейса недоступен</h2>
+              <h2>{t.caseUnavailable}</h2>
               <p>{caseResult.message}</p>
             </>
           ) : caseResult.case ? (
@@ -100,26 +104,31 @@ export default async function AccountPage() {
               <h2>{caseStatusLabel(caseResult.case.status)}</h2>
               <ul className="status-list">
                 <li>
-                  Номер кейса: <code>{caseResult.case.id}</code>
+                  {t.caseNumber}: <code>{caseResult.case.id}</code>
                 </li>
-                <li>Цель: {caseResult.case.title ?? "Не указана"}</li>
-                <li>Срочность: {caseUrgencyLabel(caseResult.case.urgency)}</li>
                 <li>
-                  Направление: {caseDirectionLabel(caseResult.case.direction)}
+                  {t.caseGoal}: {caseResult.case.title ?? t.caseGoalEmpty}
                 </li>
-                <li>Создан: {formatDateTime(caseResult.case.created_at)}</li>
+                <li>
+                  {t.caseUrgency}: {caseUrgencyLabel(caseResult.case.urgency)}
+                </li>
+                <li>
+                  {t.caseDirection}: {caseDirectionLabel(caseResult.case.direction)}
+                </li>
+                <li>
+                  {t.caseCreated}: {formatDateTime(caseResult.case.created_at)}
+                </li>
               </ul>
             </>
           ) : (
             <>
-              <h2>Кейса пока нет</h2>
+              <h2>{t.caseNoneTitle}</h2>
               <p>
-                Заполните анкету, чтобы создать кейс — после этого можно будет
-                загрузить документы.
+                {t.caseNoneText}
               </p>
               <div className="panel-actions">
                 <Link className="button" href="/onboarding">
-                  Заполнить анкету
+                  {t.caseNoneCta}
                 </Link>
               </div>
             </>
@@ -127,16 +136,16 @@ export default async function AccountPage() {
         </div>
       </section>
 
-      <section className="panel-grid" aria-label="Оплаты и история">
+      <section className="panel-grid" aria-label={t.paymentsAria}>
         <div className="panel">
-          <span className="panel__label">Оплаты</span>
-          <h2>Ваши оплаты</h2>
+          <span className="panel__label">{t.paymentsLabel}</span>
+          <h2>{t.paymentsTitle}</h2>
           {paymentsResult.status === "error" ? (
             <p className="empty-state">{paymentsResult.message}</p>
           ) : paymentsResult.payments.length === 0 ? (
             <p className="empty-state">
-              Оплат пока нет. Тарифы описаны на странице{" "}
-              <Link href="/payment">«Сопровождение»</Link>.
+              {t.paymentsEmptyPrefix}
+              <Link href="/payment">{t.paymentsEmptyLink}</Link>.
             </p>
           ) : (
             <ul className="status-list">
@@ -155,16 +164,16 @@ export default async function AccountPage() {
         </div>
 
         <div className="panel">
-          <span className="panel__label">История</span>
-          <h2>История кейса</h2>
+          <span className="panel__label">{t.historyLabel}</span>
+          <h2>{t.historyTitle}</h2>
           {!historyResult ? (
             <p className="empty-state">
-              История появится после создания кейса.
+              {t.historyNoCase}
             </p>
           ) : historyResult.status === "error" ? (
             <p className="empty-state">{historyResult.message}</p>
           ) : historyResult.events.length === 0 ? (
-            <p className="empty-state">Событий пока нет.</p>
+            <p className="empty-state">{t.historyEmpty}</p>
           ) : (
             <ul className="status-list">
               {historyResult.events.map((event) => (

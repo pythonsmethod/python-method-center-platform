@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import { useActionState } from "react";
 import {
   initialProfileDetailsActionState,
@@ -7,6 +9,7 @@ import {
 } from "@/lib/profile/actions";
 
 type ProfileDetailsFormProps = {
+  labels: Dictionary["cabinet"]["profileForm"];
   email: string | null;
   fullName: string | null;
   phone: string | null;
@@ -17,6 +20,7 @@ type ProfileDetailsFormProps = {
 // Email is shown but not editable — it is the key to the account, and
 // changing keys goes through support, not through a text field.
 export function ProfileDetailsForm({
+  labels,
   email,
   fullName,
   phone,
@@ -30,19 +34,19 @@ export function ProfileDetailsForm({
   return (
     <form action={formAction} className="onboarding-form">
       <label className="field">
-        <span>Имя и фамилия</span>
+        <span>{labels.name}</span>
         <input
           defaultValue={fullName ?? ""}
           maxLength={160}
           name="full_name"
-          placeholder="Как к вам обращаться"
+          placeholder={labels.namePlaceholder}
           required
           type="text"
         />
       </label>
 
       <label className="field">
-        <span>Телефон</span>
+        <span>{labels.phone}</span>
         <input
           defaultValue={phone ?? ""}
           maxLength={40}
@@ -53,12 +57,12 @@ export function ProfileDetailsForm({
       </label>
 
       <label className="field">
-        <span>Адрес доставки</span>
+        <span>{labels.address}</span>
         <textarea
           defaultValue={deliveryAddress ?? ""}
           maxLength={600}
           name="delivery_address"
-          placeholder={"Страна, город, улица, дом, квартира, индекс.\nСюда придёт формула Professor Python и заказы из магазина."}
+          placeholder={labels.addressPlaceholder}
           rows={3}
         />
       </label>
@@ -67,12 +71,12 @@ export function ProfileDetailsForm({
         <span>Email</span>
         <input disabled type="email" value={email ?? ""} />
         <small className="field__hint">
-          Email — это вход в аккаунт. Чтобы его сменить, напишите в поддержку.
+          {labels.emailNote}
         </small>
       </label>
 
       <button className="button" disabled={pending} type="submit">
-        {pending ? "Сохраняю…" : "Сохранить данные"}
+        {pending ? labels.saving : labels.save}
       </button>
 
       {state.message ? (

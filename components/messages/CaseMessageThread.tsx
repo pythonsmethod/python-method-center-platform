@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import {
   Fragment,
   useActionState,
@@ -24,11 +26,17 @@ type CaseMessageThreadProps = {
   caseId?: string;
   loadError?: string | null;
   expandable?: boolean;
+  // The thread is shared by the client cabinet and the team workspace, so
+  // its wording is handed in rather than read: only the cabinet side is
+  // localized, and the workspace stays Russian for the team.
+  labels: Dictionary["cabinet"]["thread"];
 };
 
-function senderLabel(role: string, viewer: "client" | "staff"): string {
+function senderLabel(role: string, viewer: "client" | "staff",
+  t: Dictionary["cabinet"]["thread"]
+): string {
   if (role === "client") {
-    return viewer === "client" ? "Вы" : "Клиент";
+    return viewer === "client" ? t.you : t.client;
   }
 
   if (role === "karen") {
@@ -36,10 +44,10 @@ function senderLabel(role: string, viewer: "client" | "staff"): string {
   }
 
   if (viewer === "staff") {
-    return "Команда (вы)";
+    return t.teamYou;
   }
 
-  return "Команда центра";
+  return t.team;
 }
 
 function formatTime(value: string): string {
@@ -53,21 +61,25 @@ function dayKey(value: string): string {
   return new Date(value).toDateString();
 }
 
-function formatDay(value: string): string {
+function formatDay(
+  value: string,
+  t: Dictionary["cabinet"]["thread"],
+  locale: string
+): string {
   const date = new Date(value);
   const today = new Date();
   const yesterday = new Date();
   yesterday.setDate(today.getDate() - 1);
 
   if (date.toDateString() === today.toDateString()) {
-    return "Сегодня";
+    return t.today;
   }
 
   if (date.toDateString() === yesterday.toDateString()) {
-    return "Вчера";
+    return t.yesterday;
   }
 
-  return date.toLocaleDateString("ru-RU", {
+  return date.toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
     year:
@@ -80,8 +92,11 @@ export function CaseMessageThread({
   viewer,
   caseId,
   loadError,
-  expandable = false
+  expandable = false,
+  labels: t
 }: CaseMessageThreadProps) {
+  // Dates follow the reader, not the server.
+  const dateLocale = t.today === "Today" ? "en-GB" : "ru-RU";
   const [expanded, setExpanded] = useState(false);
   const action = viewer === "client" ? sendClientCaseMessage : sendStaffCaseMessage;
   const [state, formAction, pending] = useActionState(
@@ -181,19 +196,18 @@ export function CaseMessageThread({
     <div className={`case-thread${expanded ? " case-thread--full" : ""}`}>
       {loadError ? (
         <p className="form-message form-message--error">
-          Сообщения недоступны: {loadError}. Возможно, миграция ещё не применена.
-        </p>
+          {t.loadError}: {loadError}. {t.loadErrorTail}</p>
       ) : null}
 
       {expandable ? (
         <div className="case-thread__toolbar">
-          {expanded ? <strong>Чат с клиентом</strong> : <span />}
+          {expanded ? <strong>{t.staffTitle}</strong> : <span />}
           <button
             className="button button--secondary"
             onClick={() => setExpanded((value) => !value)}
             type="button"
           >
-            {expanded ? "✕ Свернуть" : "⛶ Развернуть чат"}
+            {expanded ? `✕ ${t.collapse}` : `⛶ ${t.expand}`}
           </button>
         </div>
       ) : null}
@@ -202,8 +216,8 @@ export function CaseMessageThread({
         {messages.length === 0 && !loadError ? (
           <p className="case-thread__empty">
             {viewer === "client"
-              ? "Сообщений пока нет. Напишите или запишите голосовое — команда ответит здесь."
-              : "Сообщений пока нет. Напишите клиенту или запишите голосовое."}
+              ? t.emptyClient
+              : t.emptyStaff}
           </p>
         ) : null}
 
@@ -219,20 +233,20 @@ export function CaseMessageThread({
             <Fragment key={message.id}>
               {day !== prevDay ? (
                 <div className="case-day">
-                  <span>{formatDay(message.created_at)}</span>
+                  <span>{formatDay(message.created_at, t, dateLocale)}</span>
                 </div>
               ) : null}
               <div className={`case-msg${own ? " case-msg--own" : ""}`}>
                 {!own ? (
                   <span className="case-msg__sender">
-                    {senderLabel(message.sender_role, viewer)}
+                    {senderLabel(message.sender_role, viewer, t)}
                   </span>
                 ) : null}
                 {message.body ? <p>{message.body}</p> : null}
                 {message.audioUrl ? (
                   <audio controls preload="metadata" src={message.audioUrl} />
                 ) : message.audio_path && !message.audioUrl ? (
-                  <p className="case-msg__missing">Голосовое недоступно.</p>
+                  <p className="case-msg__missing">{t.audioMissing}</p>
                 ) : null}
                 <span className="case-msg__time">
                   {formatTime(message.created_at)}
@@ -250,15 +264,15 @@ export function CaseMessageThread({
           name="body"
           placeholder={
             viewer === "client"
-              ? "Напишите сообщение команде…"
-              : "Напишите сообщение клиенту…"
+              ? t.placeholderClient
+              : t.placeholderStaff
           }
           rows={3}
         />
         <div className="case-thread__actions">
           <VoiceRecorder caseId={caseId} onSent={refresh} />
           <button className="button" disabled={pending} type="submit">
-            {pending ? "Отправляю…" : "Отправить"}
+            {pending ? t.sending : t.send}
           </button>
         </div>
         {state.status === "error" ? (
@@ -268,8 +282,8 @@ export function CaseMessageThread({
 
       <p className="case-thread__note">
         {viewer === "client"
-          ? "Ответы по вашему состоянию и документам даёт лично Professor Python после изучения кейса."
-          : "Помните: ответы по состоянию, анализам и маршруту клиент получает только после решения Professor Python."}
+          ? t.noteClient
+          : t.noteStaff}
       </p>
     </div>
   );

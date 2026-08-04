@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
@@ -111,6 +113,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           <h1>Professor Python и команда</h1>
         </div>
         <CaseMessageThread
+            labels={getDictionary(await getLocale()).cabinet.thread}
           caseId={clientCase.id}
           expandable
           loadError={messagesResult?.error ?? null}
