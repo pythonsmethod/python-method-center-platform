@@ -282,11 +282,16 @@ main {
 /* A page title can be one long word — "конфиденциальности" — and at the
    36px floor of the h1 clamp it was wider than a phone, pushing the whole
    page sideways. Titled pages take a smaller floor on a narrow screen so
-   the word fits whole; break-word on h1 stays as a backstop, because a
-   break with no hyphen reads worse than a slightly smaller heading. */
+   the word fits whole.
+   Scoped to .page-header on purpose: an earlier version of this fix put
+   hyphens/break-word on every h1, which reaches the homepage hero and
+   every display heading on the site. Browsers that ship hyphenation
+   dictionaries would then start breaking headings that were never meant
+   to break — a page-title problem must not become a site-wide one. */
 @media (max-width: 520px) {
   .page-header h1 {
     font-size: clamp(26px, 7.6vw, 36px);
+    overflow-wrap: break-word;
   }
 }
 
@@ -303,11 +308,9 @@ h1 {
   color: var(--accent-strong);
   font-family: var(--font-serif);
   font-size: clamp(36px, 7vw, 72px);
-  hyphens: auto;
   line-height: 1;
   margin: 0;
   max-width: 920px;
-  overflow-wrap: break-word;
 }
 
 h2 {
@@ -4944,11 +4947,16 @@ main {
 /* A page title can be one long word — "конфиденциальности" — and at the
    36px floor of the h1 clamp it was wider than a phone, pushing the whole
    page sideways. Titled pages take a smaller floor on a narrow screen so
-   the word fits whole; break-word on h1 stays as a backstop, because a
-   break with no hyphen reads worse than a slightly smaller heading. */
+   the word fits whole.
+   Scoped to .page-header on purpose: an earlier version of this fix put
+   hyphens/break-word on every h1, which reaches the homepage hero and
+   every display heading on the site. Browsers that ship hyphenation
+   dictionaries would then start breaking headings that were never meant
+   to break — a page-title problem must not become a site-wide one. */
 @media (max-width: 520px) {
   .page-header h1 {
     font-size: clamp(26px, 7.6vw, 36px);
+    overflow-wrap: break-word;
   }
 }
 
@@ -4965,11 +4973,9 @@ h1 {
   color: var(--accent-strong);
   font-family: var(--font-serif);
   font-size: clamp(36px, 7vw, 72px);
-  hyphens: auto;
   line-height: 1;
   margin: 0;
   max-width: 920px;
-  overflow-wrap: break-word;
 }
 
 h2 {
