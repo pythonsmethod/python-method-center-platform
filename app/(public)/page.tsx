@@ -17,11 +17,11 @@ export default async function HomePage() {
   const isRu = locale === "ru";
   const copy = isRu ? {
     heroTitle: "Ясный путь к восстановлению.", heroLead: "Ваше состояние, медицинские документы и следующие шаги — в одном спокойном, продуманном пространстве.",
-    self: "Начать самостоятельно", anham: "Начать с Anham", private: "Конфиденциально", human: "Личный разбор", pace: "В вашем темпе",
+    self: "Начать самостоятельно", anham: "Начать с Анхамом", private: "Конфиденциально", human: "Личный разбор", pace: "В вашем темпе",
     foundations: "Две опоры", foundationTitle: "Экспертное решение. Постоянная поддержка.", expert: "Эксперт", companion: "Спутник на платформе",
     anhamText: "Остаётся рядом между этапами, помогает подготовиться и делает сложный путь спокойным, личным и понятным.", gift: "Подарок центра", giftTitle: "Начните с бесплатного разбора анализов.", giftCta: "Получить разбор",
     journey: "Ваш путь", journeyTitle: "От неопределённости к ясному направлению.", recovery: "Начало восстановления", recoveryText: "Двигайтесь дальше с ясным направлением, поддержкой и видимым прогрессом.",
-    tools: "Бесплатные инструменты", toolsTitle: "Небольшие данные. Важная ясность.", open: "Открыть инструмент", waiting: "Anham рядом", ready: "Я готова провести вас.", finalText: "Сегодня не нужно понимать весь путь. Мы можем начать вместе — с первого вопроса."
+    tools: "Бесплатные инструменты", toolsTitle: "Небольшие данные. Важная ясность.", open: "Открыть инструмент", waiting: "Анхам рядом", ready: "Я готов провести вас.", finalText: "Сегодня не нужно понимать весь путь. Мы можем начать вместе — с первого вопроса."
   } : {
     heroTitle: "A clearer path back to yourself.", heroLead: "Your health story, medical documents, and next steps—held in one calm, considered space.",
     self: "Start independently", anham: "Start with Anham", private: "Private by design", human: "Human-led review", pace: "Your pace, respected",
