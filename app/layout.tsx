@@ -7,26 +7,45 @@ import { socialLinks } from "@/lib/config/socials";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
-import { SiteNav } from "@/components/SiteNav";
+import { SiteNav, type NavViewer } from "@/components/SiteNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-// One door, two names: the last nav item needs to know whether anyone is
-// home. Never throws — a nav must render even if auth is unreachable.
-async function isSignedIn(): Promise<boolean> {
+// Who is looking at the header. Not merely whether anyone is signed in:
+// a member of the team leaving the workspace used to land on the
+// client-facing site whose only account door led to the client cabinet,
+// with the way back buried in the footer. It reads exactly like being
+// logged out and returned as somebody else.
+//
+// Never throws, and never blocks the page on this: a nav must render even
+// if auth is unreachable, and the worst case is a staff member seeing the
+// client door for one page load.
+async function headerViewer(): Promise<NavViewer> {
   try {
     const supabase = await createSupabaseServerClient();
 
     if (!supabase) {
-      return false;
+      return "anonymous";
     }
 
     const {
       data: { user }
     } = await supabase.auth.getUser();
 
-    return Boolean(user);
+    if (!user) {
+      return "anonymous";
+    }
+
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    return profile?.role === "admin" || profile?.role === "support"
+      ? "staff"
+      : "client";
   } catch {
-    return false;
+    return "anonymous";
   }
 }
 
@@ -69,7 +88,7 @@ type RootLayoutProps = {
 export default async function RootLayout({ children }: RootLayoutProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
-  const signedIn = await isSignedIn();
+  const viewer = await headerViewer();
 
   return (
     <html className={playfair.variable} lang={locale}>
@@ -79,7 +98,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             Python Method
           </Link>
           <div className="site-header__right">
-            <SiteNav labels={dict.nav} signedIn={signedIn} />
+            <SiteNav labels={dict.nav} viewer={viewer} />
             <LanguageSwitcher locale={locale} />
           </div>
         </header>

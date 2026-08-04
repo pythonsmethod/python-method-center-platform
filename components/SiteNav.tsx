@@ -16,15 +16,20 @@ const icons: Record<string, (props: { className?: string }) => React.ReactElemen
   "/shop": IconScarab
 };
 
+export type NavViewer = "anonymous" | "client" | "staff";
+
 type SiteNavProps = {
   labels: Record<string, string>;
-  // Decides the last item: one door, two names.
-  signedIn: boolean;
+  // Decides the last item: one door, three names. Staff need it to be
+  // their own door — leaving the workspace used to drop them onto the
+  // client-facing site with no way back except the footer, which reads
+  // exactly like having been logged out and returned as a client.
+  viewer: NavViewer;
 };
 
 // The top bar is what a visitor returns to all day long, so it is built to
 // be aimed at: a sign, a word, and a lit frame on the page you are on.
-export function SiteNav({ labels, signedIn }: SiteNavProps) {
+export function SiteNav({ labels, viewer }: SiteNavProps) {
   const pathname = usePathname();
 
   function isCurrent(href: string): boolean {
@@ -33,8 +38,10 @@ export function SiteNav({ labels, signedIn }: SiteNavProps) {
       : pathname === href || pathname.startsWith(`${href}/`);
   }
 
-  const accountHref = signedIn ? "/cabinet" : "/login";
-  const accountActive = isCurrent("/cabinet") || isCurrent("/login");
+  const isStaff = viewer === "staff";
+  const accountHref = isStaff ? "/admin" : viewer === "client" ? "/cabinet" : "/login";
+  const accountActive =
+    isCurrent("/cabinet") || isCurrent("/login") || isCurrent("/admin");
 
   return (
     <nav aria-label={labels.sections ?? "Разделы сайта"} className="site-nav">
@@ -59,7 +66,7 @@ export function SiteNav({ labels, signedIn }: SiteNavProps) {
         );
       })}
 
-      {signedIn ? (
+      {viewer !== "anonymous" ? (
         <Link
           aria-current={accountActive ? "page" : undefined}
           className={`site-nav__item${accountActive ? " site-nav__item--active" : ""}`}
@@ -69,7 +76,9 @@ export function SiteNav({ labels, signedIn }: SiteNavProps) {
             <IconAnkh />
           </span>
           <span className="site-nav__label">
-            {labels["/cabinet"] ?? "Кабинет"}
+            {isStaff
+              ? (labels["/admin"] ?? "Рабочее место")
+              : (labels["/cabinet"] ?? "Кабинет")}
           </span>
         </Link>
       ) : (
