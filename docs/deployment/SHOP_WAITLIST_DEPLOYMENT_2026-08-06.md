@@ -92,3 +92,33 @@ Three things move together, and none of them should move alone:
 A test pins the first of these: `tests/shop-waitlist.test.ts` fails if
 anything is marked `available`, so the status cannot be flipped without the
 change being noticed.
+
+---
+
+# Вторая миграция: разбор анализов для панели команды
+
+`supabase/migrations/20260806120000_case_ai_reviews.sql`
+
+Создаёт таблицу `case_ai_reviews`, в которой хранится прочтение анализов
+кейса ассистентом: разбор для Professor Python и черновик ответа клиенту.
+RLS включён без единой политики — значит, ни клиент, ни анонимный
+посетитель не могут прочитать её вообще; читает только сервис-ключ.
+
+## Применить
+
+Supabase → SQL Editor → вставить файл целиком → Run. Идемпотентно.
+
+Проверка:
+
+```sql
+select count(*) from public.case_ai_reviews;
+```
+
+`0` — применилось.
+
+## Если не применить
+
+Кнопка «Прочитать анализы кейса» отработает, ассистент прочитает файлы, а
+на сохранении вернёт: «Разбор готов, но сохранить его не удалось.
+Применена ли миграция case_ai_reviews?» Ничего не ломается — но разбор не
+переживёт перезагрузку страницы.

@@ -385,6 +385,73 @@ main {
   }
 }
 
+/* The assistant's reading of a case, on the team's case page. */
+.case-review__head {
+  align-items: flex-start;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+/* Said plainly and kept visible: this is the machine's reading, not
+   Professor Python's. Nobody on the team should have to guess which. */
+.case-review__origin {
+  border-left: 3px solid var(--accent);
+  color: var(--muted);
+  font-size: 13px;
+  margin: 14px 0 0;
+  padding-left: 12px;
+}
+
+.case-review__stale {
+  color: var(--warning);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.case-review__empty {
+  color: var(--muted);
+  margin: 12px 0 0;
+}
+
+.case-review__text {
+  color: var(--text);
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 1.6;
+  margin: 12px 0 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.case-review__draft {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  margin-top: 20px;
+  padding: 16px 18px;
+}
+
+.case-review__draft-head {
+  align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: space-between;
+}
+
+.case-review__draft-head h3 {
+  margin: 0;
+}
+
+.case-review__draft-note {
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.55;
+  margin: 12px 0 0;
+}
+
 .site-footer {
   align-items: center;
   border-top: 1px solid var(--line);

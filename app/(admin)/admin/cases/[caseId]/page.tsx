@@ -19,6 +19,8 @@ import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { CaseReviewPanel } from "@/components/cases/CaseReviewPanel";
+import { getCaseReview } from "@/lib/cases/review-queries";
 import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
@@ -155,9 +157,10 @@ export default async function StaffCaseDetailPage({
   const events = [...clientCase.case_lifecycle_events].sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
-  const [caseMessages, assistantHistory] = await Promise.all([
+  const [caseMessages, assistantHistory, review] = await Promise.all([
     getCaseMessages(clientCase.id),
-    getAssistantHistoryForCase(clientCase.profile_id)
+    getAssistantHistoryForCase(clientCase.profile_id),
+    getCaseReview(clientCase.id, documents)
   ]);
 
   return (
@@ -260,6 +263,19 @@ export default async function StaffCaseDetailPage({
             </div>
           ))
         )}
+      </section>
+
+      {/* The assistant's reading of the analyses in this case, waiting when
+          he opens it rather than made on demand. Above the file list, so
+          the reading and the files it came from sit together. */}
+      <section className="intake-section" aria-label="Разбор анализов">
+        <div className="panel">
+          <CaseReviewPanel
+            caseId={clientCase.id}
+            documentsCount={documents.length}
+            review={review}
+          />
+        </div>
       </section>
 
       <section className="intake-section" aria-label="Документы кейса">
