@@ -1,5 +1,6 @@
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { ReactNode } from "react";
+import { plural } from "@/lib/i18n/plural";
 import {
   buildDocumentTimeline,
   type TimelineDocument
@@ -57,7 +58,7 @@ export function DocumentTimeline<T extends TimelineDocument>({
             </strong>
             <span>
               {round.totalCount}{" "}
-              {t.files(round.totalCount)}
+              {plural(round.totalCount, t.files)}
               {round.updateCount > 0
                 ? ` · ${t.updatesPrefix} ${round.updateCount}`
                 : ""}

@@ -3,6 +3,7 @@ import {
   FREE_REVIEW_DEADLINE_RU
 } from "@/lib/config/promo";
 import type { Locale } from "@/lib/i18n/locale";
+import type { PluralForms } from "@/lib/i18n/plural";
 
 // Public-site copy in both languages. The client cabinet and the admin
 // workspace stay Russian for now (team-facing).
@@ -301,10 +302,10 @@ const ru = {
     timeline: {
       uploadFrom: "Загрузка от",
       latest: "последняя",
-      // Russian counts in three forms; English in two. Both go through one
-      // function so the shape stays identical across languages.
-      files: (n: number): string =>
-        n === 1 ? "файл" : n < 5 ? "файла" : "файлов",
+      // The three Russian forms as data. Never a function: this dictionary
+      // is handed to client components as props, and a function among
+      // those props cannot be serialized — it takes the page down.
+      files: { rule: "ru", one: "файл", few: "файла", many: "файлов" } as PluralForms,
       updatesPrefix: "обновлений ранее загруженных:",
       untitled: "Документ без названия",
       version: "версия"
@@ -1235,7 +1236,8 @@ const en: typeof ru = {
     timeline: {
       uploadFrom: "Upload of",
       latest: "latest",
-      files: (n: number): string => (n === 1 ? "file" : "files"),
+      // English needs two forms, so few and many carry the same word.
+      files: { rule: "en", one: "file", few: "files", many: "files" } as PluralForms,
       updatesPrefix: "updates to earlier uploads:",
       untitled: "Untitled document",
       version: "version"
