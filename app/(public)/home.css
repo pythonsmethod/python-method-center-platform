@@ -125,6 +125,15 @@
   position: relative;
 }
 
+/* Professor Python stands in the light gate; his own photograph, warm
+   graded and faded into the page rather than cut out against it. */
+.home-hero__professor {
+  height: auto;
+  max-width: 100%;
+  position: relative;
+  width: min(360px, 100%);
+}
+
 /* The light gate: the center's sign, built from gradients rather than
    from a photograph. Nothing here needs an asset, so nothing here can
    quietly become a stock image of someone who does not exist. */
@@ -171,11 +180,15 @@
   width: auto;
 }
 
+/* Анхам stands beside him, slightly forward, with his greeting above. */
 .home-hero__anham {
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
-  position: relative;
+  gap: 0.5rem;
+  position: absolute;
+  right: 0;
+  width: min(210px, 46%);
 }
 
 .home-bubble {
@@ -546,8 +559,12 @@
 
   /* The art follows the words on a phone rather than leading with a face. */
   .home-hero__art {
-    grid-template-columns: minmax(0, 1fr) minmax(0, 0.8fr);
     order: 2;
+  }
+
+  .home-hero__anham {
+    position: static;
+    width: min(180px, 60%);
   }
 
   .home-promo__terms {
@@ -556,6 +573,7 @@
     padding: 1.25rem 0 0;
   }
 
+  .home-figure__portrait,
   .home-figure__seal,
   .home-final__anham {
     justify-self: center;
@@ -598,8 +616,14 @@
   justify-self: center;
 }
 
-/* Until a real photograph of Professor Python exists, his card carries the
-   center's seal. Swap this span for an <Image> when the photo arrives. */
+.home-figure__portrait {
+  border-radius: 14px;
+  height: auto;
+  justify-self: center;
+  max-width: 100%;
+  width: 100%;
+}
+
 .home-figure__seal {
   align-items: center;
   aspect-ratio: 1;

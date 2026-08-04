@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { IconAnkh } from "@/components/icons/EgyptianIcons";
@@ -6,6 +7,8 @@ import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import "./home.css";
+
+const PROFESSOR_IMAGE = "/images/professor-python.png";
 
 // The number a person reads is their position on the whole path, not inside
 // one column: the shared start is 01–02, so each branch continues from 03
@@ -84,9 +87,17 @@ export default async function HomePage() {
             <span className="home-hero__gate-ring" />
             <IconAnkh className="home-hero__gate-ankh" />
           </div>
+          <Image
+            alt="Professor Python"
+            className="home-hero__professor"
+            height={717}
+            priority
+            src={PROFESSOR_IMAGE}
+            width={690}
+          />
           <div className="home-hero__anham">
             <p className="home-bubble">{t.heroBubble}</p>
-            <AnhamAvatar size={230} state={tier} title={anhamName} />
+            <AnhamAvatar size={150} state={tier} title={anhamName} />
           </div>
         </div>
       </section>
@@ -102,9 +113,13 @@ export default async function HomePage() {
               <span aria-hidden="true">→</span>
             </Link>
           </div>
-          <span aria-hidden="true" className="home-figure__seal">
-            <IconAnkh />
-          </span>
+          <Image
+            alt=""
+            className="home-figure__portrait"
+            height={717}
+            src={PROFESSOR_IMAGE}
+            width={690}
+          />
         </article>
 
         <article className="home-figure home-figure--anham">
