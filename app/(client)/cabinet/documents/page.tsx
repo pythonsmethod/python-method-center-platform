@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
@@ -10,13 +12,15 @@ import { DocumentUploadPanel } from "../DocumentUploadPanel";
 export const dynamic = "force-dynamic";
 
 export default async function CabinetDocumentsPage() {
+  const dict = getDictionary(await getLocale()).cabinet;
+  const t = dict.documents;
   const auth = await getRequiredUser("/cabinet/documents");
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
-        <PageHeader eyebrow="Документы" title="Мои документы" />
-        <AuthSetupNotice title="Раздел требует настройки Supabase Auth" />
+        <PageHeader eyebrow={t.eyebrow} title={t.title} />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -31,22 +35,23 @@ export default async function CabinetDocumentsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Документы"
-        title="Мои документы"
-        description="Анализы, выписки и заключения. Хранятся в закрытом хранилище — их видите только вы и команда центра."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       {!clientCase ? (
         <div className="cab-note">
-          <strong>Сначала анкета</strong>
+          <strong>{t.needCaseTitle}</strong>
           <span>
-            Документы привязываются к кейсу — он появится после анкеты.{" "}
-            <Link href="/onboarding">Заполнить анкету</Link>
+            {t.needCaseText}{" "}
+            <Link href="/onboarding">{t.needCaseCta}</Link>
           </span>
         </div>
       ) : documentResult?.status === "ready" ? (
         <>
           <DocumentUploadPanel
+              labels={t}
             caseId={clientCase.id}
             initialDocuments={documentResult.documents}
             userId={auth.userId}
@@ -54,20 +59,18 @@ export default async function CabinetDocumentsPage() {
 
           {documentResult.documents.length > 0 ? (
             <section
-              aria-label="История загрузок"
+              aria-label={t.timelineAria}
               className="documents-section"
             >
               <div className="panel">
-                <span className="panel__label">История загрузок</span>
-                <h2>Как менялись ваши документы</h2>
+                <span className="panel__label">{t.timelineLabel}</span>
+                <h2>{t.timelineTitle}</h2>
                 <p>
-                  Каждая загрузка — отдельный шаг вашей истории. Если вы
-                  присылаете свежую версию того же анализа, она помечается
-                  как новая версия — так видно динамику, а не просто список.
+                  {t.timelineText}
                 </p>
                 <DocumentTimeline
                   documents={documentResult.documents}
-                  emptyText="Загрузок пока не было."
+                  emptyText={t.timelineEmpty}
                 />
               </div>
             </section>
@@ -75,11 +78,11 @@ export default async function CabinetDocumentsPage() {
         </>
       ) : (
         <div className="cab-note">
-          <strong>Документы недоступны</strong>
+          <strong>{t.errorTitle}</strong>
           <span>
             {documentResult?.status === "error"
               ? documentResult.message
-              : "Попробуйте обновить страницу."}
+              : t.errorRetry}
           </span>
         </div>
       )}

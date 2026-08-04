@@ -121,6 +121,66 @@ const ru = {
         "Ответы по вашему состоянию и анализам даёт Professor Python лично.",
       noteStaff:
         "Помните: ответы по состоянию, анализам и лечению даёт Professor Python лично."
+    },
+    home: {
+      eyebrow: "Личный кабинет",
+      title: "Кабинет",
+      setupDescription: "Для кабинета требуется настроенная аутентификация.",
+      setupNotice: "Кабинет требует настройки Supabase Auth",
+      firstStepLabel: "Первый шаг",
+      firstStepTitle: "Заполните анкету",
+      firstStepText:
+        "Анкета создаёт ваш кейс — и сразу после неё здесь открывается переписка с Professor Python. Занимает около десяти минут.",
+      firstStepCta: "Заполнить анкету",
+      submittedTitle: "Анкета отправлена",
+      submittedText: "Кейс создан. Напишите здесь — команда центра рядом.",
+      doseTitle: "Напоминание о приёме",
+      dosePrefix: "По вашему расписанию пора принять:",
+      doseCta: "Открыть чек-лист",
+      uploadTitle: "Загрузите документы",
+      uploadText:
+        "Анализы, выписки и заключения. Без них Professor Python не сможет разобрать вашу ситуацию.",
+      uploadCta: "Загрузить",
+      threadAria: "Переписка с центром",
+      threadLabel: "Ваша переписка",
+      threadTitle: "Professor Python и команда"
+    },
+    documents: {
+      eyebrow: "Документы",
+      title: "Мои документы",
+      description:
+        "Анализы, выписки и заключения. Хранятся в закрытом хранилище центра.",
+      setupNotice: "Раздел требует настройки Supabase Auth",
+      needCaseTitle: "Сначала анкета",
+      needCaseText: "Документы привязываются к кейсу — он появится после анкеты.",
+      needCaseCta: "Заполнить анкету",
+      timelineAria: "История загрузок",
+      timelineLabel: "История загрузок",
+      timelineTitle: "Как менялись ваши документы",
+      timelineText:
+        "Каждая загрузка — отдельный шаг вашей истории. Если вы присылаете свежую версию того же анализа, она появляется как новая версия — так видно динамику, а не просто список.",
+      timelineEmpty: "Загрузок пока не было.",
+      errorTitle: "Документы недоступны",
+      errorRetry: "Попробуйте обновить страницу.",
+      uploadAria: "Документы кейса",
+      uploadLabel: "Документы",
+      uploadTitle: "Загрузить документ",
+      fileField: "Файл документа",
+      uploadCta: "Загрузить документ",
+      uploading: "Загрузка...",
+      listLabel: "Ваш кейс",
+      listTitle: "Загруженные документы",
+      listEmpty: "Документы ещё не загружены.",
+      untitled: "Документ без названия",
+      open: "Открыть",
+      status: "Статус",
+      kind: "Тип",
+      size: "Размер",
+      sizeUnknown: "Размер неизвестен",
+      errorOpen: "Не удалось открыть документ.",
+      errorPickFile: "Сначала выберите файл документа.",
+      progressUploading: "Загрузка документа...",
+      uploaded: "Документ загружен и привязан к вашему кейсу."
     }
   },
   onboarding: {
@@ -699,6 +759,67 @@ const en: typeof ru = {
         "Answers about your condition and your test results come from Professor Python personally.",
       noteStaff:
         "Remember: answers about condition, test results and treatment come from Professor Python personally."
+    },
+    home: {
+      eyebrow: "Personal cabinet",
+      title: "Cabinet",
+      setupDescription: "The cabinet needs authentication to be configured.",
+      setupNotice: "The cabinet needs Supabase Auth configured",
+      firstStepLabel: "First step",
+      firstStepTitle: "Fill in the questionnaire",
+      firstStepText:
+        "The questionnaire creates your case — and your thread with Professor Python opens here as soon as it is done. It takes about ten minutes.",
+      firstStepCta: "Fill in the questionnaire",
+      submittedTitle: "Questionnaire submitted",
+      submittedText: "Your case is created. Write here — the center's team is close by.",
+      doseTitle: "Intake reminder",
+      dosePrefix: "Your schedule says it is time to take:",
+      doseCta: "Open the checklist",
+      uploadTitle: "Upload your documents",
+      uploadText:
+        "Test results, discharge summaries and reports. Without them Professor Python cannot make sense of your situation.",
+      uploadCta: "Upload",
+      threadAria: "Conversation with the center",
+      threadLabel: "Your conversation",
+      threadTitle: "Professor Python and the team"
+    },
+    documents: {
+      eyebrow: "Documents",
+      title: "My documents",
+      description:
+        "Test results, discharge summaries and reports. Kept in the center's private storage.",
+      setupNotice: "This section needs Supabase Auth configured",
+      needCaseTitle: "The questionnaire comes first",
+      needCaseText:
+        "Documents are attached to your case — it appears once the questionnaire is done.",
+      needCaseCta: "Fill in the questionnaire",
+      timelineAria: "Upload history",
+      timelineLabel: "Upload history",
+      timelineTitle: "How your documents have changed",
+      timelineText:
+        "Every upload is a step in your history. If you send a newer version of the same test, it appears as a new version — so the change over time is visible, rather than just a pile of files.",
+      timelineEmpty: "No uploads yet.",
+      errorTitle: "Documents unavailable",
+      errorRetry: "Please try refreshing the page.",
+      uploadAria: "Case documents",
+      uploadLabel: "Documents",
+      uploadTitle: "Upload a document",
+      fileField: "Document file",
+      uploadCta: "Upload document",
+      uploading: "Uploading...",
+      listLabel: "Your case",
+      listTitle: "Uploaded documents",
+      listEmpty: "No documents uploaded yet.",
+      untitled: "Untitled document",
+      open: "Open",
+      status: "Status",
+      kind: "Type",
+      size: "Size",
+      sizeUnknown: "Size unknown",
+      errorOpen: "The document could not be opened.",
+      errorPickFile: "Please choose a document file first.",
+      progressUploading: "Uploading the document...",
+      uploaded: "The document is uploaded and attached to your case."
     }
   },
   onboarding: {

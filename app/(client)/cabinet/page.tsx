@@ -29,6 +29,8 @@ function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
 // case, the payments, the documents — lives one tap away in the column on
 // the left and does not compete with it.
 export default async function CabinetPage({ searchParams }: CabinetPageProps) {
+  const dict = getDictionary(await getLocale()).cabinet;
+  const t = dict.home;
   const auth = await getRequiredUser("/cabinet");
   const params = await searchParams;
 
@@ -36,11 +38,11 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Личный кабинет"
-          title="Кабинет"
-          description="Для кабинета требуется настроенная аутентификация."
+          eyebrow={t.eyebrow}
+          title={t.title}
+          description={t.setupDescription}
         />
-        <AuthSetupNotice title="Кабинет требует настройки Supabase Auth" />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -64,14 +66,13 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
   if (!clientCase) {
     return (
       <div className="cab-start">
-        <span className="cab-card__label">Первый шаг</span>
-        <h2>Заполните анкету</h2>
+        <span className="cab-card__label">{t.firstStepLabel}</span>
+        <h2>{t.firstStepTitle}</h2>
         <p>
-          Анкета создаёт ваш кейс — и сразу после неё здесь откроется
-          переписка с Professor Python. Занимает около десяти минут.
+          {t.firstStepText}
         </p>
         <Link className="button" href="/onboarding">
-          Заполнить анкету
+          {t.firstStepCta}
         </Link>
       </div>
     );
@@ -81,39 +82,38 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     <>
       {isOnboardingSubmitted(params?.onboarding) ? (
         <div className="cab-note">
-          <strong>Анкета отправлена</strong>
-          <span>Кейс создан. Напишите здесь — команда центра рядом.</span>
+          <strong>{t.submittedTitle}</strong>
+          <span>{t.submittedText}</span>
         </div>
       ) : null}
 
       {supplementsDue > 0 ? (
         <div className="cab-note cab-note--reminder">
-          <strong>Напоминание о приёме</strong>
+          <strong>{t.doseTitle}</strong>
           <span>
-            По вашему расписанию пора принять: {supplementsDue}.{" "}
-            <Link href="/cabinet/supplements">Открыть чек-лист</Link>
+            {t.dosePrefix} {supplementsDue}.{" "}
+            <Link href="/cabinet/supplements">{t.doseCta}</Link>
           </span>
         </div>
       ) : null}
 
       {documents.length === 0 ? (
         <div className="cab-note">
-          <strong>Загрузите документы</strong>
+          <strong>{t.uploadTitle}</strong>
           <span>
-            Анализы, выписки и заключения. Без них Professor Python не сможет
-            разобрать вашу ситуацию.{" "}
-            <Link href="/cabinet/documents">Загрузить</Link>
+            {t.uploadText}{" "}
+            <Link href="/cabinet/documents">{t.uploadCta}</Link>
           </span>
         </div>
       ) : null}
 
-      <section className="cab-thread" aria-label="Переписка с центром">
+      <section className="cab-thread" aria-label={t.threadAria}>
         <div className="cab-thread__head">
-          <span className="panel__label">Ваша переписка</span>
-          <h1>Professor Python и команда</h1>
+          <span className="panel__label">{t.threadLabel}</span>
+          <h1>{t.threadTitle}</h1>
         </div>
         <CaseMessageThread
-            labels={getDictionary(await getLocale()).cabinet.thread}
+            labels={dict.thread}
           caseId={clientCase.id}
           expandable
           loadError={messagesResult?.error ?? null}

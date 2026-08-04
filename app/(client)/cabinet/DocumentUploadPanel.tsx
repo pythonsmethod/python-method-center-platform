@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import { FormEvent, useRef, useState, useTransition } from "react";
 import {
   buildDocumentStoragePath,
@@ -20,6 +22,7 @@ type DocumentUploadPanelProps = {
   userId: string;
   caseId: string;
   initialDocuments: UploadedDocument[];
+  labels: Dictionary["cabinet"]["documents"];
 };
 
 type UploadState =
@@ -40,11 +43,11 @@ type UploadState =
       message: string;
     };
 
-function formatFileSize(value: unknown): string {
+function formatFileSize(value: unknown, unknownLabel: string): string {
   const bytes = typeof value === "number" ? value : Number(value);
 
   if (!Number.isFinite(bytes) || bytes <= 0) {
-    return "Размер неизвестен";
+    return unknownLabel;
   }
 
   if (bytes < 1024 * 1024) {
@@ -65,7 +68,8 @@ function stateClassName(state: UploadState): string {
 export function DocumentUploadPanel({
   userId,
   caseId,
-  initialDocuments
+  initialDocuments,
+  labels
 }: DocumentUploadPanelProps) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [state, setState] = useState<UploadState>({
@@ -96,7 +100,7 @@ export function DocumentUploadPanel({
 
     if (error || !data?.signedUrl) {
       documentWindow?.close();
-      setOpenError(error?.message ?? "Не удалось открыть документ.");
+      setOpenError(error?.message ?? labels.errorOpen);
       return;
     }
 
@@ -115,7 +119,7 @@ export function DocumentUploadPanel({
     if (!file) {
       setState({
         status: "error",
-        message: "Сначала выберите файл документа."
+        message: labels.errorPickFile
       });
       return;
     }
@@ -150,7 +154,7 @@ export function DocumentUploadPanel({
 
     setState({
       status: "uploading",
-      message: "Загрузка документа..."
+      message: labels.progressUploading
     });
 
     startTransition(async () => {
@@ -199,7 +203,7 @@ export function DocumentUploadPanel({
       }
       setState({
         status: "success",
-        message: "Документ загружен и привязан к вашему кейсу."
+        message: labels.uploaded
       });
     });
   }
@@ -207,15 +211,15 @@ export function DocumentUploadPanel({
   const uploading = state.status === "uploading" || isPending;
 
   return (
-    <section className="documents-section" aria-label="Документы кейса">
+    <section className="documents-section" aria-label={labels.uploadAria}>
       <div className="documents-layout">
         <form className="document-upload" onSubmit={handleSubmit}>
           <div>
-            <span className="panel__label">Документы</span>
-            <h2>Загрузить документ</h2>
+            <span className="panel__label">{labels.uploadLabel}</span>
+            <h2>{labels.uploadTitle}</h2>
           </div>
           <label className="field">
-            <span>Файл документа</span>
+            <span>{labels.fileField}</span>
             <input
               accept=".pdf,.png,.jpg,.jpeg,.webp,application/pdf,image/png,image/jpeg,image/webp"
               disabled={uploading}
@@ -224,7 +228,7 @@ export function DocumentUploadPanel({
             />
           </label>
           <button className="button" disabled={uploading} type="submit">
-            {uploading ? "Загрузка..." : "Загрузить документ"}
+            {uploading ? labels.uploading : labels.uploadCta}
           </button>
           {state.message ? (
             <p className={stateClassName(state)}>{state.message}</p>
@@ -233,8 +237,8 @@ export function DocumentUploadPanel({
 
         <div className="documents-list-panel">
           <div>
-            <span className="panel__label">Ваш кейс</span>
-            <h2>Загруженные документы</h2>
+            <span className="panel__label">{labels.listLabel}</span>
+            <h2>{labels.listTitle}</h2>
           </div>
 
           {openError ? (
@@ -242,14 +246,14 @@ export function DocumentUploadPanel({
           ) : null}
 
           {documents.length === 0 ? (
-            <p className="empty-state">Документы ещё не загружены.</p>
+            <p className="empty-state">{labels.listEmpty}</p>
           ) : (
             <ul className="document-list">
               {documents.map((document) => (
                 <li className="document-list__item" key={document.id}>
                   <div>
                     <strong>
-                      {document.original_filename ?? "Документ без названия"}
+                      {document.original_filename ?? labels.untitled}
                     </strong>
                     <span>{formatDateTime(document.created_at)}</span>
                     <span
@@ -264,16 +268,16 @@ export function DocumentUploadPanel({
                       onClick={() => handleOpenDocument(document)}
                       type="button"
                     >
-                      Открыть
+                      {labels.open}
                     </button>
                   </div>
                   <dl>
                     <div>
-                      <dt>Статус</dt>
+                      <dt>{labels.status}</dt>
                       <dd>{formatDocumentStatus(document.document_status)}</dd>
                     </div>
                     <div>
-                      <dt>Тип</dt>
+                      <dt>{labels.kind}</dt>
                       <dd>
                         {String(
                           document.metadata.mime_type ?? document.document_type
@@ -281,8 +285,8 @@ export function DocumentUploadPanel({
                       </dd>
                     </div>
                     <div>
-                      <dt>Размер</dt>
-                      <dd>{formatFileSize(document.metadata.file_size)}</dd>
+                      <dt>{labels.size}</dt>
+                      <dd>{formatFileSize(document.metadata.file_size, labels.sizeUnknown)}</dd>
                     </div>
                   </dl>
                 </li>
