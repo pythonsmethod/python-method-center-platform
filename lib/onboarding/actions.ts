@@ -11,7 +11,8 @@ import {
   type LifecycleEventInput
 } from "@/lib/cases/lifecycle";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
-import { OFFER_VERSION } from "@/lib/legal/offer";
+import { getOfferDocumentLocale, OFFER_VERSION } from "@/lib/legal/offer";
+import { getLocale } from "@/lib/i18n/locale";
 import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -57,6 +58,11 @@ export async function submitOnboarding(
     formData,
     "situationDescription"
   );
+  // Which language the offer was actually shown in. Not always the
+  // language of the site: the English client is shown the Russian text
+  // until a translation exists, and the record has to say so.
+  const uiLocale = await getLocale();
+  const offerLocale = getOfferDocumentLocale(uiLocale);
   const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
 
@@ -158,6 +164,8 @@ export async function submitOnboarding(
     situation_description: situationDescription,
     offer_accepted: true,
     offer_version: OFFER_VERSION,
+    offer_document_locale: offerLocale,
+    ui_locale: uiLocale,
     consent_accepted: true,
     submitted_at: submittedAt
   };
@@ -189,7 +197,9 @@ export async function submitOnboarding(
         version: OFFER_VERSION,
         source: "onboarding_form",
         metadata: {
-          onboarding_submission_id: onboardingSubmission.id
+          onboarding_submission_id: onboardingSubmission.id,
+          offer_document_locale: offerLocale,
+          ui_locale: uiLocale
         }
       },
       {
@@ -245,7 +255,9 @@ export async function submitOnboarding(
       entityId: offerConsentRecord.id,
       metadata: {
         consent_type: "offer_acceptance",
-        consent_version: OFFER_VERSION
+        consent_version: OFFER_VERSION,
+        offer_document_locale: offerLocale,
+        ui_locale: uiLocale
       }
     },
     {

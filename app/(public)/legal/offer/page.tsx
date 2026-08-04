@@ -1,53 +1,83 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
-import { OFFER_DOCUMENT_URL, OFFER_VERSION } from "@/lib/legal/offer";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
+import {
+  getOfferDocumentUrl,
+  isOfferInLocale,
+  OFFER_VERSION
+} from "@/lib/legal/offer";
 
-export const metadata: Metadata = {
-  title: "Публичная оферта — Python Method"
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).offer;
 
-export default function OfferPage() {
+  return { title: `${t.title} — Python Method` };
+}
+
+export default async function OfferPage() {
+  const locale = await getLocale();
+  const t = getDictionary(locale).offer;
+  const documentUrl = getOfferDocumentUrl(locale);
+  const inOwnLanguage = isOfferInLocale(locale);
+
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Юридические документы"
-        title="Публичная оферта"
-        description="Действующая редакция договора публичной оферты Python Method. Принятие оферты фиксируется при отправке анкеты."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
+
+      {/* Said before the document, not after it. Someone about to accept a
+          contract has to know first that it is not in their language. */}
+      {inOwnLanguage ? null : (
+        <section aria-label={t.languageNoticeLabel} className="panel-grid">
+          <div className="panel panel--notice">
+            <span className="panel__label">{t.languageNoticeLabel}</span>
+            <p>{t.languageNotice}</p>
+            <div className="panel-actions">
+              <Link className="button button--secondary" href="/support">
+                {t.languageNoticeCta}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Документ</span>
-          <h2>Оферта, версия {OFFER_VERSION}</h2>
-          <p>
-            Ознакомьтесь с полным текстом оферты до отправки анкеты и оплаты
-            услуг. Отправляя анкету, вы подтверждаете принятие условий этой
-            редакции документа.
-          </p>
+          <span className="panel__label">{t.docLabel}</span>
+          <h2>
+            {t.docHeading} {OFFER_VERSION}
+          </h2>
+          <p>{t.docText}</p>
           <div className="panel-actions">
             <a
               className="button"
-              href={OFFER_DOCUMENT_URL}
+              href={documentUrl}
               rel="noreferrer"
               target="_blank"
             >
-              Открыть оферту (PDF)
+              {t.openPdf}
             </a>
           </div>
         </div>
       </section>
 
-      <section className="panel-grid" aria-label="Просмотр документа">
+      <section className="panel-grid" aria-label={t.viewLabel}>
         <object
-          aria-label="Текст публичной оферты"
-          data={OFFER_DOCUMENT_URL}
-          style={{ border: "1px solid var(--line)", borderRadius: "12px", minHeight: "70vh", width: "100%" }}
+          aria-label={t.pdfAlt}
+          data={documentUrl}
+          style={{
+            border: "1px solid var(--line)",
+            borderRadius: "12px",
+            minHeight: "70vh",
+            width: "100%"
+          }}
           type="application/pdf"
         >
-          <p className="empty-state">
-            Встроенный просмотр PDF недоступен в этом браузере — используйте
-            кнопку «Открыть оферту (PDF)» выше.
-          </p>
+          <p className="empty-state">{t.pdfFallback}</p>
         </object>
       </section>
     </div>

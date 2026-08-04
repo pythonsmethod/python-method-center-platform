@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { IconAnkh } from "@/components/icons/EgyptianIcons";
 import { pluralTokens } from "@/lib/tokens/config";
 
 // A quiet coin at the top of the cabinet instead of a whole block about
@@ -12,7 +13,7 @@ export function AccountBadge() {
       href="/cabinet/account"
     >
       <span aria-hidden="true" className="token-badge__coin token-badge__coin--account">
-        ☥
+        <IconAnkh />
       </span>
       <span className="token-badge__value">
         <strong>Аккаунт</strong>

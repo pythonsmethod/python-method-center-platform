@@ -9242,3 +9242,10 @@ code {
     text-align: center;
   }
 }
+
+/* The ankh inside the account badge as a vector: the character U+2625 is
+   absent from the font stack and falls back to a dagger. */
+.token-badge__coin--account svg {
+  height: 1.1em;
+  width: auto;
+}

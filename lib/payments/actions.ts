@@ -1,6 +1,7 @@
 "use server";
 
-import { OFFER_VERSION } from "@/lib/legal/offer";
+import { getOfferDocumentLocale, OFFER_VERSION } from "@/lib/legal/offer";
+import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const KNOWN_PRODUCTS = new Set([
@@ -50,13 +51,19 @@ export async function recordPaymentOfferAcceptance(
       return;
     }
 
+    const uiLocale = await getLocale();
+
     await supabase.from("consent_records").insert({
       profile_id: user.id,
       consent_type: "offer_acceptance",
       status: "accepted",
       version: OFFER_VERSION,
       source: "payment_page",
-      metadata: { product }
+      metadata: {
+        product,
+        offer_document_locale: getOfferDocumentLocale(uiLocale),
+        ui_locale: uiLocale
+      }
     });
   } catch {
     // Consent capture is best-effort here; the checkbox itself gates the UI.
