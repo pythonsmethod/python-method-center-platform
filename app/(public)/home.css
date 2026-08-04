@@ -29,10 +29,19 @@
 
 .home-button {
   align-items: center;
+  /* Two of these are real <button> elements (they open Анхам rather than
+     navigate). Without an explicit background a button takes the browser's
+     default near-white ButtonFace, and cream text on near-white is
+     invisible — which is exactly what happened to "Пройти путь с
+     ИИ-помощником" and "Задать вопрос Анхаму". font/cursor are reset for
+     the same reason: a button does not inherit them. */
+  background: transparent;
   border: 1px solid var(--line);
   border-radius: 10px;
   color: var(--text);
+  cursor: pointer;
   display: inline-flex;
+  font-family: inherit;
   font-size: 0.98rem;
   font-weight: 600;
   gap: 0.6rem;
