@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import type { ProfileDetailsActionState } from "@/lib/profile/action-state";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
@@ -78,6 +79,14 @@ export async function updateProfileDetails(
       "Не удалось сохранить данные. Попробуйте ещё раз — а если повторится, напишите в поддержку."
     );
   }
+
+  // Without this the row is updated and the page is not: the person sees
+  // the form exactly as they left it, comes back later to an empty address
+  // field, and reasonably concludes nothing was saved. Every other action
+  // in this codebase revalidates; this one was missed.
+  revalidatePath("/cabinet/account");
+  // The cabinet greets the person by the name held on this row.
+  revalidatePath("/cabinet");
 
   return { status: "success", message: "Данные сохранены." };
 }

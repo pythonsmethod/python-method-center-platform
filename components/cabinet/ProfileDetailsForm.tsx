@@ -29,8 +29,16 @@ export function ProfileDetailsForm({
     initialProfileDetailsActionState
   );
 
+  // The fields are uncontrolled, so defaultValue only applies when they
+  // mount. Without this key, a re-render carrying freshly saved values
+  // would leave the old ones sitting in the DOM — the row updated, the
+  // page silent, and the address blank again on the next visit. Keying on
+  // the saved values remounts the fields exactly when the server has
+  // something new to show, and never while someone is typing.
+  const savedKey = `${fullName ?? ""}|${phone ?? ""}|${deliveryAddress ?? ""}`;
+
   return (
-    <form action={formAction} className="onboarding-form">
+    <form action={formAction} className="onboarding-form" key={savedKey}>
       <label className="field">
         <span>{labels.name}</span>
         <input
