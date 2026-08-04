@@ -12,7 +12,8 @@ export const dynamic = "force-dynamic";
 // when; the cabinet turns it into a daily checklist with a gentle nudge.
 // The AI comments only on timing — never on what or how much.
 export default async function CabinetSupplementsPage() {
-  const dict = getDictionary(await getLocale()).cabinet;
+  const strings = getDictionary(await getLocale());
+  const dict = strings.cabinet;
   const t = dict.supplements;
   const auth = await getRequiredUser("/cabinet/supplements");
 
@@ -20,7 +21,7 @@ export default async function CabinetSupplementsPage() {
     return (
       <div className="page-shell">
         <PageHeader eyebrow={t.eyebrow} title={t.title} />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

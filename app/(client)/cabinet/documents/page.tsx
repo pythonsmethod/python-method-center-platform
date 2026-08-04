@@ -12,7 +12,8 @@ import { DocumentUploadPanel } from "../DocumentUploadPanel";
 export const dynamic = "force-dynamic";
 
 export default async function CabinetDocumentsPage() {
-  const dict = getDictionary(await getLocale()).cabinet;
+  const strings = getDictionary(await getLocale());
+  const dict = strings.cabinet;
   const t = dict.documents;
   const auth = await getRequiredUser("/cabinet/documents");
 
@@ -20,7 +21,7 @@ export default async function CabinetDocumentsPage() {
     return (
       <div className="page-shell">
         <PageHeader eyebrow={t.eyebrow} title={t.title} />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

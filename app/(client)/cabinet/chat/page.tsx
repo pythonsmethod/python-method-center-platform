@@ -18,7 +18,8 @@ export const dynamic = "force-dynamic";
 // about payment and access, and whatever the person already asked the AI.
 // His own thread is the home page of the cabinet.
 export default async function CabinetChatPage() {
-  const dict = getDictionary(await getLocale()).cabinet;
+  const strings = getDictionary(await getLocale());
+  const dict = strings.cabinet;
   const t = dict.chat;
   const auth = await getRequiredUser("/cabinet/chat");
 
@@ -26,7 +27,7 @@ export default async function CabinetChatPage() {
     return (
       <div className="page-shell">
         <PageHeader eyebrow={t.eyebrow} title={t.title} />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

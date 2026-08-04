@@ -8,7 +8,10 @@ const PUBLIC_PATHS: { path: string; priority: number }[] = [
   { path: "/", priority: 1 },
   { path: "/review", priority: 0.9 },
   { path: "/payment", priority: 0.9 },
-  { path: "/shop", priority: 0.7 },
+  // /shop is deliberately absent: it asks search engines not to index it
+  // while the line has nothing for sale, and a sitemap entry for a
+  // noindex page is a contradiction. It goes back in with the first
+  // product that can actually be bought.
   { path: "/payment/other", priority: 0.5 },
   { path: "/support", priority: 0.5 },
   { path: "/legal/offer", priority: 0.3 },

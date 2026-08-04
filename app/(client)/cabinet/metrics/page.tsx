@@ -12,7 +12,8 @@ export const dynamic = "force-dynamic";
 // Nothing here is computed or invented by the platform — every point is a
 // value the person entered from a real analysis.
 export default async function CabinetMetricsPage() {
-  const dict = getDictionary(await getLocale()).cabinet;
+  const strings = getDictionary(await getLocale());
+  const dict = strings.cabinet;
   const t = dict.metrics;
   const auth = await getRequiredUser("/cabinet/metrics");
 
@@ -20,7 +21,7 @@ export default async function CabinetMetricsPage() {
     return (
       <div className="page-shell">
         <PageHeader eyebrow={t.eyebrow} title={t.title} />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

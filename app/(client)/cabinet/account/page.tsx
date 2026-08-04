@@ -28,7 +28,8 @@ export const dynamic = "force-dynamic";
 // what their case is, and how it got there. The cabinet itself stays for
 // the daily work — documents, chat, payments.
 export default async function AccountPage() {
-  const dict = getDictionary(await getLocale()).cabinet;
+  const strings = getDictionary(await getLocale());
+  const dict = strings.cabinet;
   const t = dict.account;
   const auth = await getRequiredUser("/cabinet/account");
 
@@ -40,7 +41,7 @@ export default async function AccountPage() {
           title={t.title}
           description={t.setupDescription}
         />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

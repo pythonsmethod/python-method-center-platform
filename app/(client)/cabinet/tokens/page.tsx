@@ -20,7 +20,8 @@ export const dynamic = "force-dynamic";
 // coin in the cabinet header. Read once — and the cabinet itself stays
 // about the person's own case, not about a bonus programme.
 export default async function TokensPage() {
-  const t = getDictionary(await getLocale()).cabinet.tokens;
+  const strings = getDictionary(await getLocale());
+  const t = strings.cabinet.tokens;
   const auth = await getRequiredUser("/cabinet/tokens");
 
   if (auth.status === "missing-env") {
@@ -31,7 +32,7 @@ export default async function TokensPage() {
           title={t.title}
           description={t.setupDescription}
         />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

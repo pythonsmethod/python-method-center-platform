@@ -398,6 +398,62 @@ const ru = {
     relatedOffer: "Договор-оферта",
     relatedPrivacy: "Политика конфиденциальности"
   },
+  setup: {
+    label: "Требуется настройка",
+    text: "Добавьте недостающие переменные окружения, чтобы аутентификация заработала:",
+    loginTitle: "Supabase Auth не настроен"
+  },
+  shop: {
+    eyebrow: "Магазин",
+    title: "Магазин центра",
+    description:
+      "Формулы, уход, книга метода и знаки центра — в одном оформлении: чёрное с золотом, знаки Египта, имя Professor Python.",
+    stageBadge: "Линия готовится",
+    stageText:
+      "Здесь показано, что войдёт в линию центра. Купить пока нельзя — мы не открываем продажу раньше, чем продукт готов. Рисунки упаковок заменятся фотографиями, когда продукция выйдет. Если что-то из этого вам нужно — оставьте email, и мы напишем в день выхода.",
+    status: {
+      available: "Уже доступно",
+      preparing: "Готовится",
+      idea: "В замысле"
+    },
+    notifyButton: "Сообщить, когда выйдет",
+    waitlist: {
+      label: "Лист ожидания",
+      title: "Сообщим, когда выйдет",
+      text: "Оставьте email — и в день, когда продукт появится, вы узнаете об этом первыми. Никаких рассылок между этим и тем днём не будет.",
+      wholeLine: "Вся линия — сообщите обо всём",
+      itemLabel: "Что вас интересует",
+      emailLabel: "Email",
+      emailPlaceholder: "you@example.com",
+      consent:
+        "Согласен(на) на обработку email, чтобы получить одно письмо о выходе продукта.",
+      submit: "Записаться",
+      submitting: "Отправляем...",
+      note: "Один email о выходе — и всё. Отписаться можно в любой момент, ответив на письмо.",
+      doneLabel: "Готово",
+      success:
+        "Записали. Мы напишем на этот адрес в день выхода — и больше ни по какому поводу.",
+      successRepeat:
+        "Вы уже в списке по этой позиции. Напишем в день выхода — второй раз записываться не нужно.",
+      errorEmail: "Укажите корректный email — на него придёт письмо о выходе.",
+      errorConsent: "Нужно согласие на обработку email, иначе мы не сможем написать.",
+      errorRateLimited:
+        "Слишком много записей подряд. Подождите немного и попробуйте ещё раз.",
+      errorUnavailable:
+        "Не удалось записать. Попробуйте через минуту или напишите нам через «Поддержку».",
+      errorGeneric: "Не удалось отправить. Попробуйте ещё раз."
+    },
+    nextLabel: "Пока магазин готовится",
+    nextTitle: "Путь начинается с разбора",
+    nextText:
+      "Первый шаг не требует покупки: зарегистрируйтесь, заполните анкету и загрузите свои анализы — Professor Python лично посмотрит вашу ситуацию.",
+    nextStart: "Начать путь",
+    nextPlans: "Тарифы сопровождения",
+    limitsLabel: "Границы ответственности",
+    limitsTitle: "Не замена лечения",
+    limitsText:
+      "Всё, что появится в магазине, — поддержка восстановления, а не лекарства и не медицинские услуги. Центр не ставит диагнозы и не назначает лечение; сопровождение не заменяет наблюдение лечащего врача."
+  },
   meta: {
     title: "Python Method — сопровождение восстановления",
     description:
@@ -1272,6 +1328,64 @@ const en: typeof ru = {
     questionsLink: "write to us before you pay",
     relatedOffer: "Offer agreement",
     relatedPrivacy: "Privacy policy"
+  },
+  setup: {
+    label: "Configuration needed",
+    text: "Add the missing environment variables so that authentication can work:",
+    loginTitle: "Supabase Auth is not configured"
+  },
+  shop: {
+    eyebrow: "Shop",
+    title: "The centre's shop",
+    description:
+      "Formulas, care products, the book of the method and the signs of the centre — in one dress: black and gold, the signs of Egypt, the name of Professor Python.",
+    stageBadge: "The line is in preparation",
+    stageText:
+      "This is what the centre's line will hold. Nothing can be bought yet — we do not open a sale before a product is ready. The drawn packages will be replaced by photographs once the products exist. If something here is what you need, leave your email and we will write on the day it launches.",
+    status: {
+      available: "Available now",
+      preparing: "In preparation",
+      idea: "At the idea stage"
+    },
+    notifyButton: "Tell me when it launches",
+    waitlist: {
+      label: "Waiting list",
+      title: "We will tell you when it launches",
+      text: "Leave your email and you will be among the first to know on the day the product appears. Nothing else will be sent between now and then.",
+      wholeLine: "The whole line — tell me about everything",
+      itemLabel: "What are you interested in",
+      emailLabel: "Email",
+      emailPlaceholder: "you@example.com",
+      consent:
+        "I consent to my email being processed so that I receive one message about the launch.",
+      submit: "Join the list",
+      submitting: "Sending...",
+      note: "One email about the launch, and that is all. You can unsubscribe at any time by replying to it.",
+      doneLabel: "Done",
+      success:
+        "You are on the list. We will write to this address on the day of the launch, and about nothing else.",
+      successRepeat:
+        "You are already on the list for this one. We will write on launch day — there is no need to sign up twice.",
+      errorEmail:
+        "Please give a valid email — the launch message will go to it.",
+      errorConsent:
+        "We need your consent to process the email, otherwise we cannot write to you.",
+      errorRateLimited:
+        "Too many sign-ups in a row. Please wait a little and try again.",
+      errorUnavailable:
+        "Could not save that. Try again in a minute, or write to us through Support.",
+      errorGeneric: "Could not send that. Please try again."
+    },
+    nextLabel: "While the shop is being prepared",
+    nextTitle: "The road begins with a review",
+    nextText:
+      "The first step requires no purchase: register, fill in the questionnaire and upload your test results — Professor Python will look at your situation personally.",
+    nextStart: "Begin the journey",
+    nextPlans: "Support plans",
+    limitsLabel: "The limits of what we do",
+    limitsTitle: "Not a replacement for treatment",
+    limitsText:
+      "Everything that appears in the shop is support for recovery, not medicine and not a medical service. The centre does not diagnose and does not prescribe treatment; the support programme does not replace your doctor's care."
   },
   meta: {
     title: "Python Method — recovery support",

@@ -33,7 +33,8 @@ async function getProfileDefaults(
 export default async function OnboardingPage() {
   const auth = await getRequiredUser("/onboarding");
   const locale = await getLocale();
-  const t = getDictionary(locale).onboarding;
+  const strings = getDictionary(locale);
+  const t = strings.onboarding;
 
   if (auth.status === "missing-env") {
     return (
@@ -44,7 +45,7 @@ export default async function OnboardingPage() {
           description={t.setupDescription}
         />
 
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

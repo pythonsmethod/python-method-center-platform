@@ -29,7 +29,8 @@ function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
 // case, the payments, the documents — lives one tap away in the column on
 // the left and does not compete with it.
 export default async function CabinetPage({ searchParams }: CabinetPageProps) {
-  const dict = getDictionary(await getLocale()).cabinet;
+  const strings = getDictionary(await getLocale());
+  const dict = strings.cabinet;
   const t = dict.home;
   const auth = await getRequiredUser("/cabinet");
   const params = await searchParams;
@@ -42,7 +43,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           title={t.title}
           description={t.setupDescription}
         />
-        <AuthSetupNotice title={t.setupNotice} />
+        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
       </div>
     );
   }

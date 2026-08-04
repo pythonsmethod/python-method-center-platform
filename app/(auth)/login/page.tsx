@@ -35,7 +35,8 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const initialMode = readParam(params?.mode) === "signup" ? "signup" : "login";
   const supabaseConfigured = hasSupabaseEnv();
   const locale = await getLocale();
-  const t = getDictionary(locale).login;
+  const strings = getDictionary(locale);
+  const t = strings.login;
 
   return (
     <div className="page-shell">
@@ -45,7 +46,10 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         description={t.description}
       />
 
-      <AuthSetupNotice />
+      <AuthSetupNotice
+        labels={strings.setup}
+        title={strings.setup.loginTitle}
+      />
 
       {readParam(params?.message) === "link-invalid" ? (
         <p className="form-message form-message--error">{t.linkInvalid}</p>

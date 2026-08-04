@@ -2795,6 +2795,60 @@ code {
   margin: 0;
 }
 
+/* Pushed to the foot of the card so the button line stays level across a
+   row whose descriptions are different lengths. */
+.shop-card__notify {
+  font-size: 12px;
+  margin-top: auto;
+  padding: 8px 14px;
+  width: 100%;
+}
+
+/* The waiting list. Framed like a panel rather than a form: it is the one
+   thing on this page a visitor can actually do. */
+.shop-waitlist {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(224, 169, 63, 0.12), transparent 55%),
+    var(--surface-muted);
+  border: 1px solid rgba(224, 169, 63, 0.35);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+  padding: 28px;
+}
+
+.shop-waitlist h2 {
+  margin: 0;
+}
+
+.shop-waitlist__text {
+  color: var(--muted);
+  margin: 0;
+  max-width: 60ch;
+}
+
+.shop-waitlist__row {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.shop-waitlist__note {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+.shop-waitlist .button {
+  align-self: flex-start;
+}
+
+.shop-waitlist--done {
+  align-items: flex-start;
+}
+
 /* The AI block in the hero: the one thing that must be noticed before
    anything else, because it is what makes this platform different from a
    clinic's website. */
@@ -7401,6 +7455,60 @@ code {
   font-size: 13px;
   line-height: 1.5;
   margin: 0;
+}
+
+/* Pushed to the foot of the card so the button line stays level across a
+   row whose descriptions are different lengths. */
+.shop-card__notify {
+  font-size: 12px;
+  margin-top: auto;
+  padding: 8px 14px;
+  width: 100%;
+}
+
+/* The waiting list. Framed like a panel rather than a form: it is the one
+   thing on this page a visitor can actually do. */
+.shop-waitlist {
+  background:
+    radial-gradient(120% 140% at 0% 0%, rgba(224, 169, 63, 0.12), transparent 55%),
+    var(--surface-muted);
+  border: 1px solid rgba(224, 169, 63, 0.35);
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 40px;
+  padding: 28px;
+}
+
+.shop-waitlist h2 {
+  margin: 0;
+}
+
+.shop-waitlist__text {
+  color: var(--muted);
+  margin: 0;
+  max-width: 60ch;
+}
+
+.shop-waitlist__row {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+}
+
+.shop-waitlist__note {
+  color: var(--muted);
+  font-size: 12px;
+  margin: 0;
+}
+
+.shop-waitlist .button {
+  align-self: flex-start;
+}
+
+.shop-waitlist--done {
+  align-items: flex-start;
 }
 
 /* The AI block in the hero: the one thing that must be noticed before
