@@ -35,7 +35,7 @@
 |---|---|---|
 | **Формат** | PNG-24 с альфа-каналом | Нужна честная прозрачность. JPEG не подойдёт — в нём нет прозрачности |
 | **Фон** | **Полностью прозрачный** | Он ложится на золотое свечение, на тёмные карточки и на пергамент. Любой залитый фон даст видимый прямоугольник |
-| **Холст** | Квадрат, **1536 × 1536 px** | Максимальный показ — 230 px; на экране с тройной плотностью это 690 px. 1536 даёт запас на будущее |
+| **Холст** | Квадрат, **не меньше 1024 × 1024 px** | Максимальный показ — 230 px; на экране с тройной плотностью это 690 px. 1024 закрывает это с запасом. Больше — лучше, но 1024 достаточно, и именно столько выдаёт ChatGPT |
 | **Размер персонажа** | ~80 % высоты холста | Поля сверху и снизу примерно равны |
 | **Положение** | Строго по центру, симметрично | Он появляется в семи местах разного размера; смещение в файле придётся компенсировать вручную в каждом |
 | **Ракурс** | Строго анфас, смотрит прямо | Он обращается к человеку |
@@ -112,7 +112,8 @@ public/images/anham-wink.png       — только для пути B, закр�
 > kind expression, reassuring and safe, not toy-like, not scary. Full body
 > visible including arms, nothing cropped. **Transparent background, no
 > background elements, no text, no speech bubble, no drop shadow, no outer
-> glow.** Square canvas, 1536×1536, subject fills about 80% of frame height.
+> glow.** Square canvas, highest available resolution, subject fills about
+> 80% of frame height.
 
 Для кадра моргания добавьте: `eyes fully closed, everything else identical`.
 Для подмигивания: `left eye closed, right eye open, everything else identical`.
