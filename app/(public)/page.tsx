@@ -140,7 +140,7 @@ export default async function HomePage() {
         <div className="home-promo__copy">
           <p className="home-promo__badge">{promo.badge}</p>
           <h2>{freeReview ? promo.titleFree : promo.titlePaid}</h2>
-          <Link className="home-button home-button--dark" href="/review">
+          <Link className="home-button home-button--gold" href="/review">
             {freeReview ? promo.ctaFree : promo.cta}
             <span aria-hidden="true">→</span>
           </Link>

@@ -4336,13 +4336,59 @@ code {
 
 .anham-companion {
   align-items: flex-end;
+  /* He wanders across the screen instead of sitting in one corner. The
+     movement is on `translate` rather than `transform`, so it composes
+     with the lift the figure takes on hover instead of cancelling it.
+     Every step of the path moves him left and up — into the screen,
+     never past its edges — so a fixed element can never widen the page.
+     He stops while he is greeting someone or while his chat is open:
+     nobody should have to chase a moving target to read or to close it. */
+  animation: anham-wander 96s ease-in-out infinite;
   bottom: clamp(14px, 3vw, 28px);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  /* Percentages, not 100vw: on a fixed element a percentage resolves
+     against the viewport without the scrollbar, so this cannot spill. */
+  max-width: calc(100% - 24px);
   position: fixed;
   right: clamp(14px, 3vw, 28px);
   z-index: 60;
+}
+
+/* Chat open: he holds still. Kept as its own rule — a selector list is
+   dropped whole if any part of it is unsupported, and :has() below must
+   not be able to take this with it. */
+.anham-companion.is-open {
+  animation: none;
+  translate: none;
+}
+
+/* Greeting open: likewise. */
+.anham-companion:has(.anham-companion__welcome) {
+  animation: none;
+  translate: none;
+}
+
+@keyframes anham-wander {
+  0% { translate: 0 0; }
+  9% { translate: -6vw -18vh; }
+  20% { translate: -46vw -12vh; }
+  31% { translate: -66vw -38vh; }
+  43% { translate: -28vw -56vh; }
+  54% { translate: -70vw -60vh; }
+  65% { translate: -72vw -22vh; }
+  76% { translate: -20vw -42vh; }
+  87% { translate: -50vw -8vh; }
+  100% { translate: 0 0; }
+}
+
+/* Someone who has asked their device for less motion gets none of this. */
+@media (prefers-reduced-motion: reduce) {
+  .anham-companion {
+    animation: none;
+    translate: none;
+  }
 }
 
 .anham-companion__figure {
@@ -4595,7 +4641,7 @@ code {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   padding: 1.1rem 1.2rem;
   position: relative;
-  width: min(320px, calc(100vw - 2rem));
+  width: min(320px, 100%);
 }
 
 .anham-companion__welcome-close {
@@ -4640,16 +4686,11 @@ code {
 @media (max-width: 560px) {
   .anham-companion {
     bottom: 12px;
-    /* Pinned on both sides rather than sized from 100vw: vw counts the
-       scrollbar, so the panel used to hang past the right edge on a
-       narrow window and widen the page. */
-    left: 12px;
     right: 12px;
   }
 
   .anham-companion__welcome {
-    max-width: 100%;
-    width: auto;
+    width: 100%;
   }
 
   .anham-companion__figure .anham {
@@ -9015,13 +9056,59 @@ code {
 
 .anham-companion {
   align-items: flex-end;
+  /* He wanders across the screen instead of sitting in one corner. The
+     movement is on `translate` rather than `transform`, so it composes
+     with the lift the figure takes on hover instead of cancelling it.
+     Every step of the path moves him left and up — into the screen,
+     never past its edges — so a fixed element can never widen the page.
+     He stops while he is greeting someone or while his chat is open:
+     nobody should have to chase a moving target to read or to close it. */
+  animation: anham-wander 96s ease-in-out infinite;
   bottom: clamp(14px, 3vw, 28px);
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
+  /* Percentages, not 100vw: on a fixed element a percentage resolves
+     against the viewport without the scrollbar, so this cannot spill. */
+  max-width: calc(100% - 24px);
   position: fixed;
   right: clamp(14px, 3vw, 28px);
   z-index: 60;
+}
+
+/* Chat open: he holds still. Kept as its own rule — a selector list is
+   dropped whole if any part of it is unsupported, and :has() below must
+   not be able to take this with it. */
+.anham-companion.is-open {
+  animation: none;
+  translate: none;
+}
+
+/* Greeting open: likewise. */
+.anham-companion:has(.anham-companion__welcome) {
+  animation: none;
+  translate: none;
+}
+
+@keyframes anham-wander {
+  0% { translate: 0 0; }
+  9% { translate: -6vw -18vh; }
+  20% { translate: -46vw -12vh; }
+  31% { translate: -66vw -38vh; }
+  43% { translate: -28vw -56vh; }
+  54% { translate: -70vw -60vh; }
+  65% { translate: -72vw -22vh; }
+  76% { translate: -20vw -42vh; }
+  87% { translate: -50vw -8vh; }
+  100% { translate: 0 0; }
+}
+
+/* Someone who has asked their device for less motion gets none of this. */
+@media (prefers-reduced-motion: reduce) {
+  .anham-companion {
+    animation: none;
+    translate: none;
+  }
 }
 
 .anham-companion__figure {
@@ -9274,7 +9361,7 @@ code {
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   padding: 1.1rem 1.2rem;
   position: relative;
-  width: min(320px, calc(100vw - 2rem));
+  width: min(320px, 100%);
 }
 
 .anham-companion__welcome-close {
@@ -9319,16 +9406,11 @@ code {
 @media (max-width: 560px) {
   .anham-companion {
     bottom: 12px;
-    /* Pinned on both sides rather than sized from 100vw: vw counts the
-       scrollbar, so the panel used to hang past the right edge on a
-       narrow window and widen the page. */
-    left: 12px;
     right: 12px;
   }
 
   .anham-companion__welcome {
-    max-width: 100%;
-    width: auto;
+    width: 100%;
   }
 
   .anham-companion__figure .anham {
