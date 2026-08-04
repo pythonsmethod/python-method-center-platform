@@ -134,14 +134,8 @@
   position: relative;
 }
 
-/* Professor Python stands in the light gate; his own photograph, warm
-   graded and faded into the page rather than cut out against it. */
-.home-hero__professor {
-  height: auto;
-  max-width: 100%;
-  position: relative;
-  width: min(360px, 100%);
-}
+/* .home-hero__professor is gone with the hero portrait. The photograph
+   lives on the "Professor Python" card below, once. */
 
 /* The light gate: the center's sign, built from gradients rather than
    from a photograph. Nothing here needs an asset, so nothing here can
@@ -184,15 +178,17 @@
 /* No ankh inside the gate: at that size it reads as a cross standing
    behind the founder's photograph, which is not the symbol this is. The
    rings and the light carry the gate on their own. */
-/* Анхам stands beside him, slightly forward, with his greeting above. */
+/* Анхам stands in the light gate, with his greeting above him. He used to
+   sit off to the bottom-right of the founder's photograph; with the
+   photograph gone he is the centre of the composition rather than an
+   attachment to it. */
 .home-hero__anham {
-  bottom: 0;
+  align-items: center;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  position: absolute;
-  right: 0;
-  width: min(210px, 46%);
+  gap: 0.9rem;
+  position: relative;
+  width: min(300px, 82%);
 }
 
 .home-bubble {
@@ -207,13 +203,16 @@
   position: relative;
 }
 
+/* The tail points at Анхам. He stands centred under the bubble now, so a
+   tail pinned to the left edge would point at nothing. */
 .home-bubble::after {
   border: 8px solid transparent;
   border-top-color: var(--surface);
   content: "";
-  left: 2rem;
+  left: 50%;
   position: absolute;
   top: 100%;
+  transform: translateX(-50%);
 }
 
 /* ---------- two figures ---------- */
@@ -561,14 +560,13 @@
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* The art follows the words on a phone rather than leading with a face. */
+  /* The art follows the words on a phone. */
   .home-hero__art {
     order: 2;
   }
 
   .home-hero__anham {
-    position: static;
-    width: min(180px, 60%);
+    width: min(240px, 74%);
   }
 
   .home-promo__terms {

@@ -87,17 +87,14 @@ export default async function HomePage() {
             <span className="home-hero__gate-ring" />
             <span className="home-hero__gate-ring" />
           </div>
-          <Image
-            alt="Professor Python"
-            className="home-hero__professor"
-            height={717}
-            priority
-            src={PROFESSOR_IMAGE}
-            width={690}
-          />
+          {/* No portrait here. The same photograph stood in the hero and
+              again on the card below, and one picture twice on one screen
+              reads as a mistake. Professor Python keeps the card; the gate
+              belongs to Анхам, who is the thing a visitor can actually use
+              from this screen. */}
           <div className="home-hero__anham">
             <p className="home-bubble">{t.heroBubble}</p>
-            <AnhamAvatar size={150} state={tier} title={anhamName} />
+            <AnhamAvatar size={200} state={tier} title={anhamName} />
           </div>
         </div>
       </section>
