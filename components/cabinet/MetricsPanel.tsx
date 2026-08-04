@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import { useActionState, useMemo, useState } from "react";
 import {
   addMetricEntry,
@@ -17,6 +19,7 @@ export type MetricRow = {
 };
 
 type MetricsPanelProps = {
+  labels: Dictionary["cabinet"]["metrics"];
   rows: MetricRow[];
 };
 
@@ -32,7 +35,7 @@ function formatDate(iso: string): string {
 // The person's numbers, drawn as a line through time. Every point is a
 // value they typed in themselves — the platform never invents data, so an
 // empty chart stays honestly empty until the first entry.
-export function MetricsPanel({ rows }: MetricsPanelProps) {
+export function MetricsPanel({ rows, labels: t }: MetricsPanelProps) {
   const metricNames = useMemo(
     () => [...new Set(rows.map((row) => row.metric_name))].sort(),
     [rows]
@@ -75,7 +78,7 @@ export function MetricsPanel({ rows }: MetricsPanelProps) {
   return (
     <>
       {metricNames.length > 0 ? (
-        <div className="metrics-tabs" role="tablist" aria-label="Показатели">
+        <div className="metrics-tabs" role="tablist" aria-label={t.tabsAria}>
           {metricNames.map((name) => (
             <button
               aria-selected={name === activeMetric}
@@ -110,13 +113,13 @@ export function MetricsPanel({ rows }: MetricsPanelProps) {
                 className={`metrics-delta${delta < 0 ? " metrics-delta--down" : delta > 0 ? " metrics-delta--up" : ""}`}
               >
                 {delta > 0 ? `+${delta}` : `${delta}`}
-                {unit ? ` ${unit}` : ""} с {formatDate(geometry.firstDate)}
+                {unit ? ` ${unit}` : ""} {t.since} {formatDate(geometry.firstDate)}
               </span>
             ) : null}
           </div>
 
           <svg
-            aria-label={`График «${activeMetric}»`}
+            aria-label={`${t.chartAria} — ${activeMetric}`}
             className="metrics-chart"
             preserveAspectRatio="none"
             role="img"
@@ -184,7 +187,7 @@ export function MetricsPanel({ rows }: MetricsPanelProps) {
                   <form action={deleteAction}>
                     <input name="entry_id" type="hidden" value={row.id} />
                     <button
-                      aria-label="Удалить запись"
+                      aria-label={t.deleteEntry}
                       className="metrics-entries__delete"
                       type="submit"
                     >
@@ -197,36 +200,33 @@ export function MetricsPanel({ rows }: MetricsPanelProps) {
         </section>
       ) : (
         <div className="cab-note">
-          <strong>Пока пусто — и это честно</strong>
+          <strong>{t.emptyTitle}</strong>
           <span>
-            График строится только из настоящих цифр, которые вы вносите из
-            своих анализов. Добавьте первый показатель ниже — со второго
-            появится линия динамики.
+            {t.emptyText}
           </span>
         </div>
       )}
 
-      <section className="panel" aria-label="Добавить показатель">
-        <span className="panel__label">Новая запись</span>
-        <h2>Внести показатель из анализа</h2>
+      <section className="panel" aria-label={t.addAria}>
+        <span className="panel__label">{t.addLabel}</span>
+        <h2>{t.addTitle}</h2>
         <p>
-          Название — как в бланке («Гемоглобин», «Ферритин», «Витамин D»),
-          значение и дата сдачи. Одинаковые названия соберутся в один график.
+          {t.addText}
         </p>
         <form action={addAction} className="onboarding-form metrics-form">
           <div className="metrics-form__row">
             <label className="field">
-              <span>Показатель</span>
+              <span>{t.fieldName}</span>
               <input
                 maxLength={80}
                 name="metric_name"
-                placeholder="Гемоглобин"
+                placeholder={t.namePlaceholder}
                 required
                 type="text"
               />
             </label>
             <label className="field">
-              <span>Значение</span>
+              <span>{t.fieldValue}</span>
               <input
                 inputMode="decimal"
                 name="value"
@@ -236,16 +236,16 @@ export function MetricsPanel({ rows }: MetricsPanelProps) {
               />
             </label>
             <label className="field">
-              <span>Единицы</span>
-              <input maxLength={30} name="unit" placeholder="г/л" type="text" />
+              <span>{t.fieldUnit}</span>
+              <input maxLength={30} name="unit" placeholder={t.unitPlaceholder} type="text" />
             </label>
             <label className="field">
-              <span>Дата сдачи</span>
+              <span>{t.fieldDate}</span>
               <input name="measured_at" required type="date" />
             </label>
           </div>
           <button className="button" disabled={addPending} type="submit">
-            {addPending ? "Сохраняю…" : "Добавить на график"}
+            {addPending ? t.saving : t.addCta}
           </button>
           {addState.message ? (
             <p

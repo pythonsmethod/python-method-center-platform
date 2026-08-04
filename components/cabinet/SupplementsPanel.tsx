@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import { useActionState, useEffect, useMemo, useState } from "react";
 import {
   addSupplement,
@@ -18,6 +20,7 @@ import {
 import type { IntakeRecord } from "@/lib/supplements/queries";
 
 type SupplementsPanelProps = {
+  labels: Dictionary["cabinet"]["supplements"];
   supplements: SupplementRow[];
   intakes: IntakeRecord[];
   serverToday: string; // ISO date, server clock — corrected on mount
@@ -38,6 +41,7 @@ function localClock(): { today: string; now: string } {
 // mount the browser's local date and time take over, so "today" is the
 // day the person is actually living.
 export function SupplementsPanel({
+  labels: t,
   supplements,
   intakes,
   serverToday,
@@ -92,16 +96,16 @@ export function SupplementsPanel({
   return (
     <>
       {schedule.length > 0 ? (
-        <section className="panel supplements-today" aria-label="Приём сегодня">
+        <section className="panel supplements-today" aria-label={t.todayAria}>
           <div className="supplements-today__head">
             <div>
-              <span className="panel__label">Сегодня</span>
+              <span className="panel__label">{t.todayLabel}</span>
               <h2>
                 {due > 0
-                  ? `Пора принять: ${due}`
+                  ? `${t.duePrefix} ${due}`
                   : takenCount === schedule.length
-                    ? "Всё принято — отличный день"
-                    : "Пока всё по расписанию"}
+                    ? t.allTaken
+                    : t.onSchedule}
               </h2>
             </div>
             <span className="supplements-today__score">
@@ -138,33 +142,30 @@ export function SupplementsPanel({
             ))}
           </ul>
           <p className="supplements-today__hint">
-            Нажмите на строку, когда приняли, — отметка сохранится. Нажали по
-            ошибке — нажмите ещё раз.
+            {t.tapHint}
           </p>
         </section>
       ) : (
         <div className="cab-note">
-          <strong>Расписания пока нет</strong>
+          <strong>{t.emptyTitle}</strong>
           <span>
-            Добавьте первую добавку ниже — и здесь появится ваш ежедневный
-            чек-лист с напоминанием, что пора принять.
+            {t.emptyText}
           </span>
         </div>
       )}
 
       {supplements.length > 0 ? (
-        <section className="panel" aria-label="Совет по времени приёма">
-          <span className="panel__label">ИИ-помощник</span>
-          <h2>Удачно ли выбрано время?</h2>
+        <section className="panel" aria-label={t.adviceAria}>
+          <span className="panel__label">{t.adviceLabel}</span>
+          <h2>{t.adviceTitle}</h2>
           <p>
-            ИИ смотрит только на <strong>время</strong> приёма вашего списка:
-            что лучше утром, что вечером, что разнести между собой. Что
-            принимать и в какой дозе — решаете вы со своим специалистом; ИИ
-            в это не вмешивается.
+            {t.adviceTextPrefix}
+            <strong>{t.adviceTextBold}</strong>
+            {t.adviceTextRest}
           </p>
           <form action={adviceAction}>
             <button className="button button--secondary" disabled={advicePending} type="submit">
-              {advicePending ? "Смотрю расписание…" : "Спросить про время приёма"}
+              {advicePending ? t.advicePending : t.adviceCta}
             </button>
           </form>
           {adviceState.status === "success" && adviceState.advice ? (
@@ -183,9 +184,9 @@ export function SupplementsPanel({
       ) : null}
 
       {supplements.length > 0 ? (
-        <section className="panel" aria-label="Мои добавки">
-          <span className="panel__label">Мой список</span>
-          <h2>Добавки и время приёма</h2>
+        <section className="panel" aria-label={t.listAria}>
+          <span className="panel__label">{t.listLabel}</span>
+          <h2>{t.listTitle}</h2>
           <ul className="supplements-list">
             {supplements.map((supplement) => (
               <li key={supplement.id}>
@@ -204,7 +205,7 @@ export function SupplementsPanel({
                     value={supplement.id}
                   />
                   <button
-                    aria-label={`Удалить «${supplement.name}»`}
+                    aria-label={`${t.remove} — ${supplement.name}`}
                     className="metrics-entries__delete"
                     type="submit"
                   >
@@ -217,38 +218,37 @@ export function SupplementsPanel({
         </section>
       ) : null}
 
-      <section className="panel" aria-label="Добавить добавку">
-        <span className="panel__label">Новая добавка</span>
-        <h2>Добавить в расписание</h2>
+      <section className="panel" aria-label={t.addAria}>
+        <span className="panel__label">{t.addLabel}</span>
+        <h2>{t.addTitle}</h2>
         <p>
-          Название, при желании дозировка — и время, когда вам удобно
-          принимать. Каждое время станет отдельной строкой в чек-листе.
+          {t.addText}
         </p>
         <form action={addAction} className="onboarding-form supplements-form">
           <div className="metrics-form__row">
             <label className="field">
-              <span>Название</span>
+              <span>{t.fieldName}</span>
               <input
                 maxLength={120}
                 name="name"
-                placeholder="Магний"
+                placeholder={t.namePlaceholder}
                 required
                 type="text"
               />
             </label>
             <label className="field">
-              <span>Дозировка (не обязательно)</span>
+              <span>{t.fieldDose}</span>
               <input
                 maxLength={120}
                 name="dose"
-                placeholder="400 мг"
+                placeholder={t.dosePlaceholder}
                 type="text"
               />
             </label>
           </div>
 
           <div className="supplements-form__times">
-            <span className="field-caption">Время приёма</span>
+            <span className="field-caption">{t.timesLabel}</span>
             {timeFields.map((time, index) => (
               <div className="supplements-form__time" key={index}>
                 <input
@@ -266,7 +266,7 @@ export function SupplementsPanel({
                 />
                 {timeFields.length > 1 ? (
                   <button
-                    aria-label="Убрать это время"
+                    aria-label={t.removeTime}
                     className="metrics-entries__delete"
                     onClick={() =>
                       setTimeFields((fields) =>
@@ -286,23 +286,23 @@ export function SupplementsPanel({
                 onClick={() => setTimeFields((fields) => [...fields, "20:00"])}
                 type="button"
               >
-                + ещё время
+                {t.addTime}
               </button>
             ) : null}
           </div>
 
           <label className="field">
-            <span>Заметка (не обязательно)</span>
+            <span>{t.fieldNote}</span>
             <input
               maxLength={300}
               name="notes"
-              placeholder="После еды, запить водой"
+              placeholder={t.notePlaceholder}
               type="text"
             />
           </label>
 
           <button className="button" disabled={addPending} type="submit">
-            {addPending ? "Сохраняю…" : "Добавить в расписание"}
+            {addPending ? t.saving : t.addCta}
           </button>
           {addState.message ? (
             <p

@@ -1,5 +1,7 @@
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { SupplementsPanel } from "@/components/cabinet/SupplementsPanel";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getSupplementsWithToday } from "@/lib/supplements/queries";
@@ -10,13 +12,15 @@ export const dynamic = "force-dynamic";
 // when; the cabinet turns it into a daily checklist with a gentle nudge.
 // The AI comments only on timing — never on what or how much.
 export default async function CabinetSupplementsPage() {
+  const dict = getDictionary(await getLocale()).cabinet;
+  const t = dict.supplements;
   const auth = await getRequiredUser("/cabinet/supplements");
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
-        <PageHeader eyebrow="Добавки" title="Мои добавки" />
-        <AuthSetupNotice title="Раздел требует настройки Supabase Auth" />
+        <PageHeader eyebrow={t.eyebrow} title={t.title} />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -29,13 +33,14 @@ export default async function CabinetSupplementsPage() {
   return (
     <>
       <PageHeader
-        eyebrow="Добавки"
-        title="Мои добавки"
-        description="Ежедневный чек-лист приёма: вы решаете, что и когда пить, кабинет напоминает и хранит отметки. Бесплатно для всех, у кого есть аккаунт."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       {result.status === "ready" ? (
         <SupplementsPanel
+          labels={t}
           intakes={result.intakes}
           serverNow={serverNow}
           serverToday={serverToday}
@@ -43,8 +48,8 @@ export default async function CabinetSupplementsPage() {
         />
       ) : (
         <div className="cab-note">
-          <strong>Раздел временно недоступен</strong>
-          <span>Попробуйте обновить страницу чуть позже.</span>
+          <strong>{t.errorTitle}</strong>
+          <span>{t.errorText}</span>
         </div>
       )}
     </>
