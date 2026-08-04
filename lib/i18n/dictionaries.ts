@@ -75,15 +75,13 @@ const ru = {
     docHeading: "Оферта, версия",
     docText:
       "Ознакомьтесь с полным текстом оферты до отправки анкеты и оплаты услуг. Отправляя анкету, вы подтверждаете принятие условий этой редакции документа.",
-    openPdf: "Открыть оферту (PDF)",
+    openOriginal: "Открыть оригинал (PDF, рус.)",
+    questionsPrefix: "Если что-то в условиях непонятно — ",
+    questionsLink: "напишите нам до оплаты",
     viewLabel: "Просмотр документа",
     pdfAlt: "Текст публичной оферты",
     pdfFallback:
       "Встроенный просмотр PDF недоступен в этом браузере — используйте кнопку «Открыть оферту (PDF)» выше.",
-    languageNoticeLabel: "Язык документа",
-    languageNotice:
-      "Текст оферты доступен на русском языке. Английский перевод готовится. Если что-то в условиях непонятно, напишите нам — мы разъясним до того, как вы что-либо примете.",
-    languageNoticeCta: "Задать вопрос по условиям"
   },
   meta: {
     title: "Python Method — сопровождение восстановления",
@@ -548,15 +546,13 @@ const en: typeof ru = {
     docHeading: "Offer, version",
     docText:
       "Please read the full text of the offer before submitting the questionnaire and before paying. Submitting the questionnaire confirms that you accept the terms of this edition.",
-    openPdf: "Open the offer (PDF)",
+    openOriginal: "Open the Russian original (PDF)",
+    questionsPrefix: "If anything in the terms is unclear, ",
+    questionsLink: "write to us before you pay",
     viewLabel: "Document viewer",
     pdfAlt: "Text of the public offer",
     pdfFallback:
       "This browser cannot display the PDF inline — use the \u00abOpen the offer (PDF)\u00bb button above.",
-    languageNoticeLabel: "Document language",
-    languageNotice:
-      "This offer is currently available in Russian only. An English translation is being prepared. The Russian text is the binding one — if anything in the terms is unclear, write to us and we will explain it before you accept anything.",
-    languageNoticeCta: "Ask about the terms"
   },
   meta: {
     title: "Python Method — recovery support",

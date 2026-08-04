@@ -9249,3 +9249,65 @@ code {
   height: 1.1em;
   width: auto;
 }
+
+/* The offer set as a document rather than a panel: a long legal text needs
+   a comfortable measure and clear hierarchy, not card styling. */
+.offer-doc {
+  color: var(--text);
+  margin: 0 auto;
+  max-width: 46rem;
+}
+
+.offer-doc__note {
+  background: var(--surface-muted);
+  border: 1px solid var(--accent);
+  border-radius: 12px;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  margin: 0 0 2.5rem;
+  padding: 1rem 1.2rem;
+}
+
+.offer-doc__title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 3vw, 2rem);
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-align: center;
+}
+
+.offer-doc__subtitle {
+  color: var(--accent);
+  margin: 0.4rem 0 2.5rem;
+  text-align: center;
+}
+
+.offer-doc h3 {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  margin: 2rem 0 0.6rem;
+}
+
+.offer-doc p,
+.offer-doc li {
+  color: var(--muted);
+  line-height: 1.7;
+  margin: 0 0 0.9rem;
+}
+
+.offer-doc ul {
+  margin: 0 0 0.9rem;
+  padding-left: 1.2rem;
+}
+
+.offer-doc__footer {
+  border-top: 1px solid var(--line);
+  font-size: 0.85rem;
+  margin-top: 2rem;
+  padding-top: 1rem;
+}
+
+.offer-doc__ask {
+  margin-top: 2rem;
+}

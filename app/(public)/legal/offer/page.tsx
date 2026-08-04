@@ -4,10 +4,14 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import {
-  getOfferDocumentUrl,
-  isOfferInLocale,
-  OFFER_VERSION
-} from "@/lib/legal/offer";
+  OFFER_EN_FOOTER,
+  OFFER_EN_SECTIONS,
+  OFFER_EN_SUBTITLE,
+  OFFER_EN_TITLE,
+  OFFER_EN_TRADEMARK_NOTE,
+  OFFER_EN_TRANSLATION_NOTE
+} from "@/lib/legal/offer-en";
+import { OFFER_DOCUMENT_URL, OFFER_VERSION } from "@/lib/legal/offer";
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).offer;
@@ -18,8 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function OfferPage() {
   const locale = await getLocale();
   const t = getDictionary(locale).offer;
-  const documentUrl = getOfferDocumentUrl(locale);
-  const inOwnLanguage = isOfferInLocale(locale);
+  const isEnglish = locale === "en";
 
   return (
     <div className="page-shell">
@@ -28,22 +31,6 @@ export default async function OfferPage() {
         title={t.title}
         description={t.description}
       />
-
-      {/* Said before the document, not after it. Someone about to accept a
-          contract has to know first that it is not in their language. */}
-      {inOwnLanguage ? null : (
-        <section aria-label={t.languageNoticeLabel} className="panel-grid">
-          <div className="panel panel--notice">
-            <span className="panel__label">{t.languageNoticeLabel}</span>
-            <p>{t.languageNotice}</p>
-            <div className="panel-actions">
-              <Link className="button button--secondary" href="/support">
-                {t.languageNoticeCta}
-              </Link>
-            </div>
-          </div>
-        </section>
-      )}
 
       <section className="panel-grid">
         <div className="panel">
@@ -55,31 +42,67 @@ export default async function OfferPage() {
           <div className="panel-actions">
             <a
               className="button"
-              href={documentUrl}
+              href={OFFER_DOCUMENT_URL}
               rel="noreferrer"
               target="_blank"
             >
-              {t.openPdf}
+              {t.openOriginal}
             </a>
           </div>
         </div>
       </section>
 
-      <section className="panel-grid" aria-label={t.viewLabel}>
-        <object
-          aria-label={t.pdfAlt}
-          data={documentUrl}
-          style={{
-            border: "1px solid var(--line)",
-            borderRadius: "12px",
-            minHeight: "70vh",
-            width: "100%"
-          }}
-          type="application/pdf"
-        >
-          <p className="empty-state">{t.pdfFallback}</p>
-        </object>
-      </section>
+      {isEnglish ? (
+        // The English text is set as a page rather than a second PDF: it
+        // stays readable on a phone, a screen reader can read it, and every
+        // future change to a contract shows up in a diff.
+        <article className="offer-doc">
+          <p className="offer-doc__note">{OFFER_EN_TRANSLATION_NOTE}</p>
+
+          <h2 className="offer-doc__title">{OFFER_EN_TITLE}</h2>
+          <p className="offer-doc__subtitle">{OFFER_EN_SUBTITLE}</p>
+
+          {OFFER_EN_SECTIONS.map((section) => (
+            <section key={section.heading}>
+              <h3>{section.heading}</h3>
+              {section.paragraphs?.map((text) => (
+                <p key={text.slice(0, 40)}>{text}</p>
+              ))}
+              {section.bullets ? (
+                <ul>
+                  {section.bullets.map((item) => (
+                    <li key={item.slice(0, 40)}>{item}</li>
+                  ))}
+                </ul>
+              ) : null}
+            </section>
+          ))}
+
+          <p className="offer-doc__footer">{OFFER_EN_FOOTER}</p>
+          <p className="offer-doc__footer">{OFFER_EN_TRADEMARK_NOTE}</p>
+
+          <p className="offer-doc__ask">
+            {t.questionsPrefix}
+            <Link href="/support">{t.questionsLink}</Link>.
+          </p>
+        </article>
+      ) : (
+        <section className="panel-grid" aria-label={t.viewLabel}>
+          <object
+            aria-label={t.pdfAlt}
+            data={OFFER_DOCUMENT_URL}
+            style={{
+              border: "1px solid var(--line)",
+              borderRadius: "12px",
+              minHeight: "70vh",
+              width: "100%"
+            }}
+            type="application/pdf"
+          >
+            <p className="empty-state">{t.pdfFallback}</p>
+          </object>
+        </section>
+      )}
     </div>
   );
 }

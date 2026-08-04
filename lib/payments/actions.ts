@@ -1,6 +1,10 @@
 "use server";
 
-import { getOfferDocumentLocale, OFFER_VERSION } from "@/lib/legal/offer";
+import {
+  getOfferDocumentLocale,
+  OFFER_BINDING_LOCALE,
+  OFFER_VERSION
+} from "@/lib/legal/offer";
 import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -62,6 +66,7 @@ export async function recordPaymentOfferAcceptance(
       metadata: {
         product,
         offer_document_locale: getOfferDocumentLocale(uiLocale),
+        offer_binding_locale: OFFER_BINDING_LOCALE,
         ui_locale: uiLocale
       }
     });

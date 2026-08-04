@@ -11,7 +11,11 @@ import {
   type LifecycleEventInput
 } from "@/lib/cases/lifecycle";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
-import { getOfferDocumentLocale, OFFER_VERSION } from "@/lib/legal/offer";
+import {
+  getOfferDocumentLocale,
+  OFFER_BINDING_LOCALE,
+  OFFER_VERSION
+} from "@/lib/legal/offer";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
@@ -170,6 +174,7 @@ export async function submitOnboarding(
     offer_accepted: true,
     offer_version: OFFER_VERSION,
     offer_document_locale: offerLocale,
+        offer_binding_locale: OFFER_BINDING_LOCALE,
     ui_locale: uiLocale,
     consent_accepted: true,
     submitted_at: submittedAt
@@ -204,6 +209,7 @@ export async function submitOnboarding(
         metadata: {
           onboarding_submission_id: onboardingSubmission.id,
           offer_document_locale: offerLocale,
+        offer_binding_locale: OFFER_BINDING_LOCALE,
           ui_locale: uiLocale
         }
       },
@@ -262,6 +268,7 @@ export async function submitOnboarding(
         consent_type: "offer_acceptance",
         consent_version: OFFER_VERSION,
         offer_document_locale: offerLocale,
+        offer_binding_locale: OFFER_BINDING_LOCALE,
         ui_locale: uiLocale
       }
     },
