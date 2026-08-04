@@ -81,7 +81,23 @@ const ru = {
         title: "Разбор и сопровождение",
         text: "После выбранного тарифа вы получаете разбор кейса и начинаете сопровождение."
       }
-    ]
+    ],
+    freeTools: {
+      badge: "Бесплатно для всех, у кого есть аккаунт",
+      title: "Два инструмента — сразу после регистрации",
+      lead: "Это не тариф и не акция. Просто создайте аккаунт — и оба инструмента останутся с вами бесплатно.",
+      items: [
+        {
+          title: "Динамика показателей",
+          text: "Вносите цифры из анализов — и смотрите на живом графике, что было полгода назад и что стало сейчас. Только ваши настоящие цифры, ничего придуманного."
+        },
+        {
+          title: "Мои добавки",
+          text: "Запишите, что и когда вы решили принимать, — кабинет соберёт дневной чек-лист и напомнит, что пора. ИИ подскажет удачное время приёма: что утром, что вечером, что разнести."
+        }
+      ],
+      cta: "Создать аккаунт и пользоваться"
+    }
   },
   promo: {
     badge: "🎁 Акция для первых клиентов",
@@ -163,11 +179,11 @@ const ru = {
     unavailable: "Тестовая оплата сейчас отключена"
   },
   widget: {
-    toggleOpen: "☥ Спросить ИИ-помощника",
+    toggleOpen: "Открыть Anham",
     toggleClose: "✕",
-    header: "☥ Помощник центра",
+    header: "Anham · Ваш спутник",
     intro:
-      "Здравствуйте! Я ИИ-помощник Python Method Center. Расскажу, как устроено сопровождение, и помогу сделать первый шаг. Помощник не даёт медицинских рекомендаций и не заменяет врача.",
+      "Здравствуйте! Я Anham, ваш спутник на платформе Python Method Center. Расскажу, как устроено сопровождение, и помогу сделать первый шаг. Я не даю медицинских рекомендаций и не заменяю врача.",
     suggestions: [
       "Как проходит сопровождение?",
       "С чего мне начать?",
@@ -177,9 +193,9 @@ const ru = {
     // helper — personal after sign-up, case-aware after payment.
     tiers: {
       registered: {
-        header: "☥ Ваш личный помощник",
+        header: "Anham · Ваш личный спутник",
         intro:
-          "Здравствуйте! Я ваш личный помощник в кабинете. Вижу, на каком шаге вы сейчас, подскажу, чего не хватает и что будет дальше. Медицинские вопросы — к Professor Python, он отвечает лично.",
+          "Здравствуйте! Я Anham, ваш личный спутник в кабинете. Вижу, на каком шаге вы сейчас, подскажу, чего не хватает и что будет дальше. Медицинские вопросы — к Professor Python, он отвечает лично.",
         suggestions: [
           "Что мне сделать дальше?",
           "На каком этапе мой кейс?",
@@ -187,9 +203,9 @@ const ru = {
         ]
       },
       client: {
-        header: "☥ Ваш персональный ИИ",
+        header: "Anham · Рядом с вашим кейсом",
         intro:
-          "Здравствуйте! Я ваш персональный ИИ: знаю вашу анкету, статус кейса, список загруженных документов и сроки сопровождения. Фото и PDF анализов можно приложить скрепкой прямо сюда — я выпишу показатели, помогу собрать всё для Professor Python и составить ему точные вопросы. Сам разбор анализов и выводы о состоянии даёт только Professor Python, лично.",
+          "Здравствуйте! Я Anham и сопровождаю ваш кейс: знаю вашу анкету, его статус, список загруженных документов и сроки сопровождения. Фото и PDF анализов можно приложить скрепкой прямо сюда — я выпишу показатели, помогу собрать всё для Professor Python и составить ему точные вопросы. Сам разбор анализов и выводы о состоянии даёт только Professor Python, лично.",
         suggestions: [
           "Что сейчас происходит с моим кейсом?",
           "Подготовь мои анализы к разбору Professor Python",
@@ -201,10 +217,10 @@ const ru = {
     welcomeTitle:
       "☥ Привет! Добро пожаловать на платформу Python Method — «Реабилитация без границ».",
     welcomeText:
-      "Я ИИ-помощник центра и рад вас приветствовать. Вы можете изучать сайт самостоятельно — или перейти в общение со мной, и я проведу вас, отвечая на все вопросы.",
+      "Я Anham, ваш спутник на платформе. Вы можете изучать сайт самостоятельно — или перейти в общение со мной, и я проведу вас, отвечая на вопросы.",
     welcomeExplore: "Изучать сайт самостоятельно",
     welcomeChat: "Общаться со мной — проведу вас",
-    welcomeNote: "Я всегда рядом — кнопка «☥ Спросить ИИ-помощника» внизу экрана.",
+    welcomeNote: "Я всегда рядом — откройте Anham внизу экрана.",
     send: "Отправить",
     sending: "Печатает…",
     placeholder: "Напишите сообщение…",
@@ -397,16 +413,32 @@ const en: typeof ru = {
         title: "Review and support",
         text: "Once your plan is chosen you receive the case review and the support program begins."
       }
-    ]
+    ],
+    freeTools: {
+      badge: "Free for everyone with an account",
+      title: "Two tools — right after sign-up",
+      lead: "Not a plan and not a promotion. Simply create an account — and both tools stay with you for free.",
+      items: [
+        {
+          title: "Progress chart",
+          text: "Enter the numbers from your test results — and see on a live chart what they were half a year ago and what they are now. Only your real numbers, nothing invented."
+        },
+        {
+          title: "My supplements",
+          text: "Write down what you decided to take and when — the cabinet builds a daily checklist and reminds you when it's time. The AI suggests good timing: what in the morning, what in the evening, what to space apart."
+        }
+      ],
+      cta: "Create an account and use them"
+    }
   },
   promo: {
     badge: "🎁 Early clients offer",
-    titleFree: "Free analyses review by Karen",
+    titleFree: "Free analyses review by Professor Python",
     textFree:
-      "Create an account, fill in the questionnaire and upload your test results — Karen will personally review them and give you feedback on your condition and recovery recommendations. The answer arrives as a file in your personal cabinet — within three working days, followed by three days of open chat for questions. Free right now, for the platform's first clients.",
-    titlePaid: "Analyses review by Karen",
+      "Create an account, fill in the questionnaire and upload your test results — Professor Python will personally review them and give you feedback on your condition and recovery recommendations. The answer arrives as a file in your personal cabinet — within three working days, followed by three days of open chat for questions. Free right now, for the platform's first clients.",
+    titlePaid: "Analyses review by Professor Python",
     textPaid:
-      "A personal review of your test results by Karen without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
+      "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
     pricePaid: "One-time service — price",
     priceFree: "Free · later this service will cost",
     priceAmount: "$1,000",
@@ -476,11 +508,11 @@ const en: typeof ru = {
     unavailable: "Test payment is currently switched off"
   },
   widget: {
-    toggleOpen: "☥ Ask the AI assistant",
+    toggleOpen: "Open Anham",
     toggleClose: "✕",
-    header: "☥ Center assistant",
+    header: "Anham · Your companion",
     intro:
-      "Hello! I am the AI assistant of Python Method Center. I can explain how the support program works and help you take the first step. I do not give medical advice and do not replace a doctor.",
+      "Hello! I am Anham, your companion on the Python Method Center platform. I can explain how the support program works and help you take the first step. I do not give medical advice and do not replace a doctor.",
     suggestions: [
       "How does the support program work?",
       "Where do I start?",
@@ -488,9 +520,9 @@ const en: typeof ru = {
     ],
     tiers: {
       registered: {
-        header: "☥ Your personal assistant",
+        header: "Anham · Your personal companion",
         intro:
-          "Hello! I am your personal assistant inside the cabinet. I can see where you are right now, what is missing and what comes next. Medical questions go to Professor Python — he answers personally.",
+          "Hello! I am Anham, your personal companion inside the cabinet. I can see where you are right now, what is missing and what comes next. Medical questions go to Professor Python — he answers personally.",
         suggestions: [
           "What should I do next?",
           "What stage is my case at?",
@@ -498,9 +530,9 @@ const en: typeof ru = {
         ]
       },
       client: {
-        header: "☥ Your personal AI",
+        header: "Anham · Beside your case",
         intro:
-          "Hello! I am your personal AI: I know your questionnaire, your case status, the list of uploaded documents and your support period. You can attach photos and PDFs of test results right here with the paperclip — I will transcribe the values, help gather everything for Professor Python and shape precise questions for him. The review itself and any conclusions about your condition come only from Professor Python, personally.",
+          "Hello! I am Anham and I accompany your case: I know your questionnaire, its status, the list of uploaded documents and your support period. You can attach photos and PDFs of test results right here with the paperclip — I will transcribe the values, help gather everything for Professor Python and shape precise questions for him. The review itself and any conclusions about your condition come only from Professor Python, personally.",
         suggestions: [
           "What is happening with my case now?",
           "Prepare my test results for Professor Python's review",
@@ -512,10 +544,10 @@ const en: typeof ru = {
     welcomeTitle:
       "☥ Hello! Welcome to the Python Method platform — “Rehabilitation Without Borders”.",
     welcomeText:
-      "I am the center's AI assistant and I'm glad to greet you. You can explore the site on your own — or talk to me, and I will guide you and answer all your questions.",
+      "I am Anham, your platform companion. You can explore the site on your own — or talk to me, and I will guide you and answer your questions.",
     welcomeExplore: "Explore the site on my own",
     welcomeChat: "Talk to me — I'll guide you",
-    welcomeNote: "I'm always nearby — the “☥ Ask the AI assistant” button at the bottom of the screen.",
+    welcomeNote: "I am always nearby — open Anham at the bottom of the screen.",
     send: "Send",
     sending: "Typing…",
     placeholder: "Write a message…",
@@ -551,11 +583,11 @@ const en: typeof ru = {
     feeNote: "A 5% service fee is added to each plan.",
     plan5Title: "Support — 5 weeks",
     plan5Desc:
-      "Case review, plan and team support for 5 weeks. As a gift, Karen sends his formula — 200 capsules; you only pay for delivery ($180).",
+      "Case review, plan and team support for 5 weeks. As a gift, Professor Python sends his formula — 200 capsules; you only pay for delivery ($180).",
     plan5Price: "$1,200 + 5% fee + $180 formula delivery = $1,440",
     plan100Title: "Support — 100 days",
     plan100Desc:
-      "Extended case support by the Python Method team for 100 days. As a gift, Karen sends his formula — 600 capsules, with delivery at Karen's own expense.",
+      "Extended case support by the Python Method team for 100 days. As a gift, Professor Python sends his formula — 600 capsules, with delivery at Professor Python's own expense.",
     plan100Price: "$3,500 + 5% fee = $3,675"
   },
   paymentSuccess: {
@@ -566,8 +598,8 @@ const en: typeof ru = {
     steps: [
       "The payment is linked to your case automatically within a few minutes (by your account or the email used at checkout). If you don't see it in your account after 10 minutes — write to us.",
       "The team will confirm the activation of your support program — you will get a message in your account chat.",
-      "Karen will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On the “5 weeks” plan the delivery is already paid by you, on the “100 days” plan Karen covers the delivery himself. The tracking number will arrive in the chat.",
-      "Karen and the team will study your case and begin the support program. All communication happens in your account."
+      "Professor Python will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On the “5 weeks” plan the delivery is already paid by you, on the “100 days” plan Professor Python covers the delivery himself. The tracking number will arrive in the chat.",
+      "Professor Python and the team will study your case and begin the support program. All communication happens in your account."
     ],
     cabinetCta: "Go to my account",
     questionLabel: "Have a question?",

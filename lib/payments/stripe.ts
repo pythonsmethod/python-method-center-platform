@@ -17,6 +17,27 @@ export const PLAN_DURATION_DAYS: Record<PaymentProduct, number> = {
   test_access: TEST_ACCESS_DAYS
 };
 
+// P2-01: the payer's email is attacker-influenced input. ILIKE treated
+// "%" and "_" in it as pattern wildcards, so "a_@gmail.com" could match a
+// different client's address and bind the payment — and the service
+// period — to the wrong account. Matching is now exact on a normalized
+// form; anything ambiguous falls to manual review instead of a guess.
+export function normalizePayerEmail(
+  email: string | null | undefined
+): string | null {
+  const clean = email?.trim().toLowerCase();
+
+  return clean && clean.includes("@") ? clean : null;
+}
+
+// Case-insensitive EXACT match pattern: every LIKE metacharacter in the
+// payer's email is escaped, so ILIKE degenerates to case-insensitive
+// equality and nothing else. Kept case-insensitive on purpose — legacy
+// profile rows may store mixed-case addresses.
+export function emailExactMatchPattern(normalizedEmail: string): string {
+  return normalizedEmail.replace(/([\\%_])/g, "\\$1");
+}
+
 export function getStripe(): Stripe | null {
   const key = process.env.STRIPE_SECRET_KEY?.trim();
 

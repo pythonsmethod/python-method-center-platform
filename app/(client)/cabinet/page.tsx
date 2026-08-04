@@ -6,6 +6,7 @@ import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
 import { getCaseMessages } from "@/lib/messages/queries";
+import { getSupplementsDueCount } from "@/lib/supplements/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -46,6 +47,8 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
   const clientCase =
     caseResult.status === "ready" && caseResult.case ? caseResult.case : null;
 
+  const supplementsDue = await getSupplementsDueCount();
+
   const [documentResult, messagesResult] = clientCase
     ? await Promise.all([
         getUploadedDocumentsForCase(auth.userId, clientCase.id),
@@ -78,6 +81,16 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
         <div className="cab-note">
           <strong>Анкета отправлена</strong>
           <span>Кейс создан. Напишите здесь — команда центра рядом.</span>
+        </div>
+      ) : null}
+
+      {supplementsDue > 0 ? (
+        <div className="cab-note cab-note--reminder">
+          <strong>Напоминание о приёме</strong>
+          <span>
+            По вашему расписанию пора принять: {supplementsDue}.{" "}
+            <Link href="/cabinet/supplements">Открыть чек-лист</Link>
+          </span>
         </div>
       ) : null}
 

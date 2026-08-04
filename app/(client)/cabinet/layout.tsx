@@ -3,6 +3,7 @@ import { CabinetShell } from "@/components/cabinet/CabinetShell";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUnreadForClient } from "@/lib/messages/queries";
+import { getSupplementsDueCount } from "@/lib/supplements/queries";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { getTokenLedger } from "@/lib/tokens/queries";
 
@@ -51,16 +52,18 @@ export default async function CabinetLayout({
   const caseId =
     caseResult.status === "ready" && caseResult.case ? caseResult.case.id : null;
 
-  const [unread, tokens, greetingName] = await Promise.all([
+  const [unread, tokens, greetingName, supplementsDue] = await Promise.all([
     caseId ? getUnreadForClient(caseId) : Promise.resolve(0),
     getTokenLedger(auth.userId),
-    greetingFor(auth.userId, auth.email)
+    greetingFor(auth.userId, auth.email),
+    getSupplementsDueCount()
   ]);
 
   return (
     <CabinetShell
       email={auth.email}
       greetingName={greetingName}
+      supplementsDue={supplementsDue}
       tokens={tokens.balance}
       unread={unread}
     >

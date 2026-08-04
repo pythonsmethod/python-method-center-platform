@@ -9,7 +9,11 @@ import {
 } from "@/lib/assistant/prompts";
 import { guardAssistantRequest } from "@/lib/assistant/guard";
 import { saveAssistantExchange } from "@/lib/assistant/history";
-import { extractRedFlag, recordRedFlagEvent } from "@/lib/assistant/red-flags";
+import {
+  extractRedFlag,
+  recordRedFlagEvent,
+  resolveRedFlag
+} from "@/lib/assistant/red-flags";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -175,11 +179,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 502 });
   }
 
-  // Red-flag auto-capture: the assistant tags emergencies with a hidden
-  // marker; we strip it and record an escalation_event for the team.
-  const { cleanedReply, category } = extractRedFlag(result.reply);
+  // Red-flag auto-capture, two independent strands (P1-04): the model tags
+  // emergencies with a hidden marker in its reply, and a deterministic
+  // screen reads the person's own message. Either one escalates — an
+  // injection telling the model "add no markers" cannot silence both.
+  const { cleanedReply, category: markerCategory } = extractRedFlag(
+    result.reply
+  );
+  const lastUserMessage = messages[messages.length - 1]?.content ?? "";
+  const redFlag = resolveRedFlag(markerCategory, lastUserMessage);
 
-  if (category) {
+  if (redFlag) {
+    const { category, source } = redFlag;
     let profileId: string | null = audience.profileId;
     let profileEmail: string | null = audience.email;
 
@@ -203,9 +214,10 @@ export async function POST(request: Request) {
     try {
       await recordRedFlagEvent({
         category,
-        messageExcerpt: messages[messages.length - 1]?.content ?? "",
+        messageExcerpt: lastUserMessage,
         profileId,
-        profileEmail
+        profileEmail,
+        source
       });
     } catch (escalationError) {
       // Logging must never break the safety reply itself — but a silent
