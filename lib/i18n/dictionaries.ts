@@ -894,6 +894,12 @@ const ru = {
     cardText1: "Форма «Написать команде» находится в",
     cabinetLink: "личном кабинете",
     cardText2: ". Команда ответит по контактам, указанным в вашей анкете.",
+    // One line, kept above the form. The full block sits at the foot of
+    // the page now; someone whose life is in danger must not have to read
+    // to the bottom to learn that we are not the number to call.
+    emergencyShort:
+      "Если сейчас есть угроза жизни — не пишите нам, звоните 112 (Европа) или 911 (США).",
+    emergencyShortLink: "Подробнее",
     emergencyLabel: "Экстренные ситуации",
     emergencyTitle: "Платформа не оказывает экстренную помощь",
     emergencyText:
@@ -1828,6 +1834,9 @@ const en: typeof ru = {
     cardText1: "The “Write to the team” form is in your",
     cabinetLink: "personal account",
     cardText2: ". The team will reply using the contacts from your questionnaire.",
+    emergencyShort:
+      "If life is in danger right now, do not write to us — call 112 (Europe) or 911 (USA).",
+    emergencyShortLink: "More",
     emergencyLabel: "Emergencies",
     emergencyTitle: "The platform does not provide emergency care",
     emergencyText:

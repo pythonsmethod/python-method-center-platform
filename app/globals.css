@@ -249,6 +249,23 @@ main {
   color: var(--accent-strong);
 }
 
+/* One line above the support form, where the full emergency block used to
+   stand. Quiet enough not to shout at everyone with a password problem,
+   marked clearly enough that someone in danger sees it before typing. */
+.support-emergency-line {
+  border-left: 3px solid var(--warning);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.55;
+  margin: 20px 0 0;
+  padding-left: 12px;
+}
+
+.support-emergency-line a {
+  color: var(--accent);
+  white-space: nowrap;
+}
+
 .site-footer {
   align-items: center;
   border-top: 1px solid var(--line);
