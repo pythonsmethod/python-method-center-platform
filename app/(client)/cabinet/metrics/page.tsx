@@ -38,7 +38,7 @@ export default async function CabinetMetricsPage() {
 
       {result.status === "ready" ? (
         <MetricsPanel
-          labels={t} rows={result.rows} />
+          labels={t} dateLocale={dict.dateLocale} rows={result.rows} />
       ) : (
         <div className="cab-note">
           <strong>{t.errorTitle}</strong>

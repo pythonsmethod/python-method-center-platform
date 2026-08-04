@@ -31,6 +31,10 @@ type CaseMessageThreadProps = {
   // localized, and the workspace stays Russian for the team.
   labels: Dictionary["cabinet"]["thread"];
   voiceLabels: Dictionary["cabinet"]["voice"];
+  // Handed in rather than guessed. This used to be inferred by comparing a
+  // label to the English word for "today", which quietly breaks the moment
+  // that label is reworded.
+  dateLocale: string;
 };
 
 function senderLabel(role: string, viewer: "client" | "staff",
@@ -51,8 +55,8 @@ function senderLabel(role: string, viewer: "client" | "staff",
   return t.team;
 }
 
-function formatTime(value: string): string {
-  return new Date(value).toLocaleTimeString("ru-RU", {
+function formatTime(value: string, locale: string): string {
+  return new Date(value).toLocaleTimeString(locale, {
     hour: "2-digit",
     minute: "2-digit"
   });
@@ -95,10 +99,9 @@ export function CaseMessageThread({
   loadError,
   expandable = false,
   labels: t,
-  voiceLabels
+  voiceLabels,
+  dateLocale
 }: CaseMessageThreadProps) {
-  // Dates follow the reader, not the server.
-  const dateLocale = t.today === "Today" ? "en-GB" : "ru-RU";
   const [expanded, setExpanded] = useState(false);
   const action = viewer === "client" ? sendClientCaseMessage : sendStaffCaseMessage;
   const [state, formAction, pending] = useActionState(
@@ -251,7 +254,7 @@ export function CaseMessageThread({
                   <p className="case-msg__missing">{t.audioMissing}</p>
                 ) : null}
                 <span className="case-msg__time">
-                  {formatTime(message.created_at)}
+                  {formatTime(message.created_at, dateLocale)}
                 </span>
               </div>
             </Fragment>

@@ -10,6 +10,9 @@ import type { PluralForms } from "@/lib/i18n/plural";
 
 const ru = {
   cabinet: {
+    // Which date format the reader sees. A plain string, never a
+    // function: this dictionary is serialized into client components.
+    dateLocale: "ru-RU",
     navLabel: "Разделы кабинета",
     sections: {
       home: { title: "Главная", hint: "Переписка с Professor Python" },
@@ -942,6 +945,9 @@ const ru = {
 
 const en: typeof ru = {
   cabinet: {
+    // Which date format the reader sees. A plain string, never a
+    // function: this dictionary is serialized into client components.
+    dateLocale: "en-GB",
     navLabel: "Cabinet sections",
     sections: {
       home: { title: "Home", hint: "Your thread with Professor Python" },

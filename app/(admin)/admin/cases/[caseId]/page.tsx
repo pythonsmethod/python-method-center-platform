@@ -324,6 +324,7 @@ export default async function StaffCaseDetailPage({
           <CaseMessageThread
             labels={getDictionary("ru").cabinet.thread}
             voiceLabels={getDictionary("ru").cabinet.voice}
+            dateLocale={getDictionary("ru").cabinet.dateLocale}
             caseId={clientCase.id}
             expandable
             loadError={caseMessages.error}

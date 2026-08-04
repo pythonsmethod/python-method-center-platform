@@ -21,10 +21,13 @@ export type MetricRow = {
 type MetricsPanelProps = {
   labels: Dictionary["cabinet"]["metrics"];
   rows: MetricRow[];
+  // The reader's date format, handed in as a string. Hardcoding "ru-RU"
+  // showed an English reader Russian dates.
+  dateLocale: string;
 };
 
-function formatDate(iso: string): string {
-  return new Date(`${iso}T00:00:00Z`).toLocaleDateString("ru-RU", {
+function formatDate(iso: string, dateLocale: string): string {
+  return new Date(`${iso}T00:00:00Z`).toLocaleDateString(dateLocale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -35,7 +38,7 @@ function formatDate(iso: string): string {
 // The person's numbers, drawn as a line through time. Every point is a
 // value they typed in themselves — the platform never invents data, so an
 // empty chart stays honestly empty until the first entry.
-export function MetricsPanel({ rows, labels: t }: MetricsPanelProps) {
+export function MetricsPanel({ rows, labels: t, dateLocale }: MetricsPanelProps) {
   const metricNames = useMemo(
     () => [...new Set(rows.map((row) => row.metric_name))].sort(),
     [rows]
@@ -104,7 +107,7 @@ export function MetricsPanel({ rows, labels: t }: MetricsPanelProps) {
                 {unit ? ` ${unit}` : ""}
                 <span className="metrics-chart-date">
                   {" "}
-                  · {formatDate(geometry.lastDate)}
+                  · {formatDate(geometry.lastDate, dateLocale)}
                 </span>
               </h2>
             </div>
@@ -113,7 +116,7 @@ export function MetricsPanel({ rows, labels: t }: MetricsPanelProps) {
                 className={`metrics-delta${delta < 0 ? " metrics-delta--down" : delta > 0 ? " metrics-delta--up" : ""}`}
               >
                 {delta > 0 ? `+${delta}` : `${delta}`}
-                {unit ? ` ${unit}` : ""} {t.since} {formatDate(geometry.firstDate)}
+                {unit ? ` ${unit}` : ""} {t.since} {formatDate(geometry.firstDate, dateLocale)}
               </span>
             ) : null}
           </div>
@@ -152,27 +155,34 @@ export function MetricsPanel({ rows, labels: t }: MetricsPanelProps) {
             {/* Dots as zero-length round-cap strokes: the viewBox stretches
                 non-uniformly, and a <circle> would stretch into an ellipse. */}
             {geometry.points.map((point) => (
+              /* No <title> here. React hoists a <title> to the document
+                 head wherever it is written — including inside an SVG —
+                 so these tooltips never reached the chart: they replaced
+                 the page's own title, and the server and client disagreed
+                 about the markup, which failed hydration and made the
+                 browser throw the rendered chart away and draw it again.
+                 The date and the value of every point are listed in full
+                 under the chart, where a phone can read them too — a
+                 hover tooltip was never available there anyway. */
               <path
+                aria-label={`${formatDate(point.date, dateLocale)}: ${point.value}${
+                  unit ? ` ${unit}` : ""
+                }`}
                 className="metrics-chart__dot"
                 d={`M ${point.x} ${point.y} h 0.01`}
                 key={`${point.date}-${point.x}`}
                 vectorEffect="non-scaling-stroke"
-              >
-                <title>
-                  {formatDate(point.date)}: {point.value}
-                  {unit ? ` ${unit}` : ""}
-                </title>
-              </path>
+              />
             ))}
           </svg>
 
           <div className="metrics-chart-axis">
-            <span>{formatDate(geometry.firstDate)}</span>
+            <span>{formatDate(geometry.firstDate, dateLocale)}</span>
             <span>
               {geometry.yMin} – {geometry.yMax}
               {unit ? ` ${unit}` : ""}
             </span>
-            <span>{formatDate(geometry.lastDate)}</span>
+            <span>{formatDate(geometry.lastDate, dateLocale)}</span>
           </div>
 
           <ul className="metrics-entries">
@@ -181,7 +191,7 @@ export function MetricsPanel({ rows, labels: t }: MetricsPanelProps) {
               .map((row) => (
                 <li key={row.id}>
                   <span>
-                    {formatDate(row.measured_at)} — <strong>{row.value}</strong>
+                    {formatDate(row.measured_at, dateLocale)} — <strong>{row.value}</strong>
                     {row.unit ? ` ${row.unit}` : ""}
                   </span>
                   <form action={deleteAction}>

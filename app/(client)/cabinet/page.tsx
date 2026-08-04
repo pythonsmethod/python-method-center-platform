@@ -116,6 +116,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
         <CaseMessageThread
             labels={dict.thread}
             voiceLabels={dict.voice}
+            dateLocale={dict.dateLocale}
           caseId={clientCase.id}
           expandable
           loadError={messagesResult?.error ?? null}
