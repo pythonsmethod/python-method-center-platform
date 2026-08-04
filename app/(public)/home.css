@@ -564,3 +564,10 @@
     flex-direction: column;
   }
 }
+
+/* Анхам inside the page: he is drawn, not photographed, so he only needs
+   centering — no object-fit, no fixed box. */
+.home-figure__avatar,
+.home-final__anham {
+  justify-self: center;
+}

@@ -1231,57 +1231,10 @@ code {
   justify-self: end;
 }
 
-.assistant-widget {
-  bottom: 18px;
-  display: grid;
-  gap: 10px;
-  justify-items: end;
-  position: fixed;
-  right: 18px;
-  z-index: 60;
-}
 
-.assistant-widget__toggle {
-  background: linear-gradient(180deg, var(--accent-strong), var(--accent));
-  border: none;
-  border-radius: 999px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.45);
-  color: #1c1508;
-  cursor: pointer;
-  font: inherit;
-  font-weight: 600;
-  padding: 12px 18px;
-}
 
-.assistant-widget__panel {
-  background: var(--background);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-  max-height: min(70vh, 560px);
-  overflow-y: auto;
-  padding: 14px;
-  width: min(380px, calc(100vw - 36px));
-}
 
-.assistant-widget__header {
-  align-items: center;
-  color: var(--accent-strong);
-  display: flex;
-  font-family: var(--font-serif);
-  font-size: 16px;
-  justify-content: space-between;
-  margin-bottom: 4px;
-}
 
-.assistant-widget__header button {
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: 16px;
-}
 
 .knowledge-panel {
   display: grid;
@@ -1447,60 +1400,12 @@ code {
 
 /* --- Welcome greeting card --- */
 
-.assistant-widget__welcome {
-  background: var(--background);
-  border: 1px solid rgba(212, 175, 55, 0.55);
-  border-radius: 14px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
-  padding: 18px 18px 14px;
-  position: relative;
-  width: min(400px, calc(100vw - 36px));
-}
 
-.assistant-widget__welcome-close {
-  background: transparent;
-  border: none;
-  color: var(--muted);
-  cursor: pointer;
-  font: inherit;
-  font-size: 15px;
-  position: absolute;
-  right: 10px;
-  top: 10px;
-}
 
-.assistant-widget__welcome-title {
-  color: var(--accent-strong);
-  font-family: var(--font-serif);
-  font-size: 16px;
-  line-height: 1.4;
-  margin: 0 18px 0 0;
-}
 
-.assistant-widget__welcome-text {
-  font-size: 14px;
-  line-height: 1.55;
-  margin: 10px 0 0;
-}
 
-.assistant-widget__welcome-actions {
-  display: grid;
-  gap: 8px;
-  margin-top: 14px;
-}
 
-.assistant-widget__welcome-actions .button {
-  font-size: 14px;
-  min-height: 42px;
-  width: 100%;
-}
 
-.assistant-widget__welcome-note {
-  color: var(--muted);
-  font-size: 12.5px;
-  margin: 10px 0 0;
-  text-align: center;
-}
 
 /* --- Mobile polish --- */
 
@@ -1577,15 +1482,6 @@ code {
 
   .site-footer nav {
     justify-content: center;
-  }
-
-  .assistant-widget {
-    bottom: 12px;
-    right: 12px;
-  }
-
-  .assistant-widget__panel {
-    max-height: min(78vh, 620px);
   }
 
   .assistant-chat__messages {
@@ -4346,5 +4242,254 @@ code {
   .site-nav__signup {
     flex: 1 1 0;
     text-align: center;
+  }
+}
+
+/* ============================================================
+   Анхам — the companion, not a chat button.
+
+   He is fixed to the viewport, so he travels with the person as they
+   scroll without any scroll listener: no jank, no work on the main
+   thread, and nothing to go wrong on a slow phone. His form never
+   changes between tiers — only his state does.
+   ============================================================ */
+
+.anham-companion {
+  bottom: clamp(14px, 3vw, 28px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.75rem;
+  position: fixed;
+  right: clamp(14px, 3vw, 28px);
+  z-index: 60;
+}
+
+.anham-companion__figure {
+  background: none;
+  border: 0;
+  border-radius: 50%;
+  cursor: pointer;
+  line-height: 0;
+  padding: 0;
+  transition: transform 0.25s ease;
+}
+
+.anham-companion__figure:hover {
+  transform: translateY(-3px) scale(1.04);
+}
+
+.anham-companion__figure:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 4px;
+}
+
+/* He breathes rather than bounces: presence without demanding attention. */
+.anham {
+  animation: anham-float 5.5s ease-in-out infinite;
+  display: block;
+  filter: drop-shadow(0 6px 18px rgba(212, 175, 55, 0.28));
+}
+
+@keyframes anham-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+.anham__halo {
+  animation: anham-breathe 4s ease-in-out infinite;
+  transform-origin: 60px 62px;
+}
+
+@keyframes anham-breathe {
+  0%,
+  100% {
+    opacity: 0.18;
+  }
+  50% {
+    opacity: 0.32;
+  }
+}
+
+/* State 2 — registered: brighter, with a ring turning around him. */
+.anham--registered {
+  filter: drop-shadow(0 6px 22px rgba(212, 175, 55, 0.42));
+}
+
+.anham__ring {
+  animation: anham-turn 14s linear infinite;
+  transform-origin: 60px 62px;
+}
+
+@keyframes anham-turn {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* State 3 — client: deeper gold, extra light, a steadier presence. */
+.anham--client {
+  filter: drop-shadow(0 8px 28px rgba(227, 194, 95, 0.55));
+}
+
+.anham--client .anham__ring {
+  animation-duration: 9s;
+  stroke-opacity: 0.95;
+}
+
+.anham__aura circle {
+  animation: anham-spark 3.2s ease-in-out infinite;
+}
+
+.anham__aura circle:nth-child(2) {
+  animation-delay: 0.9s;
+}
+
+.anham__aura circle:nth-child(3) {
+  animation-delay: 1.8s;
+}
+
+@keyframes anham-spark {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Someone who asked for less motion gets a still, calm Анхам. */
+@media (prefers-reduced-motion: reduce) {
+  .anham,
+  .anham__halo,
+  .anham__ring,
+  .anham__aura circle {
+    animation: none;
+  }
+}
+
+/* ---------- side panel ---------- */
+
+.anham-panel {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
+  display: flex;
+  flex-direction: column;
+  max-height: min(74vh, 640px);
+  overflow: hidden;
+  width: min(390px, calc(100vw - 2rem));
+}
+
+.anham-panel__header {
+  align-items: center;
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  gap: 0.6rem;
+  padding: 0.7rem 0.9rem;
+}
+
+.anham-panel__header span {
+  flex: 1 1 auto;
+  font-family: var(--font-serif);
+  font-size: 0.98rem;
+}
+
+.anham-panel__header button {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 1rem;
+  line-height: 1;
+  padding: 0.35rem;
+}
+
+.anham-panel__header button:hover {
+  color: var(--text);
+}
+
+.anham-panel__header button:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+/* ---------- first-visit greeting ---------- */
+
+.anham-companion__welcome {
+  background: var(--surface);
+  border: 1px solid var(--accent);
+  border-radius: 16px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+  padding: 1.1rem 1.2rem;
+  position: relative;
+  width: min(320px, calc(100vw - 2rem));
+}
+
+.anham-companion__welcome-close {
+  background: none;
+  border: 0;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 0.25rem;
+  position: absolute;
+  right: 0.5rem;
+  top: 0.5rem;
+}
+
+.anham-companion__welcome-title {
+  font-family: var(--font-serif);
+  font-size: 1.05rem;
+  margin: 0 1.5rem 0 0;
+}
+
+.anham-companion__welcome-text {
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  margin: 0.6rem 0 0;
+}
+
+.anham-companion__welcome-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.9rem;
+}
+
+.anham-companion__welcome-note {
+  color: var(--muted);
+  font-size: 0.8rem;
+  margin: 0.75rem 0 0;
+}
+
+/* On a phone he steps aside: smaller, and the panel takes the width it
+   needs without ever pushing the page sideways. */
+@media (max-width: 560px) {
+  .anham-companion {
+    bottom: 12px;
+    right: 12px;
+  }
+
+  .anham-companion__figure .anham {
+    height: 52px;
+    width: 52px;
+  }
+
+  .anham-panel {
+    max-height: 76vh;
+    width: calc(100vw - 24px);
+  }
+
+  .anham-companion__welcome-actions .button {
+    flex: 1 1 100%;
   }
 }

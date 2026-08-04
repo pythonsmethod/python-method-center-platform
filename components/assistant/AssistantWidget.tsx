@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
@@ -14,6 +15,9 @@ type AssistantWidgetProps = {
   tier?: "guest" | "registered" | "client";
 };
 
+// Анхам is not a chat button. He travels with the person down the page and
+// opens a side panel when asked. He is never modal and never covers the
+// content he is meant to help with.
 export function AssistantWidget({
   locale = "ru",
   tier = "guest"
@@ -26,9 +30,10 @@ export function AssistantWidget({
   const [open, setOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
   const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const toggleRef = useRef<HTMLButtonElement | null>(null);
 
   // First-visit greeting: the visitor chooses between exploring the site
-  // on their own or being guided by the assistant. Shown once per browser.
+  // on their own or being guided by Анхам. Shown once per browser.
   useEffect(() => {
     // The first-visit greeting belongs to the public consultant only.
     if (tier !== "guest") {
@@ -52,6 +57,24 @@ export function AssistantWidget({
     };
   }, [tier]);
 
+  // Escape closes the panel and returns focus to Анхам, so a keyboard user
+  // is never stranded inside it.
+  useEffect(() => {
+    if (!open) {
+      return;
+    }
+
+    function onKeyDown(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setOpen(false);
+        toggleRef.current?.focus();
+      }
+    }
+
+    document.addEventListener("keydown", onKeyDown);
+    return () => document.removeEventListener("keydown", onKeyDown);
+  }, [open]);
+
   function dismissWelcome(openChat: boolean) {
     try {
       window.localStorage.setItem(WELCOME_STORAGE_KEY, "seen");
@@ -67,24 +90,28 @@ export function AssistantWidget({
   }
 
   return (
-    <div className={`assistant-widget assistant-widget--${tier}${open ? " is-open" : ""}`}>
+    <div
+      className={`anham-companion anham-companion--${tier}${
+        open ? " is-open" : ""
+      }`}
+    >
       {showWelcome && !open ? (
         <div
           aria-label={header}
-          className="assistant-widget__welcome"
+          className="anham-companion__welcome"
           role="dialog"
         >
           <button
             aria-label={t.toggleClose}
-            className="assistant-widget__welcome-close"
+            className="anham-companion__welcome-close"
             onClick={() => dismissWelcome(false)}
             type="button"
           >
             ✕
           </button>
-          <p className="assistant-widget__welcome-title">{t.welcomeTitle}</p>
-          <p className="assistant-widget__welcome-text">{t.welcomeText}</p>
-          <div className="assistant-widget__welcome-actions">
+          <p className="anham-companion__welcome-title">{t.welcomeTitle}</p>
+          <p className="anham-companion__welcome-text">{t.welcomeText}</p>
+          <div className="anham-companion__welcome-actions">
             <button
               className="button button--secondary"
               onClick={() => dismissWelcome(false)}
@@ -100,17 +127,25 @@ export function AssistantWidget({
               {t.welcomeChat}
             </button>
           </div>
-          <p className="assistant-widget__welcome-note">{t.welcomeNote}</p>
+          <p className="anham-companion__welcome-note">{t.welcomeNote}</p>
         </div>
       ) : null}
 
       {open ? (
-        <div className="assistant-widget__panel" role="dialog" aria-label={header}>
-          <div className="assistant-widget__header">
+        <aside
+          aria-label={header}
+          className="anham-panel"
+          role="dialog"
+        >
+          <div className="anham-panel__header">
+            <AnhamAvatar size={34} state={tier} />
             <span>{header}</span>
             <button
               aria-label={t.toggleClose}
-              onClick={() => setOpen(false)}
+              onClick={() => {
+                setOpen(false);
+                toggleRef.current?.focus();
+              }}
               type="button"
             >
               ✕
@@ -131,12 +166,13 @@ export function AssistantWidget({
             locale={locale}
             suggestions={suggestions}
           />
-        </div>
+        </aside>
       ) : null}
 
       <button
+        aria-expanded={open}
         aria-label={open ? t.toggleClose : t.toggleOpen}
-        className="assistant-widget__toggle"
+        className="anham-companion__figure"
         onClick={() => {
           if (showWelcome) {
             dismissWelcome(!open);
@@ -145,9 +181,10 @@ export function AssistantWidget({
 
           setOpen((value) => !value);
         }}
+        ref={toggleRef}
         type="button"
       >
-        {open ? "✕" : t.toggleOpen}
+        <AnhamAvatar size={64} state={tier} />
       </button>
     </div>
   );
