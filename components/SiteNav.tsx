@@ -59,18 +59,32 @@ export function SiteNav({ labels, signedIn }: SiteNavProps) {
         );
       })}
 
-      <Link
-        aria-current={accountActive ? "page" : undefined}
-        className={`site-nav__item${accountActive ? " site-nav__item--active" : ""}`}
-        href={accountHref}
-      >
-        <span className="site-nav__icon">
-          <IconAnkh />
+      {signedIn ? (
+        <Link
+          aria-current={accountActive ? "page" : undefined}
+          className={`site-nav__item${accountActive ? " site-nav__item--active" : ""}`}
+          href={accountHref}
+        >
+          <span className="site-nav__icon">
+            <IconAnkh />
+          </span>
+          <span className="site-nav__label">
+            {labels["/cabinet"] ?? "Кабинет"}
+          </span>
+        </Link>
+      ) : (
+        // A guest sees the two doors named apart. "Регистрация" opens the
+        // signup tab directly — landing on the login form would make the
+        // second button a lie.
+        <span className="site-nav__auth">
+          <Link className="site-nav__signin" href="/login">
+            {labels["/login"] ?? "Вход"}
+          </Link>
+          <Link className="site-nav__signup" href="/login?mode=signup">
+            {labels.signup ?? "Регистрация"}
+          </Link>
         </span>
-        <span className="site-nav__label">
-          {labels[accountHref] ?? (signedIn ? "Кабинет" : "Вход")}
-        </span>
-      </Link>
+      )}
     </nav>
   );
 }

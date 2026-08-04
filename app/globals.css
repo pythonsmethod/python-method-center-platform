@@ -4292,3 +4292,59 @@ code {
 .free-tools__actions {
   margin-top: 4px;
 }
+
+/* Header sign-in pair. A guest sees two doors named apart: a quiet link to
+   sign in and a lit button to register, matching the rest of the site's
+   button language rather than inventing a third one. */
+.site-nav__auth {
+  align-items: center;
+  display: inline-flex;
+  gap: 0.5rem;
+}
+
+.site-nav__signin,
+.site-nav__signup {
+  border-radius: 9px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  padding: 0.5rem 1.05rem;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.site-nav__signin {
+  border: 1px solid var(--line);
+  color: var(--text);
+}
+
+.site-nav__signin:hover {
+  border-color: var(--accent);
+}
+
+.site-nav__signup {
+  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
+  border: 1px solid transparent;
+  color: #20180b;
+}
+
+.site-nav__signup:hover {
+  filter: brightness(1.06);
+}
+
+.site-nav__signin:focus-visible,
+.site-nav__signup:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+
+@media (max-width: 560px) {
+  .site-nav__auth {
+    width: 100%;
+  }
+
+  .site-nav__signin,
+  .site-nav__signup {
+    flex: 1 1 0;
+    text-align: center;
+  }
+}

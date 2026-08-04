@@ -8,5 +8,7 @@ export type AppRoute = {
 export const navRoutes: AppRoute[] = [
   { href: "/", label: "Главная" },
   { href: "/payment", label: "Сопровождение" },
-  { href: "/shop", label: "Магазин" }
+  { href: "/shop", label: "Магазин" },
+  { href: "/review", label: "Бесплатный разбор" },
+  { href: "/support", label: "Поддержка" }
 ];

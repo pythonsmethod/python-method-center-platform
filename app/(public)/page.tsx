@@ -1,61 +1,261 @@
-import Link from "next/link";
 import Image from "next/image";
-import { getDictionary } from "@/lib/i18n/dictionaries";
-import { getLocale } from "@/lib/i18n/locale";
+import Link from "next/link";
 import { isFreeReviewActive } from "@/lib/config/promo";
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
-import "./homepage-v2.css";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
+import "./home.css";
 
-const journeyIcons = ["✦", "◌", "▤", "◇", "⌁", "↑"];
+const PROFESSOR_IMAGE = "/images/professor-python-temp-v2.png";
+const ANHAM_IMAGE = "/images/anham-character-v2.png";
+
+// The number a person reads is their position on the whole path, not inside
+// one column: the shared start is 01–02, so each branch continues from 03
+// rather than restarting at 01.
+function StepList({
+  steps,
+  startAt
+}: {
+  steps: readonly { title: string; text: string }[];
+  startAt: number;
+}) {
+  return (
+    <ol className="home-track__steps">
+      {steps.map((step, index) => (
+        <li className="home-step" key={step.title}>
+          <span aria-hidden="true" className="home-step__num">
+            {String(startAt + index).padStart(2, "0")}
+          </span>
+          <div>
+            <h4>{step.title}</h4>
+            <p>{step.text}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
 
 export default async function HomePage() {
-  const [locale, tier] = await Promise.all([getLocale(), resolveAssistantTierForUi()]);
+  const [locale, tier] = await Promise.all([
+    getLocale(),
+    resolveAssistantTierForUi()
+  ]);
   const dict = getDictionary(locale);
   const t = dict.landing;
   const promo = dict.promo;
+  const paths = t.paths;
   const freeReview = isFreeReviewActive();
-  const isRu = locale === "ru";
-  const copy = isRu ? {
-    heroTitle: "Ясный путь к восстановлению.", heroLead: "Ваше состояние, медицинские документы и следующие шаги — в одном спокойном, продуманном пространстве.",
-    self: "Начать самостоятельно", anham: "Начать с Анхамом", private: "Конфиденциально", human: "Личный разбор", pace: "В вашем темпе",
-    foundations: "Две опоры", foundationTitle: "Экспертное решение. Постоянная поддержка.", expert: "Эксперт", companion: "Спутник на платформе",
-    anhamText: "Остаётся рядом между этапами, помогает подготовиться и делает сложный путь спокойным, личным и понятным.", gift: "Подарок центра", giftTitle: "Начните с бесплатного разбора анализов.", giftCta: "Получить разбор",
-    journey: "Ваш путь", journeyTitle: "От неопределённости к ясному направлению.", recovery: "Начало восстановления", recoveryText: "Двигайтесь дальше с ясным направлением, поддержкой и видимым прогрессом.",
-    tools: "Бесплатные инструменты", toolsTitle: "Небольшие данные. Важная ясность.", open: "Открыть инструмент", waiting: "Анхам рядом", ready: "Я готов провести вас.", finalText: "Сегодня не нужно понимать весь путь. Мы можем начать вместе — с первого вопроса."
-  } : {
-    heroTitle: "A clearer path back to yourself.", heroLead: "Your health story, medical documents, and next steps—held in one calm, considered space.",
-    self: "Start independently", anham: "Start with Anham", private: "Private by design", human: "Human-led review", pace: "Your pace, respected",
-    foundations: "Two foundations", foundationTitle: "Expert judgment. Constant presence.", expert: "The expert", companion: "Your platform companion",
-    anhamText: "Stays close between every step, helps you prepare, and makes a complex process feel calm, personal, and understandable.", gift: "A gift from the center", giftTitle: "Begin with a free analyses review.", giftCta: "Receive my review",
-    journey: "Your journey", journeyTitle: "From uncertainty to clear direction.", recovery: "Recovery begins", recoveryText: "Move forward with a clear direction, continuous support, and visible progress.",
-    tools: "Free tools", toolsTitle: "Small insights. Meaningful clarity.", open: "Open the tool", waiting: "Anham is here", ready: "I am ready to guide you.", finalText: "You do not need to understand the whole path today. We can begin with the first question, together."
-  };
+  const anhamName = locale === "ru" ? "Анхам" : "Anham";
 
-  const journey = [...t.steps.map((step) => ({ title: step.title, text: step.text })), { title: copy.recovery, text: copy.recoveryText }];
-  const destination = tier === "guest" ? "/login" : "/cabinet";
+  // A guest is sent to registration; someone already signed in goes straight
+  // to their cabinet instead of being asked to sign in again.
+  const startHref = tier === "guest" ? "/login" : "/cabinet";
 
-  return <div className={`home-v2 home-v2--${tier}`}>
-    <section className="hv2-hero">
-      <div className="hv2-arches" aria-hidden="true"><i/><i/><i/></div>
-      <div className="hv2-hero__copy">
-        <p className="hv2-kicker">{t.eyebrow}</p><h1>{copy.heroTitle}</h1><p className="hv2-lead">{copy.heroLead}</p>
-        <div className="hv2-actions"><Link className="hv2-button hv2-button--gold" href="/login">{copy.self}</Link><a className="hv2-button" href="#anham">{copy.anham} ↗</a></div>
-        <div className="hv2-trust"><span>{copy.private}</span><span>{copy.human}</span><span>{copy.pace}</span></div>
-      </div>
-      <div className="hv2-professor" aria-label="Professor Python"><div className="hv2-professor__light"/><Image className="hv2-professor__image" src="/images/professor-python-temp-v2.png" alt="Professor Python" fill priority sizes="(max-width: 900px) 100vw, 42vw"/><div className="hv2-professor__caption"><strong>Professor Python</strong><span>{t.expertLabel}</span></div></div>
-    </section>
+  return (
+    <div className="home">
+      <section className="home-hero">
+        <div className="home-hero__copy">
+          <p className="home-eyebrow">{t.eyebrow}</p>
+          <h1 className="home-hero__title">
+            {t.title}
+            <span className="home-hero__subtitle">{t.subtitle}</span>
+          </h1>
+          <p className="home-hero__lead">{t.heroLead}</p>
 
-    <section className="hv2-section"><header className="hv2-heading"><p>{copy.foundations}</p><h2>{copy.foundationTitle}</h2></header>
-      <div className="hv2-foundations"><article className="hv2-foundation hv2-foundation--professor"><span className="hv2-index">I</span><div className="hv2-foundation-professor"><Image src="/images/professor-python-temp-v2.png" alt="Professor Python" fill sizes="(max-width: 900px) 100vw, 42vw"/></div><div className="hv2-foundation__copy"><p className="hv2-kicker">{copy.expert}</p><h3>Professor Python</h3><p>{t.expertText}</p></div></article>
-      <article className={`hv2-foundation hv2-foundation--anham hv2-foundation--${tier}`} id="anham"><span className="hv2-index">II</span><div className="hv2-anham-portrait"><Image src="/images/anham-character-v2.png" alt="Anham, your platform companion" fill sizes="(max-width: 900px) 100vw, 42vw"/></div><div className="hv2-foundation__copy"><p className="hv2-kicker">{copy.companion}</p><h3>Anham</h3><p>{copy.anhamText}</p><span className="hv2-state-label">{tier === "guest" ? (isRu ? "Знакомство" : "First meeting") : tier === "registered" ? (isRu ? "Личный спутник" : "Personal companion") : (isRu ? "Сопровождение кейса" : "Beside your case")}</span></div></article></div>
-    </section>
+          <div className="home-actions">
+            <Link className="home-button home-button--gold" href={startHref}>
+              {t.heroCtaSelf}
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="home-button" href="/support">
+              {t.heroCtaAnham}
+              <span aria-hidden="true">☥</span>
+            </Link>
+          </div>
 
-    <section className="hv2-gift"><div className="hv2-seal"><span>{promo.badge}</span><b>01</b></div><div><p className="hv2-kicker">{copy.gift}</p><h2>{freeReview ? copy.giftTitle : promo.titlePaid}</h2><p>{freeReview ? promo.textFree : promo.textPaid}</p><strong>{freeReview ? promo.priceFree : promo.pricePaid} <span>{promo.priceAmount}</span></strong></div><Link className="hv2-button hv2-button--gold" href="/review">{freeReview ? copy.giftCta : promo.cta}</Link></section>
+          <p className="home-hero__trust">
+            <span aria-hidden="true">☥</span>
+            {t.heroTrust}
+          </p>
+        </div>
 
-    <section className="hv2-section"><header className="hv2-heading hv2-heading--split"><div><p>{copy.journey}</p><h2>{copy.journeyTitle}</h2></div><p>{t.stepsLead}</p></header><ol className="hv2-timeline">{journey.map((step,index)=><li key={step.title}><div className="hv2-step-icon" aria-hidden="true">{journeyIcons[index]}</div><span>0{index+1}</span><h3>{step.title}</h3><p>{step.text}</p></li>)}</ol></section>
+        <div className="home-hero__art">
+          <div aria-hidden="true" className="home-hero__glow" />
+          <Image
+            alt="Professor Python"
+            className="home-hero__professor"
+            height={640}
+            priority
+            src={PROFESSOR_IMAGE}
+            width={520}
+          />
+          <div className="home-hero__anham">
+            <p className="home-bubble">{t.heroBubble}</p>
+            <Image
+              alt={anhamName}
+              height={420}
+              src={ANHAM_IMAGE}
+              width={360}
+            />
+          </div>
+        </div>
+      </section>
 
-    <section className="hv2-section hv2-tools"><header className="hv2-heading"><p>{copy.tools}</p><h2>{copy.toolsTitle}</h2></header><div className="hv2-toolgrid">{t.freeTools.items.map((item,index)=><Link className="hv2-tool" href={index===0?"/cabinet/metrics":"/cabinet/supplements"} key={item.title}><span className="hv2-index">0{index+1}</span><div className={`hv2-toolvisual hv2-toolvisual--${index===0?"metrics":"supplements"}`} aria-hidden="true">{index===0?<><i/><i/><i/><b>72</b></>:<><i/><i/></>}</div><div><p className="hv2-kicker">{t.freeTools.badge}</p><h3>{item.title}</h3><p>{item.text}</p><strong>{copy.open} →</strong></div></Link>)}</div></section>
+      <section aria-label={t.levelsTitle} className="home-figures">
+        <article className="home-figure">
+          <div className="home-figure__body">
+            <h2>Professor Python</h2>
+            <p className="home-figure__role">{t.expertLabel}</p>
+            <p>{t.expertText}</p>
+            <Link className="home-more" href="/review">
+              {t.cardMore}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <Image
+            alt=""
+            className="home-figure__image"
+            height={320}
+            src={PROFESSOR_IMAGE}
+            width={280}
+          />
+        </article>
 
-    <section className="hv2-final"><div className="hv2-anham-orb" aria-hidden="true">A</div><p className="hv2-kicker">{copy.waiting}</p><h2>{copy.ready}</h2><p>{copy.finalText}</p><Link className="hv2-button hv2-button--gold" href={destination}>{copy.anham}</Link></section>
-  </div>;
+        <article className="home-figure home-figure--anham">
+          <div className="home-figure__body">
+            <h2>{anhamName}</h2>
+            <p className="home-figure__role">{t.aiLabel}</p>
+            <p>{t.aiText}</p>
+            <Link className="home-more" href="/support">
+              {t.cardMore}
+              <span aria-hidden="true">→</span>
+            </Link>
+          </div>
+          <Image
+            alt=""
+            className="home-figure__image"
+            height={320}
+            src={ANHAM_IMAGE}
+            width={280}
+          />
+        </article>
+      </section>
+
+      <section aria-label={promo.badge} className="home-promo">
+        <span aria-hidden="true" className="home-promo__gift">
+          🎁
+        </span>
+        <div className="home-promo__copy">
+          <p className="home-promo__badge">{promo.badge}</p>
+          <h2>{freeReview ? promo.titleFree : promo.titlePaid}</h2>
+          <Link className="home-button home-button--dark" href="/review">
+            {freeReview ? promo.ctaFree : promo.cta}
+            <span aria-hidden="true">→</span>
+          </Link>
+        </div>
+        <div className="home-promo__terms">
+          <p>{freeReview ? promo.textFree : promo.textPaid}</p>
+          <p className="home-promo__price">
+            <strong>{freeReview ? promo.priceFree : promo.pricePaid}</strong>
+            <span className="home-promo__amount">{promo.priceAmount}</span>
+          </p>
+        </div>
+      </section>
+
+      <section aria-label={t.howTitle} className="home-paths">
+        <header className="home-section-head">
+          <h2>{t.howTitle}</h2>
+          <p>{paths.lead}</p>
+        </header>
+
+        <ol className="home-common">
+          {paths.common.map((step, index) => (
+            <li className="home-step home-step--common" key={step.title}>
+              <span aria-hidden="true" className="home-step__num">
+                {String(index + 1).padStart(2, "0")}
+              </span>
+              <div>
+                <h3>{step.title}</h3>
+                <p>{step.text}</p>
+              </div>
+            </li>
+          ))}
+        </ol>
+
+        <div aria-hidden="true" className="home-fork">
+          <span />
+          <span />
+        </div>
+
+        <div className="home-tracks">
+          <article className="home-track home-track--free">
+            <header className="home-track__head">
+              <h3>{paths.freeLabel}</h3>
+              <p>{paths.freeNote}</p>
+            </header>
+            <StepList startAt={paths.common.length + 1} steps={paths.free} />
+          </article>
+
+          <article className="home-track home-track--support">
+            <header className="home-track__head">
+              <h3>{paths.supportLabel}</h3>
+              <p>{paths.supportNote}</p>
+            </header>
+            <StepList startAt={paths.common.length + 1} steps={paths.support} />
+          </article>
+        </div>
+      </section>
+
+      <section aria-label={t.freeTools.title} className="home-tools">
+        <header className="home-section-head">
+          <p className="home-eyebrow">{t.freeTools.badge}</p>
+          <h2>{t.freeTools.title}</h2>
+          <p>{t.freeTools.lead}</p>
+        </header>
+
+        <div className="home-tools__grid">
+          {t.freeTools.items.map((item, index) => (
+            <article className="home-tool" key={item.title}>
+              <span aria-hidden="true" className="home-tool__icon">
+                {index === 0 ? "📈" : "💊"}
+              </span>
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </article>
+          ))}
+        </div>
+
+        <Link className="home-button home-button--gold" href={startHref}>
+          {t.freeTools.cta}
+          <span aria-hidden="true">→</span>
+        </Link>
+      </section>
+
+      <section className="home-final">
+        <div className="home-final__copy">
+          <h2>{t.finalTitle}</h2>
+          <p>{t.finalText}</p>
+          <div className="home-actions">
+            <Link className="home-button home-button--gold" href={startHref}>
+              {t.finalCtaStart}
+              <span aria-hidden="true">→</span>
+            </Link>
+            <Link className="home-button" href="/support">
+              {t.finalCtaAsk}
+            </Link>
+          </div>
+        </div>
+        <Image
+          alt=""
+          className="home-final__anham"
+          height={340}
+          src={ANHAM_IMAGE}
+          width={300}
+        />
+      </section>
+
+      <p className="home-tagline">{t.tagline}</p>
+    </div>
+  );
 }

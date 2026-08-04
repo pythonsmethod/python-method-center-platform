@@ -14,7 +14,9 @@ const ru = {
     "/login": "Вход",
     "/cabinet": "Кабинет",
     "/payment": "Сопровождение",
-    "/support": "Поддержка"
+    "/review": "Бесплатный разбор",
+    "/support": "Поддержка",
+    signup: "Регистрация"
   } as Record<string, string>,
   footer: {
     offer: "Публичная оферта",
@@ -72,6 +74,49 @@ const ru = {
     disclaimerText:
       "Python Method не является медицинским учреждением, не ставит диагнозы, не назначает и не отменяет лечение. Сопровождение не заменяет наблюдение лечащего врача. Условия оказания услуг описаны в",
     disclaimerLink: "публичной оферте",
+    heroLead:
+      "Профессиональное сопровождение Professor Python и искусственный интеллект центра рядом с вами на каждом шаге пути к восстановлению и результату.",
+    heroCtaSelf: "Начать самостоятельно",
+    heroCtaAnham: "Пройти путь с ИИ-помощником",
+    heroTrust: "ИИ рядом с вами 24/7 — задавайте вопросы в любой момент",
+    heroBubble:
+      "Привет! Я Анхам, ваш ИИ-помощник. Я здесь, чтобы помочь вам на каждом шаге.",
+    cardMore: "Подробнее",
+    paths: {
+      lead: "Первые два шага одинаковы для всех. Дальше путь зависит от того, что вы выбрали — и шаги там разные.",
+      commonLabel: "Общее начало",
+      common: [
+        { title: "Регистрация", text: "Создайте аккаунт на платформе." },
+        { title: "Анкета", text: "Заполните анкету о себе — она создаёт ваш кейс." }
+      ],
+      freeLabel: "Бесплатный разбор анализов",
+      freeNote: "Подарок центра первым клиентам",
+      free: [
+        { title: "Документы", text: "Загрузите свои анализы и чек-апы." },
+        {
+          title: "Разбор",
+          text: "Professor Python лично изучает их и присылает обратную связь файлом в кабинет."
+        }
+      ],
+      supportLabel: "Полное сопровождение",
+      supportNote: "5 недель или 100 дней",
+      support: [
+        { title: "Тариф", text: "Выберите формат сопровождения и оплатите." },
+        { title: "Документы", text: "Загрузите медицинские документы по кейсу." },
+        {
+          title: "Работа с экспертом",
+          text: "Professor Python ведёт ваш случай и отвечает лично в чате кейса."
+        },
+        {
+          title: "Начало пути",
+          text: "Получите план и начинайте восстановление под сопровождением."
+        }
+      ]
+    },
+    finalTitle: "Сделайте первый шаг к восстановлению уже сегодня",
+    finalText: "Анхам всегда рядом, чтобы поддержать вас.",
+    finalCtaStart: "Начать путь сейчас",
+    finalCtaAsk: "Задать вопрос Анхаму",
     steps: [
       { title: "Регистрация", text: "Создайте аккаунт." },
       { title: "Анкета", text: "Заполните данные о себе." },
@@ -346,8 +391,10 @@ const en: typeof ru = {
     "/shop": "Shop",
     "/login": "Sign in",
     "/cabinet": "My account",
-    "/payment": "Support",
-    "/support": "Support"
+    "/payment": "Support program",
+    "/review": "Free review",
+    "/support": "Help",
+    signup: "Sign up"
   },
   footer: {
     offer: "Public offer",
@@ -404,6 +451,52 @@ const en: typeof ru = {
     disclaimerText:
       "Python Method is not a medical institution; it does not diagnose, prescribe or discontinue treatment. The support program does not replace supervision by your physician. The terms of service are described in the",
     disclaimerLink: "public offer",
+    heroLead:
+      "Professional support led by Professor Python, with the center's artificial intelligence beside you at every step toward recovery and results.",
+    heroCtaSelf: "Start on my own",
+    heroCtaAnham: "Walk the path with the AI assistant",
+    heroTrust: "The AI is with you 24/7 — ask anything, any time",
+    heroBubble:
+      "Hello! I am Anham, your AI assistant. I am here to help you at every step.",
+    cardMore: "Learn more",
+    paths: {
+      lead: "The first two steps are the same for everyone. After that the path depends on what you choose — and the steps genuinely differ.",
+      commonLabel: "Shared start",
+      common: [
+        { title: "Registration", text: "Create your account on the platform." },
+        {
+          title: "Questionnaire",
+          text: "Tell us about yourself — this creates your case."
+        }
+      ],
+      freeLabel: "Free analyses review",
+      freeNote: "A gift from the center to its first clients",
+      free: [
+        { title: "Documents", text: "Upload your test results and check-ups." },
+        {
+          title: "Review",
+          text: "Professor Python studies them personally and sends feedback as a file to your cabinet."
+        }
+      ],
+      supportLabel: "Full support program",
+      supportNote: "5 weeks or 100 days",
+      support: [
+        { title: "Plan", text: "Choose your support format and pay." },
+        { title: "Documents", text: "Upload the medical documents for your case." },
+        {
+          title: "Working with the expert",
+          text: "Professor Python leads your case and answers personally in the case chat."
+        },
+        {
+          title: "The path begins",
+          text: "Receive your plan and start recovery with support beside you."
+        }
+      ]
+    },
+    finalTitle: "Take the first step toward recovery today",
+    finalText: "Anham is always nearby to support you.",
+    finalCtaStart: "Start the path now",
+    finalCtaAsk: "Ask Anham a question",
     steps: [
       { title: "Registration", text: "Create an account." },
       { title: "Questionnaire", text: "Fill in your details." },

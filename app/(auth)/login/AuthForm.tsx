@@ -27,13 +27,16 @@ const defaultLabels: AuthFormLabels = {
   submitting: "Отправка..."
 };
 
+type AuthMode = "login" | "signup";
+
 type AuthFormProps = {
   nextPath: string;
   supabaseConfigured: boolean;
   labels?: AuthFormLabels;
+  // Which tab opens first. The header has separate "Вход" and
+  // "Регистрация" entries, and the second must not land on the login form.
+  initialMode?: AuthMode;
 };
-
-type AuthMode = "login" | "signup";
 
 function messageClassName(state: AuthActionState): string {
   return `form-message form-message--${state.status}`;
@@ -42,9 +45,10 @@ function messageClassName(state: AuthActionState): string {
 export function AuthForm({
   nextPath,
   supabaseConfigured,
-  labels = defaultLabels
+  labels = defaultLabels,
+  initialMode = "login"
 }: AuthFormProps) {
-  const [mode, setMode] = useState<AuthMode>("login");
+  const [mode, setMode] = useState<AuthMode>(initialMode);
   const [loginState, loginAction, loginPending] = useActionState(
     signInWithPassword,
     initialAuthActionState

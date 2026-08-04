@@ -11,6 +11,7 @@ type LoginPageProps = {
   searchParams?: Promise<{
     next?: string | string[];
     message?: string | string[];
+    mode?: string | string[];
   }>;
 };
 
@@ -31,6 +32,7 @@ function sanitizeNextPath(value: string | string[] | undefined): string {
 export default async function LoginPage({ searchParams }: LoginPageProps) {
   const params = await searchParams;
   const nextPath = sanitizeNextPath(params?.next);
+  const initialMode = readParam(params?.mode) === "signup" ? "signup" : "login";
   const supabaseConfigured = hasSupabaseEnv();
   const locale = await getLocale();
   const t = getDictionary(locale).login;
@@ -61,6 +63,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               submitSignup: t.submitSignup,
               submitting: t.submitting
             }}
+            initialMode={initialMode}
             nextPath={nextPath}
             supabaseConfigured={supabaseConfigured}
           />
