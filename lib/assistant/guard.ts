@@ -102,6 +102,24 @@ async function bump(bucketKey: string, limit: number): Promise<boolean> {
   }
 }
 
+// Reading a lab printout is the most expensive request the platform can
+// make: images, and a lot of them. The per-minute limiter on the endpoint
+// stops a burst, but nothing stopped the same person doing it all day, and
+// a focus group finding the paperclip is exactly when that would be found
+// out. This is a separate daily budget from chat, because a person may
+// reasonably attach several results in a day and should not lose their
+// conversation over it.
+const FILE_READS_PER_DAY = 20;
+
+export async function guardMetricsExtraction(
+  profileId: string
+): Promise<boolean> {
+  return bump(
+    `extract:${profileId}`,
+    envNumber("METRICS_EXTRACT_DAILY_LIMIT", FILE_READS_PER_DAY)
+  );
+}
+
 export async function guardAssistantRequest(input: {
   tier: AssistantTier;
   profileId: string | null;

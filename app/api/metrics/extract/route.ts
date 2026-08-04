@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude } from "@/lib/assistant/claude";
+import { guardMetricsExtraction } from "@/lib/assistant/guard";
 import {
   EXTRACTION_SYSTEM_PROMPT,
   parseExtraction
@@ -59,6 +60,12 @@ export async function POST(request: Request) {
 
   if (isRateLimited(user.id)) {
     return NextResponse.json({ error: "rate-limited" }, { status: 429 });
+  }
+
+  // Per-minute above stops a burst; this stops a day of them. Reading
+  // images is the most expensive thing the platform does.
+  if (!(await guardMetricsExtraction(user.id))) {
+    return NextResponse.json({ error: "daily-limit" }, { status: 429 });
   }
 
   let body: unknown;
