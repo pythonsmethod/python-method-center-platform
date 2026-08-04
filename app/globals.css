@@ -4493,3 +4493,108 @@ code {
     flex: 1 1 100%;
   }
 }
+
+/* ---------- Анхам is alive ----------
+   Blink, wink and a smile that warms slightly. All of it in CSS on
+   transform/opacity only, so it runs on the compositor and costs the main
+   thread nothing — he is on every page and must never make a phone work.
+
+   transform-box: fill-box makes each SVG shape rotate and scale around
+   itself rather than around the canvas origin. */
+
+.anham__eyes,
+.anham__eye-wink,
+.anham__smile,
+.anham__eye {
+  transform-box: fill-box;
+  transform-origin: center;
+}
+
+/* Both eyes close for a moment. The closed window is ~2% of the cycle,
+   which is roughly how long a real blink lasts against its interval. */
+.anham__eyes {
+  animation: anham-blink 7s infinite;
+}
+
+@keyframes anham-blink {
+  0%,
+  46%,
+  100% {
+    transform: scaleY(1);
+  }
+  48% {
+    transform: scaleY(0.08);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* And now and then, one eye alone — the difference between a machine
+   acknowledging you and someone greeting you. */
+.anham__eye-wink {
+  animation: anham-wink 11s infinite;
+}
+
+@keyframes anham-wink {
+  0%,
+  70%,
+  100% {
+    transform: scaleY(1);
+  }
+  73% {
+    transform: scaleY(0.08);
+  }
+  78% {
+    transform: scaleY(0.08);
+  }
+  81% {
+    transform: scaleY(1);
+  }
+}
+
+/* The smile lifts a little on its own rhythm, so his face is never frozen
+   between blinks. */
+.anham__smile {
+  animation: anham-smile 6.5s ease-in-out infinite;
+}
+
+@keyframes anham-smile {
+  0%,
+  100% {
+    transform: scaleX(1) scaleY(1);
+  }
+  50% {
+    transform: scaleX(1.06) scaleY(1.18);
+  }
+}
+
+/* He looks toward whoever is hovering over him, then settles back. */
+.anham-companion__figure:hover .anham__face {
+  transform: translateY(-1px);
+  transition: transform 0.3s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .anham__eyes,
+  .anham__eye-wink,
+  .anham__smile {
+    animation: none;
+  }
+}
+
+/* Анхам on the team's workspace. Professor Python and Anna see the same
+   companion their clients see — the same face, at his fullest state.
+
+   The assistant behind this panel keeps its own prompt and its own
+   latitude: it drafts for the expert and may reason openly, which the
+   client-facing Анхам must never do. Same face, different room. */
+.staff-assistant__title {
+  align-items: center;
+  display: flex;
+  gap: 0.6rem;
+}
+
+.staff-assistant__face {
+  flex: 0 0 auto;
+}

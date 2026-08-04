@@ -166,11 +166,36 @@ export function AnhamAvatar({
       <ellipse cx="60" cy="68" fill={`url(#${uid}-face)`} rx="30" ry="27" />
 
       {/* Big warm eyes and a small kind smile. Nothing sharp, nothing
-          narrowed — a child should not read a threat in this face. */}
+          narrowed — a child should not read a threat in this face.
+
+          He is alive: he blinks, and now and then he winks. The blink and
+          the wink run on cycles of 7s and 11s, which share no common
+          factor, so the pattern never lines up into something mechanical.
+          Two nested groups because both animate a transform and one
+          element cannot carry two. */}
       <g className="anham__face" filter={`url(#${uid}-glow)`}>
-        <ellipse cx="49" cy="65" fill={`url(#${uid}-eye)`} rx="6.2" ry="7.4" />
-        <ellipse cx="71" cy="65" fill={`url(#${uid}-eye)`} rx="6.2" ry="7.4" />
+        <g className="anham__eyes">
+          <g className="anham__eye-wink">
+            <ellipse
+              className="anham__eye"
+              cx="49"
+              cy="65"
+              fill={`url(#${uid}-eye)`}
+              rx="6.2"
+              ry="7.4"
+            />
+          </g>
+          <ellipse
+            className="anham__eye"
+            cx="71"
+            cy="65"
+            fill={`url(#${uid}-eye)`}
+            rx="6.2"
+            ry="7.4"
+          />
+        </g>
         <path
+          className="anham__smile"
           d="M53 78 Q60 84 67 78"
           fill="none"
           stroke="#f2d489"

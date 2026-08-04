@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
+import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
 import { EscalationPanel } from "@/components/escalations/EscalationPanel";
@@ -135,7 +136,10 @@ export default async function AdminPage() {
         <section aria-label="ИИ-помощник Professor Python" className="admin-split__assistant">
           <div className="panel">
             <span className="panel__label">ИИ-помощник Professor Python</span>
-            <h2>Рабочий чат</h2>
+            <h2 className="staff-assistant__title">
+              <AnhamAvatar className="staff-assistant__face" size={44} state="client" />
+              Рабочий чат
+            </h2>
             {assistantConfigured ? (
               <AssistantChat
                 attachments

@@ -15,6 +15,7 @@ import {
   paymentStatusLabel
 } from "@/lib/i18n/status-labels";
 import { isUuid } from "@/lib/utils/uuid";
+import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
@@ -359,7 +360,10 @@ export default async function StaffCaseDetailPage({
       <section className="intake-section" aria-label="ИИ-Ассистент по кейсу">
         <div className="panel">
           <span className="panel__label">ИИ-Ассистент Professor Python</span>
-          <h2>Помощник по этому кейсу</h2>
+          <h2 className="staff-assistant__title">
+            <AnhamAvatar className="staff-assistant__face" size={44} state="client" />
+            Помощник по этому кейсу
+          </h2>
           <p>
             Ассистент видит снимок кейса из базы: анкету, список документов,
             оплаты и историю. Содержимое загруженных файлов ему недоступно —
