@@ -172,14 +172,9 @@
   inset: 2%;
 }
 
-.home-hero__gate-ankh {
-  color: var(--accent-strong);
-  height: 46%;
-  opacity: 0.9;
-  position: relative;
-  width: auto;
-}
-
+/* No ankh inside the gate: at that size it reads as a cross standing
+   behind the founder's photograph, which is not the symbol this is. The
+   rings and the light carry the gate on their own. */
 /* Анхам stands beside him, slightly forward, with his greeting above. */
 .home-hero__anham {
   bottom: 0;
@@ -644,4 +639,17 @@
 .home-figure__seal svg {
   height: 46%;
   width: auto;
+}
+
+/* The ankh as a vector: U+2625 is absent from the font stack and falls
+   back to a dagger, which is the wrong symbol on a health platform. */
+.home-button__ankh,
+.home-hero__trust-ankh {
+  flex: 0 0 auto;
+  height: 1.05em;
+  width: auto;
+}
+
+.home-hero__trust-ankh {
+  color: var(--accent);
 }

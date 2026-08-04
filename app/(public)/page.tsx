@@ -71,12 +71,12 @@ export default async function HomePage() {
             </Link>
             <Link className="home-button" href="/support">
               {t.heroCtaAnham}
-              <span aria-hidden="true">☥</span>
+              <IconAnkh className="home-button__ankh" />
             </Link>
           </div>
 
           <p className="home-hero__trust">
-            <span aria-hidden="true">☥</span>
+            <IconAnkh className="home-hero__trust-ankh" />
             {t.heroTrust}
           </p>
         </div>
@@ -85,7 +85,6 @@ export default async function HomePage() {
           <div aria-hidden="true" className="home-hero__gate">
             <span className="home-hero__gate-ring" />
             <span className="home-hero__gate-ring" />
-            <IconAnkh className="home-hero__gate-ankh" />
           </div>
           <Image
             alt="Professor Python"
