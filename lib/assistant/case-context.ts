@@ -1,4 +1,5 @@
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
+import { getCaseReview } from "@/lib/cases/review-queries";
 import { formatDateTime } from "@/lib/i18n/format";
 import {
   caseDirectionLabel,
@@ -68,7 +69,29 @@ export async function buildCaseContext(caseId: string): Promise<string | null> {
       lines.push(`…и ещё ${documents.length - MAX_DOCUMENTS} документов.`);
     }
     lines.push(
-      "Содержимое файлов тебе недоступно — только названия и статусы. Если для ответа нужно содержимое документа, попроси Professor Python вставить текст."
+      "Сами файлы в этот разговор не приложены — здесь ты видишь только их названия и статусы."
+    );
+  }
+
+  // The reading made by the button above the document list. Once it
+  // exists, the assistant in this chat knows what is inside the client's
+  // analyses — it is text in the database by then, and costs nothing to
+  // include. Without this the natural thing to do (ask the assistant) hit
+  // the same wall as before, while the capability sat behind a button
+  // elsewhere on the page.
+  const review = await getCaseReview(detail.id, documents);
+
+  if (review) {
+    lines.push(
+      `\n### Разбор загруженных анализов (сделан ассистентом ${formatDateTime(review.createdAt)}, прочитано файлов: ${review.documentsCount}${review.isCurrent ? "" : "; ПОСЛЕ ЭТОГО клиент загрузил новые документы — разбор устарел"})`
+    );
+    lines.push(review.summary);
+    lines.push(
+      "Это твой собственный более ранний разбор этих файлов. Опирайся на него, отвечая про анализы, и говори прямо, что цифры взяты из него, а не прочитаны заново."
+    );
+  } else if (documents.length > 0) {
+    lines.push(
+      "\nРазбора этих файлов ещё нет. Не проси Professor Python вставлять текст анализов вручную и не проси прикладывать их повторно — файлы уже в системе. Скажи ему нажать кнопку «Прочитать анализы кейса» в блоке над списком документов: ты прочитаешь их сам и сохранишь разбор."
     );
   }
 

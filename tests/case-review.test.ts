@@ -162,3 +162,37 @@ describe("knowing when a reading is out of date", () => {
     expect(fingerprintDocuments([docs[0]])).not.toBe(fingerprintDocuments(docs));
   });
 });
+
+describe("the assistant in the case chat knows about the reading", () => {
+  it("is told to use the button instead of asking for the files again", async () => {
+    const { buildStaffSystemPrompt } = await import("@/lib/assistant/prompts");
+    const prompt = await buildStaffSystemPrompt();
+
+    expect(prompt).toContain("Прочитать анализы кейса");
+    expect(prompt).toContain(
+      "НИКОГДА не проси его прикладывать сюда файлы, которые клиент уже загрузил"
+    );
+  });
+
+  it("no longer claims it has no access to the case at all", async () => {
+    // It does: the case page hands it a snapshot, and the reading of the
+    // analyses is part of that snapshot once it exists. Saying otherwise
+    // sent Professor Python back to re-uploading files by hand.
+    const { buildStaffSystemPrompt } = await import("@/lib/assistant/prompts");
+    const prompt = await buildStaffSystemPrompt();
+
+    expect(prompt).not.toContain(
+      "У тебя НЕТ прямого доступа к базе данных, кейсам и документам"
+    );
+  });
+
+  it("leaves the client-facing assistant's boundary untouched", async () => {
+    // The client's Анхам still cannot read cabinet storage, and must not
+    // learn about a team-only reading of their own analyses.
+    const { buildPaidClientSystemPrompt } = await import("@/lib/assistant/prompts");
+    const prompt = await buildPaidClientSystemPrompt("контекст");
+
+    expect(prompt).toContain("ХРАНИЛИЩА КАБИНЕТА");
+    expect(prompt).not.toContain("Прочитать анализы кейса");
+  });
+});
