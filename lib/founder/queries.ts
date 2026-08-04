@@ -139,6 +139,18 @@ export async function getFounderOverview(): Promise<FounderOverview> {
         : "Не настроены TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID"
     },
     {
+      // A reminder that does not depend on anyone remembering. The paid
+      // review is not described in the offer at all — the contract lists the
+      // free assessment, 5 weeks and 100 days, and nothing else. While the
+      // review is free this is harmless; the moment it is switched to paid,
+      // the center would be selling something its contract does not mention.
+      name: "Услуга «Разбор анализов» в договоре",
+      ok: isFreeReviewActive(),
+      detail: isFreeReviewActive()
+        ? "Разбор сейчас бесплатный — договор описывать его не обязан"
+        : "ВКЛЮЧЁН ПЛАТНЫЙ РЕЖИМ, а услуги «Разбор анализов» нет в оферте. Внесите её в договор (lib/legal/offer-content.ts) и поднимите версию, прежде чем принимать оплату."
+    },
+    {
       name: "Автозапись оплат (Stripe webhook)",
       ok: Boolean(
         process.env.STRIPE_SECRET_KEY?.trim() &&
