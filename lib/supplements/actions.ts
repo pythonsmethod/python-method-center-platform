@@ -1,20 +1,16 @@
 "use server";
 
+import type {
+  SupplementActionState,
+  TimingAdviceState
+} from "@/lib/supplements/action-state";
 import { revalidatePath } from "next/cache";
 import { askClaude } from "@/lib/assistant/claude";
 import { sanitizeTimes } from "@/lib/supplements/schedule";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export type SupplementActionState = {
-  status: "idle" | "success" | "error";
-  message: string;
-};
 
-export const initialSupplementActionState: SupplementActionState = {
-  status: "idle",
-  message: ""
-};
 
 function errorState(message: string): SupplementActionState {
   return { status: "error", message };
@@ -154,17 +150,7 @@ export async function toggleIntake(
   return { status: "success", message: "" };
 }
 
-export type TimingAdviceState = {
-  status: "idle" | "success" | "error";
-  advice: string;
-  message: string;
-};
 
-export const initialTimingAdviceState: TimingAdviceState = {
-  status: "idle",
-  advice: "",
-  message: ""
-};
 
 // The one thing the AI is allowed to do here: comment on TIMING for the
 // list the person entered themselves. It never suggests what to take, what

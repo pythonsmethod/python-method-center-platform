@@ -6,11 +6,13 @@ import { useActionState, useEffect, useMemo, useState } from "react";
 import {
   addSupplement,
   getTimingAdvice,
-  initialSupplementActionState,
-  initialTimingAdviceState,
   removeSupplement,
   toggleIntake
 } from "@/lib/supplements/actions";
+import {
+  initialSupplementActionState,
+  initialTimingAdviceState
+} from "@/lib/supplements/action-state";
 import {
   buildTodaySchedule,
   countDue,

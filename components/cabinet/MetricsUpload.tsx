@@ -3,10 +3,8 @@
 import { useActionState, useRef, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { prepareFiles } from "@/lib/assistant/prepare-files";
-import {
-  initialMetricActionState,
-  saveExtractedMetrics
-} from "@/lib/metrics/actions";
+import { saveExtractedMetrics } from "@/lib/metrics/actions";
+import { initialMetricActionState } from "@/lib/metrics/action-state";
 import type { ExtractedRow } from "@/lib/metrics/extraction";
 
 type MetricsUploadProps = {

@@ -3,10 +3,8 @@
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 import { useActionState } from "react";
-import {
-  initialProfileDetailsActionState,
-  updateProfileDetails
-} from "@/lib/profile/actions";
+import { updateProfileDetails } from "@/lib/profile/actions";
+import { initialProfileDetailsActionState } from "@/lib/profile/action-state";
 
 type ProfileDetailsFormProps = {
   labels: Dictionary["cabinet"]["profileForm"];

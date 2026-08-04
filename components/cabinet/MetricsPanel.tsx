@@ -3,11 +3,8 @@
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
 import { useActionState, useMemo, useState } from "react";
-import {
-  addMetricEntry,
-  deleteMetricEntry,
-  initialMetricActionState
-} from "@/lib/metrics/actions";
+import { addMetricEntry, deleteMetricEntry } from "@/lib/metrics/actions";
+import { initialMetricActionState } from "@/lib/metrics/action-state";
 import { buildChartGeometry } from "@/lib/metrics/chart";
 
 export type MetricRow = {

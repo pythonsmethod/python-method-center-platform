@@ -1,17 +1,10 @@
 "use server";
 
+import type { ProfileDetailsActionState } from "@/lib/profile/action-state";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
-export type ProfileDetailsActionState = {
-  status: "idle" | "success" | "error";
-  message: string;
-};
 
-export const initialProfileDetailsActionState: ProfileDetailsActionState = {
-  status: "idle",
-  message: ""
-};
 
 function errorState(message: string): ProfileDetailsActionState {
   return { status: "error", message };

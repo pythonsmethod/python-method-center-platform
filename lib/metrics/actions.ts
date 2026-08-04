@@ -1,20 +1,13 @@
 "use server";
 
+import type { MetricActionState } from "@/lib/metrics/action-state";
 import { revalidatePath } from "next/cache";
 import { normalizeMetricName } from "@/lib/metrics/chart";
 import { readExtractedRow, MAX_EXTRACTED_ROWS } from "@/lib/metrics/extraction";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
-export type MetricActionState = {
-  status: "idle" | "success" | "error";
-  message: string;
-};
 
-export const initialMetricActionState: MetricActionState = {
-  status: "idle",
-  message: ""
-};
 
 function errorState(message: string): MetricActionState {
   return { status: "error", message };
