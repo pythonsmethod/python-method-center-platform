@@ -1,4 +1,6 @@
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -30,17 +32,19 @@ async function getProfileDefaults(
 
 export default async function OnboardingPage() {
   const auth = await getRequiredUser("/onboarding");
+  const locale = await getLocale();
+  const t = getDictionary(locale).onboarding;
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Анкета"
-          title="Анкета"
-          description="Для заполнения анкеты требуется настроенная аутентификация."
+          eyebrow={t.eyebrow}
+          title={t.setupTitle}
+          description={t.setupDescription}
         />
 
-        <AuthSetupNotice title="Анкета требует настройки Supabase Auth" />
+        <AuthSetupNotice title={t.setupNotice} />
       </div>
     );
   }
@@ -50,37 +54,31 @@ export default async function OnboardingPage() {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Анкета"
-        title="Расскажите о вашей ситуации"
-        description="Анкета создаёт ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Ваш аккаунт</span>
-          <h2>{auth.email ?? "Вы вошли в систему"}</h2>
-          <p>
-            Анкета сохраняется в вашем кейсе вместе с согласиями. После
-            отправки вы сможете загрузить медицинские документы в кабинете.
-          </p>
+          <span className="panel__label">{t.accountLabel}</span>
+          <h2>{auth.email ?? t.signedIn}</h2>
+          <p>{t.accountText}</p>
           <div className="panel-actions">
             <LogoutButton />
           </div>
         </div>
         <div className="panel">
-          <span className="panel__label">Что важно знать</span>
-          <h2>Анкета — не медицинская консультация</h2>
-          <p>
-            На основе анкеты не ставится диагноз и не назначается лечение. Она
-            нужна, чтобы Professor Python и команда поняли вашу ситуацию и цели.
-          </p>
+          <span className="panel__label">{t.noticeLabel}</span>
+          <h2>{t.noticeTitle}</h2>
+          <p>{t.noticeText}</p>
         </div>
       </section>
 
       <EmergencyNotice />
 
-      <section className="form-section" aria-label="Анкета">
-        <OnboardingForm profileDefaults={profileDefaults} />
+      <section className="form-section" aria-label={t.formLabel}>
+        <OnboardingForm labels={t} profileDefaults={profileDefaults} />
       </section>
     </div>
   );

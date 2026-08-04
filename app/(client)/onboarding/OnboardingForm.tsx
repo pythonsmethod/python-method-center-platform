@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useActionState } from "react";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { submitOnboarding } from "@/lib/onboarding/actions";
 import {
   initialOnboardingActionState,
@@ -10,9 +11,15 @@ import {
 
 type OnboardingFormProps = {
   profileDefaults: OnboardingProfileDefaults;
+  // The whole onboarding section of the dictionary. This form carries both
+  // consents, and a consent a person cannot read is not consent.
+  labels: Dictionary["onboarding"];
 };
 
-export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
+export function OnboardingForm({
+  profileDefaults,
+  labels
+}: OnboardingFormProps) {
   const [state, formAction, pending] = useActionState(
     submitOnboarding,
     initialOnboardingActionState
@@ -21,7 +28,7 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
   return (
     <form action={formAction} className="onboarding-form">
       <label className="field">
-        <span>Полное имя</span>
+        <span>{labels.fullName}</span>
         <input
           autoComplete="name"
           defaultValue={profileDefaults.fullName}
@@ -32,7 +39,7 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
       </label>
 
       <label className="field">
-        <span>Телефон</span>
+        <span>{labels.phone}</span>
         <input
           autoComplete="tel"
           defaultValue={profileDefaults.phone}
@@ -43,28 +50,28 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
       </label>
 
       <label className="field">
-        <span>Для кого запрос</span>
+        <span>{labels.recipient}</span>
         <select defaultValue="self" name="careRecipientType" required>
-          <option value="self">Для себя</option>
-          <option value="family_member">Для члена семьи</option>
+          <option value="self">{labels.recipientSelf}</option>
+          <option value="family_member">{labels.recipientFamily}</option>
         </select>
       </label>
 
       <label className="field">
-        <span>Основная цель</span>
+        <span>{labels.goal}</span>
         <input
           name="primaryGoal"
-          placeholder="Например: восстановление после операции"
+          placeholder={labels.goalPlaceholder}
           required
           type="text"
         />
       </label>
 
       <label className="field">
-        <span>Краткое описание ситуации</span>
+        <span>{labels.situation}</span>
         <textarea
           name="situationDescription"
-          placeholder="Что произошло, какое состояние сейчас, что уже делали"
+          placeholder={labels.situationPlaceholder}
           required
           rows={5}
         />
@@ -73,9 +80,9 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
       <label className="checkbox-field">
         <input name="offerAccepted" required type="checkbox" />
         <span>
-          Я принимаю условия{" "}
+          {labels.offerPrefix}
           <Link href="/legal/offer" target="_blank">
-            публичной оферты
+            {labels.offerLink}
           </Link>
           .
         </span>
@@ -83,14 +90,11 @@ export function OnboardingForm({ profileDefaults }: OnboardingFormProps) {
 
       <label className="checkbox-field">
         <input name="consentAccepted" required type="checkbox" />
-        <span>
-          Я даю согласие на обработку моих персональных данных и медицинской
-          информации для подготовки и ведения кейса.
-        </span>
+        <span>{labels.consent}</span>
       </label>
 
       <button className="button" disabled={pending} type="submit">
-        {pending ? "Отправка..." : "Отправить анкету"}
+        {pending ? labels.submitting : labels.submit}
       </button>
 
       {state.message ? (

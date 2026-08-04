@@ -8,6 +8,46 @@ import type { Locale } from "@/lib/i18n/locale";
 // workspace stay Russian for now (team-facing).
 
 const ru = {
+  onboarding: {
+    eyebrow: "Анкета",
+    title: "Расскажите о вашей ситуации",
+    description:
+      "Анкета создаёт ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам.",
+    setupTitle: "Анкета",
+    setupDescription: "Для заполнения анкеты требуется настроенная аутентификация.",
+    setupNotice: "Анкета требует настройки Supabase Auth",
+    accountLabel: "Ваш аккаунт",
+    signedIn: "Вы вошли в систему",
+    accountText:
+      "Анкета сохраняется в вашем кейсе вместе с согласиями. После отправки вы сможете загрузить медицинские документы в кабинете.",
+    noticeLabel: "Что важно знать",
+    noticeTitle: "Анкета — не медицинская консультация",
+    noticeText:
+      "На основе анкеты не ставится диагноз и не назначается лечение. Она нужна, чтобы Professor Python и команда поняли вашу ситуацию и цели.",
+    formLabel: "Анкета",
+    fullName: "Полное имя",
+    phone: "Телефон",
+    recipient: "Для кого запрос",
+    recipientSelf: "Для себя",
+    recipientFamily: "Для члена семьи",
+    goal: "Основная цель",
+    goalPlaceholder: "Например: восстановление после операции",
+    situation: "Краткое описание ситуации",
+    situationPlaceholder: "Что произошло, какое состояние сейчас, что уже делали",
+    offerPrefix: "Я принимаю условия ",
+    offerLink: "публичной оферты",
+    consent:
+      "Я даю согласие на обработку моих персональных данных и медицинской информации для подготовки и ведения кейса.",
+    submit: "Отправить анкету",
+    submitting: "Отправка...",
+    errorFields: "Заполните все обязательные поля анкеты.",
+    errorRecipient: "Укажите, для кого запрос.",
+    errorOffer: "Для отправки анкеты необходимо принять условия публичной оферты.",
+    errorConsent: "Для отправки анкеты необходимо согласие на обработку данных.",
+    errorCase: "Не удалось создать кейс. Попробуйте ещё раз.",
+    errorCaseUpdate: "Не удалось обновить кейс. Попробуйте ещё раз.",
+    errorConsentSave: "Не удалось зафиксировать согласия. Попробуйте ещё раз."
+  },
   offer: {
     eyebrow: "Юридические документы",
     title: "Публичная оферта",
@@ -423,6 +463,46 @@ const ru = {
 };
 
 const en: typeof ru = {
+  onboarding: {
+    eyebrow: "Questionnaire",
+    title: "Tell us about your situation",
+    description:
+      "The questionnaire creates your case: the team will read it and contact you about the next steps.",
+    setupTitle: "Questionnaire",
+    setupDescription: "Authentication must be configured before the questionnaire can be filled in.",
+    setupNotice: "The questionnaire needs Supabase Auth configured",
+    accountLabel: "Your account",
+    signedIn: "You are signed in",
+    accountText:
+      "The questionnaire is stored in your case together with your consents. Once it is submitted you can upload medical documents in your cabinet.",
+    noticeLabel: "Worth knowing",
+    noticeTitle: "The questionnaire is not a medical consultation",
+    noticeText:
+      "No diagnosis is made and no treatment is prescribed from this questionnaire. It exists so that Professor Python and the team understand your situation and your goals.",
+    formLabel: "Questionnaire",
+    fullName: "Full name",
+    phone: "Phone",
+    recipient: "Who is this request for",
+    recipientSelf: "For myself",
+    recipientFamily: "For a family member",
+    goal: "Main goal",
+    goalPlaceholder: "For example: recovery after surgery",
+    situation: "A short description of the situation",
+    situationPlaceholder: "What happened, how things are now, what has already been tried",
+    offerPrefix: "I accept the terms of the ",
+    offerLink: "public offer",
+    consent:
+      "I consent to the processing of my personal data and medical information for the preparation and handling of my case.",
+    submit: "Submit the questionnaire",
+    submitting: "Sending...",
+    errorFields: "Please fill in every required field.",
+    errorRecipient: "Please say who this request is for.",
+    errorOffer: "The terms of the public offer must be accepted to submit the questionnaire.",
+    errorConsent: "Consent to data processing is required to submit the questionnaire.",
+    errorCase: "The case could not be created. Please try again.",
+    errorCaseUpdate: "The case could not be updated. Please try again.",
+    errorConsentSave: "Your consents could not be recorded. Please try again."
+  },
   offer: {
     eyebrow: "Legal documents",
     title: "Public offer",

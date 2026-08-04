@@ -12,6 +12,7 @@ import {
 } from "@/lib/cases/lifecycle";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { getOfferDocumentLocale, OFFER_VERSION } from "@/lib/legal/offer";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -62,24 +63,28 @@ export async function submitOnboarding(
   // language of the site: the English client is shown the Russian text
   // until a translation exists, and the record has to say so.
   const uiLocale = await getLocale();
+  // Validation messages come back from the server, so they have to follow
+  // the visitor's language too — an English client was being refused in
+  // Russian.
+  const t = getDictionary(uiLocale).onboarding;
   const offerLocale = getOfferDocumentLocale(uiLocale);
   const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
 
   if (!fullName || !phone || !primaryGoal || !situationDescription) {
-    return errorState("Заполните все обязательные поля анкеты.");
+    return errorState(t.errorFields);
   }
 
   if (!isCareRecipientType(careRecipientType)) {
-    return errorState("Укажите, для кого запрос.");
+    return errorState(t.errorRecipient);
   }
 
   if (!offerAccepted) {
-    return errorState("Для отправки анкеты необходимо принять условия публичной оферты.");
+    return errorState(t.errorOffer);
   }
 
   if (!consentAccepted) {
-    return errorState("Для отправки анкеты необходимо согласие на обработку данных.");
+    return errorState(t.errorConsent);
   }
 
   const { error: profileError } = await supabase.from("profiles").upsert(
@@ -152,7 +157,7 @@ export async function submitOnboarding(
   }
 
   if (!caseId) {
-    return errorState("Не удалось создать кейс. Попробуйте ещё раз.");
+    return errorState(t.errorCase);
   }
 
   const submittedAt = new Date().toISOString();
@@ -229,7 +234,7 @@ export async function submitOnboarding(
   );
 
   if (!offerConsentRecord || !consentRecord) {
-    return errorState("Не удалось зафиксировать согласия. Попробуйте ещё раз.");
+    return errorState(t.errorConsentSave);
   }
 
   const auditLogs: AuditLogInput[] = [
