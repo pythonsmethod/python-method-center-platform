@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { RecoveryForm } from "./RecoveryForm";
 
 type RecoveryPageProps = {
@@ -7,6 +9,7 @@ type RecoveryPageProps = {
 };
 
 export default async function RecoveryPage({ searchParams }: RecoveryPageProps) {
+  const t = getDictionary(await getLocale()).recovery;
   const params = await searchParams;
   const message = Array.isArray(params?.message)
     ? params?.message[0]
@@ -15,34 +18,32 @@ export default async function RecoveryPage({ searchParams }: RecoveryPageProps) 
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Доступ к аккаунту"
-        title="Забыли пароль?"
-        description="Укажите email аккаунта — мы отправим письмо со ссылкой для смены пароля."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       {message === "link-invalid" ? (
         <p className="form-message form-message--error">
-          Ссылка для смены пароля недействительна или устарела (ссылку можно
-          использовать только один раз). Запросите новую ниже.
+          {t.expired}
         </p>
       ) : null}
 
       <section className="auth-layout">
         <div className="auth-panel">
-          <RecoveryForm />
+          <RecoveryForm labels={t} />
         </div>
         <div className="panel">
-          <span className="panel__label">Как это работает</span>
-          <h2>Три шага</h2>
+          <span className="panel__label">{t.howLabel}</span>
+          <h2>{t.howTitle}</h2>
           <p>
-            1. Отправьте форму — письмо придёт в течение пары минут (проверьте
-            «Спам»). 2. Откройте ссылку из письма. 3. Задайте новый пароль — и
-            вы снова в кабинете.
+            {t.howText}
           </p>
           <p>
-            Вспомнили пароль? <Link href="/login">Войти</Link>. Ссылка не
-            приходит — напишите нам через{" "}
-            <Link href="/support">страницу поддержки</Link>.
+            {t.rememberedPrefix}
+            <Link href="/login">{t.rememberedLink}</Link>
+            {t.noLetterPrefix}
+            <Link href="/support">{t.supportLink}</Link>.
           </p>
         </div>
       </section>

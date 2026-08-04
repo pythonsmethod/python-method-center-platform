@@ -523,6 +523,91 @@ const ru = {
       cta: "Создать аккаунт и пользоваться"
     }
   },
+  altPayment: {
+    eyebrow: "Другие способы оплаты",
+    title: "Если оплата картой не проходит",
+    description:
+      "Так бывает: в некоторых странах карты просто не принимаются, и дело не в вас. Мы найдём способ.",
+    back: "← Вернуться к тарифам",
+    methodsAria: "Доступные способы",
+    methodLabel: "Способ оплаты",
+    requestAria: "Запрос на оплату",
+    requestLabel: "Запрос",
+    requestTitle: "Напишите нам — подберём способ",
+    requestText:
+      "Укажите страну и то, как вам удобно платить. Мы ответим на email в течение 24 часов в рабочие дни. Если из вашей страны у нас пока нет способа — скажем честно и предложим другой вариант.",
+    consent:
+      "Согласен(на) на обработку указанных контактных данных для ответа на этот запрос.",
+    howLabel: "Как это будет",
+    howTitle: "Что произойдёт дальше",
+    step1: "Вы отправляете запрос — это ни к чему вас не обязывает.",
+    step2: "Мы отвечаем на email и присылаем реквизиты для вашей страны.",
+    step3:
+      "Вы оплачиваете удобным способом и присылаете подтверждение — скриншот или номер операции.",
+    step4:
+      "Команда вручную отмечает оплату в вашем кейсе, и доступ открывается так же, как при оплате картой.",
+    note:
+      "Оплата вне сайта проверяется человеком, поэтому доступ открывается не мгновенно — обычно в тот же рабочий день.",
+    planLabels: {
+      support_5_weeks: "Сопровождение — 5 недель",
+      support_15_weeks: "Сопровождение — 100 дней",
+      test_access: "Тестовый доступ (3 $)",
+      undecided: "Ещё не решил(а) — нужен совет"
+    },
+    methodLabels: {
+      bank: "Банковский перевод",
+      crypto: "Криптовалюта (USDT и другие)",
+      paypal: "PayPal",
+      wise: "Wise / Revolut",
+      other: "Другой способ (расскажу в комментарии)"
+    },
+    email: "Email для ответа",
+    country: "Ваша страна",
+    countryPlaceholder: "Например: Казахстан",
+    plan: "Какой тариф вы хотите оплатить",
+    method: "Как вам удобно платить",
+    comment: "Комментарий (необязательно)",
+    commentPlaceholder: "Что не получилось с картой, какой банк или сервис вам удобен",
+    submit: "Запросить реквизиты",
+    submitting: "Отправляем…"
+  },
+  recovery: {
+    eyebrow: "Доступ к аккаунту",
+    title: "Забыли пароль?",
+    description:
+      "Укажите email аккаунта — мы отправим письмо со ссылкой для смены пароля.",
+    expired:
+      "Ссылка для смены пароля недействительна или устарела (её можно использовать только один раз). Запросите новую ниже.",
+    emailField: "Email вашего аккаунта",
+    submit: "Отправить ссылку для смены пароля",
+    submitting: "Отправляю…",
+    howLabel: "Как это работает",
+    howTitle: "Три шага",
+    howText:
+      "1. Отправьте форму — письмо придёт в течение пары минут (проверьте «Спам»). 2. Откройте ссылку из письма. 3. Задайте новый пароль — и вы снова в кабинете.",
+    rememberedPrefix: "Вспомнили пароль? ",
+    rememberedLink: "Войти",
+    noLetterPrefix: ". Ссылка не приходит — напишите нам через ",
+    supportLink: "страницу поддержки"
+  },
+  resetPassword: {
+    eyebrow: "Доступ к аккаунту",
+    title: "Новый пароль",
+    description: "Задайте новый пароль для вашего аккаунта.",
+    expired:
+      "Ссылка для смены пароля недействительна или устарела: ссылку из письма можно открыть только один раз.",
+    requestNew: "Запросить новую ссылку",
+    toCabinet: "Перейти в кабинет",
+    passwordField: "Новый пароль (не короче 6 символов)",
+    repeatField: "Повторите новый пароль",
+    submit: "Сохранить новый пароль",
+    submitting: "Сохраняю…",
+    securityLabel: "Безопасность",
+    securityTitle: "После смены пароля",
+    securityTextPrefix:
+      "Вы останетесь в аккаунте на этом устройстве и сможете сразу перейти в кабинет. Если пароль меняли не вы — напишите нам через ",
+    supportLink: "страницу поддержки"
+  },
   promo: {
     badge: "🎁 Акция для первых клиентов",
     titleFree: "Бесплатная предварительная оценка от Professor Python",
@@ -1287,6 +1372,91 @@ const en: typeof ru = {
       ],
       cta: "Create an account and use them"
     }
+  },
+  altPayment: {
+    eyebrow: "Other ways to pay",
+    title: "If your card is not going through",
+    description:
+      "It happens: in some countries cards are simply not accepted, and it is not your fault. We will find a way.",
+    back: "← Back to the plans",
+    methodsAria: "Available methods",
+    methodLabel: "Payment method",
+    requestAria: "Payment request",
+    requestLabel: "Request",
+    requestTitle: "Write to us — we will find a way",
+    requestText:
+      "Tell us your country and how you would prefer to pay. We reply by email within 24 hours on working days. If we have no method for your country yet, we will say so honestly and suggest something else.",
+    consent:
+      "I consent to the processing of the contact details given here in order to answer this request.",
+    howLabel: "How this goes",
+    howTitle: "What happens next",
+    step1: "You send a request — it commits you to nothing.",
+    step2: "We reply by email with the payment details for your country.",
+    step3:
+      "You pay in the way that suits you and send confirmation — a screenshot or a transaction number.",
+    step4:
+      "The team records the payment in your case by hand, and your access opens exactly as it would after a card payment.",
+    note:
+      "A payment made outside the site is checked by a person, so access does not open instantly — usually the same working day.",
+    planLabels: {
+      support_5_weeks: "Support programme — 5 weeks",
+      support_15_weeks: "Support programme — 100 days",
+      test_access: "Test access ($3)",
+      undecided: "Not decided yet — I need advice"
+    },
+    methodLabels: {
+      bank: "Bank transfer",
+      crypto: "Cryptocurrency (USDT and others)",
+      paypal: "PayPal",
+      wise: "Wise / Revolut",
+      other: "Another way (I will explain in the comment)"
+    },
+    email: "Email for our reply",
+    country: "Your country",
+    countryPlaceholder: "For example: Kazakhstan",
+    plan: "Which plan do you want to pay for",
+    method: "How would you prefer to pay",
+    comment: "Comment (optional)",
+    commentPlaceholder: "What went wrong with the card, which bank or service suits you",
+    submit: "Request payment details",
+    submitting: "Sending…"
+  },
+  recovery: {
+    eyebrow: "Account access",
+    title: "Forgotten your password?",
+    description:
+      "Give the email on your account — we will send a letter with a link to change your password.",
+    expired:
+      "This password link is invalid or has expired (it can only be used once). Request a new one below.",
+    emailField: "The email on your account",
+    submit: "Send the password link",
+    submitting: "Sending…",
+    howLabel: "How it works",
+    howTitle: "Three steps",
+    howText:
+      "1. Send the form — the letter arrives within a couple of minutes (check your spam folder). 2. Open the link in the letter. 3. Set a new password — and you are back in your cabinet.",
+    rememberedPrefix: "Remembered it? ",
+    rememberedLink: "Sign in",
+    noLetterPrefix: ". No letter arriving — write to us through ",
+    supportLink: "the support page"
+  },
+  resetPassword: {
+    eyebrow: "Account access",
+    title: "New password",
+    description: "Set a new password for your account.",
+    expired:
+      "This password link is invalid or has expired: the link in the letter can only be opened once.",
+    requestNew: "Request a new link",
+    toCabinet: "Go to my cabinet",
+    passwordField: "New password (at least 6 characters)",
+    repeatField: "Repeat the new password",
+    submit: "Save the new password",
+    submitting: "Saving…",
+    securityLabel: "Security",
+    securityTitle: "After the change",
+    securityTextPrefix:
+      "You stay signed in on this device and can go straight to your cabinet. If it was not you who changed the password, write to us through ",
+    supportLink: "the support page"
   },
   promo: {
     badge: "🎁 Early clients offer",

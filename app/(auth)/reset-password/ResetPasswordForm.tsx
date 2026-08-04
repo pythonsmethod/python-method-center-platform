@@ -1,5 +1,7 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import Link from "next/link";
 import { useActionState } from "react";
 import { updatePassword } from "@/lib/auth/actions";
@@ -7,7 +9,11 @@ import type { AuthActionState } from "@/lib/auth/types";
 
 const initialState: AuthActionState = { status: "idle", message: "" };
 
-export function ResetPasswordForm() {
+type ResetPasswordFormProps = {
+  labels: Dictionary["resetPassword"];
+};
+
+export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
   const [state, action, pending] = useActionState(updatePassword, initialState);
 
   if (state.status === "success") {
@@ -15,7 +21,7 @@ export function ResetPasswordForm() {
       <div className="auth-form">
         <p className="form-message form-message--success">{state.message}</p>
         <Link className="button" href="/cabinet">
-          Перейти в кабинет
+          {labels.toCabinet}
         </Link>
       </div>
     );
@@ -24,7 +30,7 @@ export function ResetPasswordForm() {
   return (
     <form action={action} className="auth-form">
       <label className="field">
-        <span>Новый пароль (не короче 6 символов)</span>
+        <span>{labels.passwordField}</span>
         <input
           autoComplete="new-password"
           minLength={6}
@@ -34,7 +40,7 @@ export function ResetPasswordForm() {
         />
       </label>
       <label className="field">
-        <span>Повторите новый пароль</span>
+        <span>{labels.repeatField}</span>
         <input
           autoComplete="new-password"
           minLength={6}
@@ -44,11 +50,11 @@ export function ResetPasswordForm() {
         />
       </label>
       <button className="button" disabled={pending} type="submit">
-        {pending ? "Сохраняю…" : "Сохранить новый пароль"}
+        {pending ? labels.submitting : labels.submit}
       </button>
       {state.status === "error" ? (
         <p className="form-message form-message--error">
-          {state.message} <Link href="/recovery">Запросить новую ссылку</Link>
+          {state.message} <Link href="/recovery">{labels.requestNew}</Link>
         </p>
       ) : null}
     </form>

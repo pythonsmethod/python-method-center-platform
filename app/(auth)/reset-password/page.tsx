@@ -1,5 +1,7 @@
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ResetPasswordForm } from "./ResetPasswordForm";
 
@@ -7,6 +9,7 @@ import { ResetPasswordForm } from "./ResetPasswordForm";
 // user is here, the recovery session is already established. Without a
 // session the link was expired or already used.
 export default async function ResetPasswordPage() {
+  const t = getDictionary(await getLocale()).resetPassword;
   const supabase = await createSupabaseServerClient();
   let hasSession = false;
 
@@ -21,34 +24,32 @@ export default async function ResetPasswordPage() {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Доступ к аккаунту"
-        title="Новый пароль"
-        description="Задайте новый пароль для вашего аккаунта."
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
       />
 
       <section className="auth-layout">
         <div className="auth-panel">
           {hasSession ? (
-            <ResetPasswordForm />
+            <ResetPasswordForm labels={t} />
           ) : (
             <div className="auth-form">
               <p className="form-message form-message--error">
-                Ссылка для смены пароля недействительна или устарела. Ссылку из
-                письма можно открыть только один раз.
+                {t.expired}
               </p>
               <Link className="button" href="/recovery">
-                Запросить новую ссылку
+                {t.requestNew}
               </Link>
             </div>
           )}
         </div>
         <div className="panel">
-          <span className="panel__label">Безопасность</span>
-          <h2>После смены пароля</h2>
+          <span className="panel__label">{t.securityLabel}</span>
+          <h2>{t.securityTitle}</h2>
           <p>
-            Вы останетесь в аккаунте на этом устройстве и сможете сразу перейти
-            в кабинет. Если пароль меняли не вы — напишите нам через{" "}
-            <Link href="/support">страницу поддержки</Link>.
+            {t.securityTextPrefix}
+            <Link href="/support">{t.supportLink}</Link>.
           </p>
         </div>
       </section>

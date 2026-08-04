@@ -1,12 +1,18 @@
 "use client";
 
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+
 import { useActionState } from "react";
 import { requestPasswordReset } from "@/lib/auth/actions";
 import type { AuthActionState } from "@/lib/auth/types";
 
 const initialState: AuthActionState = { status: "idle", message: "" };
 
-export function RecoveryForm() {
+type RecoveryFormProps = {
+  labels: Dictionary["recovery"];
+};
+
+export function RecoveryForm({ labels }: RecoveryFormProps) {
   const [state, action, pending] = useActionState(
     requestPasswordReset,
     initialState
@@ -19,7 +25,7 @@ export function RecoveryForm() {
   return (
     <form action={action} className="auth-form">
       <label className="field">
-        <span>Email вашего аккаунта</span>
+        <span>{labels.emailField}</span>
         <input
           autoComplete="email"
           name="email"
@@ -29,7 +35,7 @@ export function RecoveryForm() {
         />
       </label>
       <button className="button" disabled={pending} type="submit">
-        {pending ? "Отправляю…" : "Отправить ссылку для смены пароля"}
+        {pending ? labels.submitting : labels.submit}
       </button>
       {state.status === "error" ? (
         <p className="form-message form-message--error">{state.message}</p>
