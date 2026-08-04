@@ -4,11 +4,13 @@ import { isFreeReviewActive } from "@/lib/config/promo";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 
-export const metadata: Metadata = {
-  title: "Разбор анализов от Professor Python — Python Method Center",
-  description:
-    "Что именно входит в разбор анализов, в каком виде и как быстро приходит ответ, кто его делает и что будет дальше."
-};
+// The review page carried its own Russian title, so an English visitor got
+// a Russian browser tab and a Russian search result for this page alone.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).meta;
+
+  return { title: t.reviewTitle, description: t.reviewDescription };
+}
 
 // Where "Get the review" leads: the offer's own page. The eight answers
 // live here — a person reads the terms first and meets the registration

@@ -37,24 +37,30 @@ const playfair = Playfair_Display({
   display: "swap"
 });
 
-export const metadata: Metadata = {
-  // One canonical address per page ("./" resolves to the current path), so
-  // search engines never index the same page under two names.
-  metadataBase: new URL(SITE_URL),
-  alternates: { canonical: "./" },
-  title: "Python Method — сопровождение восстановления",
-  description:
-    "Клиентская платформа Python Method: анкета, медицинские документы, связь с командой и оплата сопровождения.",
-  openGraph: {
-    siteName: "Python Method Center",
-    title: "Python Method Center — реабилитация без границ",
-    description:
-      "Цифровой центр восстановления: экспертное сопровождение Professor Python и ИИ-помощник рядом на каждом шаге пути.",
-    url: "./",
-    type: "website",
-    locale: "ru_RU"
-  }
-};
+// Title, description and the share card follow the visitor's language.
+// They were fixed in Russian, so an English visitor got a Russian browser
+// tab on every page, Russian text in search results, and a Russian preview
+// whenever they shared a link.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).meta;
+
+  return {
+    // One canonical address per page ("./" resolves to the current path),
+    // so search engines never index the same page under two names.
+    metadataBase: new URL(SITE_URL),
+    alternates: { canonical: "./" },
+    title: t.title,
+    description: t.description,
+    openGraph: {
+      siteName: "Python Method Center",
+      title: t.ogTitle,
+      description: t.ogDescription,
+      url: "./",
+      type: "website",
+      locale: t.ogLocale
+    }
+  };
+}
 
 type RootLayoutProps = {
   children: React.ReactNode;

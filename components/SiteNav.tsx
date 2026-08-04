@@ -37,7 +37,7 @@ export function SiteNav({ labels, signedIn }: SiteNavProps) {
   const accountActive = isCurrent("/cabinet") || isCurrent("/login");
 
   return (
-    <nav aria-label="Разделы сайта" className="site-nav">
+    <nav aria-label={labels.sections ?? "Разделы сайта"} className="site-nav">
       {navRoutes.map((route) => {
         const Icon = icons[route.href] ?? IconAnkh;
         const active = isCurrent(route.href);

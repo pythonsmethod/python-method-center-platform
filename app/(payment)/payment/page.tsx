@@ -83,16 +83,12 @@ export default async function PaymentPage() {
 
       <section className="panel-grid" aria-label={t.offerLabel}>
         <div className="panel">
-          <span className="panel__label">Другие способы оплаты</span>
-          <h2>Карта не проходит?</h2>
-          <p>
-            В некоторых странах карты просто не принимаются — и дело не в вас.
-            Мы примем оплату другим способом: банковский перевод, PayPal, Wise
-            или криптовалюта.
-          </p>
+          <span className="panel__label">{t.altLabel}</span>
+          <h2>{t.altTitle}</h2>
+          <p>{t.altText}</p>
           <div className="panel-actions">
             <Link className="button button--secondary" href="/payment/other">
-              Выбрать другой способ
+              {t.altCta}
             </Link>
           </div>
         </div>

@@ -8,6 +8,18 @@ import type { Locale } from "@/lib/i18n/locale";
 // workspace stay Russian for now (team-facing).
 
 const ru = {
+  meta: {
+    title: "Python Method — сопровождение восстановления",
+    description:
+      "Клиентская платформа Python Method: анкета, медицинские документы, связь с командой и оплата сопровождения.",
+    ogTitle: "Python Method Center — реабилитация без границ",
+    ogDescription:
+      "Цифровой центр восстановления: экспертное сопровождение Professor Python и ИИ-помощник рядом на каждом шаге пути.",
+    ogLocale: "ru_RU",
+    reviewTitle: "Разбор анализов от Professor Python — Python Method Center",
+    reviewDescription:
+      "Что именно входит в разбор анализов, сколько он занимает и что человек получает в кабинете."
+  },
   nav: {
     "/": "Главная",
     "/shop": "Магазин",
@@ -16,7 +28,8 @@ const ru = {
     "/payment": "Сопровождение",
     "/review": "Бесплатный разбор",
     "/support": "Поддержка",
-    signup: "Регистрация"
+    signup: "Регистрация",
+    sections: "Разделы сайта"
   } as Record<string, string>,
   footer: {
     offer: "Публичная оферта",
@@ -294,6 +307,11 @@ const ru = {
     offerTitle: "Оферта",
     offerText:
       "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Указывайте при оплате тот же email, что и в аккаунте платформы, — по нему команда привяжет платёж к вашему кейсу.",
+    altLabel: "Другие способы оплаты",
+    altTitle: "Карта не проходит?",
+    altText:
+      "В некоторых странах карты просто не принимаются — и дело не в вас. Мы примем оплату другим способом: банковский перевод, PayPal, Wise или криптовалюта.",
+    altCta: "Выбрать другой способ",
     offerCheckboxPrefix: "Я ознакомился(лась) и принимаю условия ",
     offerCheckboxLink: "публичной оферты",
     offerHint:
@@ -386,6 +404,18 @@ const ru = {
 };
 
 const en: typeof ru = {
+  meta: {
+    title: "Python Method — recovery support",
+    description:
+      "The Python Method client platform: questionnaire, medical documents, contact with the team and payment for support.",
+    ogTitle: "Python Method Center — rehabilitation without borders",
+    ogDescription:
+      "A digital recovery center: expert support led by Professor Python, with an AI assistant beside you at every step.",
+    ogLocale: "en_US",
+    reviewTitle: "Analyses review by Professor Python — Python Method Center",
+    reviewDescription:
+      "What the analyses review includes, how long it takes, and what arrives in your cabinet."
+  },
   nav: {
     "/": "Home",
     "/shop": "Shop",
@@ -394,7 +424,8 @@ const en: typeof ru = {
     "/payment": "Support program",
     "/review": "Free review",
     "/support": "Help",
-    signup: "Sign up"
+    signup: "Sign up",
+    sections: "Site sections"
   },
   footer: {
     offer: "Public offer",
@@ -669,6 +700,11 @@ const en: typeof ru = {
     offerTitle: "Public offer",
     offerText:
       "By paying for a plan you confirm acceptance of the public offer. Use the same email as in your platform account — the team links the payment to your case by it.",
+    altLabel: "Other ways to pay",
+    altTitle: "Card not going through?",
+    altText:
+      "In some countries cards are simply not accepted — and it is not your fault. We will take payment another way: bank transfer, PayPal, Wise or cryptocurrency.",
+    altCta: "Choose another way",
     offerCheckboxPrefix: "I have read and accept the terms of the ",
     offerCheckboxLink: "public offer",
     offerHint:
