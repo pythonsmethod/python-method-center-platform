@@ -3,12 +3,12 @@ import type Stripe from "stripe";
 import { paymentProductLabel } from "@/lib/i18n/status-labels";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { describeFailedPayment } from "@/lib/payments/failure";
+import { openServicePeriod } from "@/lib/payments/service-period";
 import {
   emailExactMatchPattern,
   getStripe,
   normalizePayerEmail,
-  productFromAmount,
-  servicePeriodEnd
+  productFromAmount
 } from "@/lib/payments/stripe";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
@@ -321,26 +321,26 @@ async function handlePaidSession(
     throw new Error(`payment insert failed: ${paymentError.message}`);
   }
 
-  // 4) Service period activation, tied to the payment.
+  // 4) Service period activation, tied to the payment. Shared with the
+  // manual path on the case page, so a renewal follows the same rule
+  // wherever the money came from.
   if (caseRow?.id) {
-    const { error: periodError } = await supabase.from("service_periods").insert({
-      profile_id: profileId,
-      case_id: caseRow.id,
-      payment_id: payment.id,
+    const period = await openServicePeriod(supabase, {
+      profileId,
+      caseId: caseRow.id,
+      paymentId: payment.id,
       product,
-      status: "active",
-      starts_at: paidAt.toISOString(),
-      ends_at: servicePeriodEnd(product, paidAt).toISOString()
+      paidAt
     });
 
-    if (periodError) {
+    if (period.status === "failed") {
       await notifyTeam({
         kind: "processing_error",
         dedupeKey: `service-period-failed:${eventId}`,
         title: "ОШИБКА ОБРАБОТКИ: период сопровождения не создан",
         lines: [
           `Оплата ${payment.id} записана, но период сопровождения не активирован.`,
-          `Ошибка: ${periodError.message}`,
+          `Ошибка: ${period.message}`,
           "Создайте период вручную."
         ],
         link: adminLink(`/admin/cases/${caseRow.id}`)

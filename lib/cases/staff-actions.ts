@@ -12,7 +12,9 @@ import {
 import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
+import { openServicePeriod } from "@/lib/payments/service-period";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 
 const amountPattern = /^\d{1,7}(?:[.,]\d{1,2})?$/;
@@ -188,7 +190,7 @@ export async function recordCasePayment(
   }
 
   const amountCents = Math.round(amount * 100);
-  const paidAt = new Date().toISOString();
+  const paidAt = new Date();
 
   const { data: payment, error: paymentError } = await supabase
     .from("payments")
@@ -200,7 +202,7 @@ export async function recordCasePayment(
       amount_cents: amountCents,
       currency,
       processor_reference: processorReference || null,
-      paid_at: paidAt,
+      paid_at: paidAt.toISOString(),
       metadata: {
         recorded_by: auth.userId,
         recorded_via: "admin_case_page"
@@ -212,6 +214,18 @@ export async function recordCasePayment(
   if (paymentError) {
     return errorState(paymentError.message);
   }
+
+  // Recording the money is not the same as switching the plan on, and this
+  // form used to do only the first. Someone who paid by transfer or in
+  // crypto — which is everyone whose card cannot leave their country —
+  // appeared as paid in the case and still had no access. Nothing said so.
+  const period = await openServicePeriod(supabase, {
+    profileId: currentCase.profile_id,
+    caseId,
+    paymentId: payment.id,
+    product,
+    paidAt
+  });
 
   await Promise.all([
     writeAuditLog({
@@ -239,12 +253,42 @@ export async function recordCasePayment(
         payment_id: payment.id,
         product,
         amount_cents: amountCents,
-        currency
+        currency,
+        service_period: period.status
       }
+    }),
+    // The referrer earns their tokens whether the client paid by card or by
+    // transfer. Rewarding only card payments would punish people for the
+    // country their friend happens to live in.
+    awardReferralTokensForPayment({
+      payerProfileId: currentCase.profile_id,
+      paymentId: payment.id
     })
   ]);
 
   revalidatePath(`/admin/cases/${caseId}`);
+  // The client is looking at their own cabinet while this happens.
+  revalidatePath("/cabinet");
 
-  return successState("Оплата зафиксирована.");
+  // Say which of the two things happened, because they are not the same and
+  // the difference decides whether anyone has to do anything next.
+  if (period.status === "failed") {
+    return errorState(
+      `Оплата записана, но тариф НЕ включён: ${period.message}. Клиент доступ не получил — откройте период вручную или напишите разработчику.`
+    );
+  }
+
+  if (period.status === "not-applicable") {
+    return successState(
+      "Оплата зафиксирована. Тариф не включался: у этого формата нет периода сопровождения."
+    );
+  }
+
+  const until = new Date(period.endsAt).toLocaleDateString("ru-RU");
+
+  return successState(
+    period.status === "extended"
+      ? `Оплата зафиксирована, сопровождение продлено до ${until}.`
+      : `Оплата зафиксирована, тариф включён до ${until}. Клиент уже видит доступ.`
+  );
 }
