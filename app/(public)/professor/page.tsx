@@ -59,7 +59,10 @@ export default async function ProfessorPage() {
             width={690}
           />
         </div>
-        <p className="professor-hero__lead">{t.lead}</p>
+        <div>
+          <p className="professor-hero__name">{t.fullName}</p>
+          <p className="professor-hero__lead">{t.lead}</p>
+        </div>
       </section>
 
       <section className="panel professor-story" aria-label={t.origin.title}>
@@ -99,14 +102,29 @@ export default async function ProfessorPage() {
         ))}
       </section>
 
-      <section className="panel-grid" aria-label={t.own.title}>
-        <div className="panel professor-story">
-          <span className="panel__label">{t.own.label}</span>
-          <h2>{t.own.title}</h2>
-          {t.own.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
+      {/* His own illness and his own returns. It belongs on the page
+          because it is the one thing that shows he is not describing a
+          broken body from the outside. */}
+      <section className="panel professor-story" aria-label={t.own.title}>
+        <span className="panel__label">{t.own.label}</span>
+        <h2>{t.own.title}</h2>
+        <ol className="professor-journey">
+          {t.own.steps.map((step) => (
+            <li className="professor-journey__step" key={step.when}>
+              <span className="professor-journey__when">{step.when}</span>
+              <strong className="professor-journey__title">{step.title}</strong>
+              <p>{step.text}</p>
+            </li>
           ))}
-          <blockquote className="professor-quote">{t.own.quote}</blockquote>
+        </ol>
+        <blockquote className="professor-quote">{t.own.quote}</blockquote>
+      </section>
+
+      <section className="panel-grid" aria-label={t.howTitle}>
+        <div className="panel">
+          <span className="panel__label">{t.personalLabel}</span>
+          <h2>{t.howTitle}</h2>
+          <p>{t.howText}</p>
         </div>
         <div className="panel professor-story">
           <span className="panel__label">{t.name.label}</span>
@@ -118,17 +136,23 @@ export default async function ProfessorPage() {
         </div>
       </section>
 
-      <section className="panel-grid" aria-label={t.howTitle}>
-        <div className="panel">
-          <span className="panel__label">{t.personalLabel}</span>
-          <h2>{t.howTitle}</h2>
-          <p>{t.howText}</p>
-        </div>
-        <div className="panel">
-          <span className="panel__label">{t.boundaryLabel}</span>
-          <h2>{t.boundaryTitle}</h2>
-          <p>{t.boundaryText}</p>
-        </div>
+      {/* The limits, written as a list of what he will not do. Exactly the
+          same content as the disclaimer that follows it, and a reader takes
+          it as character rather than as a lawyer's hedge. */}
+      <section className="panel professor-story" aria-label={t.notDoing.title}>
+        <span className="panel__label">{t.notDoing.label}</span>
+        <h2>{t.notDoing.title}</h2>
+        <ul className="professor-nots">
+          {t.notDoing.items.map((item) => (
+            <li key={item}>
+              <span className="professor-nots__mark" aria-hidden="true">
+                ✕
+              </span>
+              <span>{item}</span>
+            </li>
+          ))}
+        </ul>
+        <p className="professor-nots__legal">{t.boundaryText}</p>
       </section>
 
       <section className="panel" aria-label={t.companyTitle}>

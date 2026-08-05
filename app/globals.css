@@ -553,6 +553,94 @@ main {
   padding-left: clamp(14px, 3vw, 22px);
 }
 
+.professor-hero__name {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: clamp(1.3rem, 3.4vw, 1.7rem);
+  letter-spacing: 0.02em;
+  margin: 0 0 12px;
+}
+
+/* Four steps of his own life. A numbered list rather than a row of cards:
+   the order is the meaning, and on a phone a row of cards becomes a column
+   in which the order stops being visible. */
+.professor-journey {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  list-style: none;
+  margin: 18px 0 4px;
+  padding: 0;
+}
+
+.professor-journey__step {
+  border-top: 2px solid rgba(212, 175, 55, 0.45);
+  padding-top: 14px;
+}
+
+.professor-journey__when {
+  color: var(--accent);
+  display: block;
+  font-size: 0.78rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.professor-journey__title {
+  color: var(--text);
+  display: block;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  margin: 6px 0 8px;
+}
+
+.professor-journey p {
+  color: var(--muted);
+  font-size: 0.94rem;
+  line-height: 1.65;
+  margin: 0;
+  max-width: none;
+}
+
+/* What he will not do. */
+.professor-nots {
+  display: grid;
+  gap: 12px;
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+}
+
+.professor-nots li {
+  align-items: start;
+  color: var(--text);
+  display: grid;
+  gap: 12px;
+  grid-template-columns: 22px minmax(0, 1fr);
+  line-height: 1.65;
+}
+
+.professor-nots__mark {
+  align-items: center;
+  border: 1px solid rgba(212, 175, 55, 0.45);
+  border-radius: 50%;
+  color: var(--accent);
+  display: flex;
+  font-size: 0.7rem;
+  height: 22px;
+  justify-content: center;
+  width: 22px;
+}
+
+.professor-nots__legal {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin-top: 22px;
+  max-width: none;
+  padding-top: 18px;
+}
+
 /* "Continue your treatment." The most important sentence on the page for
    the person reading it, so it does not look like small print. */
 .professor-warning {

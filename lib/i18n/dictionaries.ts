@@ -735,6 +735,9 @@ const ru = {
     eyebrow: "Автор метода",
     title: "Professor Python",
     subtitle: "Человек, к которому приходят, когда организм больше не справляется",
+    // Настоящее имя на странице о человеке. Прозвище без имени за ним
+    // читается как псевдоним, за которым некому отвечать.
+    fullName: "Карен Пашикян",
     lead: "Тридцать лет практики. С 2024 года он работает почти исключительно с людьми в тяжёлом состоянии — с теми, кто проходит через лечение, которое их организм еле выдерживает. Каждый случай он разбирает лично.",
     // Почему он этим занимается. Прямая речь Карена — то, что он сам
     // рассказал под запись, а не пересказ.
@@ -778,14 +781,57 @@ const ru = {
       warning:
         "Он никогда не отменяет назначения врачей и не советует от них отказываться. Если вы проходите лечение — продолжайте его. Он работает рядом с вашими врачами, а не вместо них."
     },
+    // Его собственная история болезни и возвращения. Она делает то, чего не
+    // может сделать ни одно описание метода: показывает, что он говорит о
+    // разрушенном организме не со стороны.
+    //
+    // Здесь единственное место на сайте, где слово «победил» относится к
+    // болезни — и относится оно к нему самому, к его собственному гепатиту,
+    // сказано его словами о своей жизни. Это не обещание читателю и не
+    // результат метода, применённого к клиенту.
     own: {
       label: "Он знает это по себе",
-      title: "Не по учебникам",
-      paragraphs: [
-        "Чемпион в пяти видах единоборств, выступал на мировой арене. Много раз ломался — и каждый раз возвращался. Восстанавливать тело после травм он начал с себя, задолго до того, как это стало профессией."
+      title: "Путь длиной в жизнь",
+      steps: [
+        {
+          when: "10-й класс",
+          title: "Диагноз",
+          text: "Гепатит B. Печень почти разрушена. Ему сказали, что с такой печенью он не сможет заниматься спортом никогда."
+        },
+        {
+          when: "Спорт",
+          title: "Вопреки",
+          text: "Многократный чемпион страны, Азии и мира. Восстанавливать собственный организм он начал задолго до того, как это стало профессией."
+        },
+        {
+          when: "Травмы",
+          title: "Возвращения",
+          text: "Тяжёлые травмы, операции, после которых спортсменов не возвращают. Он восстанавливался и снова выходил на международный уровень."
+        },
+        {
+          when: "Сегодня",
+          title: "Метод",
+          text: "Автор Python Method. Учится каждый день и говорит, что специалист, переставший учиться, перестаёт быть специалистом."
+        }
       ],
       quote:
-        "Я показал, что я один из лучших реабилитологов в мире: восстановился, вернулся на мировой подиум и снова побеждал. Не на словах — на практике."
+        "Мне сказали, что я не смогу заниматься спортом никогда. Я победил свою болезнь и стал многократным чемпионом страны, Азии и мира. Показал, что невозможное возможно."
+    },
+    // Границы, написанные как список того, чего он не делает.
+    //
+    // Тот же смысл, что в юридической приписке, но человек читает это как
+    // характер, а не как отказ от ответственности. Из пяти пунктов четыре
+    // защищают его и центр, и все пять — правда по договору.
+    notDoing: {
+      label: "Честно",
+      title: "Чего он не делает",
+      items: [
+        "Не заменяет ваших лечащих врачей и не отменяет их назначения.",
+        "Не ставит диагнозы и не назначает лечение — это делает врач.",
+        "Не обещает результат: он зависит от вашего состояния и вашей вовлечённости.",
+        "Не работает по шаблону — одинаковых протоколов у него нет.",
+        "Не исчезает: пока идёт ваша программа, он на связи."
+      ]
     },
     // Сказать про прозвище первым — единственный способ, чтобы человек не
     // почувствовал себя обманутым, когда поймёт это сам.
@@ -793,7 +839,7 @@ const ru = {
       label: "Откуда имя",
       title: "Ни то, ни другое — не медицинское звание",
       paragraphs: [
-        "Его зовут Карен. Python — бойцовский псевдоним, приклеившийся с юности. «Профессором» его начали называть те, с кем он работал. Он никогда не выдавал ни то, ни другое за медицинское звание — и здесь не станет.",
+        "Python — бойцовский псевдоним, приклеившийся с юности. «Профессором» его начали называть те, с кем он работал. Он никогда не выдавал ни то, ни другое за медицинское звание — и здесь не станет.",
         "За именем — Ташкентский государственный институт физической культуры, работа реабилитологом с национальными и олимпийскими сборными, более тридцати лет практики и работа с людьми в 34 странах. И двадцать лет ежедневного изучения: анатомия, физиология, сейчас — клеточная биология и генетика."
       ],
       quote: "Я не просто называюсь профессором. Я потратил на это больше тридцати лет."
@@ -811,8 +857,6 @@ const ru = {
     personalText: "Разбор вашего случая делает он сам, а не ассистент и не команда.",
     howTitle: "Что происходит, когда вы пишете",
     howText: "Вы заполняете анкету и загружаете свои документы — анализы, заключения, выписки. Он читает их сам, на любом языке, сколько бы страниц ни было. Ответ приходит в ваш личный кабинет с пометкой, что это ответ Professor Python. Помощник центра помогает вам ориентироваться и вести дневник, но выводы по вашему состоянию даёт только он.",
-    boundaryLabel: "Границы",
-    boundaryTitle: "Чем он не является",
     boundaryText: "Professor Python — специалист по восстановлению организма и автор метода. Он не врач, платформа не является медицинским учреждением, и сопровождение не заменяет наблюдение вашего лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи.",
     // The eyebrow above the heading, so the block does not print the same
     // sentence twice.
@@ -1805,6 +1849,7 @@ const en: typeof ru = {
     eyebrow: "The author of the method",
     title: "Professor Python",
     subtitle: "The person people come to when the body stops coping",
+    fullName: "Karen Pashikyan",
     lead: "Thirty years of practice. Since 2024 he has worked almost entirely with people in a severe condition — those going through treatment their body can barely withstand. He reviews every case himself.",
     origin: {
       label: "Why he does this",
@@ -1835,18 +1880,48 @@ const en: typeof ru = {
     },
     own: {
       label: "He knows it in his own body",
-      title: "Not from textbooks",
-      paragraphs: [
-        "A champion in five combat sports who competed on the world stage. He was broken many times — and came back every time. He began restoring a body after injury on his own, long before it became a profession."
+      title: "A path as long as a life",
+      steps: [
+        {
+          when: "Year ten",
+          title: "The diagnosis",
+          text: "Hepatitis B. His liver almost destroyed. He was told that with a liver like that he would never do sport again."
+        },
+        {
+          when: "Sport",
+          title: "In spite of it",
+          text: "A multiple champion of his country, of Asia and of the world. He began restoring his own body long before it became a profession."
+        },
+        {
+          when: "Injuries",
+          title: "Coming back",
+          text: "Severe injuries and surgery of the kind athletes do not return from. He recovered and went back to competing internationally."
+        },
+        {
+          when: "Today",
+          title: "The method",
+          text: "The author of Python Method. He studies every day, and says a specialist who stops learning stops being one."
+        }
       ],
       quote:
-        "I showed that I am one of the best rehabilitation specialists in the world: I recovered, returned to the world podium and won again. Not in words — in practice."
+        "They told me I would never do sport again. I beat my illness and became a multiple champion of my country, of Asia and of the world. I showed that the impossible is possible."
+    },
+    notDoing: {
+      label: "Plainly",
+      title: "What he does not do",
+      items: [
+        "He does not replace your doctors and does not cancel what they prescribe.",
+        "He does not diagnose and does not prescribe treatment — your doctor does that.",
+        "He does not promise an outcome: it depends on your condition and on you.",
+        "He does not work to a template — he has no identical protocols.",
+        "He does not disappear: while your programme runs, he is there."
+      ]
     },
     name: {
       label: "Where the name comes from",
       title: "Neither of them is a medical title",
       paragraphs: [
-        "His name is Karen. Python is a fighting nickname that stuck to him in his youth. It was the people he worked with who started calling him Professor. He has never passed either off as a medical title — and will not start here.",
+        "Python is a fighting nickname that stuck to him in his youth. It was the people he worked with who started calling him Professor. He has never passed either off as a medical title — and will not start here.",
         "Behind the name: the Tashkent State Institute of Physical Culture, work as a rehabilitation specialist with national and Olympic teams, more than thirty years of practice and work with people in 34 countries. And twenty years of daily study: anatomy, physiology, and now cell biology and genetics."
       ],
       quote: "I am not merely called a professor. I spent more than thirty years on it."
@@ -1862,8 +1937,6 @@ const en: typeof ru = {
     personalText: "Your case is reviewed by him, not by an assistant and not by the team.",
     howTitle: "What happens when you write",
     howText: "You fill in the questionnaire and upload your documents — test results, reports, discharge notes. He reads them himself, in any language, however many pages there are. The answer arrives in your cabinet marked as an answer from Professor Python. The centre's assistant helps you find your way and keep your notes, but the conclusions about your state come from him alone.",
-    boundaryLabel: "The limits",
-    boundaryTitle: "What he is not",
     boundaryText: "Professor Python is a specialist in the recovery of the body and the author of the method. He is not a physician, the platform is not a medical institution, and the support programme does not replace your own doctor's care. In an emergency, call your local emergency service.",
     companyLabel: "The company",
     companyTitle: "Who stands behind the centre",

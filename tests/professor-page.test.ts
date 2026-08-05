@@ -115,12 +115,14 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
 
   it("carries no number the contract has not already stated", () => {
     // 30 years and 34 countries are both in the offer. 2024 is the year his
-    // mother fell ill — biography, and the reason the rest of the page
-    // exists. The rest are the postal address. Anything else numeric —
-    // people helped, success rates, percentages — would be invented, and on
-    // this page an invented number is a claim.
+    // mother fell ill and 10 is the school year he was diagnosed in — both
+    // biography, and both his own words. The rest are the postal address.
+    //
+    // Anything else numeric — people helped, countries, success rates,
+    // percentages — would be invented, and on this page an invented number
+    // is a claim.
     const numbers = text.match(/\d+/g) ?? [];
-    const allowed = new Set(["30", "34", "2024", "1331", "5", "90025"]);
+    const allowed = new Set(["10", "30", "34", "2024", "1331", "5", "90025"]);
 
     for (const number of numbers) {
       expect(allowed.has(number), `unexplained number on the page: ${number}`).toBe(
@@ -158,7 +160,10 @@ describe("what the page states matches the contract", () => {
   });
 
   it("uses the name the contract gives him", () => {
+    // A nickname with no real name behind it reads as a persona nobody is
+    // answerable for. The contract names him; so does the page.
     expect(clause).toContain("Карен, в дальнейшем именуемый Professor Python");
-    expect(getDictionary("ru").professor.name.paragraphs.join("\n")).toContain("Карен");
+    expect(getDictionary("ru").professor.fullName).toContain("Карен");
+    expect(getDictionary("en").professor.fullName).toContain("Karen");
   });
 });
