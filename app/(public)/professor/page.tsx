@@ -10,13 +10,25 @@ const PROFESSOR_IMAGE = "/images/professor-python.png";
 
 // The page about the person behind the method.
 //
-// Everything factual here comes from clause 2 of the offer — the document
-// the client accepts — and from nowhere else. Thirty years of practice,
-// the authorship of the method, the company and its address: all of it is
-// already signed. No education, no titles, no count of people helped, and
-// nothing that would read as a medical qualification: he is described in
-// the contract as a specialist in the recovery of the body, not as a
-// physician, and the whole platform's boundary rests on that distinction.
+// Two kinds of statement live here and they are kept apart on purpose.
+//
+// What he *does* — his mother's illness as the reason he started, the years
+// spent with people in a severe condition, restoring the body during and
+// after treatment — is biography, and it is told in his own words.
+//
+// What the method *achieves against a disease* is not on this page at all.
+// Not "helped them beat the diagnosis", not "the doctors confirmed it", not
+// "the oncologists were astonished". On a page that leads to a payment,
+// those turn a rehabilitation practice into an advertised cancer cure:
+// unlawful to publish in California, banned outright by both payment
+// processors, and — the part that matters most — capable of persuading
+// somebody to postpone the treatment that is keeping them alive.
+//
+// tests/professor-claims.test.ts holds that line so it cannot be crossed by
+// an edit made in a hurry.
+//
+// The company, the address and the thirty years still come from clause 2 of
+// the offer — the document the client signs — and nowhere else.
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).professor;
 
@@ -50,6 +62,30 @@ export default async function ProfessorPage() {
         <p className="professor-hero__lead">{t.lead}</p>
       </section>
 
+      <section className="panel professor-story" aria-label={t.origin.title}>
+        <span className="panel__label">{t.origin.label}</span>
+        <h2>{t.origin.title}</h2>
+        <blockquote className="professor-quote">{t.origin.quote}</blockquote>
+        {t.origin.paragraphs.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+        <blockquote className="professor-quote">{t.origin.quoteEnd}</blockquote>
+        <p className="professor-story__after">{t.origin.after}</p>
+      </section>
+
+      {/* The boundary is the second block on the page, not a line of small
+          print at the bottom. This is where a reader decides what he is,
+          and he says it better than any disclaimer would. */}
+      <section className="panel professor-story" aria-label={t.work.title}>
+        <span className="panel__label">{t.work.label}</span>
+        <h2>{t.work.title}</h2>
+        <blockquote className="professor-quote">{t.work.quote}</blockquote>
+        {t.work.paragraphs.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
+        <p className="professor-warning">{t.work.warning}</p>
+      </section>
+
       <section className="professor-facts" aria-label={t.yearsLabel}>
         {facts.map((fact) => (
           <div className="professor-fact" key={fact.label}>
@@ -63,14 +99,31 @@ export default async function ProfessorPage() {
         ))}
       </section>
 
+      <section className="panel-grid" aria-label={t.own.title}>
+        <div className="panel professor-story">
+          <span className="panel__label">{t.own.label}</span>
+          <h2>{t.own.title}</h2>
+          {t.own.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+          <blockquote className="professor-quote">{t.own.quote}</blockquote>
+        </div>
+        <div className="panel professor-story">
+          <span className="panel__label">{t.name.label}</span>
+          <h2>{t.name.title}</h2>
+          {t.name.paragraphs.map((paragraph) => (
+            <p key={paragraph}>{paragraph}</p>
+          ))}
+          <blockquote className="professor-quote">{t.name.quote}</blockquote>
+        </div>
+      </section>
+
       <section className="panel-grid" aria-label={t.howTitle}>
         <div className="panel">
           <span className="panel__label">{t.personalLabel}</span>
           <h2>{t.howTitle}</h2>
           <p>{t.howText}</p>
         </div>
-        {/* Said on his own page, not only in the footer: a page about a
-            person is exactly where someone decides what he is. */}
         <div className="panel">
           <span className="panel__label">{t.boundaryLabel}</span>
           <h2>{t.boundaryTitle}</h2>
@@ -79,7 +132,7 @@ export default async function ProfessorPage() {
       </section>
 
       <section className="panel" aria-label={t.companyTitle}>
-        <span className="panel__label">{t.companyTitle}</span>
+        <span className="panel__label">{t.companyLabel}</span>
         <h2>{t.companyTitle}</h2>
         <p>{t.companyText}</p>
         <div className="panel-actions">

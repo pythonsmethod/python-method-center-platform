@@ -4,30 +4,69 @@ import { OFFER_CONTENT } from "@/lib/legal/offer-content";
 
 // A page about a real person, on a platform about health.
 //
-// Everything factual on it comes from clause 2 of the offer — the document
-// the client accepts — and from nowhere else. No education, no titles, no
-// count of people helped: invented credentials on a health platform are
-// both a deception and a liability, and they are impossible to walk back
-// once a client has read them.
+// Two rules hold it together. Everything about his standing comes from
+// clause 2 of the offer — the document the client accepts — and from
+// nowhere else: invented credentials on a health platform are both a
+// deception and a liability, and they cannot be walked back once a client
+// has read them.
 //
-// The other line these tests hold is the one the whole platform rests on:
-// the contract calls him a specialist in the recovery of the body, not a
-// physician. A page about him is exactly where someone decides what he is,
-// so it must not drift into implying a medical qualification.
+// And the line the whole platform rests on: the contract calls him a
+// specialist in the recovery of the body, not a physician. A page about
+// him is exactly where someone decides what he is.
+//
+// The page now names doctors, diagnosis and treatment often — that is the
+// point of it. It says the doctor diagnoses, the doctor prescribes, and he
+// does the part nobody else does. So the test can no longer ban those words
+// outright; it bans the sentences that would put him in the doctor's place.
+//
+// Claims about beating an illness are held separately, in
+// tests/professor-claims.test.ts.
 
-const CLAIMS_A_DOCTOR = [
-  "врач",
-  "доктор",
-  "медицинское образование",
-  "клиническ",
-  "диагноз",
-  "лечени",
-  "пациент"
-];
+const PRESENTS_HIM_AS_MEDICAL = {
+  ru: [
+    "медицинское образование",
+    "клиническ",
+    "он лечит",
+    "он назначает лечение",
+    "назначает лечение он",
+    "врач Professor Python",
+    "наш врач",
+    "медицинская услуга",
+    "медицинское учреждение"
+  ],
+  en: [
+    "medical degree",
+    "medical education",
+    "clinical",
+    "he treats",
+    "he prescribes treatment",
+    // Leading space on purpose: "your doctor" ends in "our doctor", and the
+    // page says "your doctor" repeatedly — which is the correct thing for
+    // it to say.
+    " our doctor",
+    "medical service"
+  ]
+} as const;
+
+function flatten(value: unknown): string[] {
+  if (typeof value === "string") {
+    return [value];
+  }
+
+  if (Array.isArray(value)) {
+    return value.flatMap(flatten);
+  }
+
+  if (value && typeof value === "object") {
+    return Object.values(value).flatMap(flatten);
+  }
+
+  return [];
+}
 
 describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
   const t = getDictionary(locale).professor;
-  const text = Object.values(t).join("\n");
+  const text = flatten(t).join("\n");
 
   it("says plainly that he is not a physician", () => {
     const expected = locale === "ru" ? "Он не врач" : "He is not a physician";
@@ -35,21 +74,19 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
     expect(t.boundaryText).toContain(expected);
   });
 
-  it("does not present him as medical staff", () => {
-    if (locale !== "ru") {
-      return;
-    }
-
-    // Only inside the boundary paragraph, where the words appear in order
-    // to deny them, is any of this allowed.
+  it("never puts him in the doctor's place", () => {
+    // The boundary paragraph is where "medical institution" and "medical
+    // service" appear in order to be denied, so it is excluded.
     const withoutBoundary = Object.entries(t)
       .filter(([key]) => key !== "boundaryText")
-      .map(([, value]) => value)
+      .flatMap(([, value]) => flatten(value))
       .join("\n")
       .toLowerCase();
 
-    for (const claim of CLAIMS_A_DOCTOR) {
-      expect(withoutBoundary).not.toContain(claim);
+    for (const claim of PRESENTS_HIM_AS_MEDICAL[locale]) {
+      expect(withoutBoundary, `reads as a medical claim: "${claim}"`).not.toContain(
+        claim.toLowerCase()
+      );
     }
   });
 
@@ -58,24 +95,37 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
       "диплом",
       "степень",
       "сертифиц",
-      "университет",
+      "профессор медицин",
       "degree",
       "certified",
-      "university",
       "PhD"
     ]) {
       expect(text.toLowerCase()).not.toContain(invented.toLowerCase());
     }
   });
 
+  it("states openly that the title is not a title", () => {
+    // He is called Professor by the people he worked with. Saying so first,
+    // on his own page, is the difference between a nickname and a claim.
+    const expected =
+      locale === "ru" ? "не медицинское звание" : "is a medical title";
+
+    expect(t.name.title).toContain(expected);
+  });
+
   it("carries no number the contract has not already stated", () => {
-    // Thirty years is in clause 2. Anything else numeric — people helped,
-    // success rates — would be invented.
+    // 30 years and 34 countries are both in the offer. 2024 is the year his
+    // mother fell ill — biography, and the reason the rest of the page
+    // exists. The rest are the postal address. Anything else numeric —
+    // people helped, success rates, percentages — would be invented, and on
+    // this page an invented number is a claim.
     const numbers = text.match(/\d+/g) ?? [];
-    const allowed = new Set(["30", "1331", "5", "90025"]);
+    const allowed = new Set(["30", "34", "2024", "1331", "5", "90025"]);
 
     for (const number of numbers) {
-      expect(allowed.has(number)).toBe(true);
+      expect(allowed.has(number), `unexplained number on the page: ${number}`).toBe(
+        true
+      );
     }
   });
 });
@@ -90,6 +140,13 @@ describe("what the page states matches the contract", () => {
     expect(getDictionary("ru").professor.yearsValue).toBe("30 лет");
   });
 
+  it("takes the 34 countries from clause 1", () => {
+    expect(clause).toContain("в 34 странах");
+    expect(getDictionary("ru").professor.name.paragraphs.join("\n")).toContain(
+      "34 странах"
+    );
+  });
+
   it("takes the company and address from clause 2", () => {
     expect(clause).toContain("Pythons & Co");
     expect(clause).toContain("1331 Amherst Ave");
@@ -102,6 +159,6 @@ describe("what the page states matches the contract", () => {
 
   it("uses the name the contract gives him", () => {
     expect(clause).toContain("Карен, в дальнейшем именуемый Professor Python");
-    expect(getDictionary("ru").professor.subtitle).toContain("Карен");
+    expect(getDictionary("ru").professor.name.paragraphs.join("\n")).toContain("Карен");
   });
 });

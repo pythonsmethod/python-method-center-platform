@@ -518,6 +518,54 @@ main {
   margin: 0;
 }
 
+/* The story blocks. Longer reading than anywhere else on the site, so the
+   measure is capped: a paragraph that runs the full width of a desktop
+   panel is genuinely harder to read, and this is the one page where a
+   person reads every line. */
+.professor-story p {
+  color: var(--text);
+  line-height: 1.75;
+  margin: 0 0 14px;
+  max-width: 68ch;
+}
+
+.professor-story p:last-child {
+  margin-bottom: 0;
+}
+
+.professor-story__after {
+  color: var(--muted);
+}
+
+/* His own words, set apart from ours. The gold rule down the side is the
+   only signal that this is a quote — no quotation marks, because the
+   punctuation differs between the two languages and typed quotes in the
+   copy would come out wrong in one of them. */
+.professor-quote {
+  border-left: 2px solid var(--accent);
+  color: var(--text);
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 2.4vw, 1.25rem);
+  font-style: italic;
+  line-height: 1.65;
+  margin: 18px 0 22px;
+  max-width: 60ch;
+  padding-left: clamp(14px, 3vw, 22px);
+}
+
+/* "Continue your treatment." The most important sentence on the page for
+   the person reading it, so it does not look like small print. */
+.professor-warning {
+  background: rgba(212, 175, 55, 0.08);
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 14px;
+  color: var(--text);
+  line-height: 1.7;
+  margin: 22px 0 0;
+  max-width: none;
+  padding: 16px 18px;
+}
+
 @media (max-width: 720px) {
   .professor-hero {
     grid-template-columns: minmax(0, 1fr);

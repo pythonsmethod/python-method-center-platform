@@ -732,10 +732,72 @@ const ru = {
     supportLink: "страницу поддержки"
   },
   professor: {
-    eyebrow: "Эксперт центра",
+    eyebrow: "Автор метода",
     title: "Professor Python",
-    subtitle: "Карен — автор метода и ведущий специалист центра",
-    lead: "Тридцать лет практики сопровождения людей в восстановлении. Каждый кейс он разбирает лично: ваши анализы, вашу историю, вашу ситуацию — не по шаблону и не через помощника.",
+    subtitle: "Человек, к которому приходят, когда организм больше не справляется",
+    lead: "Тридцать лет практики. С 2024 года он работает почти исключительно с людьми в тяжёлом состоянии — с теми, кто проходит через лечение, которое их организм еле выдерживает. Каждый случай он разбирает лично.",
+    // Почему он этим занимается. Прямая речь Карена — то, что он сам
+    // рассказал под запись, а не пересказ.
+    //
+    // Здесь нет ни одного утверждения о том, что метод победил болезнь: ни
+    // про маму, ни про пациентов. Это сознательно. На странице, которая
+    // ведёт к оплате, соседство «тяжёлая стадия» и «вышла в ремиссию»
+    // читается как обещание вылечить рак — и регулятором, и платёжной
+    // системой, и, что важнее, человеком, который может из-за такого
+    // обещания отложить своё лечение.
+    //
+    // Мотив, клятва и то, чем он занят с тех пор, — факты его биографии.
+    // Их достаточно.
+    origin: {
+      label: "Почему он это делает",
+      title: "Всё началось с мамы",
+      quote:
+        "Я помогаю людям, потому что я видел, как страдала моя мама. Я хотел избавить её от страданий, уменьшить побочные эффекты и последствия.",
+      paragraphs: [
+        "В 2024 году тяжело заболела его мама. Четвёртая стадия. Он был рядом каждый день — и увидел то, что видят немногие: болезнь бьёт по человеку с одной стороны, а лечение — с другой.",
+        "Химиотерапия, операции, длительные протоколы разрушают печень, почки, костный мозг, кишечник. Уходят силы, вес, сон. И этим не занимается почти никто: у онколога другая задача — сама болезнь.",
+        "Тогда он дал маме слово: помогать каждому, кто к нему обратится, — уменьшать страдания, побочные эффекты, последствия. С этого началась методика, которую он выстраивал под самые тяжёлые состояния."
+      ],
+      quoteEnd:
+        "Даже сейчас, когда я записываю это, у меня идут слёзы. Я делаю это по просьбе моей мамы. Я дал слово — и я его держу.",
+      after:
+        "С тех пор он работает почти исключительно с людьми в тяжёлой стадии онкологии. Это не общие случаи «хочу быть бодрее». Это люди в самый тяжёлый момент их жизни."
+    },
+    // Граница, сказанная его собственными словами. Это не юридическая
+    // приписка внизу страницы, а второй блок сверху — потому что именно
+    // здесь человек решает, кто перед ним.
+    work: {
+      label: "Что он делает",
+      title: "«Я не лечу. Я восстанавливаю»",
+      quote:
+        "Я не лечу и не назначаю никакие лечебные курсы. Я занимаюсь комплексной реабилитацией организма.",
+      paragraphs: [
+        "Диагноз ставит врач. Лечение назначает врач. Professor Python занимается тем, за что не берётся почти никто, — восстановлением организма, пока идёт лечение и после него.",
+        "Его работа — вернуть организму ресурс: показатели крови, работу печени и почек, сон, вес, силы. Чтобы человек выдержал своё лечение и вышел из него не разрушенным."
+      ],
+      warning:
+        "Он никогда не отменяет назначения врачей и не советует от них отказываться. Если вы проходите лечение — продолжайте его. Он работает рядом с вашими врачами, а не вместо них."
+    },
+    own: {
+      label: "Он знает это по себе",
+      title: "Не по учебникам",
+      paragraphs: [
+        "Чемпион в пяти видах единоборств, выступал на мировой арене. Много раз ломался — и каждый раз возвращался. Восстанавливать тело после травм он начал с себя, задолго до того, как это стало профессией."
+      ],
+      quote:
+        "Я показал, что я один из лучших реабилитологов в мире: восстановился, вернулся на мировой подиум и снова побеждал. Не на словах — на практике."
+    },
+    // Сказать про прозвище первым — единственный способ, чтобы человек не
+    // почувствовал себя обманутым, когда поймёт это сам.
+    name: {
+      label: "Откуда имя",
+      title: "Ни то, ни другое — не медицинское звание",
+      paragraphs: [
+        "Его зовут Карен. Python — бойцовский псевдоним, приклеившийся с юности. «Профессором» его начали называть те, с кем он работал. Он никогда не выдавал ни то, ни другое за медицинское звание — и здесь не станет.",
+        "За именем — Ташкентский государственный институт физической культуры, работа реабилитологом с национальными и олимпийскими сборными, более тридцати лет практики и работа с людьми в 34 странах. И двадцать лет ежедневного изучения: анатомия, физиология, сейчас — клеточная биология и генетика."
+      ],
+      quote: "Я не просто называюсь профессором. Я потратил на это больше тридцати лет."
+    },
     // Всё ниже — из договора-оферты, пункт 2. Ничего сверх того, что
     // подтверждено документом, который принимает клиент.
     yearsLabel: "Практика",
@@ -747,16 +809,19 @@ const ru = {
     personalLabel: "Как он работает",
     personalValue: "Лично",
     personalText: "Разбор вашего случая делает он сам, а не ассистент и не команда.",
-    howTitle: "Что значит «разбирает лично»",
-    howText: "Вы заполняете анкету и загружаете свои анализы. Professor Python читает их сам и отвечает вам в переписке вашего кабинета. Искусственный интеллект центра помогает вам ориентироваться и вести дневник, но ответы по вашему состоянию, анализам и восстановлению даёт только он.",
+    howTitle: "Что происходит, когда вы пишете",
+    howText: "Вы заполняете анкету и загружаете свои документы — анализы, заключения, выписки. Он читает их сам, на любом языке, сколько бы страниц ни было. Ответ приходит в ваш личный кабинет с пометкой, что это ответ Professor Python. Помощник центра помогает вам ориентироваться и вести дневник, но выводы по вашему состоянию даёт только он.",
     boundaryLabel: "Границы",
     boundaryTitle: "Чем он не является",
     boundaryText: "Professor Python — специалист по восстановлению организма и автор метода. Он не врач, платформа не является медицинским учреждением, и сопровождение не заменяет наблюдение вашего лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи.",
+    // The eyebrow above the heading, so the block does not print the same
+    // sentence twice.
+    companyLabel: "Компания",
     companyTitle: "Кто стоит за центром",
     companyText: "Программа предоставляется компанией Pythons & Co, зарегистрированной в США: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. Условия работы — в договоре-оферте.",
     offerLink: "Читать договор",
     ctaTitle: "Начать с ним работать",
-    ctaText: "Первый шаг не требует оплаты: заполните анкету и загрузите анализы — он посмотрит вашу ситуацию.",
+    ctaText: "Первый шаг не требует оплаты: заполните анкету и загрузите документы — он посмотрит вашу ситуацию и скажет, где вы находитесь сейчас.",
     ctaFree: "Бесплатный разбор",
     ctaPlans: "Тарифы сопровождения"
   },
@@ -1737,10 +1802,55 @@ const en: typeof ru = {
     supportLink: "the support page"
   },
   professor: {
-    eyebrow: "The centre's expert",
+    eyebrow: "The author of the method",
     title: "Professor Python",
-    subtitle: "Karen — the author of the method and the centre's lead specialist",
-    lead: "Thirty years of practice supporting people through recovery. He reviews every case himself: your test results, your history, your situation — not to a template and not through an assistant.",
+    subtitle: "The person people come to when the body stops coping",
+    lead: "Thirty years of practice. Since 2024 he has worked almost entirely with people in a severe condition — those going through treatment their body can barely withstand. He reviews every case himself.",
+    origin: {
+      label: "Why he does this",
+      title: "It started with his mother",
+      quote:
+        "I help people because I saw my mother suffer. I wanted to spare her that suffering, to reduce the side effects and what they leave behind.",
+      paragraphs: [
+        "In 2024 his mother fell seriously ill. Stage four. He was beside her every day — and saw what few people see: the illness strikes a person from one side, and the treatment from the other.",
+        "Chemotherapy, surgery and long protocols wear down the liver, the kidneys, the bone marrow, the gut. Strength goes, weight goes, sleep goes. And almost nobody attends to that: an oncologist has a different task — the disease itself.",
+        "He gave his mother his word then: to help everyone who came to him, to reduce the suffering, the side effects, the aftermath. That is where the method he built for the hardest states began."
+      ],
+      quoteEnd:
+        "Even now, recording this, tears are running down my face. I do this because my mother asked me to. I gave my word — and I keep it.",
+      after:
+        "Since then he has worked almost entirely with people at a severe stage of cancer. These are not general \"I want more energy\" cases. These are people at the hardest moment of their lives."
+    },
+    work: {
+      label: "What he does",
+      title: "\"I do not treat. I restore.\"",
+      quote:
+        "I do not treat and I do not prescribe any course of treatment. I work on the full rehabilitation of the body.",
+      paragraphs: [
+        "Your doctor makes the diagnosis. Your doctor prescribes the treatment. Professor Python does what almost nobody takes on — restoring the body while the treatment is happening and after it ends.",
+        "His work is to give the body its resources back: blood markers, the work of the liver and kidneys, sleep, weight, strength. So that a person can withstand their treatment and come out of it not broken."
+      ],
+      warning:
+        "He never cancels a doctor's prescription and never advises anyone to stop one. If you are in treatment, please continue it. He works alongside your doctors, not instead of them."
+    },
+    own: {
+      label: "He knows it in his own body",
+      title: "Not from textbooks",
+      paragraphs: [
+        "A champion in five combat sports who competed on the world stage. He was broken many times — and came back every time. He began restoring a body after injury on his own, long before it became a profession."
+      ],
+      quote:
+        "I showed that I am one of the best rehabilitation specialists in the world: I recovered, returned to the world podium and won again. Not in words — in practice."
+    },
+    name: {
+      label: "Where the name comes from",
+      title: "Neither of them is a medical title",
+      paragraphs: [
+        "His name is Karen. Python is a fighting nickname that stuck to him in his youth. It was the people he worked with who started calling him Professor. He has never passed either off as a medical title — and will not start here.",
+        "Behind the name: the Tashkent State Institute of Physical Culture, work as a rehabilitation specialist with national and Olympic teams, more than thirty years of practice and work with people in 34 countries. And twenty years of daily study: anatomy, physiology, and now cell biology and genetics."
+      ],
+      quote: "I am not merely called a professor. I spent more than thirty years on it."
+    },
     yearsLabel: "Practice",
     yearsValue: "30 years",
     yearsText: "Supporting people through recovery.",
@@ -1750,16 +1860,17 @@ const en: typeof ru = {
     personalLabel: "How he works",
     personalValue: "Personally",
     personalText: "Your case is reviewed by him, not by an assistant and not by the team.",
-    howTitle: "What \"reviews personally\" means",
-    howText: "You fill in the questionnaire and upload your test results. Professor Python reads them himself and answers you in your cabinet. The centre's AI helps you find your way and keep your notes, but the answers about your state, your results and your recovery come from him alone.",
+    howTitle: "What happens when you write",
+    howText: "You fill in the questionnaire and upload your documents — test results, reports, discharge notes. He reads them himself, in any language, however many pages there are. The answer arrives in your cabinet marked as an answer from Professor Python. The centre's assistant helps you find your way and keep your notes, but the conclusions about your state come from him alone.",
     boundaryLabel: "The limits",
     boundaryTitle: "What he is not",
     boundaryText: "Professor Python is a specialist in the recovery of the body and the author of the method. He is not a physician, the platform is not a medical institution, and the support programme does not replace your own doctor's care. In an emergency, call your local emergency service.",
+    companyLabel: "The company",
     companyTitle: "Who stands behind the centre",
     companyText: "The programme is provided by Pythons & Co, registered in the USA: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. The terms of the work are in the offer agreement.",
     offerLink: "Read the contract",
     ctaTitle: "Start working with him",
-    ctaText: "The first step costs nothing: fill in the questionnaire and upload your results — he will look at your situation.",
+    ctaText: "The first step costs nothing: fill in the questionnaire and upload your documents — he will look at your situation and tell you where you stand today.",
     ctaFree: "Free review",
     ctaPlans: "Support plans"
   },
