@@ -5,7 +5,9 @@ import {
   MIN_REDEEM_TOKENS,
   pluralCapsules,
   pluralTokens,
-  TOKENS_PER_PAID_REFERRAL,
+  MIN_REFERRAL_TOKENS,
+  REFERRAL_SHARE,
+  referralTokensForAmount,
   tokensToCapsules,
   tokensToUsd
 } from "@/lib/tokens/config";
@@ -81,16 +83,47 @@ describe("a bad price must never wipe out a balance", () => {
   });
 });
 
-describe("the referral reward", () => {
-  it("is big enough to be worth redeeming", () => {
-    expect(TOKENS_PER_PAID_REFERRAL).toBeGreaterThan(0);
-    expect(TOKENS_PER_PAID_REFERRAL).toBeGreaterThanOrEqual(MIN_REDEEM_TOKENS);
+describe("the referrer's share of a purchase", () => {
+  it("is five percent, in capsules", () => {
+    expect(REFERRAL_SHARE).toBe(0.05);
+
+    // The two support plans, at today's prices and today's capsule price.
+    // Written out so a change to either is visible as a change here.
+    expect(referralTokensForAmount(144000)).toBe(12); // $1,440 → $72 → 12
+    expect(referralTokensForAmount(367500)).toBe(30); // $3,675 → $183.75 → 30
   });
 
-  it("is stated in capsules, so its worth is checkable", () => {
-    // 100 tokens is 100 capsules — half a five-week course of the formula.
-    // Stated here so that changing the reward is a decision, not a slip.
-    expect(tokensToCapsules(TOKENS_PER_PAID_REFERRAL)).toBe(100);
+  it("follows the capsule price, like every other token figure", () => {
+    process.env[ENV_KEY] = "12";
+
+    // The same $1,440 purchase now buys the referrer half as many capsules,
+    // each worth twice as much. The share of the money is unchanged.
+    expect(referralTokensForAmount(144000)).toBe(6);
+    expect(tokensToUsd(referralTokensForAmount(144000))).toBe(72);
+  });
+
+  it("never rounds a real purchase down to nothing", () => {
+    // A reward that disappears on a small purchase reads as a trick, and
+    // the person still did the work of bringing someone who paid.
+    expect(referralTokensForAmount(300)).toBe(MIN_REFERRAL_TOKENS);
+    expect(referralTokensForAmount(1)).toBe(MIN_REFERRAL_TOKENS);
+  });
+
+  it("pays nothing for a payment that is not one", () => {
+    expect(referralTokensForAmount(0)).toBe(0);
+    expect(referralTokensForAmount(-144000)).toBe(0);
+    expect(referralTokensForAmount(Number.NaN)).toBe(0);
+  });
+
+  it("rounds the leftover fraction of a capsule down, not up", () => {
+    // $700 → $35 → 5.83 capsules. Six would be us paying more than the
+    // rule says; the remainder is ours to give away later, not a debt to
+    // guess at now.
+    expect(referralTokensForAmount(70000)).toBe(5);
+  });
+
+  it("is worth redeeming after a plan purchase", () => {
+    expect(referralTokensForAmount(144000)).toBeGreaterThanOrEqual(MIN_REDEEM_TOKENS);
   });
 });
 

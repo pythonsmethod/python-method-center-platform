@@ -1449,9 +1449,10 @@ const en: typeof ru = {
       howAria: "How it works",
       howLabel: "How it works",
       howTitle: "Where tokens come from",
-      howTextPrefix: "You invite someone with your link. If they begin a support programme, you receive ",
+      howTextPrefix:
+        "You invite someone with your link. Every time they pay — for a support programme or for capsules — you get back ",
       howTextSuffix:
-        " tokens. Not for registering — for a programme actually begun: there is no room for empty accounts in this one.",
+        "% of it in tokens. Every time, not only the first. Not for registering, but for the payment itself: there is no room for empty accounts in this one. The capsules included free with a support programme need no separate counting — their cost is already inside the price the share is taken from.",
       useLabel: "What to do with them",
       useTitle: "1 token = 1 capsule of the formula",
       useTextPrefix:

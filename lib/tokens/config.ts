@@ -40,10 +40,33 @@ export function tokensToUsd(tokens: number): number {
   return Math.round(tokens * capsulePriceUsd() * 100) / 100;
 }
 
-// Awarded to the referrer when an invited person pays for a support plan
-// for the first time. Rewarding on payment (not on sign-up) keeps the
-// programme free of fake-registration farming.
-export const TOKENS_PER_PAID_REFERRAL = 100;
+// The referrer's share of what the person they invited pays. Awarded on
+// payment, never on sign-up: a reward for registering is a reward for
+// creating empty accounts.
+//
+// It applies to everything the invited person buys — a support programme
+// or capsules from the shop — and to every purchase they make, not only
+// the first. The capsules included in a support programme need no separate
+// rule: their cost is inside the price the share is taken from.
+export const REFERRAL_SHARE = 0.05;
+
+// Never nothing. Someone who brought a paying client has earned at least
+// one capsule, however small the purchase was, and a reward that rounds
+// down to zero reads as the programme being a trick.
+export const MIN_REFERRAL_TOKENS = 1;
+
+// The share, expressed in capsules — because that is what a token is.
+// Rounded down: the fraction of a capsule that is left over is ours to
+// give away later, not a debt to be guessed at now.
+export function referralTokensForAmount(amountCents: number): number {
+  if (!Number.isFinite(amountCents) || amountCents <= 0) {
+    return 0;
+  }
+
+  const shareUsd = (amountCents / 100) * REFERRAL_SHARE;
+
+  return Math.max(MIN_REFERRAL_TOKENS, Math.floor(shareUsd / capsulePriceUsd()));
+}
 
 // Guard rails for redemption.
 export const MIN_REDEEM_TOKENS = 10;

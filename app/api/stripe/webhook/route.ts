@@ -352,7 +352,8 @@ async function handlePaidSession(
   // earns tokens (once per invited person).
   await awardReferralTokensForPayment({
     payerProfileId: profileId,
-    paymentId: payment.id
+    paymentId: payment.id,
+    amountCents
   });
 
   // 6) Team ping about the money.

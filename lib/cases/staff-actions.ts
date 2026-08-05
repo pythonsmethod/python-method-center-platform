@@ -262,7 +262,8 @@ export async function recordCasePayment(
     // country their friend happens to live in.
     awardReferralTokensForPayment({
       payerProfileId: currentCase.profile_id,
-      paymentId: payment.id
+      paymentId: payment.id,
+      amountCents
     })
   ]);
 
