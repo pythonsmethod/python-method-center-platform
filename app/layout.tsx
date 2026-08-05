@@ -8,6 +8,7 @@ import { socialLinks } from "@/lib/config/socials";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav, type NavViewer } from "@/components/SiteNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
@@ -114,7 +115,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html className={playfair.variable} lang={locale}>
       <body>
-        <header className="site-header">
+        <SiteHeader>
           <Link className="brand" href="/">
             Python Method
           </Link>
@@ -122,7 +123,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <SiteNav labels={dict.nav} viewer={viewer} />
             <LanguageSwitcher locale={locale} />
           </div>
-        </header>
+        </SiteHeader>
         <main>{children}</main>
         <footer className="site-footer">
           <span>© Python Method</span>

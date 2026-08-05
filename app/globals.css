@@ -5314,7 +5314,28 @@ a {
   padding: 18px var(--page-inset);
   position: sticky;
   top: 0;
+  /* It slides away rather than blinking out: a header that vanishes reads
+     as a glitch, one that moves reads as making room. */
+  transition: transform 0.28s ease;
   z-index: 10;
+}
+
+/* Out of the way while someone reads forward. On a phone the header wraps
+   onto more than one row, and being sticky it took that much off every
+   screen the whole way down a long page. */
+.site-header--hidden {
+  transform: translateY(-100%);
+}
+
+/* An anchor must not land underneath the header when it comes back. */
+html {
+  scroll-padding-top: 96px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .site-header {
+    transition: none;
+  }
 }
 
 .brand {
