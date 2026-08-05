@@ -73,12 +73,39 @@ export function AssistantChat({
     setInput((current) => (current ? `${current} ${text}` : text));
   });
 
+  // Where a new message should leave the reader.
+  //
+  // Scrolling to the very bottom is right for a short reply and wrong for a
+  // long one: the assistant's answers run to several paragraphs, and
+  // landing at the end of one means scrolling back up to find its first
+  // line. So a reply that does not fit is shown from its beginning, and
+  // everything else — the person's own message, the "thinking" line, a
+  // short answer — goes to the bottom as before.
   useEffect(() => {
     const node = scrollRef.current;
 
-    if (node) {
-      node.scrollTop = node.scrollHeight;
+    if (!node) {
+      return;
     }
+
+    const last = node.querySelector<HTMLElement>(
+      ".assistant-msg:not(.assistant-msg--pending):last-of-type"
+    );
+    const lastMessage = messages[messages.length - 1];
+    const longAnswer =
+      !pending &&
+      lastMessage?.role === "assistant" &&
+      last !== null &&
+      last.offsetHeight > node.clientHeight * 0.8;
+
+    if (longAnswer && last) {
+      // A few pixels of the previous message stay visible, so it is obvious
+      // this is a new answer starting rather than the top of the thread.
+      node.scrollTop = Math.max(0, last.offsetTop - 12);
+      return;
+    }
+
+    node.scrollTop = node.scrollHeight;
   }, [messages, pending]);
 
   // Previous conversation of a signed-in person, so they can re-read what

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { ANHAM_OPEN_EVENT } from "@/components/assistant/AnhamOpenButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
@@ -8,6 +8,15 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
 
 const WELCOME_STORAGE_KEY = "pm-assistant-welcome-v1";
+
+// One lap of the perimeter, matching --anham-wander-duration in the CSS.
+const WANDER_MS = 120_000;
+
+// useLayoutEffect runs before the browser paints, which is what keeps the
+// correction below invisible. On the server there is no layout, and React
+// warns if it is called there — so it is only used where it exists.
+const useBeforePaint =
+  typeof window === "undefined" ? useEffect : useLayoutEffect;
 
 type AssistantWidgetProps = {
   locale?: Locale;
@@ -32,6 +41,7 @@ export function AssistantWidget({
   const [showWelcome, setShowWelcome] = useState(false);
   const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
+  const companionRef = useRef<HTMLDivElement | null>(null);
 
   // First-visit greeting: the visitor chooses between exploring the site
   // on their own or being guided by Анхам. Shown once per browser.
@@ -110,11 +120,31 @@ export function AssistantWidget({
     }
   }
 
+  // The widget lives in each route group's layout, so moving between groups
+  // unmounts and remounts it — and the flight restarted from the corner
+  // every time, which reads as him being reset rather than accompanying
+  // you. Anchoring the animation to the clock with a negative delay puts
+  // him back where he would have been had nothing happened. Applied before
+  // the browser paints, so there is no jump to see.
+  useBeforePaint(() => {
+    const node = companionRef.current;
+
+    if (!node) {
+      return;
+    }
+
+    node.style.setProperty(
+      "--anham-wander-delay",
+      `-${(Date.now() % WANDER_MS) / 1000}s`
+    );
+  }, []);
+
   return (
     <div
       className={`anham-companion anham-companion--${tier}${
         open ? " is-open" : ""
       }`}
+      ref={companionRef}
     >
       {showWelcome && !open ? (
         <div

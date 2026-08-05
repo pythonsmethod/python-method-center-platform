@@ -7,14 +7,30 @@ import Image from "next/image";
 // eye and lift again. The panel is pure black behind the eyes, so a lid is
 // invisible until it moves.
 //
-// Lid positions were measured on the render itself and are expressed as
-// percentages of the canvas, so they hold at every size he is shown at.
-// If the artwork is ever regenerated, re-measure: the eyes will move.
-const EYE_LEFT_X = 40.4;
-const EYE_RIGHT_X = 61.4;
-const EYE_Y = 37.5;
-const EYE_RX = 6.6;
-const EYE_RY = 7.4;
+// Lid geometry, taken from the render by reading its pixels rather than by
+// eye, and expressed as percentages of the canvas so it holds at every size.
+//
+// The first version was estimated, and it showed. The lids were about half
+// again as wide as the eyes and two thirds taller, so a blink put a black
+// patch on the visor around each eye instead of closing it — reported as
+// "when he blinks his pixels are bigger than his face", which was exactly
+// what it looked like.
+//
+// Measured on anham-master.png (1024x1024) by finding the bright connected
+// regions inside the visor: the eyes are round, spanning x 383-467 and
+// 567-651, y 332-422. Half a unit of margin covers the soft edge of the
+// glow without spilling onto the panel.
+//
+// The fill is the visor's own colour, sampled from the render around the
+// eyes, so even that margin is invisible. Pure black was darker than the
+// panel it sat on, which is what made an oversized lid show up as a patch.
+//
+// If the artwork is ever regenerated, measure again — do not guess.
+const EYE_LEFT_X = 41.5;
+const EYE_RIGHT_X = 59.5;
+const EYE_Y = 36.8;
+const EYE_RX = 4.6;
+const EYE_RY = 4.9;
 
 const ANHAM_SRC = "/images/anham-master.png";
 

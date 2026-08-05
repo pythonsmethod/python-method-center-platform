@@ -4989,10 +4989,12 @@ code {
   width: 100%;
 }
 
-/* The lid is the colour of the face panel behind the eyes — pure black on
-   the render — so it is invisible until it sweeps down. */
+/* The lid is the colour of the visor behind the eyes, sampled from the
+   render itself (#080501). It used to be pure black, which is darker than
+   the panel — so a lid any larger than the eye showed as a dark patch
+   around it every time he blinked. */
 .anham__lid {
-  fill: #020202;
+  fill: #080501;
   transform: scaleY(0);
   transform-box: fill-box;
   transform-origin: top;
@@ -5136,6 +5138,7 @@ code {
   overflow: hidden;
   width: min(390px, calc(100vw - 2rem));
 }
+
 
 .anham-panel__header {
   align-items: center;
@@ -9595,14 +9598,18 @@ code {
 
 .anham-companion {
   align-items: flex-end;
-  /* He wanders across the screen instead of sitting in one corner. The
-     movement is on `translate` rather than `transform`, so it composes
-     with the lift the figure takes on hover instead of cancelling it.
-     Every step of the path moves him left and up — into the screen,
-     never past its edges — so a fixed element can never widen the page.
+  /* He travels the edge of the screen rather than across it. The old path
+     cut through the middle, which put him over the text people were
+     reading — the whole point of him is to be there without being in the
+     way.
+     The movement is on `translate` rather than `transform`, so it composes
+     with the lift the figure takes on hover instead of cancelling it, and
+     the limits are in calc() rather than round vw/vh so he cannot leave
+     the screen on a narrow phone.
      He stops while he is greeting someone or while his chat is open:
      nobody should have to chase a moving target to read or to close it. */
-  animation: anham-wander 96s ease-in-out infinite;
+  animation: anham-wander var(--anham-wander-duration) linear infinite;
+  animation-delay: var(--anham-wander-delay, 0s);
   bottom: clamp(14px, 3vw, 28px);
   display: flex;
   flex-direction: column;
@@ -9629,16 +9636,26 @@ code {
   translate: none;
 }
 
+/* One lap of the perimeter, anticlockwise from the bottom-right corner.
+   The limits are exact: his own width plus both insets subtracted from the
+   viewport, so at the far corner he sits against the edge and never past
+   it. The top stop leaves the header alone. */
+:root {
+  --anham-wander-duration: 120s;
+  --anham-wander-left: calc(-100vw + 110px);
+  --anham-wander-top: calc(-100vh + 190px);
+}
+
 @keyframes anham-wander {
+  /* bottom-right, home */
   0% { translate: 0 0; }
-  9% { translate: -6vw -18vh; }
-  20% { translate: -46vw -12vh; }
-  31% { translate: -66vw -38vh; }
-  43% { translate: -28vw -56vh; }
-  54% { translate: -70vw -60vh; }
-  65% { translate: -72vw -22vh; }
-  76% { translate: -20vw -42vh; }
-  87% { translate: -50vw -8vh; }
+  /* along the bottom edge */
+  25% { translate: var(--anham-wander-left) 0; }
+  /* up the left edge */
+  50% { translate: var(--anham-wander-left) var(--anham-wander-top); }
+  /* along the top edge, below the header */
+  75% { translate: 0 var(--anham-wander-top); }
+  /* down the right edge, home */
   100% { translate: 0 0; }
 }
 
@@ -9709,10 +9726,12 @@ code {
   width: 100%;
 }
 
-/* The lid is the colour of the face panel behind the eyes — pure black on
-   the render — so it is invisible until it sweeps down. */
+/* The lid is the colour of the visor behind the eyes, sampled from the
+   render itself (#080501). It used to be pure black, which is darker than
+   the panel — so a lid any larger than the eye showed as a dark patch
+   around it every time he blinked. */
 .anham__lid {
-  fill: #020202;
+  fill: #080501;
   transform: scaleY(0);
   transform-box: fill-box;
   transform-origin: top;
@@ -9855,6 +9874,16 @@ code {
   max-height: min(74vh, 640px);
   overflow: hidden;
   width: min(390px, calc(100vw - 2rem));
+}
+/* On a phone the window was noticeably smaller than on a tablet, for no
+   reason a person can see: the same rule gave 390px of a 768px tablet and
+   358px of a 390px phone, with less height to read in. The phone gets the
+   room it has. */
+@media (max-width: 600px) {
+  .anham-panel {
+    max-height: min(82vh, 720px);
+    width: calc(100vw - 1.25rem);
+  }
 }
 
 .anham-panel__header {
