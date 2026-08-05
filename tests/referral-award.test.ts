@@ -14,7 +14,15 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 //
 // So the reference is asserted directly.
 
-const writeTokenTransaction = vi.fn(async () => ({ ok: true }));
+type LedgerEntry = {
+  profileId: string;
+  amount: number;
+  reason: string;
+  referenceId?: string | null;
+  note?: string | null;
+};
+
+const writeTokenTransaction = vi.fn(async (_entry: LedgerEntry) => ({ ok: true }));
 
 const referralRow = {
   id: "ref-1111-1111-1111-111111111111",
@@ -23,8 +31,7 @@ const referralRow = {
 
 vi.mock("@/lib/tokens/queries", () => ({
   TOKEN_REASONS: { referralPaid: "referral_paid" },
-  writeTokenTransaction: (...args: unknown[]) =>
-    writeTokenTransaction(...(args as [])),
+  writeTokenTransaction: (entry: LedgerEntry) => writeTokenTransaction(entry)
 }));
 
 vi.mock("@/lib/supabase/service", () => ({
@@ -54,7 +61,7 @@ describe("who gets paid, and for what", () => {
     }).then(() => {
       expect(writeTokenTransaction).toHaveBeenCalledTimes(1);
 
-      const entry = writeTokenTransaction.mock.calls[0][0] as Record<string, unknown>;
+      const [entry] = writeTokenTransaction.mock.calls[0];
 
       expect(entry.referenceId).toBe("payment-4444-4444-4444-444444444444");
       // Filing under the referral would cap the referrer at one reward for
@@ -69,7 +76,7 @@ describe("who gets paid, and for what", () => {
       paymentId: "payment-4444-4444-4444-444444444444",
       amountCents: 144000
     }).then(() => {
-      const entry = writeTokenTransaction.mock.calls[0][0] as Record<string, unknown>;
+      const [entry] = writeTokenTransaction.mock.calls[0];
 
       expect(entry.profileId).toBe(referralRow.referrer_profile_id);
       expect(entry.amount).toBe(12);
