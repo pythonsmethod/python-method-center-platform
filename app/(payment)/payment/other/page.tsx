@@ -28,13 +28,27 @@ export default async function OtherPaymentPage() {
         </Link>
       </div>
 
+      {/* First, before any bank details: say out loud why the card was
+          refused. Someone whose card is blocked by their country and not by
+          their balance usually concludes the problem is them, and leaves. */}
+      <section className="panel" aria-label={t.blockedTitle}>
+        <span className="panel__label">{t.blockedLabel}</span>
+        <h2>{t.blockedTitle}</h2>
+        <p>{t.blockedText}</p>
+        <ul className="alt-payment-routes">
+          {t.blockedItems.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
       {blocks.length > 0 ? (
         <section className="panel-grid" aria-label={t.methodsAria}>
           {blocks.map((block) => (
             <div className="panel" key={block.id}>
               <span className="panel__label">{t.methodLabel}</span>
-              <h2>{block.title}</h2>
-              <p>{block.hint}</p>
+              <h2>{t.methodLabels[block.id]}</h2>
+              <p>{t.methodHints[block.id]}</p>
               <pre className="payment-details">{block.details}</pre>
             </div>
           ))}

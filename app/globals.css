@@ -561,6 +561,24 @@ main {
   margin: 0 0 12px;
 }
 
+/* The routes that still work when a card cannot leave the country. A list,
+   not a paragraph: this is read by someone who has just been refused and is
+   deciding whether to give up. */
+.alt-payment-routes {
+  display: grid;
+  gap: 10px;
+  list-style: none;
+  margin: 16px 0 0;
+  padding: 0;
+}
+
+.alt-payment-routes li {
+  border-left: 2px solid rgba(212, 175, 55, 0.45);
+  color: var(--text);
+  line-height: 1.65;
+  padding-left: 14px;
+}
+
 /* Photographs of his life. A soft gold frame and a caption, so they read as
    a family album rather than as stock imagery — which is exactly the
    difference a reader feels without being able to name it. */

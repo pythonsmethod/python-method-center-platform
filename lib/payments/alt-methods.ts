@@ -4,45 +4,25 @@
 // is filled in. Nothing is invented here: if the center has no crypto
 // wallet, the crypto block simply does not exist, and the visitor sees the
 // request form instead of a promise no one can keep.
+//
+// Only the id and the details live here. The title and the explanation are
+// copy, and copy belongs in the dictionary — these strings used to be
+// hardcoded in Russian, so an English visitor whose card had just been
+// declined was shown the way out in a language they might not read.
+
+export type AltPaymentMethodId = "bank" | "crypto" | "paypal" | "wise" | "other";
 
 export type AltPaymentBlock = {
-  id: string;
-  title: string;
-  hint: string;
+  id: AltPaymentMethodId;
   details: string;
 };
 
-const SOURCES: Array<{ id: string; env: string; title: string; hint: string }> = [
-  {
-    id: "bank",
-    env: "PAYMENT_ALT_BANK",
-    title: "Банковский перевод",
-    hint: "Перевод по реквизитам. Обычно зачисляется за 1–3 рабочих дня. В назначении платежа укажите email, которым вы регистрировались."
-  },
-  {
-    id: "crypto",
-    env: "PAYMENT_ALT_CRYPTO",
-    title: "Криптовалюта",
-    hint: "Подходит там, где карты не проходят. После перевода пришлите нам хеш транзакции — так мы найдём ваш платёж."
-  },
-  {
-    id: "paypal",
-    env: "PAYMENT_ALT_PAYPAL",
-    title: "PayPal",
-    hint: "Отправляйте с того email, которым регистрировались, — так платёж привяжется к вашему кейсу быстрее."
-  },
-  {
-    id: "wise",
-    env: "PAYMENT_ALT_WISE",
-    title: "Wise / Revolut",
-    hint: "Международный перевод с низкой комиссией. Работает в большинстве стран."
-  },
-  {
-    id: "other",
-    env: "PAYMENT_ALT_OTHER",
-    title: "Ещё один способ",
-    hint: "Дополнительный способ оплаты, настроенный командой центра."
-  }
+const SOURCES: Array<{ id: AltPaymentMethodId; env: string }> = [
+  { id: "bank", env: "PAYMENT_ALT_BANK" },
+  { id: "crypto", env: "PAYMENT_ALT_CRYPTO" },
+  { id: "paypal", env: "PAYMENT_ALT_PAYPAL" },
+  { id: "wise", env: "PAYMENT_ALT_WISE" },
+  { id: "other", env: "PAYMENT_ALT_OTHER" }
 ];
 
 export function getAltPaymentBlocks(): AltPaymentBlock[] {
@@ -52,12 +32,7 @@ export function getAltPaymentBlocks(): AltPaymentBlock[] {
     const details = process.env[source.env]?.trim();
 
     if (details) {
-      blocks.push({
-        id: source.id,
-        title: source.title,
-        hint: source.hint,
-        details
-      });
+      blocks.push({ id: source.id, details });
     }
   }
 

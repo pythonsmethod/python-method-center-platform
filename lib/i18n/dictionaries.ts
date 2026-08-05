@@ -684,6 +684,29 @@ const ru = {
       wise: "Wise / Revolut",
       other: "Другой способ (расскажу в комментарии)"
     },
+    // Подписи к реквизитам, которые команда включает переменными окружения.
+    // Раньше они были зашиты в коде по-русски — и человек, у которого только
+    // что не прошла карта, видел выход из положения на языке, которого может
+    // не знать.
+    methodHints: {
+      bank: "Перевод по реквизитам. Обычно зачисляется за 1–3 рабочих дня. В назначении платежа укажите email, которым вы регистрировались.",
+      crypto: "Подходит там, где карты не проходят вообще. После перевода пришлите нам хеш транзакции — так мы найдём ваш платёж.",
+      paypal: "Отправляйте с того email, которым регистрировались, — так платёж привяжется к вашему кейсу быстрее.",
+      wise: "Международный перевод с низкой комиссией. Работает в большинстве стран.",
+      other: "Дополнительный способ оплаты, настроенный командой центра."
+    },
+    // Названо прямо. Человек, у которого карта не прошла из-за страны, а не
+    // из-за денег на счёте, обычно решает, что дело в нём, — и уходит.
+    blockedLabel: "Если карта из России или Беларуси",
+    blockedTitle: "Дело не в вас и не в вашей карте",
+    blockedText:
+      "Карты, выпущенные в России и Беларуси, с 2022 года не проходят международные платежи — банк отклоняет их автоматически, ещё до того, как деньги куда-то уходят. Это не связано ни с вашим счётом, ни с нами. Вот что работает:",
+    blockedItems: [
+      "Карта другой страны — Казахстана, Армении, Грузии, Кыргызстана, ОАЭ. Если у вас есть такая, платёж пройдёт обычным способом.",
+      "Оплата родственником или другом за границей — с его карты, а нам напишите, от кого ждать платёж, чтобы мы привязали его к вашему кейсу.",
+      "Криптовалюта (USDT) — если у вас её нет, напишите нам, подскажем самый простой путь.",
+      "Ничего из этого не подходит — напишите в форме ниже. Мы правда ищем способ, а не отвечаем отпиской."
+    ],
     email: "Email для ответа",
     country: "Ваша страна",
     countryPlaceholder: "Например: Казахстан",
@@ -1028,9 +1051,9 @@ const ru = {
     offerText:
       "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Указывайте при оплате тот же email, что и в аккаунте платформы, — по нему команда привяжет платёж к вашему кейсу.",
     altLabel: "Другие способы оплаты",
-    altTitle: "Карта не проходит?",
+    altTitle: "Карта из России или Беларуси не пройдёт",
     altText:
-      "В некоторых странах карты просто не принимаются — и дело не в вас. Мы примем оплату другим способом: банковский перевод, PayPal, Wise или криптовалюта.",
+      "Такие карты с 2022 года не проводят международные платежи — банк отклонит оплату автоматически, и дело не в вас. Есть рабочие пути: карта другой страны, оплата родственником за границей, криптовалюта или перевод. Посмотрите их до того, как пробовать картой.",
     altCta: "Выбрать другой способ",
     startCheckbox:
       "Я прошу начать работу немедленно и понимаю, что в связи с немедленным началом исполнения право отказа от договора, предусмотренное законодательством некоторых стран, не применяется, а возврат средств после оплаты не предусмотрен.",
@@ -1806,6 +1829,23 @@ const en: typeof ru = {
       wise: "Wise / Revolut",
       other: "Another way (I will explain in the comment)"
     },
+    methodHints: {
+      bank: "A transfer to our account. Usually arrives within 1-3 working days. Put the email you registered with in the payment reference.",
+      crypto: "Works where cards are not accepted at all. Send us the transaction hash afterwards so we can find your payment.",
+      paypal: "Send from the email you registered with — your payment reaches your case faster that way.",
+      wise: "An international transfer with a low fee. Works in most countries.",
+      other: "An additional method configured by the centre's team."
+    },
+    blockedLabel: "If your card is cut off from international payments",
+    blockedTitle: "It is not you, and it is not your card",
+    blockedText:
+      "Cards issued in some countries cannot make international payments at all — the bank refuses them automatically, before any money moves. It has nothing to do with your balance and nothing to do with us. Here is what works:",
+    blockedItems: [
+      "A card issued in another country. If you hold one, the payment goes through the usual way.",
+      "Payment by a relative or a friend abroad, from their card — tell us whose payment to expect so we can attach it to your case.",
+      "Cryptocurrency (USDT). If you have never used it, write to us and we will walk you through the simplest route.",
+      "None of these fits — write to us in the form below. We do look for a way rather than send a polite refusal."
+    ],
     email: "Email for our reply",
     country: "Your country",
     countryPlaceholder: "For example: Kazakhstan",
@@ -2111,7 +2151,7 @@ const en: typeof ru = {
     altLabel: "Other ways to pay",
     altTitle: "Card not going through?",
     altText:
-      "In some countries cards are simply not accepted — and it is not your fault. We will take payment another way: bank transfer, PayPal, Wise or cryptocurrency.",
+      "Cards issued in some countries cannot make international payments at all — the bank refuses them automatically, and it is not your fault. There are ways that do work: a card from another country, payment by someone abroad, cryptocurrency or a transfer. Worth reading before you try the card.",
     altCta: "Choose another way",
     startCheckbox:
       "I ask for the work to begin immediately, and I understand that because performance begins immediately the right of withdrawal provided for by the legislation of some countries does not apply, and that no refund is provided after payment.",
