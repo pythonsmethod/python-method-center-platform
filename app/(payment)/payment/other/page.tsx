@@ -3,7 +3,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { AltPaymentForm } from "@/components/payments/AltPaymentForm";
-import { getAltPaymentBlocks } from "@/lib/payments/alt-methods";
 
 export const dynamic = "force-dynamic";
 
@@ -12,7 +11,6 @@ export const dynamic = "force-dynamic";
 // expensive visitor to lose.
 export default async function OtherPaymentPage() {
   const t = getDictionary(await getLocale()).altPayment;
-  const blocks = getAltPaymentBlocks();
 
   return (
     <div className="page-shell">
@@ -42,18 +40,12 @@ export default async function OtherPaymentPage() {
         </ul>
       </section>
 
-      {blocks.length > 0 ? (
-        <section className="panel-grid" aria-label={t.methodsAria}>
-          {blocks.map((block) => (
-            <div className="panel" key={block.id}>
-              <span className="panel__label">{t.methodLabel}</span>
-              <h2>{t.methodLabels[block.id]}</h2>
-              <p>{t.methodHints[block.id]}</p>
-              <pre className="payment-details">{block.details}</pre>
-            </div>
-          ))}
-        </section>
-      ) : null}
+      <section className="panel" aria-label={t.officialTitle}>
+        <span className="panel__label">{t.officialLabel}</span>
+        <h2>{t.officialTitle}</h2>
+        <p>{t.officialText}</p>
+      </section>
+
 
       <section className="documents-section" aria-label={t.requestAria}>
         <div className="documents-layout">

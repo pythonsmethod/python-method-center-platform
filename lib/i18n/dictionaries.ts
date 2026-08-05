@@ -650,7 +650,7 @@ const ru = {
     eyebrow: "Другие способы оплаты",
     title: "Если оплата картой не проходит",
     description:
-      "Так бывает: в некоторых странах карты просто не принимаются, и дело не в вас. Мы найдём способ.",
+      "Так бывает: в некоторых странах карты просто не принимаются, и дело не в вас. Напишите нам — способ подберём лично, под вашу страну.",
     back: "← Вернуться к тарифам",
     methodsAria: "Доступные способы",
     methodLabel: "Способ оплаты",
@@ -684,17 +684,17 @@ const ru = {
       wise: "Wise / Revolut",
       other: "Другой способ (расскажу в комментарии)"
     },
-    // Подписи к реквизитам, которые команда включает переменными окружения.
-    // Раньше они были зашиты в коде по-русски — и человек, у которого только
-    // что не прошла карта, видел выход из положения на языке, которого может
-    // не знать.
-    methodHints: {
-      bank: "Перевод по реквизитам. Обычно зачисляется за 1–3 рабочих дня. В назначении платежа укажите email, которым вы регистрировались.",
-      crypto: "Подходит там, где карты не проходят вообще. После перевода пришлите нам хеш транзакции — так мы найдём ваш платёж.",
-      paypal: "Отправляйте с того email, которым регистрировались, — так платёж привяжется к вашему кейсу быстрее.",
-      wise: "Международный перевод с низкой комиссией. Работает в большинстве стран.",
-      other: "Дополнительный способ оплаты, настроенный командой центра."
-    },
+    // Официально на сайте есть только Stripe.
+    //
+    // Реквизиты для перевода, криптовалюты и всего остального больше не
+    // публикуются: они зависят от страны, а компания зарегистрирована в США
+    // и обязана знать, от кого принимает деньги. Список из пяти способов на
+    // общей странице и путал людей, и не давал ни одного из этих ответов.
+    // Теперь способ подбирается лично в переписке.
+    officialLabel: "Как это устроено",
+    officialTitle: "Официально мы принимаем оплату картой",
+    officialText:
+      "На сайте работает один способ — карта через Stripe. Всё остальное мы не публикуем списком, потому что подходящий способ зависит от вашей страны: то, что работает в одной, не работает в соседней. Напишите нам в форме ниже — мы посмотрим, откуда вы, и предложим конкретный вариант в переписке. После оплаты мы сами откроем вам тариф в кабинете.",
     // Названо прямо. Человек, у которого карта не прошла из-за страны, а не
     // из-за денег на счёте, обычно решает, что дело в нём, — и уходит.
     blockedLabel: "Если карта из России или Беларуси",
@@ -702,10 +702,9 @@ const ru = {
     blockedText:
       "Карты, выпущенные в России и Беларуси, с 2022 года не проходят международные платежи — банк отклоняет их автоматически, ещё до того, как деньги куда-то уходят. Это не связано ни с вашим счётом, ни с нами. Вот что работает:",
     blockedItems: [
-      "Карта другой страны — Казахстана, Армении, Грузии, Кыргызстана, ОАЭ. Если у вас есть такая, платёж пройдёт обычным способом.",
-      "Оплата родственником или другом за границей — с его карты, а нам напишите, от кого ждать платёж, чтобы мы привязали его к вашему кейсу.",
-      "Криптовалюта (USDT) — если у вас её нет, напишите нам, подскажем самый простой путь.",
-      "Ничего из этого не подходит — напишите в форме ниже. Мы правда ищем способ, а не отвечаем отпиской."
+      "Карта другой страны — Казахстана, Армении, Грузии, Кыргызстана, ОАЭ. Такая карта проходит на сайте обычным способом, ничего дополнительно делать не нужно.",
+      "Оплата с карты близкого человека за границей. Напишите нам, от кого ждать платёж, — мы привяжем его к вашему кейсу.",
+      "Ни то, ни другое не подходит — напишите нам в форме ниже, и мы подберём способ лично под вашу страну."
     ],
     email: "Email для ответа",
     country: "Ваша страна",
@@ -1053,7 +1052,7 @@ const ru = {
     altLabel: "Другие способы оплаты",
     altTitle: "Карта из России или Беларуси не пройдёт",
     altText:
-      "Такие карты с 2022 года не проводят международные платежи — банк отклонит оплату автоматически, и дело не в вас. Есть рабочие пути: карта другой страны, оплата родственником за границей, криптовалюта или перевод. Посмотрите их до того, как пробовать картой.",
+      "Такие карты с 2022 года не проводят международные платежи — банк отклонит оплату автоматически, и дело не в вас. Рабочие пути есть: карта другой страны или оплата с карты близкого человека за границей. Если ни то, ни другое — напишите нам, и мы подберём способ лично. Посмотрите это до того, как пробовать картой.",
     altCta: "Выбрать другой способ",
     startCheckbox:
       "Я прошу начать работу немедленно и понимаю, что в связи с немедленным началом исполнения право отказа от договора, предусмотренное законодательством некоторых стран, не применяется, а возврат средств после оплаты не предусмотрен.",
@@ -1830,22 +1829,18 @@ const en: typeof ru = {
       wise: "Wise / Revolut",
       other: "Another way (I will explain in the comment)"
     },
-    methodHints: {
-      bank: "A transfer to our account. Usually arrives within 1-3 working days. Put the email you registered with in the payment reference.",
-      crypto: "Works where cards are not accepted at all. Send us the transaction hash afterwards so we can find your payment.",
-      paypal: "Send from the email you registered with — your payment reaches your case faster that way.",
-      wise: "An international transfer with a low fee. Works in most countries.",
-      other: "An additional method configured by the centre's team."
-    },
+    officialLabel: "How this works",
+    officialTitle: "Officially we take card payments",
+    officialText:
+      "One method works on the site: a card through Stripe. We do not publish a list of anything else, because the method that suits you depends on your country — what works in one does not work next door. Write to us in the form below, we will look at where you are and suggest something concrete in the conversation. Once you have paid, we open your plan in the cabinet ourselves.",
     blockedLabel: "If your card is cut off from international payments",
     blockedTitle: "It is not you, and it is not your card",
     blockedText:
       "Cards issued in some countries cannot make international payments at all — the bank refuses them automatically, before any money moves. It has nothing to do with your balance and nothing to do with us. Here is what works:",
     blockedItems: [
-      "A card issued in another country. If you hold one, the payment goes through the usual way.",
-      "Payment by a relative or a friend abroad, from their card — tell us whose payment to expect so we can attach it to your case.",
-      "Cryptocurrency (USDT). If you have never used it, write to us and we will walk you through the simplest route.",
-      "None of these fits — write to us in the form below. We do look for a way rather than send a polite refusal."
+      "A card issued in another country. It goes through on the site the usual way, with nothing extra to do.",
+      "Payment from the card of someone close to you abroad. Tell us whose payment to expect so we can attach it to your case.",
+      "Neither of those fits — write to us in the form below and we will find a way that suits your country."
     ],
     email: "Email for our reply",
     country: "Your country",
@@ -2152,7 +2147,7 @@ const en: typeof ru = {
     altLabel: "Other ways to pay",
     altTitle: "Card not going through?",
     altText:
-      "Cards issued in some countries cannot make international payments at all — the bank refuses them automatically, and it is not your fault. There are ways that do work: a card from another country, payment by someone abroad, cryptocurrency or a transfer. Worth reading before you try the card.",
+      "Cards issued in some countries cannot make international payments at all — the bank refuses them automatically, and it is not your fault. There are ways that do work: a card from another country, or payment from the card of someone close to you abroad. If neither fits, write to us and we will find a way with you. Worth reading before you try the card.",
     altCta: "Choose another way",
     startCheckbox:
       "I ask for the work to begin immediately, and I understand that because performance begins immediately the right of withdrawal provided for by the legislation of some countries does not apply, and that no refund is provided after payment.",
