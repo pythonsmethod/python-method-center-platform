@@ -61,10 +61,26 @@ const playfair = Playfair_Display({
 // They were fixed in Russian, so an English visitor got a Russian browser
 // tab on every page, Russian text in search results, and a Russian preview
 // whenever they shared a link.
+// Google Search Console offers several ways to prove the site is ours. The
+// HTML-tag method is the only one that needs a code change, which would
+// otherwise mean waiting on a deploy in the middle of setting it up. Paste
+// the code from Search Console into NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION in
+// Vercel, redeploy, press Verify.
+//
+// Only the token belongs here — not the whole <meta> tag Search Console
+// shows. It is a public value by design: it appears in the page source of
+// every site that uses this method, and it proves ownership only to Google.
+function verificationTokens(): Metadata["verification"] {
+  const google = process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION?.trim();
+
+  return google ? { google } : undefined;
+}
+
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).meta;
 
   return {
+    verification: verificationTokens(),
     // One canonical address per page ("./" resolves to the current path),
     // so search engines never index the same page under two names.
     metadataBase: new URL(SITE_URL),
