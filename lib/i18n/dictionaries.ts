@@ -304,9 +304,9 @@ const ru = {
       howTextSuffix:
         " токенов. Не за регистрацию — именно за начатое сопровождение: в этой программе нет места пустым аккаунтам.",
       useLabel: "Что с ними делать",
-      useTitle: "1 токен = 1 доллар скидки",
+      useTitle: "1 токен = 1 капсула формулы",
       useTextPrefix:
-        "Токены копятся и превращаются в скидку на любую оплату на платформе. Обменять можно от ",
+        "Токен привязан к капсуле формулы, а не к доллару: дорожает капсула — дорожают и ваши токены. Токены копятся и превращаются в скидку на любую оплату на платформе. Обменять можно от ",
       useTextSuffix:
         " токенов: платформа выдаст код, который вводится на странице оплаты. Срок жизни кода — 60 дней, использовать его можно один раз.",
       balanceAria: "Ваши токены",
@@ -1453,9 +1453,9 @@ const en: typeof ru = {
       howTextSuffix:
         " tokens. Not for registering — for a programme actually begun: there is no room for empty accounts in this one.",
       useLabel: "What to do with them",
-      useTitle: "1 token = 1 dollar off",
+      useTitle: "1 token = 1 capsule of the formula",
       useTextPrefix:
-        "Tokens accumulate and turn into a discount on any payment on the platform. You can exchange them from ",
+        "A token is tied to a capsule of the formula rather than to a dollar: when the capsule costs more, so do your tokens. Tokens accumulate and turn into a discount on any payment on the platform. You can exchange them from ",
       useTextSuffix:
         " tokens: the platform issues a code that you enter on the payment page. The code lasts 60 days and can be used once.",
       balanceAria: "Your tokens",

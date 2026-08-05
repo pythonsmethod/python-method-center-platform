@@ -5,6 +5,8 @@ import { getStripe } from "@/lib/payments/stripe";
 import {
   MIN_REDEEM_TOKENS,
   REDEEM_CODE_VALID_DAYS,
+  formatUsd,
+  pluralCapsules,
   tokensToUsd
 } from "@/lib/tokens/config";
 import {
@@ -72,8 +74,13 @@ export async function redeemTokens(
     Math.floor(Date.now() / 1000) + REDEEM_CODE_VALID_DAYS * 24 * 60 * 60;
 
   try {
+    // Stripe takes whole cents. tokensToUsd already rounds to the cent, but
+    // multiplying a decimal by 100 in floating point does not always land on
+    // an integer — and Stripe rejects the request when it does not.
+    const amountOffCents = Math.round(tokensToUsd(requested) * 100);
+
     const coupon = await stripe.coupons.create({
-      amount_off: tokensToUsd(requested) * 100,
+      amount_off: amountOffCents,
       currency: "usd",
       duration: "once",
       max_redemptions: 1,
@@ -113,7 +120,7 @@ export async function redeemTokens(
     return {
       status: "success",
       code: promotionCode.code,
-      message: `Код скидки на ${tokensToUsd(requested)} $ создан. Введите его на странице оплаты в поле «Промокод». Код действует ${REDEEM_CODE_VALID_DAYS} дней и работает один раз.`
+      message: `Код скидки на ${formatUsd(tokensToUsd(requested))} $ создан — это ${requested} ${pluralCapsules(requested)} формулы по сегодняшней цене. Введите его на странице оплаты в поле «Промокод». Код действует ${REDEEM_CODE_VALID_DAYS} дней и работает один раз.`
     };
   } catch {
     return errorState(

@@ -2632,6 +2632,17 @@ code {
   font-size: 13.5px;
 }
 
+/* Why the balance is worth what it says. Quieter than the number, because
+   it is a rule rather than an amount — but present, so a rise in the capsule
+   price reads as the promise keeping rather than as us changing the terms. */
+.tokens__peg {
+  color: var(--accent);
+  display: block;
+  font-size: 12.5px;
+  line-height: 1.5;
+  margin-top: 6px;
+}
+
 .tokens__form {
   display: grid;
   gap: 12px;

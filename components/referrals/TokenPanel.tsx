@@ -3,8 +3,14 @@
 import { useActionState, useState } from "react";
 import { redeemTokens } from "@/lib/tokens/actions";
 import { initialRedeemState } from "@/lib/tokens/redeem-state";
-import { MIN_REDEEM_TOKENS, tokensToUsd } from "@/lib/tokens/config";
-import { pluralTokens } from "@/lib/tokens/config";
+import {
+  formatUsd,
+  MIN_REDEEM_TOKENS,
+  pluralCapsules,
+  pluralTokens,
+  tokensToCapsules,
+  tokensToUsd
+} from "@/lib/tokens/config";
 import { reasonLabels, type TokenTransaction } from "@/lib/tokens/queries";
 
 type TokenPanelProps = {
@@ -35,8 +41,17 @@ export function TokenPanel({ balance, transactions }: TokenPanelProps) {
         <strong>
           {balance} {pluralTokens(balance)}
         </strong>
+        {/* Capsules first, dollars second. The capsule is the promise —
+            one token is one capsule and always will be — and the dollar
+            figure is only today's translation of it. Showing it the other
+            way round would make a rise in the capsule price look like us
+            changing the rules. */}
         <span className="tokens__value">
-          = {tokensToUsd(balance)} $ скидки на любую покупку
+          = {tokensToCapsules(balance)} {pluralCapsules(tokensToCapsules(balance))}{" "}
+          формулы, или {formatUsd(tokensToUsd(balance))} $ скидки на любую покупку
+        </span>
+        <span className="tokens__peg">
+          Один токен — это одна капсула. Дорожает капсула — дорожают и ваши токены.
         </span>
       </div>
 
