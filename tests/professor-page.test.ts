@@ -113,6 +113,18 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
     expect(t.name.title).toContain(expected);
   });
 
+  it("has a caption for every photograph in the timeline", () => {
+    // The photographs are matched to the steps by position, so a step added
+    // in one language and not the other would slide a picture onto the
+    // wrong decade of a real person's life. Nothing in a build would catch
+    // that; the count is checked here instead.
+    expect(t.own.steps).toHaveLength(4);
+
+    for (const step of t.own.steps) {
+      expect(step.alt.length).toBeGreaterThan(0);
+    }
+  });
+
   it("carries no number the contract has not already stated", () => {
     // 30 years and 34 countries are both in the offer. 2024 is the year his
     // mother fell ill and 10 is the school year he was diagnosed in — both

@@ -764,7 +764,9 @@ const ru = {
       quoteEnd:
         "Даже сейчас, когда я записываю это, у меня идут слёзы. Я делаю это по просьбе моей мамы. Я дал слово — и я его держу.",
       after:
-        "С тех пор он работает почти исключительно с людьми в тяжёлой стадии онкологии. Это не общие случаи «хочу быть бодрее». Это люди в самый тяжёлый момент их жизни."
+        "С тех пор он работает почти исключительно с людьми в тяжёлой стадии онкологии. Это не общие случаи «хочу быть бодрее». Это люди в самый тяжёлый момент их жизни.",
+      photoAlt: "Карен с мамой в горах",
+      photoCaption: "Карен с мамой"
     },
     // Граница, сказанная его собственными словами. Это не юридическая
     // приписка внизу страницы, а второй блок сверху — потому что именно
@@ -796,22 +798,26 @@ const ru = {
         {
           when: "10-й класс",
           title: "Диагноз",
-          text: "Гепатит B. Печень почти разрушена. Ему сказали, что с такой печенью он не сможет заниматься спортом никогда."
+          text: "Гепатит B. Печень почти разрушена. Ему сказали, что с такой печенью он не сможет заниматься спортом никогда.",
+          alt: "Карен подростком"
         },
         {
           when: "Спорт",
           title: "Вопреки",
-          text: "Многократный чемпион страны, Азии и мира. Восстанавливать собственный организм он начал задолго до того, как это стало профессией."
+          text: "Многократный чемпион страны, Азии и мира. Восстанавливать собственный организм он начал задолго до того, как это стало профессией.",
+          alt: "Карен со штангой на раннем этапе тренировок"
         },
         {
           when: "Травмы",
           title: "Возвращения",
-          text: "Тяжёлые травмы, операции, после которых спортсменов не возвращают. Он восстанавливался и снова выходил на международный уровень."
+          text: "Тяжёлые травмы, операции, после которых спортсменов не возвращают. Он восстанавливался и снова выходил на международный уровень.",
+          alt: "Судья поднимает руку Карена после победы на турнире"
         },
         {
           when: "Сегодня",
           title: "Метод",
-          text: "Автор Python Method. Учится каждый день и говорит, что специалист, переставший учиться, перестаёт быть специалистом."
+          text: "Автор Python Method. Учится каждый день и говорит, что специалист, переставший учиться, перестаёт быть специалистом.",
+          alt: "Карен сегодня"
         }
       ],
       quote:
@@ -842,7 +848,9 @@ const ru = {
         "Python — бойцовский псевдоним, приклеившийся с юности. «Профессором» его начали называть те, с кем он работал. Он никогда не выдавал ни то, ни другое за медицинское звание — и здесь не станет.",
         "За именем — Ташкентский государственный институт физической культуры, работа реабилитологом с национальными и олимпийскими сборными, более тридцати лет практики и работа с людьми в 34 странах. И двадцать лет ежедневного изучения: анатомия, физиология, сейчас — клеточная биология и генетика."
       ],
-      quote: "Я не просто называюсь профессором. Я потратил на это больше тридцати лет."
+      quote: "Я не просто называюсь профессором. Я потратил на это больше тридцати лет.",
+      photoAlt: "Стенд с медалями: Karen «Python» Pashikyan — грэпплинг, джиу-джитсу, бокс, MMA, панкратион, борьба",
+      photoCaption: "Его медали"
     },
     // Всё ниже — из договора-оферты, пункт 2. Ничего сверх того, что
     // подтверждено документом, который принимает клиент.
@@ -1864,7 +1872,9 @@ const en: typeof ru = {
       quoteEnd:
         "Even now, recording this, tears are running down my face. I do this because my mother asked me to. I gave my word — and I keep it.",
       after:
-        "Since then he has worked almost entirely with people at a severe stage of cancer. These are not general \"I want more energy\" cases. These are people at the hardest moment of their lives."
+        "Since then he has worked almost entirely with people at a severe stage of cancer. These are not general \"I want more energy\" cases. These are people at the hardest moment of their lives.",
+      photoAlt: "Karen with his mother in the mountains",
+      photoCaption: "Karen and his mother"
     },
     work: {
       label: "What he does",
@@ -1885,22 +1895,26 @@ const en: typeof ru = {
         {
           when: "Year ten",
           title: "The diagnosis",
-          text: "Hepatitis B. His liver almost destroyed. He was told that with a liver like that he would never do sport again."
+          text: "Hepatitis B. His liver almost destroyed. He was told that with a liver like that he would never do sport again.",
+          alt: "Karen as a teenager"
         },
         {
           when: "Sport",
           title: "In spite of it",
-          text: "A multiple champion of his country, of Asia and of the world. He began restoring his own body long before it became a profession."
+          text: "A multiple champion of his country, of Asia and of the world. He began restoring his own body long before it became a profession.",
+          alt: "Karen lifting a barbell in his early training years"
         },
         {
           when: "Injuries",
           title: "Coming back",
-          text: "Severe injuries and surgery of the kind athletes do not return from. He recovered and went back to competing internationally."
+          text: "Severe injuries and surgery of the kind athletes do not return from. He recovered and went back to competing internationally.",
+          alt: "The referee raising Karen's arm after a win"
         },
         {
           when: "Today",
           title: "The method",
-          text: "The author of Python Method. He studies every day, and says a specialist who stops learning stops being one."
+          text: "The author of Python Method. He studies every day, and says a specialist who stops learning stops being one.",
+          alt: "Karen today"
         }
       ],
       quote:
@@ -1924,7 +1938,9 @@ const en: typeof ru = {
         "Python is a fighting nickname that stuck to him in his youth. It was the people he worked with who started calling him Professor. He has never passed either off as a medical title — and will not start here.",
         "Behind the name: the Tashkent State Institute of Physical Culture, work as a rehabilitation specialist with national and Olympic teams, more than thirty years of practice and work with people in 34 countries. And twenty years of daily study: anatomy, physiology, and now cell biology and genetics."
       ],
-      quote: "I am not merely called a professor. I spent more than thirty years on it."
+      quote: "I am not merely called a professor. I spent more than thirty years on it.",
+      photoAlt: "A medal rack reading Karen 'Python' Pashikyan — grappling, jiu-jitsu, boxing, MMA, pankration, wrestling",
+      photoCaption: "His medals"
     },
     yearsLabel: "Practice",
     yearsValue: "30 years",

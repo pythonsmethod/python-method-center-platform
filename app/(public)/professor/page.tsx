@@ -7,6 +7,20 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
+const MOTHER_IMAGE = "/images/professor/mother.jpg";
+const MEDALS_IMAGE = "/images/professor/medals.jpg";
+
+// One photograph per step of the timeline, in the same order as the steps
+// in the dictionary. Paths are not translations, so they live here rather
+// than in the copy — tests/professor-page.test.ts checks the two lists stay
+// the same length in both languages, because a photograph sliding onto the
+// wrong decade of someone's life is not a defect a build can see.
+const JOURNEY_IMAGES = [
+  { src: "/images/professor/young.jpg", width: 640, height: 766 },
+  { src: "/images/professor/barbell.jpg", width: 640, height: 853 },
+  { src: "/images/professor/victory.jpg", width: 640, height: 640 },
+  { src: PROFESSOR_IMAGE, width: 690, height: 717 }
+];
 
 // The page about the person behind the method.
 //
@@ -68,10 +82,24 @@ export default async function ProfessorPage() {
       <section className="panel professor-story" aria-label={t.origin.title}>
         <span className="panel__label">{t.origin.label}</span>
         <h2>{t.origin.title}</h2>
-        <blockquote className="professor-quote">{t.origin.quote}</blockquote>
-        {t.origin.paragraphs.map((paragraph) => (
-          <p key={paragraph}>{paragraph}</p>
-        ))}
+        <div className="professor-origin">
+          <div className="professor-origin__text">
+            <blockquote className="professor-quote">{t.origin.quote}</blockquote>
+            {t.origin.paragraphs.map((paragraph) => (
+              <p key={paragraph}>{paragraph}</p>
+            ))}
+          </div>
+          <figure className="professor-photo professor-photo--portrait">
+            <Image
+              alt={t.origin.photoAlt}
+              height={1688}
+              sizes="(max-width: 860px) 100vw, 320px"
+              src={MOTHER_IMAGE}
+              width={900}
+            />
+            <figcaption>{t.origin.photoCaption}</figcaption>
+          </figure>
+        </div>
         <blockquote className="professor-quote">{t.origin.quoteEnd}</blockquote>
         <p className="professor-story__after">{t.origin.after}</p>
       </section>
@@ -109,13 +137,28 @@ export default async function ProfessorPage() {
         <span className="panel__label">{t.own.label}</span>
         <h2>{t.own.title}</h2>
         <ol className="professor-journey">
-          {t.own.steps.map((step) => (
-            <li className="professor-journey__step" key={step.when}>
-              <span className="professor-journey__when">{step.when}</span>
-              <strong className="professor-journey__title">{step.title}</strong>
-              <p>{step.text}</p>
-            </li>
-          ))}
+          {t.own.steps.map((step, index) => {
+            const photo = JOURNEY_IMAGES[index];
+
+            return (
+              <li className="professor-journey__step" key={step.when}>
+                {photo ? (
+                  <span className="professor-journey__photo">
+                    <Image
+                      alt={step.alt}
+                      height={photo.height}
+                      sizes="(max-width: 720px) 100vw, 260px"
+                      src={photo.src}
+                      width={photo.width}
+                    />
+                  </span>
+                ) : null}
+                <span className="professor-journey__when">{step.when}</span>
+                <strong className="professor-journey__title">{step.title}</strong>
+                <p>{step.text}</p>
+              </li>
+            );
+          })}
         </ol>
         <blockquote className="professor-quote">{t.own.quote}</blockquote>
       </section>
@@ -129,6 +172,19 @@ export default async function ProfessorPage() {
         <div className="panel professor-story">
           <span className="panel__label">{t.name.label}</span>
           <h2>{t.name.title}</h2>
+          {/* The medal rack carries his name in full, in the form the
+              nickname came from. It explains the block better than the
+              block does. */}
+          <figure className="professor-photo professor-photo--wide">
+            <Image
+              alt={t.name.photoAlt}
+              height={752}
+              sizes="(max-width: 860px) 100vw, 520px"
+              src={MEDALS_IMAGE}
+              width={1100}
+            />
+            <figcaption>{t.name.photoCaption}</figcaption>
+          </figure>
           {t.name.paragraphs.map((paragraph) => (
             <p key={paragraph}>{paragraph}</p>
           ))}
