@@ -10,10 +10,17 @@ import type { Locale } from "@/lib/i18n/locale";
 //
 // That freedom is over. The version must now change whenever the text does:
 // clause 12 says the edition in force at confirmation is the one that
-// applies, and consent records store this string — editing v3 in place from
-// here on would make consents to two different contracts indistinguishable
-// after the fact. The next change to the text is oferta-v4.
-export const OFFER_VERSION = "oferta-v3";
+// applies, and consent records store this string — editing an edition in
+// place from here on would make consents to two different contracts
+// indistinguishable after the fact.
+//
+// v4 (2026-08-05) is the first amendment made under that rule. Clause 3 no
+// longer describes the free format as a way to "decide whether you need the
+// support programme"; it describes it as what it is, an assessment of where
+// the person stands today. Nothing about price, entitlement or what is
+// delivered changes — but the text changed, so the version does too, and
+// anyone who accepted v3 is recorded as having accepted v3.
+export const OFFER_VERSION = "oferta-v4";
 
 // The superseded edition, kept reachable because clients accepted it and
 // clause 12 says their terms do not change.

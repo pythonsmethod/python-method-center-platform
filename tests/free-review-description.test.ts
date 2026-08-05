@@ -81,6 +81,51 @@ describe("what the free format is described as", () => {
   });
 });
 
+// The site was corrected first and the contract was left behind, so for a
+// while the document a client signs described the free format as a way to
+// "decide whether you need the support programme" while the page selling it
+// said something else. The contract is the version that wins in a dispute,
+// which makes the site the one that looks untrue.
+//
+// These run against the contract itself, so the two can only be changed
+// together from now on.
+describe("the contract describes the free format the same way", () => {
+  const clause = (locale: "ru" | "en") =>
+    OFFER_CONTENT[locale].sections.flatMap((section) => section.paragraphs ?? []).join("\n");
+
+  it("does not present it as a step towards buying", () => {
+    for (const phrase of [
+      "нужно ли вам сопровождение",
+      "нужно ли сопровождение",
+      "помогает понять направление"
+    ]) {
+      expect(clause("ru")).not.toContain(phrase);
+    }
+
+    for (const phrase of ["whether you need the support", "understand the direction"]) {
+      expect(clause("en")).not.toContain(phrase);
+    }
+  });
+
+  it("describes it as an assessment of the person's current state", () => {
+    expect(clause("ru")).toContain("где вы находитесь сейчас");
+    expect(clause("ru")).toContain("показателями вашего организма");
+    expect(clause("en")).toContain("where you stand today");
+    expect(clause("en")).toContain("body's markers");
+  });
+
+  it("still keeps recommendations in the paid formats", () => {
+    // The correction must not accidentally widen what the free format
+    // gives. Clause 3 draws that line and has to keep drawing it.
+    expect(clause("ru")).toContain(
+      "Полный разбор, рекомендации и сопровождение входят в платные форматы"
+    );
+    expect(clause("en")).toContain(
+      "A full review, recommendations and the support programme are part of the paid formats"
+    );
+  });
+});
+
 describe("the assistant tells visitors the same thing", () => {
   it("describes the free format by the person's state, not by the sale", () => {
     // A visitor who asks the assistant must hear what the page says. A

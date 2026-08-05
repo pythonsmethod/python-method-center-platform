@@ -31,6 +31,23 @@ import type { Locale } from "@/lib/i18n/locale";
 // has always said 100 days; 15 weeks is 105, so the contract promised five
 // days more than anything actually delivers.
 //
+// --- v4 amendment, clause 3 ---------------------------------------------
+// The free format was described in the contract as an assessment that
+// "helps you understand the direction and decide whether you need the
+// support programme". The founder's correction: it is not a step towards a
+// sale. It is an assessment of where the person stands today and what is
+// happening with their body's markers.
+//
+// The site copy and the assistant were corrected first, and the contract
+// was left behind — so for a while the document a client signed described
+// the product differently from the page that sold it. Clause 3 now uses the
+// same words as the site.
+//
+// Nothing about what is delivered, what it costs or what the client is
+// entitled to changes; only the description of the purpose. tests/
+// free-review-description.test.ts now checks the contract as well as the
+// site, so the two cannot drift apart again.
+//
 // This wording has not been reviewed by a lawyer.
 
 export type OfferSection = {
@@ -77,7 +94,7 @@ const RU: OfferDocument = {
       heading: "3. Форматы участия",
       paragraphs: [
         "Предварительная аналитика ресурсного состояния — бесплатно. После регистрации в личном кабинете вам доступна бесплатная предварительная аналитика. Вы отправляете свои данные, наш AI собирает и структурирует их в готовый файл, Professor Python формирует предварительную ориентирующую оценку вашего ресурсного состояния, и вы получаете ответ с пометкой, что это ответ Professor Python.",
-        "Это ориентирующая оценка, а не полный разбор: она помогает понять направление и решить, нужно ли вам сопровождение. Предоставляется один раз. Полный разбор, рекомендации и сопровождение входят в платные форматы ниже.",
+        "Это ориентирующая оценка, а не полный разбор: она показывает, где вы находитесь сейчас и что происходит с показателями вашего организма. Предоставляется один раз. Полный разбор, рекомендации и сопровождение входят в платные форматы ниже.",
         "Сопровождение 5 недель — 1 200 USD. Полный разбор ваших документов и показателей, заключение Professor Python и 5 недель индивидуального сопровождения: ваша восстановительная программа, её корректировки и возможность задавать вопросы на всём протяжении срока.",
         "Сопровождение 100 дней — 3 500 USD. Для тех, кому нужна длительная работа: восстановление в динамике, прохождение нескольких этапов, поддержка в периоды лечения. Качество работы во всех форматах одинаковое — отличается только продолжительность участия Professor Python.",
         "Формула Professor Python. На обоих форматах сопровождения Professor Python отправляет свою формулу от своего имени как подарок: 200 капсул на формате «5 недель» и 600 капсул на формате «100 дней». На формате «5 недель» доставка формулы оплачивается отдельно — 180 USD, и входит в итоговую сумму к оплате. На формате «100 дней» доставку Professor Python берёт на себя. В бесплатную предварительную аналитику формула не входит.",
@@ -199,7 +216,7 @@ const EN: OfferDocument = {
       heading: "3. Ways to take part",
       paragraphs: [
         "Preliminary analysis of your resource state — free of charge. After registering in your personal cabinet, a free preliminary analysis is available to you. You send your data, our AI collects and structures it into a prepared file, Professor Python forms a preliminary orienting assessment of your resource state, and you receive a reply marked as Professor Python's answer.",
-        "This is an orienting assessment, not a full review: it helps you understand the direction and decide whether you need the support programme. It is provided once. A full review, recommendations and the support programme are part of the paid formats below.",
+        "This is an orienting assessment, not a full review: it shows where you stand today and what is happening with your body's markers. It is provided once. A full review, recommendations and the support programme are part of the paid formats below.",
         "Support programme, 5 weeks — 1,200 USD. A full review of your documents and indicators, Professor Python's conclusion, and 5 weeks of individual support: your recovery programme, its adjustments, and the ability to ask questions throughout the period.",
         "Support programme, 100 days — 3,500 USD. For those who need longer work: recovery followed over time, moving through several stages, and support during periods of treatment. The quality of the work is the same in every format — only the length of Professor Python's involvement differs.",
         "Professor Python's formula. On both support formats Professor Python sends his formula personally, as a gift: 200 capsules on the 5-week format and 600 capsules on the 100-day format. On the 5-week format, delivery of the formula is paid separately — 180 USD, included in the final amount payable. On the 100-day format Professor Python covers delivery himself. The formula is not part of the free preliminary analysis.",
