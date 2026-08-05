@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
+import { isFreeReviewActive } from "@/lib/config/promo";
 import { SITE_URL } from "@/lib/config/site";
 import { socialLinks } from "@/lib/config/socials";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -69,7 +70,11 @@ export async function generateMetadata(): Promise<Metadata> {
     metadataBase: new URL(SITE_URL),
     alternates: { canonical: "./" },
     title: t.title,
-    description: t.description,
+    // The promo sentence is appended, never baked in: the day the free
+    // review ends, this line stops promising it without a code change.
+    description: isFreeReviewActive()
+      ? `${t.description} ${t.descriptionFree}`
+      : t.description,
     openGraph: {
       siteName: "Python Method Center",
       title: t.ogTitle,

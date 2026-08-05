@@ -488,8 +488,15 @@ const ru = {
   },
   meta: {
     title: "Python Method — сопровождение восстановления",
+    // This is the line a stranger reads in Google before deciding whether
+    // to click. The old one described the software — anketa, documents,
+    // payment — which is what the site *has*, not what a person comes for.
     description:
-      "Клиентская платформа Python Method: анкета, медицинские документы, связь с командой и оплата сопровождения.",
+      "Восстановление под личным сопровождением Professor Python: он лично разбирает ваши анализы, а ИИ-помощник рядом каждый день.",
+    // Kept separate because it is only true while the promo runs. The
+    // layout appends it when NEXT_PUBLIC_FREE_REVIEW is on, so switching
+    // the promo off cannot leave a stale "бесплатно" in search results.
+    descriptionFree: "Первый разбор — бесплатно.",
     ogTitle: "Python Method Center — реабилитация без границ",
     ogDescription:
       "Цифровой центр восстановления: экспертное сопровождение Professor Python и ИИ-помощник рядом на каждом шаге пути.",
@@ -1491,7 +1498,8 @@ const en: typeof ru = {
   meta: {
     title: "Python Method — recovery support",
     description:
-      "The Python Method client platform: questionnaire, medical documents, contact with the team and payment for support.",
+      "Recovery guided personally by Professor Python: he reviews your analyses himself, with an AI assistant beside you every day.",
+    descriptionFree: "The first review is free.",
     ogTitle: "Python Method Center — rehabilitation without borders",
     ogDescription:
       "A digital recovery center: expert support led by Professor Python, with an AI assistant beside you at every step.",
