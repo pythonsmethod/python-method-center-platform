@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { paymentProductLabel } from "@/lib/i18n/status-labels";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
+import { describeFailedPayment } from "@/lib/payments/failure";
 import {
   emailExactMatchPattern,
   getStripe,
@@ -88,25 +89,12 @@ export async function POST(request: Request) {
       }
       case "checkout.session.async_payment_failed":
       case "payment_intent.payment_failed": {
-        const object = event.data.object as
-          | Stripe.Checkout.Session
-          | Stripe.PaymentIntent;
-        const email =
-          "customer_details" in object
-            ? object.customer_details?.email
-            : (object as Stripe.PaymentIntent).receipt_email;
-
-        await notifyTeam({
-          kind: "payment",
-          dedupeKey: `payment_failed:${event.id}`,
-          title: "⚠️ Оплата не прошла",
-          lines: [
-            email ? `Email плательщика: ${email}` : null,
-            `Событие Stripe: ${event.id}`,
-            "Клиенту могла потребоваться помощь с оплатой."
-          ],
-          link: adminLink("/admin")
-        });
+        await handleFailedPayment(
+          supabase,
+          stripe,
+          event.data.object as Stripe.Checkout.Session | Stripe.PaymentIntent,
+          event
+        );
         break;
       }
       case "charge.refunded": {
@@ -139,6 +127,78 @@ export async function POST(request: Request) {
 }
 
 type ServiceClient = NonNullable<ReturnType<typeof createSupabaseServiceClient>>;
+
+// A failed payment leaves no trace in our database, so the alert is the only
+// thing that exists about it. It has to carry everything a person needs to
+// act: who tried, how much, why it failed, and one tap through to the
+// payment in Stripe.
+//
+// The first version sent the event id and a link to /admin, where there is
+// nothing about a failed payment at all. It fired during the focus group
+// with no email on it, and there was no way to tell who had been unable to
+// pay.
+async function handleFailedPayment(
+  supabase: ServiceClient,
+  stripe: Stripe,
+  object: Stripe.Checkout.Session | Stripe.PaymentIntent,
+  event: Stripe.Event
+) {
+  const details = await describeFailedPayment(object, {
+    livemode: event.livemode,
+    lookup: {
+      charge: (id) => stripe.charges.retrieve(id),
+      customer: (id) => stripe.customers.retrieve(id)
+    }
+  });
+
+  // If the address belongs to someone we know, point straight at their case
+  // instead of at the top of the admin panel.
+  const payerEmail = normalizePayerEmail(details.email);
+  let caseId: string | null = null;
+  let known = false;
+
+  if (payerEmail) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id")
+      .ilike("email", emailExactMatchPattern(payerEmail))
+      .maybeSingle();
+
+    known = Boolean(profile?.id);
+
+    if (profile?.id) {
+      const { data: caseRow } = await supabase
+        .from("client_cases")
+        .select("id")
+        .eq("profile_id", profile.id)
+        .maybeSingle();
+
+      caseId = caseRow?.id ?? null;
+    }
+  }
+
+  const amount =
+    details.amountCents !== null
+      ? `${(details.amountCents / 100).toFixed(2)} ${(details.currency ?? "usd").toUpperCase()}`
+      : null;
+
+  await notifyTeam({
+    kind: "payment",
+    dedupeKey: `payment_failed:${event.id}`,
+    title: "⚠️ Оплата не прошла",
+    lines: [
+      details.email
+        ? `Плательщик: ${details.email}${known ? " — есть аккаунт" : " — аккаунта с таким email нет"}`
+        : "Email плательщика Stripe не передал — смотрите платёж по ссылке ниже",
+      amount ? `Сумма: ${amount}` : null,
+      details.reason ? `Причина: ${details.reason}` : null,
+      details.dashboardUrl ? `Платёж в Stripe: ${details.dashboardUrl}` : null,
+      !event.livemode ? "Это тестовый режим Stripe, реальные деньги не списывались." : null,
+      "Клиенту могла потребоваться помощь с оплатой."
+    ],
+    link: caseId ? adminLink(`/admin/cases/${caseId}`) : adminLink("/admin/cases")
+  });
+}
 
 async function handlePaidSession(
   supabase: ServiceClient,
