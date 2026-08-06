@@ -251,6 +251,29 @@ Telegram, out of roughly **2,000 consultations**. Those cases are the
 practice the platform was built from, not platform revenue, and are
 described that way here on purpose.
 
+The constraint today is not demand. Requests arrive continuously across
+Instagram, TikTok, WhatsApp, Telegram and Viber — people send their test
+results unprompted, and he cannot get through them.
+`[[FILL: три числа, и они важнее всех остальных в заявке —
+(1) сколько человек написали за последние N недель, по всем каналам;
+(2) сколько из них он успел разобрать;
+(3) сколько ждут прямо сейчас. Формулировка: "X wrote in N weeks, he can
+carry Y at a time, Z are waiting."]]`
+
+↳ по-русски: «спрос превышает мощность» — самое сильное, что вообще может
+быть в заявке на этой стадии, и одновременно самое лёгкое для проверки.
+Но словами это не считается: «высокий спрос» пишет каждый второй.
+
+Как это зафиксировать за вечер:
+
+- скриншоты непрочитанных в каждом из пяти каналов, с числом;
+- один кейс со ста файлами от одного человека (обезличенный) — эта деталь
+  объясняет и проблему, и почему в админке приём до 30 файлов за раз;
+- сколько человек ждут дольше трёх рабочих дней, обещанных в бесплатном
+  разборе;
+- и начните записывать тех, кого не взяли. Люди, которых развернули и
+  нигде не отметили, для заявки не существуют.
+
 ↳ по-русски: 480 и 2000 — цифры из ваших собственных документов
 (`docs/safety/ЗАЩИТА_ПОМОЩНИКА_ОТ_НАПЛЫВА.md`). Обязательно пишите про них
 именно так: «это практика до платформы». Если подать их как выручку
@@ -292,16 +315,43 @@ it. That is why the first thing on the site is a free assessment of your
 resource state by him personally, and why an AI will talk to you for
 fifteen messages before anyone asks you for a card.
 
-**The second is his hours.** 480 cases, every one read personally, in
-WhatsApp threads with the documents scattered through them. He is the
-ceiling. He should be the ceiling on judgement — and on nothing else.
+**The second is his hours**, and this is the wall the platform was built
+against.
 
-Everything in the product is one of those two walls: the free tier and the
-free review are the first, and the AI, the case file, the drafts and the
-red-flag watch are the second.
+People find him and write from wherever they already are: Instagram,
+TikTok, WhatsApp, Telegram, Viber. They send their test results as
+photographs into a chat thread — one person will send a hundred separate
+files. He reads all of them, in any language, and answers personally.
+Meanwhile the people who have already paid are in the same inbox, mixed in
+with the strangers.
 
-↳ по-русски: воронка 2000 → 480 — самый сильный аргумент в заявке, потому
-что это не рассуждение, а измерение. Держите её и на интервью.
+By the time this platform was started he had stopped eating properly and
+stopped sleeping. Not as a figure of speech. One man, five messengers, and
+a queue that does not stop.
+
+Nothing about that is a technology problem at first glance, and that is
+exactly why it went unsolved: the work looks like it simply requires him.
+It doesn't. The reading of a hundred photographs into an ordered case file
+doesn't require him. Answering the same eleven questions about how the
+programme works doesn't require him. Noticing at 3am that somebody has
+written something frightening doesn't require him — it requires something
+awake. Only the judgement requires him.
+
+So the product is drawn along exactly that line. Everything in it is one
+of the two walls: the free tier and the free review answer the trust wall;
+the case file, the document intake, the drafts, the 24-hour assistant and
+the red-flag watch answer the hours wall.
+
+There is a third thing the move fixed, which we did not set out to do.
+Those hundred files used to live in Instagram and WhatsApp threads. They
+now live in private storage with signed URLs, recorded consent and an
+audit trail, and the person can see their own and nobody else's.
+
+↳ по-русски: этот ответ теперь держится на двух вещах — на измерении
+(2000 → 480) и на картинке, которую невозможно выдумать (пять мессенджеров,
+сто файлов от одного человека, он перестал есть и спать). Вторая работает
+на партнёра сильнее первой, потому что из неё сразу видно, почему продукт
+устроен именно так. Держите обе на интервью.
 
 ### Who are your competitors? What do you understand that they don't?
 
@@ -475,6 +525,25 @@ partner finds in ten minutes.
    claim above. `[[FILL: если к моменту интервью есть кандидат —
    назовите его специальность и стадию разговора. Один конкретный
    человек здесь стоит больше любой формулировки.]]`
+
+### The one chart worth building before the interview
+
+There is a number that describes this entire company, and it is not
+revenue: **the share of a client's questions that get resolved without
+Karen touching them.**
+
+Every time he writes an answer into the knowledge base, the assistant
+starts giving that answer itself, and his share of the load drops. That
+line going down over time *is* the business — it is the difference between
+a practice and a platform, drawn from your own data rather than argued for.
+
+You already store what it needs: `assistant_messages`, the case chat, the
+escalation events. Even four data points, one per week, is enough. A
+partner who sees that line understands the company in five seconds.
+
+↳ по-русски: если успеете сделать до подачи только одну вещь помимо цифр
+очереди — делайте эту. Она отвечает сразу на «а это не просто сайт для
+одного врача?» и на «а что вообще масштабируется?».
 
 ### What transfers to the next expert, and what doesn't
 
