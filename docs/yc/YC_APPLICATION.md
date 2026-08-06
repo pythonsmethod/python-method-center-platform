@@ -359,6 +359,25 @@ GLOBOCAN, дать актуальный год]]`, essentially all of them go th
 treatment that damages the body, and almost none of them are offered
 anybody whose job is that damage.
 
+And there is a second layer, which we are not claiming yet because we have
+not earned it. Python Method is the first expert practice we have run end
+to end. The machinery under it — case files, tiered AI with boundaries
+enforced server-side, escalation, payments, referrals — is not specific to
+rehabilitation. What is specific is the judgement layer: the prompts, the
+boundaries, the intake, the red-flag routing. Karen authors his own,
+himself, in a knowledge base, with no engineer in the loop. Our next
+expert is the test of whether somebody else can author theirs the same
+way. If they can, this is infrastructure for every expert practice
+currently being delivered over WhatsApp.
+
+↳ по-русски: это и есть весь второй слой, и он стоит здесь намеренно — в
+конце ответа про размер рынка, одним абзацем, с явной оговоркой «мы этого
+ещё не заслужили». Так он читается как амбиция человека, который понимает,
+чем доказательство отличается от намерения. Вынесенный в начало заявки,
+тот же самый текст читается как «платформа с одним клиентом». Пропорция —
+примерно 85% фактов о Python Method и 15% про этот слой; не меняйте её,
+пока не появится второй эксперт.
+
 ↳ по-русски: считайте снизу, от своих чисел, а не сверху от «рынка
 здоровья на $X триллионов». YC верит арифметике, которую вы можете
 защитить.
@@ -376,13 +395,33 @@ we want to work on», и это нормальный ответ.]]`
 
 ## 5. Legal / equity
 
-- **Legal entity:** yes — Pythons & Co, registered in the United States
-  (1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025). `[[FILL: уточнить
-  форму (LLC / C-Corp) и штат регистрации — YC спрашивает именно это, и
-  для инвестиции им нужен Delaware C-Corp; если сейчас LLC, так и
-  написать, это переоформляется.]]`
+The application is filed by the existing company: **Python Method**,
+operating through **Pythons & Co**, registered in the United States
+(1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025). Stripe already settles
+into it, so the revenue and the entity are the same thing.
+
+- **Legal entity:** yes — Pythons & Co. `[[FILL: форма (LLC / C-Corp) и
+  штат регистрации, ровно как в документах.]]`
 - **Investment taken:** `[[FILL: брали ли деньги. Если нет — «No».]]`
 - **Currently fundraising:** `[[FILL: да/нет]]`
+
+↳ по-русски — четыре проверки до подачи, в порядке важности:
+
+1. **Cap table.** Кому принадлежит Pythons & Co *по документам* на
+   сегодня. Если 100% у одного человека, а второй сооснователь по факту —
+   это надо оформить до подачи. YC просит структуру владения на интервью,
+   и «мы договоримся потом» там читается как «не договорились».
+2. **Форма.** YC инвестирует только в Delaware C-Corp. Подавать можно с
+   любой формой — это заявку не блокирует; переоформление делается после
+   акцепта и это рутина. Но в заявке пишите форму как есть. Написать
+   «C-Corp», когда в документах LLC, — единственная ошибка в этом разделе,
+   которая не чинится.
+3. **Что ещё внутри компании.** Если через Pythons & Co идёт что-то
+   помимо платформы — практика, продажа формулы, — знать что именно и на
+   какие суммы. Спросят.
+4. **Карен.** Доля в компании, участие в минутном видео, присутствие на
+   интервью. Заявка подаётся от двух сооснователей, и это должно быть
+   правдой на бумаге, а не только по договорённости.
 
 ---
 
@@ -429,3 +468,37 @@ partner finds in ten minutes.
    sleep, strength, completed treatment protocols. `[[FILL: есть ли
    собранные до/после показатели хотя бы по нескольким кейсам — это
    лучшее, что можно принести на интервью.]]`
+7. **"You say it generalizes. What actually transfers?"** Answer from the
+   code, not in general terms. See the table below.
+8. **"So where is expert number two?"** The honest answer is the one that
+   works: it is the next thing we are doing, and it is the test of the
+   claim above. `[[FILL: если к моменту интервью есть кандидат —
+   назовите его специальность и стадию разговора. Один конкретный
+   человек здесь стоит больше любой формулировки.]]`
+
+### What transfers to the next expert, and what doesn't
+
+Have this ready. "Всё переиспользуется" is not an answer a technical
+partner accepts, and the honest version is more convincing anyway.
+
+| Transfers almost unchanged | Rebuilt per vertical |
+| --- | --- |
+| Accounts, roles, case lifecycle | System prompts and the boundary rules |
+| Private document storage, signed URLs | Red-flag taxonomy and routing |
+| Chat with voice messages | Intake questionnaire fields |
+| Tiered AI resolved server-side, model arbiter, prompt caching | Offer, privacy policy, refund terms |
+| Notification pipeline with retry/dedupe log | Pricing and programme structure |
+| Stripe payment links + idempotent webhook | The physical product (the formula) |
+| Referral and token economics | |
+| Audit logs, bilingual i18n, staff workspace | |
+| The knowledge base the expert edits himself | |
+
+The point to make out loud: **the machinery transfers, the judgement does
+not** — and the judgement layer is where all the work is. Which is why the
+knowledge base matters more than any other part of the product: it is the
+only place where the judgement layer gets authored by the expert instead
+of by us. Making that layer fully self-serve is the whole roadmap.
+
+↳ по-русски: этот раздел — ваш ответ и на «а это не агентство?». Агентство
+отвечает «мы всё сделаем под клиента». Компания отвечает «вот это уже
+машина, вот это пока руками, и вот как мы убираем оттуда руки».
