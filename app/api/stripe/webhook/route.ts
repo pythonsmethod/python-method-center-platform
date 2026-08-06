@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { paymentProductLabel } from "@/lib/i18n/status-labels";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
-import { describeFailedPayment } from "@/lib/payments/failure";
+import { describeFailedPayment, stripeDashboardUrl } from "@/lib/payments/failure";
 import { openServicePeriod } from "@/lib/payments/service-period";
 import {
   emailExactMatchPattern,
@@ -83,7 +83,7 @@ export async function POST(request: Request) {
 
         // Delayed payment methods complete later via async_payment_succeeded.
         if (session.payment_status === "paid") {
-          await handlePaidSession(supabase, session, event.id);
+          await handlePaidSession(supabase, session, event);
         }
         break;
       }
@@ -203,8 +203,9 @@ async function handleFailedPayment(
 async function handlePaidSession(
   supabase: ServiceClient,
   session: Stripe.Checkout.Session,
-  eventId: string
+  event: Stripe.Event
 ) {
+  const eventId = event.id;
   const amountCents = session.amount_total ?? 0;
   const currency = (session.currency ?? "usd").toUpperCase();
   const customerEmail = normalizePayerEmail(session.customer_details?.email);
@@ -245,18 +246,31 @@ async function handlePaidSession(
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
   if (!profileId || !product) {
+    // The money is in and we do not know whose it is. Everything needed to
+    // find out goes in the alert: what was bought, the address that failed
+    // to match, why it probably failed, and one tap through to the payment
+    // in Stripe — which is where the payer's name and card country are.
     await notifyTeam({
       kind: "payment",
       dedupeKey: `payment_unmatched:${eventId}`,
       title: "💰 ОПЛАТА ПОЛУЧЕНА — нужна ручная привязка",
       lines: [
+        product ? `Тариф: ${paymentProductLabel(product)}` : null,
         `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
         customerEmail
           ? `Email плательщика: ${customerEmail} (аккаунт ${profileId ? "найден" : "не найден"})`
           : "Email плательщика не передан",
         !product ? "Сумма не совпала ни с одним тарифом" : null,
-        `Референс: ${reference}`,
-        "Запишите оплату вручную в кейсе клиента."
+        !profileId && customerEmail
+          ? "Обычно это значит, что человек платил, не войдя в аккаунт, или с другого адреса — спросите, каким email он регистрировался."
+          : null,
+        stripeDashboardUrl(reference, event.livemode)
+          ? `Платёж в Stripe: ${stripeDashboardUrl(reference, event.livemode)}`
+          : `Референс: ${reference}`,
+        !event.livemode
+          ? "Это тестовый режим Stripe, реальные деньги не списывались."
+          : null,
+        "Запишите оплату в кейсе клиента — форма записи и включает тариф."
       ],
       link: adminLink("/admin/cases")
     });

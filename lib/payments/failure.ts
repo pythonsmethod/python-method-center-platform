@@ -46,7 +46,12 @@ function cleanEmail(value: string | null | undefined): string | null {
 // A live-mode object belongs under dashboard.stripe.com; a test-mode one
 // under dashboard.stripe.com/test. Sending someone to the wrong one shows
 // an empty page and reads as "the payment does not exist".
-function dashboardUrl(reference: string | null, livemode: boolean): string | null {
+//
+// Exported because a payment that succeeded but could not be matched to an
+// account needs the same one-tap route to it: the dashboard is where the
+// payer's name and card country are, and that is how you work out who they
+// are when the email does not match anyone.
+export function stripeDashboardUrl(reference: string | null, livemode: boolean): string | null {
   if (!reference) {
     return null;
   }
@@ -90,7 +95,7 @@ export async function describeFailedPayment(
       currency: session.currency ?? null,
       reason: null,
       reference,
-      dashboardUrl: dashboardUrl(reference, livemode)
+      dashboardUrl: stripeDashboardUrl(reference, livemode)
     };
   }
 
@@ -138,6 +143,6 @@ export async function describeFailedPayment(
     currency: intent.currency ?? null,
     reason: describeError(lastError),
     reference: intent.id,
-    dashboardUrl: dashboardUrl(intent.id, livemode)
+    dashboardUrl: stripeDashboardUrl(intent.id, livemode)
   };
 }
