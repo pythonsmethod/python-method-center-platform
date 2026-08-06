@@ -1049,6 +1049,13 @@ const ru = {
     offerTitle: "Оферта",
     offerText:
       "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Указывайте при оплате тот же email, что и в аккаунте платформы, — по нему команда привяжет платёж к вашему кейсу.",
+    // Регистрация раньше оплаты. Публичную платёжную ссылку мог открыть
+    // кто угодно — и тогда деньги приходили без аккаунта, к которому их
+    // привязать. Цены при этом видны всем: смысл не в том, чтобы прятать
+    // стоимость.
+    signInToPay: "Зарегистрироваться и оплатить",
+    signInWhy:
+      "Оплата открывается после регистрации. Так платёж сразу привязывается к вашему кабинету, доступ включается автоматически, и вам не придётся ничего никому доказывать. Регистрация занимает минуту.",
     altLabel: "Другие способы оплаты",
     altTitle: "Карта из России или Беларуси не пройдёт",
     altText:
@@ -2144,6 +2151,9 @@ const en: typeof ru = {
     offerTitle: "Public offer",
     offerText:
       "By paying for a plan you confirm acceptance of the public offer. Use the same email as in your platform account — the team links the payment to your case by it.",
+    signInToPay: "Register and pay",
+    signInWhy:
+      "Payment opens once you have an account. That way it attaches to your cabinet straight away, access switches on by itself, and you never have to prove anything to anyone. Registering takes a minute.",
     altLabel: "Other ways to pay",
     altTitle: "Card not going through?",
     altText:

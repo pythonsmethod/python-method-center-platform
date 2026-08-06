@@ -7643,6 +7643,23 @@ code {
   box-shadow: 0 0 24px rgba(224, 169, 63, 0.15);
 }
 
+/* Shown instead of the consent ticks to someone without an account: the
+   consent is recorded against a profile, so there is nothing to record
+   yet — and the reason payment is not open to them belongs here, where
+   they are looking for the button. */
+.offer-gate--signin {
+  align-items: start;
+  display: grid;
+  gap: 14px;
+  justify-items: start;
+}
+
+.offer-gate--signin p {
+  color: var(--text);
+  line-height: 1.7;
+  margin: 0;
+}
+
 .offer-gate__label {
   align-items: flex-start;
   color: var(--text);

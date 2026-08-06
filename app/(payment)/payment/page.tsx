@@ -63,9 +63,13 @@ export default async function PaymentPage() {
           offerCheckboxPrefix: t.offerCheckboxPrefix,
           offerCheckboxLink: t.offerCheckboxLink,
           offerHint: t.offerHint,
-          refundLink: t.refundLink
+          refundLink: t.refundLink,
+          signInToPay: t.signInToPay,
+          signInWhy: t.signInWhy
         }}
         plans={plans}
+        signInHref="/login?next=/payment"
+        signedIn={Boolean(profileId)}
       >
         <div className="panel panel--promo">
           <span className="panel__label">{promo.badge}</span>

@@ -63,9 +63,13 @@ export default async function TestPaymentPage() {
           offerCheckboxPrefix: payment.offerCheckboxPrefix,
           offerCheckboxLink: payment.offerCheckboxLink,
           offerHint: payment.offerHint,
-          refundLink: payment.refundLink
+          refundLink: payment.refundLink,
+          signInToPay: payment.signInToPay,
+          signInWhy: payment.signInWhy
         }}
         plans={plans}
+        signInHref="/login?next=/payment/test"
+        signedIn={Boolean(profileId)}
       />
 
       <section className="panel-grid" aria-label={t.howLabel}>

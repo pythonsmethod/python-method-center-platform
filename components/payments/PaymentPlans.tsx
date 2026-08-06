@@ -15,15 +15,32 @@ type PaymentPlanLabels = {
   offerCheckboxLink: string;
   offerHint: string;
   refundLink: string;
+  signInToPay: string;
+  signInWhy: string;
 };
 
+// Payment happens after registration, never before.
+//
+// A payment link is public, so anyone could pay without an account — and
+// then there was no account to attach the money to. The webhook fell back
+// to matching the payer's email, which fails whenever someone pays with a
+// different address from the one they registered with, and the money ended
+// up in a Telegram message with nobody to give it to.
+//
+// Signed in, the account id travels with the payment and the match cannot
+// fail. So the button asks for an account first, and the prices stay
+// visible to everyone: the point is not to hide what things cost.
 export function PaymentPlans({
   plans,
   labels,
+  signedIn = true,
+  signInHref = "/login",
   children
 }: {
   plans: PaymentPlan[];
   labels: PaymentPlanLabels;
+  signedIn?: boolean;
+  signInHref?: string;
   children?: ReactNode;
 }) {
   const [offerAccepted, setOfferAccepted] = useState(false);
@@ -46,6 +63,7 @@ export function PaymentPlans({
 
   return (
     <>
+      {signedIn ? (
       <div
         className={`offer-gate${
           showHint && !accepted ? " offer-gate--alert" : ""
@@ -100,6 +118,14 @@ export function PaymentPlans({
           </p>
         ) : null}
       </div>
+      ) : (
+        <div className="offer-gate offer-gate--signin">
+          <p>{labels.signInWhy}</p>
+          <Link className="button" href={signInHref}>
+            {labels.signInToPay}
+          </Link>
+        </div>
+      )}
 
       <section className="panel-grid">
         {children}
@@ -111,7 +137,11 @@ export function PaymentPlans({
             <p className="price-line">{plan.priceLine}</p>
             <div className="panel-actions">
               {plan.paymentLinkUrl ? (
-                accepted ? (
+                !signedIn ? (
+                  <Link className="button" href={signInHref}>
+                    {labels.signInToPay}
+                  </Link>
+                ) : accepted ? (
                   <a
                     className="button"
                     href={plan.paymentLinkUrl}
@@ -144,7 +174,11 @@ export function PaymentPlans({
 
             {plan.paypalUrl ? (
               <div className="plan-paypal">
-                {accepted ? (
+                {!signedIn ? (
+                  <Link className="button button--paypal" href={signInHref}>
+                    {labels.signInToPay}
+                  </Link>
+                ) : accepted ? (
                   <a
                     className="button button--paypal"
                     href={plan.paypalUrl}
