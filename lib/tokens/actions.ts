@@ -6,7 +6,7 @@ import {
   MIN_REDEEM_TOKENS,
   REDEEM_CODE_VALID_DAYS,
   formatUsd,
-  pluralCapsules,
+  pluralTokens,
   tokensToUsd
 } from "@/lib/tokens/config";
 import {
@@ -120,7 +120,7 @@ export async function redeemTokens(
     return {
       status: "success",
       code: promotionCode.code,
-      message: `Код скидки на ${formatUsd(tokensToUsd(requested))} $ создан — это ${requested} ${pluralCapsules(requested)} формулы по сегодняшней цене. Введите его на странице оплаты в поле «Промокод». Код действует ${REDEEM_CODE_VALID_DAYS} дней и работает один раз.`
+      message: `Код скидки на ${formatUsd(tokensToUsd(requested))} $ создан — это ${requested} ${pluralTokens(requested)}. Введите его на странице оплаты в поле «Промокод». Код действует ${REDEEM_CODE_VALID_DAYS} дней и работает один раз.`
     };
   } catch {
     return errorState(

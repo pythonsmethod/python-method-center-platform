@@ -6,9 +6,7 @@ import { initialRedeemState } from "@/lib/tokens/redeem-state";
 import {
   formatUsd,
   MIN_REDEEM_TOKENS,
-  pluralCapsules,
   pluralTokens,
-  tokensToCapsules,
   tokensToUsd
 } from "@/lib/tokens/config";
 import { reasonLabels, type TokenTransaction } from "@/lib/tokens/queries";
@@ -41,17 +39,16 @@ export function TokenPanel({ balance, transactions }: TokenPanelProps) {
         <strong>
           {balance} {pluralTokens(balance)}
         </strong>
-        {/* Capsules first, dollars second. The capsule is the promise —
-            one token is one capsule and always will be — and the dollar
-            figure is only today's translation of it. Showing it the other
-            way round would make a rise in the capsule price look like us
-            changing the rules. */}
+        {/* One line, one meaning. The balance used to be shown in capsules
+            of the formula first and dollars second; the formula cannot be
+            sold yet, so a balance denominated in it promised something we
+            might not be able to hand over. A dollar of discount is a
+            promise the platform can always keep. */}
         <span className="tokens__value">
-          = {tokensToCapsules(balance)} {pluralCapsules(tokensToCapsules(balance))}{" "}
-          формулы, или {formatUsd(tokensToUsd(balance))} $ скидки на любую покупку
+          = {formatUsd(tokensToUsd(balance))} $ скидки на любую покупку
         </span>
         <span className="tokens__peg">
-          Один токен — это одна капсула. Дорожает капсула — дорожают и ваши токены.
+          Один токен — один доллар скидки.
         </span>
       </div>
 

@@ -1,72 +1,58 @@
 // Referral token economics. All values live here so the founder can change
 // the programme by changing one number.
 
-// What one capsule of the formula costs today.
+// What one token is worth.
 //
-// This is the anchor of the whole programme: one token is one capsule, and
-// nothing else. Every dollar figure shown anywhere is derived from it, so
-// when the capsule becomes more expensive, every token held by every client
-// becomes more valuable on the same day.
+// A token used to be a capsule of the formula, and every dollar figure was
+// derived from the capsule price. That peg is gone: the formula is a CBD
+// product made under contract, it cannot be sold until the paperwork and
+// the state-by-state rules are settled, and a reward payable only in a
+// thing we may not be able to ship everywhere is a promise with a hole in
+// it. A token is now a dollar of discount and nothing else.
 //
-// That is deliberate, and it is a promise with a cost: unspent balances are
-// a liability that grows with the price. Codes already issued do not move —
-// Stripe fixes the discount in dollars at the moment of redemption — so
-// only unspent tokens revalue.
-//
-// TOKEN_CAPSULE_PRICE_USD in the environment overrides it without a
-// deployment. A missing, zero, negative or unparseable value falls back to
-// the number below rather than quietly making every balance worthless.
-const CAPSULE_PRICE_FALLBACK_USD = 6;
+// TOKEN_VALUE_USD in the environment overrides it without a deployment. A
+// missing, zero, negative or unparseable value falls back to the number
+// below rather than quietly making every balance worthless.
+const TOKEN_VALUE_FALLBACK_USD = 1;
 
-// Price history, so any balance can be explained after the fact:
-//   2026-08-05 — $6, the first published price.
+// Value history, so any balance can be explained after the fact:
+//   2026-08-05 — 1 token = 1 capsule of the formula ($6 at the time).
+//   2026-08-06 — 1 token = $1, the peg to the capsule dropped.
+//
+// Balances carried over unchanged in token count, which raised what a
+// holder could redeem rather than lowering it. Nobody lost value on the
+// change, and that is the only version of this change worth making.
 
-export function capsulePriceUsd(): number {
-  const raw = process.env.TOKEN_CAPSULE_PRICE_USD?.trim();
+export function tokenValueUsd(): number {
+  const raw = process.env.TOKEN_VALUE_USD?.trim();
   const parsed = raw ? Number(raw) : Number.NaN;
 
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : CAPSULE_PRICE_FALLBACK_USD;
-}
-
-// One token is one capsule. Kept as its own function because it answers a
-// different question from the dollar one — and it is the only one of the
-// two that can never change.
-export function tokensToCapsules(tokens: number): number {
-  return tokens;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : TOKEN_VALUE_FALLBACK_USD;
 }
 
 export function tokensToUsd(tokens: number): number {
   // Money, so never a fraction of a cent.
-  return Math.round(tokens * capsulePriceUsd() * 100) / 100;
+  return Math.round(tokens * tokenValueUsd() * 100) / 100;
 }
 
-// The referrer's share of what the person they invited pays. Awarded on
-// payment, never on sign-up: a reward for registering is a reward for
-// creating empty accounts.
+// What the referrer earns when somebody they invited registers.
 //
-// It applies to everything the invited person buys — a support programme
-// or capsules from the shop — and to every purchase they make, not only
-// the first. The capsules included in a support programme need no separate
-// rule: their cost is inside the price the share is taken from.
-export const REFERRAL_SHARE = 0.05;
+// The old rule refused to pay for a sign-up at all, on the grounds that a
+// reward for registering is a reward for creating empty accounts. That
+// reasoning has not stopped being true — it is just now priced at a dollar
+// and deliberately an order of magnitude below the reward for a purchase,
+// so farming empty accounts pays a dollar a head for work that is not
+// worth a dollar. It is still the line to watch if the balances ever look
+// strange: see docs/yc/ and the note in awardReferralTokensForSignup.
+export const REFERRAL_SIGNUP_TOKENS = 1;
 
-// Never nothing. Someone who brought a paying client has earned at least
-// one capsule, however small the purchase was, and a reward that rounds
-// down to zero reads as the programme being a trick.
-export const MIN_REFERRAL_TOKENS = 1;
-
-// The share, expressed in capsules — because that is what a token is.
-// Rounded down: the fraction of a capsule that is left over is ours to
-// give away later, not a debt to be guessed at now.
-export function referralTokensForAmount(amountCents: number): number {
-  if (!Number.isFinite(amountCents) || amountCents <= 0) {
-    return 0;
-  }
-
-  const shareUsd = (amountCents / 100) * REFERRAL_SHARE;
-
-  return Math.max(MIN_REFERRAL_TOKENS, Math.floor(shareUsd / capsulePriceUsd()));
-}
+// What the referrer earns when somebody they invited pays.
+//
+// A flat reward per payment, not a share of it: the share was expressed in
+// capsules and died with the peg, and a flat number is one the person can
+// hold in their head. It applies to every purchase the invited person
+// makes, not only the first.
+export const REFERRAL_PURCHASE_TOKENS = 10;
 
 // Guard rails for redemption.
 export const MIN_REDEEM_TOKENS = 10;
@@ -99,24 +85,4 @@ export function pluralTokens(count: number): string {
   }
 
   return "токенов";
-}
-
-// Russian plural for "капсула" — 1 капсула, 2 капсулы, 5 капсул.
-export function pluralCapsules(count: number): string {
-  const mod100 = Math.abs(count) % 100;
-  const mod10 = mod100 % 10;
-
-  if (mod100 >= 11 && mod100 <= 14) {
-    return "капсул";
-  }
-
-  if (mod10 === 1) {
-    return "капсула";
-  }
-
-  if (mod10 >= 2 && mod10 <= 4) {
-    return "капсулы";
-  }
-
-  return "капсул";
 }

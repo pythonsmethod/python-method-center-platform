@@ -349,11 +349,10 @@ async function handlePaidSession(
   }
 
   // 5) Referral reward: if this client was invited by someone, the referrer
-  // earns tokens (once per invited person).
+  // earns tokens (once per payment).
   await awardReferralTokensForPayment({
     payerProfileId: profileId,
-    paymentId: payment.id,
-    amountCents
+    paymentId: payment.id
   });
 
   // 6) Team ping about the money.

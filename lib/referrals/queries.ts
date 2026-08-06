@@ -1,5 +1,6 @@
 import { generateReferralCode, normalizeReferralCode } from "@/lib/referrals/code";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { awardReferralTokensForSignup } from "@/lib/tokens/award";
 
 export const REFERRAL_COOKIE = "pm-ref";
 
@@ -91,12 +92,28 @@ export async function attachReferral(input: {
 
     // The unique constraint on referred_profile_id makes a second attempt
     // a no-op, so first attribution wins.
-    await supabase.from("referrals").insert({
-      referrer_profile_id: referrer.id,
-      referred_profile_id: input.referredProfileId,
-      code,
-      source: "link"
-    });
+    //
+    // The row is read back because it is what makes the sign-up reward
+    // payable exactly once: a duplicate insert returns no row, and no row
+    // means nothing is awarded. Attribution that did not happen here must
+    // never pay a second time.
+    const { data: created } = await supabase
+      .from("referrals")
+      .insert({
+        referrer_profile_id: referrer.id,
+        referred_profile_id: input.referredProfileId,
+        code,
+        source: "link"
+      })
+      .select("id")
+      .maybeSingle();
+
+    if (created?.id) {
+      await awardReferralTokensForSignup({
+        referralId: created.id,
+        referrerProfileId: referrer.id
+      });
+    }
   } catch {
     // Attribution is best-effort by design.
   }

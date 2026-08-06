@@ -17,13 +17,15 @@ export type TokenLedger = {
 };
 
 export const TOKEN_REASONS = {
+  referralSignup: "referral_signup",
   referralPaid: "referral_paid",
   redeemed: "redeemed",
   manual: "manual_adjustment"
 } as const;
 
 export const reasonLabels: Record<string, string> = {
-  referral_paid: "Приглашённый начал сопровождение",
+  referral_signup: "Приглашённый зарегистрировался",
+  referral_paid: "Приглашённый оплатил",
   redeemed: "Использовано как скидка",
   manual_adjustment: "Начисление от команды"
 };

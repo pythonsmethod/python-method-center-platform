@@ -8,7 +8,7 @@ import { TokenPanel } from "@/components/referrals/TokenPanel";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { referralLink } from "@/lib/referrals/code";
 import { getReferralSummary } from "@/lib/referrals/queries";
-import { MIN_REDEEM_TOKENS, REFERRAL_SHARE } from "@/lib/tokens/config";
+import { MIN_REDEEM_TOKENS, REFERRAL_PURCHASE_TOKENS } from "@/lib/tokens/config";
 import { getTokenLedger } from "@/lib/tokens/queries";
 
 export const dynamic = "force-dynamic";
@@ -53,7 +53,7 @@ export default async function TokensPage() {
           <h2>{t.howTitle}</h2>
           <p>
             {t.howTextPrefix}
-            {Math.round(REFERRAL_SHARE * 100)}
+            {REFERRAL_PURCHASE_TOKENS}
             {t.howTextSuffix}
           </p>
         </div>

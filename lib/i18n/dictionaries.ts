@@ -300,13 +300,13 @@ const ru = {
       howAria: "Как это работает",
       howLabel: "Как это работает",
       howTitle: "Откуда берутся токены",
-      howTextPrefix: "Вы приглашаете человека по своей ссылке. Если он начинает сопровождение, вам начисляется ",
+      howTextPrefix: "Вы приглашаете человека по своей ссылке. За его регистрацию вам начисляется 1 токен, а когда он оплачивает — ещё ",
       howTextSuffix:
-        " токенов. Не за регистрацию — именно за начатое сопровождение: в этой программе нет места пустым аккаунтам.",
+        " токенов. И так за каждую его оплату, не только за первую.",
       useLabel: "Что с ними делать",
-      useTitle: "1 токен = 1 капсула формулы",
+      useTitle: "1 токен = 1 доллар скидки",
       useTextPrefix:
-        "Токен привязан к капсуле формулы, а не к доллару: дорожает капсула — дорожают и ваши токены. Токены копятся и превращаются в скидку на любую оплату на платформе. Обменять можно от ",
+        "Токены копятся и превращаются в скидку на любую оплату на платформе. Обменять можно от ",
       useTextSuffix:
         " токенов: платформа выдаст код, который вводится на странице оплаты. Срок жизни кода — 60 дней, использовать его можно один раз.",
       balanceAria: "Ваши токены",
@@ -1449,13 +1449,13 @@ const en: typeof ru = {
       howLabel: "How it works",
       howTitle: "Where tokens come from",
       howTextPrefix:
-        "You invite someone with your link. Every time they pay — for a support programme or for capsules — you get back ",
+        "You invite someone with your link. When they register you get 1 token, and when they pay you get another ",
       howTextSuffix:
-        "% of it in tokens. Every time, not only the first. Not for registering, but for the payment itself: there is no room for empty accounts in this one. The capsules included free with a support programme need no separate counting — their cost is already inside the price the share is taken from.",
+        " tokens. Every time they pay, not only the first time.",
       useLabel: "What to do with them",
-      useTitle: "1 token = 1 capsule of the formula",
+      useTitle: "1 token = $1 off",
       useTextPrefix:
-        "A token is tied to a capsule of the formula rather than to a dollar: when the capsule costs more, so do your tokens. Tokens accumulate and turn into a discount on any payment on the platform. You can exchange them from ",
+        "Tokens accumulate and turn into a discount on any payment on the platform. You can exchange them from ",
       useTextSuffix:
         " tokens: the platform issues a code that you enter on the payment page. The code lasts 60 days and can be used once.",
       balanceAria: "Your tokens",

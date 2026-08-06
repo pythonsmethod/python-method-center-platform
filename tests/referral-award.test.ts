@@ -12,7 +12,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // The two differ by one word and produce completely different economics,
 // and neither TypeScript nor a passing build can tell them apart.
 //
-// So the reference is asserted directly.
+// The sign-up reward is the mirror image and needs the opposite guarantee:
+// it is filed under the referral id precisely so it can be paid once and
+// never again, however many times attribution is attempted.
+//
+// So both references are asserted directly.
 
 type LedgerEntry = {
   profileId: string;
@@ -30,7 +34,10 @@ const referralRow = {
 };
 
 vi.mock("@/lib/tokens/queries", () => ({
-  TOKEN_REASONS: { referralPaid: "referral_paid" },
+  TOKEN_REASONS: {
+    referralSignup: "referral_signup",
+    referralPaid: "referral_paid"
+  },
   writeTokenTransaction: (entry: LedgerEntry) => writeTokenTransaction(entry)
 }));
 
@@ -46,7 +53,8 @@ vi.mock("@/lib/supabase/service", () => ({
   })
 }));
 
-const { awardReferralTokensForPayment } = await import("@/lib/tokens/award");
+const { awardReferralTokensForPayment, awardReferralTokensForSignup } =
+  await import("@/lib/tokens/award");
 
 beforeEach(() => {
   writeTokenTransaction.mockClear();
@@ -56,8 +64,7 @@ describe("who gets paid, and for what", () => {
   it("files the reward under the payment, so every purchase pays", () => {
     return awardReferralTokensForPayment({
       payerProfileId: "payer-3333-3333-3333-333333333333",
-      paymentId: "payment-4444-4444-4444-444444444444",
-      amountCents: 144000
+      paymentId: "payment-4444-4444-4444-444444444444"
     }).then(() => {
       expect(writeTokenTransaction).toHaveBeenCalledTimes(1);
 
@@ -70,26 +77,46 @@ describe("who gets paid, and for what", () => {
     });
   });
 
-  it("pays the referrer, never the buyer", () => {
+  it("pays the referrer ten tokens for a purchase, never the buyer", () => {
     return awardReferralTokensForPayment({
       payerProfileId: "payer-3333-3333-3333-333333333333",
-      paymentId: "payment-4444-4444-4444-444444444444",
-      amountCents: 144000
+      paymentId: "payment-4444-4444-4444-444444444444"
     }).then(() => {
       const [entry] = writeTokenTransaction.mock.calls[0];
 
       expect(entry.profileId).toBe(referralRow.referrer_profile_id);
-      expect(entry.amount).toBe(12);
+      expect(entry.amount).toBe(10);
+    });
+  });
+});
+
+describe("the reward for a registration", () => {
+  it("pays the referrer a single token", () => {
+    return awardReferralTokensForSignup({
+      referralId: referralRow.id,
+      referrerProfileId: referralRow.referrer_profile_id
+    }).then(() => {
+      expect(writeTokenTransaction).toHaveBeenCalledTimes(1);
+
+      const [entry] = writeTokenTransaction.mock.calls[0];
+
+      expect(entry.profileId).toBe(referralRow.referrer_profile_id);
+      expect(entry.amount).toBe(1);
+      expect(entry.reason).toBe("referral_signup");
     });
   });
 
-  it("writes nothing at all when the amount earns nothing", () => {
-    return awardReferralTokensForPayment({
-      payerProfileId: "payer-3333-3333-3333-333333333333",
-      paymentId: "payment-5555-5555-5555-555555555555",
-      amountCents: 0
+  // The whole defence against farming empty accounts. Filed under the
+  // referral, whose row carries a unique constraint on the invited person,
+  // a registration can be paid exactly once however often it is retried.
+  it("files under the referral, so a registration can only pay once", () => {
+    return awardReferralTokensForSignup({
+      referralId: referralRow.id,
+      referrerProfileId: referralRow.referrer_profile_id
     }).then(() => {
-      expect(writeTokenTransaction).not.toHaveBeenCalled();
+      const [entry] = writeTokenTransaction.mock.calls[0];
+
+      expect(entry.referenceId).toBe(referralRow.id);
     });
   });
 });
