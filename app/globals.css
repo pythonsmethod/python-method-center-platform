@@ -5996,6 +5996,27 @@ code {
   margin-top: 24px;
 }
 
+/* Finding one client among many. On a phone the fields stack; on a laptop
+   the input takes the room and the buttons sit beside it. */
+.case-search {
+  align-items: end;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.case-search .field {
+  flex: 1 1 260px;
+  margin: 0;
+}
+
+.case-search__result {
+  color: var(--muted);
+  font-size: 0.92rem;
+  margin: 0 0 14px;
+}
+
 .table-wrap {
   background: var(--surface);
   border: 1px solid var(--line);

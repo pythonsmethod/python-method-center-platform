@@ -8,6 +8,7 @@ import {
   getStaffCases,
   type StaffCaseListItem
 } from "@/lib/cases/staff-queries";
+import { searchCases } from "@/lib/cases/search";
 import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { formatDateTime } from "@/lib/i18n/format";
 import {
@@ -91,7 +92,12 @@ function CaseTable({
   );
 }
 
-export default async function StaffCasesPage() {
+type PageProps = {
+  searchParams: Promise<{ q?: string }>;
+};
+
+export default async function StaffCasesPage({ searchParams }: PageProps) {
+  const query = ((await searchParams).q ?? "").slice(0, 120);
   const auth = await getRequiredStaffUser("/admin/cases");
 
   if (auth.status === "missing-env") {
@@ -135,6 +141,9 @@ export default async function StaffCasesPage() {
     getStaffUnreadCounts()
   ]);
 
+  const found =
+    casesResult.status === "ready" ? searchCases(casesResult.cases, query) : [];
+
   return (
     <div className="page-shell">
       <PageHeader
@@ -154,9 +163,45 @@ export default async function StaffCasesPage() {
         </div>
       </section>
 
+      {/* A payment arrives from an address and the first question is always
+          "do we know this person?". Scrolling a growing table on a phone to
+          answer it is how an account gets missed. A plain form, so it works
+          with the page reloaded and needs no JavaScript. */}
+      <section className="panel" aria-label="Поиск по кейсам">
+        <form className="case-search" method="get">
+          <label className="field">
+            <span>Найти клиента</span>
+            <input
+              autoComplete="off"
+              defaultValue={query}
+              name="q"
+              placeholder="Email, имя, телефон или номер кейса"
+              type="search"
+            />
+          </label>
+          <button className="button button--secondary" type="submit">
+            Найти
+          </button>
+          {query ? (
+            <Link className="button button--secondary" href="/admin/cases">
+              Сбросить
+            </Link>
+          ) : null}
+        </form>
+      </section>
+
       <section className="intake-section" aria-label="Кейсы клиентов">
         {casesResult.status === "ready" ? (
-          <CaseTable cases={casesResult.cases} unreadByCase={unread.byCase} />
+          <>
+            {query ? (
+              <p className="case-search__result">
+                {found.length > 0
+                  ? `Найдено: ${found.length} из ${casesResult.cases.length}`
+                  : `Ничего не найдено по запросу «${query}». Скорее всего, у этого человека ещё нет аккаунта на сайте.`}
+              </p>
+            ) : null}
+            <CaseTable cases={found} unreadByCase={unread.byCase} />
+          </>
         ) : (
           <div className="notice notice--warning">
             <span className="panel__label">Кейсы недоступны</span>
