@@ -86,8 +86,19 @@ export async function generateCaseReview(
   }
 
   if (loaded.attachments.length === 0) {
+    // The old message blamed the file formats whatever had actually gone
+    // wrong, and the first case it met was six perfectly ordinary phone
+    // photographs that were merely too large. Saying the wrong reason costs
+    // more than saying none: it sends someone converting files that were
+    // fine.
+    const reasons = [...new Set(loaded.skipped.map((item) => item.reason))]
+      .map((reason) => SKIPPED_REASON[reason] ?? reason)
+      .join("; ");
+
     return errorState(
-      "Ни один документ кейса не удалось прочитать — проверьте форматы файлов."
+      reasons
+        ? `Ни один документ кейса не удалось прочитать. Причина: ${reasons}. Файлов в кейсе: ${loaded.skipped.length}.`
+        : "Ни один документ кейса не удалось прочитать."
     );
   }
 

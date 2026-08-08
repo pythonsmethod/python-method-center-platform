@@ -1,7 +1,6 @@
+import sharp from "sharp";
 import {
   MAX_ATTACHMENTS,
-  MAX_ATTACHMENT_BYTES,
-  MAX_TOTAL_ATTACHMENT_BYTES,
   PDF_TYPE,
   isImageType,
   isTextType,
@@ -19,6 +18,31 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 //
 // Nothing is cached and nothing is copied anywhere: the bytes travel to
 // the model with one request and are dropped.
+//
+// Photographs are shrunk on the way. Clients send their analyses as photos
+// of paper, straight from a phone — four or five megabytes each — and the
+// limits written for what a person types into a chat rejected every one of
+// them, so a case with six pages of blood work read as "no documents could
+// be read, check the file formats". The formats were fine.
+//
+// 1568px on the long edge is the size the model works at: anything larger
+// is scaled down before it is looked at, so this throws away bytes and not
+// detail. A photographed lab printout comes out around a third of a
+// megabyte and stays perfectly legible.
+
+// After shrinking, an image this size is a photograph of something that is
+// not a document. Left generous on purpose.
+const MAX_IMAGE_BYTES = 1_500_000;
+
+// A PDF cannot be shrunk here, and a scanned one is legitimately heavy.
+const MAX_FILE_BYTES = 4_500_000;
+
+// The whole request. Well inside what the model accepts; the cap exists so
+// a case with sixty files cannot build a request that simply fails.
+const MAX_TOTAL_BYTES = 14_000_000;
+
+// The longest edge the model reasons at.
+const IMAGE_LONG_EDGE = 1568;
 
 export type CaseDocumentRow = {
   id: string;
@@ -82,6 +106,41 @@ export function isReadableType(mediaType: string): boolean {
   return isImageType(mediaType) || mediaType === PDF_TYPE || isTextType(mediaType);
 }
 
+// Down to the size the model reads at, and re-encoded as JPEG: a phone
+// photograph is already lossy, so nothing is lost that was there, and the
+// file becomes small enough that six pages of analyses fit in one request.
+//
+// Returns null when the bytes turn out not to be an image at all — better
+// to report one unreadable file than to fail the whole reading.
+export async function shrinkImage(
+  input: Buffer
+): Promise<{ bytes: Buffer; mediaType: string } | null> {
+  try {
+    const image = sharp(input, { failOn: "none" });
+    const meta = await image.metadata();
+    const longest = Math.max(meta.width ?? 0, meta.height ?? 0);
+
+    if (longest === 0) {
+      return null;
+    }
+
+    // Already small: leave it exactly as the client sent it.
+    if (longest <= IMAGE_LONG_EDGE && input.byteLength <= MAX_IMAGE_BYTES) {
+      return { bytes: input, mediaType: `image/${meta.format ?? "jpeg"}` };
+    }
+
+    const bytes = await image
+      .rotate()
+      .resize({ width: IMAGE_LONG_EDGE, height: IMAGE_LONG_EDGE, fit: "inside", withoutEnlargement: true })
+      .jpeg({ quality: 82, mozjpeg: true })
+      .toBuffer();
+
+    return { bytes, mediaType: "image/jpeg" };
+  } catch {
+    return null;
+  }
+}
+
 // Downloads what fits inside one request. The caps are the model's, not
 // ours: too many megabytes and the request simply fails, so the oldest
 // documents are read first and the rest are reported as left out.
@@ -124,23 +183,34 @@ export async function loadCaseDocuments(
       continue;
     }
 
-    const bytes = Buffer.from(await data.arrayBuffer());
+    const original = Buffer.from(await data.arrayBuffer());
+    const shrunk = isImageType(mediaType)
+      ? await shrinkImage(original)
+      : { bytes: original, mediaType };
 
-    if (bytes.byteLength > MAX_ATTACHMENT_BYTES) {
+    if (!shrunk) {
+      // The bytes are not an image the way the file claimed to be.
+      skipped.push({ name: row.original_filename, reason: "unreadable" });
+      continue;
+    }
+
+    const limit = isImageType(shrunk.mediaType) ? MAX_IMAGE_BYTES : MAX_FILE_BYTES;
+
+    if (shrunk.bytes.byteLength > limit) {
       skipped.push({ name: row.original_filename, reason: "too-big" });
       continue;
     }
 
-    if (total + bytes.byteLength > MAX_TOTAL_ATTACHMENT_BYTES) {
+    if (total + shrunk.bytes.byteLength > MAX_TOTAL_BYTES) {
       skipped.push({ name: row.original_filename, reason: "no-room" });
       continue;
     }
 
-    total += bytes.byteLength;
+    total += shrunk.bytes.byteLength;
     attachments.push({
       name: row.original_filename,
-      mediaType,
-      data: bytes.toString("base64")
+      mediaType: shrunk.mediaType,
+      data: shrunk.bytes.toString("base64")
     });
   }
 
