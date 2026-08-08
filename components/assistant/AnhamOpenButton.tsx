@@ -7,8 +7,18 @@ import type { ReactNode } from "react";
 // need to know who called.
 export const ANHAM_OPEN_EVENT = "anham:open";
 
-export function openAnham(): void {
-  window.dispatchEvent(new Event(ANHAM_OPEN_EVENT));
+// A question can travel with the request to open.
+//
+// The hardest part of talking to an assistant for the first time is not
+// willingness — it is the empty box and not knowing what may be asked. A
+// ready question that sends itself removes that, and the conversation
+// starts with an answer rather than with a blinking cursor.
+export type AnhamOpenDetail = { ask?: string };
+
+export function openAnham(ask?: string): void {
+  window.dispatchEvent(
+    new CustomEvent<AnhamOpenDetail>(ANHAM_OPEN_EVENT, { detail: { ask } })
+  );
 }
 
 type AnhamOpenButtonProps = {
@@ -23,7 +33,7 @@ export function AnhamOpenButton({
   children
 }: AnhamOpenButtonProps) {
   return (
-    <button className={className} onClick={openAnham} type="button">
+    <button className={className} onClick={() => openAnham()} type="button">
       {children}
     </button>
   );

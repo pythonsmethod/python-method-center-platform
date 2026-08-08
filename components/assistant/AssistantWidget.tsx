@@ -2,7 +2,7 @@
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
-import { ANHAM_OPEN_EVENT } from "@/components/assistant/AnhamOpenButton";
+import { ANHAM_OPEN_EVENT, type AnhamOpenDetail } from "@/components/assistant/AnhamOpenButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
@@ -39,6 +39,9 @@ export function AssistantWidget({
   const suggestions = tierCopy?.suggestions ?? t.suggestions;
   const [open, setOpen] = useState(false);
   const [showWelcome, setShowWelcome] = useState(false);
+  // A question that arrived with the request to open, sent as soon as the
+  // window is there to send it from.
+  const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
   const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const companionRef = useRef<HTMLDivElement | null>(null);
@@ -74,15 +77,21 @@ export function AssistantWidget({
   //
   // #anham does the same for a link arriving from another page.
   useEffect(() => {
-    function open() {
+    function open(event: Event) {
+      const ask = (event as CustomEvent<AnhamOpenDetail>).detail?.ask;
+
       setShowWelcome(false);
       setOpen(true);
+
+      if (ask) {
+        setPendingQuestion(ask);
+      }
     }
 
     window.addEventListener(ANHAM_OPEN_EVENT, open);
 
     if (window.location.hash === "#anham") {
-      open();
+      open(new Event(ANHAM_OPEN_EVENT));
     }
 
     return () => window.removeEventListener(ANHAM_OPEN_EVENT, open);
@@ -213,8 +222,10 @@ export function AssistantWidget({
             historyEndpoint={
               tier === "guest" ? undefined : "/api/assistant/history"
             }
+            initialQuestion={pendingQuestion}
             intro={intro}
             locale={locale}
+            onInitialQuestionSent={() => setPendingQuestion(null)}
             suggestions={suggestions}
           />
         </aside>

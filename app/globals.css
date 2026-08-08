@@ -8843,6 +8843,95 @@ code {
 
 /* The conversation is the page: it takes the height that is left and never
    makes the person scroll the page to reach the input field. */
+/* The invitation to talk to the assistant, in the cabinet.
+   Gold-edged rather than another grey panel: it sits above a message thread
+   that fills the screen, and a person with a question has to see it before
+   they start typing into that thread instead. */
+.assistant-invite {
+  align-items: start;
+  background: linear-gradient(180deg, rgba(212, 175, 55, 0.09), rgba(212, 175, 55, 0.02));
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 18px;
+  display: grid;
+  gap: clamp(14px, 3vw, 22px);
+  grid-template-columns: auto minmax(0, 1fr);
+  margin-bottom: 22px;
+  padding: clamp(18px, 3vw, 26px);
+}
+
+.assistant-invite h2 {
+  font-size: clamp(1.15rem, 3vw, 1.4rem);
+  margin: 6px 0 10px;
+}
+
+.assistant-invite p {
+  color: var(--text);
+  line-height: 1.7;
+  margin: 0;
+}
+
+.assistant-invite__avatar {
+  display: block;
+  line-height: 0;
+}
+
+/* Ready questions, laid out as things to press rather than things to read. */
+.assistant-invite__questions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 16px 0 0;
+}
+
+.assistant-invite__question {
+  background: rgba(212, 175, 55, 0.12);
+  border: 1px solid rgba(212, 175, 55, 0.5);
+  border-radius: 999px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.95rem;
+  line-height: 1.4;
+  padding: 10px 16px;
+  text-align: left;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.assistant-invite__question:hover {
+  background: rgba(212, 175, 55, 0.22);
+  transform: translateY(-1px);
+}
+
+.assistant-invite__question:focus-visible {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 3px;
+}
+
+.assistant-invite__boundary {
+  border-top: 1px solid rgba(212, 175, 55, 0.25);
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 16px;
+  padding-top: 14px;
+}
+
+@media (max-width: 640px) {
+  .assistant-invite {
+    grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+
+  .assistant-invite__questions {
+    justify-content: center;
+  }
+
+  .assistant-invite__question {
+    text-align: center;
+    width: 100%;
+  }
+}
+
 .cab-thread {
   display: grid;
   gap: 12px;

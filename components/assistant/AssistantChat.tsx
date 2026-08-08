@@ -32,6 +32,11 @@ type AssistantChatProps = {
   // with an account — for everyone else the thread starts empty every time,
   // because nothing about them is stored.
   historyEndpoint?: string;
+  // A question handed in from outside — a ready first question someone
+  // tapped instead of facing an empty box. Sent once, as soon as the window
+  // exists to send it from.
+  initialQuestion?: string | null;
+  onInitialQuestionSent?: () => void;
 };
 
 // When the files do not fit one request, they are read in parts: each part
@@ -53,7 +58,9 @@ export function AssistantChat({
   attachments: allowAttachments = false,
   caseId,
   locale = "ru",
-  historyEndpoint
+  historyEndpoint,
+  initialQuestion = null,
+  onInitialQuestionSent
 }: AssistantChatProps) {
   const t = getDictionary(locale).widget;
   const effectivePlaceholder = placeholder ?? t.placeholder;
@@ -222,6 +229,21 @@ export function AssistantChat({
 
     return data.reply;
   }
+
+  // Sent once per question handed in, and never while something else is in
+  // flight — a double send would ask the same thing twice and charge for it
+  // twice.
+  const sentQuestion = useRef<string | null>(null);
+
+  useEffect(() => {
+    if (!initialQuestion || pending || sentQuestion.current === initialQuestion) {
+      return;
+    }
+
+    sentQuestion.current = initialQuestion;
+    void send(initialQuestion);
+    onInitialQuestionSent?.();
+  }, [initialQuestion, pending]);
 
   async function send(text: string) {
     const trimmed = text.trim();

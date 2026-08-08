@@ -147,7 +147,28 @@ const ru = {
       uploadCta: "Загрузить",
       threadAria: "Переписка с центром",
       threadLabel: "Ваша переписка",
-      threadTitle: "Professor Python и команда"
+      threadTitle: "Professor Python и команда",
+      // Приглашение к помощнику — в кабинете, а не на главной.
+      //
+      // Вся фокус-группа зарегистрировалась и ни один человек ему не
+      // написал. После регистрации люди оказываются здесь, где весь экран
+      // занимает переписка с командой, а помощник — необъяснённая фигурка
+      // у края экрана. Человек с вопросом делает очевидное: пишет в
+      // большое видимое поле. Это не нехватка желания, а нехватка
+      // указателя.
+      inviteLabel: "Помощник центра",
+      inviteTitle: "Спросите Анхама — он отвечает сразу",
+      inviteText:
+        "Пока Professor Python разбирает ваши документы, помощник центра рядом круглосуточно. Он объяснит, что означают показатели в ваших анализах, поможет разобраться в кабинете и ответит на вопросы, с которыми неловко ждать. Это бесплатно и не тратит ваше сопровождение.",
+      // Готовые вопросы, а не пустое поле. Труднее всего именно первый
+      // вопрос: человек не знает, о чём тут вообще можно спросить.
+      inviteQuestions: [
+        "Что означают мои анализы?",
+        "Как проходит сопровождение?",
+        "Что мне загрузить, чтобы разбор был полным?"
+      ],
+      inviteBoundary:
+        "Анхам — искусственный интеллект центра, а не Professor Python. Его ответы помогают сориентироваться; разбор ваших документов и рекомендации даёт лично он — в переписке ниже."
     },
     documents: {
       eyebrow: "Документы",
@@ -1301,7 +1322,18 @@ const en: typeof ru = {
       uploadCta: "Upload",
       threadAria: "Conversation with the center",
       threadLabel: "Your conversation",
-      threadTitle: "Professor Python and the team"
+      threadTitle: "Professor Python and the team",
+      inviteLabel: "The centre's assistant",
+      inviteTitle: "Ask Anham — he answers straight away",
+      inviteText:
+        "While Professor Python goes through your documents, the centre's assistant is here around the clock. He explains what the markers in your results mean, helps you find your way around the cabinet, and answers the questions it feels awkward to wait for. It is free and it uses none of your support programme.",
+      inviteQuestions: [
+        "What do my test results mean?",
+        "How does the support programme work?",
+        "What should I upload so the review is complete?"
+      ],
+      inviteBoundary:
+        "Anham is the centre's AI, not Professor Python. His answers help you get your bearings; the review of your documents and the recommendations come from him personally — in the conversation below."
     },
     documents: {
       eyebrow: "Documents",

@@ -3,6 +3,7 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
+import { AssistantInvite } from "@/components/assistant/AssistantInvite";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
@@ -107,6 +108,19 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           </span>
         </div>
       ) : null}
+
+      {/* Above the thread, not below it: the thread is what a person reaches
+          for when they have a question, so the alternative has to be seen
+          before they start typing into it. */}
+      <AssistantInvite
+        labels={{
+          label: t.inviteLabel,
+          title: t.inviteTitle,
+          text: t.inviteText,
+          questions: t.inviteQuestions,
+          boundary: t.inviteBoundary
+        }}
+      />
 
       <section className="cab-thread" aria-label={t.threadAria}>
         <div className="cab-thread__head">
