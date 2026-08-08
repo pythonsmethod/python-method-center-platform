@@ -131,7 +131,19 @@ function withAttachments(
     { type: "text", text: ATTACHMENT_DATA_PREFACE }
   ];
 
-  for (const file of attachments) {
+  attachments.forEach((file, index) => {
+    // Every file is announced by name before its contents.
+    //
+    // Images used to arrive as bare picture blocks with nothing to identify
+    // them, so a reader who could not make out a word had no way to say
+    // where it was — the model genuinely did not know the file was called
+    // IMG_6219. On a case of six photographed pages that turns "I could not
+    // read this" into something nobody can act on.
+    blocks.push({
+      type: "text",
+      text: `Файл ${index + 1} из ${attachments.length} — «${file.name}»:`
+    });
+
     if (isImageType(file.mediaType)) {
       blocks.push({
         type: "image",
@@ -141,7 +153,7 @@ function withAttachments(
           data: file.data
         }
       });
-      continue;
+      return;
     }
 
     if (file.mediaType === PDF_TYPE) {
@@ -154,7 +166,7 @@ function withAttachments(
           data: file.data
         }
       });
-      continue;
+      return;
     }
 
     if (isTextType(file.mediaType)) {
@@ -169,7 +181,7 @@ function withAttachments(
         text: `Содержимое приложенного файла «${file.name}»:\n${decoded}`
       });
     }
-  }
+  });
 
   blocks.push({ type: "text", text: ATTACHMENT_DATA_CLOSING });
   blocks.push({ type: "text", text: String(last.content) });

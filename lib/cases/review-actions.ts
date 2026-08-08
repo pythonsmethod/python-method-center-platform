@@ -4,8 +4,16 @@ import { revalidatePath } from "next/cache";
 import { askClaude } from "@/lib/assistant/claude";
 import {
   CASE_REVIEW_SYSTEM_PROMPT,
+  CASE_REVIEW_UNREAD_HEADING,
   parseCaseReview
 } from "@/lib/assistant/case-review";
+import {
+  compareTranscriptions,
+  formatAgreed,
+  formatDisputed,
+  parseTranscription,
+  TRANSCRIPTION_SYSTEM_PROMPT
+} from "@/lib/assistant/transcription";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
@@ -110,16 +118,74 @@ export async function generateCaseReview(
           .join(", ")}. Скажи об этом первой строкой разбора.`
       : "";
 
+  // Two independent readings of the same files, then a comparison done by
+  // code rather than by the model.
+  //
+  // The error this exists for was not a wrong number: every one of the forty
+  // laboratory values was right. It was a table whose value column was
+  // printed offset from its row labels, and one row of slippage turned a
+  // non-smoker into a smoker. Alignment is exactly the kind of mistake a
+  // second look catches and a stricter instruction does not.
+  //
+  // The two passes run at once: they do not depend on each other, and a
+  // person is waiting.
+  const [firstPass, secondPass] = await Promise.all([
+    askClaude(
+      TRANSCRIPTION_SYSTEM_PROMPT,
+      [
+        {
+          role: "user",
+          content: `Перепиши всё содержимое приложенных документов по заданному формату.${skippedNote}`
+        }
+      ],
+      8000,
+      loaded.attachments
+    ),
+    askClaude(
+      TRANSCRIPTION_SYSTEM_PROMPT,
+      [
+        {
+          role: "user",
+          content:
+            "Перепиши всё содержимое приложенных документов по заданному формату. Читай внимательно каждое поле, включая таблицы осмотра и назначения препаратов."
+        }
+      ],
+      8000,
+      loaded.attachments
+    )
+  ]);
+
+  if (firstPass.status !== "ok" || secondPass.status !== "ok") {
+    return errorState("Ассистент сейчас недоступен. Попробуйте через минуту.");
+  }
+
+  const comparison = compareTranscriptions(
+    parseTranscription(firstPass.reply),
+    parseTranscription(secondPass.reply)
+  );
+
+  if (comparison.agreed.length === 0 && comparison.disputed.length === 0) {
+    return errorState(
+      "Не удалось перенести ни одного значения из документов. Проверьте, что файлы открываются и на них видно текст."
+    );
+  }
+
+  const disputedNote =
+    comparison.disputed.length > 0
+      ? `\n\nСПОРНЫЕ МЕСТА — два чтения не сошлись или чтение было неуверенным. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(comparison.disputed)}`
+      : `\n\nСПОРНЫХ МЕСТ НЕТ: оба чтения совпали по всем строкам. Так и напиши в разделе «${CASE_REVIEW_UNREAD_HEADING}».`;
+
   const result = await askClaude(
     `${CASE_REVIEW_SYSTEM_PROMPT}\n\n${context ?? ""}`,
     [
       {
         role: "user",
-        content: `Прочитай приложенные анализы клиента и подготовь обе части по заданному формату.${skippedNote}`
+        content: `Вот значения, переписанные из документов клиента и подтверждённые двумя независимыми чтениями. Подготовь обе части по заданному формату, опираясь только на них.\n\n${formatAgreed(
+          comparison.agreed
+        )}${disputedNote}${skippedNote}`
       }
     ],
-    4000,
-    loaded.attachments
+    4000
   );
 
   if (result.status !== "ok") {
