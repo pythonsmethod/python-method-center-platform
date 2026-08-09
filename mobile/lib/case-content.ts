@@ -6,6 +6,8 @@ export type MobileDocument = {
   document_type: string;
   status: string;
   document_status: string | null;
+  // Needed to sign a short-lived URL when the person opens the file.
+  storage_path: string | null;
   created_at: string;
 };
 
@@ -22,7 +24,7 @@ export type MobileLifecycleEvent = {
 export async function loadDocuments(profileId: string, caseId: string): Promise<MobileDocument[]> {
   const { data, error } = await supabase
     .from('uploaded_documents')
-    .select('id, original_filename, document_type, status, document_status, created_at')
+    .select('id, original_filename, document_type, status, document_status, storage_path, created_at')
     .eq('profile_id', profileId)
     .eq('case_id', caseId)
     .order('created_at', { ascending: false });
