@@ -2,7 +2,21 @@ import * as Crypto from 'expo-crypto';
 import * as DocumentPicker from 'expo-document-picker';
 import { Linking } from 'react-native';
 
+import { apiRequest } from '@/lib/api-client';
 import { supabase } from '@/lib/supabase';
+
+async function registerDocument(input: {
+  documentId: string;
+  storagePath: string;
+  originalFilename: string;
+  mimeType: string;
+  fileSize: number;
+}) {
+  return apiRequest('/api/mobile/documents', {
+    method: 'POST',
+    body: JSON.stringify(input),
+  });
+}
 
 const BUCKET = 'client-documents';
 const MAX_BYTES = 25 * 1024 * 1024;
@@ -74,27 +88,21 @@ export async function pickAndUploadDocument(input: {
   });
   if (uploadError) throw uploadError;
 
-  const { error: metadataError } = await supabase.from('uploaded_documents').insert({
-    id: documentId,
-    profile_id: input.profileId,
-    case_id: input.caseId,
-    document_type: 'other',
-    status: 'uploaded',
-    document_status: 'uploaded',
-    storage_path: storagePath,
-    original_filename: asset.name,
-    metadata: {
-      storage_bucket: BUCKET,
-      mime_type: mimeType,
-      file_size: asset.size,
-      uploaded_via: 'mobile_app',
-      storage_path_version: 'user_case_document_filename_v1',
-    },
-  });
-
-  if (metadataError) {
+  // Registration goes through the platform, not straight into the table: the
+  // server re-checks the path, confirms the object really landed, and writes
+  // the audit row that the web upload also writes. A direct insert would
+  // leave a document on a case with no trace of who put it there.
+  try {
+    await registerDocument({
+      documentId,
+      storagePath,
+      originalFilename: asset.name,
+      mimeType,
+      fileSize: asset.size,
+    });
+  } catch (error) {
     await supabase.storage.from(BUCKET).remove([storagePath]);
-    throw metadataError;
+    throw error;
   }
 
   return { status: 'uploaded' as const, documentId };
