@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Alert, Pressable, SafeAreaView, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { PASSWORD_RESET_REDIRECT_URL } from '@/lib/deep-links';
 import { supabase } from '@/lib/supabase';
 
 export default function RecoveryScreen() {
@@ -10,7 +11,7 @@ export default function RecoveryScreen() {
   async function recover() {
     setSubmitting(true);
     const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
-      redirectTo: 'pythonmethod://reset-password',
+      redirectTo: PASSWORD_RESET_REDIRECT_URL,
     });
     setSubmitting(false);
 
