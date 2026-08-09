@@ -806,7 +806,227 @@ cannot start regardless of code quality.
 
 # PART II — CHANGES MADE
 
-*This section is completed after the fixes; see the changelog below.*
+Branch: `audit/mobile-beta`, based on `origin/agent/mobile-app-foundation`
+(`2cd90e2`). Six commits. No web page, no Server Action, no migration and no
+RLS policy was modified.
 
-<!-- FIXES-BEGIN -->
-<!-- FIXES-END -->
+## 13. Commits
+
+| Commit | Title | Fixes |
+|---|---|---|
+| `4b3db86` | Audit the mobile app for an internal beta | — (this report) |
+| `67f9196` | Let a document actually open on the phone | P0-2 |
+| `1febf80` | Make the mobile install reproducible and complete | P0-3, P1-3, + a latent install failure |
+| `95e24f1` | Make password recovery finish on the phone | P0-5 |
+| `fea1568` | Record a phone upload the way the website records one | P1-2 |
+| `d6c1181` | Stop leaking database errors, and let a recording be cancelled | P1-9, P1-7, P1-4 |
+
+## 14. Files changed
+
+**Added**
+
+| File | Purpose |
+|---|---|
+| `docs/mobile/MOBILE_INTERNAL_BETA_AUDIT_2026-08-09.md` | this report |
+| `mobile/app/reset-password.tsx` | the missing recovery destination |
+| `mobile/lib/deep-links.ts` | redirect URL derived from the app's real scheme |
+| `mobile/lib/api-client.ts` | one place that attaches the bearer token |
+| `mobile/.gitignore` | keeps generated native dirs, `.expo` and `.env` out |
+| `mobile/package-lock.json` | reproducible installs |
+| `app/api/mobile/documents/route.ts` | document registration with audit trail |
+
+**Modified**
+
+| File | Change |
+|---|---|
+| `mobile/lib/case-content.ts` | select and type `storage_path` |
+| `mobile/package.json` | 4 peer deps declared; `react-dom` pinned; `react-native-worklets` override |
+| `mobile/app/recovery.tsx` | use the derived redirect URL |
+| `mobile/app/_layout.tsx` | register `reset-password` |
+| `mobile/lib/document-storage.ts` | register through the platform, not a direct insert |
+| `mobile/lib/team-chat.ts` | use the shared api-client |
+| `mobile/app/team-chat.tsx` | cancel a recording |
+| `app/api/mobile/messages/route.ts` | generic client errors, real reason logged |
+| `app/api/mobile/messages/audio/route.ts` | same |
+
+## 15. Additional defect found during the fixes
+
+Not visible in the first pass, found when re-installing:
+
+**`npm install` in `mobile/` did not resolve on a clean tree, and `npm ci`
+failed outright.** Two separate causes, both pre-existing — confirmed by
+stashing every change and reproducing on the original `package.json`:
+
+1. `react` pinned to `19.2.3` while `react-dom` floated to `19.2.8`, which
+   requires `react@^19.2.8`. `react-dom` arrives through expo-router's web
+   support.
+2. `expo-modules-core` accepts `react-native-worklets` up to `^0.10.0`, but
+   npm hoisted `0.11.3` because `react-native-reanimated` allows
+   `0.10.x - 0.11.x`. The tree `npm install` produced was one `npm ci` then
+   rejected.
+
+This matters more than it looks: **EAS runs `npm ci` when a lockfile is
+present**, so the first EAS build would have failed regardless of everything
+else. Fixed by pinning `react-dom` to `react`'s version and adding an
+`overrides` entry for `react-native-worklets`.
+
+## 16. Tests run and results
+
+Every command below was executed on the final state of this branch.
+
+| Project | Command | Before | After |
+|---|---|---|---|
+| web | `npm run typecheck` | ✅ pass | ✅ pass |
+| web | `npm test` | ✅ 128/128 | ✅ 128/128 |
+| web | `npm run build` | ✅ pass | ✅ pass (3 mobile routes compiled) |
+| mobile | `npm install` (clean tree) | ❌ ERESOLVE | ✅ exit 0 |
+| mobile | `npm ci` | ❌ EUSAGE | ✅ exit 0 |
+| mobile | `npm run typecheck` | ❌ 4 × TS2339 | ✅ exit 0 |
+| mobile | `npx expo-doctor` | ❌ 17/20 | ✅ 18/20 |
+| mobile | `npx expo config --type public` | ✅ pass | ✅ pass |
+| mobile | `npx expo prebuild --clean` | ✅ pass | ✅ pass |
+
+The two remaining expo-doctor failures are both outbound network fetches
+blocked by this sandbox's proxy — the config-schema check and the React Native
+Directory metadata check. The config itself resolves locally
+(`expo config --type public` exits 0), so neither is a project defect. They
+should be re-run on an unrestricted network to confirm.
+
+Prebuild re-verified after the changes: iOS `CFBundleURLSchemes` and Android
+`android:scheme` both read `pythonmethodcenter`, matching the recovery
+redirect the app now derives. Generated `ios/` and `android/` were deleted
+again and are now git-ignored.
+
+## 17. Remaining blockers
+
+### Still P0 — cannot be fixed inside the repository
+
+| # | Blocker | Why it is not a code change |
+|---|---|---|
+| **P0-1** | `/api/mobile/*` is not deployed. `main` has no `api/mobile`; the app defaults to `https://pythonmethodcenter.com`. Chat, voice, unread and now document registration all 404 on a device. | Requires merging this branch to `main` (verified conflict-free) or deploying it as a preview and pointing `EXPO_PUBLIC_API_BASE_URL` at that URL. A deployment decision, not a patch. |
+| **P0-4** | No `extra.eas.projectId`. | Minted by `eas init` against a real Expo account. Inventing an id would be fabrication. |
+
+### Still P1
+
+| # | Item | Note |
+|---|---|---|
+| **P1-1** | Session tokens remain in unencrypted `AsyncStorage` | **Deliberately not changed.** `expo-secure-store` caps a value at ~2 KB on iOS and a Supabase session commonly exceeds that, so a naive adapter silently breaks sign-in — and it cannot be verified without a device. Shipping an untested auth change into a beta is worse than the risk it removes on team-owned test phones. Implement with chunking, verify on a device, before any public release. |
+| **P1-5** | 3 s poll re-signs every audio URL and re-marks read | Works; wasteful. Needs a cheaper delta endpoint. |
+| **P1-6** | Voice MIME hard-coded `audio/mp4` | Correct for the `HIGH_QUALITY` preset on both platforms in principle; **unverified on an Android device.** In the test plan. |
+| **P1-8** | No icon, no splash | Needs brand assets. |
+
+### Unchanged and out of scope for a beta
+
+All P2 items, and every MISSING feature in the parity matrix: onboarding, AI
+and its red-flag escalation, metrics, supplements, support requests, payments,
+push, legal pages, account deletion, English.
+
+## 18. Verdict after fixes
+
+Repository-side readiness moved from **blocked** to **buildable**. All five P0s
+that were code defects are fixed and verified; the two that remain are a
+deployment decision and an EAS account.
+
+The recommendation is unchanged — **GO WITH BLOCKERS** — but the blocker list
+is now two items long instead of five, and neither is a bug.
+
+---
+
+# PART III — REAL-DEVICE TEST CHECKLIST
+
+Run on one iPhone and one Android device. **Prerequisite: P0-1 is closed** —
+`EXPO_PUBLIC_API_BASE_URL` must point at a deployment that actually serves
+`/api/mobile/*`, otherwise every row touching chat, voice or document upload
+fails for that reason alone.
+
+Two accounts are needed: **A** (a real test client with a case) and **B** (a
+second client, used only for the isolation check).
+
+### Auth
+
+| # | Step | Expected |
+|---|---|---|
+| A1 | Sign in with account A's existing **website** credentials | Cabinet opens; same case as the web |
+| A2 | Force-quit, reopen | Still signed in — no re-entry of the password |
+| A3 | Leave the app backgrounded overnight, reopen | Session refreshed silently, no logout |
+| A4 | Log out, reopen | Login screen; cabinet unreachable |
+| A5 | Request recovery, open the email **on the phone** | App opens on "Новый пароль" — *this is the P0-5 fix; the primary thing to verify* |
+| A6 | Set a new password | Lands in the cabinet |
+| A7 | Sign in **on the website** with the new password | Works — one account, both channels |
+| A8 | Open a recovery link twice | Second attempt shows "Ссылка не подошла", not a blank screen |
+| A9 | Sign up a brand-new account | Confirm-email path behaves as configured in Supabase |
+
+### Data sync
+
+| # | Step | Expected |
+|---|---|---|
+| S1 | Staff changes case status on web → pull-to-refresh on phone | New status and label |
+| S2 | Staff adds a lifecycle event → open История | Event appears with a client-safe label |
+| S3 | Upload a document on the phone → open the web cabinet | Same document, same filename |
+| S4 | Upload on web → refresh phone | Appears on the phone |
+| S5 | Check `audit_logs` after a phone upload | A `document_uploaded` row with `uploaded_via: "mobile_app"` — *verifies the P1-2 fix* |
+
+### Documents
+
+| # | Step | Expected |
+|---|---|---|
+| D1 | Upload a PDF | Succeeds, appears in the list |
+| D2 | Upload a JPG | Succeeds |
+| D3 | **Tap an existing document** | Opens — *this is the P0-2 fix; it did nothing at all before* |
+| D4 | Pick an unsupported type (e.g. .docx) | Refused with a readable message, nothing uploaded |
+| D5 | Pick a file over 25 MB | Refused before upload starts |
+| D6 | Kill the network mid-upload | Clear error; no orphan row; no half-file in storage |
+| D7 | Upload a file whose name has Cyrillic and spaces | Succeeds — the sanitised path must match what the server rebuilds, or registration is rejected |
+
+### Chat
+
+| # | Step | Expected |
+|---|---|---|
+| C1 | Send text from phone → web staff view | Arrives within ~3 s |
+| C2 | Staff replies on web → phone | Arrives within ~3 s |
+| C3 | Unread badge on the cabinet screen | Counts staff messages; clears on opening the chat |
+| C4 | Staff opens the case on web after the phone read it | Read state consistent |
+| C5 | Send a very long message (8000 chars) | Accepted; 8001 rejected |
+
+### Voice
+
+| # | Step | Expected |
+|---|---|---|
+| V1 | First tap on "Голос" | Permission prompt shows **the Russian sentence from app.json** |
+| V2 | Deny permission, tap again | Readable message, no crash |
+| V3 | Record ~5 s and send | Appears in the thread with a duration |
+| V4 | **Tap "Отменить" while recording** | Recording discarded, nothing sent — *P1-7 fix* |
+| V5 | Play back your own voice message | Plays |
+| V6 | Staff plays it on the web | Plays — same file, same bucket |
+| V7 | Staff records on web → play on phone | Plays |
+| V8 | **Record and send on Android specifically** | Accepted — *P1-6 is unverified; if the upload is rejected as an unsupported format, this is why* |
+| V9 | Record with Bluetooth headphones connected | Records from the expected microphone |
+| V10 | Record ~3 minutes | Under the 10 MB limit, uploads |
+
+### Case
+
+| # | Step | Expected |
+|---|---|---|
+| K1 | Profile name, email, phone | Match the web cabinet |
+| K2 | Case number, status, direction | Match |
+| K3 | Service period product and dates | Match |
+| K4 | Sign in as an account with **no** case | "Кейс ещё не создан"; no crash; documents and chat degrade gracefully |
+
+### Network and failure
+
+| # | Step | Expected |
+|---|---|---|
+| N1 | Airplane mode, open the cabinet | Readable error, not a blank screen or a spinner forever |
+| N2 | Throttle to 3G, open chat | Loads, no duplicate sends |
+| N3 | Revoke the session in Supabase, then act in the app | Sent back to login, not a silent failure |
+| N4 | Background the app for 10 minutes during recording | No crash |
+
+### Security — the row that matters most
+
+| # | Step | Expected |
+|---|---|---|
+| X1 | Sign in as **B**. Confirm B sees only B's case, documents and messages | No trace of A |
+| X2 | With B's bearer token, call `GET /api/mobile/messages` | Returns **B's** thread only. The endpoint accepts no case id, so there is nothing to tamper with — confirm that empirically |
+| X3 | With B's token, `POST /api/mobile/documents` using **A's** storage path | Rejected — the server rebuilds the path from B's identity |
+| X4 | With B's session, try `createSignedUrl` on A's document path via the Supabase SDK | Denied by Storage RLS |
+| X5 | Inspect the built app bundle for `service_role`, Stripe, Anthropic, OpenAI or Telegram strings | Nothing found |
