@@ -67,7 +67,8 @@ export async function POST(request: Request) {
     .upload(audioPath, bytes, { contentType: file.type || "audio/mp4", upsert: false });
 
   if (uploadError) {
-    return NextResponse.json({ error: uploadError.message }, { status: 502 });
+    console.error("mobile audio: upload failed", uploadError.message);
+    return NextResponse.json({ error: "Не удалось сохранить голосовое." }, { status: 502 });
   }
 
   const duration = Number.isFinite(rawDuration) && rawDuration > 0 && rawDuration <= 3600
@@ -89,7 +90,8 @@ export async function POST(request: Request) {
 
   if (insertError || !message) {
     await supabase.storage.from(CASE_AUDIO_BUCKET).remove([audioPath]);
-    return NextResponse.json({ error: insertError?.message ?? "Не удалось отправить голосовое." }, { status: 502 });
+    console.error("mobile audio: insert failed", insertError?.message ?? "unknown");
+    return NextResponse.json({ error: "Не удалось отправить голосовое." }, { status: 502 });
   }
 
   await notifyTeam({

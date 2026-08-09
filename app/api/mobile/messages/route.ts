@@ -63,7 +63,10 @@ export async function GET(request: Request) {
     .order("created_at", { ascending: true })
     .limit(200);
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 502 });
+  if (error) {
+    console.error("mobile messages: load failed", error.message);
+    return NextResponse.json({ error: "Не удалось загрузить переписку." }, { status: 502 });
+  }
 
   const messages = await Promise.all(
     (data ?? []).map(async (message) => {
@@ -112,7 +115,10 @@ export async function POST(request: Request) {
     .select("id, sender_role, body, audio_path, audio_duration_seconds, created_at, read_at")
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 502 });
+  if (error) {
+    console.error("mobile messages: send failed", error.message);
+    return NextResponse.json({ error: "Не удалось отправить сообщение." }, { status: 502 });
+  }
 
   await notifyTeam({
     kind: "client_message",

@@ -89,6 +89,22 @@ export default function TeamChatScreen() {
     }
   }
 
+  // Starting a recording used to be one-way: the only way out was to send it.
+  // Someone who misspoke, or started by accident, had no way to discard it.
+  async function cancelRecording() {
+    if (!recorderState.isRecording) return;
+    setError(null);
+
+    try {
+      await recorder.stop();
+      await setAudioModeAsync({ allowsRecording: false, playsInSilentMode: true });
+    } catch {
+      // Nothing was sent, so a failure to stop cleanly is not worth an alarm.
+    } finally {
+      setSending(false);
+    }
+  }
+
   async function toggleRecording() {
     if (sending) return;
     setError(null);
@@ -151,7 +167,14 @@ export default function TeamChatScreen() {
           </ScrollView>
         )}
 
-        {recorderState.isRecording ? <View style={styles.recordingBar}><Text style={styles.recordingText}>● Запись {Math.round(recorderState.durationMillis / 1000)} сек.</Text></View> : null}
+        {recorderState.isRecording ? (
+          <View style={styles.recordingBar}>
+            <Text style={styles.recordingText}>● Запись {Math.round(recorderState.durationMillis / 1000)} сек.</Text>
+            <Pressable onPress={() => void cancelRecording()} hitSlop={10}>
+              <Text style={styles.cancelRecording}>Отменить</Text>
+            </Pressable>
+          </View>
+        ) : null}
 
         <View style={styles.composer}>
           <Pressable onPress={() => void toggleRecording()} disabled={sending} style={[styles.micButton, recorderState.isRecording && styles.micActive]}>
@@ -177,7 +200,8 @@ const styles = StyleSheet.create({
   teamBubble: { backgroundColor: '#1D1D1D', borderColor: '#39342C', borderWidth: 1, borderBottomLeftRadius: 5 }, sender: { color: '#C9A85C', fontSize: 11, fontWeight: '700' },
   messageText: { color: '#F2EEE7', fontSize: 15, lineHeight: 21 }, audioNote: { color: '#D8D0C4', fontSize: 13 }, time: { color: '#8D867A', fontSize: 10, alignSelf: 'flex-end' },
   emptyCard: { backgroundColor: '#151515', borderRadius: 18, padding: 20, gap: 7 }, emptyTitle: { color: '#FFF', fontSize: 17, fontWeight: '700' }, emptyText: { color: '#BDB5A8', fontSize: 14, lineHeight: 21 },
-  recordingBar: { backgroundColor: '#311B1B', paddingVertical: 8, paddingHorizontal: 16 }, recordingText: { color: '#FFB4AB', fontWeight: '700' },
+  recordingBar: { backgroundColor: '#311B1B', paddingVertical: 8, paddingHorizontal: 16, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  recordingText: { color: '#FFB4AB', fontWeight: '700' }, cancelRecording: { color: '#FFD9D4', fontWeight: '700', textDecorationLine: 'underline' },
   composer: { borderTopColor: '#2E2A24', borderTopWidth: 1, padding: 12, flexDirection: 'row', alignItems: 'flex-end', gap: 8, backgroundColor: '#101010' },
   input: { flex: 1, minHeight: 44, maxHeight: 120, backgroundColor: '#1B1B1B', color: '#FFF', borderRadius: 15, paddingHorizontal: 14, paddingVertical: 11, fontSize: 15 },
   micButton: { borderColor: '#755F35', borderWidth: 1, borderRadius: 14, paddingHorizontal: 12, paddingVertical: 13 }, micActive: { backgroundColor: '#6E2929', borderColor: '#A34E4E' },
