@@ -11,6 +11,7 @@ import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { listOpenEscalations } from "@/lib/escalations/queries";
 import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { hasAssistantEnv } from "@/lib/assistant/router";
+import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 
 export default async function AdminPage() {
@@ -58,6 +59,9 @@ export default async function AdminPage() {
     getStaffUnreadCounts()
   ]);
   const assistantConfigured = hasAssistantEnv();
+  // Only the founder sees which model answers; for the team it is simply
+  // the assistant.
+  const showProviders = canSeeProviderNames(auth.email);
 
   return (
     <div className="page-shell page-shell--wide">
@@ -146,7 +150,7 @@ export default async function AdminPage() {
                 endpoint="/api/assistant/staff"
                 intro="Здравствуйте, Professor Python! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Можно прикрепить до 30 фото или PDF за раз (скрепка внизу): снимки сжимаются сами, а если файлов много — я прочитаю их по частям и соберу общий разбор. Файлы нигде не сохраняются."
                 placeholder="Вставьте вопрос или прикрепите файл…"
-                providerChoice
+                providerChoice={showProviders}
                 suggestions={[
                   "Разбери приложенные анализы по методу",
                   "Составь черновик ответа клиенту",
@@ -156,9 +160,9 @@ export default async function AdminPage() {
               />
             ) : (
               <p className="form-message form-message--error">
-                ИИ-помощник ещё не подключён: добавьте в Vercel переменную
-                окружения ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT)
-                и сделайте Redeploy.
+                {showProviders
+                  ? "ИИ-помощник ещё не подключён: добавьте в Vercel переменную окружения ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT) и сделайте Redeploy."
+                  : "ИИ-помощник ещё не подключён. Напишите основателю — это настройка платформы."}
               </p>
             )}
           </div>

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
+import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
 import { formatDateTime } from "@/lib/i18n/format";
@@ -119,6 +120,9 @@ export default async function StaffCaseDetailPage({
     notFound();
   }
 
+  // Only the founder sees which model answers; for the team it is simply
+  // the assistant.
+  const showProviders = canSeeProviderNames(auth.email);
   const detailResult = await getStaffCaseDetail(caseId);
 
   if (detailResult.status === "error") {
@@ -399,7 +403,7 @@ export default async function StaffCaseDetailPage({
             endpoint="/api/assistant/staff"
             intro="Я вижу данные этого кейса: анкету, статусы, список документов, оплаты и историю. Спросите — сделаю выжимку, черновик ответа клиенту или предложу следующие шаги. Фото и PDF можно приложить скрепкой — до 30 штук за раз, прочитаю все. Решения — за Professor Python."
             placeholder="Например: сделай выжимку кейса…"
-            providerChoice
+            providerChoice={showProviders}
             suggestions={[
               "Разбери приложенные анализы по методу",
               "Сделай выжимку кейса",

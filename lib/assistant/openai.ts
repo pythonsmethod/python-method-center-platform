@@ -6,6 +6,11 @@ export function hasOpenAiEnv(): boolean {
   return Boolean(process.env.OPENAI_API_KEY?.trim());
 }
 
+// The failure texts below reach a person's screen: the chat routes return
+// `message` verbatim. They name no vendor on purpose — a client whose reply
+// failed over would otherwise learn which company was busy, which is exactly
+// what the founder decided nobody outside her own view should see. Which
+// provider actually failed belongs in the logs, not in the answer.
 export async function askOpenAi(
   system: string,
   messages: ChatMessage[],
@@ -45,14 +50,14 @@ export async function askOpenAi(
     if (response.status === 429) {
       return {
         status: "error",
-        message: "GPT перегружен. Попробуйте через минуту."
+        message: "Ассистент перегружен. Попробуйте через минуту."
       };
     }
 
     if (!response.ok) {
       return {
         status: "error",
-        message: "GPT временно недоступен. Попробуйте позже."
+        message: "Ассистент временно недоступен. Попробуйте позже."
       };
     }
 
@@ -63,14 +68,14 @@ export async function askOpenAi(
     const reply = data.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
-      return { status: "error", message: "Пустой ответ GPT." };
+      return { status: "error", message: "Пустой ответ ассистента." };
     }
 
     return { status: "ok", reply };
   } catch {
     return {
       status: "error",
-      message: "Не удалось связаться с GPT. Попробуйте позже."
+      message: "Не удалось связаться с ассистентом. Попробуйте позже."
     };
   }
 }

@@ -1,12 +1,11 @@
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
-import {
-  askAssistantTeam,
-  isAssistantProvider
-} from "@/lib/assistant/router";
+import { askAssistantTeam } from "@/lib/assistant/router";
+import { staffAssistantView } from "@/lib/assistant/staff-provider";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { buildStaffSystemPrompt } from "@/lib/assistant/prompts";
+import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { isUuid } from "@/lib/utils/uuid";
 
@@ -49,8 +48,13 @@ export async function POST(request: Request) {
     );
   }
 
-  const rawProvider = (body as { provider?: unknown })?.provider;
-  const provider = isAssistantProvider(rawProvider) ? rawProvider : "auto";
+  // A provider named in the request body is honoured only for the founder;
+  // for everyone else the choice is made here and the name never comes back.
+  const showProviders = canSeeProviderNames(auth.email);
+  const { provider, attribution } = staffAssistantView(
+    showProviders,
+    (body as { provider?: unknown })?.provider
+  );
 
   let system = await buildStaffSystemPrompt();
 
@@ -66,28 +70,33 @@ export async function POST(request: Request) {
       system = `${system}\n\n${caseContext}`;
     }
   }
-  // Attachments go to Claude: it reads photos and PDFs directly. The
-  // arbiter and the GPT paths are skipped for such a question rather than
-  // answering it without seeing the file.
+  // Attachments go to the one provider that reads photos and PDFs directly.
+  // The arbiter path is skipped for such a question rather than answering it
+  // without seeing the file.
   const result = attachments
     ? hasClaudeEnv()
       ? await askClaude(system, messages, 1500, attachments)
       : ({
           status: "error" as const,
-          message:
-            "Файлы и фото читает Claude — добавьте ANTHROPIC_API_KEY в переменные окружения."
+          message: showProviders
+            ? "Файлы и фото читает Claude — добавьте ANTHROPIC_API_KEY в переменные окружения."
+            : "Помощник сейчас не может читать файлы. Напишите основателю — это настройка платформы."
         })
     : await askAssistantTeam(
         system,
         messages,
         provider === "both" ? 1200 : 1500,
         provider,
-        { attribution: provider === "best" }
+        { attribution }
       );
 
   if (result.status === "unavailable") {
     return NextResponse.json(
-      { error: "ИИ-помощник ещё не подключён: добавьте ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT) в переменные окружения." },
+      {
+        error: showProviders
+          ? "ИИ-помощник ещё не подключён: добавьте ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT) в переменные окружения."
+          : "ИИ-помощник ещё не подключён. Напишите основателю — это настройка платформы."
+      },
       { status: 503 }
     );
   }
