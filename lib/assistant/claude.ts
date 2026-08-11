@@ -80,7 +80,7 @@ export type AssistantResult =
 // prompts are sent as-is — below the provider minimum caching does nothing.
 const CACHEABLE_SYSTEM_MIN_CHARS = 4000;
 
-function buildSystemParam(system: string) {
+export function buildSystemParam(system: string) {
   if (system.length < CACHEABLE_SYSTEM_MIN_CHARS) {
     return system;
   }
