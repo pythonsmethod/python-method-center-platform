@@ -1,6 +1,11 @@
 import { readFileSync, readdirSync, statSync } from "node:fs";
 import { join, relative } from "node:path";
 import { afterEach, describe, expect, it } from "vitest";
+import {
+  buildGuestSystemPrompt,
+  buildPaidClientSystemPrompt,
+  buildRegisteredSystemPrompt
+} from "@/lib/assistant/prompts";
 import { staffAssistantView } from "@/lib/assistant/staff-provider";
 import { canSeeProviderNames, isFounderEmail } from "@/lib/auth/require-founder";
 
@@ -86,6 +91,46 @@ describe("what the team's chat does with a provider named in the request", () =>
 
   it("does not label the side-by-side mode, which labels itself", () => {
     expect(staffAssistantView(true, "both").attribution).toBe(false);
+  });
+});
+
+describe("what the assistant is allowed to say about itself", () => {
+  // The assistant used to sell the paid level by describing the machinery:
+  // "two models answer, a third picks the better one". No vendor was named,
+  // but it is still the same thing the founder took off the screens — the
+  // person is invited to trust the arrangement instead of the answer. It is
+  // also the sentence a client quotes back when asking to be switched to a
+  // particular model.
+  const MECHANISM =
+    /две модели|две дают ответ|третья выбирает|связка сильнейших|арбитр/i;
+
+  it("never explains how many models answer", async () => {
+    const prompts = await Promise.all([
+      buildGuestSystemPrompt(),
+      buildRegisteredSystemPrompt(null),
+      buildPaidClientSystemPrompt(null)
+    ]);
+
+    for (const prompt of prompts) {
+      expect(prompt).not.toMatch(MECHANISM);
+      expect(prompt).not.toMatch(/claude|gpt|anthropic|openai/i);
+    }
+  });
+
+  it("is told to refuse the question rather than improvise an answer", async () => {
+    // Removing the sentence is not enough: asked directly, a model will
+    // happily describe itself. The refusal has to be an instruction.
+    const prompt = await buildGuestSystemPrompt();
+
+    expect(prompt).toContain("Не называй компании и модели");
+  });
+
+  it("keeps the paid level worth paying for", async () => {
+    // What replaced the machinery must still say what the person gets,
+    // otherwise the honest ladder turns into an empty upsell.
+    const prompt = await buildGuestSystemPrompt();
+
+    expect(prompt).toContain("помнит историю человека");
   });
 });
 
