@@ -5663,6 +5663,59 @@ p {
 
 /* The login page carries no side panel any more: the form is the whole
    column, so the grid must not keep a second, empty one. */
+
+/* The page between "Создать аккаунт" and the cabinet. Read by someone who
+   is anxious that they have already done something wrong, so it is set
+   larger and looser than the forms around it. */
+.check-email {
+  display: grid;
+  gap: 18px;
+}
+
+.check-email__steps {
+  display: grid;
+  gap: 12px;
+  font-size: 17px;
+  line-height: 1.5;
+  margin: 0;
+  padding-left: 22px;
+}
+
+.check-email__steps li {
+  padding-left: 4px;
+}
+
+.check-email__steps li::marker {
+  color: var(--accent-strong);
+  font-weight: 700;
+}
+
+.check-email__note {
+  color: var(--muted);
+  font-size: 15px;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.check-email__resend {
+  display: grid;
+  gap: 12px;
+}
+
+/* Ways out, for when the letter is not the answer. Quiet, but never
+   hidden: a person who is stuck must not have to guess that help exists. */
+.check-email__links {
+  border-top: 1px solid var(--line);
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+}
+
+.check-email__links a {
+  color: var(--accent-strong);
+  font-size: 15px;
+}
+
 .auth-layout--single {
   grid-template-columns: minmax(0, 440px);
 }

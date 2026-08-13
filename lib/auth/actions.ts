@@ -10,7 +10,7 @@ import {
   validateNewPassword,
   validatePhone
 } from "@/lib/auth/validation";
-import { confirmNewUserEmail } from "@/lib/auth/confirm-new-user";
+import { PENDING_EMAIL_COOKIE } from "@/lib/auth/pending-email";
 import { createRegistrationProfile } from "@/lib/profile/registration";
 import { getLocale } from "@/lib/i18n/locale";
 import {
@@ -195,35 +195,27 @@ export async function signUpWithPassword(
     });
   }
 
+  // Confirmation switched off in Supabase: the session is already open, so
+  // nothing stands between the person and the cabinet.
   if (data.session) {
     redirect(sanitizeNextPath(formData.get("next")));
   }
 
-  // No session means confirmation is switched on in Supabase. Rather than
-  // send the person to their inbox, confirm the address for them and open
-  // the session here — see lib/auth/confirm-new-user.ts for what that
-  // costs and why it is worth it.
-  if (data.user && (await confirmNewUserEmail(data.user.id))) {
-    const { error: signInError } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+  // Otherwise the address has to be confirmed first. A sentence under the
+  // form was not enough: people read "проверьте почту", closed the tab and
+  // were never seen again. They get a page of their own now, which says
+  // what to do and can open their mailbox for them.
+  const pendingCookies = await cookies();
 
-    if (!signInError) {
-      redirect(sanitizeNextPath(formData.get("next")));
-    }
-  }
+  pendingCookies.set(PENDING_EMAIL_COOKIE, email, {
+    httpOnly: true,
+    maxAge: 60 * 60,
+    path: "/",
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production"
+  });
 
-  // Only reached when the service key is missing or the admin call failed.
-  // Then the emailed link really is the only way in, and saying so is
-  // better than leaving the person to guess.
-  return {
-    status: "success",
-    message:
-      "Аккаунт создан. Мы отправили письмо на " +
-      email +
-      " — откройте ссылку из него, и только после этого вход заработает. Письма нет? Проверьте папку «Спам» и запросите его заново на этой странице."
-  };
+  redirect("/check-email");
 }
 
 // Sends the confirmation email again. Offered right under the sign-in form
