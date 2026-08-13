@@ -18,7 +18,9 @@ describe("translateAuthError", () => {
     ["Password should be at least 6 characters", "weak_password"],
     ["Unable to validate email address: invalid format", "invalid_email"],
     ["Signups not allowed for this instance", "signup_disabled"],
-    ["Database error saving new user", "server_error"]
+    ["Database error saving new user", "server_error"],
+    ["Error sending confirmation email", "email_send_failed"],
+    ["Error sending recovery email", "email_send_failed"]
   ];
 
   for (const [raw, code] of cases) {
@@ -48,6 +50,22 @@ describe("translateAuthError", () => {
       expect(message).not.toContain(raw);
       expect(/[а-яё]/i.test(message)).toBe(true);
     }
+  });
+
+  // The same sentence appears under the sign-in form and the sign-up form.
+  // "Не получилось войти" under "Создать аккаунт" answers a question the
+  // person did not ask, and it happened to a live focus group.
+  it("keeps the fallback free of either verb", () => {
+    const { message } = translateAuthError("something nobody has met yet");
+
+    expect(message).not.toMatch(/войти|зарегистр/i);
+  });
+
+  it("does not tell someone to retry a letter that cannot be sent", () => {
+    const { message } = translateAuthError("Error sending confirmation email");
+
+    expect(message).toContain("не ваша ошибка");
+    expect(message).not.toMatch(/попробуйте ещё раз/i);
   });
 
   it("tells a locked-out person where to go next", () => {
