@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import {
   resendConfirmationEmail,
   signInWithPassword,
@@ -68,10 +68,19 @@ export function AuthForm({
   initialMode = "login"
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
-  // The address is held here so the "send the letter again" form below can
-  // reuse it without making the person type it a second time.
+  // Every field is held here, not left to the browser. React empties an
+  // uncontrolled form once its action returns, so a single mistake used to
+  // wipe the phone number and both passwords — and since the address
+  // survived, the page looked like it had simply ignored the button.
   const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [revealPassword, setRevealPassword] = useState(false);
+  // What went wrong is printed under a button that sits below the fold on
+  // a phone. Bringing it into view is the difference between "the site is
+  // broken" and "ah, that address is already registered".
+  const messageRef = useRef<HTMLParagraphElement | null>(null);
   const [loginState, loginAction, loginPending] = useActionState(
     signInWithPassword,
     initialAuthActionState
@@ -93,6 +102,15 @@ export function AuthForm({
   // the button never appears as a guess.
   const offerResend =
     activeState.code === "email_not_confirmed" && email.length > 0;
+
+  useEffect(() => {
+    if (activeState.status === "error") {
+      messageRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "center"
+      });
+    }
+  }, [activeState]);
 
   return (
     <section className="auth-panel" aria-label="Authentication form">
@@ -146,9 +164,11 @@ export function AuthForm({
               autoComplete="tel"
               inputMode="tel"
               name="phone"
+              onChange={(event) => setPhone(event.target.value)}
               placeholder={labels.phonePlaceholder}
               required
               type="tel"
+              value={phone}
             />
             <small className="field__hint">{labels.phoneHint}</small>
           </label>
@@ -160,8 +180,10 @@ export function AuthForm({
             autoComplete={isLogin ? "current-password" : "new-password"}
             minLength={isLogin ? undefined : 6}
             name="password"
+            onChange={(event) => setPassword(event.target.value)}
             required
             type={passwordType}
+            value={password}
           />
         </label>
 
@@ -174,8 +196,10 @@ export function AuthForm({
               autoComplete="new-password"
               minLength={6}
               name="confirm"
+              onChange={(event) => setConfirm(event.target.value)}
               required
               type={passwordType}
+              value={confirm}
             />
           </label>
         ) : null}
@@ -189,6 +213,19 @@ export function AuthForm({
           <span>{labels.showPassword}</span>
         </label>
 
+        {/* Above the button, not below it. Below, on a phone, it lands
+            past the bottom of the screen and the form reads as a button
+            that does nothing. */}
+        {activeState.message ? (
+          <p
+            aria-live="polite"
+            className={messageClassName(activeState)}
+            ref={messageRef}
+          >
+            {activeState.message}
+          </p>
+        ) : null}
+
         <button
           className="button"
           disabled={!supabaseConfigured || pending}
@@ -200,10 +237,6 @@ export function AuthForm({
               ? labels.submitLogin
               : labels.submitSignup}
         </button>
-
-        {activeState.message ? (
-          <p className={messageClassName(activeState)}>{activeState.message}</p>
-        ) : null}
       </form>
 
       {offerResend ? (
