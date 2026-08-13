@@ -16,6 +16,37 @@ export function validateEmail(email: string): string | null {
   return null;
 }
 
+// The centre serves several countries, so the country code is never
+// guessed from the digits: a Russian 8, an Armenian 0 and a French 0 mean
+// different things. Only spacing and punctuation are removed, and the "+"
+// is kept if the person wrote one.
+export function normalizePhone(phone: string): string {
+  const raw = String(phone ?? "").trim();
+  const digits = raw.replace(/\D/g, "");
+
+  if (!digits) {
+    return "";
+  }
+
+  return raw.startsWith("+") ? `+${digits}` : digits;
+}
+
+export function validatePhone(phone: string): string | null {
+  const digits = normalizePhone(phone).replace(/\D/g, "");
+
+  if (!digits) {
+    return "Введите номер телефона — по нему с вами свяжется команда.";
+  }
+
+  // 7 digits is the shortest national number in use, 15 the international
+  // maximum (E.164).
+  if (digits.length < 7 || digits.length > 15) {
+    return "Проверьте номер телефона: он должен содержать от 7 до 15 цифр, вместе с кодом страны.";
+  }
+
+  return null;
+}
+
 export function validateNewPassword(
   password: string,
   confirm: string

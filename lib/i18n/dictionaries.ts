@@ -1172,6 +1172,10 @@ const ru = {
     tabLogin: "Войти",
     tabSignup: "Создать аккаунт",
     email: "Email",
+    phone: "Телефон",
+    phonePlaceholder: "+7 999 123-45-67",
+    phoneHint:
+      "Нужен, чтобы команда могла связаться с вами. Рассылок на него не будет.",
     password: "Пароль",
     passwordConfirm: "Повторите пароль",
     showPassword: "Показать пароль",
@@ -2282,6 +2286,10 @@ const en: typeof ru = {
     tabLogin: "Sign in",
     tabSignup: "Create account",
     email: "Email",
+    phone: "Phone",
+    phonePlaceholder: "+1 555 123 4567",
+    phoneHint:
+      "So the team can reach you. No mailings will be sent to this number.",
     password: "Password",
     passwordConfirm: "Repeat password",
     showPassword: "Show password",
