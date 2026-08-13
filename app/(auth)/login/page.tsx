@@ -55,7 +55,9 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         <p className="form-message form-message--error">{t.linkInvalid}</p>
       ) : null}
 
-      <section className="auth-layout">
+      {/* No side panel: what used to stand in it is said once, in the page
+          header above. The tab is the form and nothing else. */}
+      <section className="auth-layout auth-layout--single">
         <div>
           <AuthForm
             labels={{
@@ -81,11 +83,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="auth-help">
             <Link href="/recovery">{t.forgot}</Link>
           </p>
-        </div>
-        <div className="panel">
-          <span className="panel__label">{t.afterLabel}</span>
-          <h2>{t.afterTitle}</h2>
-          <p>{t.afterText}</p>
         </div>
       </section>
     </div>

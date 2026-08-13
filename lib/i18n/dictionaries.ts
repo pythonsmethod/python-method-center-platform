@@ -1164,11 +1164,10 @@ const ru = {
   login: {
     eyebrow: "Вход",
     title: "Вход и регистрация",
-    description: "Войдите в аккаунт или создайте новый, используя email и пароль.",
-    afterLabel: "Что дальше",
-    afterTitle: "После входа",
-    afterText:
-      "Вы попадёте в личный кабинет, где можно заполнить анкету, создать кейс, загрузить медицинские документы и написать команде.",
+    // Said once, above the form: the page used to repeat itself in a side
+    // panel that pushed the form itself below the fold on a phone.
+    description:
+      "Войдите в аккаунт или создайте новый, используя email и пароль. После входа вы попадёте в личный кабинет, где можно заполнить анкету, создать кейс, загрузить медицинские документы и написать команде.",
     tabLogin: "Войти",
     tabSignup: "Создать аккаунт",
     email: "Email",
@@ -2278,11 +2277,8 @@ const en: typeof ru = {
   login: {
     eyebrow: "Sign in",
     title: "Sign in & registration",
-    description: "Sign in to your account or create a new one using email and password.",
-    afterLabel: "What's next",
-    afterTitle: "After signing in",
-    afterText:
-      "You will get to your personal account where you can fill in the questionnaire, create a case, upload medical documents and write to the team.",
+    description:
+      "Sign in to your account or create a new one using email and password. After signing in you will get to your personal account where you can fill in the questionnaire, create a case, upload medical documents and write to the team.",
     tabLogin: "Sign in",
     tabSignup: "Create account",
     email: "Email",

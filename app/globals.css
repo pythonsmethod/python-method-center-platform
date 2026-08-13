@@ -5660,6 +5660,13 @@ p {
   margin-top: 36px;
 }
 
+
+/* The login page carries no side panel any more: the form is the whole
+   column, so the grid must not keep a second, empty one. */
+.auth-layout--single {
+  grid-template-columns: minmax(0, 440px);
+}
+
 .auth-panel,
 .notice {
   background: var(--surface);
