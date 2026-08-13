@@ -14,6 +14,7 @@ export type AuthErrorCode =
   | "weak_password"
   | "invalid_email"
   | "signup_disabled"
+  | "email_send_failed"
   | "server_error"
   | "unknown";
 
@@ -35,10 +36,16 @@ const MESSAGES: Record<AuthErrorCode, string> = {
   invalid_email: "Проверьте, правильно ли написан email.",
   signup_disabled:
     "Регистрация сейчас закрыта. Напишите команде — вас заведут вручную.",
+  email_send_failed:
+    "Аккаунт не создан: не удалось отправить письмо подтверждения. Это неполадка с нашей почтой, а не ваша ошибка. Напишите команде — вас заведут вручную.",
   server_error:
     "Не получилось из-за ошибки на нашей стороне. Попробуйте через минуту, а если повторится — напишите команде.",
+  // Deliberately says neither "войти" nor "зарегистрироваться": the same
+  // sentence is shown under the sign-in form and under the sign-up form,
+  // and "не получилось войти" on a registration page reads as an answer to
+  // a question nobody asked.
   unknown:
-    "Не получилось войти. Попробуйте ещё раз, а если ошибка повторяется — напишите команде."
+    "Не получилось. Попробуйте ещё раз, а если ошибка повторяется — напишите команде."
 };
 
 // Order matters: the first pattern that matches wins, so the narrow cases
@@ -50,6 +57,11 @@ const PATTERNS: Array<[RegExp, AuthErrorCode]> = [
   [/password should be|weak_password|password is too short/i, "weak_password"],
   [/unable to validate email|invalid email|email_address_invalid/i, "invalid_email"],
   [/signups not allowed|signup_disabled|signups are disabled/i, "signup_disabled"],
+  // The mail sender is misconfigured or refusing. Supabase reports this as
+  // a plain 500, and left unrecognised it reached the reader as "try
+  // again" — advice that cannot work, because trying again sends the same
+  // letter through the same broken sender.
+  [/error sending|failed to send|sending (confirmation|recovery|magic)|smtp/i, "email_send_failed"],
   [/invalid login credentials|invalid_credentials|invalid_grant/i, "invalid_credentials"],
   [/database error|unexpected_failure|internal (server )?error/i, "server_error"]
 ];
