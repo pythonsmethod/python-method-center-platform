@@ -1173,9 +1173,13 @@ const ru = {
     tabSignup: "Создать аккаунт",
     email: "Email",
     password: "Пароль",
+    passwordConfirm: "Повторите пароль",
+    showPassword: "Показать пароль",
     submitLogin: "Войти",
     submitSignup: "Создать аккаунт",
     submitting: "Отправка...",
+    resend: "Отправить письмо ещё раз",
+    resending: "Отправляем...",
     forgot: "Забыли пароль?",
     linkInvalid:
       "Ссылка из письма недействительна или устарела. Войдите с паролем или запросите новую ссылку через «Забыли пароль?»."
@@ -2279,9 +2283,13 @@ const en: typeof ru = {
     tabSignup: "Create account",
     email: "Email",
     password: "Password",
+    passwordConfirm: "Repeat password",
+    showPassword: "Show password",
     submitLogin: "Sign in",
     submitSignup: "Create account",
     submitting: "Sending...",
+    resend: "Send the email again",
+    resending: "Sending...",
     forgot: "Forgot your password?",
     linkInvalid:
       "The link from the email is invalid or expired. Sign in with your password or request a new link via “Forgot your password?”."

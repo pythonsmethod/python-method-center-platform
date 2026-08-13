@@ -1,7 +1,11 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { signInWithPassword, signUpWithPassword } from "@/lib/auth/actions";
+import {
+  resendConfirmationEmail,
+  signInWithPassword,
+  signUpWithPassword
+} from "@/lib/auth/actions";
 import {
   initialAuthActionState,
   type AuthActionState
@@ -12,9 +16,13 @@ type AuthFormLabels = {
   tabSignup: string;
   email: string;
   password: string;
+  passwordConfirm: string;
+  showPassword: string;
   submitLogin: string;
   submitSignup: string;
   submitting: string;
+  resend: string;
+  resending: string;
 };
 
 const defaultLabels: AuthFormLabels = {
@@ -22,9 +30,13 @@ const defaultLabels: AuthFormLabels = {
   tabSignup: "Создать аккаунт",
   email: "Email",
   password: "Пароль",
+  passwordConfirm: "Повторите пароль",
+  showPassword: "Показать пароль",
   submitLogin: "Войти",
   submitSignup: "Создать аккаунт",
-  submitting: "Отправка..."
+  submitting: "Отправка...",
+  resend: "Отправить письмо ещё раз",
+  resending: "Отправляем..."
 };
 
 type AuthMode = "login" | "signup";
@@ -49,6 +61,10 @@ export function AuthForm({
   initialMode = "login"
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
+  // The address is held here so the "send the letter again" form below can
+  // reuse it without making the person type it a second time.
+  const [email, setEmail] = useState("");
+  const [revealPassword, setRevealPassword] = useState(false);
   const [loginState, loginAction, loginPending] = useActionState(
     signInWithPassword,
     initialAuthActionState
@@ -57,10 +73,19 @@ export function AuthForm({
     signUpWithPassword,
     initialAuthActionState
   );
+  const [resendState, resendAction, resendPending] = useActionState(
+    resendConfirmationEmail,
+    initialAuthActionState
+  );
 
   const isLogin = mode === "login";
   const activeState = isLogin ? loginState : signupState;
   const pending = isLogin ? loginPending : signupPending;
+  const passwordType = revealPassword ? "text" : "password";
+  // Only offered when Supabase itself said the address is unconfirmed, so
+  // the button never appears as a guess.
+  const offerResend =
+    activeState.code === "email_not_confirmed" && email.length > 0;
 
   return (
     <section className="auth-panel" aria-label="Authentication form">
@@ -91,11 +116,16 @@ export function AuthForm({
         <label className="field">
           <span>{labels.email}</span>
           <input
+            autoCapitalize="none"
             autoComplete="email"
+            autoCorrect="off"
             name="email"
+            onChange={(event) => setEmail(event.target.value)}
             placeholder="client@example.com"
             required
+            spellCheck={false}
             type="email"
+            value={email}
           />
         </label>
         <label className="field">
@@ -105,8 +135,32 @@ export function AuthForm({
             minLength={isLogin ? undefined : 6}
             name="password"
             required
-            type="password"
+            type={passwordType}
           />
+        </label>
+
+        {/* Typed twice on sign-up: a slip here is invisible behind the dots,
+            and it is the slip that turns into "wrong password" tomorrow. */}
+        {!isLogin ? (
+          <label className="field">
+            <span>{labels.passwordConfirm}</span>
+            <input
+              autoComplete="new-password"
+              minLength={6}
+              name="confirm"
+              required
+              type={passwordType}
+            />
+          </label>
+        ) : null}
+
+        <label className="auth-reveal">
+          <input
+            checked={revealPassword}
+            onChange={(event) => setRevealPassword(event.target.checked)}
+            type="checkbox"
+          />
+          <span>{labels.showPassword}</span>
         </label>
 
         <button
@@ -125,6 +179,23 @@ export function AuthForm({
           <p className={messageClassName(activeState)}>{activeState.message}</p>
         ) : null}
       </form>
+
+      {offerResend ? (
+        <form action={resendAction} className="auth-resend">
+          <input name="email" type="hidden" value={email} />
+          <button
+            className="button button--secondary"
+            disabled={!supabaseConfigured || resendPending}
+            type="submit"
+          >
+            {resendPending ? labels.resending : labels.resend}
+          </button>
+        </form>
+      ) : null}
+
+      {resendState.message ? (
+        <p className={messageClassName(resendState)}>{resendState.message}</p>
+      ) : null}
     </section>
   );
 }

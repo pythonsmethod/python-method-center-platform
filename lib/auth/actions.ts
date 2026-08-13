@@ -5,18 +5,27 @@ import { redirect } from "next/navigation";
 import { attachReferral, REFERRAL_COOKIE } from "@/lib/referrals/queries";
 import type { AuthActionState } from "@/lib/auth/types";
 import {
-  validateNewPassword,
-  validateRecoveryEmail
+  validateEmail,
+  validateNewPassword
 } from "@/lib/auth/validation";
+import {
+  translateAuthError,
+  type AuthErrorCode
+} from "@/lib/auth/error-messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 
-function errorState(message: string): AuthActionState {
-  return { status: "error", message };
+function errorState(message: string, code?: AuthErrorCode): AuthActionState {
+  return { status: "error", message, code };
 }
 
 function readCredentials(formData: FormData) {
-  const email = String(formData.get("email") ?? "").trim();
+  // Emails are case-insensitive, and a phone keyboard capitalises the first
+  // letter of everything. Someone who registered as "Anna@mail.ru" must be
+  // able to sign in as "anna@mail.ru".
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
   const password = String(formData.get("password") ?? "");
 
   return { email, password };
@@ -64,7 +73,9 @@ export async function signInWithPassword(
   });
 
   if (error) {
-    return errorState(error.message);
+    const { code, message } = translateAuthError(error.message);
+
+    return errorState(message, code);
   }
 
   let nextPath = sanitizeNextPath(formData.get("next"));
@@ -102,8 +113,22 @@ export async function signUpWithPassword(
     return errorState("Введите email и пароль.");
   }
 
-  if (password.length < 6) {
-    return errorState("Пароль должен быть не короче 6 символов.");
+  const emailError = validateEmail(email);
+
+  if (emailError) {
+    return errorState(emailError);
+  }
+
+  // The password is typed twice. Without the second field a slip on a phone
+  // keyboard creates an account whose password nobody knows — the person
+  // then reads "Invalid login credentials" and thinks the site is broken.
+  const passwordError = validateNewPassword(
+    password,
+    String(formData.get("confirm") ?? "")
+  );
+
+  if (passwordError) {
+    return errorState(passwordError);
   }
 
   const { data, error } = await supabase.auth.signUp({
@@ -115,7 +140,19 @@ export async function signUpWithPassword(
   });
 
   if (error) {
-    return errorState(error.message);
+    const { code, message } = translateAuthError(error.message);
+
+    return errorState(message, code);
+  }
+
+  // Supabase hides the fact that an email is taken: instead of an error it
+  // returns a decoy user with an empty identity list, and the password that
+  // was just typed is not saved anywhere. Left unsaid, the person leaves the
+  // form believing the account now has their new password.
+  if (data.user && (data.user.identities?.length ?? 0) === 0) {
+    const { message } = translateAuthError("User already registered");
+
+    return errorState(message, "already_registered");
   }
 
   // Referral attribution: the ?ref=CODE the visitor arrived with was stored
@@ -132,9 +169,59 @@ export async function signUpWithPassword(
     redirect(sanitizeNextPath(formData.get("next")));
   }
 
+  // No session means confirmation is switched on. Say so plainly, because
+  // until the link is opened every sign-in attempt will be refused.
   return {
     status: "success",
-    message: "Заявка на регистрацию отправлена. Если включено подтверждение, проверьте почту."
+    message:
+      "Аккаунт создан. Мы отправили письмо на " +
+      email +
+      " — откройте ссылку из него, и только после этого вход заработает. Письма нет? Проверьте папку «Спам» и запросите его заново на этой странице."
+  };
+}
+
+// Sends the confirmation email again. Offered right under the sign-in form
+// when Supabase refuses the login because the address is still unconfirmed:
+// the first letter often lands in spam or never leaves the mail provider.
+export async function resendConfirmationEmail(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  }
+
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  const emailError = validateEmail(email);
+
+  if (emailError) {
+    return errorState(emailError);
+  }
+
+  const { error } = await supabase.auth.resend({
+    type: "signup",
+    email,
+    options: {
+      emailRedirectTo: await getEmailRedirectTo()
+    }
+  });
+
+  if (error) {
+    const { code, message } = translateAuthError(error.message);
+
+    return errorState(message, code);
+  }
+
+  return {
+    status: "success",
+    message:
+      "Письмо отправлено заново на " +
+      email +
+      ". Проверьте почту и папку «Спам»."
   };
 }
 
@@ -150,8 +237,10 @@ export async function requestPasswordReset(
     return errorState(SERVICE_UNAVAILABLE_MESSAGE);
   }
 
-  const email = String(formData.get("email") ?? "").trim();
-  const validationError = validateRecoveryEmail(email);
+  const email = String(formData.get("email") ?? "")
+    .trim()
+    .toLowerCase();
+  const validationError = validateEmail(email);
 
   if (validationError) {
     return errorState(validationError);

@@ -5716,6 +5716,30 @@ p {
   color: var(--accent-strong);
 }
 
+/* Seeing the password is the difference between a typo caught now and a
+   person locked out tomorrow — on a phone keyboard it is not a nicety. */
+.auth-reveal {
+  align-items: center;
+  color: var(--muted);
+  cursor: pointer;
+  display: flex;
+  font-size: 14px;
+  gap: 10px;
+  margin-top: -4px;
+}
+
+.auth-reveal input {
+  accent-color: var(--accent);
+  height: 20px;
+  width: 20px;
+}
+
+/* Offered only when the account exists but its email is unconfirmed. */
+.auth-resend {
+  display: grid;
+  margin-top: 14px;
+}
+
 .field {
   display: grid;
   gap: 8px;
