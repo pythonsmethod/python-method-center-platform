@@ -5,9 +5,13 @@ import { redirect } from "next/navigation";
 import { attachReferral, REFERRAL_COOKIE } from "@/lib/referrals/queries";
 import type { AuthActionState } from "@/lib/auth/types";
 import {
+  normalizePhone,
   validateEmail,
-  validateNewPassword
+  validateNewPassword,
+  validatePhone
 } from "@/lib/auth/validation";
+import { createRegistrationProfile } from "@/lib/profile/registration";
+import { getLocale } from "@/lib/i18n/locale";
 import {
   translateAuthError,
   type AuthErrorCode
@@ -131,11 +135,23 @@ export async function signUpWithPassword(
     return errorState(passwordError);
   }
 
+  const phoneError = validatePhone(String(formData.get("phone") ?? ""));
+
+  if (phoneError) {
+    return errorState(phoneError);
+  }
+
+  const phone = normalizePhone(String(formData.get("phone") ?? ""));
+
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
     options: {
-      emailRedirectTo: await getEmailRedirectTo()
+      emailRedirectTo: await getEmailRedirectTo(),
+      // Also kept on the auth user, so the number is visible in the
+      // Supabase dashboard even if the service key is missing and the
+      // profile row below never gets written.
+      data: { phone }
     }
   });
 
@@ -153,6 +169,19 @@ export async function signUpWithPassword(
     const { message } = translateAuthError("User already registered");
 
     return errorState(message, "already_registered");
+  }
+
+  if (data.user) {
+    // Before the referral below, not after: a referral row points at
+    // profiles(id), so until this row exists every attribution made by
+    // someone who had not yet filled the questionnaire failed silently on
+    // the foreign key.
+    await createRegistrationProfile({
+      userId: data.user.id,
+      email,
+      phone,
+      locale: await getLocale()
+    });
   }
 
   // Referral attribution: the ?ref=CODE the visitor arrived with was stored

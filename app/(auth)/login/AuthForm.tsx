@@ -15,6 +15,9 @@ type AuthFormLabels = {
   tabLogin: string;
   tabSignup: string;
   email: string;
+  phone: string;
+  phonePlaceholder: string;
+  phoneHint: string;
   password: string;
   passwordConfirm: string;
   showPassword: string;
@@ -29,6 +32,10 @@ const defaultLabels: AuthFormLabels = {
   tabLogin: "Войти",
   tabSignup: "Создать аккаунт",
   email: "Email",
+  phone: "Телефон",
+  phonePlaceholder: "+7 999 123-45-67",
+  phoneHint:
+    "Нужен, чтобы команда могла связаться с вами. Рассылок на него не будет.",
   password: "Пароль",
   passwordConfirm: "Повторите пароль",
   showPassword: "Показать пароль",
@@ -128,6 +135,25 @@ export function AuthForm({
             value={email}
           />
         </label>
+
+        {/* Asked once, at the door. A person who registers and goes quiet
+            is otherwise unreachable: until the questionnaire is filled in,
+            the team knows nothing but an email address. */}
+        {!isLogin ? (
+          <label className="field">
+            <span>{labels.phone}</span>
+            <input
+              autoComplete="tel"
+              inputMode="tel"
+              name="phone"
+              placeholder={labels.phonePlaceholder}
+              required
+              type="tel"
+            />
+            <small className="field__hint">{labels.phoneHint}</small>
+          </label>
+        ) : null}
+
         <label className="field">
           <span>{labels.password}</span>
           <input
