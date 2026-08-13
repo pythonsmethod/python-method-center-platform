@@ -1186,6 +1186,29 @@ const ru = {
     forgot: "Забыли пароль?",
     linkInvalid:
       "Ссылка из письма недействительна или устарела. Войдите с паролем или запросите новую ссылку через «Забыли пароль?»."
+  },
+  // Written for someone who is not sure what a tab is: one action per
+  // line, in the order it happens, and no word that assumes practice.
+  checkEmail: {
+    eyebrow: "Остался один шаг",
+    title: "Проверьте почту",
+    sentTo: "Мы отправили письмо на адрес",
+    sentToUnknown: "Мы отправили письмо на адрес, который вы указали.",
+    step1: "Откройте свою почту — там новое письмо от «Python Method».",
+    step2: "Внутри письма нажмите кнопку «Подтвердить почту».",
+    step3: "Вы сразу окажетесь в личном кабинете. Больше ничего делать не нужно.",
+    openMailbox: "Открыть",
+    spamNote:
+      "Письмо приходит в течение минуты. Если его нет — загляните в папку «Спам» или «Промоакции»: письма от новых отправителей часто попадают туда. Найдёте — откройте и нажмите кнопку внутри, оттуда оно работает так же.",
+    resend: "Отправить письмо ещё раз",
+    resending: "Отправляем...",
+    askEmail: "Напишите адрес, на который отправить письмо ещё раз.",
+    emailLabel: "Ваш email",
+    alreadyConfirmed: "Я уже нажал кнопку в письме — войти",
+    wrongAddress: "Я ошибся в адресе — зарегистрироваться заново",
+    askTeam: "Ничего не получается — написать команде",
+    linkInvalid:
+      "Ссылка из письма не сработала: обычно это значит, что письмо старое или по ссылке уже переходили. Отправьте письмо заново кнопкой ниже и откройте ссылку из самого свежего."
   }
 };
 
@@ -2297,6 +2320,27 @@ const en: typeof ru = {
     forgot: "Forgot your password?",
     linkInvalid:
       "The link from the email is invalid or expired. Sign in with your password or request a new link via “Forgot your password?”."
+  },
+  checkEmail: {
+    eyebrow: "One step left",
+    title: "Check your email",
+    sentTo: "We have sent an email to",
+    sentToUnknown: "We have sent an email to the address you entered.",
+    step1: "Open your mailbox — there is a new email from “Python Method”.",
+    step2: "Inside the email, press the “Confirm email” button.",
+    step3: "You will land in your personal account straight away. Nothing else is needed.",
+    openMailbox: "Open",
+    spamNote:
+      "The email arrives within a minute. If it is not there, look in “Spam” or “Promotions”: email from new senders often goes there. It works exactly the same from that folder.",
+    resend: "Send the email again",
+    resending: "Sending...",
+    askEmail: "Enter the address the email should be sent to again.",
+    emailLabel: "Your email",
+    alreadyConfirmed: "I have already pressed the button — sign in",
+    wrongAddress: "I mistyped the address — register again",
+    askTeam: "Nothing works — write to the team",
+    linkInvalid:
+      "The link from the email did not work: usually that means the email is old, or the link has already been used. Send the email again with the button below and open the link from the newest one."
   }
 };
 
