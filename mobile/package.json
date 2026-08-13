@@ -14,14 +14,21 @@
     "@react-native-async-storage/async-storage": "^2.2.0",
     "@supabase/supabase-js": "^2.50.0",
     "expo": "^57.0.0",
-    "expo-router": "~57.0.2",
+    "expo-constants": "~57.0.10",
+    "expo-linking": "~57.0.5",
+    "expo-router": "~57.0.12",
     "expo-status-bar": "~3.0.8",
     "react": "19.2.3",
+    "react-dom": "19.2.3",
     "react-native": "0.86.0",
+    "react-native-safe-area-context": "^5.9.0",
     "react-native-url-polyfill": "^2.0.0"
   },
   "devDependencies": {
     "@types/react": "^19.2.0",
     "typescript": "^5.8.3"
+  },
+  "overrides": {
+    "react-native-worklets": "~0.10.3"
   }
 }
