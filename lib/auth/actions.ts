@@ -10,6 +10,7 @@ import {
   validateNewPassword,
   validatePhone
 } from "@/lib/auth/validation";
+import { confirmNewUserEmail } from "@/lib/auth/confirm-new-user";
 import { createRegistrationProfile } from "@/lib/profile/registration";
 import { getLocale } from "@/lib/i18n/locale";
 import {
@@ -198,8 +199,24 @@ export async function signUpWithPassword(
     redirect(sanitizeNextPath(formData.get("next")));
   }
 
-  // No session means confirmation is switched on. Say so plainly, because
-  // until the link is opened every sign-in attempt will be refused.
+  // No session means confirmation is switched on in Supabase. Rather than
+  // send the person to their inbox, confirm the address for them and open
+  // the session here — see lib/auth/confirm-new-user.ts for what that
+  // costs and why it is worth it.
+  if (data.user && (await confirmNewUserEmail(data.user.id))) {
+    const { error: signInError } = await supabase.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (!signInError) {
+      redirect(sanitizeNextPath(formData.get("next")));
+    }
+  }
+
+  // Only reached when the service key is missing or the admin call failed.
+  // Then the emailed link really is the only way in, and saying so is
+  // better than leaving the person to guess.
   return {
     status: "success",
     message:
