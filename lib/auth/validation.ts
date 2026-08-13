@@ -2,7 +2,7 @@
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-export function validateRecoveryEmail(email: string): string | null {
+export function validateEmail(email: string): string | null {
   const trimmed = email.trim();
 
   if (!trimmed) {

@@ -1,23 +1,23 @@
 import { describe, expect, it } from "vitest";
 import {
   validateNewPassword,
-  validateRecoveryEmail
+  validateEmail
 } from "@/lib/auth/validation";
 
-describe("validateRecoveryEmail", () => {
+describe("validateEmail", () => {
   it("accepts a normal email", () => {
-    expect(validateRecoveryEmail("maria@example.com")).toBeNull();
+    expect(validateEmail("maria@example.com")).toBeNull();
   });
 
   it("rejects an empty value", () => {
-    expect(validateRecoveryEmail("")).toBeTruthy();
-    expect(validateRecoveryEmail("   ")).toBeTruthy();
+    expect(validateEmail("")).toBeTruthy();
+    expect(validateEmail("   ")).toBeTruthy();
   });
 
   it("rejects malformed emails", () => {
-    expect(validateRecoveryEmail("not-an-email")).toBeTruthy();
-    expect(validateRecoveryEmail("a@b")).toBeTruthy();
-    expect(validateRecoveryEmail("a b@c.com")).toBeTruthy();
+    expect(validateEmail("not-an-email")).toBeTruthy();
+    expect(validateEmail("a@b")).toBeTruthy();
+    expect(validateEmail("a b@c.com")).toBeTruthy();
   });
 });
 

@@ -63,9 +63,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               tabSignup: t.tabSignup,
               email: t.email,
               password: t.password,
+              passwordConfirm: t.passwordConfirm,
+              showPassword: t.showPassword,
               submitLogin: t.submitLogin,
               submitSignup: t.submitSignup,
-              submitting: t.submitting
+              submitting: t.submitting,
+              resend: t.resend,
+              resending: t.resending
             }}
             initialMode={initialMode}
             nextPath={nextPath}
