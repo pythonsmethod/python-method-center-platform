@@ -11061,7 +11061,7 @@ body:has(.pm-app) > .site-header,
 body:has(.pm-app) > .site-footer { display: none; }
 .native-app-route > main { min-height: 100dvh; }
 .pm-app { min-height: 100dvh; color: #f7f2e8; background: radial-gradient(circle at 50% 18%, #231806 0, #080705 30%, #030303 72%); padding-bottom: 88px; }
-.pm-app__header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 14px clamp(18px,4vw,34px); border-bottom: 1px solid rgba(218,165,65,.18); background: rgba(3,3,3,.88); backdrop-filter: blur(18px); }
+.pm-app__header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; min-height: calc(82px + env(safe-area-inset-top)); padding: calc(18px + env(safe-area-inset-top)) clamp(18px,4vw,34px) 16px; border-bottom: 1px solid rgba(218,165,65,.18); background: rgba(3,3,3,.88); backdrop-filter: blur(18px); }
 .pm-app__mark,.pm-app__profile { display:grid; place-items:center; width:42px; height:42px; border:1px solid #aa761d; border-radius:50%; color:#ffd778; background:linear-gradient(145deg,#211707,#080604); font-weight:800; text-decoration:none; }
 .pm-app__identity { min-width:0; display:flex; flex:1; flex-direction:column; }
 .pm-app__identity strong { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:15px; }
