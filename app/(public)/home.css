@@ -1,12 +1,18 @@
+/* The layout of this page came from the mobile-launch pass and stays as it
+   is. The palette did not: it arrived light grey with a green accent, which
+   is not this centre. Black and gold, the same tokens the rest of the site
+   is built from, so a colour changed once in :root changes here too. */
 .app-home {
-  --app-bg: #f5f7f2;
-  --app-card: #ffffff;
-  --app-text: #17221d;
-  --app-muted: #637069;
-  --app-green: #246b4b;
-  --app-green-dark: #174832;
-  --app-soft: #e8f2ec;
-  --app-line: #dce4df;
+  --app-bg: var(--background);
+  --app-card: var(--surface);
+  --app-text: var(--text);
+  --app-muted: var(--muted);
+  --app-accent: var(--accent);
+  --app-accent-strong: var(--accent-strong);
+  /* Gold at low opacity rather than a colour of its own: it has to sit on
+     two different dark surfaces and stay the same wash on both. */
+  --app-soft: rgba(212, 175, 55, 0.12);
+  --app-line: var(--line);
   background: var(--app-bg);
   border-radius: 28px;
   color: var(--app-text);
@@ -287,55 +293,57 @@
   padding: clamp(2rem, 7vw, 6rem);
 }
 
-.app-kicker { color: var(--app-green) !important; font-size: .78rem; font-weight: 800; letter-spacing: .14em; margin: 0 0 .85rem; text-transform: uppercase; }
+.app-kicker { color: var(--app-accent) !important; font-size: .78rem; font-weight: 800; letter-spacing: .14em; margin: 0 0 .85rem; text-transform: uppercase; }
 .app-hero h1 { font-family: var(--font-serif); font-size: clamp(2.65rem, 6vw, 5.25rem); letter-spacing: -.035em; line-height: .98; margin: 0; max-width: 760px; text-transform: none; }
-.app-hero__subtitle { color: var(--app-green) !important; font-size: clamp(1.1rem, 2vw, 1.45rem); font-weight: 650; margin: 1rem 0 0; }
+.app-hero__subtitle { color: var(--app-accent) !important; font-size: clamp(1.1rem, 2vw, 1.45rem); font-weight: 650; margin: 1rem 0 0; }
 .app-hero__lead { color: var(--app-muted) !important; font-size: 1.05rem; line-height: 1.7; margin: 1.25rem 0 0; max-width: 610px; }
 .app-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
 
 .app-button { align-items: center; border: 1px solid transparent; border-radius: 12px; cursor: pointer; display: inline-flex; font: inherit; font-weight: 750; gap: .7rem; justify-content: center; min-height: 52px; padding: .85rem 1.25rem; text-decoration: none; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
 .app-button:hover { transform: translateY(-2px); }
-.app-button--primary { background: var(--app-green); color: #fff; }
-.app-button--primary:hover { background: var(--app-green-dark); }
+.app-button--primary { background: var(--app-accent); color: var(--background); }
+.app-button--primary:hover { background: var(--app-accent-strong); }
 .app-button--secondary { background: var(--app-card); border-color: var(--app-line); color: var(--app-text); }
-.app-button--secondary:hover { border-color: var(--app-green); }
+.app-button--secondary:hover { border-color: var(--app-accent); }
 .app-trust { color: var(--app-muted) !important; font-size: .88rem; margin: 1.2rem 0 0; }
 
 .app-hero__visual { display: grid; place-items: center; }
-.app-assistant-card { align-items: center; background: linear-gradient(145deg, #fff, #eaf4ee); border: 1px solid var(--app-line); border-radius: 30px; box-shadow: 0 28px 70px rgba(30, 72, 52, .12); display: flex; flex-direction: column; min-height: 430px; overflow: hidden; padding: 1.5rem; position: relative; text-align: center; width: min(100%, 390px); }
-.app-assistant-card::before { background: radial-gradient(circle, rgba(43, 125, 87, .15), transparent 68%); content: ""; height: 340px; position: absolute; top: 90px; width: 340px; }
+.app-assistant-card { align-items: center; background: linear-gradient(145deg, var(--surface), var(--surface-muted)); border: 1px solid var(--app-line); border-radius: 30px; box-shadow: 0 28px 70px rgba(0, 0, 0, .45); display: flex; flex-direction: column; min-height: 430px; overflow: hidden; padding: 1.5rem; position: relative; text-align: center; width: min(100%, 390px); }
+.app-assistant-card::before { background: radial-gradient(circle, rgba(212, 175, 55, .16), transparent 68%); content: ""; height: 340px; position: absolute; top: 90px; width: 340px; }
 .app-assistant-card > * { position: relative; }
 .app-assistant-card p { font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.45; margin: 2.25rem 0 1rem; max-width: 280px; }
-.app-status { align-self: flex-start; background: var(--app-soft); border-radius: 99px; color: var(--app-green); font-size: .78rem; font-weight: 750; padding: .45rem .7rem; }
-.app-status i { background: #39a76e; border-radius: 50%; display: inline-block; height: 7px; margin-right: .35rem; width: 7px; }
+.app-status { align-self: flex-start; background: var(--app-soft); border-radius: 99px; color: var(--app-accent); font-size: .78rem; font-weight: 750; padding: .45rem .7rem; }
+.app-status i { background: var(--app-accent); border-radius: 50%; display: inline-block; height: 7px; margin-right: .35rem; width: 7px; }
 
 .app-quick { background: var(--app-card); border-bottom: 1px solid var(--app-line); border-top: 1px solid var(--app-line); display: grid; grid-template-columns: repeat(3, 1fr); }
 .app-quick > a, .app-quick__button { align-items: center; background: transparent; border: 0; border-right: 1px solid var(--app-line); color: var(--app-text); cursor: pointer; display: grid; font: inherit; gap: .9rem; grid-template-columns: auto 1fr auto; min-height: 140px; padding: 1.4rem; text-align: left; text-decoration: none; }
 .app-quick > :last-child { border-right: 0; }
 .app-quick > a:hover, .app-quick__button:hover { background: var(--app-soft); }
-.app-quick__icon { align-items: center; background: var(--app-soft); border-radius: 50%; color: var(--app-green); display: flex; font-size: .75rem; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
+.app-quick__icon { align-items: center; background: var(--app-soft); border-radius: 50%; color: var(--app-accent); display: flex; font-size: .75rem; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
 .app-quick strong, .app-quick small { display: block; }
 .app-quick strong { font-size: .95rem; }
 .app-quick small { color: var(--app-muted); display: -webkit-box; font-size: .78rem; line-height: 1.4; margin-top: .35rem; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
-.app-quick b { color: var(--app-green); font-size: 1.1rem; }
+.app-quick b { color: var(--app-accent); font-size: 1.1rem; }
 
 .app-route { padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 7vw, 6rem); }
 .app-section-head { max-width: 720px; }
 .app-section-head h2 { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.1; margin: 0; }
 .app-steps { counter-reset: steps; display: grid; gap: 1rem; list-style: none; margin: 3rem 0 0; padding: 0; }
 .app-steps li { align-items: start; background: var(--app-card); border: 1px solid var(--app-line); border-radius: 18px; display: grid; gap: 1rem; grid-template-columns: auto 1fr; padding: 1.4rem; }
-.app-steps li > span { align-items: center; background: var(--app-green); border-radius: 10px; color: #fff; display: flex; font-weight: 800; height: 38px; justify-content: center; width: 38px; }
+.app-steps li > span { align-items: center; background: var(--app-accent); border-radius: 10px; color: var(--background); display: flex; font-weight: 800; height: 38px; justify-content: center; width: 38px; }
 .app-steps h3 { font-size: 1rem; margin: .1rem 0 .35rem; }
 .app-steps p { color: var(--app-muted) !important; line-height: 1.6; margin: 0; }
 
-.app-expert { align-items: stretch; background: #173f2e; color: #fff; display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); min-height: 470px; }
-.app-expert__portrait { min-height: 400px; overflow: hidden; position: relative; }
-.app-expert__portrait img { object-fit: cover; object-position: center top; }
-.app-expert__copy { align-self: center; padding: clamp(2rem, 7vw, 5rem); }
-.app-expert__copy .app-kicker { color: #95d4b4 !important; }
+.app-expert { align-items: center; background: var(--surface-muted); color: var(--text); display: grid; gap: clamp(1.5rem, 4vw, 3rem); grid-template-columns: auto minmax(0, 1fr); padding: clamp(2rem, 6vw, 4rem); }
+/* A small window. His face sits high in the frame, so the crop does too —
+   centred, it would show his chest. */
+.app-expert__portrait { border: 1px solid rgba(212, 175, 55, 0.35); border-radius: 50%; height: 132px; overflow: hidden; width: 132px; }
+.app-expert__portrait img { display: block; height: 100%; object-fit: cover; object-position: 50% 18%; width: 100%; }
+.app-expert__copy { align-self: center; }
+.app-expert__copy .app-kicker { color: var(--accent-strong) !important; }
 .app-expert h2 { font-family: var(--font-serif); font-size: clamp(2.2rem, 4vw, 3.5rem); margin: 0; }
-.app-expert p:not(.app-kicker) { color: #d6e6dd !important; line-height: 1.75; max-width: 560px; }
-.app-text-link { color: #fff; display: inline-flex; font-weight: 750; gap: .5rem; margin-top: 1rem; text-underline-offset: 4px; }
+.app-expert p:not(.app-kicker) { color: var(--muted) !important; line-height: 1.75; max-width: 560px; }
+.app-text-link { color: var(--accent-strong); display: inline-flex; font-weight: 750; gap: .5rem; margin-top: 1rem; text-underline-offset: 4px; }
 
 .app-final { align-items: center; display: flex; gap: 2rem; justify-content: space-between; padding: clamp(3rem, 7vw, 5rem); }
 .app-final h2 { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.25rem); margin: 0; }
@@ -349,8 +357,7 @@
   .app-quick { grid-template-columns: 1fr; }
   .app-quick > a, .app-quick__button { border-bottom: 1px solid var(--app-line); border-right: 0; min-height: 108px; }
   .app-quick > :last-child { border-bottom: 0; }
-  .app-expert { grid-template-columns: 1fr; }
-  .app-expert__portrait { max-height: 460px; }
+  .app-expert { gap: 1.25rem; grid-template-columns: auto minmax(0, 1fr); }
 }
 
 @media (max-width: 560px) {
@@ -367,19 +374,6 @@
 .home-figure__avatar,
 .home-final__anham {
   justify-self: center;
-}
-
-/* A small window, not a photograph filling half the card: he asked for his
-   face to take a corner of the page. The crop sits high because his face is
-   in the upper part of the frame. */
-.home-figure__portrait {
-  border: 1px solid rgba(212, 175, 55, 0.35);
-  border-radius: 50%;
-  height: 112px;
-  justify-self: center;
-  object-fit: cover;
-  object-position: 50% 18%;
-  width: 112px;
 }
 
 .home-figure__seal {

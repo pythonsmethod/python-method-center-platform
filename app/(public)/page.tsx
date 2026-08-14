@@ -93,8 +93,17 @@ export default async function HomePage() {
       </section>
 
       <section className="app-expert" aria-labelledby="expert-title" data-scroll-reveal>
+        {/* A small window, not a portrait band. He asked for his face to
+            take a corner of the page rather than half a screen, and the
+            mobile-launch layout brought the big photograph back. */}
         <div className="app-expert__portrait">
-          <Image alt="" fill sizes="(max-width: 760px) 100vw, 36vw" src={PROFESSOR_IMAGE} />
+          <Image
+            alt=""
+            height={717}
+            sizes="132px"
+            src={PROFESSOR_IMAGE}
+            width={690}
+          />
         </div>
         <div className="app-expert__copy">
           <p className="app-kicker">{t.expertLabel}</p>
