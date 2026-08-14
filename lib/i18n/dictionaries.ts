@@ -1291,7 +1291,10 @@ const ru = {
     wrongAddress: "Я ошибся в адресе — зарегистрироваться заново",
     askTeam: "Ничего не получается — написать команде",
     linkInvalid:
-      "Ссылка из письма не сработала: обычно это значит, что письмо старое или по ссылке уже переходили. Отправьте письмо заново кнопкой ниже и откройте ссылку из самого свежего."
+      "Ссылка сработала не до конца — но почта, скорее всего, уже подтверждена. Так бывает, когда письмо открыли не на том устройстве, где регистрировались.",
+    linkInvalidSignIn: "Войти — почта уже подтверждена",
+    linkInvalidNote:
+      "Введите тот же email и пароль, что задавали при регистрации. Если вход скажет, что почта не подтверждена — вернитесь сюда и отправьте письмо заново кнопкой ниже."
   }
 };
 
@@ -2506,7 +2509,10 @@ const en: typeof ru = {
     wrongAddress: "I mistyped the address — register again",
     askTeam: "Nothing works — write to the team",
     linkInvalid:
-      "The link from the email did not work: usually that means the email is old, or the link has already been used. Send the email again with the button below and open the link from the newest one."
+      "The link worked only halfway — but your address is most likely confirmed already. This happens when the email is opened on a different device from the one you registered on.",
+    linkInvalidSignIn: "Sign in — your address is confirmed",
+    linkInvalidNote:
+      "Use the same email and password you chose when registering. If signing in says the address is not confirmed, come back here and send the email again with the button below."
   }
 };
 
