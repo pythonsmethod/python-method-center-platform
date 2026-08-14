@@ -3,8 +3,6 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
-import { SocialSignIn } from "@/components/auth/SocialSignIn";
-import { enabledSocialProviders } from "@/lib/auth/providers";
 import { AuthForm } from "./AuthForm";
 
 import Link from "next/link";
@@ -76,25 +74,12 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               submitSignup: t.submitSignup,
               submitting: t.submitting,
               resend: t.resend,
-              resending: t.resending,
-              noAccount: t.noAccount,
-              enrollNow: t.enrollNow
+              resending: t.resending
             }}
             initialMode={initialMode}
             nextPath={nextPath}
             supabaseConfigured={supabaseConfigured}
-          >
-            <SocialSignIn
-              labels={{
-                divider: t.socialDivider,
-                google: t.socialGoogle,
-                apple: t.socialApple,
-                hint: t.socialHint
-              }}
-              nextPath={nextPath}
-              providers={enabledSocialProviders()}
-            />
-          </AuthForm>
+          />
           <p className="auth-help">
             <Link href="/recovery">{t.forgot}</Link>
           </p>

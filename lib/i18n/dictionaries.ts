@@ -1267,13 +1267,6 @@ const ru = {
     resend: "Отправить письмо ещё раз",
     resending: "Отправляем...",
     forgot: "Забыли пароль?",
-    socialDivider: "или",
-    socialGoogle: "Продолжить с Google",
-    socialApple: "Продолжить с Apple",
-    socialHint:
-      "Вход через Google или Apple — без нового пароля. Мы получаем только ваш email и имя; доступа к вашей почте и контактам у нас нет.",
-    noAccount: "Ещё нет аккаунта?",
-    enrollNow: "Зарегистрироваться",
     linkInvalid:
       "Ссылка из письма недействительна или устарела. Войдите с паролем или запросите новую ссылку через «Забыли пароль?»."
   },
@@ -2491,13 +2484,6 @@ const en: typeof ru = {
     resend: "Send the email again",
     resending: "Sending...",
     forgot: "Forgot your password?",
-    socialDivider: "or",
-    socialGoogle: "Continue with Google",
-    socialApple: "Continue with Apple",
-    socialHint:
-      "Signing in with Google or Apple means no new password. We receive only your email address and name — we have no access to your mail or your contacts.",
-    noAccount: "No account yet?",
-    enrollNow: "Create one",
     linkInvalid:
       "The link from the email is invalid or expired. Sign in with your password or request a new link via “Forgot your password?”."
   },
