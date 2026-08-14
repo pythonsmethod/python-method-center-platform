@@ -308,6 +308,7 @@
 .app-trust { color: var(--app-muted) !important; font-size: .88rem; margin: 1.2rem 0 0; }
 
 .app-hero__visual { display: grid; place-items: center; }
+.app-mobile-download, .app-mobile-route { display: none; }
 .app-assistant-card { align-items: center; background: linear-gradient(145deg, var(--surface), var(--surface-muted)); border: 1px solid var(--app-line); border-radius: 30px; box-shadow: 0 28px 70px rgba(0, 0, 0, .45); display: flex; flex-direction: column; min-height: 430px; overflow: hidden; padding: 1.5rem; position: relative; text-align: center; width: min(100%, 390px); }
 .app-assistant-card::before { background: radial-gradient(circle, rgba(212, 175, 55, .16), transparent 68%); content: ""; height: 340px; position: absolute; top: 90px; width: 340px; }
 .app-assistant-card > * { position: relative; }
@@ -366,6 +367,31 @@
   .app-actions { align-items: stretch; flex-direction: column; }
   .app-button { width: 100%; }
   .app-assistant-card { min-height: 390px; }
+  .app-mobile-download {
+    background: var(--app-card);
+    border: 1px solid var(--app-line);
+    border-radius: 18px;
+    display: grid;
+    gap: 1.25rem;
+    margin-top: 1.25rem;
+    padding: 1.35rem;
+    width: 100%;
+  }
+  .app-mobile-download h2 { font-family: var(--font-serif); font-size: 1.55rem; line-height: 1.15; margin: 0; }
+  .app-mobile-download p:not(.app-kicker) { color: var(--app-muted) !important; font-size: .88rem; line-height: 1.65; margin: .8rem 0 0; }
+  .app-mobile-download__links { display: grid; gap: .65rem; grid-template-columns: 1fr 1fr; }
+  .app-mobile-download__links a, .app-mobile-download__links span { align-items: center; background: #0d0b08; border: 1px solid var(--app-line); border-radius: 10px; color: var(--app-text); display: flex; flex-direction: column; font-size: .7rem; font-weight: 700; justify-content: center; min-height: 58px; padding: .65rem; text-align: center; }
+  .app-mobile-download__links a { border-color: var(--app-accent); }
+  .app-mobile-download__links small { color: var(--app-accent); font-size: .62rem; margin-top: .25rem; text-transform: uppercase; }
+  .app-route { padding-block: 4rem; }
+  .app-route > .app-section-head, .app-route > .app-steps { display: none; }
+  .app-mobile-route { display: block; }
+  .app-mobile-route > h2 { color: var(--app-accent) !important; font-size: .78rem; font-weight: 800; letter-spacing: .14em; margin: 0 0 1.5rem; text-transform: uppercase; }
+  .app-mobile-route ol { display: grid; gap: 1rem; list-style: none; margin: 0; padding: 0; }
+  .app-mobile-route li { align-items: start; background: var(--app-card); border: 1px solid var(--app-line); border-radius: 18px; display: grid; gap: 1rem; grid-template-columns: auto 1fr; padding: 1.25rem; }
+  .app-mobile-route li > span { align-items: center; background: var(--app-accent); border-radius: 10px; color: var(--background); display: flex; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
+  .app-mobile-route h3 { font-size: .98rem; line-height: 1.35; margin: .05rem 0 .35rem; }
+  .app-mobile-route p { color: var(--app-muted) !important; font-size: .86rem; line-height: 1.55; margin: 0; }
   .app-final { align-items: stretch; flex-direction: column; }
 }
 

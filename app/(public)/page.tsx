@@ -7,6 +7,7 @@ import { isFreeReviewActive } from "@/lib/config/promo";
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
+import { APP_STORE_URL, GOOGLE_PLAY_URL } from "@/lib/config/mobile-app";
 import "./home.css";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
@@ -21,6 +22,44 @@ export default async function HomePage() {
   const freeReview = isFreeReviewActive();
   const startHref = tier === "guest" ? "/login" : "/cabinet";
   const anhamName = locale === "ru" ? "Анхам" : "Anham";
+  const mobile = locale === "ru"
+    ? {
+        appEyebrow: "Приложение Python Method",
+        appTitle: "Больше возможностей — в приложении",
+        appText: "Установите приложение, чтобы пользоваться расширенным личным кабинетом, быть на связи с Анхамом и видеть свой путь в одном месте.",
+        appStore: "Скачать в App Store",
+        playStore: "Скачать в Google Play",
+        comingSoon: "Скоро",
+        journeyTitle: "Как работает центр",
+        supportTitle: "Сопровождение",
+        supportText: "Выберите подходящий формат сопровождения — 5 недель или 100 дней.",
+        communicationTitle: "Ежедневное общение и поддержка",
+        communicationText: "Карен и Анхам остаются рядом, отвечают на вопросы и помогают двигаться дальше.",
+        appStepTitle: "Расширенный кабинет в приложении",
+        appStepText: "Все основные функции, история и персональный путь собраны в мобильном приложении."
+      }
+    : {
+        appEyebrow: "Python Method app",
+        appTitle: "More possibilities in the app",
+        appText: "Install the app for the expanded personal cabinet, a direct connection with Anham and your complete journey in one place.",
+        appStore: "Download on the App Store",
+        playStore: "Get it on Google Play",
+        comingSoon: "Coming soon",
+        journeyTitle: "How the center works",
+        supportTitle: "Support program",
+        supportText: "Choose the right support format — 5 weeks or 100 days.",
+        communicationTitle: "Daily communication and support",
+        communicationText: "Karen and Anham stay beside you, answer questions and help you keep moving.",
+        appStepTitle: "Expanded cabinet in the app",
+        appStepText: "Core functions, history and your personal journey come together in the mobile app."
+      };
+  const mobileSteps = [
+    ...t.paths.common,
+    ...(freeReview ? [{ title: t.paths.freeLabel, text: t.paths.freeNote }] : []),
+    { title: mobile.supportTitle, text: mobile.supportText },
+    { title: mobile.communicationTitle, text: mobile.communicationText },
+    { title: mobile.appStepTitle, text: mobile.appStepText }
+  ];
 
   return (
     <div className="app-home">
@@ -51,6 +90,25 @@ export default async function HomePage() {
             <p>{t.heroBubble}</p>
             <AnhamAvatar size={184} state={tier} title={anhamName} />
           </div>
+          <aside className="app-mobile-download" aria-labelledby="app-download-title">
+            <div>
+              <p className="app-kicker">{mobile.appEyebrow}</p>
+              <h2 id="app-download-title">{mobile.appTitle}</h2>
+              <p>{mobile.appText}</p>
+            </div>
+            <div className="app-mobile-download__links">
+              {APP_STORE_URL ? (
+                <a href={APP_STORE_URL} rel="noopener noreferrer" target="_blank">{mobile.appStore}</a>
+              ) : (
+                <span aria-label={`${mobile.appStore}: ${mobile.comingSoon}`}>{mobile.appStore}<small>{mobile.comingSoon}</small></span>
+              )}
+              {GOOGLE_PLAY_URL ? (
+                <a href={GOOGLE_PLAY_URL} rel="noopener noreferrer" target="_blank">{mobile.playStore}</a>
+              ) : (
+                <span aria-label={`${mobile.playStore}: ${mobile.comingSoon}`}>{mobile.playStore}<small>{mobile.comingSoon}</small></span>
+              )}
+            </div>
+          </aside>
         </div>
       </section>
 
@@ -90,6 +148,17 @@ export default async function HomePage() {
             <div><h3>{t.paths.freeLabel}</h3><p>{t.paths.freeNote}</p></div>
           </li>
         </ol>
+        <div className="app-mobile-route">
+          <h2>{mobile.journeyTitle}</h2>
+          <ol>
+            {mobileSteps.map((step, index) => (
+              <li key={step.title}>
+                <span>{index + 1}</span>
+                <div><h3>{step.title}</h3><p>{step.text}</p></div>
+              </li>
+            ))}
+          </ol>
+        </div>
       </section>
 
       <section className="app-expert" aria-labelledby="expert-title" data-scroll-reveal>
