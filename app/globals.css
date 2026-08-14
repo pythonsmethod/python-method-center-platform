@@ -4887,6 +4887,7 @@ code {
 /* ---------- eyes ---------- */
 
 .anham__lids {
+  animation: anham-float 5.5s ease-in-out infinite;
   height: 100%;
   inset: 0;
   pointer-events: none;
@@ -5023,6 +5024,7 @@ code {
    nothing turning. */
 @media (prefers-reduced-motion: reduce) {
   .anham__art,
+  .anham__lids,
   .anham__ring,
   .anham__aura i {
     animation: none;
@@ -9855,6 +9857,7 @@ code {
 /* ---------- eyes ---------- */
 
 .anham__lids {
+  animation: anham-float 5.5s ease-in-out infinite;
   height: 100%;
   inset: 0;
   pointer-events: none;
@@ -9991,6 +9994,7 @@ code {
    nothing turning. */
 @media (prefers-reduced-motion: reduce) {
   .anham__art,
+  .anham__lids,
   .anham__ring,
   .anham__aura i {
     animation: none;
