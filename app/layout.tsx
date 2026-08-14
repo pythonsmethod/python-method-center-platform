@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav, type NavViewer } from "@/components/SiteNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppRouteMode } from "@/components/AppRouteMode";
+import { PublicMobileDock } from "@/components/PublicMobileDock";
 
 // Who is looking at the header. Not merely whether anyone is signed in:
 // a member of the team leaving the workspace used to land on the
@@ -160,6 +161,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </div>
         </SiteHeader>
         <main>{children}</main>
+        {viewer === "anonymous" ? <PublicMobileDock locale={locale} /> : null}
         <footer className="site-footer">
           <span>© Python Method</span>
           {socialLinks.length > 0 ? (
