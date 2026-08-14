@@ -8,21 +8,14 @@ import { getLocale } from "@/lib/i18n/locale";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
 const MOTHER_IMAGE = "/images/professor/mother.jpg";
-const MEDALS_IMAGE = "/images/professor/medals.jpg";
-
-// One photograph per step of the timeline, in the same order as the steps
-// in the dictionary. Paths are not translations, so they live here rather
-// than in the copy — tests/professor-page.test.ts checks the two lists stay
-// the same length in both languages, because a photograph sliding onto the
-// wrong decade of someone's life is not a defect a build can see.
-const JOURNEY_IMAGES = [
-  { src: "/images/professor/young.jpg", width: 640, height: 766 },
-  { src: "/images/professor/barbell.jpg", width: 640, height: 853 },
-  { src: "/images/professor/victory.jpg", width: 640, height: 640 },
-  { src: PROFESSOR_IMAGE, width: 690, height: 717 }
-];
 
 // The page about the person behind the method.
+//
+// Short by his own request. He did not want his life told on a website, so
+// everything personal is gone — the school years, the illness he had, the
+// sport, the medals, the nickname's history. What remains of the private
+// side is his mother, because she is the reason the method exists and he
+// asked for that part to stay.
 //
 // Two kinds of statement live here and they are kept apart on purpose.
 //
@@ -63,20 +56,26 @@ export default async function ProfessorPage() {
     <div className="page-shell">
       <PageHeader eyebrow={t.eyebrow} title={t.title} description={t.subtitle} />
 
+      {/* A small window, not a portrait: he asked for his face to take a
+          corner of the page rather than a third of the screen. */}
       <section className="professor-hero" aria-label={t.title}>
-        <div className="professor-hero__portrait">
-          <Image
-            alt="Professor Python"
-            height={717}
-            priority
-            src={PROFESSOR_IMAGE}
-            width={690}
-          />
+        <div className="professor-hero__head">
+          <span className="professor-hero__portrait">
+            <Image
+              alt="Professor Python"
+              height={717}
+              priority
+              sizes="96px"
+              src={PROFESSOR_IMAGE}
+              width={690}
+            />
+          </span>
+          <span>
+            <span className="professor-hero__name">{t.fullName}</span>
+            <span className="professor-hero__nickname">{t.nicknameNote}</span>
+          </span>
         </div>
-        <div>
-          <p className="professor-hero__name">{t.fullName}</p>
-          <p className="professor-hero__lead">{t.lead}</p>
-        </div>
+        <p className="professor-hero__lead">{t.lead}</p>
       </section>
 
       <section className="panel professor-story" aria-label={t.origin.title}>
@@ -130,66 +129,10 @@ export default async function ProfessorPage() {
         ))}
       </section>
 
-      {/* His own illness and his own returns. It belongs on the page
-          because it is the one thing that shows he is not describing a
-          broken body from the outside. */}
-      <section className="panel professor-story" aria-label={t.own.title}>
-        <span className="panel__label">{t.own.label}</span>
-        <h2>{t.own.title}</h2>
-        <ol className="professor-journey">
-          {t.own.steps.map((step, index) => {
-            const photo = JOURNEY_IMAGES[index];
-
-            return (
-              <li className="professor-journey__step" key={step.when}>
-                {photo ? (
-                  <span className="professor-journey__photo">
-                    <Image
-                      alt={step.alt}
-                      height={photo.height}
-                      sizes="(max-width: 720px) 100vw, 260px"
-                      src={photo.src}
-                      width={photo.width}
-                    />
-                  </span>
-                ) : null}
-                <span className="professor-journey__when">{step.when}</span>
-                <strong className="professor-journey__title">{step.title}</strong>
-                <p>{step.text}</p>
-              </li>
-            );
-          })}
-        </ol>
-        <blockquote className="professor-quote">{t.own.quote}</blockquote>
-      </section>
-
-      <section className="panel-grid" aria-label={t.howTitle}>
-        <div className="panel">
-          <span className="panel__label">{t.personalLabel}</span>
-          <h2>{t.howTitle}</h2>
-          <p>{t.howText}</p>
-        </div>
-        <div className="panel professor-story">
-          <span className="panel__label">{t.name.label}</span>
-          <h2>{t.name.title}</h2>
-          {/* The medal rack carries his name in full, in the form the
-              nickname came from. It explains the block better than the
-              block does. */}
-          <figure className="professor-photo professor-photo--wide">
-            <Image
-              alt={t.name.photoAlt}
-              height={752}
-              sizes="(max-width: 860px) 100vw, 520px"
-              src={MEDALS_IMAGE}
-              width={1100}
-            />
-            <figcaption>{t.name.photoCaption}</figcaption>
-          </figure>
-          {t.name.paragraphs.map((paragraph) => (
-            <p key={paragraph}>{paragraph}</p>
-          ))}
-          <blockquote className="professor-quote">{t.name.quote}</blockquote>
-        </div>
+      <section className="panel" aria-label={t.howTitle}>
+        <span className="panel__label">{t.personalLabel}</span>
+        <h2>{t.howTitle}</h2>
+        <p>{t.howText}</p>
       </section>
 
       {/* The limits, written as a list of what he will not do. Exactly the

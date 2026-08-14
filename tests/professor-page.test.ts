@@ -105,36 +105,46 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
   });
 
   it("states openly that the title is not a title", () => {
-    // He is called Professor by the people he worked with. Saying so first,
-    // on his own page, is the difference between a nickname and a claim.
+    // He is called Professor by the people he worked with. The block that
+    // explained where the name came from is gone with the rest of his
+    // biography, so this sentence now carries that job alone — and it has
+    // to stay: a reader who works the nickname out for themselves feels
+    // they were being fooled.
     const expected =
-      locale === "ru" ? "не медицинское звание" : "is a medical title";
+      locale === "ru" ? "не медицинское звание" : "not a medical title";
 
-    expect(t.name.title).toContain(expected);
+    expect(t.nicknameNote).toContain(expected);
   });
 
-  it("has a caption for every photograph in the timeline", () => {
-    // The photographs are matched to the steps by position, so a step added
-    // in one language and not the other would slide a picture onto the
-    // wrong decade of a real person's life. Nothing in a build would catch
-    // that; the count is checked here instead.
-    expect(t.own.steps).toHaveLength(4);
+  it("tells nothing of his private life beyond his mother", () => {
+    // He asked for this. The page used to carry his school years, the
+    // illness he had, his sport, his injuries and his medals; all of it is
+    // gone, and the reason the method exists — his mother — stays.
+    const personal =
+      locale === "ru"
+        ? ["гепатит", "чемпион", "школ", "класс", "штанг", "медал", "травм"]
+        : ["hepatitis", "champion", "school", "barbell", "medal", "injur"];
 
-    for (const step of t.own.steps) {
-      expect(step.alt.length).toBeGreaterThan(0);
+    for (const word of personal) {
+      expect(text.toLowerCase(), `private life back on the page: "${word}"`).not.toContain(
+        word
+      );
     }
+
+    const mother = locale === "ru" ? "мам" : "mother";
+
+    expect(text.toLowerCase()).toContain(mother);
   });
 
   it("carries no number the contract has not already stated", () => {
     // 30 years and 34 countries are both in the offer. 2024 is the year his
-    // mother fell ill and 10 is the school year he was diagnosed in — both
-    // biography, and both his own words. The rest are the postal address.
+    // mother fell ill, in his own words. The rest are the postal address.
     //
     // Anything else numeric — people helped, countries, success rates,
     // percentages — would be invented, and on this page an invented number
     // is a claim.
     const numbers = text.match(/\d+/g) ?? [];
-    const allowed = new Set(["10", "30", "34", "2024", "1331", "5", "90025"]);
+    const allowed = new Set(["30", "34", "2024", "1331", "5", "90025"]);
 
     for (const number of numbers) {
       expect(allowed.has(number), `unexplained number on the page: ${number}`).toBe(
@@ -156,9 +166,7 @@ describe("what the page states matches the contract", () => {
 
   it("takes the 34 countries from clause 1", () => {
     expect(clause).toContain("в 34 странах");
-    expect(getDictionary("ru").professor.name.paragraphs.join("\n")).toContain(
-      "34 странах"
-    );
+    expect(getDictionary("ru").professor.lead).toContain("34 странах");
   });
 
   it("takes the company and address from clause 2", () => {

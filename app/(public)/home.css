@@ -238,7 +238,7 @@
   border-radius: 16px;
   display: grid;
   gap: 1rem;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.6fr);
+  grid-template-columns: minmax(0, 1fr) auto;
   overflow: hidden;
   padding: 1.5rem;
 }
@@ -688,12 +688,17 @@
   justify-self: center;
 }
 
+/* A small window, not a photograph filling half the card: he asked for his
+   face to take a corner of the page. The crop sits high because his face is
+   in the upper part of the frame. */
 .home-figure__portrait {
-  border-radius: 14px;
-  height: auto;
+  border: 1px solid rgba(212, 175, 55, 0.35);
+  border-radius: 50%;
+  height: 112px;
   justify-self: center;
-  max-width: 100%;
-  width: 100%;
+  object-fit: cover;
+  object-position: 50% 18%;
+  width: 112px;
 }
 
 .home-figure__seal {
