@@ -29,6 +29,72 @@ const NEVER_PUBLISHED = {
   en: ["USDT", "TRC", "IBAN", "SWIFT", "wallet address"]
 } as const;
 
+// No country is named on either page, in either language.
+//
+// The founder's call, and it holds up on its own: a person whose card was
+// refused already knows where they live, and a list of countries printed on
+// a payment page reads as "you are not our client". It is also a list that
+// goes out of date by itself — the Russian text still said "since 2022",
+// which nobody was ever going to come back and revise.
+//
+// What must survive without it: that it is not their fault, and a route to
+// a human who will find them a way to pay.
+const COUNTRIES = [
+  "росси",
+  "беларус",
+  "казахстан",
+  "армени",
+  "грузи",
+  "кыргыз",
+  "оаэ",
+  "украин",
+  "russia",
+  "belarus",
+  "kazakhstan",
+  "armenia",
+  "georgia",
+  "kyrgyz",
+  "uae",
+  "ukraine"
+];
+
+describe.each(["ru", "en"] as const)("naming no country in %s", (locale) => {
+  it("keeps both payment pages free of a country list", () => {
+    const dictionary = getDictionary(locale);
+    const collect = (value: unknown): string[] =>
+      typeof value === "string"
+        ? [value]
+        : Array.isArray(value)
+          ? value.flatMap(collect)
+          : value && typeof value === "object"
+            ? Object.values(value).flatMap(collect)
+            : [];
+
+    const alt = { ...dictionary.altPayment } as Record<string, unknown>;
+
+    // The one exception, and it is the opposite case: this is the example
+    // of what to type into "your country", not a country whose cards fail.
+    delete alt.countryPlaceholder;
+
+    const text = [...collect(alt), ...collect(dictionary.payment)]
+      .join("\n")
+      .toLowerCase();
+
+    for (const country of COUNTRIES) {
+      expect(text, `a country is named on a payment page: "${country}"`).not.toContain(
+        country
+      );
+    }
+  });
+
+  it("still says whose fault it is not", () => {
+    const t = getDictionary(locale).altPayment;
+    const expected = locale === "ru" ? "не связано ни с вашим счётом" : "nothing to do with your balance";
+
+    expect(t.blockedText).toContain(expected);
+  });
+});
+
 describe.each(["ru", "en"] as const)("the alternative payment page in %s", (locale) => {
   const t = getDictionary(locale).altPayment;
 
@@ -99,7 +165,7 @@ describe("the warning on the payment page", () => {
     // all. So the only place this can be said is here, in advance.
     const ru = getDictionary("ru").payment;
 
-    expect(ru.altTitle).toContain("России");
+    expect(ru.altTitle.toLowerCase()).toContain("не проходит");
     expect(ru.altText).toContain("до того, как пробовать картой");
   });
 
