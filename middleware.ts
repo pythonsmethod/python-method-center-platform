@@ -56,7 +56,8 @@ export async function middleware(request: NextRequest) {
           name: string;
           value: string;
           options: CookieOptions;
-        }[]
+        }[],
+        headers: Record<string, string>
       ) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
@@ -64,6 +65,9 @@ export async function middleware(request: NextRequest) {
         response = NextResponse.next({ request });
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
+        });
+        Object.entries(headers).forEach(([name, value]) => {
+          response.headers.set(name, value);
         });
       }
     }

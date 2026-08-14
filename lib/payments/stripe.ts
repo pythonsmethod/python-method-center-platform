@@ -79,6 +79,6 @@ export function servicePeriodEnd(
   startsAt: Date
 ): Date {
   const ends = new Date(startsAt);
-  ends.setDate(ends.getDate() + PLAN_DURATION_DAYS[product]);
+  ends.setUTCDate(ends.getUTCDate() + PLAN_DURATION_DAYS[product]);
   return ends;
 }

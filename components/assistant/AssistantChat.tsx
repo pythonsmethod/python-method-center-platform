@@ -243,7 +243,10 @@ export function AssistantChat({
     sentQuestion.current = initialQuestion;
     void send(initialQuestion);
     onInitialQuestionSent?.();
-  }, [initialQuestion, pending]);
+    // `send` intentionally stays out of the dependencies: this effect owns
+    // one initial hand-off, and sentQuestion prevents duplicate paid calls.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialQuestion, pending, onInitialQuestionSent]);
 
   async function send(text: string) {
     const trimmed = text.trim();

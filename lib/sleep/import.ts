@@ -267,10 +267,6 @@ export function parseQualityValue(value: string): number | null {
   return null;
 }
 
-function matchColumn(header: string, synonyms: string[]): boolean {
-  return synonyms.some((synonym) => header.includes(synonym));
-}
-
 export function parseSleepCsv(text: string): ImportResult {
   const lines = text
     .split(/\r?\n/)

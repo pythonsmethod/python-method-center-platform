@@ -1,6 +1,6 @@
 "use client";
 
-import { useTransition } from "react";
+import { useFormStatus } from "react-dom";
 import type { Locale } from "@/lib/i18n/locale";
 import { setLocale } from "@/lib/i18n/set-locale";
 
@@ -8,40 +8,42 @@ type LanguageSwitcherProps = {
   locale: Locale;
 };
 
-export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
-  const [pending, startTransition] = useTransition();
+function LocaleButton({
+  active,
+  label
+}: {
+  active: boolean;
+  label: string;
+}) {
+  const { pending } = useFormStatus();
 
-  // The cookie is written by the server, then the page is fetched again from
-  // scratch. router.refresh() would be lighter, but every page here reads
-  // the language on the server, and a full load is the one thing that
-  // cannot leave half the screen in the old language.
-  const choose = (next: Locale) => {
-    if (next === locale || pending) {
-      return;
-    }
-
-    startTransition(async () => {
-      await setLocale(next);
-      window.location.reload();
-    });
-  };
-
-  const button = (value: Locale, label: string) => (
+  return (
     <button
-      aria-pressed={locale === value}
+      aria-pressed={active}
       className={
-        locale === value ? "lang-switch__btn lang-switch__btn--on" : "lang-switch__btn"
+        active ? "lang-switch__btn lang-switch__btn--on" : "lang-switch__btn"
       }
-      disabled={pending}
-      onClick={() => choose(value)}
-      type="button"
+      disabled={active || pending}
+      type="submit"
     >
       {label}
     </button>
   );
+}
+
+export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
+  const button = (value: Locale, label: string) => (
+    <form action={setLocale.bind(null, value)} key={value}>
+      <LocaleButton active={locale === value} label={label} />
+    </form>
+  );
 
   return (
-    <div aria-busy={pending} aria-label="Язык / Language" className="lang-switch" role="group">
+    <div
+      aria-label={locale === "ru" ? "Язык интерфейса" : "Interface language"}
+      className="lang-switch"
+      role="group"
+    >
       {button("ru", "RU")}
       {button("en", "EN")}
     </div>

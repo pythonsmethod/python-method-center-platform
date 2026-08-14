@@ -43,6 +43,8 @@ export default function ErrorBoundary({
           <button className="button" onClick={() => reset()} type="button">
             Попробовать снова
           </button>
+          {/* A hard navigation clears the failed client tree and stale chunks. */}
+          {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
           <a className="button button--secondary" href="/">
             На главную
           </a>

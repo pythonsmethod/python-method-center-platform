@@ -1,16 +1,16 @@
-/* Homepage. Built on the site tokens (--background/--accent/--parchment),
-   so the page cannot drift away from the rest of the site when the palette
-   changes in one place.
-
-   Layout rule for this file: every horizontal row collapses to a single
-   column at 900px and below, and nothing has a fixed width that could push
-   the body wider than the viewport. */
-
-.home {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(3rem, 7vw, 6rem);
-  margin: 0 auto;
+.app-home {
+  --app-bg: #f5f7f2;
+  --app-card: #ffffff;
+  --app-text: #17221d;
+  --app-muted: #637069;
+  --app-green: #246b4b;
+  --app-green-dark: #174832;
+  --app-soft: #e8f2ec;
+  --app-line: #dce4df;
+  background: var(--app-bg);
+  border-radius: 28px;
+  color: var(--app-text);
+  margin: 1.25rem auto 4rem;
   max-width: 1240px;
   /* Vertical only. <main> already applies --page-inset horizontally, and
      adding a second inset here pushed the whole homepage about 16px
@@ -240,445 +240,126 @@
   gap: 1rem;
   grid-template-columns: minmax(0, 1fr) auto;
   overflow: hidden;
-  padding: 1.5rem;
 }
 
-.home-figure h2 {
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  margin: 0;
+.app-home *, .app-home *::before, .app-home *::after { box-sizing: border-box; }
+.app-home h1, .app-home h2, .app-home h3, .app-home p { color: inherit; }
+.app-home button, .app-home a { -webkit-tap-highlight-color: transparent; }
+.app-home a:focus-visible, .app-home button:focus-visible { outline: 3px solid #e1a936; outline-offset: 3px; }
+
+/* Elements stay fully readable without JavaScript. Once the small observer
+   is ready, upcoming windows wait just below their final position and rise
+   into view as the visitor reaches them. */
+.scroll-reveal-ready .app-home [data-scroll-reveal] {
+  opacity: 0;
+  transform: translate3d(0, 34px, 0) scale(.985);
+  transition:
+    opacity .65s cubic-bezier(.22, 1, .36, 1),
+    transform .75s cubic-bezier(.22, 1, .36, 1);
+  will-change: opacity, transform;
 }
 
-.home-figure p {
-  color: var(--muted);
-  font-size: 0.94rem;
-  line-height: 1.6;
-  margin: 0.6rem 0 0;
+.scroll-reveal-ready .app-home [data-scroll-reveal].is-visible {
+  opacity: 1;
+  transform: translate3d(0, 0, 0) scale(1);
 }
 
-.home-figure__role {
-  color: var(--accent) !important;
-  font-size: 0.85rem !important;
-  margin-top: 0.25rem !important;
+.scroll-reveal-ready .app-quick > [data-scroll-reveal]:nth-child(2),
+.scroll-reveal-ready .app-steps > [data-scroll-reveal]:nth-child(2) {
+  transition-delay: 90ms;
 }
 
-.home-more {
+.scroll-reveal-ready .app-quick > [data-scroll-reveal]:nth-child(3),
+.scroll-reveal-ready .app-steps > [data-scroll-reveal]:nth-child(3) {
+  transition-delay: 180ms;
+}
+
+.scroll-reveal-ready .app-steps > [data-scroll-reveal]:nth-child(4) {
+  transition-delay: 270ms;
+}
+
+.app-hero {
   align-items: center;
-  color: var(--accent);
-  display: inline-flex;
-  font-size: 0.92rem;
-  font-weight: 600;
-  gap: 0.45rem;
-  margin-top: 1rem;
-  text-decoration: none;
-}
-
-.home-more:hover {
-  text-decoration: underline;
-}
-
-.home-more:focus-visible {
-  outline: 2px solid var(--accent-strong);
-  outline-offset: 3px;
-}
-
-/* ---------- promo ---------- */
-
-/* Was a light parchment card. It could not work: the site's own rules for
-   h2, p and the small caps label carry dark-theme colours, so the moment
-   the block's background went light, its text stayed beige — beige on
-   parchment, which is very nearly invisible. Fixing it by re-colouring
-   every child would leave the same trap for the next element added here.
-   The block is dark like the rest of the page instead, and the inherited
-   colours are correct again. */
-.home-promo {
-  align-items: center;
-  background:
-    radial-gradient(120% 140% at 0% 0%, rgba(224, 169, 63, 0.16), transparent 55%),
-    linear-gradient(180deg, #211a0f 0%, #17120a 100%);
-  border: 1px solid rgba(212, 175, 55, 0.4);
-  border-radius: 18px;
-  color: var(--text);
   display: grid;
-  gap: clamp(1rem, 3vw, 2rem);
-  grid-template-columns: auto minmax(0, 1.1fr) minmax(0, 1fr);
-  padding: clamp(1.5rem, 4vw, 2.25rem);
+  gap: clamp(2rem, 6vw, 5rem);
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, .85fr);
+  min-height: 680px;
+  padding: clamp(2rem, 7vw, 6rem);
 }
 
-.home-promo__gift {
-  font-size: clamp(3rem, 7vw, 4.5rem);
-  line-height: 1;
-}
+.app-kicker { color: var(--app-green) !important; font-size: .78rem; font-weight: 800; letter-spacing: .14em; margin: 0 0 .85rem; text-transform: uppercase; }
+.app-hero h1 { font-family: var(--font-serif); font-size: clamp(2.65rem, 6vw, 5.25rem); letter-spacing: -.035em; line-height: .98; margin: 0; max-width: 760px; text-transform: none; }
+.app-hero__subtitle { color: var(--app-green) !important; font-size: clamp(1.1rem, 2vw, 1.45rem); font-weight: 650; margin: 1rem 0 0; }
+.app-hero__lead { color: var(--app-muted) !important; font-size: 1.05rem; line-height: 1.7; margin: 1.25rem 0 0; max-width: 610px; }
+.app-actions { display: flex; flex-wrap: wrap; gap: .75rem; margin-top: 2rem; }
 
-.home-promo__badge {
-  color: var(--accent);
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.12em;
-  margin: 0;
-  text-transform: uppercase;
-}
+.app-button { align-items: center; border: 1px solid transparent; border-radius: 12px; cursor: pointer; display: inline-flex; font: inherit; font-weight: 750; gap: .7rem; justify-content: center; min-height: 52px; padding: .85rem 1.25rem; text-decoration: none; transition: background .2s ease, border-color .2s ease, transform .2s ease; }
+.app-button:hover { transform: translateY(-2px); }
+.app-button--primary { background: var(--app-green); color: #fff; }
+.app-button--primary:hover { background: var(--app-green-dark); }
+.app-button--secondary { background: var(--app-card); border-color: var(--app-line); color: var(--app-text); }
+.app-button--secondary:hover { border-color: var(--app-green); }
+.app-trust { color: var(--app-muted) !important; font-size: .88rem; margin: 1.2rem 0 0; }
 
-.home-promo h2 {
-  color: var(--accent-strong);
-  font-family: var(--font-serif);
-  font-size: clamp(1.3rem, 3vw, 1.9rem);
-  line-height: 1.25;
-  margin: 0.6rem 0 1.25rem;
-}
+.app-hero__visual { display: grid; place-items: center; }
+.app-assistant-card { align-items: center; background: linear-gradient(145deg, #fff, #eaf4ee); border: 1px solid var(--app-line); border-radius: 30px; box-shadow: 0 28px 70px rgba(30, 72, 52, .12); display: flex; flex-direction: column; min-height: 430px; overflow: hidden; padding: 1.5rem; position: relative; text-align: center; width: min(100%, 390px); }
+.app-assistant-card::before { background: radial-gradient(circle, rgba(43, 125, 87, .15), transparent 68%); content: ""; height: 340px; position: absolute; top: 90px; width: 340px; }
+.app-assistant-card > * { position: relative; }
+.app-assistant-card p { font-family: var(--font-serif); font-size: 1.2rem; line-height: 1.45; margin: 2.25rem 0 1rem; max-width: 280px; }
+.app-status { align-self: flex-start; background: var(--app-soft); border-radius: 99px; color: var(--app-green); font-size: .78rem; font-weight: 750; padding: .45rem .7rem; }
+.app-status i { background: #39a76e; border-radius: 50%; display: inline-block; height: 7px; margin-right: .35rem; width: 7px; }
 
-.home-promo__terms {
-  border-left: 1px solid var(--line);
-  padding-left: clamp(1rem, 3vw, 2rem);
-}
+.app-quick { background: var(--app-card); border-bottom: 1px solid var(--app-line); border-top: 1px solid var(--app-line); display: grid; grid-template-columns: repeat(3, 1fr); }
+.app-quick > a, .app-quick__button { align-items: center; background: transparent; border: 0; border-right: 1px solid var(--app-line); color: var(--app-text); cursor: pointer; display: grid; font: inherit; gap: .9rem; grid-template-columns: auto 1fr auto; min-height: 140px; padding: 1.4rem; text-align: left; text-decoration: none; }
+.app-quick > :last-child { border-right: 0; }
+.app-quick > a:hover, .app-quick__button:hover { background: var(--app-soft); }
+.app-quick__icon { align-items: center; background: var(--app-soft); border-radius: 50%; color: var(--app-green); display: flex; font-size: .75rem; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
+.app-quick strong, .app-quick small { display: block; }
+.app-quick strong { font-size: .95rem; }
+.app-quick small { color: var(--app-muted); display: -webkit-box; font-size: .78rem; line-height: 1.4; margin-top: .35rem; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+.app-quick b { color: var(--app-green); font-size: 1.1rem; }
 
-.home-promo__terms p {
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
-  margin: 0;
-}
+.app-route { padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 7vw, 6rem); }
+.app-section-head { max-width: 720px; }
+.app-section-head h2 { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.3rem); line-height: 1.1; margin: 0; }
+.app-steps { counter-reset: steps; display: grid; gap: 1rem; list-style: none; margin: 3rem 0 0; padding: 0; }
+.app-steps li { align-items: start; background: var(--app-card); border: 1px solid var(--app-line); border-radius: 18px; display: grid; gap: 1rem; grid-template-columns: auto 1fr; padding: 1.4rem; }
+.app-steps li > span { align-items: center; background: var(--app-green); border-radius: 10px; color: #fff; display: flex; font-weight: 800; height: 38px; justify-content: center; width: 38px; }
+.app-steps h3 { font-size: 1rem; margin: .1rem 0 .35rem; }
+.app-steps p { color: var(--app-muted) !important; line-height: 1.6; margin: 0; }
 
-.home-promo__price {
-  align-items: center;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
-  margin-top: 1.25rem !important;
-}
+.app-expert { align-items: stretch; background: #173f2e; color: #fff; display: grid; grid-template-columns: minmax(280px, .8fr) minmax(0, 1.2fr); min-height: 470px; }
+.app-expert__portrait { min-height: 400px; overflow: hidden; position: relative; }
+.app-expert__portrait img { object-fit: cover; object-position: center top; }
+.app-expert__copy { align-self: center; padding: clamp(2rem, 7vw, 5rem); }
+.app-expert__copy .app-kicker { color: #95d4b4 !important; }
+.app-expert h2 { font-family: var(--font-serif); font-size: clamp(2.2rem, 4vw, 3.5rem); margin: 0; }
+.app-expert p:not(.app-kicker) { color: #d6e6dd !important; line-height: 1.75; max-width: 560px; }
+.app-text-link { color: #fff; display: inline-flex; font-weight: 750; gap: .5rem; margin-top: 1rem; text-underline-offset: 4px; }
 
-.home-promo__amount {
-  background: linear-gradient(135deg, var(--accent), var(--accent-strong));
-  border-radius: 10px;
-  color: #20180b;
-  font-family: var(--font-serif);
-  font-size: 1.5rem;
-  font-weight: 700;
-  padding: 0.4rem 1.4rem;
-  /* The amount must never be broken across lines. */
-  white-space: nowrap;
-}
+.app-final { align-items: center; display: flex; gap: 2rem; justify-content: space-between; padding: clamp(3rem, 7vw, 5rem); }
+.app-final h2 { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.25rem); margin: 0; }
+.app-final p:not(.app-kicker) { color: var(--app-muted) !important; line-height: 1.65; margin-bottom: 0; max-width: 650px; }
+.app-final .app-button { flex: 0 0 auto; }
 
-/* ---------- how the center works: shared start, then a fork ---------- */
-
-.home-section-head {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.home-section-head h2 {
-  font-family: var(--font-serif);
-  font-size: clamp(1.5rem, 3.4vw, 2.2rem);
-  margin: 0.5rem 0 0;
-}
-
-.home-section-head p {
-  color: var(--muted);
-  line-height: 1.6;
-  margin: 0.75rem auto 0;
-  max-width: 46rem;
-}
-
-.home-common {
-  display: grid;
-  gap: 1rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.home-step {
-  align-items: flex-start;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 14px;
-  display: flex;
-  gap: 0.9rem;
-  padding: 1.1rem 1.25rem;
-}
-
-.home-step--common {
-  background: var(--surface-muted);
-}
-
-.home-step__num {
-  align-items: center;
-  border: 1px solid var(--accent);
-  border-radius: 50%;
-  color: var(--accent);
-  display: flex;
-  flex: 0 0 auto;
-  font-size: 0.85rem;
-  font-weight: 700;
-  height: 2.25rem;
-  justify-content: center;
-  width: 2.25rem;
-}
-
-.home-step h3,
-.home-step h4 {
-  font-size: 1rem;
-  margin: 0.35rem 0 0;
-}
-
-.home-step p {
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.55;
-  margin: 0.35rem 0 0;
-}
-
-/* The visual fork between the shared start and the two branches. */
-.home-fork {
-  display: flex;
-  height: 2.5rem;
-  justify-content: center;
-  margin: 0;
-  position: relative;
-}
-
-.home-fork span {
-  background: var(--line);
-  height: 100%;
-  width: 1px;
-}
-
-.home-fork span:first-child {
-  margin-right: 25%;
-}
-
-.home-fork span:last-child {
-  margin-left: 25%;
-}
-
-.home-tracks {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-}
-
-.home-track {
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.home-track--free {
-  border-color: var(--accent);
-}
-
-.home-track__head h3 {
-  font-family: var(--font-serif);
-  font-size: 1.25rem;
-  margin: 0;
-}
-
-.home-track__head p {
-  color: var(--accent);
-  font-size: 0.85rem;
-  margin: 0.35rem 0 1.25rem;
-}
-
-.home-track__steps {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* ---------- tools unlocked by registration ---------- */
-
-.home-tools {
-  text-align: center;
-}
-
-.home-tools__grid {
-  display: grid;
-  gap: 1.25rem;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  margin-bottom: 2rem;
-  text-align: left;
-}
-
-.home-tool {
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  padding: 1.5rem;
-}
-
-.home-tool__icon {
-  display: block;
-  font-size: 2rem;
-  line-height: 1;
-  margin-bottom: 0.75rem;
-}
-
-.home-tool h3 {
-  font-family: var(--font-serif);
-  font-size: 1.2rem;
-  margin: 0;
-}
-
-.home-tool p {
-  color: var(--muted);
-  font-size: 0.92rem;
-  line-height: 1.6;
-  margin: 0.6rem 0 0;
-}
-
-/* ---------- final call ---------- */
-
-.home-final {
-  align-items: center;
-  background: var(--surface);
-  border: 1px solid var(--line);
-  border-radius: 18px;
-  display: grid;
-  gap: 1.5rem;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.42fr);
-  padding: clamp(1.5rem, 4vw, 2.5rem);
-}
-
-.home-final h2 {
-  font-family: var(--font-serif);
-  font-size: clamp(1.4rem, 3.2vw, 2.1rem);
-  line-height: 1.25;
-  margin: 0;
-}
-
-.home-final p {
-  color: var(--muted);
-  margin: 0.75rem 0 0;
-}
-
-.home-final__anham {
-  justify-self: center;
-}
-
-.home-tagline {
-  color: var(--accent);
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  margin: 0;
-  text-align: center;
-}
-
-/* ---------- responsive ---------- */
-
-/* On a phone the founder asked for the page to read down the middle
-   rather than along the left edge. Everything the page says is centred
-   below 720px — the hero, the section headers, the cards and the steps.
-   The numbered steps keep their number beside the text, so they are laid
-   out as a centred column instead of a left-aligned row. */
-@media (max-width: 720px) {
-  .home,
-  .home-hero__copy,
-  .home-section-head,
-  .home-figure__body,
-  .home-promo__copy,
-  .home-promo__terms,
-  .home-track__head,
-  .home-step div,
-  .home-final,
-  .home-tool {
-    text-align: center;
-  }
-
-  .home-hero__lead,
-  .home-section-head p,
-  .home-final p {
-    margin-left: auto;
-    margin-right: auto;
-  }
-
-  .home-actions,
-  .home-promo__price {
-    justify-content: center;
-  }
-
-  .home-more,
-  .home-hero__trust {
-    justify-content: center;
-  }
-
-  /* The step is a flex row of number + text; stacking it puts the number
-     above the words so the whole card reads down the middle. */
-  .home-step {
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-  }
-
-  .home-promo__terms {
-    padding-left: 0;
-  }
-}
-
-@media (max-width: 900px) {
-  .home-hero,
-  .home-figures,
-  .home-figure,
-  .home-promo,
-  .home-common,
-  .home-tracks,
-  .home-tools__grid,
-  .home-final {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  /* The art follows the words on a phone. */
-  .home-hero__art {
-    order: 2;
-  }
-
-  .home-hero__anham {
-    width: min(240px, 74%);
-  }
-
-  .home-promo__terms {
-    border-left: 0;
-    border-top: 1px solid var(--line);
-    padding: 1.25rem 0 0;
-  }
-
-  .home-figure__portrait,
-  .home-figure__seal,
-  .home-final__anham {
-    justify-self: center;
-    order: -1;
-  }
-
-  /* With one column there is nothing to fork into. */
-  .home-fork {
-    height: 1.5rem;
-  }
-
-  .home-fork span:first-child,
-  .home-fork span:last-child {
-    display: none;
-  }
-
-  .home-fork::after {
-    background: var(--line);
-    content: "";
-    height: 100%;
-    width: 1px;
-  }
+@media (max-width: 860px) {
+  .app-home { border-radius: 20px; margin-top: .75rem; }
+  .app-hero { grid-template-columns: 1fr; min-height: 0; padding: 3.5rem 1.5rem; }
+  .app-hero__visual { margin-top: .5rem; }
+  .app-quick { grid-template-columns: 1fr; }
+  .app-quick > a, .app-quick__button { border-bottom: 1px solid var(--app-line); border-right: 0; min-height: 108px; }
+  .app-quick > :last-child { border-bottom: 0; }
+  .app-expert { grid-template-columns: 1fr; }
+  .app-expert__portrait { max-height: 460px; }
 }
 
 @media (max-width: 560px) {
-  .home-button {
-    justify-content: center;
-    width: 100%;
-  }
-
-  .home-actions {
-    flex-direction: column;
-  }
+  .app-home { border-radius: 0; margin-inline: calc(var(--page-inset) * -1); width: auto; }
+  .app-hero h1 { font-size: clamp(2.45rem, 13vw, 3.6rem); }
+  .app-actions { align-items: stretch; flex-direction: column; }
+  .app-button { width: 100%; }
+  .app-assistant-card { min-height: 390px; }
+  .app-final { align-items: stretch; flex-direction: column; }
 }
 
 /* Анхам inside the page: he is drawn, not photographed, so he only needs
@@ -758,4 +439,9 @@
   background: none;
   border: 0;
   padding: 0;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-home *, .app-home *::before, .app-home *::after { scroll-behavior: auto !important; transition: none !important; }
+  .scroll-reveal-ready .app-home [data-scroll-reveal] { opacity: 1; transform: none; }
 }

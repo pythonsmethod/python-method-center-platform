@@ -258,7 +258,7 @@ describe("how many business modules still name a provider", () => {
         const source = readFileSync(full, "utf8");
 
         if (/\baskClaude\s*\(|\baskOpenAi\s*\(/.test(source)) {
-          callers.push(relative(root, full));
+          callers.push(relative(root, full).replaceAll("\\", "/"));
         }
       }
     };

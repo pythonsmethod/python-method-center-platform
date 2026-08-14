@@ -1,6 +1,6 @@
 "use client";
 
-import type { ReactNode } from "react";
+import type { ComponentPropsWithoutRef, ReactNode } from "react";
 
 // The event the companion listens for. Anything on the page can ask Анхам
 // to open — the buttons do not need a reference to him, and he does not
@@ -21,7 +21,10 @@ export function openAnham(ask?: string): void {
   );
 }
 
-type AnhamOpenButtonProps = {
+type AnhamOpenButtonProps = Omit<
+  ComponentPropsWithoutRef<"button">,
+  "children" | "onClick" | "type"
+> & {
   className?: string;
   children: ReactNode;
 };
@@ -30,10 +33,16 @@ type AnhamOpenButtonProps = {
 // of navigating them away to the support page.
 export function AnhamOpenButton({
   className,
-  children
+  children,
+  ...buttonProps
 }: AnhamOpenButtonProps) {
   return (
-    <button className={className} onClick={() => openAnham()} type="button">
+    <button
+      {...buttonProps}
+      className={className}
+      onClick={() => openAnham()}
+      type="button"
+    >
       {children}
     </button>
   );

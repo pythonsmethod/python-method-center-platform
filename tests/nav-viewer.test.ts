@@ -42,6 +42,6 @@ describe("resolving the viewer", () => {
 
   it("never lets the header fail on an auth problem", () => {
     // A nav that throws takes every page with it.
-    expect(layout).toContain('  } catch {\n    return "anonymous";\n  }');
+    expect(layout).toMatch(/  } catch {\r?\n    return "anonymous";\r?\n  }/);
   });
 });

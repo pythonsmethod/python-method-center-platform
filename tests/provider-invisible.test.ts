@@ -293,7 +293,7 @@ describe("no vendor name in anything a person can read", () => {
 
     for (const dir of ["app", "components", "lib"]) {
       for (const file of sourceFiles(join(ROOT, dir))) {
-        const path = relative(ROOT, file);
+        const path = relative(ROOT, file).replaceAll("\\", "/");
 
         if (path in ALLOWED) {
           continue;

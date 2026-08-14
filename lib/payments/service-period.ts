@@ -32,7 +32,7 @@ export function isPlanProduct(product: string): product is PaymentProduct {
 
 function addDays(from: Date, days: number): Date {
   const end = new Date(from);
-  end.setDate(end.getDate() + days);
+  end.setUTCDate(end.getUTCDate() + days);
   return end;
 }
 

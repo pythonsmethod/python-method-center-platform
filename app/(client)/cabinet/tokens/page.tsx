@@ -1,4 +1,3 @@
-import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";

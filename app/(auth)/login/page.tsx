@@ -1,5 +1,6 @@
-import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
+import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
+import { IconAnkh } from "@/components/icons/EgyptianIcons";
 import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -37,28 +38,53 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const locale = await getLocale();
   const strings = getDictionary(locale);
   const t = strings.login;
+  const anhamHelp = locale === "ru"
+    ? "Анхам рядом и поможет, если появится вопрос."
+    : "Anham is nearby if you have a question.";
+  const privacyNote = locale === "ru"
+    ? "Ваши данные защищены и доступны только команде центра."
+    : "Your information is protected and visible only to the center team.";
 
   return (
-    <div className="page-shell">
-      <PageHeader
-        eyebrow={t.eyebrow}
-        title={t.title}
-        description={t.description}
-      />
+    <div className="auth-app">
+      <aside className="auth-app__story">
+        <Link className="auth-app__brand" href="/">
+          <IconAnkh />
+          <span>Python Method Center</span>
+        </Link>
+        <div className="auth-app__story-copy">
+          <span className="auth-app__eyebrow">{t.eyebrow}</span>
+          <h1>{t.title}</h1>
+          <p>{t.description}</p>
+          <div className="auth-app__guide">
+            <AnhamAvatar
+              size={82}
+              state="guest"
+              title={locale === "ru" ? "Анхам" : "Anham"}
+            />
+            <span>{anhamHelp}</span>
+          </div>
+        </div>
+      </aside>
 
-      <AuthSetupNotice
-        labels={strings.setup}
-        title={strings.setup.loginTitle}
-      />
+      <main className="auth-app__main">
+        <section className="auth-app__card" aria-label={t.title}>
+          <div className="auth-app__mobile-brand" aria-hidden="true">
+            <IconAnkh />
+            <strong>Python Method Center</strong>
+          </div>
+          <p className="auth-app__welcome">{t.eyebrow}</p>
+          <h2>{t.title}</h2>
 
-      {readParam(params?.message) === "link-invalid" ? (
-        <p className="form-message form-message--error">{t.linkInvalid}</p>
-      ) : null}
+          <AuthSetupNotice
+            labels={strings.setup}
+            title={strings.setup.loginTitle}
+          />
 
-      {/* No side panel: what used to stand in it is said once, in the page
-          header above. The tab is the form and nothing else. */}
-      <section className="auth-layout auth-layout--single">
-        <div>
+          {readParam(params?.message) === "link-invalid" ? (
+            <p className="form-message form-message--error">{t.linkInvalid}</p>
+          ) : null}
+
           <AuthForm
             labels={{
               tabLogin: t.tabLogin,
@@ -74,7 +100,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
               submitSignup: t.submitSignup,
               submitting: t.submitting,
               resend: t.resend,
-              resending: t.resending
+              resending: t.resending,
+              formAria: locale === "ru"
+                ? "Форма входа и регистрации"
+                : "Sign in and registration form",
+              modeAria: locale === "ru"
+                ? "Режим авторизации"
+                : "Authentication mode",
+              rememberMe: locale === "ru" ? "Запомнить меня" : "Remember me"
             }}
             initialMode={initialMode}
             nextPath={nextPath}
@@ -83,8 +116,11 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           <p className="auth-help">
             <Link href="/recovery">{t.forgot}</Link>
           </p>
-        </div>
-      </section>
+          <p className="auth-app__privacy">
+            {privacyNote}
+          </p>
+        </section>
+      </main>
     </div>
   );
 }
