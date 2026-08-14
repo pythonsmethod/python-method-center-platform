@@ -39,8 +39,22 @@ export default async function CheckEmailPage({
 
       <section className="auth-layout auth-layout--single">
         <div className="auth-panel check-email">
+          {/* A link that fails almost always means the address is already
+              confirmed: Supabase marks it confirmed on its own side before
+              sending the person here, and only the session fails to open
+              when the letter was read in a different browser. Signing in
+              is the answer, not another letter — chasing letters is what
+              kept the focus group going in circles. */}
           {linkInvalid ? (
-            <p className="form-message form-message--error">{t.linkInvalid}</p>
+            <>
+              <p className="form-message form-message--error">
+                {t.linkInvalid}
+              </p>
+              <Link className="button" href="/login">
+                {t.linkInvalidSignIn}
+              </Link>
+              <p className="check-email__note">{t.linkInvalidNote}</p>
+            </>
           ) : null}
 
           <ol className="check-email__steps">
