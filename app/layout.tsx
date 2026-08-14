@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -11,6 +11,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav, type NavViewer } from "@/components/SiteNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { AppRouteMode } from "@/components/AppRouteMode";
 
 // Who is looking at the header. Not merely whether anyone is signed in:
 // a member of the team leaving the workspace used to land on the
@@ -81,6 +82,31 @@ export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).meta;
 
   return {
+    applicationName: "Python Method Center",
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "black-translucent",
+      title: "Python Method"
+    },
+    formatDetection: {
+      telephone: false
+    },
+    icons: {
+      apple: [
+        {
+          url: "/images/anham-master.png",
+          sizes: "1024x1024",
+          type: "image/png"
+        }
+      ],
+      icon: [
+        {
+          url: "/images/anham-master.png",
+          sizes: "1024x1024",
+          type: "image/png"
+        }
+      ]
+    },
     verification: verificationTokens(),
     // One canonical address per page ("./" resolves to the current path),
     // so search engines never index the same page under two names.
@@ -103,6 +129,14 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+export const viewport: Viewport = {
+  colorScheme: "dark",
+  themeColor: "#100d08",
+  viewportFit: "cover",
+  width: "device-width",
+  initialScale: 1
+};
+
 type RootLayoutProps = {
   children: React.ReactNode;
 };
@@ -115,9 +149,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   return (
     <html className={playfair.variable} lang={locale}>
       <body>
+        <AppRouteMode />
         <SiteHeader>
           <Link className="brand" href="/">
-            Python Method
+            Python Method Center
           </Link>
           <div className="site-header__right">
             <SiteNav labels={dict.nav} viewer={viewer} />
@@ -141,7 +176,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
               ))}
             </nav>
           ) : null}
-          <nav aria-label="More">
+          <nav aria-label={locale === "ru" ? "Дополнительно" : "More"}>
             <Link href="/professor">{dict.footer.professor}</Link>
             <Link href="/legal/offer">{dict.footer.offer}</Link>
             <Link href="/legal/privacy">{dict.footer.privacy}</Link>

@@ -11,7 +11,7 @@ import {
   type AuthActionState
 } from "@/lib/auth/types";
 
-type AuthFormLabels = {
+export type AuthFormLabels = {
   tabLogin: string;
   tabSignup: string;
   email: string;
@@ -26,6 +26,9 @@ type AuthFormLabels = {
   submitting: string;
   resend: string;
   resending: string;
+  formAria: string;
+  modeAria: string;
+  rememberMe: string;
 };
 
 const defaultLabels: AuthFormLabels = {
@@ -43,7 +46,10 @@ const defaultLabels: AuthFormLabels = {
   submitSignup: "Создать аккаунт",
   submitting: "Отправка...",
   resend: "Отправить письмо ещё раз",
-  resending: "Отправляем..."
+  resending: "Отправляем...",
+  formAria: "Форма входа и регистрации",
+  modeAria: "Режим авторизации",
+  rememberMe: "Запомнить меня"
 };
 
 type AuthMode = "login" | "signup";
@@ -77,6 +83,7 @@ export function AuthForm({
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [revealPassword, setRevealPassword] = useState(false);
+  const [remember, setRemember] = useState(true);
   // What went wrong is printed under a button that sits below the fold on
   // a phone. Bringing it into view is the difference between "the site is
   // broken" and "ah, that address is already registered".
@@ -113,8 +120,8 @@ export function AuthForm({
   }, [activeState]);
 
   return (
-    <section className="auth-panel" aria-label="Authentication form">
-      <div className="auth-tabs" role="tablist" aria-label="Authentication mode">
+    <section className="auth-panel" aria-label={labels.formAria}>
+      <div className="auth-tabs" role="tablist" aria-label={labels.modeAria}>
         <button
           aria-pressed={isLogin}
           className={isLogin ? "auth-tab auth-tab--active" : "auth-tab"}
@@ -201,6 +208,18 @@ export function AuthForm({
               type={passwordType}
               value={confirm}
             />
+          </label>
+        ) : null}
+
+        {isLogin ? (
+          <label className="auth-remember">
+            <input
+              checked={remember}
+              name="remember"
+              onChange={(event) => setRemember(event.target.checked)}
+              type="checkbox"
+            />
+            <span>{labels.rememberMe}</span>
           </label>
         ) : null}
 

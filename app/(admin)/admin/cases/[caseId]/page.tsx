@@ -10,7 +10,6 @@ import {
   caseDirectionLabel,
   caseStatusLabel,
   caseUrgencyLabel,
-  documentStatusLabel,
   lifecycleEventLabel,
   paymentProductLabel,
   paymentStatusLabel

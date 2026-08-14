@@ -47,7 +47,8 @@ export default async function CabinetLayout({
   children: ReactNode;
 }) {
   const auth = await getRequiredUser("/cabinet");
-  const dict = getDictionary(await getLocale()).cabinet;
+  const locale = await getLocale();
+  const dict = getDictionary(locale).cabinet;
 
   if (auth.status === "missing-env") {
     return <>{children}</>;
@@ -68,6 +69,7 @@ export default async function CabinetLayout({
     <CabinetShell
       email={auth.email}
       labels={dict}
+      locale={locale}
       greetingName={greetingName}
       supplementsDue={supplementsDue}
       tokens={tokens.balance}

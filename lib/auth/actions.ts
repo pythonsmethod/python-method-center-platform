@@ -56,6 +56,30 @@ async function getEmailRedirectTo(): Promise<string> {
   return `${origin}/auth/callback`;
 }
 
+// Supabase sessions are persistent by default. When a person explicitly
+// clears "Remember me", rewrite the freshly issued auth cookies as session
+// cookies so the browser removes them when it closes.
+async function applyRememberPreference(formData: FormData): Promise<void> {
+  if (formData.get("remember") === "on") {
+    return;
+  }
+
+  const store = await cookies();
+
+  for (const cookie of store.getAll()) {
+    if (!cookie.name.startsWith("sb-")) {
+      continue;
+    }
+
+    store.set(cookie.name, cookie.value, {
+      httpOnly: false,
+      path: "/",
+      sameSite: "lax",
+      secure: process.env.NODE_ENV === "production"
+    });
+  }
+}
+
 export async function signInWithPassword(
   _previousState: AuthActionState,
   formData: FormData
@@ -82,6 +106,8 @@ export async function signInWithPassword(
 
     return errorState(message, code);
   }
+
+  await applyRememberPreference(formData);
 
   let nextPath = sanitizeNextPath(formData.get("next"));
 
