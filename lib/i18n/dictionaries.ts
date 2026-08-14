@@ -911,22 +911,6 @@ const ru = {
       warning:
         "Он никогда не отменяет назначения врачей и не советует от них отказываться. Если вы проходите лечение — продолжайте его. Он работает рядом с вашими врачами, а не вместо них."
     },
-    // Границы, написанные как список того, чего он не делает.
-    //
-    // Тот же смысл, что в юридической приписке, но человек читает это как
-    // характер, а не как отказ от ответственности. Из пяти пунктов четыре
-    // защищают его и центр, и все пять — правда по договору.
-    notDoing: {
-      label: "Честно",
-      title: "Чего он не делает",
-      items: [
-        "Не заменяет ваших лечащих врачей и не отменяет их назначения.",
-        "Не ставит диагнозы и не назначает лечение — это делает врач.",
-        "Не обещает результат: он зависит от вашего состояния и вашей вовлечённости.",
-        "Не работает по шаблону — одинаковых протоколов у него нет.",
-        "Не исчезает: пока идёт ваша программа, он на связи."
-      ]
-    },
     // Всё ниже — из договора-оферты, пункт 2. Ничего сверх того, что
     // подтверждено документом, который принимает клиент.
     yearsLabel: "Практика",
@@ -2109,17 +2093,6 @@ const en: typeof ru = {
       ],
       warning:
         "He never cancels a doctor's prescription and never advises anyone to stop one. If you are in treatment, please continue it. He works alongside your doctors, not instead of them."
-    },
-    notDoing: {
-      label: "Plainly",
-      title: "What he does not do",
-      items: [
-        "He does not replace your doctors and does not cancel what they prescribe.",
-        "He does not diagnose and does not prescribe treatment — your doctor does that.",
-        "He does not promise an outcome: it depends on your condition and on you.",
-        "He does not work to a template — he has no identical protocols.",
-        "He does not disappear: while your programme runs, he is there."
-      ]
     },
     yearsLabel: "Practice",
     yearsValue: "30 years",

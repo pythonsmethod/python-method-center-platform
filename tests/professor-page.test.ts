@@ -1,3 +1,5 @@
+import { readFileSync } from "node:fs";
+import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { OFFER_CONTENT } from "@/lib/legal/offer-content";
@@ -70,6 +72,13 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
 
   it("says plainly that he is not a physician", () => {
     const expected = locale === "ru" ? "Он не врач" : "He is not a physician";
+
+    expect(t.boundaryText).toContain(expected);
+  });
+
+  it("still tells someone in an emergency where to go", () => {
+    const expected =
+      locale === "ru" ? "экстренной помощи" : "emergency service";
 
     expect(t.boundaryText).toContain(expected);
   });
@@ -151,6 +160,22 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
         true
       );
     }
+  });
+});
+
+describe("the boundary paragraph is still printed", () => {
+  it("is rendered by the page, not merely present in the dictionary", () => {
+    // It used to sit under the list of what he will not do. That list is
+    // gone by the founder's call, and the paragraph came within one line of
+    // going with it: without it the page reads as a medical service and
+    // says nowhere what to do in an emergency. A dictionary entry nobody
+    // renders would pass every other test in this file.
+    const page = readFileSync(
+      join(process.cwd(), "app/(public)/professor/page.tsx"),
+      "utf8"
+    );
+
+    expect(page).toContain("t.boundaryText");
   });
 });
 

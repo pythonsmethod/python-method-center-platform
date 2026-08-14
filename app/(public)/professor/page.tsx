@@ -133,25 +133,16 @@ export default async function ProfessorPage() {
         <span className="panel__label">{t.personalLabel}</span>
         <h2>{t.howTitle}</h2>
         <p>{t.howText}</p>
-      </section>
+        {/* The list of what he will not do stood here as its own block and
+            read as a wall of refusals on the page where someone decides to
+            trust him. It is gone by the founder's call — the same terms are
+            in the contract a client accepts at payment.
 
-      {/* The limits, written as a list of what he will not do. Exactly the
-          same content as the disclaimer that follows it, and a reader takes
-          it as character rather than as a lawyer's hedge. */}
-      <section className="panel professor-story" aria-label={t.notDoing.title}>
-        <span className="panel__label">{t.notDoing.label}</span>
-        <h2>{t.notDoing.title}</h2>
-        <ul className="professor-nots">
-          {t.notDoing.items.map((item) => (
-            <li key={item}>
-              <span className="professor-nots__mark" aria-hidden="true">
-                ✕
-              </span>
-              <span>{item}</span>
-            </li>
-          ))}
-        </ul>
-        <p className="professor-nots__legal">{t.boundaryText}</p>
+            This paragraph is not. Without it the page reads as a medical
+            service, which it is not, and there would be nowhere on it that
+            says where to go in an emergency. So it stays, quietly, at the
+            end of the block about how the work actually happens. */}
+        <p className="professor-legal">{t.boundaryText}</p>
       </section>
 
       <section className="panel" aria-label={t.companyTitle}>
