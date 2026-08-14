@@ -45,6 +45,13 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
           </select>
         </label>
         <label>
+          Раздел
+          <select defaultValue="general" name="topic">
+            <option value="general">Общее знание</option>
+            <option value="sleep">Про сон — видно клиентам в разделе «Мой сон»</option>
+          </select>
+        </label>
+        <label>
           Текст знания
           <textarea
             maxLength={8000}

@@ -10433,3 +10433,251 @@ code {
   line-height: 1.6;
   margin: 0;
 }
+
+/* ============================================================ */
+/* Мой сон — the sleep diary.                                    */
+/*                                                               */
+/* Appended at the very end on purpose: this stylesheet contains */
+/* two copies of most of its rules, and the later copy is the    */
+/* one the browser applies. Anything added earlier is invisible. */
+/* ============================================================ */
+
+.sleep-stats {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  margin-top: 12px;
+}
+
+.sleep-stat {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 2px;
+  padding: 12px 14px;
+}
+
+.sleep-stat strong {
+  font-size: 20px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.2;
+}
+
+.sleep-stat span {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.sleep-stat--wide strong {
+  color: var(--accent-strong);
+}
+
+.sleep-summary__hint {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 12px 0 0;
+}
+
+.sleep-form__row {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+}
+
+.field--grow {
+  grid-column: span 2;
+  min-width: 0;
+}
+
+@media (max-width: 560px) {
+  .field--grow {
+    grid-column: auto;
+  }
+}
+
+.sleep-quality {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  display: grid;
+  gap: 8px;
+  margin: 0;
+  padding: 12px 14px;
+}
+
+.sleep-quality legend {
+  color: var(--muted);
+  font-size: 13px;
+  padding: 0 6px;
+}
+
+.sleep-quality__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.sleep-quality__option {
+  cursor: pointer;
+}
+
+.sleep-quality__option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.sleep-quality__option span {
+  align-items: center;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  display: flex;
+  font-variant-numeric: tabular-nums;
+  height: 44px;
+  justify-content: center;
+  transition: background 0.15s ease, border-color 0.15s ease;
+  width: 44px;
+}
+
+.sleep-quality__option input:checked + span {
+  background: var(--accent);
+  border-color: var(--accent-strong);
+  color: var(--on-accent, #fff);
+}
+
+.sleep-quality__option input:focus-visible + span {
+  outline: 2px solid var(--accent-strong);
+  outline-offset: 2px;
+}
+
+.sleep-quality small {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.sleep-list {
+  display: grid;
+  gap: 6px;
+  list-style: none;
+  margin: 12px 0 0;
+  padding: 0;
+}
+
+.sleep-list li {
+  align-items: center;
+  border-top: 1px solid var(--line);
+  display: flex;
+  gap: 10px;
+  justify-content: space-between;
+  padding: 10px 2px 4px;
+}
+
+.sleep-list__body {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sleep-list__body em {
+  color: var(--accent-strong);
+  font-size: 13.5px;
+  font-style: normal;
+  font-variant-numeric: tabular-nums;
+}
+
+.sleep-list__body small {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.sleep-list__source {
+  color: var(--muted);
+  font-size: 11.5px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.sleep-import {
+  gap: 12px;
+}
+
+.sleep-import input[type="file"] {
+  font-size: 14px;
+  max-width: 100%;
+}
+
+.sleep-import__recognized {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 8px 0 0;
+}
+
+.sleep-import__skipped {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--warning, #c98a2b);
+  border-radius: 10px;
+  display: grid;
+  gap: 6px;
+  margin-top: 12px;
+  padding: 12px 14px;
+}
+
+.sleep-import__skipped ul {
+  display: grid;
+  gap: 4px;
+  font-size: 13px;
+  margin: 0;
+  padding-left: 18px;
+}
+
+.sleep-import__skipped small {
+  color: var(--muted);
+  font-size: 12.5px;
+}
+
+.sleep-devices__honest {
+  border-top: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 13px;
+  margin: 16px 0 0;
+  padding-top: 12px;
+}
+
+.sleep-guidance__entry {
+  border-left: 3px solid var(--accent);
+  margin-top: 14px;
+  padding-left: 14px;
+}
+
+.sleep-guidance__entry h3 {
+  font-size: 15px;
+  margin: 0 0 6px;
+}
+
+.sleep-guidance__entry p {
+  font-size: 14px;
+  margin: 0 0 6px;
+}
+
+.sleep-advice {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--accent);
+  border-radius: 10px;
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 14px 16px;
+}
+
+.sleep-advice p {
+  font-size: 14px;
+  margin: 0;
+}
+
+.sleep-advice small {
+  color: var(--muted);
+  font-size: 12.5px;
+}

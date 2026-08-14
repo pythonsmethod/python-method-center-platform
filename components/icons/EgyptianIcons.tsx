@@ -170,6 +170,18 @@ export function IconWater(props: IconProps) {
   );
 }
 
+// Moon — Khonsu's crescent cradling the disc, the Egyptian sign for the
+// night. Sleep belongs to it.
+export function IconMoon(props: IconProps) {
+  return frame(
+    <>
+      <path d="M31 8a17 17 0 1 0 9 30 20 20 0 0 1-9-30Z" />
+      <circle cx="30" cy="22" r="4.5" />
+    </>,
+    props
+  );
+}
+
 export const egyptianIcons = {
   ankh: IconAnkh,
   cobra: IconCobra,
@@ -180,7 +192,8 @@ export const egyptianIcons = {
   wingedSun: IconWingedSun,
   djed: IconDjed,
   scales: IconScales,
-  water: IconWater
+  water: IconWater,
+  moon: IconMoon
 } as const;
 
 export type EgyptianIconName = keyof typeof egyptianIcons;

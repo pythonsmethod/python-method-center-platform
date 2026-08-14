@@ -65,3 +65,43 @@ export async function getKnowledgeForPrompt(
 
   return `\n\n## База знаний центра (составлена командой — опирайся на неё в первую очередь)\n${blocks.join("\n\n")}`;
 }
+
+export type GuidanceEntry = {
+  id: string;
+  title: string;
+  content: string;
+};
+
+// Professor Python's own guidance on one topic, for showing to the person
+// as his words rather than folding into a prompt.
+//
+// Fails soft and on purpose: the topic column arrives with a migration, and
+// a cabinet page must not break on a database that has not been migrated
+// yet. Silence is the correct degraded state — a sleep page with no
+// guidance card still tracks sleep.
+export async function listGuidance(topic: "sleep"): Promise<GuidanceEntry[]> {
+  const supabase = createSupabaseServiceClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const { data, error } = await supabase
+    .from("assistant_knowledge")
+    .select("id, title, content")
+    .eq("topic", topic)
+    .eq("is_active", true)
+    .in("audience", ["client", "both"])
+    .order("created_at", { ascending: true })
+    .limit(20);
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data.map((entry) => ({
+    id: String(entry.id),
+    title: String(entry.title),
+    content: String(entry.content)
+  }));
+}

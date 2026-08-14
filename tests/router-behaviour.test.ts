@@ -218,6 +218,66 @@ describe("both — the comparison mode", () => {
   });
 });
 
+describe("how many business modules still name a provider", () => {
+  it("does not grow", async () => {
+    // Phase 4 of the provider-independence migration has to bring this list
+    // to zero. Until then it may only shrink: new code that asks a provider
+    // by name makes the refactor bigger than it already is.
+    const { readFileSync, readdirSync, statSync } = await import("node:fs");
+    const { join, relative } = await import("node:path");
+
+    const ALLOWED = [
+      "app/api/assistant/client/route.ts",
+      "app/api/assistant/staff/route.ts",
+      "app/api/metrics/extract/route.ts",
+      "lib/assistant/router.ts",
+      "lib/cases/review-actions.ts",
+      "lib/supplements/actions.ts"
+    ];
+
+    const root = process.cwd();
+    const callers: string[] = [];
+
+    const walk = (dir: string) => {
+      for (const entry of readdirSync(dir)) {
+        if (entry === "node_modules" || entry.startsWith(".")) {
+          continue;
+        }
+
+        const full = join(dir, entry);
+
+        if (statSync(full).isDirectory()) {
+          walk(full);
+          continue;
+        }
+
+        if (!/\.tsx?$/.test(entry)) {
+          continue;
+        }
+
+        const source = readFileSync(full, "utf8");
+
+        if (/\baskClaude\s*\(|\baskOpenAi\s*\(/.test(source)) {
+          callers.push(relative(root, full));
+        }
+      }
+    };
+
+    for (const dir of ["app", "components", "lib"]) {
+      walk(join(root, dir));
+    }
+
+    expect(
+      callers.filter(
+        (file) =>
+          !ALLOWED.includes(file) &&
+          file !== "lib/assistant/claude.ts" &&
+          file !== "lib/assistant/openai.ts"
+      )
+    ).toEqual([]);
+  });
+});
+
 describe("what must never happen on failure", () => {
   it("returns a failure rather than an invented answer", async () => {
     // The migration must keep this: a provider that fell over produces a

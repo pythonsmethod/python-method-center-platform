@@ -9,6 +9,7 @@ import {
   IconAnkh,
   IconEyeOfHorus,
   IconLotus,
+  IconMoon,
   IconPapyrus,
   IconScales,
   IconScarab,
@@ -29,6 +30,7 @@ function buildSections(t: Dictionary["cabinet"]): CabinetSection[] {
     { href: "/cabinet/documents", ...t.sections.documents, icon: IconPapyrus },
     { href: "/cabinet/metrics", ...t.sections.metrics, icon: IconWater },
     { href: "/cabinet/supplements", ...t.sections.supplements, icon: IconLotus },
+    { href: "/cabinet/sleep", ...t.sections.sleep, icon: IconMoon },
     { href: "/cabinet/chat", ...t.sections.chat, icon: IconEyeOfHorus },
     { href: "/cabinet/account", ...t.sections.account, icon: IconScales },
     { href: "/cabinet/tokens", ...t.sections.tokens, icon: IconScarab }

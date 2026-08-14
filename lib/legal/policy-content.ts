@@ -24,7 +24,7 @@ import type { Locale } from "@/lib/i18n/locale";
 //
 // Neither document has been reviewed by a lawyer.
 
-export const POLICY_UPDATED_ISO = "2026-08-04";
+export const POLICY_UPDATED_ISO = "2026-08-09";
 
 export type LegalSection = {
   heading: string;
@@ -65,7 +65,7 @@ const PRIVACY_RU: LegalDocument = {
         "Документы: файлы, которые вы загружаете, — анализы, выписки, снимки.",
         "Переписка: сообщения в вашем кейсе, включая голосовые, и вложения к ним.",
         "Диалоги с ИИ-помощником: ваши вопросы и его ответы.",
-        "Показатели и добавки: значения, которые вы вносите сами, и состав приёма.",
+        "Показатели, добавки и сон: значения, которые вы вносите сами, состав приёма и записи о сне — время засыпания и подъёма, продолжительность, ваша оценка самочувствия и заметки. Сюда же попадает то, что вы переносите файлом из приложения часов, кольца или браслета.",
         "Оплаты: сумма, тариф, валюта, дата и ссылка на платёж у платёжного провайдера. Данные банковской карты к нам не поступают и у нас не хранятся никогда.",
         "Согласия: отметка о принятии оферты и согласия на обработку данных — с датой, версией документа и языком, на котором вы его читали.",
         "Служебные записи: журнал действий с кейсом, события эскалации, счётчики обращений к помощнику."
@@ -203,7 +203,7 @@ const PRIVACY_EN: LegalDocument = {
         "Documents: the files you upload — test results, discharge summaries, scans.",
         "Correspondence: the messages in your case, including voice messages and their attachments.",
         "Conversations with the AI assistant: your questions and its answers.",
-        "Metrics and supplements: the values you enter yourself and your intake plan.",
+        "Metrics, supplements and sleep: the values you enter yourself, your intake plan, and your sleep records — bedtime and wake-up time, duration, your own rating of how you felt, and notes. This also covers what you bring over as a file from the app of a watch, ring or bracelet.",
         "Payments: amount, plan, currency, date and a reference to the payment held by the payment provider. Card details never reach us and are never stored by us.",
         "Consents: the record that you accepted the offer and consented to the processing of your data — with the date, the version of the document and the language you read it in.",
         "Service records: the log of actions on your case, escalation events, and counters of assistant usage."

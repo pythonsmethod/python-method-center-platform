@@ -19,6 +19,7 @@ const ru = {
       documents: { title: "Мои документы", hint: "Анализы и выписки" },
       metrics: { title: "Динамика", hint: "Ваши показатели на графике" },
       supplements: { title: "Мои добавки", hint: "Чек-лист приёма на день" },
+      sleep: { title: "Мой сон", hint: "Дневник сна и режим" },
       chat: { title: "Связь с центром", hint: "Поддержка и ИИ-помощник" },
       account: { title: "Мой кейс", hint: "Аккаунт, оплаты, история" },
       tokens: { title: "Токены", hint: "Приглашения и скидки" }
@@ -310,6 +311,88 @@ const ru = {
       notePlaceholder: "После еды, запить водой",
       addCta: "Добавить в расписание",
       saving: "Сохраняю…"
+    },
+    sleep: {
+      eyebrow: "Сон",
+      title: "Мой сон",
+      description:
+        "Дневник сна: сколько вы спали, как себя чувствовали и что из этого складывается в картину.",
+      setupNotice: "Раздел требует настройки Supabase Auth",
+      errorTitle: "Раздел временно недоступен",
+      errorText:
+        "Возможно, раздел ещё не подключён к базе. Попробуйте обновить страницу чуть позже.",
+      summaryAria: "Картина сна",
+      summaryLabel: "Картина",
+      summaryTitle: "Что видно по вашим записям",
+      statNights: "Записано ночей",
+      statAverage: "Средний сон",
+      statBedtime: "Обычный отбой",
+      statWake: "Обычный подъём",
+      statSpread: "Разброс отбоя",
+      statQuality: "Самочувствие",
+      statQualitySuffix: "из 5",
+      unitHour: "ч",
+      unitMinute: "мин",
+      spreadHint:
+        "Разброс — насколько время засыпания гуляет от ночи к ночи. Это та часть сна, на которую проще всего повлиять.",
+      emptyTitle: "Записей пока нет",
+      emptyText:
+        "Запишите первую ночь ниже — или перенесите её из приложения ваших часов, кольца или браслета. Дальше картина соберётся сама.",
+      listAria: "Последние ночи",
+      listLabel: "Дневник",
+      listTitle: "Последние ночи",
+      remove: "Удалить запись",
+      sourceImport: "из устройства",
+      awakeningsForms: {
+        rule: "ru",
+        one: "пробуждение",
+        few: "пробуждения",
+        many: "пробуждений"
+      } as PluralForms,
+      addAria: "Записать ночь",
+      addLabel: "Новая запись",
+      addTitle: "Записать ночь",
+      addText:
+        "Дата — утро, когда вы проснулись. Если ночь уже записана, новая запись её заменит.",
+      fieldDate: "Утро",
+      fieldBedtime: "Уснули",
+      fieldWake: "Проснулись",
+      fieldQuality: "Как себя чувствовали после сна",
+      qualityHint: "1 — разбито, 5 — выспался",
+      fieldAwakenings: "Просыпались за ночь (не обязательно)",
+      fieldNote: "Заметка (не обязательно)",
+      notePlaceholder: "Душно, поздно поел, шумно за окном",
+      addCta: "Записать ночь",
+      saving: "Сохраняю…",
+      devicesAria: "Часы, кольца и браслеты",
+      devicesLabel: "Устройства",
+      devicesTitle: "Часы, кольцо, браслет",
+      devicesText:
+        "Если вы носите гаджет, не нужно переписывать ночи руками: выгрузите сон из его приложения файлом CSV и перенесите сюда одним нажатием. Мы прочитаем даты, время сна и продолжительность и покажем, что именно поняли.",
+      devicesHonest:
+        "Честно о кнопке «подключить»: сайт не может сам забирать данные из Apple Watch — Apple отдаёт их только через приложение «Здоровье» на самом телефоне. Для колец и браслетов прямое подключение мы включаем по одному, по мере проверки. Файл работает уже сейчас и со всеми устройствами сразу.",
+      deviceField: "Откуда файл (не обязательно)",
+      devicePlaceholder: "Oura, Garmin, Xiaomi…",
+      importCta: "Перенести ночи из файла",
+      importPending: "Читаю файл…",
+      importRecognized: "Понятые столбцы:",
+      importSkipped: "Не удалось прочитать:",
+      importSkippedHint:
+        "Откройте файл и посмотрите эти строки сами — мы ничего не додумываем за вас.",
+      guidanceAria: "Рекомендации по сну",
+      guidanceLabel: "Professor Python",
+      guidanceTitle: "Что советует автор метода",
+      guidanceEmpty:
+        "Здесь появятся рекомендации Professor Python по сну — его собственными словами.",
+      adviceAria: "Разбор сна помощником",
+      adviceLabel: "ИИ-помощник",
+      adviceTitle: "Спросить Анхама про свой сон",
+      adviceText:
+        "Помощник смотрит только на ваши записи и на принципы центра: что видно по ним и что можно поправить в режиме. Диагнозов он не ставит и лечения не назначает — это к врачу и к Professor Python.",
+      adviceCta: "Разобрать мой сон",
+      advicePending: "Смотрю ваши ночи…",
+      adviceBoundary:
+        "Это общие ориентиры по режиму, а не медицинская рекомендация."
     },
     tokens: {
       eyebrow: "Токены",
@@ -1223,6 +1306,7 @@ const en: typeof ru = {
       documents: { title: "My documents", hint: "Test results and records" },
       metrics: { title: "Progress", hint: "Your values on a chart" },
       supplements: { title: "My supplements", hint: "Today's intake checklist" },
+      sleep: { title: "My sleep", hint: "Sleep diary and routine" },
       chat: { title: "Contact the center", hint: "Support and the AI assistant" },
       account: { title: "My case", hint: "Account, payments, history" },
       tokens: { title: "Tokens", hint: "Invitations and discounts" }
@@ -1506,6 +1590,88 @@ const en: typeof ru = {
       notePlaceholder: "After food, with water",
       addCta: "Add to the schedule",
       saving: "Saving…"
+    },
+    sleep: {
+      eyebrow: "Sleep",
+      title: "My sleep",
+      description:
+        "A sleep diary: how long you slept, how you felt, and what it all adds up to.",
+      setupNotice: "This section needs Supabase Auth configured",
+      errorTitle: "Section temporarily unavailable",
+      errorText:
+        "The section may not be connected to the database yet. Please try refreshing in a moment.",
+      summaryAria: "Your sleep picture",
+      summaryLabel: "Picture",
+      summaryTitle: "What your records show",
+      statNights: "Nights recorded",
+      statAverage: "Average sleep",
+      statBedtime: "Usual bedtime",
+      statWake: "Usual wake-up",
+      statSpread: "Bedtime spread",
+      statQuality: "How you felt",
+      statQualitySuffix: "out of 5",
+      unitHour: "h",
+      unitMinute: "min",
+      spreadHint:
+        "The spread is how much your bedtime moves from night to night. It is the part of sleep that is easiest to change.",
+      emptyTitle: "Nothing recorded yet",
+      emptyText:
+        "Write down your first night below — or bring it over from the app of your watch, ring or bracelet. The picture builds itself from there.",
+      listAria: "Recent nights",
+      listLabel: "Diary",
+      listTitle: "Recent nights",
+      remove: "Delete entry",
+      sourceImport: "from a device",
+      awakeningsForms: {
+        rule: "en",
+        one: "awakening",
+        few: "awakenings",
+        many: "awakenings"
+      } as PluralForms,
+      addAria: "Record a night",
+      addLabel: "New entry",
+      addTitle: "Record a night",
+      addText:
+        "The date is the morning you woke up. If that night is already recorded, this replaces it.",
+      fieldDate: "Morning",
+      fieldBedtime: "Fell asleep",
+      fieldWake: "Woke up",
+      fieldQuality: "How you felt after sleeping",
+      qualityHint: "1 — wrecked, 5 — fully rested",
+      fieldAwakenings: "Times you woke up (optional)",
+      fieldNote: "Note (optional)",
+      notePlaceholder: "Stuffy, ate late, noisy outside",
+      addCta: "Record the night",
+      saving: "Saving…",
+      devicesAria: "Watches, rings and bracelets",
+      devicesLabel: "Devices",
+      devicesTitle: "Watch, ring, bracelet",
+      devicesText:
+        "If you wear a gadget there is no need to retype your nights: export your sleep from its app as a CSV file and bring it over in one tap. We read the dates, the times and the duration — and show you exactly what we understood.",
+      devicesHonest:
+        "Honestly about a \"connect\" button: a website cannot take data out of an Apple Watch — Apple releases it only through the Health app on the phone itself. Direct connections for rings and bracelets are switched on one at a time, as each is tested. The file works today, and with every device at once.",
+      deviceField: "Which device the file came from (optional)",
+      devicePlaceholder: "Oura, Garmin, Xiaomi…",
+      importCta: "Bring nights over from a file",
+      importPending: "Reading the file…",
+      importRecognized: "Columns understood:",
+      importSkipped: "Could not be read:",
+      importSkippedHint:
+        "Open the file and look at these lines yourself — we do not fill in the gaps for you.",
+      guidanceAria: "Sleep guidance",
+      guidanceLabel: "Professor Python",
+      guidanceTitle: "What the author of the method advises",
+      guidanceEmpty:
+        "Professor Python's own guidance on sleep will appear here, in his own words.",
+      adviceAria: "The assistant's reading of your sleep",
+      adviceLabel: "AI assistant",
+      adviceTitle: "Ask Anham about your sleep",
+      adviceText:
+        "The assistant looks only at your own records and at the centre's principles: what they show and what can be adjusted in your routine. It does not diagnose and does not prescribe — that is for your doctor and for Professor Python.",
+      adviceCta: "Read my sleep",
+      advicePending: "Looking at your nights…",
+      adviceBoundary:
+        "These are general pointers about routine, not medical advice."
     },
     tokens: {
       eyebrow: "Tokens",
