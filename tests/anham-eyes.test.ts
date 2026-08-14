@@ -22,6 +22,7 @@ import { beforeAll, describe, expect, it } from "vitest";
 
 const AVATAR = path.join(process.cwd(), "public", "images", "anham-master.png");
 const SOURCE = path.join(process.cwd(), "components", "assistant", "AnhamAvatar.tsx");
+const STYLES = path.join(process.cwd(), "app", "globals.css");
 
 type Region = { minX: number; maxX: number; minY: number; maxY: number; size: number };
 
@@ -154,5 +155,14 @@ describe("the eyelids drawn over them", () => {
 
     expect(rx - eyeRx, "lid is wider than the eye by more than a unit").toBeLessThan(1);
     expect(ry - eyeRy, "lid is taller than the eye by more than a unit").toBeLessThan(1);
+  });
+
+  it("move in sync with the floating artwork", () => {
+    const styles = readFileSync(STYLES, "utf8");
+    const artAnimation = styles.match(/\.anham__art\s*\{[\s\S]*?animation:\s*([^;]+);/);
+    const lidsAnimation = styles.match(/\.anham__lids\s*\{[\s\S]*?animation:\s*([^;]+);/);
+
+    expect(artAnimation?.[1]).toBe("anham-float 5.5s ease-in-out infinite");
+    expect(lidsAnimation?.[1]).toBe(artAnimation?.[1]);
   });
 });
