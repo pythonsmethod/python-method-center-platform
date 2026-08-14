@@ -10681,3 +10681,87 @@ code {
   color: var(--muted);
   font-size: 12.5px;
 }
+
+/* ============================================================ */
+/* Вход через Google и Apple.                                    */
+/* Appended at the end: the later copy of a rule wins in this     */
+/* stylesheet.                                                   */
+/* ============================================================ */
+
+.auth-social {
+  display: grid;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.auth-social__divider {
+  align-items: center;
+  color: var(--muted);
+  display: grid;
+  font-size: 13px;
+  gap: 12px;
+  grid-template-columns: 1fr auto 1fr;
+}
+
+.auth-social__divider::before,
+.auth-social__divider::after {
+  background: var(--line);
+  content: "";
+  height: 1px;
+}
+
+.auth-social__button {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+  display: flex;
+  font: inherit;
+  font-size: 15px;
+  gap: 10px;
+  justify-content: center;
+  min-height: 48px;
+  padding: 10px 18px;
+  transition: border-color 0.15s ease, background 0.15s ease;
+  width: 100%;
+}
+
+.auth-social__button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+.auth-social__button:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.auth-social__mark {
+  flex: none;
+  height: 18px;
+  width: 18px;
+}
+
+.auth-social__hint {
+  color: var(--muted);
+  font-size: 12.5px;
+  margin: 2px 0 0;
+}
+
+.auth-enroll {
+  color: var(--muted);
+  font-size: 14px;
+  margin: 16px 0 0;
+  text-align: center;
+}
+
+.auth-enroll__link {
+  background: none;
+  border: 0;
+  color: var(--accent-strong);
+  cursor: pointer;
+  font: inherit;
+  padding: 0;
+  text-decoration: underline;
+}

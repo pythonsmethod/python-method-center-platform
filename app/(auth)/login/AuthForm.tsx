@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState } from "react";
+import { useActionState, useEffect, useRef, useState, type ReactNode } from "react";
 import {
   resendConfirmationEmail,
   signInWithPassword,
@@ -26,6 +26,8 @@ type AuthFormLabels = {
   submitting: string;
   resend: string;
   resending: string;
+  noAccount: string;
+  enrollNow: string;
 };
 
 const defaultLabels: AuthFormLabels = {
@@ -43,7 +45,9 @@ const defaultLabels: AuthFormLabels = {
   submitSignup: "Создать аккаунт",
   submitting: "Отправка...",
   resend: "Отправить письмо ещё раз",
-  resending: "Отправляем..."
+  resending: "Отправляем...",
+  noAccount: "Ещё нет аккаунта?",
+  enrollNow: "Зарегистрироваться"
 };
 
 type AuthMode = "login" | "signup";
@@ -55,6 +59,9 @@ type AuthFormProps = {
   // Which tab opens first. The header has separate "Вход" and
   // "Регистрация" entries, and the second must not land on the login form.
   initialMode?: AuthMode;
+  // The other ways in — Google, Apple — rendered inside this card so the
+  // whole choice reads as one door rather than two unrelated blocks.
+  children?: ReactNode;
 };
 
 function messageClassName(state: AuthActionState): string {
@@ -65,7 +72,8 @@ export function AuthForm({
   nextPath,
   supabaseConfigured,
   labels = defaultLabels,
-  initialMode = "login"
+  initialMode = "login",
+  children
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   // Every field is held here, not left to the browser. React empties an
@@ -254,6 +262,25 @@ export function AuthForm({
 
       {resendState.message ? (
         <p className={messageClassName(resendState)}>{resendState.message}</p>
+      ) : null}
+
+      {children}
+
+      {/* The way back for someone who came to sign in and has no account.
+          The tabs above say the same thing, but a person who has just
+          failed to sign in is looking at the bottom of the form, not the
+          top of it. */}
+      {isLogin ? (
+        <p className="auth-enroll">
+          {labels.noAccount}{" "}
+          <button
+            className="auth-enroll__link"
+            onClick={() => setMode("signup")}
+            type="button"
+          >
+            {labels.enrollNow}
+          </button>
+        </p>
       ) : null}
     </section>
   );

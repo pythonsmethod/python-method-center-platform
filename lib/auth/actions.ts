@@ -11,6 +11,11 @@ import {
   validatePhone
 } from "@/lib/auth/validation";
 import { PENDING_EMAIL_COOKIE } from "@/lib/auth/pending-email";
+import {
+  enabledSocialProviders,
+  isSocialProvider,
+  oauthRedirectTo
+} from "@/lib/auth/providers";
 import { createRegistrationProfile } from "@/lib/profile/registration";
 import { getLocale } from "@/lib/i18n/locale";
 import {
@@ -355,6 +360,58 @@ export async function updatePassword(
     status: "success",
     message: "Пароль обновлён. Теперь можно перейти в кабинет."
   };
+}
+
+// Signing in with Google or Apple.
+//
+// Nothing about the account is decided here: Supabase sends the person to
+// the provider, the provider sends them back to /auth/callback with a code,
+// and the callback is where the session is opened and the profile row is
+// made sure of. This function only starts the trip — and refuses to start
+// it for a provider the site has not been configured for, so a crafted
+// request cannot produce a broken redirect the interface would never offer.
+export async function signInWithProvider(
+  _previousState: AuthActionState,
+  formData: FormData
+): Promise<AuthActionState> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  }
+
+  const provider = String(formData.get("provider") ?? "");
+
+  if (
+    !isSocialProvider(provider) ||
+    !enabledSocialProviders().includes(provider)
+  ) {
+    return errorState("Этот способ входа сейчас недоступен.");
+  }
+
+  const headerStore = await headers();
+  const origin =
+    headerStore.get("origin") ??
+    process.env.NEXT_PUBLIC_SITE_URL ??
+    "http://localhost:3000";
+
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider,
+    options: {
+      redirectTo: oauthRedirectTo(
+        origin,
+        sanitizeNextPath(formData.get("next"))
+      )
+    }
+  });
+
+  if (error || !data?.url) {
+    return errorState(
+      "Не удалось начать вход. Попробуйте ещё раз или войдите по email."
+    );
+  }
+
+  redirect(data.url);
 }
 
 export async function logoutAction() {
