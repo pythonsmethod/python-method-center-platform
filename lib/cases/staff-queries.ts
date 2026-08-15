@@ -8,6 +8,7 @@ export type StaffCaseListItem = {
   direction: string;
   title: string | null;
   created_at: string;
+  updated_at: string;
   profiles: {
     email: string | null;
     full_name: string | null;
@@ -39,7 +40,7 @@ export async function getStaffCases(): Promise<StaffCasesResult> {
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      "id, status, urgency, direction, title, created_at, profiles(email, full_name, phone)"
+      "id, status, urgency, direction, title, created_at, updated_at, profiles(email, full_name, phone)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
