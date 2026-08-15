@@ -47,10 +47,23 @@ export default async function CabinetLayout({
   children: ReactNode;
 }) {
   const auth = await getRequiredUser("/cabinet");
-  const dict = getDictionary(await getLocale()).cabinet;
+  const locale = await getLocale();
+  const dict = getDictionary(locale).cabinet;
 
   if (auth.status === "missing-env") {
-    return <>{children}</>;
+    return (
+      <CabinetShell
+        email={null}
+        greetingName={dict.friend}
+        labels={dict}
+        locale={locale}
+        supplementsDue={0}
+        tokens={0}
+        unread={0}
+      >
+        {children}
+      </CabinetShell>
+    );
   }
 
   const caseResult = await getClientCaseShell(auth.userId);
@@ -68,6 +81,7 @@ export default async function CabinetLayout({
     <CabinetShell
       email={auth.email}
       labels={dict}
+      locale={locale}
       greetingName={greetingName}
       supplementsDue={supplementsDue}
       tokens={tokens.balance}

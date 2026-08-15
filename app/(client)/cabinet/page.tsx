@@ -1,148 +1,91 @@
 import Link from "next/link";
-import { AuthSetupNotice } from "@/components/AuthSetupNotice";
-import { PageHeader } from "@/components/PageHeader";
-import { getDictionary } from "@/lib/i18n/dictionaries";
-import { getLocale } from "@/lib/i18n/locale";
-import { AssistantInvite } from "@/components/assistant/AssistantInvite";
-import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { CabinetAnhamCard } from "@/components/cabinet/CabinetAnhamCard";
+import { IconAnkh, IconEyeOfHorus } from "@/components/icons/EgyptianIcons";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
-import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
+import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale, type Locale } from "@/lib/i18n/locale";
 import { getCaseMessages } from "@/lib/messages/queries";
-import { getSupplementsDueCount } from "@/lib/supplements/queries";
-import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 
 export const dynamic = "force-dynamic";
 
-type CabinetPageProps = {
-  searchParams?: Promise<{
-    onboarding?: string | string[];
-  }>;
-};
+const copy = {
+  ru: {
+    eyebrow: "Связь с центром", title: "Мы рядом, когда вам это нужно",
+    intro: "Выберите, с кем хотите продолжить диалог.",
+    karen: "Karen — Professor Python", personal: "Личное сопровождение",
+    preview: "Я изучаю ваши материалы. Если потребуется уточнение, напишу вам здесь.",
+    newMessage: "Новые сообщения появятся здесь", continueDialog: "Продолжить диалог",
+    caseTitle: "Мой случай", caseReview: "Материалы на рассмотрении",
+    caseEmpty: "Заполните анкету, чтобы создать случай", openCase: "Открыть случай",
+    appTitle: "Больше возможностей — в приложении",
+    appText: "Ежедневная сводка, персональные напоминания и расширенные функции аккаунта доступны в приложении Python Method Center.",
+    appCta: "Узнать о приложении", protected: "Защищённый диалог", askAnham: "Спросить Анхама"
+  },
+  en: {
+    eyebrow: "Contact the center", title: "We are here when you need us",
+    intro: "Choose who you would like to continue the conversation with.",
+    karen: "Karen — Professor Python", personal: "Personal guidance",
+    preview: "I am reviewing your materials. If I need any clarification, I will message you here.",
+    newMessage: "New messages will appear here", continueDialog: "Continue conversation",
+    caseTitle: "My case", caseReview: "Materials under review",
+    caseEmpty: "Complete the questionnaire to create your case", openCase: "Open case",
+    appTitle: "More features in the app",
+    appText: "Daily summaries, personal reminders, and expanded account features are available in the Python Method Center app.",
+    appCta: "Learn about the app", protected: "Protected conversation", askAnham: "Ask Anham"
+  }
+} as const satisfies Record<Locale, object>;
 
-function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
-  return Array.isArray(value)
-    ? value.includes("submitted")
-    : value === "submitted";
-}
-
-// The home page of the cabinet is the conversation with Professor Python,
-// because that is what a person comes here to do. Everything else — the
-// case, the payments, the documents — lives one tap away in the column on
-// the left and does not compete with it.
-export default async function CabinetPage({ searchParams }: CabinetPageProps) {
+export default async function CabinetPage() {
   const locale = await getLocale();
   const strings = getDictionary(locale);
-  const dict = strings.cabinet;
-  const t = dict.home;
+  const t = strings.cabinet.home;
+  const c = copy[locale];
   const auth = await getRequiredUser("/cabinet");
-  const params = await searchParams;
+  let hasCase = false;
+  let latestMessage: string | null = null;
 
-  if (auth.status === "missing-env") {
-    return (
-      <div className="page-shell">
-        <PageHeader
-          eyebrow={t.eyebrow}
-          title={t.title}
-          description={t.setupDescription}
-        />
-        <AuthSetupNotice title={t.setupNotice} labels={strings.setup} />
-      </div>
-    );
+  if (auth.status !== "missing-env") {
+    const caseResult = await getClientCaseShell(auth.userId);
+    const clientCase = caseResult.status === "ready" ? caseResult.case : null;
+    hasCase = Boolean(clientCase);
+    if (clientCase) {
+      const messages = await getCaseMessages(clientCase.id);
+      latestMessage = [...messages.messages].reverse().find((message) => message.sender_role !== "client" && message.body)?.body ?? null;
+    }
   }
 
-  const caseResult = await getClientCaseShell(auth.userId);
-  const clientCase =
-    caseResult.status === "ready" && caseResult.case ? caseResult.case : null;
+  return <div className="web-home">
+    <header className="web-home__heading">
+      <span>{c.eyebrow}</span><h1>{c.title}</h1><p>{c.intro}</p>
+    </header>
 
-  const supplementsDue = await getSupplementsDueCount();
-  const assistantTier = await resolveAssistantTierForUi();
-
-  const [documentResult, messagesResult] = clientCase
-    ? await Promise.all([
-        getUploadedDocumentsForCase(auth.userId, clientCase.id),
-        getCaseMessages(clientCase.id)
-      ])
-    : [null, null];
-
-  const documents =
-    documentResult?.status === "ready" ? documentResult.documents : [];
-
-  if (!clientCase) {
-    return (
-      <div className="cab-start">
-        <span className="cab-card__label">{t.firstStepLabel}</span>
-        <h2>{t.firstStepTitle}</h2>
-        <p>
-          {t.firstStepText}
-        </p>
-        <Link className="button" href="/onboarding">
-          {t.firstStepCta}
-        </Link>
-      </div>
-    );
-  }
-
-  return (
-    <>
-      {isOnboardingSubmitted(params?.onboarding) ? (
-        <div className="cab-note">
-          <strong>{t.submittedTitle}</strong>
-          <span>{t.submittedText}</span>
+    <div className="web-home__priority">
+      <section className="contact-card contact-card--karen" aria-labelledby="karen-title">
+        <div className="contact-card__head">
+          <span className="contact-card__avatar"><IconEyeOfHorus /></span>
+          <div><h2 id="karen-title">{c.karen}</h2><p>{c.personal}</p></div>
+          <span className="contact-card__lock" title={c.protected}>⌾</span>
         </div>
-      ) : null}
-
-      {supplementsDue > 0 ? (
-        <div className="cab-note cab-note--reminder">
-          <strong>{t.doseTitle}</strong>
-          <span>
-            {t.dosePrefix} {supplementsDue}.{" "}
-            <Link href="/cabinet/supplements">{t.doseCta}</Link>
-          </span>
-        </div>
-      ) : null}
-
-      {documents.length === 0 ? (
-        <div className="cab-note">
-          <strong>{t.uploadTitle}</strong>
-          <span>
-            {t.uploadText}{" "}
-            <Link href="/cabinet/documents">{t.uploadCta}</Link>
-          </span>
-        </div>
-      ) : null}
-
-      {/* Above the thread, not below it: the thread is what a person reaches
-          for when they have a question, so the alternative has to be seen
-          before they start typing into it. */}
-      <AssistantInvite
-        attachments={assistantTier === "client"}
-        locale={locale}
-        labels={{
-          label: t.inviteLabel,
-          title: t.inviteTitle,
-          text: t.inviteText,
-          questions: t.inviteQuestions,
-          boundary: t.inviteBoundary
-        }}
-      />
-
-      <section className="cab-thread" aria-label={t.threadAria}>
-        <div className="cab-thread__head">
-          <span className="panel__label">{t.threadLabel}</span>
-          <h1>{t.threadTitle}</h1>
-        </div>
-        <CaseMessageThread
-            labels={dict.thread}
-            voiceLabels={dict.voice}
-            dateLocale={dict.dateLocale}
-          caseId={clientCase.id}
-          expandable
-          loadError={messagesResult?.error ?? null}
-          messages={messagesResult?.messages ?? []}
-          viewer="client"
-        />
+        <blockquote>{latestMessage ?? c.preview}</blockquote>
+        <span className="contact-card__status"><i />{latestMessage ? c.protected : c.newMessage}</span>
+        <Link className="contact-card__primary" href="/cabinet/dialog">{c.continueDialog}<span>→</span></Link>
       </section>
-    </>
-  );
+
+      <CabinetAnhamCard button={c.askAnham} label={t.inviteLabel} title={t.inviteTitle} text={t.inviteText} questions={t.inviteQuestions} boundary={t.inviteBoundary} />
+    </div>
+
+    <div className="web-home__secondary">
+      <Link className="case-shortcut" href={hasCase ? "/cabinet/account" : "/onboarding"}>
+        <span className="case-shortcut__icon"><IconAnkh /></span>
+        <span><small>{c.caseTitle}</small><strong>{hasCase ? c.caseReview : c.caseEmpty}</strong></span>
+        <span>{c.openCase} →</span>
+      </Link>
+      <aside className="web-app-promo">
+        <span className="web-app-promo__phone" aria-hidden="true">▯</span>
+        <span><strong>{c.appTitle}</strong><p>{c.appText}</p></span>
+        <Link href="/welcome">{c.appCta} →</Link>
+      </aside>
+    </div>
+  </div>;
 }
