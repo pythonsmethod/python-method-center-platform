@@ -100,8 +100,6 @@ export default async function AdminPage() {
     ? {
         eyebrow: "Рабочий кабинет Карена",
         title: "Сегодня",
-        hello: "Всё важное на одном экране",
-        description: "Сначала срочное, затем клиенты, которые ждут вашего ответа.",
         messages: "Новых сообщений",
         flags: "Красных флагов",
         clients: "Клиентов в работе",
@@ -123,8 +121,6 @@ export default async function AdminPage() {
     : {
         eyebrow: "Karen's workspace",
         title: "Today",
-        hello: "Everything important on one screen",
-        description: "Urgent items first, followed by clients waiting for your reply.",
         messages: "New messages",
         flags: "Red flags",
         clients: "Active clients",
@@ -160,11 +156,9 @@ export default async function AdminPage() {
         <header className="karen-mobile-hero">
           <span>{copy.eyebrow}</span>
           <h1 id="karen-today-title">{copy.title}</h1>
-          <strong>{copy.hello}</strong>
-          <p>{copy.description}</p>
         </header>
 
-        <div className="karen-mobile-stats" aria-label={copy.hello}>
+        <div className="karen-mobile-stats" aria-label={copy.title}>
           <Link href="/admin/cases">
             <b>{unread.total}</b>
             <span>{copy.messages}</span>
