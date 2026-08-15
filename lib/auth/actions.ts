@@ -46,14 +46,20 @@ function sanitizeNextPath(value: FormDataEntryValue | null): string {
   return nextPath;
 }
 
-async function getEmailRedirectTo(): Promise<string> {
+async function getEmailRedirectTo(nextPath?: string): Promise<string> {
   const headerStore = await headers();
   const origin =
     headerStore.get("origin") ??
     process.env.NEXT_PUBLIC_SITE_URL ??
     "http://localhost:3000";
 
-  return `${origin}/auth/callback`;
+  const callback = new URL("/auth/callback", origin);
+
+  if (nextPath) {
+    callback.searchParams.set("next", nextPath);
+  }
+
+  return callback.toString();
 }
 
 // Supabase sessions are persistent by default. When a person explicitly
@@ -139,6 +145,7 @@ export async function signUpWithPassword(
   }
 
   const { email, password } = readCredentials(formData);
+  const nextPath = sanitizeNextPath(formData.get("next"));
 
   if (!email || !password) {
     return errorState("Введите email и пароль.");
@@ -174,7 +181,7 @@ export async function signUpWithPassword(
     email,
     password,
     options: {
-      emailRedirectTo: await getEmailRedirectTo(),
+      emailRedirectTo: await getEmailRedirectTo(nextPath),
       // Also kept on the auth user, so the number is visible in the
       // Supabase dashboard even if the service key is missing and the
       // profile row below never gets written.
@@ -224,7 +231,7 @@ export async function signUpWithPassword(
   // Confirmation switched off in Supabase: the session is already open, so
   // nothing stands between the person and the cabinet.
   if (data.session) {
-    redirect(sanitizeNextPath(formData.get("next")));
+    redirect(nextPath);
   }
 
   // Otherwise the address has to be confirmed first. A sentence under the

@@ -77,7 +77,7 @@ export default async function PaymentPage() {
           signInWhy: t.signInWhy
         }}
         plans={plans}
-        signInHref="/login?next=/payment"
+        signInHref="/login?mode=signup&next=/payment"
         signedIn={Boolean(profileId)}
       />
 
