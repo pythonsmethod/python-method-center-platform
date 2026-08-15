@@ -2620,7 +2620,8 @@ code {
    untouched; these rules apply only inside the protected staff area. */
 .admin-nav__icon,
 .karen-mobile-home,
-.staff-case-mobile {
+.staff-case-mobile,
+.staff-document-mobile {
   display: none;
 }
 
@@ -3000,6 +3001,97 @@ code {
   }
 
   .staff-client-card__open b {
+    font-size: 1.35rem;
+    line-height: 0.8;
+  }
+
+  .staff-document-desktop,
+  .staff-document-intro {
+    display: none;
+  }
+
+  .staff-document-mobile {
+    display: block;
+  }
+
+  .staff-document-list {
+    display: grid;
+    gap: 10px;
+  }
+
+  .staff-document-card {
+    display: grid;
+    grid-template-columns: 42px minmax(0, 1fr);
+    gap: 12px;
+    padding: 14px;
+    border: 1px solid rgba(212, 168, 68, 0.3);
+    border-radius: 18px;
+    background: linear-gradient(155deg, rgba(49, 39, 18, 0.74), rgba(22, 18, 11, 0.96));
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .staff-document-card__icon {
+    display: grid;
+    width: 42px;
+    height: 42px;
+    place-items: center;
+    border: 1px solid rgba(231, 191, 69, 0.48);
+    border-radius: 13px;
+    background: #302713;
+    color: #efc747;
+    font-size: 1.25rem;
+  }
+
+  .staff-document-card__body {
+    min-width: 0;
+  }
+
+  .staff-document-card__body strong,
+  .staff-document-card__case,
+  .staff-document-card__filename,
+  .staff-document-card__body small {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .staff-document-card__body strong {
+    color: #fff5db;
+    font-size: 1rem;
+  }
+
+  .staff-document-card__case {
+    margin-top: 5px;
+    color: #dcb946;
+    font-size: 0.75rem;
+  }
+
+  .staff-document-card__filename {
+    margin-top: 8px;
+    color: #d4c7aa;
+    font-size: 0.84rem;
+  }
+
+  .staff-document-card__body small {
+    margin-top: 4px;
+    color: #8f836b;
+    font-size: 0.68rem;
+  }
+
+  .staff-document-card__open {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 7px;
+    color: #e2be47;
+    font-size: 0.75rem;
+    font-weight: 800;
+  }
+
+  .staff-document-card__open b {
     font-size: 1.35rem;
     line-height: 0.8;
   }
