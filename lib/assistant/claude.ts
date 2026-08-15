@@ -74,6 +74,9 @@ export type AssistantResult =
   | { status: "unavailable" }
   | { status: "error"; message: string };
 
+const CONTINUE_INSTRUCTION =
+  "Продолжи ответ ровно с того места, где он оборвался. Не повторяй уже написанное, сохрани язык и закончи мысль кратко и естественно.";
+
 // Prompt caching: the system prompt (rules + knowledge base) is the biggest
 // and most repeated part of every request. Marking it as cacheable makes
 // repeat reads roughly ten times cheaper than fresh input tokens. Short
@@ -211,14 +214,15 @@ export async function askClaude(
   }
 
   try {
+    const requestMessages =
+      attachments && attachments.length > 0
+        ? withAttachments(messages, attachments)
+        : messages;
     const response = await anthropic.messages.create({
       model: ASSISTANT_MODEL,
       max_tokens: maxTokens,
       system: buildSystemParam(system),
-      messages:
-        attachments && attachments.length > 0
-          ? withAttachments(messages, attachments)
-          : messages
+      messages: requestMessages
     });
 
     if (response.stop_reason === "refusal") {
@@ -229,7 +233,7 @@ export async function askClaude(
       };
     }
 
-    const reply = response.content
+    let reply = response.content
       .filter((block) => block.type === "text")
       .map((block) => block.text)
       .join("\n")
@@ -237,6 +241,35 @@ export async function askClaude(
 
     if (!reply) {
       return { status: "error", message: "Пустой ответ ассистента." };
+    }
+
+    // A token ceiling is not a completed answer. Ask once for the missing
+    // ending and return one seamless message instead of exposing a sentence
+    // cut in half. One continuation keeps latency and cost bounded.
+    if (response.stop_reason === "max_tokens") {
+      try {
+        const continuation = await anthropic.messages.create({
+          model: ASSISTANT_MODEL,
+          max_tokens: maxTokens,
+          system: buildSystemParam(system),
+          messages: [
+            ...requestMessages,
+            { role: "assistant", content: reply },
+            { role: "user", content: CONTINUE_INSTRUCTION }
+          ]
+        });
+        const ending = continuation.content
+          .filter((block) => block.type === "text")
+          .map((block) => block.text)
+          .join("\n")
+          .trim();
+
+        if (ending) {
+          reply = `${reply}\n${ending}`;
+        }
+      } catch {
+        // Preserve the useful first part if only the continuation call fails.
+      }
     }
 
     return { status: "ok", reply };
