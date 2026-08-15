@@ -113,6 +113,11 @@ export default async function AdminPage() {
         noCases: "Активных кейсов пока нет.",
         allClients: "Все клиенты",
         assistant: "Спросить помощника",
+        assistantTitle: "Рабочий помощник",
+        assistantIntro: "Вставьте вопрос клиента, текст анкеты или прикрепите анализы — помогу сделать выжимку и подготовить ответ.",
+        assistantPlaceholder: "Вопрос, текст или файл…",
+        assistantUnavailable: "Помощник пока не подключён. Напишите администратору платформы.",
+        assistantSuggestions: ["Сделай выжимку кейса", "Подготовь черновик ответа", "Разбери приложенные анализы"],
         unread: "нов."
       }
     : {
@@ -131,6 +136,11 @@ export default async function AdminPage() {
         noCases: "There are no active cases yet.",
         allClients: "All clients",
         assistant: "Ask assistant",
+        assistantTitle: "Work assistant",
+        assistantIntro: "Paste a client's question or questionnaire, or attach test results — I can summarize them and draft a reply.",
+        assistantPlaceholder: "Question, text or file…",
+        assistantUnavailable: "The assistant is not connected yet. Contact the platform administrator.",
+        assistantSuggestions: ["Summarize the case", "Draft a reply", "Review the attached results"],
         unread: "new"
       };
   const cases = casesResult.status === "ready"
@@ -208,8 +218,28 @@ export default async function AdminPage() {
 
         <div className="karen-mobile-actions">
           <Link className="button" href="/admin/cases">{copy.allClients}</Link>
-          <a className="button button--secondary" href="#karen-assistant">{copy.assistant}</a>
+          <a className="button button--secondary" href="#karen-mobile-assistant">{copy.assistant}</a>
         </div>
+
+        <section className="karen-mobile-assistant" id="karen-mobile-assistant" aria-labelledby="karen-mobile-assistant-title">
+          <span className="panel__label">Professor Python AI</span>
+          <h2 className="staff-assistant__title" id="karen-mobile-assistant-title">
+            <AnhamAvatar className="staff-assistant__face" size={44} state="client" />
+            {copy.assistantTitle}
+          </h2>
+          {assistantConfigured ? (
+            <AssistantChat
+              attachments
+              endpoint="/api/assistant/staff"
+              intro={copy.assistantIntro}
+              placeholder={copy.assistantPlaceholder}
+              providerChoice={showProviders}
+              suggestions={copy.assistantSuggestions}
+            />
+          ) : (
+            <p className="form-message form-message--error">{copy.assistantUnavailable}</p>
+          )}
+        </section>
       </section>
 
       <div className="karen-desktop-home">
