@@ -1,7 +1,8 @@
 "use client";
 
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
-import { openAnham } from "@/components/assistant/AnhamOpenButton";
+import { AssistantChat } from "@/components/assistant/AssistantChat";
+import type { Locale } from "@/lib/i18n/locale";
 
 type AssistantInviteLabels = {
   label: string;
@@ -27,7 +28,19 @@ type AssistantInviteLabels = {
 // question already written. The empty box is the real barrier, not
 // willingness — a question that sends itself removes it, and the
 // conversation starts with an answer rather than a blinking cursor.
-export function AssistantInvite({ labels }: { labels: AssistantInviteLabels }) {
+export function AssistantInvite({
+  attachments = false,
+  labels,
+  locale
+}: {
+  attachments?: boolean;
+  labels: AssistantInviteLabels;
+  locale: Locale;
+}) {
+  const chatIntro = locale === "ru"
+    ? "Здравствуйте! Напишите свой вопрос — я отвечу сразу."
+    : "Hello! Write your question and I will answer straight away.";
+
   return (
     <section className="assistant-invite" aria-label={labels.title}>
       <span className="assistant-invite__avatar" aria-hidden="true">
@@ -39,24 +52,20 @@ export function AssistantInvite({ labels }: { labels: AssistantInviteLabels }) {
         <h2>{labels.title}</h2>
         <p>{labels.text}</p>
 
-        <div className="assistant-invite__questions">
-          {labels.questions.map((question) => (
-            <button
-              className="assistant-invite__question"
-              key={question}
-              onClick={() => openAnham(question)}
-              type="button"
-            >
-              {question}
-            </button>
-          ))}
-        </div>
-
         {/* Said here rather than only inside the chat: someone who thinks
             this is Professor Python answering will read every word of it
             as his, and that is the one misunderstanding the platform
             cannot afford. */}
         <p className="assistant-invite__boundary">{labels.boundary}</p>
+
+        <AssistantChat
+          attachments={attachments}
+          endpoint="/api/assistant/client"
+          historyEndpoint="/api/assistant/history"
+          intro={chatIntro}
+          locale={locale}
+          suggestions={labels.questions}
+        />
       </div>
     </section>
   );

@@ -2664,6 +2664,15 @@ code {
     margin: 0;
   }
 
+  .assistant-invite .assistant-chat {
+    margin-top: 18px;
+  }
+
+  .assistant-invite .assistant-chat__messages {
+    min-height: 150px;
+    max-height: 48vh;
+  }
+
   .admin-nav {
     position: fixed;
     z-index: 70;
