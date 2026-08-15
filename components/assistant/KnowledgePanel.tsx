@@ -7,19 +7,15 @@ import {
 } from "@/lib/assistant/actions";
 import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { KnowledgeEntry } from "@/lib/assistant/knowledge";
-
-const audienceLabels: Record<KnowledgeEntry["audience"], string> = {
-  client: "ИИ клиентов",
-  staff: "ИИ Professor Python",
-  both: "Оба ИИ"
-};
+import type { Locale } from "@/lib/i18n/locale";
 
 type KnowledgePanelProps = {
   entries: KnowledgeEntry[];
   loadError: string | null;
+  locale?: Locale;
 };
 
-export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
+export function KnowledgePanel({ entries, loadError, locale = "ru" }: KnowledgePanelProps) {
   const [addState, addAction, addPending] = useActionState(
     addKnowledgeEntry,
     initialStaffActionState
@@ -28,41 +24,86 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
     setKnowledgeEntryActive,
     initialStaffActionState
   );
+  const t = locale === "ru"
+    ? {
+        title: "Заголовок",
+        titlePlaceholder: "Например: Как отвечать про цены",
+        audience: "Для кого это знание",
+        clientAi: "Для ИИ клиентов (на сайте)",
+        staffAi: "Для персонального ИИ Карена",
+        bothAi: "Для обоих",
+        topic: "Раздел",
+        general: "Общее знание",
+        sleep: "Про сон — видно клиентам в разделе «Мой сон»",
+        content: "Текст знания",
+        contentPlaceholder: "Принцип, наблюдение, факт или формулировка, которую ИИ должен запомнить и использовать.",
+        saving: "Сохраняю…",
+        save: "Сохранить знание",
+        unavailable: "База знаний недоступна",
+        migration: "Возможно, обновление базы ещё не применено.",
+        off: "выключено",
+        disable: "Выключить",
+        enable: "Включить",
+        empty: "Пока нет сохранённых знаний. Добавьте первый принцип или наблюдение — персональный ИИ начнёт использовать его в работе.",
+        audienceLabels: { client: "ИИ клиентов", staff: "Персональный ИИ Карена", both: "Оба ИИ" }
+      }
+    : {
+        title: "Title",
+        titlePlaceholder: "For example: How to answer pricing questions",
+        audience: "Who should use this knowledge",
+        clientAi: "Client AI (on the website)",
+        staffAi: "Karen's personal AI",
+        bothAi: "Both assistants",
+        topic: "Section",
+        general: "General knowledge",
+        sleep: "Sleep — visible to clients in My Sleep",
+        content: "Knowledge text",
+        contentPlaceholder: "A principle, observation, fact, or wording the AI should remember and use.",
+        saving: "Saving…",
+        save: "Save knowledge",
+        unavailable: "Knowledge base unavailable",
+        migration: "The database update may not have been applied yet.",
+        off: "disabled",
+        disable: "Disable",
+        enable: "Enable",
+        empty: "There is no saved knowledge yet. Add the first principle or observation and the personal AI will begin using it.",
+        audienceLabels: { client: "Client AI", staff: "Karen's personal AI", both: "Both assistants" }
+      };
 
   return (
     <div className="knowledge-panel">
       <form action={addAction} className="knowledge-panel__form">
         <label>
-          Заголовок
-          <input maxLength={200} name="title" placeholder="Например: Как отвечать про цены" required type="text" />
+          {t.title}
+          <input maxLength={200} name="title" placeholder={t.titlePlaceholder} required type="text" />
         </label>
         <label>
-          Для кого это знание
+          {t.audience}
           <select defaultValue="client" name="audience">
-            <option value="client">Для ИИ клиентов (на сайте)</option>
-            <option value="staff">Для ИИ Professor Python (в админке)</option>
-            <option value="both">Для обоих</option>
+            <option value="client">{t.clientAi}</option>
+            <option value="staff">{t.staffAi}</option>
+            <option value="both">{t.bothAi}</option>
           </select>
         </label>
         <label>
-          Раздел
+          {t.topic}
           <select defaultValue="general" name="topic">
-            <option value="general">Общее знание</option>
-            <option value="sleep">Про сон — видно клиентам в разделе «Мой сон»</option>
+            <option value="general">{t.general}</option>
+            <option value="sleep">{t.sleep}</option>
           </select>
         </label>
         <label>
-          Текст знания
+          {t.content}
           <textarea
             maxLength={8000}
             name="content"
-            placeholder="Правило, факт или готовая формулировка, которую ИИ должен использовать в ответах."
+            placeholder={t.contentPlaceholder}
             required
             rows={4}
           />
         </label>
         <button className="button" disabled={addPending} type="submit">
-          {addPending ? "Сохраняю…" : "Сохранить знание"}
+          {addPending ? t.saving : t.save}
         </button>
         {addState.status !== "idle" ? (
           <p className={`form-message form-message--${addState.status}`}>
@@ -73,7 +114,7 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
 
       {loadError ? (
         <p className="form-message form-message--error">
-          База знаний недоступна: {loadError}. Возможно, миграция ещё не применена.
+          {t.unavailable}: {loadError}. {t.migration}
         </p>
       ) : null}
 
@@ -88,8 +129,8 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
               <div>
                 <strong>{entry.title}</strong>
                 <span className="knowledge-panel__meta">
-                  {audienceLabels[entry.audience]}
-                  {entry.is_active ? "" : " · выключено"}
+                  {t.audienceLabels[entry.audience]}
+                  {entry.is_active ? "" : ` · ${t.off}`}
                 </span>
                 <p>{entry.content}</p>
               </div>
@@ -105,7 +146,7 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
                   disabled={togglePending}
                   type="submit"
                 >
-                  {entry.is_active ? "Выключить" : "Включить"}
+                  {entry.is_active ? t.disable : t.enable}
                 </button>
               </form>
             </li>
@@ -113,8 +154,7 @@ export function KnowledgePanel({ entries, loadError }: KnowledgePanelProps) {
         </ul>
       ) : !loadError ? (
         <p className="knowledge-panel__empty">
-          Пока нет знаний. Добавьте первое — например, ответы на частые вопросы
-          клиентов, — и ИИ клиентов начнёт использовать его.
+          {t.empty}
         </p>
       ) : null}
     </div>
