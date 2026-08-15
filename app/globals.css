@@ -2717,7 +2717,7 @@ code {
     margin: 6px 0 4px;
     color: #fff7df;
     font-family: var(--font-playfair), Georgia, serif;
-    font-size: clamp(2.6rem, 15vw, 4.2rem);
+    font-size: clamp(2.05rem, 11vw, 3.15rem);
     line-height: 0.96;
   }
 
