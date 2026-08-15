@@ -363,10 +363,16 @@
 
 @media (max-width: 560px) {
   .app-home { border-radius: 0; margin-inline: calc(var(--page-inset) * -1); width: auto; }
-  .app-hero h1 { font-size: clamp(2.45rem, 13vw, 3.6rem); }
+  .app-hero { text-align: center; }
+  .app-hero__copy { display: flex; flex-direction: column; align-items: center; }
+  .app-hero h1 { font-size: clamp(2.45rem, 13vw, 3.6rem); margin-inline: auto; }
+  .app-hero__lead { margin-inline: auto; max-width: 32rem; }
+  .app-actions { justify-content: center; width: 100%; }
+  .app-trust { margin-inline: auto; max-width: 28rem; }
   .app-actions { align-items: stretch; flex-direction: column; }
   .app-button { width: 100%; }
   .app-assistant-card { min-height: 390px; }
+  .app-status { align-self: center; }
   .app-mobile-download {
     background: var(--app-card);
     border: 1px solid var(--app-line);
@@ -375,6 +381,7 @@
     gap: 1.25rem;
     margin-top: 1.25rem;
     padding: 1.35rem;
+    text-align: center;
     width: 100%;
   }
   .app-mobile-download h2 { font-family: var(--font-serif); font-size: 1.55rem; line-height: 1.15; margin: 0; }
@@ -383,16 +390,28 @@
   .app-mobile-download__links a, .app-mobile-download__links span { align-items: center; background: #0d0b08; border: 1px solid var(--app-line); border-radius: 10px; color: var(--app-text); display: flex; flex-direction: column; font-size: .7rem; font-weight: 700; justify-content: center; min-height: 58px; padding: .65rem; text-align: center; }
   .app-mobile-download__links a { border-color: var(--app-accent); }
   .app-mobile-download__links small { color: var(--app-accent); font-size: .62rem; margin-top: .25rem; text-transform: uppercase; }
-  .app-route { padding-block: 4rem; }
+  .app-quick > a, .app-quick__button {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    padding-inline: 1.5rem;
+    text-align: center;
+  }
+  .app-quick small { max-width: 28rem; }
+  .app-route { padding-block: 4rem; text-align: center; }
   .app-route > .app-section-head, .app-route > .app-steps { display: none; }
   .app-mobile-route { display: block; }
   .app-mobile-route > h2 { color: var(--app-accent) !important; font-size: .78rem; font-weight: 800; letter-spacing: .14em; margin: 0 0 1.5rem; text-transform: uppercase; }
   .app-mobile-route ol { display: grid; gap: 1rem; list-style: none; margin: 0; padding: 0; }
-  .app-mobile-route li { align-items: start; background: var(--app-card); border: 1px solid var(--app-line); border-radius: 18px; display: grid; gap: 1rem; grid-template-columns: auto 1fr; padding: 1.25rem; }
+  .app-mobile-route li { align-items: center; background: var(--app-card); border: 1px solid var(--app-line); border-radius: 18px; display: flex; flex-direction: column; gap: .85rem; padding: 1.25rem; text-align: center; }
   .app-mobile-route li > span { align-items: center; background: var(--app-accent); border-radius: 10px; color: var(--background); display: flex; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
   .app-mobile-route h3 { font-size: .98rem; line-height: 1.35; margin: .05rem 0 .35rem; }
   .app-mobile-route p { color: var(--app-muted) !important; font-size: .86rem; line-height: 1.55; margin: 0; }
-  .app-final { align-items: stretch; flex-direction: column; }
+  .app-expert { grid-template-columns: 1fr; justify-items: center; text-align: center; }
+  .app-expert__copy { align-items: center; display: flex; flex-direction: column; }
+  .app-expert p:not(.app-kicker) { margin-inline: auto; }
+  .app-final { align-items: stretch; flex-direction: column; text-align: center; }
+  .app-final > div { align-items: center; display: flex; flex-direction: column; }
+  .app-final p:not(.app-kicker) { margin-inline: auto; }
 }
 
 /* Анхам inside the page: he is drawn, not photographed, so he only needs

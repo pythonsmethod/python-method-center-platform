@@ -5151,7 +5151,12 @@ code {
   }
 
   .anham-companion__welcome {
+    text-align: center;
     width: 100%;
+  }
+
+  .anham-companion__welcome-title {
+    margin-inline: 1.5rem;
   }
 
   .anham-companion__figure .anham {
