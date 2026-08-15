@@ -29,9 +29,9 @@ const TIER_SETTINGS: Record<
 > = {
   // Slightly higher than a short answer needs: the guest level also has to
   // fit the honest explanation of what the next two levels give.
-  guest: { provider: "claude", maxTokens: 650, perMinute: 8 },
-  registered: { provider: "claude", maxTokens: 700, perMinute: 20 },
-  client: { provider: "best", maxTokens: 900, perMinute: 30 }
+  guest: { provider: "claude", maxTokens: 800, perMinute: 8 },
+  registered: { provider: "claude", maxTokens: 1400, perMinute: 20 },
+  client: { provider: "best", maxTokens: 1800, perMinute: 30 }
 };
 
 // Hard ceiling applied by IP before anything else runs, so a flood cannot
