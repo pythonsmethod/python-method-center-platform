@@ -47,12 +47,21 @@ export default async function PaymentPage() {
   }));
 
   return (
-    <div className="page-shell">
-      <PageHeader
-        eyebrow={t.eyebrow}
-        title={t.title}
-        description={t.description}
-      />
+    <div className="page-shell payment-page">
+      <section className="panel panel--promo payment-page__promo">
+        <span className="panel__label">{promo.badge}</span>
+        <h1>{freeReview ? promo.titleFree : promo.titlePaid}</h1>
+        <p>{freeReview ? promo.textFree : promo.textPaid}</p>
+        <p className="price-line">
+          {freeReview ? promo.priceFree : promo.pricePaid}
+          <span className="price-amount">{promo.priceAmount}</span>
+        </p>
+        <div className="panel-actions">
+          <Link className="button" href="/login">
+            {freeReview ? promo.ctaFree : promo.cta}
+          </Link>
+        </div>
+      </section>
 
       <PaymentPlans
         labels={{
@@ -70,22 +79,13 @@ export default async function PaymentPage() {
         plans={plans}
         signInHref="/login?next=/payment"
         signedIn={Boolean(profileId)}
-      >
-        <div className="panel panel--promo">
-          <span className="panel__label">{promo.badge}</span>
-          <h2>{freeReview ? promo.titleFree : promo.titlePaid}</h2>
-          <p>{freeReview ? promo.textFree : promo.textPaid}</p>
-          <p className="price-line">
-            {freeReview ? promo.priceFree : promo.pricePaid}
-            <span className="price-amount">{promo.priceAmount}</span>
-          </p>
-          <div className="panel-actions">
-            <Link className="button" href="/login">
-              {freeReview ? promo.ctaFree : promo.cta}
-            </Link>
-          </div>
-        </div>
-      </PaymentPlans>
+      />
+
+      <PageHeader
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
+      />
 
       <section className="panel-grid" aria-label={t.offerLabel}>
         <div className="panel">

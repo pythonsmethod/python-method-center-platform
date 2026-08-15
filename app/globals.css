@@ -2426,6 +2426,26 @@ code {
   box-shadow: 0 0 30px rgba(212, 175, 55, 0.1);
 }
 
+.payment-page__promo h1 {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  margin-top: 0.65rem;
+}
+
+.payment-page > .page-header {
+  margin-top: clamp(3.5rem, 8vw, 6rem);
+}
+
+@media (max-width: 560px) {
+  .payment-page__promo {
+    text-align: center;
+  }
+
+  .payment-page__promo .panel-actions {
+    display: flex;
+    justify-content: center;
+  }
+}
+
 /* --- Referral panel (client cabinet) --- */
 
 .referral {
@@ -11072,12 +11092,12 @@ body:has(.pm-app) > .site-footer { display: none; }
 
 @media (max-width: 560px) {
   body:has(.public-mobile-dock) { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
-  body:has(.app-home) .site-header .site-nav { display: none; }
-  body:has(.app-home) .site-header {
+  body:has(.public-mobile-dock) .site-header .site-nav { display: none; }
+  body:has(.public-mobile-dock) .site-header {
     min-height: 58px;
     padding-block: 10px;
   }
-  body:has(.app-home) .site-header__right {
+  body:has(.public-mobile-dock) .site-header__right {
     margin-left: auto;
     width: auto;
   }
