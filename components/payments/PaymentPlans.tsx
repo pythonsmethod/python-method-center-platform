@@ -118,14 +118,7 @@ export function PaymentPlans({
           </p>
         ) : null}
       </div>
-      ) : (
-        <div className="offer-gate offer-gate--signin">
-          <p>{labels.signInWhy}</p>
-          <Link className="button" href={signInHref}>
-            {labels.signInToPay}
-          </Link>
-        </div>
-      )}
+      ) : null}
 
       <section className="panel-grid">
         {children}
@@ -136,12 +129,12 @@ export function PaymentPlans({
             <p>{plan.description}</p>
             <p className="price-line">{plan.priceLine}</p>
             <div className="panel-actions">
-              {plan.paymentLinkUrl ? (
-                !signedIn ? (
-                  <Link className="button" href={signInHref}>
-                    {labels.signInToPay}
-                  </Link>
-                ) : accepted ? (
+              {!signedIn ? (
+                <Link className="button" href={signInHref}>
+                  {labels.signInToPay}
+                </Link>
+              ) : plan.paymentLinkUrl ? (
+                accepted ? (
                   <a
                     className="button"
                     href={plan.paymentLinkUrl}
@@ -172,13 +165,9 @@ export function PaymentPlans({
               )}
             </div>
 
-            {plan.paypalUrl ? (
+            {plan.paypalUrl && signedIn ? (
               <div className="plan-paypal">
-                {!signedIn ? (
-                  <Link className="button button--paypal" href={signInHref}>
-                    {labels.signInToPay}
-                  </Link>
-                ) : accepted ? (
+                {accepted ? (
                   <a
                     className="button button--paypal"
                     href={plan.paypalUrl}

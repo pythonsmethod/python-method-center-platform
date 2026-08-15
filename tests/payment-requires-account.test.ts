@@ -32,7 +32,7 @@ describe.each(PAGES)("$file", ({ file, next }) => {
 
   it("sends a visitor back to this page after they register", () => {
     // Landing on the cabinet instead loses the person mid-purchase.
-    expect(source).toContain(`signInHref="/login?next=${next}"`);
+    expect(source).toContain(`signInHref="/login?mode=signup&next=${next}"`);
   });
 
   it("still attaches the account to the payment link", () => {
