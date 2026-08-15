@@ -11638,9 +11638,9 @@ body:has(.pm-app) > .site-footer { display: none; }
 @media (max-width: 560px) {
   body:has(.public-mobile-dock) { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
   body:has(.public-mobile-dock) .site-header .site-nav { display: none; }
-  body:has(.public-mobile-dock) .site-header {
-    min-height: 58px;
-    padding-block: 10px;
+  body:has(.app-home) .site-header {
+    min-height: calc(64px + env(safe-area-inset-top));
+    padding-block: calc(16px + env(safe-area-inset-top)) 10px;
   }
   body:has(.public-mobile-dock) .site-header__right {
     margin-left: auto;
