@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
+import { LogoutButton } from "@/components/LogoutButton";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
@@ -28,7 +29,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         documents: "Документы",
         assistant: "ИИ и знания",
         requests: "Обращения",
-        founder: "Обзор"
+        founder: "Обзор",
+        home: "На главную сайта",
+        logout: "Выйти"
       }
     : {
         workspace: "Team workspace",
@@ -38,7 +41,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         documents: "Documents",
         assistant: "AI & knowledge",
         requests: "Requests",
-        founder: "Overview"
+        founder: "Overview",
+        home: "Website home",
+        logout: "Sign out"
       };
 
   const adminNavRoutes = [
@@ -53,6 +58,12 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <>
+      {auth.status === "authorized" ? (
+        <div className="admin-mobile-utility" aria-label={labels.workspace}>
+          <Link href="/">← {labels.home}</Link>
+          <LogoutButton label={labels.logout} />
+        </div>
+      ) : null}
       <div className="admin-nav">
         <span className="admin-nav__label">{labels.workspace}</span>
         <nav aria-label={labels.navigation}>
