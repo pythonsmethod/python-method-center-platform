@@ -2,158 +2,101 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import type { ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { logoutAction } from "@/lib/auth/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import {
-  IconAnkh,
-  IconEyeOfHorus,
-  IconLotus,
-  IconMoon,
-  IconPapyrus,
-  IconScales,
-  IconScarab,
-  IconWater,
-  IconWingedSun
+  IconAnkh, IconEyeOfHorus, IconLotus, IconMoon, IconPapyrus,
+  IconScales, IconScarab, IconWater, IconWingedSun
 } from "@/components/icons/EgyptianIcons";
 
-type CabinetSection = {
-  href: string;
-  title: string;
-  hint: string;
-  icon: (props: { className?: string }) => React.ReactElement;
-};
-
-function buildSections(t: Dictionary["cabinet"]): CabinetSection[] {
-  return [
-    { href: "/cabinet", ...t.sections.home, icon: IconWingedSun },
-    { href: "/cabinet/documents", ...t.sections.documents, icon: IconPapyrus },
-    { href: "/cabinet/metrics", ...t.sections.metrics, icon: IconWater },
-    { href: "/cabinet/supplements", ...t.sections.supplements, icon: IconLotus },
-    { href: "/cabinet/sleep", ...t.sections.sleep, icon: IconMoon },
-    { href: "/cabinet/chat", ...t.sections.chat, icon: IconEyeOfHorus },
-    { href: "/cabinet/account", ...t.sections.account, icon: IconScales },
-    { href: "/cabinet/tokens", ...t.sections.tokens, icon: IconScarab }
-  ];
-}
-
 type CabinetShellProps = {
-  children: ReactNode;
-  email: string | null;
-  greetingName: string;
-  unread: number;
-  tokens: number;
-  supplementsDue: number;
-  // The cabinet section of the dictionary, handed down by the layout: this
-  // is a client component and cannot read cookies to find the locale.
-  labels: Dictionary["cabinet"];
+  children: ReactNode; email: string | null; greetingName: string;
+  unread: number; tokens: number; supplementsDue: number;
+  locale: "ru" | "en"; preview?: boolean; labels: Dictionary["cabinet"];
 };
 
-// The cabinet as a workspace. The column of destinations is always on the
-// screen — on a desktop with its explanations, on a phone as a narrow strip
-// of signs — because a menu hidden behind a button is a menu a first-time
-// visitor never finds.
-export function CabinetShell({
-  children,
-  email,
-  greetingName,
-  unread,
-  tokens,
-  supplementsDue,
-  labels: t
-}: CabinetShellProps) {
+type NavItem = {
+  href: string; label: string; hint: string;
+  icon: (props: { className?: string }) => React.ReactElement; badge?: number;
+};
+
+export function CabinetShell({ children, email, greetingName, unread, tokens,
+  supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
   const pathname = usePathname();
-  const sections = buildSections(t);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const ru = locale === "ru";
+  const root = preview ? "/app-preview" : "/cabinet";
 
-  function isCurrent(href: string): boolean {
-    return href === "/cabinet"
-      ? pathname === "/cabinet"
-      : pathname === href || pathname.startsWith(`${href}/`);
-  }
+  useEffect(() => setMenuOpen(false), [pathname]);
+  useEffect(() => {
+    document.body.classList.toggle("cabinet-menu-open", menuOpen);
+    return () => document.body.classList.remove("cabinet-menu-open");
+  }, [menuOpen]);
 
-  return (
-    <div className="cab">
-      <aside className="cab__side">
-        <nav aria-label={t.navLabel} className="cab__nav">
-          {sections.map((section) => {
-            const Icon = section.icon;
-            const active = isCurrent(section.href);
-            // Badges live where the action is: unread messages on the home
-            // page, doses waiting to be taken on the tracker.
-            const badge =
-              section.href === "/cabinet"
-                ? unread
-                : section.href === "/cabinet/supplements"
-                  ? supplementsDue
-                  : 0;
+  const nav: Array<{ title: string; items: NavItem[] }> = [
+    { title: ru ? "Главное" : "Overview", items: [
+      { href: root, label: t.sections.home.title, hint: t.sections.home.hint, icon: IconWingedSun },
+      { href: `${root}/account`, label: t.sections.account.title, hint: t.sections.account.hint, icon: IconScales }
+    ] },
+    { title: ru ? "Материалы и трекеры" : "Files and trackers", items: [
+      { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus },
+      { href: `${root}/metrics`, label: t.sections.metrics.title, hint: t.sections.metrics.hint, icon: IconWater },
+      { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue },
+      { href: `${root}/sleep`, label: t.sections.sleep.title, hint: t.sections.sleep.hint, icon: IconMoon }
+    ] },
+    { title: ru ? "Общение" : "Communication", items: [
+      { href: `${root}/dialog`, label: "Professor Python", hint: ru ? "Личное сопровождение" : "Personal guidance", icon: IconEyeOfHorus, badge: unread },
+      { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh }
+    ] },
+    { title: ru ? "Возможности" : "Benefits", items: [
+      { href: `${root}/tokens`, label: t.sections.tokens.title, hint: t.sections.tokens.hint, icon: IconScarab }
+    ] }
+  ];
 
-            return (
-              <Link
-                aria-current={active ? "page" : undefined}
-                className={`cab__link${active ? " cab__link--active" : ""}`}
-                href={section.href}
-                key={section.href}
-              >
-                <span className="cab__link-icon">
-                  <Icon />
-                  {badge > 0 ? <b className="cab__badge">{badge}</b> : null}
-                </span>
-                <span className="cab__link-body">
-                  <strong>{section.title}</strong>
-                  <em>{section.hint}</em>
-                </span>
-              </Link>
-            );
-          })}
-        </nav>
+  const isCurrent = (href: string) => href === root
+    ? pathname === href : pathname === href || pathname.startsWith(`${href}/`);
 
-        {/* Always reachable, always last: the one button that must never be
-            hunted for. */}
-        <Link className="cab__sos" href="/support#emergency">
-          <span aria-hidden="true">☎</span>
-          <span className="cab__sos-text">{t.sos}</span>
+  return <div className="web-cab">
+    <aside aria-label={t.navLabel} className={`web-cab__sidebar${menuOpen ? " is-open" : ""}`}>
+      <div className="web-cab__sidebar-head">
+        <Link className="web-cab__brand" href={root}>
+          <span className="web-cab__brand-symbol"><IconAnkh /></span>
+          <span><strong>Python Method</strong><small>Center</small></span>
         </Link>
-
-        {/* Leaving must never require searching. Quiet on purpose: an exit,
-            not an invitation. */}
-        <form action={logoutAction}>
-          <button className="cab__logout" type="submit">
-            <span aria-hidden="true">⎋</span>
-            <span className="cab__logout-text">{t.logout}</span>
-          </button>
-        </form>
-      </aside>
-
-      <div className="cab__main">
-        <header className="cab__top">
-          <div className="cab__hello">
-            <strong>
-              {t.greeting}, {greetingName}!
-            </strong>
-            <span>{t.greetingNote}</span>
-          </div>
-
-          <div className="cab__chips">
-            <Link className="cab__chip" href="/cabinet/tokens">
-              <span className="cab__chip-icon cab__chip-icon--coin">⊙</span>
-              <span>{tokens}</span>
-            </Link>
-            <Link className="cab__chip cab__chip--user" href="/cabinet/account">
-              <span className="cab__chip-icon">
-                <IconAnkh />
-              </span>
-              <span className="cab__chip-user">
-                <strong>{greetingName}</strong>
-                <em>{email ?? t.clientFallback}</em>
-              </span>
-            </Link>
-          </div>
-        </header>
-
-        <div className="cab__content">{children}</div>
+        <button aria-label={ru ? "Закрыть меню" : "Close menu"} className="web-cab__close" onClick={() => setMenuOpen(false)} type="button">×</button>
       </div>
+      <nav className="web-cab__nav">
+        {nav.map((group) => <div className="web-cab__nav-group" key={group.title}>
+          <span className="web-cab__nav-title">{group.title}</span>
+          {group.items.map((item) => {
+            const Icon = item.icon; const active = isCurrent(item.href);
+            return <Link aria-current={active ? "page" : undefined} aria-label={item.label} className={`web-cab__nav-link${active ? " is-active" : ""}`} href={item.href} key={item.href}>
+              <span className="web-cab__nav-icon"><Icon />{item.badge ? <b>{item.badge}</b> : null}</span>
+              <span><strong>{item.label}</strong><small>{item.hint}</small></span><i aria-hidden="true">›</i>
+            </Link>;
+          })}
+        </div>)}
+      </nav>
+      <div className="web-cab__sidebar-foot">
+        <Link className="web-cab__emergency" href="/support#emergency">{t.sos}</Link>
+        {preview ? null : <form action={logoutAction}><button type="submit">{t.logout}</button></form>}
+      </div>
+    </aside>
+    {menuOpen ? <button aria-label={ru ? "Закрыть меню" : "Close menu"} className="web-cab__backdrop" onClick={() => setMenuOpen(false)} type="button" /> : null}
+    <div className="web-cab__workspace">
+      <header className="web-cab__topbar">
+        <button aria-expanded={menuOpen} aria-label={ru ? "Открыть меню кабинета" : "Open cabinet menu"} className="web-cab__menu" onClick={() => setMenuOpen(true)} type="button"><span /><span /><span /></button>
+        <Link className="web-cab__mobile-brand" href={root}><IconAnkh /><span>Python Method Center</span></Link>
+        <div className="web-cab__welcome"><strong>{ru ? `Добрый день, ${greetingName}` : `Good day, ${greetingName}`}</strong><span>{ru ? "Ваш личный кабинет" : "Your personal cabinet"}</span></div>
+        <div className="web-cab__top-actions">
+          <LanguageSwitcher locale={locale} />
+          <Link aria-label={ru ? `Токены: ${tokens}` : `Tokens: ${tokens}`} className="web-cab__token" href={`${root}/tokens`}><IconScarab /><span>{tokens}</span></Link>
+          <Link className="web-cab__account" href={`${root}/account`}><span>{greetingName.slice(0, 1).toUpperCase()}</span><span><strong>{greetingName}</strong><small>{email ?? t.clientFallback}</small></span></Link>
+        </div>
+      </header>
+      <main className="web-cab__content">{children}</main>
     </div>
-  );
+  </div>;
 }
-
-export { IconEyeOfHorus };
