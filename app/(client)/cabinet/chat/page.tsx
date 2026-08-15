@@ -120,7 +120,7 @@ export default async function CabinetChatPage() {
         </div>
       </section>
 
-      <EmergencyNotice />
+      <EmergencyNotice text={strings.support.emergencyText} />
     </>
   );
 }

@@ -89,7 +89,7 @@ export default async function AccountPage() {
             phone={profileRow?.phone ?? null}
           />
           <div className="panel-actions">
-            <LogoutButton />
+            <LogoutButton label={dict.logout} />
           </div>
         </div>
 

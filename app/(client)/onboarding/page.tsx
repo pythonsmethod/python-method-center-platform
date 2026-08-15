@@ -66,7 +66,7 @@ export default async function OnboardingPage() {
           <h2>{auth.email ?? t.signedIn}</h2>
           <p>{t.accountText}</p>
           <div className="panel-actions">
-            <LogoutButton />
+            <LogoutButton label={strings.cabinet.logout} />
           </div>
         </div>
         <div className="panel">
@@ -76,7 +76,7 @@ export default async function OnboardingPage() {
         </div>
       </section>
 
-      <EmergencyNotice />
+      <EmergencyNotice text={strings.support.emergencyText} />
 
       <section className="form-section" aria-label={t.formLabel}>
         <OnboardingForm labels={t} profileDefaults={profileDefaults} />
