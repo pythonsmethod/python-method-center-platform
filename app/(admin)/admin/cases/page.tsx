@@ -15,6 +15,7 @@ import {
   caseStatusLabel,
   caseUrgencyLabel
 } from "@/lib/i18n/status-labels";
+import { getLocale, type Locale } from "@/lib/i18n/locale";
 
 function shortId(value: string): string {
   return value.slice(0, 8);
@@ -32,7 +33,7 @@ function CaseTable({
   }
 
   return (
-    <div className="table-wrap">
+    <div className="table-wrap staff-case-desktop">
       <table className="data-table">
         <thead>
           <tr>
@@ -92,6 +93,93 @@ function CaseTable({
   );
 }
 
+function CaseCards({
+  cases,
+  locale,
+  unreadByCase
+}: {
+  cases: StaffCaseListItem[];
+  locale: Locale;
+  unreadByCase: Record<string, number>;
+}) {
+  const copy = locale === "ru"
+    ? {
+        unnamed: "Без имени",
+        open: "Открыть клиента",
+        unread: "новых",
+        updated: "Обновлён",
+        empty: "Клиентов пока нет.",
+        status: {
+          created: "Создан",
+          awaiting_onboarding: "Ожидает анкету",
+          ready_for_review: "Передан на изучение",
+          in_review: "Изучается",
+          active_support: "Сопровождение",
+          inactive_support: "Приостановлен",
+          completed: "Завершён",
+          archived: "В архиве"
+        },
+        urgency: { normal: "Обычная", elevated: "Повышенная", critical: "Критическая" }
+      }
+    : {
+        unnamed: "Unnamed client",
+        open: "Open client",
+        unread: "new",
+        updated: "Updated",
+        empty: "There are no clients yet.",
+        status: {
+          created: "Created",
+          awaiting_onboarding: "Awaiting questionnaire",
+          ready_for_review: "Ready for review",
+          in_review: "Under review",
+          active_support: "Active support",
+          inactive_support: "Paused",
+          completed: "Completed",
+          archived: "Archived"
+        },
+        urgency: { normal: "Normal", elevated: "Elevated", critical: "Critical" }
+      };
+  const label = (labels: Record<string, string>, value: string) =>
+    labels[value] ?? value.replaceAll("_", " ");
+  const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "short" });
+
+  if (cases.length === 0) {
+    return <p className="empty-state staff-case-mobile">{copy.empty}</p>;
+  }
+
+  return (
+    <div className="staff-case-mobile staff-client-list">
+      {cases.map((clientCase) => {
+        const name = clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? copy.unnamed;
+        const unreadCount = unreadByCase[clientCase.id] ?? 0;
+
+        return (
+          <Link className="staff-client-card" href={`/admin/cases/${clientCase.id}`} key={clientCase.id}>
+            <span className="staff-client-card__avatar" aria-hidden="true">
+              {name.trim().charAt(0).toUpperCase() || "?"}
+            </span>
+            <span className="staff-client-card__body">
+              <span className="staff-client-card__name-row">
+                <strong>{name}</strong>
+                {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
+              </span>
+              {clientCase.title ? <span className="staff-client-card__goal">{clientCase.title}</span> : null}
+              <span className="staff-client-card__meta">
+                {label(copy.status, clientCase.status)} · {label(copy.urgency, clientCase.urgency)}
+              </span>
+              <small>{copy.updated}: {formatter.format(new Date(clientCase.updated_at))}</small>
+            </span>
+            <span className="staff-client-card__open">
+              <span>{copy.open}</span>
+              <b aria-hidden="true">›</b>
+            </span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
 type PageProps = {
   searchParams: Promise<{ q?: string }>;
 };
@@ -99,6 +187,7 @@ type PageProps = {
 export default async function StaffCasesPage({ searchParams }: PageProps) {
   const query = ((await searchParams).q ?? "").slice(0, 120);
   const auth = await getRequiredStaffUser("/admin/cases");
+  const locale = await getLocale();
 
   if (auth.status === "missing-env") {
     return (
@@ -152,7 +241,7 @@ export default async function StaffCasesPage({ searchParams }: PageProps) {
         description="Список кейсов с анкетами и документами. Открывайте кейс для просмотра анкеты."
       />
 
-      <section className="panel-grid">
+      <section className="panel-grid staff-session-panel">
         <div className="panel">
           <span className="panel__label">Сессия</span>
           <h2>{auth.email ?? "Сотрудник"}</h2>
@@ -201,6 +290,7 @@ export default async function StaffCasesPage({ searchParams }: PageProps) {
               </p>
             ) : null}
             <CaseTable cases={found} unreadByCase={unread.byCase} />
+            <CaseCards cases={found} locale={locale} unreadByCase={unread.byCase} />
           </>
         ) : (
           <div className="notice notice--warning">
