@@ -1,6 +1,8 @@
 import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
 
 const DEFAULT_OPENAI_MODEL = "gpt-5.1";
+const CONTINUE_INSTRUCTION =
+  "Продолжи ответ ровно с того места, где он оборвался. Не повторяй уже написанное, сохрани язык и закончи мысль кратко и естественно.";
 
 export function hasOpenAiEnv(): boolean {
   return Boolean(process.env.OPENAI_API_KEY?.trim());
@@ -62,13 +64,54 @@ export async function askOpenAi(
     }
 
     const data = (await response.json()) as {
-      choices?: { message?: { content?: string | null } }[];
+      choices?: {
+        finish_reason?: string | null;
+        message?: { content?: string | null };
+      }[];
     };
 
-    const reply = data.choices?.[0]?.message?.content?.trim();
+    let reply = data.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
       return { status: "error", message: "Пустой ответ ассистента." };
+    }
+
+    if (data.choices?.[0]?.finish_reason === "length") {
+      try {
+        const continuationResponse = await fetch(`${baseUrl}/v1/chat/completions`, {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${apiKey}`,
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            model,
+            max_completion_tokens: maxTokens,
+            messages: [
+              { role: "system", content: system },
+              ...messages.map((message) => ({
+                role: message.role,
+                content: message.content
+              })),
+              { role: "assistant", content: reply },
+              { role: "user", content: CONTINUE_INSTRUCTION }
+            ]
+          })
+        });
+
+        if (continuationResponse.ok) {
+          const continuationData = (await continuationResponse.json()) as {
+            choices?: { message?: { content?: string | null } }[];
+          };
+          const ending = continuationData.choices?.[0]?.message?.content?.trim();
+
+          if (ending) {
+            reply = `${reply}\n${ending}`;
+          }
+        }
+      } catch {
+        // Preserve the useful first part if only the continuation call fails.
+      }
     }
 
     return { status: "ok", reply };
