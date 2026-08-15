@@ -2875,20 +2875,6 @@ code {
     font-size: 1.6rem;
   }
 
-  .karen-mobile-actions {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 8px;
-    margin-top: 18px;
-  }
-
-  .karen-mobile-actions .button {
-    min-height: 48px;
-    padding-inline: 10px;
-    font-size: 0.78rem;
-    text-align: center;
-  }
-
   .karen-mobile-assistant {
     scroll-margin-top: 18px;
     margin-top: 22px;

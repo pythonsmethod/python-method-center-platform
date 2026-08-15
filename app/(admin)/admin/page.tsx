@@ -110,7 +110,6 @@ export default async function AdminPage() {
         waiting: "Обновлено",
         noCases: "Активных кейсов пока нет.",
         allClients: "Все клиенты",
-        assistant: "Спросить помощника",
         assistantTitle: "Рабочий помощник",
         assistantIntro: "Вставьте вопрос клиента, текст анкеты или прикрепите анализы — помогу сделать выжимку и подготовить ответ.",
         assistantPlaceholder: "Вопрос, текст или файл…",
@@ -131,7 +130,6 @@ export default async function AdminPage() {
         waiting: "Updated",
         noCases: "There are no active cases yet.",
         allClients: "All clients",
-        assistant: "Ask assistant",
         assistantTitle: "Work assistant",
         assistantIntro: "Paste a client's question or questionnaire, or attach test results — I can summarize them and draft a reply.",
         assistantPlaceholder: "Question, text or file…",
@@ -208,11 +206,6 @@ export default async function AdminPage() {
               </Link>
             );
           })}
-        </div>
-
-        <div className="karen-mobile-actions">
-          <Link className="button" href="/admin/cases">{copy.allClients}</Link>
-          <a className="button button--secondary" href="#karen-mobile-assistant">{copy.assistant}</a>
         </div>
 
         <section className="karen-mobile-assistant" id="karen-mobile-assistant" aria-labelledby="karen-mobile-assistant-title">
