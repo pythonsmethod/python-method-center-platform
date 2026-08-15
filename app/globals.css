@@ -11804,3 +11804,14 @@ body:has(.pm-app) > .site-footer { display: none; }
   .site-nav__label { white-space: nowrap; }
   .page-shell { max-width: 1180px; }
 }
+.locale-copy--en {
+  display: none;
+}
+
+html[lang="en"] .locale-copy--ru {
+  display: none;
+}
+
+html[lang="en"] .locale-copy--en {
+  display: block;
+}
