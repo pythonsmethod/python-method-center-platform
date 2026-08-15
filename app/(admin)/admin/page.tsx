@@ -13,9 +13,12 @@ import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
+import { getLocale } from "@/lib/i18n/locale";
+import { getStaffCases } from "@/lib/cases/staff-queries";
 
 export default async function AdminPage() {
   const auth = await getRequiredStaffUser("/admin");
+  const locale = await getLocale();
 
   if (auth.status === "missing-env") {
     return (
@@ -53,18 +56,163 @@ export default async function AdminPage() {
     );
   }
 
-  const [knowledge, escalations, unread] = await Promise.all([
+  const [knowledge, escalations, unread, casesResult] = await Promise.all([
     listKnowledgeEntries(),
     listOpenEscalations(),
-    getStaffUnreadCounts()
+    getStaffUnreadCounts(),
+    getStaffCases()
   ]);
   const assistantConfigured = hasAssistantEnv();
   // Only the founder sees which model answers; for the team it is simply
   // the assistant.
   const showProviders = canSeeProviderNames(auth.email);
+  const statusLabels = locale === "ru"
+    ? {
+        created: "Создан",
+        awaiting_onboarding: "Ожидает анкету",
+        ready_for_review: "Передан на изучение",
+        in_review: "Изучается командой",
+        active_support: "Активное сопровождение",
+        inactive_support: "Сопровождение приостановлено",
+        completed: "Завершён",
+        archived: "В архиве"
+      }
+    : {
+        created: "Created",
+        awaiting_onboarding: "Awaiting questionnaire",
+        ready_for_review: "Ready for review",
+        in_review: "Under review",
+        active_support: "Active support",
+        inactive_support: "Support paused",
+        completed: "Completed",
+        archived: "Archived"
+      };
+  const urgencyLabels = locale === "ru"
+    ? { normal: "Обычная", elevated: "Повышенная", critical: "Критическая" }
+    : { normal: "Normal", elevated: "Elevated", critical: "Critical" };
+  const label = (labels: Record<string, string>, value: string) =>
+    labels[value] ?? value.replaceAll("_", " ");
+  const dateFormatter = new Intl.DateTimeFormat(locale === "ru" ? "ru" : "en", {
+    dateStyle: "short",
+    timeStyle: "short"
+  });
+  const copy = locale === "ru"
+    ? {
+        eyebrow: "Рабочий кабинет Карена",
+        title: "Сегодня",
+        hello: "Всё важное на одном экране",
+        description: "Сначала срочное, затем клиенты, которые ждут вашего ответа.",
+        messages: "Новых сообщений",
+        flags: "Красных флагов",
+        clients: "Клиентов в работе",
+        attention: "Требует внимания",
+        queue: "Очередь на сегодня",
+        queueHint: "Сначала показаны срочные кейсы и непрочитанные сообщения.",
+        open: "Открыть клиента",
+        waiting: "Обновлено",
+        noCases: "Активных кейсов пока нет.",
+        allClients: "Все клиенты",
+        assistant: "Спросить помощника",
+        unread: "нов."
+      }
+    : {
+        eyebrow: "Karen's workspace",
+        title: "Today",
+        hello: "Everything important on one screen",
+        description: "Urgent items first, followed by clients waiting for your reply.",
+        messages: "New messages",
+        flags: "Red flags",
+        clients: "Active clients",
+        attention: "Needs attention",
+        queue: "Today's queue",
+        queueHint: "Urgent cases and unread messages appear first.",
+        open: "Open client",
+        waiting: "Updated",
+        noCases: "There are no active cases yet.",
+        allClients: "All clients",
+        assistant: "Ask assistant",
+        unread: "new"
+      };
+  const cases = casesResult.status === "ready"
+    ? [...casesResult.cases]
+        .sort((a, b) => {
+          const urgency = (value: string) => value === "critical" ? 2 : value === "elevated" ? 1 : 0;
+          const priorityA = urgency(a.urgency) * 1000 + (unread.byCase[a.id] ?? 0) * 100;
+          const priorityB = urgency(b.urgency) * 1000 + (unread.byCase[b.id] ?? 0) * 100;
+          return priorityB - priorityA || b.updated_at.localeCompare(a.updated_at);
+        })
+        .slice(0, 8)
+    : [];
 
   return (
     <div className="page-shell page-shell--wide">
+      <section className="karen-mobile-home" aria-labelledby="karen-today-title">
+        <header className="karen-mobile-hero">
+          <span>{copy.eyebrow}</span>
+          <h1 id="karen-today-title">{copy.title}</h1>
+          <strong>{copy.hello}</strong>
+          <p>{copy.description}</p>
+        </header>
+
+        <div className="karen-mobile-stats" aria-label={copy.hello}>
+          <Link href="/admin/cases">
+            <b>{unread.total}</b>
+            <span>{copy.messages}</span>
+          </Link>
+          <a href="#karen-flags">
+            <b>{escalations.escalations.length}</b>
+            <span>{copy.flags}</span>
+          </a>
+          <Link href="/admin/cases">
+            <b>{casesResult.status === "ready" ? casesResult.cases.length : "—"}</b>
+            <span>{copy.clients}</span>
+          </Link>
+        </div>
+
+        {(escalations.escalations.length > 0 || escalations.error) ? (
+          <div className="karen-mobile-alert" id="karen-flags">
+            <span className="panel__label">{copy.attention}</span>
+            <EscalationPanel escalations={escalations.escalations} loadError={escalations.error} />
+          </div>
+        ) : null}
+
+        <div className="karen-mobile-section-head">
+          <div>
+            <span className="panel__label">{copy.queue}</span>
+            <p>{copy.queueHint}</p>
+          </div>
+          <Link href="/admin/cases">{copy.allClients} →</Link>
+        </div>
+
+        <div className="karen-mobile-queue">
+          {cases.length === 0 ? <p className="empty-state">{copy.noCases}</p> : cases.map((clientCase) => {
+            const unreadCount = unread.byCase[clientCase.id] ?? 0;
+            return (
+              <Link className="karen-client-card" href={`/admin/cases/${clientCase.id}`} key={clientCase.id}>
+                <span className="karen-client-card__avatar" aria-hidden="true">
+                  {(clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "?").trim().charAt(0).toUpperCase()}
+                </span>
+                <span className="karen-client-card__content">
+                  <span className="karen-client-card__topline">
+                    <strong>{clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "—"}</strong>
+                    {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
+                  </span>
+                  <span>{clientCase.title ?? label(statusLabels, clientCase.status)}</span>
+                  <small>{label(urgencyLabels, clientCase.urgency)} · {copy.waiting}: {dateFormatter.format(new Date(clientCase.updated_at))}</small>
+                </span>
+                <span className="karen-client-card__arrow" aria-label={copy.open}>›</span>
+              </Link>
+            );
+          })}
+        </div>
+
+        <div className="karen-mobile-actions">
+          <Link className="button" href="/admin/cases">{copy.allClients}</Link>
+          <a className="button button--secondary" href="#karen-assistant">{copy.assistant}</a>
+        </div>
+      </section>
+
+      <div className="karen-desktop-home">
       <PageHeader
         eyebrow="Рабочее место команды"
         title="Админ-панель"
@@ -137,7 +285,7 @@ export default async function AdminPage() {
           </div>
         </section>
 
-        <section aria-label="ИИ-помощник Professor Python" className="admin-split__assistant">
+        <section aria-label="ИИ-помощник Professor Python" className="admin-split__assistant" id="karen-assistant">
           <div className="panel">
             <span className="panel__label">ИИ-помощник Professor Python</span>
             <h2 className="staff-assistant__title">
@@ -178,6 +326,7 @@ export default async function AdminPage() {
             <KnowledgePanel entries={knowledge.entries} loadError={knowledge.error} />
           </div>
         </section>
+      </div>
       </div>
     </div>
   );
