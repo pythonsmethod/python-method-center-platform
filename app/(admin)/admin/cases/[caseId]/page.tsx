@@ -122,6 +122,11 @@ export default async function StaffCaseDetailPage({
   // Only the founder sees which model answers; for the team it is simply
   // the assistant.
   const showProviders = canSeeProviderNames(auth.email);
+  // Case status editing and manual payment recording are developer/founder
+  // controls. They stay out of Karen's clinical workspace so his attention
+  // remains on the client, documents and conversation. This intentionally
+  // fails closed when the founder allowlist is not configured.
+  const showAdminControls = auth.role === "admin" && canSeeProviderNames(auth.email);
   const detailResult = await getStaffCaseDetail(caseId);
 
   if (detailResult.status === "error") {
@@ -200,43 +205,45 @@ export default async function StaffCaseDetailPage({
         </div>
       </section>
 
-      <section className="panel-grid" aria-label="Управление кейсом">
-        <div className="panel">
-          <span className="panel__label">Управление</span>
-          <h2>Обновить кейс</h2>
-          <CaseManagementForm
-            caseId={clientCase.id}
-            direction={clientCase.direction}
-            status={clientCase.status}
-            urgency={clientCase.urgency}
-          />
-        </div>
+      {showAdminControls ? (
+        <section className="panel-grid" aria-label="Управление кейсом">
+          <div className="panel">
+            <span className="panel__label">Управление</span>
+            <h2>Обновить кейс</h2>
+            <CaseManagementForm
+              caseId={clientCase.id}
+              direction={clientCase.direction}
+              status={clientCase.status}
+              urgency={clientCase.urgency}
+            />
+          </div>
 
-        <div className="panel">
-          <span className="panel__label">Оплаты</span>
-          <h2>Записать оплату</h2>
-          <PaymentRecordForm caseId={clientCase.id} />
-          {payments.length === 0 ? (
-            <p className="empty-state">Оплат пока нет.</p>
-          ) : (
-            <ul className="status-list">
-              {payments.map((payment) => (
-                <li key={payment.id}>
-                  {paymentProductLabel(payment.product)} —{" "}
-                  {formatAmount(payment.amount_cents, payment.currency)} —{" "}
-                  {paymentStatusLabel(payment.status)}
-                  {payment.paid_at
-                    ? ` (${formatDateTime(payment.paid_at)})`
-                    : ""}
-                  {payment.processor_reference
-                    ? ` · ${payment.processor_reference}`
-                    : ""}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </section>
+          <div className="panel">
+            <span className="panel__label">Оплаты</span>
+            <h2>Записать оплату</h2>
+            <PaymentRecordForm caseId={clientCase.id} />
+            {payments.length === 0 ? (
+              <p className="empty-state">Оплат пока нет.</p>
+            ) : (
+              <ul className="status-list">
+                {payments.map((payment) => (
+                  <li key={payment.id}>
+                    {paymentProductLabel(payment.product)} —{" "}
+                    {formatAmount(payment.amount_cents, payment.currency)} —{" "}
+                    {paymentStatusLabel(payment.status)}
+                    {payment.paid_at
+                      ? ` (${formatDateTime(payment.paid_at)})`
+                      : ""}
+                    {payment.processor_reference
+                      ? ` · ${payment.processor_reference}`
+                      : ""}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+        </section>
+      ) : null}
 
       <section className="panel-grid" aria-label="Анкеты онбординга">
         {submissions.length === 0 ? (
