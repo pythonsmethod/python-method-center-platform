@@ -10,6 +10,7 @@ import { getClientCaseShell } from "@/lib/cases/queries";
 import { getUploadedDocumentsForCase } from "@/lib/documents/queries";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { getSupplementsDueCount } from "@/lib/supplements/queries";
+import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +31,8 @@ function isOnboardingSubmitted(value: string | string[] | undefined): boolean {
 // case, the payments, the documents — lives one tap away in the column on
 // the left and does not compete with it.
 export default async function CabinetPage({ searchParams }: CabinetPageProps) {
-  const strings = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const strings = getDictionary(locale);
   const dict = strings.cabinet;
   const t = dict.home;
   const auth = await getRequiredUser("/cabinet");
@@ -54,6 +56,7 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
     caseResult.status === "ready" && caseResult.case ? caseResult.case : null;
 
   const supplementsDue = await getSupplementsDueCount();
+  const assistantTier = await resolveAssistantTierForUi();
 
   const [documentResult, messagesResult] = clientCase
     ? await Promise.all([
@@ -113,6 +116,8 @@ export default async function CabinetPage({ searchParams }: CabinetPageProps) {
           for when they have a question, so the alternative has to be seen
           before they start typing into it. */}
       <AssistantInvite
+        attachments={assistantTier === "client"}
+        locale={locale}
         labels={{
           label: t.inviteLabel,
           title: t.inviteTitle,
