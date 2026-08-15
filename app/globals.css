@@ -2621,7 +2621,8 @@ code {
 .admin-nav__icon,
 .karen-mobile-home,
 .staff-case-mobile,
-.staff-document-mobile {
+.staff-document-mobile,
+.admin-mobile-utility {
   display: none;
 }
 
@@ -2634,6 +2635,33 @@ code {
   body:has(.admin-nav) .site-header,
   body:has(.admin-nav) .site-footer {
     display: none;
+  }
+
+  .admin-mobile-utility {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: min(calc(100% - 32px), 560px);
+    margin: calc(12px + env(safe-area-inset-top)) auto 0;
+  }
+
+  .admin-mobile-utility > a,
+  .admin-mobile-utility button {
+    min-height: 40px;
+    padding: 9px 13px;
+    border: 1px solid rgba(212, 168, 68, 0.3);
+    border-radius: 999px;
+    background: rgba(24, 19, 11, 0.88);
+    color: #d8c89f;
+    font-size: 0.74rem;
+    font-weight: 700;
+    line-height: 1;
+    text-decoration: none;
+  }
+
+  .admin-mobile-utility form {
+    margin: 0;
   }
 
   .admin-nav {
