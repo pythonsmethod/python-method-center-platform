@@ -484,3 +484,154 @@
   .app-home *, .app-home *::before, .app-home *::after { scroll-behavior: auto !important; transition: none !important; }
   .scroll-reveal-ready .app-home [data-scroll-reveal] { opacity: 1; transform: none; }
 }
+
+/* Tablet and desktop use the same visual language as the approved phone
+   experience, but take advantage of the wider canvas instead of merely
+   stretching the mobile stack. Phone rules above remain untouched. */
+@media (min-width: 561px) {
+  .app-mobile-download {
+    background: var(--app-card);
+    border: 1px solid var(--app-line);
+    border-radius: 18px;
+    display: grid;
+    gap: 1rem;
+    margin-top: 1rem;
+    padding: 1.2rem;
+    text-align: center;
+    width: min(100%, 390px);
+  }
+
+  .app-mobile-download h2 {
+    font-family: var(--font-serif);
+    font-size: 1.45rem;
+    line-height: 1.15;
+    margin: 0;
+  }
+
+  .app-mobile-download p:not(.app-kicker) {
+    color: var(--app-muted) !important;
+    font-size: .84rem;
+    line-height: 1.55;
+    margin: .7rem auto 0;
+    max-width: 32rem;
+  }
+
+  .app-mobile-download__links {
+    display: grid;
+    gap: .65rem;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .app-mobile-download__links a,
+  .app-mobile-download__links span {
+    align-items: center;
+    background: #0d0b08;
+    border: 1px solid var(--app-line);
+    border-radius: 10px;
+    color: var(--app-text);
+    display: flex;
+    flex-direction: column;
+    font-size: .7rem;
+    font-weight: 700;
+    justify-content: center;
+    min-height: 54px;
+    padding: .6rem;
+    text-align: center;
+  }
+
+  .app-mobile-download__links a { border-color: var(--app-accent); }
+  .app-mobile-download__links small {
+    color: var(--app-accent);
+    font-size: .6rem;
+    margin-top: .2rem;
+    text-transform: uppercase;
+  }
+
+  .app-route > .app-section-head,
+  .app-route > .app-steps { display: none; }
+
+  .app-mobile-route { display: block; text-align: center; }
+  .app-mobile-route > h2 {
+    color: var(--app-accent) !important;
+    font-size: .82rem;
+    font-weight: 800;
+    letter-spacing: .16em;
+    margin: 0 0 2rem;
+    text-transform: uppercase;
+  }
+
+  .app-mobile-route ol {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .app-mobile-route li {
+    align-items: center;
+    background: var(--app-card);
+    border: 1px solid var(--app-line);
+    border-radius: 18px;
+    display: flex;
+    flex-direction: column;
+    min-height: 190px;
+    padding: 1.5rem;
+    text-align: center;
+  }
+
+  .app-mobile-route li > span {
+    align-items: center;
+    background: var(--app-accent);
+    border-radius: 10px;
+    color: var(--background);
+    display: flex;
+    font-weight: 800;
+    height: 42px;
+    justify-content: center;
+    margin-bottom: .85rem;
+    width: 42px;
+  }
+
+  .app-mobile-route h3 { font-size: 1rem; margin: 0 0 .45rem; }
+  .app-mobile-route p {
+    color: var(--app-muted) !important;
+    font-size: .88rem;
+    line-height: 1.55;
+    margin: 0 auto;
+    max-width: 30rem;
+  }
+}
+
+@media (min-width: 561px) and (max-width: 1024px) {
+  .app-hero { padding: 4.5rem clamp(2rem, 7vw, 4.5rem); text-align: center; }
+  .app-hero__copy { align-items: center; display: flex; flex-direction: column; }
+  .app-hero h1,
+  .app-hero__lead,
+  .app-trust { margin-inline: auto; }
+  .app-actions { justify-content: center; }
+  .app-hero__visual { margin-top: 1.25rem; }
+  .app-quick > a,
+  .app-quick__button { justify-items: center; text-align: center; }
+  .app-expert { justify-items: center; text-align: center; }
+  .app-expert__copy { align-items: center; display: flex; flex-direction: column; }
+  .app-final { text-align: center; }
+}
+
+@media (min-width: 1025px) {
+  .app-home { max-width: 1480px; }
+  .app-hero {
+    gap: clamp(4rem, 8vw, 8rem);
+    grid-template-columns: minmax(0, 1fr) minmax(390px, .72fr);
+    min-height: 720px;
+    padding: clamp(4rem, 7vw, 7rem);
+  }
+  .app-hero__visual { align-content: center; }
+  .app-quick > a,
+  .app-quick__button { min-height: 156px; }
+  .app-mobile-route ol { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .app-route { padding-inline: clamp(4rem, 8vw, 8rem); }
+  .app-expert { grid-template-columns: minmax(180px, .35fr) minmax(0, 1fr); }
+  .app-expert__portrait { height: 164px; width: 164px; }
+}
