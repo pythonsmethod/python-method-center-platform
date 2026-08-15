@@ -2657,7 +2657,7 @@ code {
 
   .admin-nav nav {
     display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
     gap: 2px;
   }
 
@@ -2677,6 +2677,33 @@ code {
     font-size: 0.64rem;
     line-height: 1.1;
     text-align: center;
+  }
+
+  .admin-nav nav a.admin-nav__founder {
+    display: none;
+  }
+
+  .karen-ai-page {
+    width: min(100%, 560px);
+    margin: 0 auto;
+  }
+
+  .karen-ai-page .page-header {
+    text-align: left;
+  }
+
+  .karen-ai-grid {
+    display: grid;
+    gap: 14px;
+  }
+
+  .karen-ai-grid > .panel {
+    padding: 18px 14px;
+    border-radius: 20px;
+  }
+
+  .karen-ai-grid .knowledge-panel__form label {
+    font-size: 0.82rem;
   }
 
   .admin-nav__icon {
