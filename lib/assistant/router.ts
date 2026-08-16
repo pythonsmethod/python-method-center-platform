@@ -5,6 +5,7 @@ import {
   type ChatMessage
 } from "@/lib/assistant/claude";
 import { askOpenAi, hasOpenAiEnv } from "@/lib/assistant/openai";
+import type { ChatAttachment } from "@/lib/assistant/attachments";
 
 // Both models share the same system prompt (rules + Karen's knowledge base),
 // so they answer as one team.
@@ -28,6 +29,20 @@ export function isAssistantProvider(value: unknown): value is AssistantProvider 
 
 export function hasAssistantEnv(): boolean {
   return hasClaudeEnv() || hasOpenAiEnv();
+}
+
+// Vision/document extraction currently needs Claude's native attachment
+// blocks. Business routes call this provider-neutral boundary rather than
+// naming the provider themselves, so a future multimodal fallback stays
+// contained in one module.
+export async function askAssistantWithAttachments(
+  system: string,
+  messages: ChatMessage[],
+  maxTokens: number,
+  attachments: ChatAttachment[]
+): Promise<AssistantResult> {
+  if (!hasClaudeEnv()) return { status: "unavailable" };
+  return askClaude(system, messages, maxTokens, attachments);
 }
 
 async function askWithFallback(
