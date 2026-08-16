@@ -5635,9 +5635,44 @@ code {
   box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
   display: flex;
   flex-direction: column;
-  max-height: min(74vh, 640px);
+  height: min(720px, calc(100dvh - 32px));
+  max-height: calc(100dvh - 32px);
   overflow: hidden;
-  width: min(390px, calc(100vw - 2rem));
+  width: min(430px, calc(100vw - 2rem));
+}
+
+/* The chat is a small application inside the panel: only its conversation
+   history scrolls. The prompt, attachments and Send button stay reachable
+   at the bottom even when the intro or history is long. `min-height: 0` is
+   essential here — without it the grid keeps its intrinsic height and
+   silently pushes the composer below the viewport. */
+.anham-panel > .assistant-chat {
+  display: flex;
+  flex: 1 1 auto;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  padding: 10px;
+  margin-top: 0;
+}
+
+.anham-panel .assistant-chat__messages {
+  flex: 1 1 auto;
+  max-height: none;
+  min-height: 0;
+}
+
+.anham-panel .assistant-chat__suggestions,
+.anham-panel .assistant-chat__provider,
+.anham-panel .assistant-chat__form {
+  flex: 0 0 auto;
+}
+
+/* The floating avatar used to consume another 64px below the open panel,
+   which could move the Send button off-screen on laptop displays. The
+   avatar returns as soon as the panel closes. */
+.anham-companion.is-open > .anham-companion__figure {
+  display: none;
 }
 
 
@@ -10620,7 +10655,8 @@ code {
    room it has. */
 @media (max-width: 600px) {
   .anham-panel {
-    max-height: min(82vh, 720px);
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
     width: calc(100vw - 1.25rem);
   }
 }
@@ -10726,7 +10762,8 @@ code {
   }
 
   .anham-panel {
-    max-height: 76vh;
+    height: calc(100dvh - 24px);
+    max-height: calc(100dvh - 24px);
     width: calc(100vw - 24px);
   }
 
