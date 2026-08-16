@@ -256,7 +256,8 @@ export async function POST(request: Request) {
         caseId: audience.caseId,
         tier: audience.tier,
         question: displayText || messages[messages.length - 1]?.content || "",
-        answer: cleanedReply
+        answer: cleanedReply,
+        locale: rawLocale === "en" ? "en" : "ru"
       });
     }
   }

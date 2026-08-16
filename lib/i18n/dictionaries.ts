@@ -169,7 +169,7 @@ const ru = {
         "Что мне загрузить, чтобы разбор был полным?"
       ],
       inviteBoundary:
-        "Анхам — искусственный интеллект центра, а не Professor Python. Его ответы помогают сориентироваться; разбор ваших документов и рекомендации даёт лично он — в переписке ниже."
+        "Анхам — искусственный интеллект центра, а не Professor Python. Его ответы помогают сориентироваться; документы разбирает и рекомендации лично даёт Professor Python — в переписке ниже."
     },
     documents: {
       eyebrow: "Документы",
@@ -1387,7 +1387,7 @@ const en: typeof ru = {
         "What should I upload so the review is complete?"
       ],
       inviteBoundary:
-        "Anham is the centre's AI, not Professor Python. His answers help you get your bearings; the review of your documents and the recommendations come from him personally — in the conversation below."
+        "Anham is the centre's AI, not Professor Python. His answers help you get your bearings; Professor Python personally reviews your documents and provides recommendations in the conversation below."
     },
     documents: {
       eyebrow: "Documents",
