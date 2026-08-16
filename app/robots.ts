@@ -15,11 +15,12 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api/",
           "/admin",
+          "/app-preview",
           "/cabinet",
           "/onboarding",
           "/auth/",
-          "/recovery",
-          "/reset-password",
+          "/site-preview",
+          "/welcome",
           "/payment/test",
           "/payment/success"
         ]

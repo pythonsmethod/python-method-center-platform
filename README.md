@@ -133,6 +133,9 @@ Copy `.env.example` to `.env.local`. Key groups:
 - Notifications: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
 - `NEXT_PUBLIC_SITE_URL` — absolute origin for links in notifications and
   auth redirects
+- `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` — optional token from the Google
+  Search Console HTML-tag verification method (omit when DNS verification is
+  already in place)
 
 Do not commit `.env.local` or expose any server-only key via `NEXT_PUBLIC_*`.
 

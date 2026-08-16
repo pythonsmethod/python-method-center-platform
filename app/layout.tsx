@@ -113,7 +113,10 @@ export async function generateMetadata(): Promise<Metadata> {
     // so search engines never index the same page under two names.
     metadataBase: new URL(SITE_URL),
     alternates: { canonical: "./" },
-    title: t.title,
+    title: {
+      default: t.title,
+      template: `%s | Python Method Center`
+    },
     // The promo sentence is appended, never baked in: the day the free
     // review ends, this line stops promising it without a code change.
     description: isFreeReviewActive()
