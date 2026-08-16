@@ -2,19 +2,21 @@ import Stripe from "stripe";
 import {
   PLAN_100D_TOTAL_USD,
   PLAN_5W_TOTAL_USD,
-  TEST_ACCESS_DAYS,
-  TEST_ACCESS_TOTAL_USD,
   type PaymentPlan
 } from "@/lib/payments/config";
 
 export type PaymentProduct = PaymentPlan["product"];
+// Existing focus-group periods keep their original database product id.
+// It is absent from the storefront and amount mapping, so no new purchase
+// can create it while already-issued access remains valid.
+export type ServicePeriodProduct = PaymentProduct | "test_access";
 
 // Support-period length per product ("support_15_weeks" is the internal
 // enum id of the 100-day plan — the storefront label changed, the id didn't).
-export const PLAN_DURATION_DAYS: Record<PaymentProduct, number> = {
+export const PLAN_DURATION_DAYS: Record<ServicePeriodProduct, number> = {
   support_5_weeks: 35,
   support_15_weeks: 100,
-  test_access: TEST_ACCESS_DAYS
+  test_access: 14
 };
 
 // P2-01: the payer's email is attacker-influenced input. ILIKE treated
@@ -67,15 +69,11 @@ export function productFromAmount(
     return "support_15_weeks";
   }
 
-  if (amountCents === TEST_ACCESS_TOTAL_USD * 100) {
-    return "test_access";
-  }
-
   return null;
 }
 
 export function servicePeriodEnd(
-  product: PaymentProduct,
+  product: ServicePeriodProduct,
   startsAt: Date
 ): Date {
   const ends = new Date(startsAt);

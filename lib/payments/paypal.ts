@@ -7,21 +7,18 @@
 
 export type PayPalProduct =
   | "support_5_weeks"
-  | "support_15_weeks"
-  | "test_access";
+  | "support_15_weeks";
 
 const ENV_BY_PRODUCT: Record<PayPalProduct, string> = {
   support_5_weeks: "NEXT_PUBLIC_PAYPAL_LINK_5W",
-  support_15_weeks: "NEXT_PUBLIC_PAYPAL_LINK_15W",
-  test_access: "NEXT_PUBLIC_PAYPAL_LINK_TEST"
+  support_15_weeks: "NEXT_PUBLIC_PAYPAL_LINK_15W"
 };
 
 // Links are read from NEXT_PUBLIC_* on purpose: the payment page renders
 // them into the markup, and there is nothing secret about a payment link.
 const RAW_LINKS: Record<PayPalProduct, string | undefined> = {
   support_5_weeks: process.env.NEXT_PUBLIC_PAYPAL_LINK_5W,
-  support_15_weeks: process.env.NEXT_PUBLIC_PAYPAL_LINK_15W,
-  test_access: process.env.NEXT_PUBLIC_PAYPAL_LINK_TEST
+  support_15_weeks: process.env.NEXT_PUBLIC_PAYPAL_LINK_15W
 };
 
 export function paypalEnvName(product: PayPalProduct): string {

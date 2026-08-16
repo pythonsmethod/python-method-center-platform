@@ -9,15 +9,8 @@ import { getPaypalLink } from "@/lib/payments/paypal";
 export const PLAN_5W_TOTAL_USD = 1440;
 export const PLAN_100D_TOTAL_USD = 3675;
 
-// Test access for invited testers: the real paid path end to end — Stripe,
-// the webhook, the cabinet, the personal AI of a paying client — for the
-// price of a coffee. Never shown on the public payment page; it lives on
-// /payment/test, which is only reachable by direct link.
-export const TEST_ACCESS_TOTAL_USD = 3;
-export const TEST_ACCESS_DAYS = 14;
-
 export type PaymentPlan = {
-  product: "support_5_weeks" | "support_15_weeks" | "test_access";
+  product: "support_5_weeks" | "support_15_weeks";
   title: string;
   description: string;
   priceLine: string;
@@ -37,33 +30,10 @@ function readPaymentLink(value: string | undefined): string | null {
   return url;
 }
 
-// Returns the test plan only when its Payment Link is configured, so the
-// page disappears by itself once the link is removed from Vercel.
-export function getTestAccessPlan(locale: Locale = "ru"): PaymentPlan | null {
-  const t = getDictionary(locale).paymentTest;
-  const paymentLinkUrl = readPaymentLink(
-    process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_TEST
-  );
-
-  if (!paymentLinkUrl) {
-    return null;
-  }
-
-  return {
-    product: "test_access",
-    title: t.planTitle,
-    description: t.planDesc,
-    priceLine: t.planPrice,
-    paymentLinkUrl,
-    paypalUrl: getPaypalLink("test_access")
-  };
-}
-
 export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
   const t = getDictionary(locale).payment;
-  const testPlan = getTestAccessPlan(locale);
 
-  const plans: PaymentPlan[] = [
+  return [
     {
       product: "support_5_weeks",
       title: t.plan5Title,
@@ -85,14 +55,4 @@ export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
       paypalUrl: getPaypalLink("support_15_weeks")
     }
   ];
-
-  // The test tariff stands among the real ones on purpose: testers should
-  // choose a plan exactly as a client does. It disappears the moment its
-  // Payment Link is removed from the environment — that is how it is
-  // switched off before the public launch.
-  if (testPlan) {
-    plans.push(testPlan);
-  }
-
-  return plans;
 }
