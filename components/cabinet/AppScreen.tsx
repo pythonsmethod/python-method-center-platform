@@ -51,7 +51,6 @@ export function AppScreen({ locale, name = "", screen }: AppScreenProps) {
       <div className="pm-trackers">
         <Link href="/cabinet/metrics"><span className="pm-tracker__icon">↗</span><span><strong>{ru ? "Динамика показателей" : "Health trends"}</strong><small>{ru ? "Мои значения и изменения" : "My values and changes"}</small><em>{ru ? "Обновлено сегодня" : "Updated today"}</em></span><b>›</b></Link>
         <Link href="/cabinet/supplements"><span className="pm-tracker__icon">◒</span><span><strong>{ru ? "Мои добавки" : "My supplements"}</strong><small>{ru ? "Чек-лист приёма" : "Daily checklist"}</small><em>{ru ? "Посмотреть расписание" : "View schedule"}</em></span><b>›</b></Link>
-        <Link href="/cabinet/sleep"><span className="pm-tracker__icon">☾</span><span><strong>{ru ? "Мой сон" : "My sleep"}</strong><small>{ru ? "Дневник сна и самочувствия" : "Sleep and wellbeing diary"}</small><em>{ru ? "Добавить запись" : "Add an entry"}</em></span><b>›</b></Link>
       </div>
     </section>
   );

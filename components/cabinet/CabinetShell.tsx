@@ -7,7 +7,7 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { logoutAction } from "@/lib/auth/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import {
-  IconAnkh, IconEyeOfHorus, IconLotus, IconMoon, IconPapyrus,
+  IconAnkh, IconEyeOfHorus, IconLotus, IconPapyrus,
   IconScales, IconScarab, IconWater, IconWingedSun
 } from "@/components/icons/EgyptianIcons";
 
@@ -43,8 +43,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
     { title: ru ? "Материалы и трекеры" : "Files and trackers", items: [
       { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus },
       { href: `${root}/metrics`, label: t.sections.metrics.title, hint: t.sections.metrics.hint, icon: IconWater },
-      { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue },
-      { href: `${root}/sleep`, label: t.sections.sleep.title, hint: t.sections.sleep.hint, icon: IconMoon }
+      { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue }
     ] },
     { title: ru ? "Общение" : "Communication", items: [
       { href: `${root}/dialog`, label: "Professor Python", hint: ru ? "Личное сопровождение" : "Personal guidance", icon: IconEyeOfHorus, badge: unread },
