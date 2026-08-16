@@ -15,7 +15,7 @@ const ru = {
     dateLocale: "ru-RU",
     navLabel: "Разделы кабинета",
     sections: {
-      home: { title: "Главная", hint: "Переписка с Professor Python" },
+      home: { title: "Главная кабинета", hint: "Переписка с Professor Python" },
       documents: { title: "Мои документы", hint: "Анализы и выписки" },
       metrics: { title: "Динамика", hint: "Ваши показатели на графике" },
       supplements: { title: "Мои добавки", hint: "Чек-лист приёма на день" },
@@ -1242,7 +1242,7 @@ const en: typeof ru = {
     dateLocale: "en-GB",
     navLabel: "Cabinet sections",
     sections: {
-      home: { title: "Home", hint: "Your thread with Professor Python" },
+      home: { title: "Cabinet home", hint: "Your thread with Professor Python" },
       documents: { title: "My documents", hint: "Test results and records" },
       metrics: { title: "Progress", hint: "Your values on a chart" },
       supplements: { title: "My supplements", hint: "Today's intake checklist" },

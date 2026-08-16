@@ -36,6 +36,9 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
   }, [menuOpen]);
 
   const nav: Array<{ title: string; items: NavItem[] }> = [
+    { title: ru ? "Веб-сайт" : "Website", items: [
+      { href: "/", label: ru ? "Главная страница сайта" : "Main website", hint: ru ? "О центре и сопровождении" : "About the center and its support", icon: IconAnkh }
+    ] },
     { title: ru ? "Главное" : "Overview", items: [
       { href: root, label: t.sections.home.title, hint: t.sections.home.hint, icon: IconWingedSun },
       { href: `${root}/account`, label: t.sections.account.title, hint: t.sections.account.hint, icon: IconScales }
@@ -60,7 +63,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
   return <div className="web-cab">
     <aside aria-label={t.navLabel} className={`web-cab__sidebar${menuOpen ? " is-open" : ""}`}>
       <div className="web-cab__sidebar-head">
-        <Link className="web-cab__brand" href={root}>
+        <Link aria-label={ru ? "Перейти на главную страницу сайта" : "Go to the main website"} className="web-cab__brand" href="/">
           <span className="web-cab__brand-symbol"><IconAnkh /></span>
           <span><strong>Python Method</strong><small>Center</small></span>
         </Link>
