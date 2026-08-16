@@ -1,5 +1,5 @@
 import type { createSupabaseServiceClient } from "@/lib/supabase/service";
-import { PLAN_DURATION_DAYS, type PaymentProduct } from "@/lib/payments/stripe";
+import { PLAN_DURATION_DAYS, type ServicePeriodProduct } from "@/lib/payments/stripe";
 
 // Opening the support period is what actually turns a payment into access.
 //
@@ -26,7 +26,7 @@ export type ServicePeriodOutcome =
   | { status: "not-applicable" }
   | { status: "failed"; message: string };
 
-export function isPlanProduct(product: string): product is PaymentProduct {
+export function isPlanProduct(product: string): product is ServicePeriodProduct {
   return product in PLAN_DURATION_DAYS;
 }
 

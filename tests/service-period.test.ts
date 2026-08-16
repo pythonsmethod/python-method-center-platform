@@ -169,6 +169,8 @@ describe("what must not quietly succeed", () => {
   it("knows which products carry a period at all", () => {
     expect(isPlanProduct("support_5_weeks")).toBe(true);
     expect(isPlanProduct("support_15_weeks")).toBe(true);
+    // Legacy focus-group periods remain valid, although this product can no
+    // longer be bought or selected for a new manual payment.
     expect(isPlanProduct("test_access")).toBe(true);
     expect(isPlanProduct("preliminary_assessment")).toBe(false);
     expect(isPlanProduct("nonsense")).toBe(false);

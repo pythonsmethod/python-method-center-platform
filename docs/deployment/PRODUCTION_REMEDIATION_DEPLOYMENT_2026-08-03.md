@@ -214,7 +214,7 @@ select count(*) from public.profiles where email ilike 'a\_@gmail.com';
 
 ## 14. Verify AI attached-file behavior
 
-- **Action:** as a TEST paying account (the $3 test product), attach a
+- **Action:** as a test account with access granted by staff, attach a
   small PDF in the assistant chat and ask: «какие мои материалы ты сейчас
   видишь?».
 - **Expected:** the answer names the attached PDF as read, and describes

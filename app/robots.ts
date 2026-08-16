@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 import { SITE_URL } from "@/lib/config/site";
 
 // The public face of the platform is welcome in search; the private one is
-// not. Everything behind a login, every API, and the invite-only test
-// payment page stay out of the index — not as a security measure (auth does
+// not. Everything behind a login and every API stay out of the index — not
+// as a security measure (auth does
 // that), but so no half-private page ever becomes someone's first
 // impression of the center.
 export default function robots(): MetadataRoute.Robots {
@@ -21,7 +21,6 @@ export default function robots(): MetadataRoute.Robots {
           "/auth/",
           "/site-preview",
           "/welcome",
-          "/payment/test",
           "/payment/success"
         ]
       }

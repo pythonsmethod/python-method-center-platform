@@ -233,10 +233,14 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
     const period = periodResult.data?.[0];
 
     if (period) {
+      const periodLabel =
+        period.product === "support_5_weeks"
+          ? "5 недель"
+          : period.product === "support_15_weeks"
+            ? "100 дней"
+            : "архивный тестовый доступ (14 дней)";
       lines.push(
-        `Период сопровождения: ${
-          period.product === "support_5_weeks" ? "5 недель" : "100 дней"
-        }, статус «${period.status}», с ${formatDate(period.starts_at)} по ${formatDate(period.ends_at)}.`
+        `Период сопровождения: ${periodLabel}, статус «${period.status}», с ${formatDate(period.starts_at)} по ${formatDate(period.ends_at)}.`
       );
     }
 

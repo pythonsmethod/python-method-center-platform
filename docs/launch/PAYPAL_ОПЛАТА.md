@@ -30,7 +30,7 @@ Business-аккаунт даёт то, ради чего всё затевает
 3. Создать кнопку типа **Buy Now** / **Pay Now**.
 4. Указать:
    - **Item name:** `Python Method — сопровождение 5 недель`
-   - **Price:** `1440.00 USD` (для второго тарифа — `3675.00`, для теста — `3.00`)
+   - **Price:** `1440.00 USD` (для второго тарифа — `3675.00`)
 5. В дополнительных настройках (**Step 3 → Advanced / More options**):
    - **Take customers to this URL after checkout (auto return):**
      `https://pythonmethodcenter.com/payment/success?method=paypal`
@@ -65,7 +65,6 @@ Settings → Environment Variables → Add New (Sensitive выключить):
 | --- | --- |
 | `NEXT_PUBLIC_PAYPAL_LINK_5W` | ссылка на кнопку тарифа «5 недель» |
 | `NEXT_PUBLIC_PAYPAL_LINK_15W` | ссылка на кнопку тарифа «100 дней» |
-| `NEXT_PUBLIC_PAYPAL_LINK_TEST` | ссылка на кнопку тестового доступа 3 $ |
 
 Затем **Redeploy**. Можно задать не все три — кнопка появится только там,
 где ссылка есть.

@@ -18,8 +18,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 // session, not from anything else.
 
 const PAGES = [
-  { file: "app/(payment)/payment/page.tsx", next: "/payment" },
-  { file: "app/(payment)/payment/test/page.tsx", next: "/payment/test" }
+  { file: "app/(payment)/payment/page.tsx", next: "/payment" }
 ];
 
 describe.each(PAGES)("$file", ({ file, next }) => {

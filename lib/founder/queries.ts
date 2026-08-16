@@ -175,13 +175,6 @@ export async function getFounderOverview(): Promise<FounderOverview> {
           : "Заданы не все ссылки на тарифы"
     },
     {
-      name: "Тестовый тариф 3 $",
-      ok: Boolean(process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_TEST?.trim()),
-      detail: process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_TEST?.trim()
-        ? "Включён — карточка «Тестовый доступ» видна на странице оплаты"
-        : "Выключен — нет NEXT_PUBLIC_STRIPE_PAYMENT_LINK_TEST, карточки на сайте нет"
-    },
-    {
       name: "Акция «Бесплатный разбор»",
       ok: true,
       detail: isFreeReviewActive()

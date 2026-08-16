@@ -10,8 +10,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const KNOWN_PRODUCTS = new Set([
   "support_5_weeks",
-  "support_15_weeks",
-  "test_access"
+  "support_15_weeks"
 ]);
 
 // Records offer acceptance from the payment page for signed-in clients.

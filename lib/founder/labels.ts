@@ -63,7 +63,7 @@ export const notificationStatusLabels: Record<string, string> = {
 export const productLabels: Record<string, string> = {
   support_5_weeks: "Сопровождение — 5 недель",
   support_15_weeks: "Сопровождение — 100 дней",
-  test_access: "Тестовый доступ (3 $)"
+  test_access: "Архивный тестовый доступ"
 };
 
 export function formatMoney(amountCents: number, currency = "USD"): string {

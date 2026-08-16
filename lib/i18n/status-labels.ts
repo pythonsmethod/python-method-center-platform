@@ -28,8 +28,8 @@ const lifecycleEventLabels: LocalizedLabels = {
   en: { case_created: "Case created", onboarding_submitted: "Questionnaire submitted", status_changed: "Case status changed", payment_recorded: "Payment recorded", service_period_started: "Support period started", service_period_completed: "Support period completed", support_requested: "Support request sent", escalation_created: "Escalation created", consent_recorded: "Consent recorded", admin_note_added: "Team note added" }
 };
 const paymentProductLabels: LocalizedLabels = {
-  ru: { preliminary_assessment: "Предварительная оценка", support_5_weeks: "Сопровождение — 5 недель", support_15_weeks: "Сопровождение — 100 дней", test_access: "Тестовый доступ (3 $)" },
-  en: { preliminary_assessment: "Preliminary assessment", support_5_weeks: "Support — 5 weeks", support_15_weeks: "Support — 100 days", test_access: "Test access ($3)" }
+  ru: { preliminary_assessment: "Предварительная оценка", support_5_weeks: "Сопровождение — 5 недель", support_15_weeks: "Сопровождение — 100 дней", test_access: "Архивный тестовый доступ" },
+  en: { preliminary_assessment: "Preliminary assessment", support_5_weeks: "Support — 5 weeks", support_15_weeks: "Support — 100 days", test_access: "Archived test access" }
 };
 const paymentStatusLabels: LocalizedLabels = {
   ru: { not_required: "Не требуется", pending: "Ожидает оплаты", paid: "Оплачен", failed: "Не прошёл", refunded: "Возвращён", partially_refunded: "Возвращён частично" },

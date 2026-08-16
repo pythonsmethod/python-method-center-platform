@@ -11,7 +11,6 @@
 --    3. Токены: начисление и списание как скидка
 --    4. Защита ИИ-помощника от наплыва: суточные счётчики
 --    5. Сохранение переписки с ИИ — только у тех, кто в аккаунте
---    6. Тестовый доступ за 3 $ — отдельный вид оплаты
 --    7. Данные клиента: адрес доставки формулы и заказов
 --    8. Бесплатные инструменты: график динамики показателей и трекер добавок
 --    9. Трекер сна и рекомендации по сну от Professor Python
@@ -255,16 +254,6 @@ create policy "assistant_messages_select_own"
 on public.assistant_messages for select
 to authenticated
 using (profile_id = auth.uid());
-
-
--- ============================================================
--- ЧАСТЬ 6. ТЕСТОВЫЙ ДОСТУП ЗА 3 $
--- Отдельный вид оплаты для приглашённых тестировщиков из разных
--- стран: они проходят настоящий путь оплаты, а тестовые деньги
--- не попадают в отчёт о выручке вместе с настоящими.
--- ============================================================
-
-alter type public.payment_product add value if not exists 'test_access';
 
 
 -- ============================================================
@@ -590,12 +579,6 @@ select "Что проверяем", "Статус" from (
     case when to_regclass('public.assistant_messages') is not null
       then '✅ есть' else '❌ НЕТ' end
   union all select 11,
-    'Тестовый доступ за 3 $ (вид оплаты test_access)',
-    case when exists (
-      select 1 from pg_enum e join pg_type t on t.oid = e.enumtypid
-      where t.typname = 'payment_product' and e.enumlabel = 'test_access'
-    ) then '✅ есть' else '❌ НЕТ' end
-  union all select 12,
     'Адрес доставки клиента (profiles.delivery_address)',
     case when exists (
       select 1 from information_schema.columns
