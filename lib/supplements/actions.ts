@@ -9,6 +9,7 @@ import { askClaude } from "@/lib/assistant/claude";
 import { sanitizeTimes } from "@/lib/supplements/schedule";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { MAX_EXTRACTED_SUPPLEMENTS, readExtractedSupplement } from "@/lib/supplements/extraction";
 
 
 
@@ -69,6 +70,35 @@ export async function addSupplement(
   revalidatePath("/cabinet");
 
   return { status: "success", message: `«${name}» добавлен в расписание.` };
+}
+
+export async function saveExtractedSupplements(
+  _previous: SupplementActionState,
+  formData: FormData
+): Promise<SupplementActionState> {
+  const locale = formData.get("locale") === "en" ? "en" : "ru";
+  const supabase = await createSupabaseServerClient();
+  if (!supabase) return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return errorState(locale === "en" ? "Your session has expired. Please sign in again." : "Сессия истекла — войдите заново.");
+
+  let parsed: unknown;
+  try { parsed = JSON.parse(String(formData.get("rows") ?? "[]")); }
+  catch { return errorState(locale === "en" ? "Could not read the selected rows." : "Не удалось прочитать выбранные строки."); }
+  if (!Array.isArray(parsed) || parsed.length === 0) return errorState(locale === "en" ? "Select at least one supplement." : "Выберите хотя бы одну добавку.");
+
+  const rows = parsed.slice(0, MAX_EXTRACTED_SUPPLEMENTS).map(readExtractedSupplement)
+    .filter((row): row is NonNullable<typeof row> => Boolean(row));
+  if (!rows.length) return errorState(locale === "en" ? "No rows passed validation. Add them manually." : "Ни одна строка не прошла проверку — внесите вручную.");
+
+  const { error } = await supabase.from("supplements").insert(rows.map((row) => ({
+    profile_id: user.id, name: row.name, dose: row.dose,
+    times: row.times, notes: [row.notes, row.timing_note].filter(Boolean).join(" · ").slice(0, 300) || null,
+    is_active: true
+  })));
+  if (error) return errorState(locale === "en" ? "Could not save the schedule. Please try again." : "Не удалось сохранить расписание. Попробуйте ещё раз.");
+  revalidatePath("/cabinet/supplements"); revalidatePath("/cabinet");
+  return { status: "success", message: locale === "en" ? `Added to schedule: ${rows.length}.` : `Добавлено в расписание: ${rows.length}.` };
 }
 
 export async function removeSupplement(
