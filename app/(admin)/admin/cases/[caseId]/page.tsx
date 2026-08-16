@@ -167,7 +167,7 @@ export default async function StaffCaseDetailPage({
   );
   const [caseMessages, assistantHistory, review] = await Promise.all([
     getCaseMessages(clientCase.id),
-    getAssistantHistoryForCase(clientCase.profile_id),
+    getAssistantHistoryForCase(clientCase.profile_id, "ru"),
     getCaseReview(clientCase.id, documents)
   ]);
 

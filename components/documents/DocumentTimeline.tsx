@@ -6,18 +6,20 @@ import {
   type TimelineDocument
 } from "@/lib/documents/timeline";
 import { documentStatusLabel } from "@/lib/i18n/status-labels";
+import type { Locale } from "@/lib/i18n/locale";
 
 type DocumentTimelineProps<T extends TimelineDocument> = {
   labels: Dictionary["cabinet"]["timeline"];
   documents: T[];
   emptyText: string;
+  locale?: Locale;
   // The staff view adds an "open file" button; the client view adds
   // nothing. Rendering stays on the server either way.
   renderAction?: (document: T) => ReactNode;
 };
 
-function dayLabel(dayKey: string): string {
-  return new Date(`${dayKey}T00:00:00Z`).toLocaleDateString("ru-RU", {
+function dayLabel(dayKey: string, locale: Locale): string {
+  return new Date(`${dayKey}T00:00:00Z`).toLocaleDateString(locale === "ru" ? "ru-RU" : "en-US", {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -25,8 +27,8 @@ function dayLabel(dayKey: string): string {
   });
 }
 
-function timeLabel(createdAt: string): string {
-  return new Date(createdAt).toLocaleTimeString("ru-RU", {
+function timeLabel(createdAt: string, locale: Locale): string {
+  return new Date(createdAt).toLocaleTimeString(locale === "ru" ? "ru-RU" : "en-US", {
     hour: "2-digit",
     minute: "2-digit"
   });
@@ -38,6 +40,7 @@ function timeLabel(createdAt: string): string {
 export function DocumentTimeline<T extends TimelineDocument>({
   documents,
   emptyText,
+  locale = "ru",
   renderAction,
   labels: t
 }: DocumentTimelineProps<T>) {
@@ -53,7 +56,7 @@ export function DocumentTimeline<T extends TimelineDocument>({
         <li className="doc-round" key={round.dayKey}>
           <div className="doc-round__head">
             <strong>
-              {t.uploadFrom} {dayLabel(round.dayKey)}
+              {t.uploadFrom} {dayLabel(round.dayKey, locale)}
               {index === 0 ? ` · ${t.latest}` : ""}
             </strong>
             <span>
@@ -72,9 +75,9 @@ export function DocumentTimeline<T extends TimelineDocument>({
                     {document.original_filename ?? t.untitled}
                   </strong>
                   <span>
-                    {timeLabel(document.created_at)}
+                    {timeLabel(document.created_at, locale)}
                     {document.document_status
-                      ? ` · ${documentStatusLabel(document.document_status)}`
+                      ? ` · ${documentStatusLabel(document.document_status, locale)}`
                       : ""}
                   </span>
                 </div>

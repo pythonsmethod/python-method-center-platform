@@ -17,12 +17,14 @@ import { documentStatusLabel } from "@/lib/i18n/status-labels";
 import { formatDateTime } from "@/lib/i18n/format";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
+import type { Locale } from "@/lib/i18n/locale";
 
 type DocumentUploadPanelProps = {
   userId: string;
   caseId: string;
   initialDocuments: UploadedDocument[];
   labels: Dictionary["cabinet"]["documents"];
+  locale: Locale;
 };
 
 type UploadState =
@@ -57,8 +59,8 @@ function formatFileSize(value: unknown, unknownLabel: string): string {
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
-function formatDocumentStatus(status: DocumentIntakeStatus): string {
-  return documentStatusLabel(status);
+function formatDocumentStatus(status: DocumentIntakeStatus, locale: Locale): string {
+  return documentStatusLabel(status, locale);
 }
 
 function stateClassName(state: UploadState): string {
@@ -69,7 +71,8 @@ export function DocumentUploadPanel({
   userId,
   caseId,
   initialDocuments,
-  labels
+  labels,
+  locale
 }: DocumentUploadPanelProps) {
   const [documents, setDocuments] = useState(initialDocuments);
   const [state, setState] = useState<UploadState>({
@@ -255,11 +258,11 @@ export function DocumentUploadPanel({
                     <strong>
                       {document.original_filename ?? labels.untitled}
                     </strong>
-                    <span>{formatDateTime(document.created_at)}</span>
+                    <span>{formatDateTime(document.created_at, locale)}</span>
                     <span
                       className={`status-badge status-badge--${document.document_status}`}
                     >
-                      {formatDocumentStatus(document.document_status)}
+                      {formatDocumentStatus(document.document_status, locale)}
                     </span>
                   </div>
                   <div className="panel-actions">
@@ -274,7 +277,7 @@ export function DocumentUploadPanel({
                   <dl>
                     <div>
                       <dt>{labels.status}</dt>
-                      <dd>{formatDocumentStatus(document.document_status)}</dd>
+                      <dd>{formatDocumentStatus(document.document_status, locale)}</dd>
                     </div>
                     <div>
                       <dt>{labels.kind}</dt>

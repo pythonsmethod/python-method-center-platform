@@ -16,7 +16,8 @@ export const dynamic = "force-dynamic";
 // coin in the cabinet header. Read once — and the cabinet itself stays
 // about the person's own case, not about a bonus programme.
 export default async function TokensPage() {
-  const strings = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const strings = getDictionary(locale);
   const t = strings.cabinet.tokens;
   const auth = await getRequiredUser("/cabinet/tokens");
 
@@ -76,6 +77,7 @@ export default async function TokensPage() {
             </div>
             <TokenPanel
               balance={tokens.balance}
+              locale={locale}
               transactions={tokens.transactions}
             />
           </div>
@@ -93,6 +95,7 @@ export default async function TokensPage() {
                 code={referral.code}
                 invited={referral.invited}
                 link={referralLink(referral.code)}
+                locale={locale}
                 paid={referral.paid}
                 started={referral.started}
               />

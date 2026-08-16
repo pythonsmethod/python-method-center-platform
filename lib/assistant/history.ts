@@ -1,5 +1,6 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { AssistantTier } from "@/lib/assistant/tiers";
+import type { Locale } from "@/lib/i18n/locale";
 
 // Conversations with the AI are kept only for people who have an account —
 // registered visitors and paying clients. A person who described their
@@ -12,6 +13,8 @@ export type AssistantHistoryMessage = {
   role: "user" | "assistant";
   content: string;
   created_at: string;
+  locale: Locale | null;
+  message_sequence: number;
 };
 
 // A single answer can be long; a whole conversation of them is what makes
@@ -37,6 +40,7 @@ type SaveInput = {
   tier: AssistantTier;
   question: string;
   answer: string;
+  locale: Locale;
 };
 
 // Best effort by design: if saving fails, the person still gets their
@@ -46,7 +50,8 @@ export async function saveAssistantExchange({
   caseId,
   tier,
   question,
-  answer
+  answer,
+  locale
 }: SaveInput): Promise<void> {
   if (tier === "guest") {
     return;
@@ -72,14 +77,16 @@ export async function saveAssistantExchange({
         case_id: caseId,
         role: "user",
         content: userText || "—",
-        tier
+        tier,
+        locale
       },
       {
         profile_id: profileId,
         case_id: caseId,
         role: "assistant",
         content: assistantText || "—",
-        tier
+        tier,
+        locale
       }
     ]);
   } catch {
@@ -94,6 +101,7 @@ export type AssistantHistoryResult =
 // The person's own conversation, oldest first — the order it reads in.
 export async function getOwnAssistantHistory(
   profileId: string,
+  locale: Locale,
   limit = HISTORY_PAGE_SIZE
 ): Promise<AssistantHistoryResult> {
   const supabase = createSupabaseServiceClient();
@@ -104,15 +112,18 @@ export async function getOwnAssistantHistory(
 
   const { data, error } = await supabase
     .from("assistant_messages")
-    .select("id, role, content, created_at")
+    .select("id, role, content, created_at, locale, message_sequence")
     .eq("profile_id", profileId)
-    .order("created_at", { ascending: false })
+    .eq("locale", locale)
+    .order("message_sequence", { ascending: false })
     .limit(limit);
 
   if (error) {
     return {
       status: "error",
-      message: "Не удалось загрузить историю переписки с ИИ."
+      message: locale === "ru"
+        ? "Не удалось загрузить историю переписки с ИИ."
+        : "Could not load your AI conversation history."
     };
   }
 
@@ -125,7 +136,8 @@ export async function getOwnAssistantHistory(
 // ground is not covered twice when the case is opened.
 export async function getAssistantHistoryForCase(
   profileId: string,
+  locale: Locale,
   limit = HISTORY_PAGE_SIZE
 ): Promise<AssistantHistoryResult> {
-  return getOwnAssistantHistory(profileId, limit);
+  return getOwnAssistantHistory(profileId, locale, limit);
 }

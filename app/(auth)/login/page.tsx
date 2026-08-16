@@ -5,6 +5,8 @@ import { hasSupabaseEnv } from "@/lib/supabase/env";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { AuthForm } from "./AuthForm";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 import Link from "next/link";
 
@@ -35,6 +37,13 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const nextPath = sanitizeNextPath(params?.next);
   const initialMode = readParam(params?.mode) === "signup" ? "signup" : "login";
   const supabaseConfigured = hasSupabaseEnv();
+  if (supabaseConfigured) {
+    const supabase = await createSupabaseServerClient();
+    const { data } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+    if (data.user) {
+      redirect(nextPath);
+    }
+  }
   const locale = await getLocale();
   const strings = getDictionary(locale);
   const t = strings.login;

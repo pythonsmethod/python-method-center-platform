@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getLocale } from "@/lib/i18n/locale";
 
 export const runtime = "nodejs";
 
@@ -22,7 +23,7 @@ export async function GET() {
     return NextResponse.json({ messages: [] });
   }
 
-  const result = await getOwnAssistantHistory(user.id);
+  const result = await getOwnAssistantHistory(user.id, await getLocale());
 
   if (result.status === "error") {
     return NextResponse.json({ messages: [] });

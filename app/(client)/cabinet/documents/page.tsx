@@ -12,7 +12,8 @@ import { DocumentUploadPanel } from "../DocumentUploadPanel";
 export const dynamic = "force-dynamic";
 
 export default async function CabinetDocumentsPage() {
-  const strings = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const strings = getDictionary(locale);
   const dict = strings.cabinet;
   const t = dict.documents;
   const auth = await getRequiredUser("/cabinet/documents");
@@ -52,7 +53,8 @@ export default async function CabinetDocumentsPage() {
       ) : documentResult?.status === "ready" ? (
         <>
           <DocumentUploadPanel
-              labels={t}
+            labels={t}
+            locale={locale}
             caseId={clientCase.id}
             initialDocuments={documentResult.documents}
             userId={auth.userId}
@@ -71,6 +73,7 @@ export default async function CabinetDocumentsPage() {
                 </p>
                 <DocumentTimeline
                   labels={dict.timeline}
+                  locale={locale}
                   documents={documentResult.documents}
                   emptyText={t.timelineEmpty}
                 />

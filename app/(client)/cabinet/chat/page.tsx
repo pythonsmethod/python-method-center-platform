@@ -18,7 +18,8 @@ export const dynamic = "force-dynamic";
 // about payment and access, and whatever the person already asked the AI.
 // His own thread is the home page of the cabinet.
 export default async function CabinetChatPage() {
-  const strings = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const strings = getDictionary(locale);
   const dict = strings.cabinet;
   const t = dict.chat;
   const auth = await getRequiredUser("/cabinet/chat");
@@ -34,7 +35,7 @@ export default async function CabinetChatPage() {
 
   const [supportResult, assistantResult] = await Promise.all([
     getOwnSupportRequests(auth.userId),
-    getOwnAssistantHistory(auth.userId)
+    getOwnAssistantHistory(auth.userId, locale)
   ]);
 
   return (
@@ -70,6 +71,7 @@ export default async function CabinetChatPage() {
             messages={
               assistantResult.status === "ready" ? assistantResult.messages : []
             }
+            locale={locale}
             viewer="client"
           />
         </div>
@@ -106,9 +108,9 @@ export default async function CabinetChatPage() {
                   <li className="document-list__item" key={request.id}>
                     <div>
                       <strong>{request.subject}</strong>
-                      <span>{formatDateTime(request.created_at)}</span>
+                      <span>{formatDateTime(request.created_at, locale)}</span>
                       <span className="status-badge">
-                        {supportStatusLabel(request.status)}
+                        {supportStatusLabel(request.status, locale)}
                       </span>
                     </div>
                     {request.body ? <p>{request.body}</p> : null}

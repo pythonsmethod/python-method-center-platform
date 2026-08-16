@@ -42,10 +42,30 @@ type AssistantChatProps = {
 // When the files do not fit one request, they are read in parts: each part
 // is transcribed to the letter, and the full analysis is done afterwards on
 // everything together.
-const EXTRACT_INSTRUCTION = `Это часть присланных файлов (фотографии, сканы или PDF анализов и обследований).
-Выпиши из них МАКСИМАЛЬНО ПОЛНО и дословно всё, что там написано: названия исследований, показатели, значения, единицы измерения, референсные диапазоны, даты, заключения врачей, назначения.
-Ничего не интерпретируй, не оценивай и не добавляй от себя — только то, что действительно написано в файлах.
-Указывай, из какого файла что взято. Если фрагмент нечитаем — так и напиши.`;
+const chatCopy = {
+  ru: {
+    tooMany: (count: number) => `За раз можно приложить не больше ${count} файлов.`,
+    preparing: (count: number) => count > 1 ? `Готовлю ${count} файлов…` : "Готовлю файл…",
+    inspectFiles: "Посмотри приложенные файлы.",
+    reading: (from: number, to: number, total: number) => `Читаю файлы ${from}–${to} из ${total}…`,
+    combining: "Собираю общий разбор…", history: "Ваша прошлая переписка", today: "Сегодня",
+    provider: "Кто отвечает", best: "Лучший ответ (арбитр выбирает)", both: "Оба вместе (совет)",
+    remove: (name: string) => `Убрать ${name}`, attach: "Прикрепить файл или фото",
+    attachTitle: "Фото, PDF или текстовый файл — до 30 штук за раз. Снимки сжимаются автоматически, файлы не сохраняются на платформе.",
+    extract: `Это часть присланных файлов (фотографии, сканы или PDF анализов и обследований).\nВыпиши из них максимально полно и дословно всё, что там написано. Ничего не интерпретируй и не добавляй от себя. Указывай источник каждого фрагмента.`
+  },
+  en: {
+    tooMany: (count: number) => `You can attach no more than ${count} files at once.`,
+    preparing: (count: number) => count > 1 ? `Preparing ${count} files…` : "Preparing file…",
+    inspectFiles: "Please review the attached files.",
+    reading: (from: number, to: number, total: number) => `Reading files ${from}–${to} of ${total}…`,
+    combining: "Combining the full review…", history: "Your previous conversation", today: "Today",
+    provider: "Who answers", best: "Best answer (selected by the arbiter)", both: "Both together (panel)",
+    remove: (name: string) => `Remove ${name}`, attach: "Attach a file or photo",
+    attachTitle: "Photos, PDFs, or text files — up to 30 at once. Images are compressed automatically and files are not stored on the platform.",
+    extract: `This is one part of the attached files (photos, scans, or PDFs of test results and examinations).\nTranscribe everything in them as fully and literally as possible. Do not interpret, assess, or add anything. Identify the source file for each fragment.`
+  }
+} as const;
 
 type Provider = "best" | "claude" | "gpt" | "both";
 
@@ -63,6 +83,7 @@ export function AssistantChat({
   onInitialQuestionSent
 }: AssistantChatProps) {
   const t = getDictionary(locale).widget;
+  const c = chatCopy[locale];
   const effectivePlaceholder = placeholder ?? t.placeholder;
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
@@ -160,7 +181,7 @@ export function AssistantChat({
     const room = MAX_ATTACHMENTS_TOTAL - files.length;
 
     if (room <= 0) {
-      setError(`За раз можно приложить не больше ${MAX_ATTACHMENTS_TOTAL} файлов.`);
+      setError(c.tooMany(MAX_ATTACHMENTS_TOTAL));
       return;
     }
 
@@ -168,9 +189,7 @@ export function AssistantChat({
 
     setError(null);
     setProgress(
-      picked.length > 1
-        ? `Готовлю ${picked.length} файлов…`
-        : "Готовлю файл…"
+      c.preparing(picked.length)
     );
 
     // Photos are downscaled here, in the browser: thirty phone snapshots
@@ -271,7 +290,7 @@ export function AssistantChat({
     setError(null);
     setPending(true);
 
-    const question = trimmed || "Посмотри приложенные файлы.";
+    const question = trimmed || c.inspectFiles;
 
     try {
       if (attached.length === 0) {
@@ -299,14 +318,14 @@ export function AssistantChat({
 
       for (const [index, batch] of batches.entries()) {
         setProgress(
-          `Читаю файлы ${read + 1}–${read + batch.length} из ${attached.length}…`
+          c.reading(read + 1, read + batch.length, attached.length)
         );
 
         const partReply = await ask(
           [
             {
               role: "user",
-              content: `${EXTRACT_INSTRUCTION}\n\nЭто часть ${index + 1} из ${batches.length}. Файлы: ${batch
+              content: `${c.extract}\n\n${locale === "ru" ? "Это часть" : "This is part"} ${index + 1} ${locale === "ru" ? "из" : "of"} ${batches.length}. ${locale === "ru" ? "Файлы" : "Files"}: ${batch
                 .map((file) => file.name)
                 .join(", ")}.`
             }
@@ -320,7 +339,7 @@ export function AssistantChat({
         read += batch.length;
       }
 
-      setProgress("Собираю общий разбор…");
+      setProgress(c.combining);
 
       const reply = await ask(
         [
@@ -354,12 +373,12 @@ export function AssistantChat({
       <div className="assistant-chat__messages" ref={scrollRef}>
         <div className="assistant-msg assistant-msg--assistant">{intro}</div>
         {restored > 0 ? (
-          <p className="assistant-chat__divider">Ваша прошлая переписка</p>
+          <p className="assistant-chat__divider">{c.history}</p>
         ) : null}
         {messages.map((message, index) => (
           <Fragment key={`${index}-${message.role}`}>
             {restored > 0 && index === restored ? (
-              <p className="assistant-chat__divider">Сегодня</p>
+              <p className="assistant-chat__divider">{c.today}</p>
             ) : null}
             <div className={`assistant-msg assistant-msg--${message.role}`}>
               {message.content}
@@ -395,15 +414,15 @@ export function AssistantChat({
 
       {providerChoice ? (
         <label className="assistant-chat__provider">
-          Кто отвечает
+          {c.provider}
           <select
             onChange={(event) => setProvider(event.target.value as Provider)}
             value={provider}
           >
-            <option value="best">Лучший ответ (арбитр выбирает)</option>
+            <option value="best">{c.best}</option>
             <option value="claude">Claude</option>
             <option value="gpt">GPT</option>
-            <option value="both">Оба вместе (совет)</option>
+            <option value="both">{c.both}</option>
           </select>
         </label>
       ) : null}
@@ -439,7 +458,7 @@ export function AssistantChat({
               <li key={file.id}>
                 <span>📎 {file.name}</span>
                 <button
-                  aria-label={`Убрать ${file.name}`}
+                aria-label={c.remove(file.name)}
                   onClick={() =>
                     setFiles((current) =>
                       current.filter((item) => item.id !== file.id)
@@ -469,10 +488,10 @@ export function AssistantChat({
                 type="file"
               />
               <button
-                aria-label="Прикрепить файл или фото"
+                aria-label={c.attach}
                 className="assistant-chat__mic"
                 onClick={() => fileInputRef.current?.click()}
-                title="Фото, PDF или текстовый файл — до 30 штук за раз. Снимки сжимаются автоматически, файлы не сохраняются на платформе."
+                title={c.attachTitle}
                 type="button"
               >
                 📎

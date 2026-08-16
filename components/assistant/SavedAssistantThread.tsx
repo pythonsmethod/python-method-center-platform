@@ -1,5 +1,6 @@
 import { formatDateTime } from "@/lib/i18n/format";
 import type { AssistantHistoryMessage } from "@/lib/assistant/history";
+import type { Locale } from "@/lib/i18n/locale";
 
 type SavedAssistantThreadProps = {
   messages: AssistantHistoryMessage[];
@@ -7,6 +8,7 @@ type SavedAssistantThreadProps = {
   emptyText: string;
   // Who is reading: the person themselves or the team.
   viewer: "client" | "staff";
+  locale?: Locale;
 };
 
 // A read-only view of a conversation with the AI. Answering happens in the
@@ -15,7 +17,8 @@ export function SavedAssistantThread({
   messages,
   loadError = null,
   emptyText,
-  viewer
+  viewer,
+  locale = "ru"
 }: SavedAssistantThreadProps) {
   if (loadError) {
     return <p className="empty-state">{loadError}</p>;
@@ -35,10 +38,10 @@ export function SavedAssistantThread({
           <span className="assistant-log__meta">
             {message.role === "user"
               ? viewer === "staff"
-                ? "Клиент"
-                : "Вы"
-              : "ИИ-помощник"}{" "}
-            · {formatDateTime(message.created_at)}
+                ? locale === "ru" ? "Клиент" : "Client"
+                : locale === "ru" ? "Вы" : "You"
+              : locale === "ru" ? "ИИ-помощник" : "AI assistant"}{" "}
+            · {formatDateTime(message.created_at, locale)}
           </span>
           {message.content}
         </div>

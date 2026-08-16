@@ -28,7 +28,8 @@ export const dynamic = "force-dynamic";
 // what their case is, and how it got there. The cabinet itself stays for
 // the daily work — documents, chat, payments.
 export default async function AccountPage() {
-  const strings = getDictionary(await getLocale());
+  const locale = await getLocale();
+  const strings = getDictionary(locale);
   const dict = strings.cabinet;
   const t = dict.account;
   const auth = await getRequiredUser("/cabinet/account");
@@ -102,7 +103,7 @@ export default async function AccountPage() {
             </>
           ) : caseResult.case ? (
             <>
-              <h2>{caseStatusLabel(caseResult.case.status)}</h2>
+              <h2>{caseStatusLabel(caseResult.case.status, locale)}</h2>
               <ul className="status-list">
                 <li>
                   {t.caseNumber}: <code>{caseResult.case.id}</code>
@@ -111,13 +112,13 @@ export default async function AccountPage() {
                   {t.caseGoal}: {caseResult.case.title ?? t.caseGoalEmpty}
                 </li>
                 <li>
-                  {t.caseUrgency}: {caseUrgencyLabel(caseResult.case.urgency)}
+                  {t.caseUrgency}: {caseUrgencyLabel(caseResult.case.urgency, locale)}
                 </li>
                 <li>
-                  {t.caseDirection}: {caseDirectionLabel(caseResult.case.direction)}
+                  {t.caseDirection}: {caseDirectionLabel(caseResult.case.direction, locale)}
                 </li>
                 <li>
-                  {t.caseCreated}: {formatDateTime(caseResult.case.created_at)}
+                  {t.caseCreated}: {formatDateTime(caseResult.case.created_at, locale)}
                 </li>
               </ul>
             </>
@@ -152,11 +153,11 @@ export default async function AccountPage() {
             <ul className="status-list">
               {paymentsResult.payments.map((payment) => (
                 <li key={payment.id}>
-                  {paymentProductLabel(payment.product)} —{" "}
+                  {paymentProductLabel(payment.product, locale)} —{" "}
                   {(payment.amount_cents / 100).toFixed(2)} {payment.currency} —{" "}
-                  {paymentStatusLabel(payment.status)}
+                  {paymentStatusLabel(payment.status, locale)}
                   {payment.paid_at
-                    ? ` (${formatDateTime(payment.paid_at)})`
+                    ? ` (${formatDateTime(payment.paid_at, locale)})`
                     : ""}
                 </li>
               ))}
@@ -179,10 +180,10 @@ export default async function AccountPage() {
             <ul className="status-list">
               {historyResult.events.map((event) => (
                 <li key={event.id}>
-                  {formatDateTime(event.created_at)} —{" "}
-                  {lifecycleEventLabel(event.event_type)}
+                  {formatDateTime(event.created_at, locale)} —{" "}
+                  {lifecycleEventLabel(event.event_type, locale)}
                   {event.to_status
-                    ? `: ${caseStatusLabel(event.to_status)}`
+                    ? `: ${caseStatusLabel(event.to_status, locale)}`
                     : ""}
                 </li>
               ))}
