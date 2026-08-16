@@ -8,6 +8,11 @@ import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { APP_STORE_URL, GOOGLE_PLAY_URL } from "@/lib/config/mobile-app";
+import {
+  organizationStructuredData,
+  serializeStructuredData,
+  websiteStructuredData
+} from "@/lib/seo/structured-data";
 import "./home.css";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
@@ -63,6 +68,18 @@ export default async function HomePage() {
 
   return (
     <div className="app-home">
+      <script
+        dangerouslySetInnerHTML={{
+          __html: serializeStructuredData(websiteStructuredData(locale))
+        }}
+        type="application/ld+json"
+      />
+      <script
+        dangerouslySetInnerHTML={{
+          __html: serializeStructuredData(organizationStructuredData(locale))
+        }}
+        type="application/ld+json"
+      />
       <ScrollReveal />
       <section className="app-hero" aria-labelledby="app-title">
         <div className="app-hero__copy">

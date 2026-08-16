@@ -591,7 +591,7 @@ const ru = {
       "Всё, что появится в магазине, — поддержка восстановления, а не лекарства и не медицинские услуги. Центр не ставит диагнозы и не назначает лечение; сопровождение не заменяет наблюдение лечащего врача."
   },
   meta: {
-    title: "Python Method — сопровождение восстановления",
+    title: "Python Method Center — сопровождение восстановления",
     // This is the line a stranger reads in Google before deciding whether
     // to click. The old one described the software — anketa, documents,
     // payment — which is what the site *has*, not what a person comes for.
@@ -1811,7 +1811,7 @@ const en: typeof ru = {
       "Everything that appears in the shop is support for recovery, not medicine and not a medical service. The centre does not diagnose and does not prescribe treatment; the support programme does not replace your doctor's care."
   },
   meta: {
-    title: "Python Method — recovery support",
+    title: "Python Method Center — recovery support",
     description:
       "Recovery guided personally by Professor Python: he reviews your analyses himself, with an AI assistant beside you every day.",
     descriptionFree: "The first review is free.",

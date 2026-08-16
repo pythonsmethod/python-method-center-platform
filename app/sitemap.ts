@@ -17,8 +17,7 @@ const PUBLIC_PATHS: { path: string; priority: number }[] = [
   { path: "/support", priority: 0.5 },
   { path: "/legal/offer", priority: 0.3 },
   { path: "/legal/privacy", priority: 0.3 },
-  { path: "/legal/refund", priority: 0.3 },
-  { path: "/login", priority: 0.3 }
+  { path: "/legal/refund", priority: 0.3 }
 ];
 
 export default function sitemap(): MetadataRoute.Sitemap {

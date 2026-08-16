@@ -1,6 +1,11 @@
+import type { Metadata } from "next";
 import { AssistantWidget } from "@/components/assistant/AssistantWidget";
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getLocale } from "@/lib/i18n/locale";
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false }
+};
 
 type LayoutProps = {
   children: React.ReactNode;
