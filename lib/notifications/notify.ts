@@ -10,6 +10,8 @@ export type NotificationKind =
   | "client_message"
   | "support_request"
   | "payment"
+  | "new_registration"
+  | "new_case"
   | "processing_error";
 
 export type NotifyTeamInput = {
