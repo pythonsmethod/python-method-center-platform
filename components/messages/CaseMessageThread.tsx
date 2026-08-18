@@ -16,9 +16,11 @@ import {
 } from "@/lib/messages/actions";
 import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { CaseMessage } from "@/lib/messages/queries";
+import { mergeRefreshedMessages } from "@/lib/messages/merge";
 import { VoiceRecorder } from "@/components/messages/VoiceRecorder";
 
 const POLL_INTERVAL_MS = 3000;
+const SIGNED_AUDIO_URL_REFRESH_MS = 45 * 60 * 1000;
 
 type CaseMessageThreadProps = {
   messages: CaseMessage[];
@@ -112,6 +114,7 @@ export function CaseMessageThread({
   const listRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
   const lastCountRef = useRef(initialMessages.length);
+  const signedAudioUrlsAtRef = useRef(Date.now());
 
   const refresh = useCallback(async () => {
     try {
@@ -127,7 +130,17 @@ export function CaseMessageThread({
       const data = (await response.json()) as { messages?: CaseMessage[] };
 
       if (Array.isArray(data.messages)) {
-        setMessages(data.messages);
+        const rotateAudioUrls =
+          Date.now() - signedAudioUrlsAtRef.current >=
+          SIGNED_AUDIO_URL_REFRESH_MS;
+
+        if (rotateAudioUrls) {
+          signedAudioUrlsAtRef.current = Date.now();
+        }
+
+        setMessages((current) =>
+          mergeRefreshedMessages(current, data.messages ?? [], rotateAudioUrls)
+        );
       }
     } catch {
       // Network hiccup: keep the current list, next poll will retry.

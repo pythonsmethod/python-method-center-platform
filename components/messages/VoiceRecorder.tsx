@@ -19,9 +19,13 @@ function pickMimeType(): string {
   }
 
   const candidates = [
+    // Prefer AAC in an MP4 container whenever the browser can record it.
+    // Safari/iOS plays this natively; choosing WebM first made voice notes
+    // recorded by Karen hang forever in some clients' iPhone players.
+    "audio/mp4;codecs=mp4a.40.2",
+    "audio/mp4",
     "audio/webm;codecs=opus",
     "audio/webm",
-    "audio/mp4",
     "audio/ogg"
   ];
 
