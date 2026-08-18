@@ -247,36 +247,6 @@ export default async function StaffCaseDetailPage({
         </section>
       ) : null}
 
-      <section className="panel-grid" aria-label="Анкеты онбординга">
-        {submissions.length === 0 ? (
-          <div className="panel">
-            <span className="panel__label">Анкета</span>
-            <h2>Анкета не отправлена</h2>
-            <p>Клиент ещё не заполнил анкету онбординга.</p>
-          </div>
-        ) : (
-          submissions.map((submission) => (
-            <div className="panel" key={submission.id}>
-              <span className="panel__label">
-                Анкета от{" "}
-                {submission.submitted_at
-                  ? formatDateTime(submission.submitted_at)
-                  : "—"}
-              </span>
-              <h2>Ответы клиента</h2>
-              <ul className="status-list">
-                {Object.entries(submission.payload).map(([key, value]) => (
-                  <li key={key}>
-                    <strong>{payloadFieldLabels[key] ?? key}:</strong>{" "}
-                    {formatPayloadValue(key, value)}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))
-        )}
-      </section>
-
       {/* The assistant's reading of the analyses in this case, waiting when
           he opens it rather than made on demand. Above the file list, so
           the reading and the files it came from sit together. */}
@@ -421,6 +391,36 @@ export default async function StaffCaseDetailPage({
             ]}
           />
         </div>
+      </section>
+
+      <section className="panel-grid" aria-label="Анкеты онбординга">
+        {submissions.length === 0 ? (
+          <div className="panel">
+            <span className="panel__label">Анкета</span>
+            <h2>Анкета не отправлена</h2>
+            <p>Клиент ещё не заполнил анкету онбординга.</p>
+          </div>
+        ) : (
+          submissions.map((submission) => (
+            <div className="panel" key={submission.id}>
+              <span className="panel__label">
+                Анкета от{" "}
+                {submission.submitted_at
+                  ? formatDateTime(submission.submitted_at)
+                  : "—"}
+              </span>
+              <h2>Ответы клиента</h2>
+              <ul className="status-list">
+                {Object.entries(submission.payload).map(([key, value]) => (
+                  <li key={key}>
+                    <strong>{payloadFieldLabels[key] ?? key}:</strong>{" "}
+                    {formatPayloadValue(key, value)}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))
+        )}
       </section>
 
       <div className="panel-actions">
