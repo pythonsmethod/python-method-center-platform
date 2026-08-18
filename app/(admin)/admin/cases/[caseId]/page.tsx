@@ -188,16 +188,18 @@ export default async function StaffCaseDetailPage({
             <li>Телефон: {clientCase.profiles?.phone ?? "—"}</li>
           </ul>
         </div>
-        <div className="panel">
-          <span className="panel__label">Кейс</span>
-          <h2>{caseStatusLabel(clientCase.status)}</h2>
-          <ul className="status-list">
-            <li>Срочность: {caseUrgencyLabel(clientCase.urgency)}</li>
-            <li>Направление: {caseDirectionLabel(clientCase.direction)}</li>
-            <li>Создан: {formatDateTime(clientCase.created_at)}</li>
-            <li>Обновлён: {formatDateTime(clientCase.updated_at)}</li>
-          </ul>
-        </div>
+        {showAdminControls ? (
+          <div className="panel">
+            <span className="panel__label">Кейс</span>
+            <h2>{caseStatusLabel(clientCase.status)}</h2>
+            <ul className="status-list">
+              <li>Срочность: {caseUrgencyLabel(clientCase.urgency)}</li>
+              <li>Направление: {caseDirectionLabel(clientCase.direction)}</li>
+              <li>Создан: {formatDateTime(clientCase.created_at)}</li>
+              <li>Обновлён: {formatDateTime(clientCase.updated_at)}</li>
+            </ul>
+          </div>
+        ) : null}
         <div className="panel">
           <span className="panel__label">Описание ситуации</span>
           <h2>Из анкеты</h2>
