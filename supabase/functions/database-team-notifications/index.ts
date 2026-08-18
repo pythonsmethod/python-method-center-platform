@@ -1,3 +1,8 @@
+declare const Deno: {
+  serve(handler: (request: Request) => Response | Promise<Response>): void;
+  env: { get(name: string): string | undefined };
+};
+
 const EXPECTED_SECRET_HASH =
   "51691e896a4b42c366f9bbee050f9f59947518ba86aa2aaeecd2c93bd8030e38";
 const DESTINATION =
