@@ -346,7 +346,16 @@
 .app-expert p:not(.app-kicker) { color: var(--muted) !important; line-height: 1.75; max-width: 560px; }
 .app-text-link { color: var(--accent-strong); display: inline-flex; font-weight: 750; gap: .5rem; margin-top: 1rem; text-underline-offset: 4px; }
 
-.app-final { align-items: center; display: flex; gap: 2rem; justify-content: space-between; padding: clamp(3rem, 7vw, 5rem); }
+/* The closing call to action stacks into a column only at 560px, but its
+   row needs about 610px to hold the heading and the button side by side —
+   so between those two widths the button was pushed off the screen and
+   dragged the whole landing page sideways. Wrapping costs nothing where
+   the row already fits and lets the button drop under the heading where it
+   does not, which covers the gap at every width rather than at one more
+   breakpoint. `min-width: 0` lets the text column shrink to its own
+   wrapping instead of to its longest word. */
+.app-final { align-items: center; display: flex; flex-wrap: wrap; gap: 2rem; justify-content: space-between; padding: clamp(3rem, 7vw, 5rem); }
+.app-final > div { min-width: 0; }
 .app-final h2 { font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 3.25rem); margin: 0; }
 .app-final p:not(.app-kicker) { color: var(--app-muted) !important; line-height: 1.65; margin-bottom: 0; max-width: 650px; }
 .app-final .app-button { flex: 0 0 auto; }

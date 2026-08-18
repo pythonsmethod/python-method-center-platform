@@ -11715,9 +11715,23 @@ body:has(.pm-app) > .site-header,
 body:has(.pm-app) > .site-footer { display: none; }
 .native-app-route > main { min-height: 100dvh; }
 
-/* Guest-only mobile public navigation. It is rendered by the root layout,
-   but stays entirely absent from desktop and signed-in views. */
+/* The public site's navigation on a phone. It is rendered by the root
+   layout for everyone and stays entirely absent from desktop.
+   It used to be rendered for guests only, which meant signing in took the
+   bottom menu away and fell back to the desktop bar stacked into a
+   ~300px-tall block: a third of a phone screen spent on navigation, and a
+   site that looked like a different one after logging in. The dock now
+   names the signed-in person's own door instead of disappearing.
+   The screens that bring their own navigation — the client cabinet, the
+   staff workspace, the installed-app welcome and the app shell — hide the
+   public header and footer, and the dock belongs to that same set. */
 .public-mobile-dock { display: none; }
+
+body:has(.web-cab) .public-mobile-dock,
+body:has(.admin-nav) .public-mobile-dock,
+body:has(.app-welcome) .public-mobile-dock,
+body.welcome-active .public-mobile-dock,
+body:has(.pm-app) .public-mobile-dock { display: none !important; }
 
 @media (max-width: 560px) {
   body:has(.public-mobile-dock) { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
@@ -11776,6 +11790,31 @@ body:has(.pm-app) > .site-footer { display: none; }
   body:has(.public-mobile-dock) .anham-companion {
     bottom: calc(130px + env(safe-area-inset-bottom));
     z-index: 61;
+  }
+
+  /* The dock now travels with signed-in people too, so it reaches the
+     screens that bring their own navigation. It is hidden there — and so
+     the strip the body reserves for it, and the lift it gives Anham, have
+     to go with it, or those screens carry 126px of dead space under their
+     own bottom bar. */
+  body:is(
+      :has(.web-cab),
+      :has(.admin-nav),
+      :has(.app-welcome),
+      .welcome-active,
+      :has(.pm-app)
+    ) {
+    padding-bottom: 0;
+  }
+
+  body:is(
+      :has(.web-cab),
+      :has(.admin-nav),
+      :has(.app-welcome),
+      .welcome-active,
+      :has(.pm-app)
+    ) .anham-companion {
+    bottom: 12px;
   }
 }
 .pm-app { min-height: 100dvh; color: #f7f2e8; background: radial-gradient(circle at 50% 18%, #231806 0, #080705 30%, #030303 72%); padding-bottom: 88px; }
