@@ -2,7 +2,8 @@
 
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 
-import { FormEvent, useRef, useState, useTransition } from "react";
+import { FormEvent, useEffect, useRef, useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import {
   buildDocumentStoragePath,
   DOCUMENT_STORAGE_BUCKET,
@@ -75,6 +76,7 @@ export function DocumentUploadPanel({
   locale
 }: DocumentUploadPanelProps) {
   const [documents, setDocuments] = useState(initialDocuments);
+  const router = useRouter();
   const [state, setState] = useState<UploadState>({
     status: "idle",
     message: ""
@@ -82,6 +84,20 @@ export function DocumentUploadPanel({
   const [isPending, startTransition] = useTransition();
   const [openError, setOpenError] = useState<string>("");
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    setDocuments(initialDocuments);
+  }, [initialDocuments]);
+
+  useEffect(() => {
+    const hasWork = documents.some((document) =>
+      ["uploaded", "queued", "processing"].includes(document.document_status)
+    );
+    if (!hasWork) return;
+
+    const timer = window.setInterval(() => router.refresh(), 10_000);
+    return () => window.clearInterval(timer);
+  }, [documents, router]);
 
   async function handleOpenDocument(document: UploadedDocument) {
     setOpenError("");
@@ -208,6 +224,7 @@ export function DocumentUploadPanel({
         status: "success",
         message: labels.uploaded
       });
+      void fetch("/api/documents/process", { method: "POST" }).catch(() => undefined);
     });
   }
 

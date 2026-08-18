@@ -8,15 +8,14 @@ import {
   parseCaseReview
 } from "@/lib/assistant/case-review";
 import {
-  compareTranscriptions,
   formatAgreed,
   formatDisputed,
-  parseTranscription,
-  TRANSCRIPTION_SYSTEM_PROMPT
+  type DisputedValue,
+  type TranscribedValue
 } from "@/lib/assistant/transcription";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { getStaffUserState } from "@/lib/auth/require-staff";
-import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
+import { fingerprintDocuments } from "@/lib/cases/case-documents";
 import type { CaseReviewActionState } from "@/lib/cases/review-state";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -24,13 +23,6 @@ import { isUuid } from "@/lib/utils/uuid";
 function errorState(message: string): CaseReviewActionState {
   return { status: "error", message };
 }
-
-const SKIPPED_REASON: Record<string, string> = {
-  "too-big": "слишком большой файл",
-  unsupported: "формат, который ассистент не читает",
-  "no-room": "не поместился в один запрос",
-  unreadable: "файл не удалось скачать"
-};
 
 // Reads the case's own analyses and writes down what the assistant made of
 // them. Staff only, and stored where no client can reach it.
@@ -64,7 +56,7 @@ export async function generateCaseReview(
     .from("uploaded_documents")
     // metadata carries the mime type the browser reported at upload;
     // there is no mime_type column on this table.
-    .select("id, storage_path, original_filename, metadata, created_at")
+    .select("id, original_filename, document_status, created_at")
     .eq("case_id", caseId)
     .order("created_at", { ascending: true })
     .limit(60);
@@ -79,101 +71,46 @@ export async function generateCaseReview(
     return errorState("В кейсе пока нет загруженных документов.");
   }
 
-  const loaded = await loadCaseDocuments(
-    (documents ?? []).map((row) => ({
-      id: String(row.id),
-      storage_path: String(row.storage_path),
-      original_filename: String(row.original_filename ?? ""),
-      mimeType: readMimeType(row.metadata),
-      created_at: String(row.created_at)
-    }))
-  );
-
-  if (!loaded) {
-    return errorState("Хранилище документов недоступно.");
+  const waiting = documents.filter((row) => row.document_status !== "ready");
+  if (waiting.length > 0) {
+    const reupload = waiting.filter((row) => row.document_status === "needs_reupload").length;
+    return errorState(
+      reupload > 0
+        ? `Итог пока не собирается: ${reupload} файл(а) клиенту нужно загрузить повторно. Остальные документы сохранены.`
+        : `Документы ещё распознаются: готово ${documents.length - waiting.length} из ${documents.length}.`
+    );
   }
 
-  if (loaded.attachments.length === 0) {
-    // The old message blamed the file formats whatever had actually gone
-    // wrong, and the first case it met was six perfectly ordinary phone
-    // photographs that were merely too large. Saying the wrong reason costs
-    // more than saying none: it sends someone converting files that were
-    // fine.
-    const reasons = [...new Set(loaded.skipped.map((item) => item.reason))]
-      .map((reason) => SKIPPED_REASON[reason] ?? reason)
-      .join("; ");
+  const { data: extractions, error: extractionError } = await supabase
+    .from("document_extractions")
+    .select("document_id, agreed_values, disputed_values")
+    .eq("case_id", caseId);
 
+  if (extractionError) {
+    return errorState(`Не удалось получить распознанные документы: ${extractionError.message}`);
+  }
+
+  if ((extractions?.length ?? 0) !== documents.length) {
     return errorState(
-      reasons
-        ? `Ни один документ кейса не удалось прочитать. Причина: ${reasons}. Файлов в кейсе: ${loaded.skipped.length}.`
-        : "Ни один документ кейса не удалось прочитать."
+      `Результаты ещё собираются: готово ${extractions?.length ?? 0} из ${documents.length}. Ни один файл не будет пропущен.`
     );
+  }
+
+  const agreed = (extractions ?? []).flatMap((row) =>
+    Array.isArray(row.agreed_values) ? row.agreed_values as TranscribedValue[] : []
+  );
+  const disputed = (extractions ?? []).flatMap((row) =>
+    Array.isArray(row.disputed_values) ? row.disputed_values as DisputedValue[] : []
+  );
+
+  if (agreed.length === 0 && disputed.length === 0) {
+    return errorState("В распознанных документах не найдено содержимого для итогового разбора.");
   }
 
   const context = await buildCaseContext(caseId);
-  const skippedNote =
-    loaded.skipped.length > 0
-      ? `\n\nВНИМАНИЕ: часть файлов не попала в этот запрос — ${loaded.skipped
-          .map((item) => `«${item.name}» (${SKIPPED_REASON[item.reason] ?? item.reason})`)
-          .join(", ")}. Скажи об этом первой строкой разбора.`
-      : "";
-
-  // Two independent readings of the same files, then a comparison done by
-  // code rather than by the model.
-  //
-  // The error this exists for was not a wrong number: every one of the forty
-  // laboratory values was right. It was a table whose value column was
-  // printed offset from its row labels, and one row of slippage turned a
-  // non-smoker into a smoker. Alignment is exactly the kind of mistake a
-  // second look catches and a stricter instruction does not.
-  //
-  // The two passes run at once: they do not depend on each other, and a
-  // person is waiting.
-  const [firstPass, secondPass] = await Promise.all([
-    askClaude(
-      TRANSCRIPTION_SYSTEM_PROMPT,
-      [
-        {
-          role: "user",
-          content: `Перепиши всё содержимое приложенных документов по заданному формату.${skippedNote}`
-        }
-      ],
-      8000,
-      loaded.attachments
-    ),
-    askClaude(
-      TRANSCRIPTION_SYSTEM_PROMPT,
-      [
-        {
-          role: "user",
-          content:
-            "Перепиши всё содержимое приложенных документов по заданному формату. Читай внимательно каждое поле, включая таблицы осмотра и назначения препаратов."
-        }
-      ],
-      8000,
-      loaded.attachments
-    )
-  ]);
-
-  if (firstPass.status !== "ok" || secondPass.status !== "ok") {
-    return errorState("Ассистент сейчас недоступен. Попробуйте через минуту.");
-  }
-
-  const comparison = compareTranscriptions(
-    parseTranscription(firstPass.reply),
-    parseTranscription(secondPass.reply)
-  );
-
-  if (comparison.agreed.length === 0 && comparison.disputed.length === 0) {
-    return errorState(
-      "Не удалось перенести ни одного значения из документов. Проверьте, что файлы открываются и на них видно текст."
-    );
-  }
-
-  const disputedNote =
-    comparison.disputed.length > 0
-      ? `\n\nСПОРНЫЕ МЕСТА — два чтения не сошлись или чтение было неуверенным. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(comparison.disputed)}`
-      : `\n\nСПОРНЫХ МЕСТ НЕТ: оба чтения совпали по всем строкам. Так и напиши в разделе «${CASE_REVIEW_UNREAD_HEADING}».`;
+  const disputedNote = disputed.length > 0
+    ? `\n\nСПОРНЫЕ МЕСТА — два чтения не сошлись или чтение было неуверенным. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(disputed)}`
+    : `\n\nСПОРНЫХ МЕСТ НЕТ: оба чтения совпали по всем строкам. Так и напиши в разделе «${CASE_REVIEW_UNREAD_HEADING}».`;
 
   const result = await askClaude(
     `${CASE_REVIEW_SYSTEM_PROMPT}\n\n${context ?? ""}`,
@@ -181,8 +118,8 @@ export async function generateCaseReview(
       {
         role: "user",
         content: `Вот значения, переписанные из документов клиента и подтверждённые двумя независимыми чтениями. Подготовь обе части по заданному формату, опираясь только на них.\n\n${formatAgreed(
-          comparison.agreed
-        )}${disputedNote}${skippedNote}`
+          agreed
+        )}${disputedNote}`
       }
     ],
     4000
@@ -205,8 +142,8 @@ export async function generateCaseReview(
       case_id: caseId,
       summary: parsed.parts.summary,
       draft: parsed.parts.draft,
-      documents_fingerprint: loaded.fingerprint,
-      documents_count: loaded.attachments.length,
+      documents_fingerprint: fingerprintDocuments(documents),
+      documents_count: documents.length,
       created_by: auth.userId,
       created_at: new Date().toISOString()
     },
@@ -223,6 +160,6 @@ export async function generateCaseReview(
 
   return {
     status: "success",
-    message: `Прочитано документов: ${loaded.attachments.length}.`
+    message: `Итог собран из всех документов: ${documents.length}.`
   };
 }

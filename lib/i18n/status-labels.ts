@@ -16,8 +16,8 @@ const caseDirectionLabels: LocalizedLabels = {
   en: { recovery: "Recovery", rehabilitation: "Rehabilitation", preservation: "Condition preservation", not_set: "Not set" }
 };
 const documentStatusLabels: LocalizedLabels = {
-  ru: { uploaded: "Загружен", queued: "В очереди", ready: "Обработан", processing: "Обрабатывается", accepted: "Принят", needs_reupload: "Нужна повторная загрузка", archived: "В архиве" },
-  en: { uploaded: "Uploaded", queued: "Queued", ready: "Processed", processing: "Processing", accepted: "Accepted", needs_reupload: "Upload again", archived: "Archived" }
+  ru: { uploaded: "Загружен", queued: "В очереди", ready: "Обработан", processing: "Обрабатывается", accepted: "Принят", needs_reupload: "Нужна повторная загрузка", failed: "Временная ошибка обработки", archived: "В архиве" },
+  en: { uploaded: "Uploaded", queued: "Queued", ready: "Processed", processing: "Processing", accepted: "Accepted", needs_reupload: "Upload again", failed: "Temporary processing error", archived: "Archived" }
 };
 const supportStatusLabels: LocalizedLabels = {
   ru: { open: "Открыт", in_progress: "В работе", waiting_on_client: "Ждёт вашего ответа", escalated_to_karen: "Передан Professor Python", resolved: "Решён", closed: "Закрыт" },

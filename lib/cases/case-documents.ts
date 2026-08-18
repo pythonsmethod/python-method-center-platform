@@ -35,11 +35,11 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 const MAX_IMAGE_BYTES = 1_500_000;
 
 // A PDF cannot be shrunk here, and a scanned one is legitimately heavy.
-const MAX_FILE_BYTES = 4_500_000;
+const MAX_FILE_BYTES = 25 * 1024 * 1024;
 
 // The whole request. Well inside what the model accepts; the cap exists so
 // a case with sixty files cannot build a request that simply fails.
-const MAX_TOTAL_BYTES = 14_000_000;
+const MAX_TOTAL_BYTES = 25 * 1024 * 1024;
 
 // The longest edge the model reasons at.
 const IMAGE_LONG_EDGE = 1568;

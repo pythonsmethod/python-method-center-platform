@@ -206,7 +206,7 @@ const ru = {
       errorOpen: "Не удалось открыть документ.",
       errorPickFile: "Сначала выберите файл документа.",
       progressUploading: "Загрузка документа...",
-      uploaded: "Документ загружен и привязан к вашему кейсу."
+      uploaded: "Документ загружен и поставлен на автоматическое распознавание. Можно загружать следующий файл."
     },
     metrics: {
       eyebrow: "Динамика",
@@ -1405,7 +1405,7 @@ const en: typeof ru = {
       errorOpen: "The document could not be opened.",
       errorPickFile: "Please choose a document file first.",
       progressUploading: "Uploading the document...",
-      uploaded: "The document is uploaded and attached to your case."
+      uploaded: "The document is uploaded and queued for automatic reading. You can upload the next file."
     },
     metrics: {
       eyebrow: "Progress",
