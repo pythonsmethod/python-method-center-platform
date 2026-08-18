@@ -155,12 +155,35 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
   }
 
   const prompt = "Перепиши всё содержимое этого документа по заданному формату. Не пропускай ни одной строки, даты, подписи или части заключения.";
-  const [first, second] = await Promise.all([
-    askAssistantWithAttachments(TRANSCRIPTION_SYSTEM_PROMPT, [{ role: "user", content: prompt }], 8000, loaded.attachments),
-    askAssistantWithAttachments(TRANSCRIPTION_SYSTEM_PROMPT, [{ role: "user", content: prompt }], 8000, loaded.attachments)
-  ]);
-  if (first.status !== "ok" || second.status !== "ok") {
-    return finishFailure(job, "service", "Reading provider unavailable");
+  // Run the two independent readings sequentially. Parallel vision requests
+  // hit provider rate limits on real multi-file cases and wasted both reads;
+  // independence means separate calls, not simultaneous calls.
+  const first = await askAssistantWithAttachments(
+    TRANSCRIPTION_SYSTEM_PROMPT,
+    [{ role: "user", content: prompt }],
+    8000,
+    loaded.attachments
+  );
+  if (first.status !== "ok") {
+    return finishFailure(
+      job,
+      "service",
+      first.status === "error" ? first.message : "Reading provider is not configured"
+    );
+  }
+
+  const second = await askAssistantWithAttachments(
+    TRANSCRIPTION_SYSTEM_PROMPT,
+    [{ role: "user", content: prompt }],
+    8000,
+    loaded.attachments
+  );
+  if (second.status !== "ok") {
+    return finishFailure(
+      job,
+      "service",
+      second.status === "error" ? second.message : "Reading provider is not configured"
+    );
   }
 
   const firstRows = parseTranscription(first.reply);
