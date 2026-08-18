@@ -283,6 +283,7 @@ export default async function StaffCaseDetailPage({
           <CaseReviewPanel
             caseId={clientCase.id}
             documentsCount={documents.length}
+            documentStatuses={documents.map((document) => document.document_status)}
             review={review}
           />
         </div>

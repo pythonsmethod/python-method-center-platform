@@ -13,6 +13,7 @@ import type {
 import { writeAuditLog } from "@/lib/audit/log";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import { enqueueDocumentProcessing } from "@/lib/documents/processing";
 
 type RecordUploadedDocumentInput = {
   caseId: string;
@@ -151,8 +152,17 @@ export async function recordUploadedDocumentMetadata(
     }
   });
 
+  const queued = await enqueueDocumentProcessing({
+    documentId: document.id,
+    caseId: input.caseId,
+    profileId: user.id
+  });
+
   return {
     status: "success",
-    document: document as UploadedDocument
+    document: {
+      ...document,
+      document_status: queued ? "queued" : document.document_status
+    } as UploadedDocument
   };
 }

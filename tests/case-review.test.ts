@@ -164,11 +164,11 @@ describe("knowing when a reading is out of date", () => {
 });
 
 describe("the assistant in the case chat knows about the reading", () => {
-  it("is told to use the button instead of asking for the files again", async () => {
+  it("is told to wait for automatic reading instead of asking for the files again", async () => {
     const { buildStaffSystemPrompt } = await import("@/lib/assistant/prompts");
     const prompt = await buildStaffSystemPrompt();
 
-    expect(prompt).toContain("Прочитать анализы кейса");
+    expect(prompt).toContain("Собрать итоговый разбор");
     expect(prompt).toContain(
       "НИКОГДА не проси его прикладывать сюда файлы, которые клиент уже загрузил"
     );
@@ -193,6 +193,6 @@ describe("the assistant in the case chat knows about the reading", () => {
     const prompt = await buildPaidClientSystemPrompt("контекст");
 
     expect(prompt).toContain("ХРАНИЛИЩА КАБИНЕТА");
-    expect(prompt).not.toContain("Прочитать анализы кейса");
+    expect(prompt).not.toContain("Собрать итоговый разбор");
   });
 });

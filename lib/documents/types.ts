@@ -10,7 +10,10 @@ export type UploadedDocumentMetadata = {
 export type DocumentIntakeStatus =
   | "uploaded"
   | "queued"
+  | "processing"
   | "ready"
+  | "needs_reupload"
+  | "failed"
   | "archived";
 
 export type UploadedDocument = {

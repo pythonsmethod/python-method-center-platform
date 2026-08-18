@@ -11,6 +11,7 @@ type CaseReviewPanelProps = {
   caseId: string;
   review: CaseReview | null;
   documentsCount: number;
+  documentStatuses?: string[];
 };
 
 function formatWhen(iso: string): string {
@@ -38,13 +39,17 @@ function formatWhen(iso: string): string {
 export function CaseReviewPanel({
   caseId,
   review,
-  documentsCount
+  documentsCount,
+  documentStatuses = []
 }: CaseReviewPanelProps) {
   const [state, action, pending] = useActionState(
     generateCaseReview,
     initialCaseReviewState
   );
   const [copied, setCopied] = useState(false);
+  const readyCount = documentStatuses.filter((status) => status === "ready").length;
+  const reuploadCount = documentStatuses.filter((status) => status === "needs_reupload").length;
+  const allReady = documentsCount > 0 && readyCount === documentsCount;
 
   async function copyDraft() {
     if (!review?.draft) {
@@ -75,14 +80,14 @@ export function CaseReviewPanel({
           <input name="case_id" type="hidden" value={caseId} />
           <button
             className="button button--secondary"
-            disabled={pending || documentsCount === 0}
+            disabled={pending || !allReady}
             type="submit"
           >
             {pending
-              ? "Читаю анализы..."
+              ? "Собираю итог..."
               : review
-                ? "Перечитать"
-                : "Прочитать анализы кейса"}
+                ? "Пересобрать итог"
+                : "Собрать итоговый разбор"}
           </button>
         </form>
       </div>
@@ -90,6 +95,17 @@ export function CaseReviewPanel({
       {documentsCount === 0 ? (
         <p className="case-review__empty">
           В кейсе пока нет загруженных документов.
+        </p>
+      ) : null}
+
+      {documentsCount > 0 ? (
+        <p className="case-review__origin">
+          Автоматически распознано файлов: {readyCount} из {documentsCount}.
+          {reuploadCount > 0
+            ? ` Нужна повторная загрузка: ${reuploadCount}. Клиент получил сообщение с названием файла.`
+            : allReady
+              ? " Все материалы учтены — итог можно собрать без повторного чтения файлов."
+              : " Остальные файлы находятся в очереди или обрабатываются."}
         </p>
       ) : null}
 
