@@ -4,8 +4,7 @@ import {
 } from "@/lib/assistant/guard";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import {
-  isFreeReviewActive,
-  PAID_REVIEW_PRICE_LABEL
+  isFreeReviewActive
 } from "@/lib/config/promo";
 import {
   actorRoleLabels,
@@ -179,7 +178,7 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       ok: true,
       detail: isFreeReviewActive()
         ? "Включена — разбор анализов бесплатный"
-        : `Выключена — разбор платный (${PAID_REVIEW_PRICE_LABEL})`
+        : "Выключена — акция завершена"
     }
   ];
 
