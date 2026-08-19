@@ -2,6 +2,10 @@ import { describe, expect, it } from "vitest";
 import { buildGuestSystemPrompt } from "@/lib/assistant/prompts";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { OFFER_CONTENT } from "@/lib/legal/offer-content";
+import {
+  FREE_REVIEW_DEADLINE_EN,
+  FREE_REVIEW_DEADLINE_RU
+} from "@/lib/config/promo";
 
 // What the free format actually is, pinned in one place.
 //
@@ -28,6 +32,18 @@ function freeReviewCopy(locale: "ru" | "en"): string {
 }
 
 describe("what the free format is described as", () => {
+  it("shows the September 1 deadline without advertising a future price", async () => {
+    expect(FREE_REVIEW_DEADLINE_RU).toBe("1 сентября 2026 года");
+    expect(FREE_REVIEW_DEADLINE_EN).toBe("1 September 2026");
+
+    const publishedCopy = `${freeReviewCopy("ru")}\n${freeReviewCopy("en")}`;
+    expect(publishedCopy).not.toMatch(/\$\s?1[ ,.\u00a0]?000/);
+
+    const prompt = await buildGuestSystemPrompt();
+    expect(prompt).toContain(FREE_REVIEW_DEADLINE_RU);
+    expect(prompt).not.toMatch(/\$\s?1[ ,.\u00a0]?000/);
+  });
+
   it("says it is an assessment of the person's current state", () => {
     expect(freeReviewCopy("ru")).toContain("показателями вашего организма");
     expect(freeReviewCopy("ru")).toContain("где вы находитесь сейчас");

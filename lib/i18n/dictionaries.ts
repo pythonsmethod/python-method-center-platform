@@ -948,9 +948,9 @@ const ru = {
     textPaid:
       "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
     // The amount is rendered on its own line and never wraps mid-number.
-    pricePaid: "Разовая услуга — стоимость",
-    priceFree: "Бесплатно · позже эта услуга будет стоить",
-    priceAmount: "$1 000",
+    pricePaid: "Условия после завершения акции уточняйте у команды",
+    priceFree: `Бесплатно до ${FREE_REVIEW_DEADLINE_RU}`,
+    priceAmount: "",
     cta: "Получить разбор",
     ctaFree: "Получить бесплатную оценку",
     note: "Предварительная оценка является экспертным мнением и не заменяет консультацию врача."
@@ -963,7 +963,7 @@ const ru = {
     items: [
       {
         q: "Почему это бесплатно?",
-        a: `Это предложение для первых клиентов центра — до ${FREE_REVIEW_DEADLINE_RU}. Позже та же услуга будет стоить $1 000.`
+        a: `Это предложение для первых клиентов центра и действует до ${FREE_REVIEW_DEADLINE_RU}.`
       },
       {
         q: "Что входит?",
@@ -2106,9 +2106,9 @@ const en: typeof ru = {
     titlePaid: "Analyses review by Professor Python",
     textPaid:
       "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
-    pricePaid: "One-time service — price",
-    priceFree: "Free · later this service will cost",
-    priceAmount: "$1,000",
+    pricePaid: "Ask the team about terms after the offer ends",
+    priceFree: `Free until ${FREE_REVIEW_DEADLINE_EN}`,
+    priceAmount: "",
     cta: "Get the review",
     ctaFree: "Get the free review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
@@ -2119,7 +2119,7 @@ const en: typeof ru = {
     items: [
       {
         q: "Why is it free?",
-        a: `This is an offer for the centre's first clients — until ${FREE_REVIEW_DEADLINE_EN}. Later the same service will cost $1,000.`
+        a: `This offer is for the centre's first clients and runs until ${FREE_REVIEW_DEADLINE_EN}.`
       },
       {
         q: "What is included?",
