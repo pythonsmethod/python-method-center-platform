@@ -11733,6 +11733,34 @@ body:has(.pm-app) > .site-footer { display: none; }
   .public-mobile-dock a:last-child { color: var(--accent-strong); }
   .public-mobile-dock__icon { color: var(--accent); height: 22px; width: 22px; }
   .native-app-route .public-mobile-dock { display: none; }
+
+  /* The conversation is its own mobile surface. Keeping the fixed dock
+     underneath it covered the composer on short iPhones, and iOS Safari
+     could not scroll the clipped panel far enough to reveal the textarea.
+     Hide the dock until the conversation closes and size the panel against
+     the visual viewport so the keyboard can shrink it safely. */
+  body:has(.anham-companion.is-open) .public-mobile-dock {
+    display: none;
+  }
+
+  .anham-companion.is-open {
+    align-items: stretch;
+    bottom: max(12px, env(safe-area-inset-bottom));
+    gap: 0;
+    left: 12px;
+    max-width: none;
+    right: 12px;
+    top: max(12px, env(safe-area-inset-top));
+    z-index: 70;
+  }
+
+  .anham-companion.is-open .anham-panel {
+    flex: 1 1 auto;
+    height: auto;
+    max-height: calc(100dvh - 24px - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+    min-height: 0;
+    width: 100%;
+  }
 }
 .pm-app { min-height: 100dvh; color: #f7f2e8; background: radial-gradient(circle at 50% 18%, #231806 0, #080705 30%, #030303 72%); padding-bottom: 88px; }
 .pm-app__header { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; gap: 12px; min-height: calc(82px + env(safe-area-inset-top)); padding: calc(18px + env(safe-area-inset-top)) clamp(18px,4vw,34px) 16px; border-bottom: 1px solid rgba(218,165,65,.18); background: rgba(3,3,3,.88); backdrop-filter: blur(18px); }
