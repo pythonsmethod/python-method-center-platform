@@ -164,7 +164,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </div>
         </SiteHeader>
         <main>{children}</main>
-        {viewer === "anonymous" ? <PublicMobileDock locale={locale} /> : null}
+        <PublicMobileDock locale={locale} viewer={viewer} />
         <footer className="site-footer">
           <span>© Python Method</span>
           {socialLinks.length > 0 ? (
