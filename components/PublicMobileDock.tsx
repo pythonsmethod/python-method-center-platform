@@ -8,20 +8,27 @@ import {
   IconWingedSun
 } from "@/components/icons/EgyptianIcons";
 import type { Locale } from "@/lib/i18n/locale";
+import type { NavViewer } from "@/components/SiteNav";
 
 type PublicMobileDockProps = {
   locale: Locale;
+  viewer: NavViewer;
 };
 
-export function PublicMobileDock({ locale }: PublicMobileDockProps) {
+export function PublicMobileDock({ locale, viewer }: PublicMobileDockProps) {
   const ru = locale === "ru";
+  const account = viewer === "staff"
+    ? { href: "/admin", label: ru ? "Рабочее место" : "Workspace" }
+    : viewer === "client"
+      ? { href: "/cabinet", label: ru ? "Кабинет" : "Account" }
+      : { href: "/login", label: ru ? "Вход / Регистрация" : "Sign in / Sign up" };
   const items = [
     { href: "/", label: ru ? "Главная" : "Home", Icon: IconWingedSun },
     { href: "/payment", label: ru ? "Сопровождение" : "Program", Icon: IconScales },
     { href: "/shop", label: ru ? "Магазин" : "Shop", Icon: IconEyeOfHorus },
     { href: "/review", label: ru ? "Бесплатный разбор" : "Free review", Icon: IconPapyrus },
     { href: "/support", label: ru ? "Поддержка" : "Support", Icon: IconWater },
-    { href: "/login", label: ru ? "Вход / Регистрация" : "Sign in / Sign up", Icon: IconAnkh }
+    { ...account, Icon: IconAnkh }
   ];
 
   return (
