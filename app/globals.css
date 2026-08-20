@@ -11685,8 +11685,7 @@ body:has(.pm-app) > .site-header,
 body:has(.pm-app) > .site-footer { display: none; }
 .native-app-route > main { min-height: 100dvh; }
 
-/* Guest-only mobile public navigation. It is rendered by the root layout,
-   but stays entirely absent from desktop and signed-in views. */
+/* Mobile navigation is permanent for every viewer on phone-class devices.\n   Authentication changes only the account destination, never its position. */
 .public-mobile-dock { display: none; }
 
 @media (max-width: 560px) {
@@ -11732,8 +11731,6 @@ body:has(.pm-app) > .site-footer { display: none; }
   .public-mobile-dock a:first-child,
   .public-mobile-dock a:last-child { color: var(--accent-strong); }
   .public-mobile-dock__icon { color: var(--accent); height: 22px; width: 22px; }
-  .native-app-route .public-mobile-dock { display: none; }
-
   /* The conversation is its own mobile surface. Keeping the fixed dock
      underneath it covered the composer on short iPhones, and iOS Safari
      could not scroll the clipped panel far enough to reveal the textarea.
