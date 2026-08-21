@@ -895,9 +895,7 @@ const ru = {
       ],
       quoteEnd: "Я дал слово — и я его держу.",
       after:
-        "С тех пор он работает почти исключительно с людьми в тяжёлой стадии онкологии — с теми, кто в самый тяжёлый момент своей жизни.",
-      photoAlt: "Карен с мамой в горах",
-      photoCaption: "Карен с мамой"
+        "С тех пор он работает почти исключительно с людьми в тяжёлой стадии онкологии — с теми, кто в самый тяжёлый момент своей жизни."
     },
     // Граница, сказанная его собственными словами. Это не юридическая
     // приписка внизу страницы, а второй блок сверху — потому что именно
@@ -2061,9 +2059,7 @@ const en: typeof ru = {
       ],
       quoteEnd: "I gave my word — and I keep it.",
       after:
-        "Since then he has worked almost entirely with people at a severe stage of cancer — people at the hardest moment of their lives.",
-      photoAlt: "Karen with his mother in the mountains",
-      photoCaption: "Karen and his mother"
+        "Since then he has worked almost entirely with people at a severe stage of cancer — people at the hardest moment of their lives."
     },
     work: {
       label: "What he does",
