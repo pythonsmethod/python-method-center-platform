@@ -9,8 +9,12 @@ import { getPaypalLink } from "@/lib/payments/paypal";
 export const PLAN_5W_TOTAL_USD = 1440;
 export const PLAN_100D_TOTAL_USD = 3675;
 
+// Legacy database/payment id. Never show this value as "15 weeks" to users:
+// the canonical public name and actual duration are both 100 days.
+export const SUPPORT_100_DAY_PRODUCT = "support_15_weeks" as const;
+
 export type PaymentPlan = {
-  product: "support_5_weeks" | "support_15_weeks";
+  product: "support_5_weeks" | typeof SUPPORT_100_DAY_PRODUCT;
   title: string;
   description: string;
   priceLine: string;
@@ -45,14 +49,14 @@ export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
       paypalUrl: getPaypalLink("support_5_weeks")
     },
     {
-      product: "support_15_weeks",
+      product: SUPPORT_100_DAY_PRODUCT,
       title: t.plan100Title,
       description: t.plan100Desc,
       priceLine: t.plan100Price,
       paymentLinkUrl: readPaymentLink(
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W
       ),
-      paypalUrl: getPaypalLink("support_15_weeks")
+      paypalUrl: getPaypalLink(SUPPORT_100_DAY_PRODUCT)
     }
   ];
 }

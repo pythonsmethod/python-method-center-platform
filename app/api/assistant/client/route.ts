@@ -1,13 +1,21 @@
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
-import { askAssistantTeam, type AssistantProvider } from "@/lib/assistant/router";
+import {
+  askAnham,
+  askAssistantTeam,
+  chooseAnhamMode,
+  type AssistantProvider
+} from "@/lib/assistant/router";
 import {
   buildGuestSystemPrompt,
   buildPaidClientSystemPrompt,
   buildRegisteredSystemPrompt
 } from "@/lib/assistant/prompts";
-import { guardAssistantRequest } from "@/lib/assistant/guard";
+import {
+  guardAnhamDeepRequest,
+  guardAssistantRequest
+} from "@/lib/assistant/guard";
 import { saveAssistantExchange } from "@/lib/assistant/history";
 import {
   extractRedFlag,
@@ -134,6 +142,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ reply: guard.message }, { status: 200 });
   }
 
+  const requestedAnhamMode = audience.tier === "client"
+    ? chooseAnhamMode(messages)
+    : "standard";
+  const anhamMode =
+    requestedAnhamMode === "deep" && audience.profileId
+      ? await guardAnhamDeepRequest(audience.profileId)
+        ? "deep"
+        : "standard"
+      : requestedAnhamMode;
+
   let system: string;
 
   if (audience.tier === "client") {
@@ -161,12 +179,14 @@ export async function POST(request: Request) {
     ? hasClaudeEnv()
       ? await askClaude(system, messages, settings.maxTokens, attachments)
       : ({ status: "unavailable" } as const)
-    : await askAssistantTeam(
-        system,
-        messages,
-        settings.maxTokens,
-        settings.provider
-      );
+    : audience.tier === "client"
+      ? await askAnham(system, messages, settings.maxTokens, anhamMode)
+      : await askAssistantTeam(
+          system,
+          messages,
+          settings.maxTokens,
+          settings.provider
+        );
 
   if (result.status === "unavailable") {
     return NextResponse.json(

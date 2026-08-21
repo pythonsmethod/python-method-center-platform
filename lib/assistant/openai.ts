@@ -16,7 +16,8 @@ export function hasOpenAiEnv(): boolean {
 export async function askOpenAi(
   system: string,
   messages: ChatMessage[],
-  maxTokens: number
+  maxTokens: number,
+  options: { reasoningEffort?: "high" } = {}
 ): Promise<AssistantResult> {
   const apiKey = process.env.OPENAI_API_KEY?.trim();
 
@@ -39,6 +40,9 @@ export async function askOpenAi(
       body: JSON.stringify({
         model,
         max_completion_tokens: maxTokens,
+        ...(options.reasoningEffort
+          ? { reasoning_effort: options.reasoningEffort }
+          : {}),
         messages: [
           { role: "system", content: system },
           ...messages.map((message) => ({
@@ -87,6 +91,9 @@ export async function askOpenAi(
           body: JSON.stringify({
             model,
             max_completion_tokens: maxTokens,
+            ...(options.reasoningEffort
+              ? { reasoning_effort: options.reasoningEffort }
+              : {}),
             messages: [
               { role: "system", content: system },
               ...messages.map((message) => ({

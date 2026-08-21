@@ -13,6 +13,10 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 //                the published recommendations of Professor Python.
 export type AssistantTier = "guest" | "registered" | "client";
 
+export function isPaidSupportProduct(product: unknown): boolean {
+  return product === "support_5_weeks" || product === "support_15_weeks";
+}
+
 export type AssistantAudience = {
   tier: AssistantTier;
   profileId: string | null;
@@ -71,12 +75,15 @@ export async function resolveAssistantTierForUi(): Promise<AssistantTier> {
 
     const { data } = await supabase
       .from("payments")
-      .select("id")
+      .select("product")
       .eq("profile_id", user.id)
       .eq("status", "paid")
+      .in("product", ["support_5_weeks", "support_15_weeks"])
       .limit(1);
 
-    return (data ?? []).length > 0 ? "client" : "registered";
+    return (data ?? []).some((row) => isPaidSupportProduct(row.product))
+      ? "client"
+      : "registered";
   } catch {
     return "guest";
   }
@@ -137,7 +144,10 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
 
     const caseRow = caseResult.data;
     const paidPayments = paymentsResult.data ?? [];
-    const hasPaid = paidPayments.length > 0;
+    const supportPayments = paidPayments.filter((row) =>
+      isPaidSupportProduct(row.product)
+    );
+    const hasPaidSupport = supportPayments.length > 0;
 
     const lines: string[] = [];
     lines.push(`Собеседник вошёл в аккаунт: ${user.email ?? "email скрыт"}.`);
@@ -154,8 +164,8 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
       );
     }
 
-    if (hasPaid) {
-      const products = paidPayments
+    if (hasPaidSupport) {
+      const products = supportPayments
         .map((row) =>
           row.product === "support_5_weeks"
             ? "«5 недель»"
@@ -171,7 +181,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
 
     if (!caseRow) {
       return {
-        tier: hasPaid ? "client" : "registered",
+        tier: hasPaidSupport ? "client" : "registered",
         profileId: user.id,
         email: user.email ?? null,
         caseId: null,
@@ -223,7 +233,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
           .filter(Boolean)
           .slice(0, 10)
           .join("; ")}. Содержимое файлов из хранилища тебе НЕ доступно — только названия. Никогда не делай вид, что читал их.${
-          hasPaid
+          hasPaidSupport
             ? " Если клиент хочет показать сами анализы — предложи приложить фото или PDF скрепкой прямо в этот чат: приложенное ты читаешь полностью, выписываешь показатели и готовишь к разбору Professor Python. Свой разбор и выводы о состоянии НЕ даёшь — их даёт только Professor Python."
             : ""
         }`
@@ -255,7 +265,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
     }
 
     return {
-      tier: hasPaid ? "client" : "registered",
+      tier: hasPaidSupport ? "client" : "registered",
       profileId: user.id,
       email: user.email ?? null,
       caseId: caseRow.id,

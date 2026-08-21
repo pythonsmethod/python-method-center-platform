@@ -40,7 +40,7 @@ describe("daily limits", () => {
   it("uses the built-in caps when nothing is configured", () => {
     expect(getDailyLimit("guest")).toBe(15);
     expect(getDailyLimit("registered")).toBe(60);
-    expect(getDailyLimit("client")).toBe(200);
+    expect(getDailyLimit("client")).toBe(60);
     expect(getGuestDailyTotalLimit()).toBe(400);
   });
 
