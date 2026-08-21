@@ -7,7 +7,6 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
-const MOTHER_IMAGE = "/images/professor/mother.jpg";
 
 // The page about the person behind the method.
 //
@@ -81,24 +80,10 @@ export default async function ProfessorPage() {
       <section className="panel professor-story" aria-label={t.origin.title}>
         <span className="panel__label">{t.origin.label}</span>
         <h2>{t.origin.title}</h2>
-        <div className="professor-origin">
-          <div className="professor-origin__text">
-            <blockquote className="professor-quote">{t.origin.quote}</blockquote>
-            {t.origin.paragraphs.map((paragraph) => (
-              <p key={paragraph}>{paragraph}</p>
-            ))}
-          </div>
-          <figure className="professor-photo professor-photo--portrait">
-            <Image
-              alt={t.origin.photoAlt}
-              height={1688}
-              sizes="(max-width: 860px) 100vw, 320px"
-              src={MOTHER_IMAGE}
-              width={900}
-            />
-            <figcaption>{t.origin.photoCaption}</figcaption>
-          </figure>
-        </div>
+        <blockquote className="professor-quote">{t.origin.quote}</blockquote>
+        {t.origin.paragraphs.map((paragraph) => (
+          <p key={paragraph}>{paragraph}</p>
+        ))}
         <blockquote className="professor-quote">{t.origin.quoteEnd}</blockquote>
         <p className="professor-story__after">{t.origin.after}</p>
       </section>

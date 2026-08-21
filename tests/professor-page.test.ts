@@ -179,6 +179,19 @@ describe("the boundary paragraph is still printed", () => {
   });
 });
 
+describe("the mother photo is not published", () => {
+  it("does not render the private photograph or its caption", () => {
+    const page = readFileSync(
+      join(process.cwd(), "app/(public)/professor/page.tsx"),
+      "utf8"
+    );
+
+    expect(page).not.toContain("MOTHER_IMAGE");
+    expect(page).not.toContain("t.origin.photoAlt");
+    expect(page).not.toContain("t.origin.photoCaption");
+  });
+});
+
 describe("what the page states matches the contract", () => {
   const clause = OFFER_CONTENT.ru.sections
     .flatMap((section) => section.paragraphs ?? [])
