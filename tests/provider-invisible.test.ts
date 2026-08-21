@@ -34,21 +34,19 @@ describe("who is allowed to see which model answered", () => {
     }
   });
 
-  it("fails closed when no allowlist is configured", () => {
-    // The important case. An unset environment variable must not quietly
-    // hand the whole team the view: an empty list means nobody, not
-    // everybody.
+  it("keeps founder access when no deployment allowlist is configured", () => {
     delete process.env.FOUNDER_EMAILS;
 
+    expect(canSeeProviderNames("DubrovenkoAnna@gmail.com")).toBe(true);
     expect(canSeeProviderNames("anna@example.com")).toBe(false);
     expect(canSeeProviderNames(null)).toBe(false);
   });
 
-  it("still lets any admin into the founder cabinet without a list", () => {
-    // Cabinet access is a separate, older rule and is not tightened here.
+  it("restricts the founder cabinet to the creator without an extra list", () => {
     delete process.env.FOUNDER_EMAILS;
 
-    expect(isFounderEmail("anna@example.com")).toBe(true);
+    expect(isFounderEmail("DubrovenkoAnna@gmail.com")).toBe(true);
+    expect(isFounderEmail("anna@example.com")).toBe(false);
   });
 
   it("shows the machinery to the founder and to nobody else", () => {
