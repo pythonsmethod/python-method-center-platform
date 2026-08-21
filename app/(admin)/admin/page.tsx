@@ -190,7 +190,7 @@ export default async function AdminPage() {
           {cases.length === 0 ? <p className="empty-state">{copy.noCases}</p> : cases.map((clientCase) => {
             const unreadCount = unread.byCase[clientCase.id] ?? 0;
             return (
-              <Link className="karen-client-card" href={`/admin/cases/${clientCase.id}`} key={clientCase.id}>
+              <Link className="karen-client-card" href={`/admin/cases/${clientCase.id}?view=today`} key={clientCase.id}>
                 <span className="karen-client-card__avatar" aria-hidden="true">
                   {(clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "?").trim().charAt(0).toUpperCase()}
                 </span>

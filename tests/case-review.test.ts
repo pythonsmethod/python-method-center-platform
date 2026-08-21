@@ -17,12 +17,11 @@ import { fingerprintDocuments, isReadableType } from "@/lib/cases/case-documents
 // and nothing may ever start to.
 
 describe("the two halves of the answer", () => {
-  const answer = `${CASE_REVIEW_SUMMARY_MARKER}
-Ферритин 18 нг/мл (реф. 30–150), 01.08.2026 — читается уверенно.
-Витамин D — снимок смазан, цифру не беру.
+  const answer = `${CASE_REVIEW_DRAFT_MARKER}
+Аня, посмотрел ваши анализы.
 
-${CASE_REVIEW_DRAFT_MARKER}
-Аня, посмотрел ваши анализы.`;
+${CASE_REVIEW_SUMMARY_MARKER}
+Файл №2, «blood.jpg»: витамин D. Что проверить: цифра размыта.`;
 
   it("splits the reading from the draft", () => {
     const result = parseCaseReview(answer);
@@ -30,8 +29,7 @@ ${CASE_REVIEW_DRAFT_MARKER}
     expect(result.status).toBe("ok");
     if (result.status !== "ok") return;
 
-    expect(result.parts.summary).toContain("Ферритин 18");
-    expect(result.parts.summary).not.toContain("Аня, посмотрел");
+    expect(result.parts.summary).toContain("Файл №2");
     expect(result.parts.draft).toBe("Аня, посмотрел ваши анализы.");
   });
 
@@ -45,41 +43,43 @@ ${CASE_REVIEW_DRAFT_MARKER}
     }
   });
 
-  it("leaves the draft empty rather than improvising one", () => {
-    // If the model loses the second marker, everything becomes the reading
-    // for Professor Python. The half addressed to a client is the one that
-    // must never be assembled out of guesswork.
+  it("rejects an answer without the client-ready section", () => {
     const result = parseCaseReview(
       `${CASE_REVIEW_SUMMARY_MARKER}\nТолько разбор, черновика нет.`
     );
-
-    expect(result.status).toBe("ok");
-    if (result.status !== "ok") return;
-
-    expect(result.parts.summary).toBe("Только разбор, черновика нет.");
-    expect(result.parts.draft).toBe("");
+    expect(result.status).toBe("unreadable");
   });
 
-  it("takes an unmarked answer as the reading, not as a reply", () => {
+  it("rejects an unmarked answer", () => {
     const result = parseCaseReview("Ассистент ответил без разделителей.");
-
-    expect(result.status === "ok" && result.parts.draft).toBe("");
-    expect(result.status === "ok" && result.parts.summary).toContain(
-      "без разделителей"
-    );
+    expect(result.status).toBe("unreadable");
   });
 
   it("reports an empty answer instead of storing nothing", () => {
-    for (const raw of ["", "   ", `${CASE_REVIEW_SUMMARY_MARKER}\n \n${CASE_REVIEW_DRAFT_MARKER}\n `]) {
+    for (const raw of ["", "   ", `${CASE_REVIEW_DRAFT_MARKER}\n \n${CASE_REVIEW_SUMMARY_MARKER}\n `]) {
       expect(parseCaseReview(raw).status).toBe("unreadable");
     }
+  });
+
+  it("turns the no-verification sentinel into an empty verification block", () => {
+    const result = parseCaseReview(
+      `${CASE_REVIEW_DRAFT_MARKER}\nГотовый текст.\n${CASE_REVIEW_SUMMARY_MARKER}\nНЕТ`
+    );
+    expect(result.status === "ok" && result.parts.summary).toBe("");
+  });
+
+  it("removes a stray long dash from text copied to the client", () => {
+    const result = parseCaseReview(
+      `${CASE_REVIEW_DRAFT_MARKER}\nПечень — работает без заметной нагрузки.\n${CASE_REVIEW_SUMMARY_MARKER}\nНЕТ`
+    );
+    expect(result.status === "ok" && result.parts.draft).not.toContain("—");
   });
 });
 
 describe("what the prompt requires", () => {
   it("tells the draft not to mention the assistant", () => {
     expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
-      "Не упоминай ИИ, ассистента, платформу"
+      "Не упоминай ИИ, автоматическое распознавание"
     );
   });
 
@@ -89,14 +89,25 @@ describe("what the prompt requires", () => {
     );
   });
 
-  it("keeps the paid boundary in the draft", () => {
+  it("requires plain-language names instead of unexplained abbreviations", () => {
     expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
-      "полный разбор с рекомендациями входит в платные форматы"
+      "Не выдавай техническую россыпь"
     );
   });
 
   it("forbids guessing an unreadable figure", () => {
     expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Никогда не угадывай цифру");
+  });
+
+  it("forbids long dashes in the client-ready text", () => {
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Символ «—» в готовом тексте запрещён");
+  });
+
+  it("limits holistic conclusions to systems supported by the documents", () => {
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
+      "только если по ним действительно есть данные"
+    );
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Жёсткий максимум 600 слов");
   });
 });
 
@@ -119,10 +130,13 @@ describe("nothing sends the draft", () => {
     expect(source).not.toContain("sendStaffCaseMessage");
   });
 
-  it("says on screen that the reading is the machine's, not his", () => {
+  it("shows a separate verification block below the client-ready text", () => {
     const source = readFileSync("components/cases/CaseReviewPanel.tsx", "utf8");
 
-    expect(source).toContain("Это мнение ИИ, а не разбор Professor Python");
+    expect(source.indexOf("review.draft")).toBeLessThan(
+      source.indexOf("review.summary")
+    );
+    expect(source).toContain("Требует проверки");
   });
 });
 
