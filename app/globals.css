@@ -452,6 +452,25 @@ main {
   margin: 12px 0 0;
 }
 
+.case-review__verification {
+  background: rgba(224, 169, 63, 0.06);
+  border: 1px solid rgba(224, 169, 63, 0.32);
+  border-radius: 10px;
+  margin-top: 14px;
+  padding: 14px 16px;
+}
+
+.case-review__verification .case-review__text {
+  font-size: 13px;
+  margin-top: 10px;
+}
+
+.case-review__verified {
+  color: var(--success);
+  font-size: 13px;
+  margin-top: 12px;
+}
+
 /* The page about the person behind the method.
 
    The portrait is a small window by his own request: it used to be a

@@ -41,6 +41,7 @@ export async function generateCaseReview(
   }
 
   const caseId = String(formData.get("case_id") ?? "");
+  const locale = formData.get("locale") === "en" ? "en" : "ru";
 
   if (!isUuid(caseId)) {
     return errorState("Некорректный кейс.");
@@ -103,22 +104,39 @@ export async function generateCaseReview(
     Array.isArray(row.disputed_values) ? row.disputed_values as DisputedValue[] : []
   );
 
+  const fileNumbers = new Map(
+    documents.map((document, index) => [
+      String(document.original_filename ?? "document"),
+      index + 1
+    ])
+  );
+  const numberedFile = (file: string) =>
+    `№${fileNumbers.get(file) ?? "?"} «${file}»`;
+  const numberedAgreed = agreed.map((value) => ({
+    ...value,
+    file: numberedFile(value.file)
+  }));
+  const numberedDisputed = disputed.map((value) => ({
+    ...value,
+    file: numberedFile(value.file)
+  }));
+
   if (agreed.length === 0 && disputed.length === 0) {
     return errorState("В распознанных документах не найдено содержимого для итогового разбора.");
   }
 
   const context = await buildCaseContext(caseId);
   const disputedNote = disputed.length > 0
-    ? `\n\nСПОРНЫЕ МЕСТА — два чтения не сошлись или чтение было неуверенным. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(disputed)}`
-    : `\n\nСПОРНЫХ МЕСТ НЕТ: оба чтения совпали по всем строкам. Так и напиши в разделе «${CASE_REVIEW_UNREAD_HEADING}».`;
+    ? `\n\nСПОРНЫЕ МЕСТА. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(numberedDisputed)}`
+    : `\n\nСПОРНЫХ МЕСТ НЕТ. После разделителя «${CASE_REVIEW_UNREAD_HEADING}» напиши только «НЕТ».`;
 
   const result = await askClaude(
-    `${CASE_REVIEW_SYSTEM_PROMPT}\n\n${context ?? ""}`,
+    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write both the client-ready text and the verification list in English." : "Русский. Оба раздела пиши по-русски."}\n\n${context ?? ""}`,
     [
       {
         role: "user",
-        content: `Вот значения, переписанные из документов клиента и подтверждённые двумя независимыми чтениями. Подготовь обе части по заданному формату, опираясь только на них.\n\n${formatAgreed(
-          agreed
+        content: `Вот значения, переписанные из документов клиента и подтверждённые двумя независимыми чтениями. Сначала подготовь готовый клиентский текст, затем короткий блок проверки. Опирайся только на эти данные.\n\n${formatAgreed(
+          numberedAgreed
         )}${disputedNote}`
       }
     ],

@@ -17,6 +17,7 @@ import {
 import { isUuid } from "@/lib/utils/uuid";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { getLocale } from "@/lib/i18n/locale";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { CaseReviewPanel } from "@/components/cases/CaseReviewPanel";
@@ -31,6 +32,9 @@ import { PaymentRecordForm } from "./PaymentRecordForm";
 type StaffCasePageProps = {
   params: Promise<{
     caseId: string;
+  }>;
+  searchParams: Promise<{
+    view?: string;
   }>;
 };
 
@@ -74,10 +78,13 @@ function formatPayloadValue(key: string, value: unknown): string {
 }
 
 export default async function StaffCaseDetailPage({
-  params
+  params,
+  searchParams
 }: StaffCasePageProps) {
   const { caseId } = await params;
+  const focusedTodayView = (await searchParams).view === "today";
   const auth = await getRequiredStaffUser(`/admin/cases/${caseId}`);
+  const locale = await getLocale();
 
   if (auth.status === "missing-env") {
     return (
@@ -153,6 +160,97 @@ export default async function StaffCaseDetailPage({
     notFound();
   }
 
+  if (focusedTodayView) {
+    const caseMessages = await getCaseMessages(clientCase.id);
+    const dictionary = getDictionary(locale);
+    const copy = locale === "ru"
+      ? {
+          eyebrow: "Работа с клиентом",
+          fallbackName: "Клиент",
+          conversationLabel: "Личные сообщения",
+          conversationTitle: "Диалог с клиентом",
+          conversationHint: "Здесь находится вся переписка по кейсу. Новые сообщения можно отправить текстом или голосом.",
+          assistantLabel: "ИИ-помощник по кейсу",
+          assistantTitle: "Спросить по этому клиенту",
+          assistantHint: "Помощник знает анкету, документы, распознанные анализы, историю и переписку этого кейса. Он поможет разобрать общую картину или подготовить ответ клиенту.",
+          assistantIntro: "Я вижу весь доступный контекст этого кейса. Спросите меня об анализах, состоянии систем организма, истории клиента или попросите подготовить короткий ответ для личного сообщения.",
+          assistantPlaceholder: "Вопрос по этому кейсу...",
+          suggestions: [
+            "Что сейчас происходит с организмом?",
+            "Подготовь ответ клиенту",
+            "На что обратить внимание в анализах?"
+          ]
+        }
+      : {
+          eyebrow: "Client workspace",
+          fallbackName: "Client",
+          conversationLabel: "Private messages",
+          conversationTitle: "Client conversation",
+          conversationHint: "This is the complete case conversation. New messages can be sent as text or voice.",
+          assistantLabel: "Case AI assistant",
+          assistantTitle: "Ask about this client",
+          assistantHint: "The assistant knows this case's questionnaire, documents, recognized test results, history, and conversation. It can review the overall picture or prepare a client reply.",
+          assistantIntro: "I can see all available context for this case. Ask about test results, the state of body systems, the client's history, or request a concise private-message reply.",
+          assistantPlaceholder: "Ask about this case...",
+          suggestions: [
+            "What is happening in the body now?",
+            "Prepare a client reply",
+            "What needs attention in the test results?"
+          ]
+        };
+    const clientName = clientCase.profiles?.full_name
+      ?? clientCase.profiles?.email
+      ?? copy.fallbackName;
+
+    return (
+      <div className="page-shell karen-case-workspace">
+        <PageHeader
+          eyebrow={copy.eyebrow}
+          title={clientName}
+          description={clientCase.title ?? ""}
+        />
+
+        <section className="intake-section" aria-label={copy.conversationTitle}>
+          <div className="panel">
+            <span className="panel__label">{copy.conversationLabel}</span>
+            <h2>{copy.conversationTitle}</h2>
+            <p>{copy.conversationHint}</p>
+            <CaseMessageThread
+              labels={dictionary.cabinet.thread}
+              voiceLabels={dictionary.cabinet.voice}
+              dateLocale={dictionary.cabinet.dateLocale}
+              caseId={clientCase.id}
+              expandable
+              loadError={caseMessages.error}
+              messages={caseMessages.messages}
+              viewer="staff"
+            />
+          </div>
+        </section>
+
+        <section className="intake-section" aria-label={copy.assistantLabel}>
+          <div className="panel">
+            <span className="panel__label">{copy.assistantLabel}</span>
+            <h2 className="staff-assistant__title">
+              <AnhamAvatar className="staff-assistant__face" size={44} state="client" />
+              {copy.assistantTitle}
+            </h2>
+            <p>{copy.assistantHint}</p>
+            <AssistantChat
+              attachments
+              caseId={clientCase.id}
+              endpoint="/api/assistant/staff"
+              intro={copy.assistantIntro}
+              placeholder={copy.assistantPlaceholder}
+              providerChoice={showProviders}
+              suggestions={copy.suggestions}
+            />
+          </div>
+        </section>
+      </div>
+    );
+  }
+
   const submissions = [...clientCase.onboarding_submissions].sort((a, b) =>
     (b.submitted_at ?? "").localeCompare(a.submitted_at ?? "")
   );
@@ -207,6 +305,31 @@ export default async function StaffCaseDetailPage({
         </div>
       </section>
 
+      <section
+        className="intake-section"
+        id="case-conversation"
+        aria-label="Чат с клиентом"
+      >
+        <div className="panel">
+          <span className="panel__label">Чат с клиентом</span>
+          <h2>Переписка по кейсу</h2>
+          <p>
+            Клиент видит эти сообщения в своём кабинете. Можно писать текстом
+            или записывать голосовые.
+          </p>
+          <CaseMessageThread
+            labels={getDictionary("ru").cabinet.thread}
+            voiceLabels={getDictionary("ru").cabinet.voice}
+            dateLocale={getDictionary("ru").cabinet.dateLocale}
+            caseId={clientCase.id}
+            expandable
+            loadError={caseMessages.error}
+            messages={caseMessages.messages}
+            viewer="staff"
+          />
+        </div>
+      </section>
+
       {showAdminControls ? (
         <section className="panel-grid" aria-label="Управление кейсом">
           <div className="panel">
@@ -257,6 +380,7 @@ export default async function StaffCaseDetailPage({
             documentsCount={documents.length}
             documentStatuses={documents.map((document) => document.document_status)}
             review={review}
+            locale={locale}
           />
         </div>
       </section>
@@ -309,27 +433,6 @@ export default async function StaffCaseDetailPage({
               ))}
             </ul>
           )}
-        </div>
-      </section>
-
-      <section className="intake-section" aria-label="Чат с клиентом">
-        <div className="panel">
-          <span className="panel__label">Чат с клиентом</span>
-          <h2>Переписка по кейсу</h2>
-          <p>
-            Клиент видит эти сообщения в своём кабинете. Можно писать текстом
-            или записывать голосовые.
-          </p>
-          <CaseMessageThread
-            labels={getDictionary("ru").cabinet.thread}
-            voiceLabels={getDictionary("ru").cabinet.voice}
-            dateLocale={getDictionary("ru").cabinet.dateLocale}
-            caseId={clientCase.id}
-            expandable
-            loadError={caseMessages.error}
-            messages={caseMessages.messages}
-            viewer="staff"
-          />
         </div>
       </section>
 

@@ -12,21 +12,8 @@ type CaseReviewPanelProps = {
   review: CaseReview | null;
   documentsCount: number;
   documentStatuses?: string[];
+  locale?: "ru" | "en";
 };
-
-function formatWhen(iso: string): string {
-  if (!iso) {
-    return "";
-  }
-
-  return new Date(iso).toLocaleString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric",
-    hour: "2-digit",
-    minute: "2-digit"
-  });
-}
 
 // What Professor Python meets when he opens a case: the assistant's reading
 // of the analyses already sitting in that case, and a draft reply.
@@ -40,7 +27,8 @@ export function CaseReviewPanel({
   caseId,
   review,
   documentsCount,
-  documentStatuses = []
+  documentStatuses = [],
+  locale = "ru"
 }: CaseReviewPanelProps) {
   const [state, action, pending] = useActionState(
     generateCaseReview,
@@ -50,6 +38,43 @@ export function CaseReviewPanel({
   const readyCount = documentStatuses.filter((status) => status === "ready").length;
   const reuploadCount = documentStatuses.filter((status) => status === "needs_reupload").length;
   const allReady = documentsCount > 0 && readyCount === documentsCount;
+  const t = locale === "ru"
+    ? {
+        aria: "Подготовленный разбор анализов",
+        label: "ИИ-разбор документов",
+        title: "Готовый текст для клиента",
+        empty: "Анализы ещё не прочитаны",
+        build: "Подготовить текст",
+        rebuild: "Подготовить заново",
+        building: "Готовлю текст...",
+        noDocuments: "В кейсе пока нет загруженных документов.",
+        copied: "Скопировано",
+        copy: "Копировать",
+        note: "Проверьте текст, сверьте его с документами, дополните или скорректируйте при необходимости, затем отправьте клиенту в личных сообщениях.",
+        verify: "Требует проверки",
+        verifyNote: "ИИ не смог уверенно прочитать эти места. Номер и название помогут сразу открыть нужный файл.",
+        verified: "Дополнительная проверка не требуется.",
+        stale: "Клиент загрузил новые документы после подготовки текста. Подготовьте его заново.",
+        recognized: "Распознано файлов"
+      }
+    : {
+        aria: "Prepared test result review",
+        label: "AI document review",
+        title: "Client-ready text",
+        empty: "The test results have not been reviewed yet",
+        build: "Prepare text",
+        rebuild: "Prepare again",
+        building: "Preparing text...",
+        noDocuments: "No documents have been uploaded to this case yet.",
+        copied: "Copied",
+        copy: "Copy",
+        note: "Review the text against the original documents, amend it if needed, then send it to the client in a private message.",
+        verify: "Requires verification",
+        verifyNote: "The AI could not read these items confidently. The file number and name take you directly to the right document.",
+        verified: "No additional verification is required.",
+        stale: "The client uploaded new documents after this text was prepared. Prepare it again.",
+        recognized: "Files recognized"
+      };
 
   async function copyDraft() {
     if (!review?.draft) {
@@ -68,39 +93,40 @@ export function CaseReviewPanel({
   }
 
   return (
-    <section className="case-review" aria-label="Разбор анализов ассистентом">
+    <section className="case-review" aria-label={t.aria}>
       <div className="case-review__head">
         <div>
-          <span className="panel__label">Ассистент по анализам</span>
+          <span className="panel__label">{t.label}</span>
           <h2>
-            {review ? "Разбор загруженных анализов" : "Анализы ещё не прочитаны"}
+            {review ? t.title : t.empty}
           </h2>
         </div>
         <form action={action}>
           <input name="case_id" type="hidden" value={caseId} />
+          <input name="locale" type="hidden" value={locale} />
           <button
             className="button button--secondary"
             disabled={pending || !allReady}
             type="submit"
           >
             {pending
-              ? "Собираю итог..."
+              ? t.building
               : review
-                ? "Пересобрать итог"
-                : "Собрать итоговый разбор"}
+                ? t.rebuild
+                : t.build}
           </button>
         </form>
       </div>
 
       {documentsCount === 0 ? (
         <p className="case-review__empty">
-          В кейсе пока нет загруженных документов.
+          {t.noDocuments}
         </p>
       ) : null}
 
       {documentsCount > 0 ? (
         <p className="case-review__origin">
-          Автоматически распознано файлов: {readyCount} из {documentsCount}.
+          {t.recognized}: {readyCount} / {documentsCount}.
           {reuploadCount > 0
             ? ` Нужна повторная загрузка: ${reuploadCount}. Клиент получил сообщение с названием файла.`
             : allReady
@@ -123,40 +149,38 @@ export function CaseReviewPanel({
         <>
           {!review.isCurrent ? (
             <p className="case-review__stale">
-              Клиент загрузил документы после этого разбора — нажмите
-              «Перечитать», чтобы ассистент увидел новые.
+              {t.stale}
             </p>
           ) : null}
-
-          <p className="case-review__origin">
-            Это мнение ИИ, а не разбор Professor Python. Прочитано документов:{" "}
-            {review.documentsCount} · {formatWhen(review.createdAt)}.
-          </p>
-
-          <div className="case-review__body">
-            <pre className="case-review__text">{review.summary}</pre>
-          </div>
 
           {review.draft ? (
             <div className="case-review__draft">
               <div className="case-review__draft-head">
-                <h3>Черновик ответа клиенту</h3>
+                <h3>{t.title}</h3>
                 <button
                   className="button button--secondary"
                   onClick={() => void copyDraft()}
                   type="button"
                 >
-                  {copied ? "Скопировано" : "Скопировать"}
+                  {copied ? t.copied : t.copy}
                 </button>
               </div>
               <pre className="case-review__text">{review.draft}</pre>
               <p className="case-review__draft-note">
-                Клиент не увидит, что текст готовил ассистент. Вставьте его в
-                поле ответа ниже, прочитайте, поправьте под себя — и отправьте
-                от своего имени. Отправляет только человек.
+                {t.note}
               </p>
             </div>
           ) : null}
+
+          {review.summary ? (
+            <aside className="case-review__verification" aria-label={t.verify}>
+              <span className="panel__label">{t.verify}</span>
+              <p className="case-review__draft-note">{t.verifyNote}</p>
+              <pre className="case-review__text">{review.summary}</pre>
+            </aside>
+          ) : (
+            <p className="case-review__verified">{t.verified}</p>
+          )}
         </>
       ) : null}
     </section>
