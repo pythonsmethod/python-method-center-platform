@@ -32,7 +32,7 @@ export function getPublicAssistantMode(): PublicAssistantMode {
 const DAILY_LIMIT: Record<AssistantTier, number> = {
   guest: 15,
   registered: 60,
-  client: 200
+  client: 60
 };
 
 // Platform-wide daily cap for guests: the hard ceiling on what the free
@@ -110,6 +110,16 @@ async function bump(bucketKey: string, limit: number): Promise<boolean> {
 // reasonably attach several results in a day and should not lose their
 // conversation over it.
 const FILE_READS_PER_DAY = 20;
+const ANHAM_DEEP_READS_PER_DAY = 10;
+
+export async function guardAnhamDeepRequest(
+  profileId: string
+): Promise<boolean> {
+  return bump(
+    `anham-deep:${profileId}`,
+    envNumber("ANHAM_DEEP_DAILY_LIMIT", ANHAM_DEEP_READS_PER_DAY)
+  );
+}
 
 export async function guardMetricsExtraction(
   profileId: string

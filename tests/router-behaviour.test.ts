@@ -27,7 +27,12 @@ vi.mock("@/lib/assistant/openai", () => ({
   hasOpenAiEnv: () => hasOpenAiEnv()
 }));
 
-const { askAssistantTeam, hasAssistantEnv, isAssistantProvider } = await import(
+const {
+  askAnham,
+  askAssistantTeam,
+  hasAssistantEnv,
+  isAssistantProvider
+} = await import(
   "@/lib/assistant/router"
 );
 
@@ -215,6 +220,46 @@ describe("both — the comparison mode", () => {
     askOpenAi.mockResolvedValue(failed("GPT упал"));
 
     await expect(ask("both")).resolves.toEqual(failed("Claude упал"));
+  });
+});
+
+describe("Anham synthesis", () => {
+  it("uses one strong model for an everyday answer", async () => {
+    askClaude.mockResolvedValue(ok("единый ответ"));
+
+    await expect(
+      askAnham("система", MESSAGES, 500, "standard")
+    ).resolves.toEqual(ok("единый ответ"));
+    expect(askClaude).toHaveBeenCalledTimes(1);
+    expect(askOpenAi).not.toHaveBeenCalled();
+  });
+
+  it("combines two independent readings into one final answer", async () => {
+    askClaude
+      .mockResolvedValueOnce(ok("разбор A"))
+      .mockResolvedValueOnce(ok("единый ответ Анхама"));
+    askOpenAi.mockResolvedValueOnce(ok("разбор B"));
+
+    await expect(
+      askAnham("контекст кейса", MESSAGES, 500, "deep")
+    ).resolves.toEqual(ok("единый ответ Анхама"));
+    expect(askClaude).toHaveBeenCalledTimes(2);
+    expect(askOpenAi).toHaveBeenCalledWith(
+      "контекст кейса",
+      MESSAGES,
+      500,
+      { reasoningEffort: "high" }
+    );
+  });
+
+  it("returns the completed reading if the other provider fails", async () => {
+    askClaude.mockResolvedValue(ok("надёжный ответ"));
+    askOpenAi.mockResolvedValue(failed());
+
+    await expect(
+      askAnham("система", MESSAGES, 500, "deep")
+    ).resolves.toEqual(ok("надёжный ответ"));
+    expect(askClaude).toHaveBeenCalledTimes(1);
   });
 });
 

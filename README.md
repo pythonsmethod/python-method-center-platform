@@ -129,6 +129,7 @@ Copy `.env.example` to `.env.local`. Key groups:
 - AI abuse protection (all optional, safe defaults): `PUBLIC_ASSISTANT_MODE`
   (`open` | `registered_only` | `off`), `ASSISTANT_DAILY_LIMIT_GUEST` /
   `_REGISTERED` / `_CLIENT`, `ASSISTANT_DAILY_TOTAL_GUEST`,
+  `ANHAM_DEEP_DAILY_LIMIT` (default `10`),
   `ASSISTANT_USAGE_SALT`
 - Notifications: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
 - `NEXT_PUBLIC_SITE_URL` — absolute origin for links in notifications and
