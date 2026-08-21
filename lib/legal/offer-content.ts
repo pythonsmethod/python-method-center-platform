@@ -79,7 +79,7 @@ const RU: OfferDocument = {
     {
       heading: "1. О программе",
       paragraphs: [
-        "Это авторская программа восстановления организма, созданная на основе тридцатилетней практики и опыта работы с людьми в 34 странах.",
+        "Это авторская программа восстановления организма, созданная на основе тридцатилетней практики и опыта работы с людьми в 36 странах.",
         "Работа всегда индивидуальна. Здесь нет шаблонов: направление, продолжительность и содержание работы определяются по вашим документам, показателям и текущему состоянию."
       ]
     },
@@ -201,7 +201,7 @@ const EN: OfferDocument = {
     {
       heading: "1. About the programme",
       paragraphs: [
-        "This is an original programme for restoring the body, built on thirty years of practice and work with people in 34 countries.",
+        "This is an original programme for restoring the body, built on thirty years of practice and work with people in 36 countries.",
         "The work is always individual. There are no templates here: the direction, the length and the content of the work are determined by your documents, your indicators and your current condition."
       ]
     },

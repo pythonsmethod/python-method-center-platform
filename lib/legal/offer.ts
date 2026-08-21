@@ -20,7 +20,10 @@ import type { Locale } from "@/lib/i18n/locale";
 // the person stands today. Nothing about price, entitlement or what is
 // delivered changes — but the text changed, so the version does too, and
 // anyone who accepted v3 is recorded as having accepted v3.
-export const OFFER_VERSION = "oferta-v4";
+//
+// v5 (2026-08-21) corrects the stated geographic reach from 34 to 36
+// countries. Services, prices and entitlements remain unchanged.
+export const OFFER_VERSION = "oferta-v5";
 
 // The superseded edition, kept reachable because clients accepted it and
 // clause 12 says their terms do not change.
