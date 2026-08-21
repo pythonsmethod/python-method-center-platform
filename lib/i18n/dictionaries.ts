@@ -867,7 +867,7 @@ const ru = {
     // Настоящее имя на странице о человеке. Прозвище без имени за ним
     // читается как псевдоним, за которым некому отвечать.
     fullName: "Карен Пашикян",
-    lead: "Реабилитолог. Более тридцати лет практики, работа с людьми в 34 странах. С 2024 года — почти исключительно с теми, кто проходит через тяжёлое лечение. Каждый случай он разбирает лично.",
+    lead: "Реабилитолог. Более тридцати лет практики, работа с людьми в 36 странах. С 2024 года — почти исключительно с теми, кто проходит через тяжёлое лечение. Каждый случай он разбирает лично.",
     // Прозвище, названное первым и одной строкой. Единственное, что
     // осталось от блока про его имя: человек не должен узнать это сам и
     // почувствовать себя обманутым.
@@ -2048,7 +2048,7 @@ const en: typeof ru = {
     title: "Professor Python",
     subtitle: "The person people come to when the body stops coping",
     fullName: "Karen Pashikyan",
-    lead: "A rehabilitation specialist. More than thirty years of practice and work with people in 34 countries. Since 2024, almost entirely with those going through heavy treatment. He reviews every case himself.",
+    lead: "A rehabilitation specialist. More than thirty years of practice and work with people in 36 countries. Since 2024, almost entirely with those going through heavy treatment. He reviews every case himself.",
     nicknameNote: "\"Professor Python\" is a nickname, not a medical title.",
     origin: {
       label: "Why he does this",

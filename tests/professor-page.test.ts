@@ -146,14 +146,14 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
   });
 
   it("carries no number the contract has not already stated", () => {
-    // 30 years and 34 countries are both in the offer. 2024 is the year his
+    // 30 years and 36 countries are both in the offer. 2024 is the year his
     // mother fell ill, in his own words. The rest are the postal address.
     //
     // Anything else numeric — people helped, countries, success rates,
     // percentages — would be invented, and on this page an invented number
     // is a claim.
     const numbers = text.match(/\d+/g) ?? [];
-    const allowed = new Set(["30", "34", "2024", "1331", "5", "90025"]);
+    const allowed = new Set(["30", "36", "2024", "1331", "5", "90025"]);
 
     for (const number of numbers) {
       expect(allowed.has(number), `unexplained number on the page: ${number}`).toBe(
@@ -189,9 +189,9 @@ describe("what the page states matches the contract", () => {
     expect(getDictionary("ru").professor.yearsValue).toBe("30 лет");
   });
 
-  it("takes the 34 countries from clause 1", () => {
-    expect(clause).toContain("в 34 странах");
-    expect(getDictionary("ru").professor.lead).toContain("34 странах");
+  it("takes the 36 countries from clause 1", () => {
+    expect(clause).toContain("в 36 странах");
+    expect(getDictionary("ru").professor.lead).toContain("36 странах");
   });
 
   it("takes the company and address from clause 2", () => {
