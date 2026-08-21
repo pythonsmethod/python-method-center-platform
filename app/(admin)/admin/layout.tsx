@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
-import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { LogoutButton } from "@/components/LogoutButton";
 
 type AdminLayoutProps = {
@@ -51,7 +50,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/cases", label: labels.clients, icon: "♙" },
     { href: "/admin/documents", label: labels.documents, icon: "▤" },
     { href: "/admin/assistant", label: labels.assistant, icon: "✦" },
-    ...(auth.status === "authorized" && auth.role === "admin" && canSeeProviderNames(auth.email)
+    ...(auth.status === "authorized"
       ? [{ href: "/admin/requests", label: labels.requests, icon: "✉" }]
       : [])
   ];
