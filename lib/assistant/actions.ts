@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
-import { isKarenAssistantEmail } from "@/lib/auth/require-karen";
+import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 
@@ -28,7 +28,7 @@ export async function addKnowledgeEntry(
 ): Promise<StaffActionState> {
   const auth = await getStaffUserState();
 
-  if (auth.status !== "authorized" || !isKarenAssistantEmail(auth.email)) {
+  if (auth.status !== "authorized" || !resolvePrivateAssistantRole(auth.email)) {
     return errorState("Нет доступа к базе знаний.");
   }
 
@@ -108,7 +108,7 @@ export async function setKnowledgeEntryActive(
 ): Promise<StaffActionState> {
   const auth = await getStaffUserState();
 
-  if (auth.status !== "authorized" || !isKarenAssistantEmail(auth.email)) {
+  if (auth.status !== "authorized" || !resolvePrivateAssistantRole(auth.email)) {
     return errorState("Нет доступа к базе знаний.");
   }
 
