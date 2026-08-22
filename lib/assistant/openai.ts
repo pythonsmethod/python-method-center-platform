@@ -1,6 +1,8 @@
 import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
 
-const DEFAULT_OPENAI_MODEL = "gpt-5.1";
+// Quality-first flagship. Deployments can pin a different available model,
+// but Karen's private assistant must not silently fall back to a legacy one.
+const DEFAULT_OPENAI_MODEL = "gpt-5.6-sol";
 const CONTINUE_INSTRUCTION =
   "Продолжи ответ ровно с того места, где он оборвался. Не повторяй уже написанное, сохрани язык и закончи мысль кратко и естественно.";
 

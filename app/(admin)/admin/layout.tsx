@@ -2,8 +2,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
-import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { LogoutButton } from "@/components/LogoutButton";
+import { isKarenEmail } from "@/lib/auth/require-karen";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
@@ -27,7 +27,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         today: "Сегодня",
         clients: "Клиенты",
         documents: "Документы",
-        assistant: "ИИ и знания",
+        assistant: "Анхам",
         requests: "Обращения",
         founder: "Обзор",
         home: "На главную сайта",
@@ -39,7 +39,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         today: "Today",
         clients: "Clients",
         documents: "Documents",
-        assistant: "AI & knowledge",
+        assistant: "Anham",
         requests: "Requests",
         founder: "Overview",
         home: "Website home",
@@ -50,8 +50,10 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin", label: labels.today, icon: "⌂" },
     { href: "/admin/cases", label: labels.clients, icon: "♙" },
     { href: "/admin/documents", label: labels.documents, icon: "▤" },
-    { href: "/admin/assistant", label: labels.assistant, icon: "✦" },
-    ...(auth.status === "authorized" && auth.role === "admin" && canSeeProviderNames(auth.email)
+    ...(auth.status === "authorized" && isKarenEmail(auth.email)
+      ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
+      : []),
+    ...(auth.status === "authorized"
       ? [{ href: "/admin/requests", label: labels.requests, icon: "✉" }]
       : [])
   ];

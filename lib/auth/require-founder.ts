@@ -1,38 +1,30 @@
 import { getStaffUserState, type StaffUserState } from "@/lib/auth/require-staff";
 
+// The platform creator must never lose founder access because a deployment
+// variable is missing or stale. Additional founder accounts can still be
+// supplied through FOUNDER_EMAILS.
+export const PRIMARY_FOUNDER_EMAIL = "dubrovenkoanna@gmail.com";
+
 export function founderAllowlist(): string[] {
-  return (process.env.FOUNDER_EMAILS ?? "")
-    .split(",")
+  return [PRIMARY_FOUNDER_EMAIL, ...(process.env.FOUNDER_EMAILS ?? "").split(",")]
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
 }
 
-// Cabinet access. An empty allowlist means "any admin", which is how the
-// platform has always run.
+// Cabinet access is restricted to the platform creator and any explicitly
+// configured additional founder accounts.
 export function isFounderEmail(email: string | null | undefined): boolean {
   const allowlist = founderAllowlist();
-
-  if (allowlist.length === 0) {
-    return true;
-  }
-
   return Boolean(email && allowlist.includes(email.toLowerCase()));
 }
 
 // Who may see which model is answering.
 //
 // Deliberately stricter than cabinet access, and deliberately fails closed:
-// with no allowlist configured, nobody sees a vendor name — not the team,
-// not Professor Python. The founder decided that everyone else simply uses
-// the assistant, and an empty environment variable must not quietly turn
-// that back on.
+// Only the platform creator and explicitly configured additional founders
+// see vendor names; everyone else simply uses the assistant.
 export function canSeeProviderNames(email: string | null | undefined): boolean {
   const allowlist = founderAllowlist();
-
-  if (allowlist.length === 0) {
-    return false;
-  }
-
   return Boolean(email && allowlist.includes(email.toLowerCase()));
 }
 
