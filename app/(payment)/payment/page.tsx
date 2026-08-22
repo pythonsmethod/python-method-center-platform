@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { PaymentPlans } from "@/components/payments/PaymentPlans";
@@ -6,6 +7,16 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFreeReviewActive } from "@/lib/config/promo";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).payment;
+
+  return {
+    title: t.title,
+    description: t.description,
+    alternates: { canonical: "/payment" }
+  };
+}
 
 // Signed-in clients get their profile id attached to the Stripe link as
 // client_reference_id, so the webhook can bind the payment to the account

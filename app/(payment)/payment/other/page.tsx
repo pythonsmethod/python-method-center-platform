@@ -1,8 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { AltPaymentForm } from "@/components/payments/AltPaymentForm";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).altPayment;
+
+  return {
+    title: t.title,
+    description: t.description,
+    alternates: { canonical: "/payment/other" }
+  };
+}
 
 export const dynamic = "force-dynamic";
 

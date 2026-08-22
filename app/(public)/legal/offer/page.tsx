@@ -9,7 +9,7 @@ import { OFFER_ARCHIVE_V2_URL, OFFER_VERSION } from "@/lib/legal/offer";
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).offer;
 
-  return { title: `${t.title} — Python Method` };
+  return { title: `${t.title} — Python Method`, description: t.description };
 }
 
 export default async function OfferPage() {

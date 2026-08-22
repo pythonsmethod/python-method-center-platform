@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { IconAnkh } from "@/components/icons/EgyptianIcons";
@@ -16,6 +17,13 @@ type LoginPageProps = {
     message?: string | string[];
     mode?: string | string[];
   }>;
+};
+
+// Query parameters only choose the post-login destination or the visible
+// form tab. They never create a distinct document for search engines.
+export const metadata: Metadata = {
+  alternates: { canonical: "/login" },
+  robots: { index: false, follow: false }
 };
 
 function readParam(value: string | string[] | undefined): string | undefined {
