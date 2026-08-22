@@ -8,14 +8,21 @@ import {
 import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { KnowledgeEntry } from "@/lib/assistant/knowledge";
 import type { Locale } from "@/lib/i18n/locale";
+import type { PrivateAssistantRole } from "@/lib/auth/require-karen";
 
 type KnowledgePanelProps = {
   entries: KnowledgeEntry[];
   loadError: string | null;
   locale?: Locale;
+  role?: PrivateAssistantRole;
 };
 
-export function KnowledgePanel({ entries, loadError, locale = "ru" }: KnowledgePanelProps) {
+export function KnowledgePanel({
+  entries,
+  loadError,
+  locale = "ru",
+  role = "karen"
+}: KnowledgePanelProps) {
   const [addState, addAction, addPending] = useActionState(
     addKnowledgeEntry,
     initialStaffActionState
@@ -29,9 +36,9 @@ export function KnowledgePanel({ entries, loadError, locale = "ru" }: KnowledgeP
         title: "Заголовок",
         titlePlaceholder: "Например: Как отвечать про цены",
         audience: "Для кого это знание",
-        clientAi: "Для ИИ клиентов (на сайте)",
-        staffAi: "Для персонального ИИ Карена",
-        bothAi: "Для обоих",
+        clientAi: "Только для ИИ клиентов",
+        staffAi: "Только для личных ИИ Анны и Карена",
+        bothAi: "Для личных ИИ и ИИ клиентов",
         topic: "Раздел",
         general: "Общее знание",
         sleep: "Про сон — видно клиентам в разделе «Мой сон»",
@@ -44,16 +51,18 @@ export function KnowledgePanel({ entries, loadError, locale = "ru" }: KnowledgeP
         off: "выключено",
         disable: "Выключить",
         enable: "Включить",
-        empty: "Пока нет сохранённых знаний. Добавьте первый принцип или наблюдение — персональный ИИ начнёт использовать его в работе.",
-        audienceLabels: { client: "ИИ клиентов", staff: "Персональный ИИ Карена", both: "Оба ИИ" }
+        empty: role === "founder"
+          ? "Пока нет сохранённых знаний. Добавьте первый принцип платформы."
+          : "Пока нет сохранённых знаний. Добавьте первый принцип методики.",
+        audienceLabels: { client: "ИИ клиентов", staff: "Личные ИИ Анны и Карена", both: "Личные ИИ + ИИ клиентов" }
       }
     : {
         title: "Title",
         titlePlaceholder: "For example: How to answer pricing questions",
         audience: "Who should use this knowledge",
-        clientAi: "Client AI (on the website)",
-        staffAi: "Karen's personal AI",
-        bothAi: "Both assistants",
+        clientAi: "Client AI only",
+        staffAi: "Anna and Karen's personal AIs only",
+        bothAi: "Personal AIs and client AI",
         topic: "Section",
         general: "General knowledge",
         sleep: "Sleep — visible to clients in My Sleep",
@@ -67,7 +76,7 @@ export function KnowledgePanel({ entries, loadError, locale = "ru" }: KnowledgeP
         disable: "Disable",
         enable: "Enable",
         empty: "There is no saved knowledge yet. Add the first principle or observation and the personal AI will begin using it.",
-        audienceLabels: { client: "Client AI", staff: "Karen's personal AI", both: "Both assistants" }
+        audienceLabels: { client: "Client AI", staff: "Anna and Karen's personal AIs", both: "Personal AIs + client AI" }
       };
 
   return (
@@ -79,7 +88,7 @@ export function KnowledgePanel({ entries, loadError, locale = "ru" }: KnowledgeP
         </label>
         <label>
           {t.audience}
-          <select defaultValue="client" name="audience">
+          <select defaultValue="both" name="audience">
             <option value="client">{t.clientAi}</option>
             <option value="staff">{t.staffAi}</option>
             <option value="both">{t.bothAi}</option>

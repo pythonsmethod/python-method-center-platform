@@ -6,12 +6,11 @@ import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
 import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { hasAssistantEnv } from "@/lib/assistant/router";
-import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
-import { isKarenAssistantEmail } from "@/lib/auth/require-karen";
+import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { getLocale } from "@/lib/i18n/locale";
 
-export default async function KarenAssistantPage() {
+export default async function PrivateAssistantPage() {
   const auth = await getRequiredStaffUser("/admin/assistant");
   const locale = await getLocale();
 
@@ -22,13 +21,30 @@ export default async function KarenAssistantPage() {
   if (auth.status === "error") {
     return <div className="page-shell"><p className="form-message form-message--error">{auth.message}</p></div>;
   }
-  if (auth.status === "authorized" && !isKarenAssistantEmail(auth.email)) notFound();
+  const assistantRole = auth.status === "authorized"
+    ? resolvePrivateAssistantRole(auth.email)
+    : null;
+
+  if (!assistantRole) notFound();
 
   const knowledge = await listKnowledgeEntries();
   const configured = hasAssistantEnv();
-  const showProviders = canSeeProviderNames(auth.email);
+  const isFounder = assistantRole === "founder";
   const t = locale === "ru"
-    ? {
+    ? isFounder ? {
+        eyebrow: "Персональный ИИ Анны",
+        title: "ИИ основателя и общая база знаний",
+        description: "Здесь Анна ставит задачи, развивает принципы платформы и вместе с Professor Python обучает клиентского Анхама.",
+        chatLabel: "Рабочий диалог основателя",
+        chatTitle: "Личный помощник Анны",
+        intro: "Здравствуйте, Анна. Дайте мне задачу, идею или принцип — помогу довести его до сильного решения или знания для системы.",
+        placeholder: "Напишите задачу, идею или правило…",
+        suggestions: ["Помоги принять решение", "Преврати мою мысль в правило", "Подготовь задание для команды"],
+        unavailable: "Личный помощник пока не подключён.",
+        knowledgeLabel: "Общая память",
+        knowledgeTitle: "База знаний Анны и Professor Python",
+        knowledgeDescription: "Вы оба формируете эту память. Для каждого знания выберите, остаётся ли оно внутри или также обучает ИИ клиентов."
+      } : {
         eyebrow: "Персональный ИИ Карена",
         title: "ИИ и база знаний",
         description: "Здесь Карен общается со своим помощником и постепенно передаёт ему собственные принципы, наблюдения и методику.",
@@ -41,8 +57,20 @@ export default async function KarenAssistantPage() {
         knowledgeLabel: "Память помощника",
         knowledgeTitle: "База знаний Карена",
         knowledgeDescription: "Сохранённые здесь знания становятся постоянной памятью ИИ. Карен может добавлять новые правила и при необходимости временно выключать их."
-      }
-    : {
+      } : isFounder ? {
+        eyebrow: "Anna's personal AI",
+        title: "Founder AI and shared knowledge base",
+        description: "Anna assigns work, develops the platform's principles, and trains the client-facing Anham together with Professor Python.",
+        chatLabel: "Founder workspace",
+        chatTitle: "Anna's personal assistant",
+        intro: "Hello, Anna. Give me a task, idea, or principle — I will help turn it into a strong decision or durable system knowledge.",
+        placeholder: "Write a task, idea, or rule…",
+        suggestions: ["Help me make a decision", "Turn my thought into a rule", "Prepare a task for the team"],
+        unavailable: "The personal assistant is not connected yet.",
+        knowledgeLabel: "Shared memory",
+        knowledgeTitle: "Anna and Professor Python's knowledge base",
+        knowledgeDescription: "You both shape this memory. For each entry, decide whether it stays internal or also trains the client-facing AI."
+      } : {
         eyebrow: "Karen's personal AI",
         title: "AI and knowledge base",
         description: "Karen talks to his assistant here and gradually teaches it his principles, observations, and method.",
@@ -73,7 +101,7 @@ export default async function KarenAssistantPage() {
               endpoint="/api/assistant/staff"
               intro={t.intro}
               placeholder={t.placeholder}
-              providerChoice={showProviders}
+              providerChoice={isFounder}
               suggestions={t.suggestions}
             />
           ) : <p className="form-message form-message--error">{t.unavailable}</p>}
@@ -83,7 +111,12 @@ export default async function KarenAssistantPage() {
           <span className="panel__label">{t.knowledgeLabel}</span>
           <h2>{t.knowledgeTitle}</h2>
           <p>{t.knowledgeDescription}</p>
-          <KnowledgePanel entries={knowledge.entries} loadError={knowledge.error} locale={locale} />
+          <KnowledgePanel
+            entries={knowledge.entries}
+            loadError={knowledge.error}
+            locale={locale}
+            role={assistantRole}
+          />
         </section>
       </div>
     </div>
