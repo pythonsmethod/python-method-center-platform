@@ -8,6 +8,7 @@ import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
+import { isKarenAssistantEmail } from "@/lib/auth/require-karen";
 import { getLocale } from "@/lib/i18n/locale";
 
 export default async function KarenAssistantPage() {
@@ -21,6 +22,7 @@ export default async function KarenAssistantPage() {
   if (auth.status === "error") {
     return <div className="page-shell"><p className="form-message form-message--error">{auth.message}</p></div>;
   }
+  if (auth.status === "authorized" && !isKarenAssistantEmail(auth.email)) notFound();
 
   const knowledge = await listKnowledgeEntries();
   const configured = hasAssistantEnv();
