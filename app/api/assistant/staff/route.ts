@@ -1,12 +1,13 @@
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
-import { askAssistantTeam } from "@/lib/assistant/router";
+import { askAssistantTeam, askKarenAssistant } from "@/lib/assistant/router";
 import { staffAssistantView } from "@/lib/assistant/staff-provider";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { buildStaffSystemPrompt } from "@/lib/assistant/prompts";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getStaffUserState } from "@/lib/auth/require-staff";
+import { isKarenAssistantEmail } from "@/lib/auth/require-karen";
 import { isUuid } from "@/lib/utils/uuid";
 
 export const runtime = "nodejs";
@@ -15,6 +16,10 @@ export async function POST(request: Request) {
   const auth = await getStaffUserState();
 
   if (auth.status !== "authorized") {
+    return NextResponse.json({ error: "Нет доступа." }, { status: 403 });
+  }
+
+  if (!isKarenAssistantEmail(auth.email)) {
     return NextResponse.json({ error: "Нет доступа." }, { status: 403 });
   }
 
@@ -82,13 +87,15 @@ export async function POST(request: Request) {
             ? "Файлы и фото читает Claude — добавьте ANTHROPIC_API_KEY в переменные окружения."
             : "Помощник сейчас не может читать файлы. Напишите основателю — это настройка платформы."
         })
-    : await askAssistantTeam(
-        system,
-        messages,
-        provider === "both" ? 1200 : 1500,
-        provider,
-        { attribution }
-      );
+    : showProviders && provider !== "best"
+      ? await askAssistantTeam(
+          system,
+          messages,
+          provider === "both" ? 1600 : 2200,
+          provider,
+          { attribution, deepReasoning: true }
+        )
+      : await askKarenAssistant(system, messages, 2200);
 
   if (result.status === "unavailable") {
     return NextResponse.json(

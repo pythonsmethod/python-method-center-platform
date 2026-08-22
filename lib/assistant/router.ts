@@ -290,3 +290,14 @@ export async function askAnham(
         deepReasoning: true
       });
 }
+
+// The private expert workspace always gets the quality-first path: two
+// independent flagship drafts and one coherent synthesis when both providers
+// are configured, with a high-reasoning fallback when only OpenAI is present.
+export async function askKarenAssistant(
+  system: string,
+  messages: ChatMessage[],
+  maxTokens: number
+): Promise<AssistantResult> {
+  return askAnham(system, messages, maxTokens, "deep");
+}
