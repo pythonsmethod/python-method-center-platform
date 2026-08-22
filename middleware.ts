@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/env";
+import { SITE_URL } from "@/lib/config/site";
 
 const REFERRAL_COOKIE = "pm-ref";
 const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 90; // 90 days
@@ -27,6 +28,22 @@ function captureReferral(request: NextRequest, response: NextResponse): void {
 }
 
 export async function middleware(request: NextRequest) {
+  const canonicalOrigin = new URL(SITE_URL);
+  const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
+  const requestHost = forwardedHost || request.nextUrl.host;
+  const alternateHost = `www.${canonicalOrigin.host}`;
+
+  // All historical http/www variants collapse to the single origin used by
+  // canonical tags and the sitemap. Keeping the path and query preserves old
+  // bookmarks while preventing Google from treating the old host as another
+  // copy of the site.
+  if (requestHost.toLowerCase() === alternateHost.toLowerCase()) {
+    const destination = request.nextUrl.clone();
+    destination.protocol = canonicalOrigin.protocol;
+    destination.host = canonicalOrigin.host;
+    return NextResponse.redirect(destination, 308);
+  }
+
   const config = getSupabaseConfig();
   let response = NextResponse.next({ request });
 
