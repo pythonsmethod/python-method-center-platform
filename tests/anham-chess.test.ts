@@ -33,4 +33,10 @@ describe("Anham chess", () => {
     expect(chess).toContain('from "chess.js"');
     expect(chess).toContain("window.localStorage.setItem(storageKey, fen)");
   });
+
+  it("forces a consistent text chess set on iOS", () => {
+    expect(chess).toContain('wp: "♟︎"');
+    expect(chess).toContain('bp: "♟︎"');
+    expect(chess).toContain("black pawn into a glossy emoji");
+  });
 });
