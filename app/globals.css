@@ -12155,3 +12155,32 @@ body.cabinet-menu-open { overflow: hidden; }
   .case-shortcut>span:last-child,.web-app-promo a { grid-column:2; width:max-content; }
 }
 @media (prefers-reduced-motion:reduce) { .web-cab * { transition:none!important; } }
+/* Professor Python explicitly approves each durable memory after a reply. */
+.assistant-memory {
+  margin: 12px 0;
+  padding: 14px;
+  border: 1px solid rgba(190, 142, 55, 0.55);
+  border-radius: 14px;
+  background: rgba(34, 24, 9, 0.75);
+}
+
+.assistant-memory p { margin: 0; }
+
+.assistant-memory__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.assistant-memory__actions button {
+  padding: 8px 11px;
+  border: 1px solid rgba(190, 142, 55, 0.55);
+  border-radius: 999px;
+  color: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.assistant-memory__actions button:hover:not(:disabled) { background: rgba(190, 142, 55, 0.16); }
+.assistant-memory__actions button:disabled { cursor: wait; opacity: 0.6; }

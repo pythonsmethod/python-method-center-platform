@@ -39,7 +39,7 @@ export default async function PrivateAssistantPage() {
       suggestions: ["Help formulate a new principle", "Turn my thoughts into an instruction", "Prepare client material"],
       unavailable: "The personal assistant is not connected yet. Contact the platform administrator."
     };
-    return <div className="page-shell page-shell--wide karen-ai-page"><KarenAnhamWorkspace configured={configured} labels={labels} showProviders={false} /></div>;
+    return <div className="page-shell page-shell--wide karen-ai-page"><KarenAnhamWorkspace configured={configured} labels={labels} locale={locale} showProviders={false} /></div>;
   }
 
   const knowledge = await listKnowledgeEntries();
@@ -77,7 +77,7 @@ export default async function PrivateAssistantPage() {
       <section className="panel" aria-label={t.chatTitle}>
         <span className="panel__label">{t.chatLabel}</span>
         <h2 className="staff-assistant__title"><AnhamAvatar className="staff-assistant__face" size={44} state="client" />{t.chatTitle}</h2>
-        {configured ? <AssistantChat attachments endpoint="/api/assistant/staff" intro={t.intro} placeholder={t.placeholder} providerChoice suggestions={t.suggestions} /> : <p className="form-message form-message--error">{t.unavailable}</p>}
+        {configured ? <AssistantChat attachments endpoint="/api/assistant/staff" intro={t.intro} locale={locale} placeholder={t.placeholder} providerChoice suggestions={t.suggestions} /> : <p className="form-message form-message--error">{t.unavailable}</p>}
       </section>
       <section className="panel" aria-label={t.knowledgeTitle}>
         <span className="panel__label">{t.knowledgeLabel}</span><h2>{t.knowledgeTitle}</h2><p>{t.knowledgeDescription}</p>
