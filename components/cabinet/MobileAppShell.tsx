@@ -23,7 +23,8 @@ const icons = {
   today: "◯",
   case: "▰",
   dialog: "▣",
-  anham: "✣"
+  anham: "✣",
+  chess: "♞"
 } as const;
 
 export function MobileAppShell({
@@ -43,7 +44,8 @@ export function MobileAppShell({
     { href: root, label: ru ? "Сегодня" : "Today", icon: icons.today },
     { href: `${root}/case`, label: ru ? "Случай" : "Case", icon: icons.case },
     { href: `${root}/dialog`, label: ru ? "Диалог" : "Dialogue", icon: icons.dialog, badge: unread },
-    { href: `${root}/anham`, label: "Anham", icon: icons.anham }
+    { href: `${root}/anham`, label: "Anham", icon: icons.anham },
+    { href: `${root}/chess`, label: ru ? "Шахматы" : "Chess", icon: icons.chess }
   ];
 
   const current = (href: string) => href === root
