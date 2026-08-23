@@ -53,6 +53,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
       { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh }
     ] },
     { title: ru ? "Возможности" : "Benefits", items: [
+      { href: `${root}/chess`, label: ru ? "Шахматы с Anham" : "Chess with Anham", hint: ru ? "Сыграть онлайн-партию" : "Play an online game", icon: IconEyeOfHorus },
       { href: `${root}/tokens`, label: t.sections.tokens.title, hint: t.sections.tokens.hint, icon: IconScarab }
     ] }
   ];
