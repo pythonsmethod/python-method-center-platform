@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
+import type { Locale } from "@/lib/i18n/locale";
 
 type WorkspaceLabels = {
   back: string;
@@ -16,12 +17,14 @@ type WorkspaceLabels = {
 type KarenAnhamWorkspaceProps = {
   configured: boolean;
   labels: WorkspaceLabels;
+  locale: Locale;
   showProviders: boolean;
 };
 
 export function KarenAnhamWorkspace({
   configured,
   labels,
+  locale,
   showProviders
 }: KarenAnhamWorkspaceProps) {
   return (
@@ -40,6 +43,8 @@ export function KarenAnhamWorkspace({
             attachments
             endpoint="/api/assistant/staff"
             intro={labels.intro}
+            locale={locale}
+            memoryCapture
             placeholder={labels.placeholder}
             providerChoice={showProviders}
             suggestions={labels.suggestions}

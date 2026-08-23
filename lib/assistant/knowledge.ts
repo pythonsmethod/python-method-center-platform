@@ -8,6 +8,7 @@ export type KnowledgeEntry = {
   content: string;
   audience: KnowledgeAudience;
   is_active: boolean;
+  collection?: "general" | "book" | "method" | "client_answers";
   created_at: string;
 };
 
@@ -25,7 +26,7 @@ export async function listKnowledgeEntries(): Promise<{
 
   const { data, error } = await supabase
     .from("assistant_knowledge")
-    .select("id, title, content, audience, is_active, created_at")
+    .select("id, title, content, audience, is_active, collection, created_at")
     .order("created_at", { ascending: false })
     .limit(200);
 

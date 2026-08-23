@@ -37,6 +37,7 @@ type AssistantChatProps = {
   // exists to send it from.
   initialQuestion?: string | null;
   onInitialQuestionSent?: () => void;
+  memoryCapture?: boolean;
 };
 
 // When the files do not fit one request, they are read in parts: each part
@@ -80,7 +81,8 @@ export function AssistantChat({
   locale = "ru",
   historyEndpoint,
   initialQuestion = null,
-  onInitialQuestionSent
+  onInitialQuestionSent,
+  memoryCapture = false
 }: AssistantChatProps) {
   const t = getDictionary(locale).widget;
   const c = chatCopy[locale];
@@ -92,6 +94,8 @@ export function AssistantChat({
   const [provider, setProvider] = useState<Provider>("best");
   const [files, setFiles] = useState<PreparedFile[]>([]);
   const [progress, setProgress] = useState<string | null>(null);
+  const [memoryState, setMemoryState] = useState<"offer" | "saving" | "saved" | "dismissed">("dismissed");
+  const [memoryMessage, setMemoryMessage] = useState<string | null>(null);
   // How many of the messages on screen came from a previous visit — they get
   // a divider so it is clear where today's conversation starts.
   const [restored, setRestored] = useState(0);
@@ -289,6 +293,8 @@ export function AssistantChat({
     setFiles([]);
     setError(null);
     setPending(true);
+    setMemoryState("dismissed");
+    setMemoryMessage(null);
 
     const question = trimmed || c.inspectFiles;
 
@@ -296,6 +302,7 @@ export function AssistantChat({
       if (attached.length === 0) {
         const reply = await ask(nextMessages, null);
         setMessages([...nextMessages, { role: "assistant", content: reply }]);
+        if (memoryCapture) setMemoryState("offer");
         return;
       }
 
@@ -308,6 +315,7 @@ export function AssistantChat({
           { displayText: visible }
         );
         setMessages([...nextMessages, { role: "assistant", content: reply }]);
+        if (memoryCapture) setMemoryState("offer");
         return;
       }
 
@@ -356,6 +364,7 @@ export function AssistantChat({
       );
 
       setMessages([...nextMessages, { role: "assistant", content: reply }]);
+      if (memoryCapture) setMemoryState("offer");
     } catch (sendError) {
       setError(
         sendError instanceof Error && sendError.message
@@ -365,6 +374,28 @@ export function AssistantChat({
     } finally {
       setProgress(null);
       setPending(false);
+    }
+  }
+
+  async function saveMemory(collection: "book" | "method" | "client_answers") {
+    if (memoryState === "saving") return;
+    setMemoryState("saving");
+    setMemoryMessage(null);
+
+    try {
+      const response = await fetch("/api/assistant/memory", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: contextWindow(messages), collection })
+      });
+      const data = await response.json().catch(() => null) as { title?: string; error?: string } | null;
+      if (!response.ok) throw new Error(data?.error ?? t.errorGeneric);
+
+      setMemoryState("saved");
+      setMemoryMessage(locale === "ru" ? `Сохранено: ${data?.title ?? "новое знание"}` : `Saved: ${data?.title ?? "new knowledge"}`);
+    } catch (memoryError) {
+      setMemoryState("offer");
+      setMemoryMessage(memoryError instanceof Error ? memoryError.message : t.errorNetwork);
     }
   }
 
@@ -397,6 +428,23 @@ export function AssistantChat({
         ) : null}
         {error ? <p className="form-message form-message--error">{error}</p> : null}
       </div>
+
+      {memoryCapture && memoryState !== "dismissed" ? (
+        <div className="assistant-memory" role="status">
+          {memoryState === "saved" ? <p>{memoryMessage}</p> : (
+            <>
+              <strong>{locale === "ru" ? "Professor Python, сохранить результат этого разговора?" : "Professor Python, save the result of this conversation?"}</strong>
+              <div className="assistant-memory__actions">
+                <button disabled={memoryState === "saving"} onClick={() => void saveMemory("book")} type="button">{locale === "ru" ? "В книгу" : "To the book"}</button>
+                <button disabled={memoryState === "saving"} onClick={() => void saveMemory("method")} type="button">{locale === "ru" ? "В метод" : "To the method"}</button>
+                <button disabled={memoryState === "saving"} onClick={() => void saveMemory("client_answers")} type="button">{locale === "ru" ? "В память ответов клиентам" : "To client-answer memory"}</button>
+                <button disabled={memoryState === "saving"} onClick={() => { setMemoryState("dismissed"); setMemoryMessage(null); }} type="button">{locale === "ru" ? "Не сохранять" : "Do not save"}</button>
+              </div>
+              {memoryMessage ? <p className="form-message form-message--error">{memoryMessage}</p> : null}
+            </>
+          )}
+        </div>
+      ) : null}
 
       {messages.length === 0 && suggestions.length > 0 ? (
         <div className="assistant-chat__suggestions">
