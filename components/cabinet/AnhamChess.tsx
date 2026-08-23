@@ -3,7 +3,11 @@
 import { useEffect, useRef, useState } from "react";
 import { Chess, type Move, type Square } from "chess.js";
 
-type AnhamChessProps = { locale: "ru" | "en"; preview?: boolean };
+type AnhamChessProps = {
+  locale: "ru" | "en";
+  preview?: boolean;
+  storageScope?: "client" | "karen";
+};
 
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const pieces: Record<string, string> = {
@@ -49,9 +53,11 @@ function chooseAnhamMove(game: Chess): Move | null {
   return choices[Math.floor(Math.random() * choices.length)] ?? null;
 }
 
-export function AnhamChess({ locale, preview = false }: AnhamChessProps) {
+export function AnhamChess({ locale, preview = false, storageScope = "client" }: AnhamChessProps) {
   const ru = locale === "ru";
-  const storageKey = preview ? "pm-anham-chess-preview" : "pm-anham-chess";
+  const storageKey = preview
+    ? "pm-anham-chess-preview"
+    : `pm-anham-chess-${storageScope}`;
   const gameRef = useRef(new Chess());
   const [fen, setFen] = useState(gameRef.current.fen());
   const [selected, setSelected] = useState<Square | null>(null);

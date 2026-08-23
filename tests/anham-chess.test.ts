@@ -4,11 +4,20 @@ import { describe, expect, it } from "vitest";
 const chess = readFileSync("components/cabinet/AnhamChess.tsx", "utf8");
 const cabinetNav = readFileSync("components/cabinet/CabinetShell.tsx", "utf8");
 const mobileNav = readFileSync("components/cabinet/MobileAppShell.tsx", "utf8");
+const adminNav = readFileSync("app/(admin)/admin/layout.tsx", "utf8");
+const karenChess = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
 
 describe("Anham chess", () => {
   it("is reachable from both the website cabinet and the mobile app", () => {
     expect(cabinetNav).toContain("`${root}/chess`");
     expect(mobileNav).toContain("`${root}/chess`");
+  });
+
+  it("is available in Karen's protected workspace with separate game state", () => {
+    expect(adminNav).toContain('href: "/admin/chess"');
+    expect(adminNav).toContain('privateAssistantRole === "karen"');
+    expect(karenChess).toContain('resolvePrivateAssistantRole(auth.email) !== "karen"');
+    expect(karenChess).toContain('storageScope="karen"');
   });
 
   it("provides complete Russian and English game states", () => {
