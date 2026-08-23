@@ -5898,14 +5898,56 @@ body:has(.karen-ai-page) {
 }
 
 .karen-anham-workspace__chat .assistant-msg--assistant {
-  font-size: clamp(1.18rem, 1.35vw, 1.42rem);
-  line-height: 1.65;
+  background: #fffdf8;
+  border-color: #e7dcc8;
+  color: #241b0d;
+  font-size: clamp(1.05rem, 1.12vw, 1.18rem);
+  line-height: 1.58;
   max-width: min(92%, 920px);
-  padding: 14px 17px;
+  padding: 12px 15px;
 }
 
 .karen-anham-workspace__chat .assistant-msg--user {
+  background: #d9fdd3;
+  border-color: #b9e6b2;
+  color: #102014;
   font-size: 1rem;
+  max-width: min(88%, 820px);
+}
+
+.karen-anham-workspace__chat .assistant-chat__form {
+  align-items: end;
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 22px;
+  display: grid;
+  gap: 8px 10px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  padding: 10px;
+}
+
+.karen-anham-workspace__chat .assistant-chat__form textarea {
+  background: var(--surface);
+  border-radius: 16px;
+  font-size: 1.05rem;
+  line-height: 1.5;
+  max-height: 240px;
+  min-height: 96px;
+  overflow-y: auto;
+  padding: 13px 15px;
+  resize: none;
+}
+
+.karen-anham-workspace__chat .assistant-chat__actions {
+  align-self: end;
+  grid-column: 2;
+  grid-row: 1;
+  padding-bottom: 3px;
+}
+
+.karen-anham-workspace__chat .assistant-chat__voice-hint,
+.karen-anham-workspace__chat .assistant-chat__files {
+  grid-column: 1 / -1;
 }
 
 @media (max-width: 760px) {
@@ -5940,8 +5982,17 @@ body:has(.karen-ai-page) {
   }
 
   .karen-anham-workspace__chat .assistant-msg--assistant {
-    font-size: 1.2rem;
+    font-size: 1.06rem;
     max-width: 96%;
+  }
+
+  .karen-anham-workspace__chat .assistant-chat__form {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .karen-anham-workspace__chat .assistant-chat__actions {
+    grid-column: 1;
+    grid-row: auto;
   }
 }
 

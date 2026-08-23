@@ -101,9 +101,19 @@ export function AssistantChat({
   const [restored, setRestored] = useState(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const voice = useVoiceInput((text) => {
     setInput((current) => (current ? `${current} ${text}` : text));
   });
+
+  // Keep a long draft visible like a messenger composer: grow until a
+  // comfortable ceiling, then scroll inside the field.
+  useEffect(() => {
+    const composer = composerRef.current;
+    if (!composer) return;
+    composer.style.height = "auto";
+    composer.style.height = `${Math.min(Math.max(composer.scrollHeight, 96), 240)}px`;
+  }, [input, voice.interim]);
 
   // Where a new message should leave the reader.
   //
@@ -492,7 +502,8 @@ export function AssistantChat({
             }
           }}
           placeholder={voice.listening ? t.listening : effectivePlaceholder}
-          rows={2}
+          ref={composerRef}
+          rows={4}
           value={voice.interim ? `${input}${input ? " " : ""}${voice.interim}` : input}
         />
         {voice.listening ? (
