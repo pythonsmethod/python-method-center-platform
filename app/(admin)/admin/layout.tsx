@@ -28,6 +28,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         clients: "Клиенты",
         documents: "Документы",
         assistant: "ИИ и знания",
+        chess: "Шахматы",
         requests: "Обращения",
         founder: "Обзор",
         home: "На главную сайта",
@@ -40,18 +41,25 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         clients: "Clients",
         documents: "Documents",
         assistant: "AI & knowledge",
+        chess: "Chess",
         requests: "Requests",
         founder: "Overview",
         home: "Website home",
         logout: "Sign out"
       };
 
+  const privateAssistantRole = auth.status === "authorized"
+    ? resolvePrivateAssistantRole(auth.email)
+    : null;
   const adminNavRoutes = [
     { href: "/admin", label: labels.today, icon: "⌂" },
     { href: "/admin/cases", label: labels.clients, icon: "♙" },
     { href: "/admin/documents", label: labels.documents, icon: "▤" },
-    ...(auth.status === "authorized" && resolvePrivateAssistantRole(auth.email)
+    ...(privateAssistantRole
       ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
+      : []),
+    ...(privateAssistantRole === "karen"
+      ? [{ href: "/admin/chess", label: labels.chess, icon: "♞" }]
       : []),
     ...(auth.status === "authorized"
       ? [{ href: "/admin/requests", label: labels.requests, icon: "✉" }]
