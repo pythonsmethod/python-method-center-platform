@@ -1,4 +1,7 @@
 import { getStaffUserState, type StaffUserState } from "@/lib/auth/require-staff";
+import { isFounderEmail } from "@/lib/auth/require-founder";
+
+export type PrivateAssistantRole = "founder" | "karen";
 
 export function karenAllowlist(): string[] {
   return (process.env.KAREN_EMAILS ?? "")
@@ -7,17 +10,27 @@ export function karenAllowlist(): string[] {
     .filter(Boolean);
 }
 
-// Karen's assistant contains private case material and his unpublished
-// methodology. Access therefore fails closed when the deployment allowlist
-// is absent; a staff or admin role alone is deliberately insufficient.
-export function isKarenEmail(email: string | null | undefined): boolean {
+// This assistant contains private case material and unpublished methodology.
+// A staff/admin role alone is deliberately insufficient.
+export function isKarenAssistantEmail(email: string | null | undefined): boolean {
   return Boolean(email && karenAllowlist().includes(email.toLowerCase()));
 }
 
-export async function getKarenUserState(): Promise<StaffUserState> {
+// Founder wins when an address temporarily appears in both allowlists. This
+// lets deployments move Anna out of KAREN_EMAILS without ever showing her the
+// Karen persona in the meantime.
+export function resolvePrivateAssistantRole(
+  email: string | null | undefined
+): PrivateAssistantRole | null {
+  if (isFounderEmail(email)) return "founder";
+  if (isKarenAssistantEmail(email)) return "karen";
+  return null;
+}
+
+export async function getKarenAssistantUserState(): Promise<StaffUserState> {
   const state = await getStaffUserState();
 
   if (state.status !== "authorized") return state;
 
-  return isKarenEmail(state.email) ? state : { status: "forbidden" };
+  return resolvePrivateAssistantRole(state.email) ? state : { status: "forbidden" };
 }

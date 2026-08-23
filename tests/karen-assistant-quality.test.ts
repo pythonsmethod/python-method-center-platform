@@ -13,7 +13,7 @@ vi.mock("@/lib/assistant/openai", () => ({
 import { askOpenAi } from "@/lib/assistant/openai";
 import { askKarenAssistant } from "@/lib/assistant/router";
 
-describe("Karen assistant quality path", () => {
+describe("private expert assistant quality path", () => {
   it("uses high reasoning even when only OpenAI is configured", async () => {
     const result = await askKarenAssistant(
       "system",

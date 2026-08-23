@@ -7,7 +7,7 @@ import { buildCaseContext } from "@/lib/assistant/case-context";
 import { buildStaffSystemPrompt } from "@/lib/assistant/prompts";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getStaffUserState } from "@/lib/auth/require-staff";
-import { isKarenEmail } from "@/lib/auth/require-karen";
+import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { isUuid } from "@/lib/utils/uuid";
 
 export const runtime = "nodejs";
@@ -19,7 +19,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Нет доступа." }, { status: 403 });
   }
 
-  if (!isKarenEmail(auth.email)) {
+  const assistantRole = resolvePrivateAssistantRole(auth.email);
+
+  if (!assistantRole) {
     return NextResponse.json({ error: "Нет доступа." }, { status: 403 });
   }
 
@@ -61,7 +63,7 @@ export async function POST(request: Request) {
     (body as { provider?: unknown })?.provider
   );
 
-  let system = await buildStaffSystemPrompt();
+  let system = await buildStaffSystemPrompt(assistantRole);
 
   // Optional case binding: the assistant on a case page receives a live
   // snapshot of that case from the database (metadata, questionnaire,

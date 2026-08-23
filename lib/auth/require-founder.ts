@@ -20,7 +20,6 @@ export function isFounderEmail(email: string | null | undefined): boolean {
 
 // Who may see which model is answering.
 //
-// Deliberately stricter than cabinet access, and deliberately fails closed:
 // Only the platform creator and explicitly configured additional founders
 // see vendor names; everyone else simply uses the assistant.
 export function canSeeProviderNames(email: string | null | undefined): boolean {

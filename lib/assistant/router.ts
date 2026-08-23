@@ -291,10 +291,9 @@ export async function askAnham(
       });
 }
 
-// Karen always gets the quality-first path. Unlike the public assistant's
-// automatic mode, this asks both configured flagships to reason independently
-// and then produces one coherent answer. askAnham already degrades safely to
-// the strongest configured provider when only one is available.
+// The private expert workspace always gets the quality-first path: two
+// independent flagship drafts and one coherent synthesis when both providers
+// are configured, with a high-reasoning fallback when only OpenAI is present.
 export async function askKarenAssistant(
   system: string,
   messages: ChatMessage[],

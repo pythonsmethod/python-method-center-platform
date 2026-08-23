@@ -3,7 +3,7 @@ import { notFound } from "next/navigation";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { LogoutButton } from "@/components/LogoutButton";
-import { isKarenEmail } from "@/lib/auth/require-karen";
+import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
@@ -27,7 +27,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         today: "Сегодня",
         clients: "Клиенты",
         documents: "Документы",
-        assistant: "Анхам",
+        assistant: "ИИ и знания",
         requests: "Обращения",
         founder: "Обзор",
         home: "На главную сайта",
@@ -39,7 +39,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         today: "Today",
         clients: "Clients",
         documents: "Documents",
-        assistant: "Anham",
+        assistant: "AI & knowledge",
         requests: "Requests",
         founder: "Overview",
         home: "Website home",
@@ -50,7 +50,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin", label: labels.today, icon: "⌂" },
     { href: "/admin/cases", label: labels.clients, icon: "♙" },
     { href: "/admin/documents", label: labels.documents, icon: "▤" },
-    ...(auth.status === "authorized" && isKarenEmail(auth.email)
+    ...(auth.status === "authorized" && resolvePrivateAssistantRole(auth.email)
       ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
       : []),
     ...(auth.status === "authorized"
