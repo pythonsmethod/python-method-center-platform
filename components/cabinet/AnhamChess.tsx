@@ -11,8 +11,10 @@ type AnhamChessProps = {
 
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const pieces: Record<string, string> = {
-  wp: "♙", wn: "♘", wb: "♗", wr: "♖", wq: "♕", wk: "♔",
-  bp: "♟", bn: "♞", bb: "♝", br: "♜", bq: "♛", bk: "♚"
+  // One solid symbol set for both colours plus VS15 keeps iOS from turning
+  // only the black pawn into a glossy emoji while the other pieces stay text.
+  wp: "♟︎", wn: "♞︎", wb: "♝︎", wr: "♜︎", wq: "♛︎", wk: "♚︎",
+  bp: "♟︎", bn: "♞︎", bb: "♝︎", br: "♜︎", bq: "♛︎", bk: "♚︎"
 };
 const values: Record<string, number> = { p: 100, n: 320, b: 330, r: 500, q: 900, k: 20_000 };
 
@@ -130,7 +132,10 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       <div><span>{ru ? "Игра с ИИ-помощником" : "Play with your AI assistant"}</span><h1 id="anham-chess-title">{ru ? "Шахматы с Anham" : "Chess with Anham"}</h1></div>
       <div className="chess-room__opponent"><b>✣</b><span><strong>Anham</strong><small>{ru ? "в сети" : "online"}</small></span><i aria-label={ru ? "В сети" : "Online"} /></div>
     </header>
-    <div aria-live="polite" className={`chess-room__status${thinking ? " is-thinking" : ""}`}>{status()}</div>
+    <div className="chess-room__statusbar">
+      <div aria-live="polite" className={`chess-room__status${thinking ? " is-thinking" : ""}`}>{status()}</div>
+      <button aria-label={ru ? "Начать новую партию" : "Start a new game"} onClick={newGame} type="button">↻ <span>{ru ? "Заново" : "Restart"}</span></button>
+    </div>
     <div className="chess-room__layout">
       <div className="chess-board" role="grid" aria-label={ru ? "Шахматная доска" : "Chess board"}>
         {board.flatMap((rank, rankIndex) => rank.map((piece, fileIndex) => {
