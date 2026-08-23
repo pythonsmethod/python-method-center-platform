@@ -10,6 +10,7 @@ const eslintConfig = [
   {
     ignores: [
       ".next/**",
+      ".codex-worktrees/**",
       "node_modules/**",
       "out/**",
       "dist/**",

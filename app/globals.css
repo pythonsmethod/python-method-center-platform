@@ -5826,6 +5826,125 @@ code {
   flex: 0 0 auto;
 }
 
+/* Karen's private Anham is one room: conversation first, durable memory one
+   tab away. The thread uses the available screen height and Anham's words are
+   deliberately large for comfortable reading. */
+.karen-ai-page {
+  max-width: none;
+  min-height: calc(100dvh - 72px);
+}
+
+body:has(.karen-ai-page) .admin-nav,
+body:has(.karen-ai-page) .admin-mobile-utility {
+  display: none;
+}
+
+body:has(.karen-ai-page) {
+  padding-bottom: 0;
+}
+
+.karen-anham-workspace {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 24px;
+  box-shadow: 0 18px 60px rgba(20, 16, 8, 0.08);
+  min-height: calc(100dvh - 250px);
+  overflow: hidden;
+}
+
+.karen-anham-workspace__bar {
+  align-items: center;
+  background: var(--surface-muted);
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  justify-content: space-between;
+  min-height: 72px;
+  padding: 10px 16px;
+}
+
+.karen-anham-workspace__back {
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  color: var(--text);
+  display: flex;
+  font-size: 0.95rem;
+  font-weight: 700;
+  min-height: 44px;
+  padding: 8px 14px;
+  text-decoration: none;
+}
+
+.karen-anham-workspace__identity {
+  align-items: center;
+  display: flex;
+  font-size: 1.1rem;
+  gap: 9px;
+}
+
+.karen-anham-workspace__chat {
+  padding: 16px;
+}
+
+.karen-anham-workspace__chat .assistant-chat {
+  grid-template-rows: minmax(320px, 1fr) auto auto auto;
+  min-height: calc(100dvh - 350px);
+}
+
+.karen-anham-workspace__chat .assistant-chat__messages {
+  max-height: none;
+  min-height: min(58dvh, 720px);
+}
+
+.karen-anham-workspace__chat .assistant-msg--assistant {
+  font-size: clamp(1.18rem, 1.35vw, 1.42rem);
+  line-height: 1.65;
+  max-width: min(92%, 920px);
+  padding: 14px 17px;
+}
+
+.karen-anham-workspace__chat .assistant-msg--user {
+  font-size: 1rem;
+}
+
+@media (max-width: 760px) {
+  .karen-ai-page {
+    width: 100%;
+  }
+
+  .karen-anham-workspace {
+    border-radius: 20px;
+    min-height: calc(100dvh - 210px);
+  }
+
+  .karen-anham-workspace__bar {
+    padding-inline: 10px;
+  }
+
+  .karen-anham-workspace__back {
+    font-size: 0.86rem;
+    padding-inline: 10px;
+  }
+
+  .karen-anham-workspace__chat {
+    padding: 10px;
+  }
+
+  .karen-anham-workspace__chat .assistant-chat {
+    min-height: calc(100dvh - 300px);
+  }
+
+  .karen-anham-workspace__chat .assistant-chat__messages {
+    min-height: 52dvh;
+  }
+
+  .karen-anham-workspace__chat .assistant-msg--assistant {
+    font-size: 1.2rem;
+    max-width: 96%;
+  }
+}
+
 root {
   --background: #17120a;
   --surface: #211a0f;
@@ -11707,7 +11826,7 @@ body:has(.pm-app) > .site-footer { display: none; }
 /* Mobile navigation is permanent for every viewer on phone-class devices.\n   Authentication changes only the account destination, never its position. */
 .public-mobile-dock { display: none; }
 
-@media (max-width: 560px) {
+@media (max-width: 560px), (hover: none) and (pointer: coarse) {
   body:has(.public-mobile-dock) { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
   body:has(.public-mobile-dock) .site-header .site-nav { display: none; }
   body:has(.app-home) .site-header {
