@@ -6,6 +6,7 @@ const cabinetNav = readFileSync("components/cabinet/CabinetShell.tsx", "utf8");
 const mobileNav = readFileSync("components/cabinet/MobileAppShell.tsx", "utf8");
 const adminNav = readFileSync("app/(admin)/admin/layout.tsx", "utf8");
 const karenChess = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
+const clientChess = readFileSync("app/(client)/cabinet/chess/page.tsx", "utf8");
 const styles = readFileSync("app/globals.css", "utf8");
 
 describe("Anham chess", () => {
@@ -14,11 +15,16 @@ describe("Anham chess", () => {
     expect(mobileNav).toContain("`${root}/chess`");
   });
 
-  it("is available in Karen's protected workspace with separate game state", () => {
+  it("is available to every authorized staff user with separate game state", () => {
     expect(adminNav).toContain('href: "/admin/chess"');
-    expect(adminNav).toContain('privateAssistantRole === "karen"');
-    expect(karenChess).toContain('resolvePrivateAssistantRole(auth.email) !== "karen"');
-    expect(karenChess).toContain('storageScope="karen"');
+    expect(adminNav).toContain('auth.status === "authorized"');
+    expect(karenChess).not.toContain("resolvePrivateAssistantRole");
+    expect(karenChess).toContain("storageScope={`staff-${auth.userId}`}");
+  });
+
+  it("keeps each client's saved game separate on shared devices", () => {
+    expect(clientChess).toContain('getRequiredUser("/cabinet/chess")');
+    expect(clientChess).toContain("`client-${auth.userId}`");
   });
 
   it("provides complete Russian and English game states", () => {
