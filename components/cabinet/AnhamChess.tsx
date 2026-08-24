@@ -6,7 +6,7 @@ import { Chess, type Move, type Square } from "chess.js";
 type AnhamChessProps = {
   locale: "ru" | "en";
   preview?: boolean;
-  storageScope?: "client" | "karen";
+  storageScope?: string;
 };
 
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;

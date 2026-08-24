@@ -58,7 +58,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     ...(privateAssistantRole
       ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
       : []),
-    ...(privateAssistantRole === "karen"
+    ...(auth.status === "authorized"
       ? [{ href: "/admin/chess", label: labels.chess, icon: "♞" }]
       : []),
     ...(auth.status === "authorized"
