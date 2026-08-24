@@ -8,6 +8,7 @@ const adminNav = readFileSync("app/(admin)/admin/layout.tsx", "utf8");
 const karenChess = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
 const clientChess = readFileSync("app/(client)/cabinet/chess/page.tsx", "utf8");
 const styles = readFileSync("app/globals.css", "utf8");
+const chessAssistant = readFileSync("app/api/assistant/chess/route.ts", "utf8");
 
 describe("Anham chess", () => {
   it("is reachable from both the website cabinet and the mobile app", () => {
@@ -63,5 +64,13 @@ describe("Anham chess", () => {
     expect(styles).toContain("-webkit-appearance:none");
     expect(styles).toContain("grid-template-columns:minmax(0,1fr)");
     expect(styles).not.toContain("aspect-ratio:1; border:0; color:#16100a");
+  });
+
+  it("lets every signed-in player discuss the live position with Anham", () => {
+    expect(chess).toContain('endpoint="/api/assistant/chess"');
+    expect(chess).toContain("requestContext={{ fen, pgn: game.pgn() }}");
+    expect(chessAssistant).toContain("await supabase.auth.getUser()");
+    expect(chessAssistant).toContain("CURRENT POSITION (authoritative FEN)");
+    expect(chessAssistant).toContain("history.fen() === position.fen()");
   });
 });
