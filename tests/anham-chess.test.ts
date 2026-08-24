@@ -6,6 +6,7 @@ const cabinetNav = readFileSync("components/cabinet/CabinetShell.tsx", "utf8");
 const mobileNav = readFileSync("components/cabinet/MobileAppShell.tsx", "utf8");
 const adminNav = readFileSync("app/(admin)/admin/layout.tsx", "utf8");
 const karenChess = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
+const styles = readFileSync("app/globals.css", "utf8");
 
 describe("Anham chess", () => {
   it("is reachable from both the website cabinet and the mobile app", () => {
@@ -43,5 +44,11 @@ describe("Anham chess", () => {
   it("uses the Egyptian board frame and ornamentation", () => {
     expect(chess).toContain("chess-board-frame__ornament");
     expect(chess).toContain("𓋹 · 𓂀 · 𓆣 · 𓇳");
+  });
+
+  it("locks the board to eight equal rows and columns on iPhone", () => {
+    expect(styles).toContain("grid-template-columns:repeat(8,minmax(0,1fr))");
+    expect(styles).toContain("grid-template-rows:repeat(8,minmax(0,1fr))");
+    expect(styles).toContain("min-height:0; min-width:0");
   });
 });
