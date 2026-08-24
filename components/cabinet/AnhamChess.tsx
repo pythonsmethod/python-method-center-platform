@@ -137,17 +137,21 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       <button aria-label={ru ? "Начать новую партию" : "Start a new game"} onClick={newGame} type="button">↻ <span>{ru ? "Заново" : "Restart"}</span></button>
     </div>
     <div className="chess-room__layout">
-      <div className="chess-board" role="grid" aria-label={ru ? "Шахматная доска" : "Chess board"}>
-        {board.flatMap((rank, rankIndex) => rank.map((piece, fileIndex) => {
-          const square = `${files[fileIndex]}${8 - rankIndex}` as Square;
-          const light = (rankIndex + fileIndex) % 2 === 0;
-          const isSelected = selected === square; const target = targets.includes(square);
-          return <button aria-label={`${square}${piece ? ` ${pieces[`${piece.color}${piece.type}`]}` : ""}`} className={`chess-board__square ${light ? "is-light" : "is-dark"}${isSelected ? " is-selected" : ""}${target ? " is-target" : ""}`} disabled={thinking} key={square} onClick={() => selectSquare(square)} role="gridcell" type="button">
-            <span className={piece ? `is-${piece.color}` : undefined}>{piece ? pieces[`${piece.color}${piece.type}`] : ""}</span>
-            {fileIndex === 0 ? <small className="chess-board__rank">{8 - rankIndex}</small> : null}
-            {rankIndex === 7 ? <small className="chess-board__file">{files[fileIndex]}</small> : null}
-          </button>;
-        }))}
+      <div className="chess-board-frame">
+        <div aria-hidden="true" className="chess-board-frame__ornament">𓋹 · 𓂀 · 𓆣 · 𓇳 · 𓆣 · 𓂀 · 𓋹</div>
+        <div className="chess-board" role="grid" aria-label={ru ? "Шахматная доска" : "Chess board"}>
+          {board.flatMap((rank, rankIndex) => rank.map((piece, fileIndex) => {
+            const square = `${files[fileIndex]}${8 - rankIndex}` as Square;
+            const light = (rankIndex + fileIndex) % 2 === 0;
+            const isSelected = selected === square; const target = targets.includes(square);
+            return <button aria-label={`${square}${piece ? ` ${pieces[`${piece.color}${piece.type}`]}` : ""}`} className={`chess-board__square ${light ? "is-light" : "is-dark"}${isSelected ? " is-selected" : ""}${target ? " is-target" : ""}`} disabled={thinking} key={square} onClick={() => selectSquare(square)} role="gridcell" type="button">
+              <span className={piece ? `is-${piece.color}` : undefined}>{piece ? pieces[`${piece.color}${piece.type}`] : ""}</span>
+              {fileIndex === 0 ? <small className="chess-board__rank">{8 - rankIndex}</small> : null}
+              {rankIndex === 7 ? <small className="chess-board__file">{files[fileIndex]}</small> : null}
+            </button>;
+          }))}
+        </div>
+        <div aria-hidden="true" className="chess-board-frame__seal"><span>𓂀</span></div>
       </div>
       <aside className="chess-room__panel">
         <div className="chess-room__tip"><b>✣</b><p><strong>{ru ? "Подсказка Anham" : "Anham’s tip"}</strong>{ru ? "Нажмите на фигуру, затем на подсвеченное поле. Пешка на последней линии автоматически станет ферзём." : "Tap a piece, then a highlighted square. A pawn reaching the last rank is promoted to a queen."}</p></div>

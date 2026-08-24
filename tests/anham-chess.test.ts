@@ -39,4 +39,9 @@ describe("Anham chess", () => {
     expect(chess).toContain('bp: "♟︎"');
     expect(chess).toContain("black pawn into a glossy emoji");
   });
+
+  it("uses the Egyptian board frame and ornamentation", () => {
+    expect(chess).toContain("chess-board-frame__ornament");
+    expect(chess).toContain("𓋹 · 𓂀 · 𓆣 · 𓇳");
+  });
 });
