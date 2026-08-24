@@ -51,4 +51,11 @@ describe("Anham chess", () => {
     expect(styles).toContain("grid-template-rows:repeat(8,minmax(0,1fr))");
     expect(styles).toContain("min-height:0; min-width:0");
   });
+
+  it("normalizes the square geometry across browsers and devices", () => {
+    expect(styles).toContain("contain:layout paint; container-type:inline-size");
+    expect(styles).toContain("-webkit-appearance:none");
+    expect(styles).toContain("grid-template-columns:minmax(0,1fr)");
+    expect(styles).not.toContain("aspect-ratio:1; border:0; color:#16100a");
+  });
 });
