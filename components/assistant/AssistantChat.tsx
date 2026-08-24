@@ -38,6 +38,9 @@ type AssistantChatProps = {
   initialQuestion?: string | null;
   onInitialQuestionSent?: () => void;
   memoryCapture?: boolean;
+  // Optional structured context for a purpose-built endpoint. Generic chat
+  // endpoints ignore it; the chess endpoint uses it for the live position.
+  requestContext?: Record<string, string>;
 };
 
 // When the files do not fit one request, they are read in parts: each part
@@ -82,7 +85,8 @@ export function AssistantChat({
   historyEndpoint,
   initialQuestion = null,
   onInitialQuestionSent,
-  memoryCapture = false
+  memoryCapture = false,
+  requestContext
 }: AssistantChatProps) {
   const t = getDictionary(locale).widget;
   const c = chatCopy[locale];
@@ -248,7 +252,8 @@ export function AssistantChat({
         ...(providerChoice ? { provider } : {}),
         ...(caseId ? { caseId } : {}),
         ...(save?.transient ? { transient: true } : {}),
-        ...(save?.displayText ? { displayText: save.displayText } : {})
+        ...(save?.displayText ? { displayText: save.displayText } : {}),
+        ...(requestContext ? { requestContext } : {})
       })
     });
 

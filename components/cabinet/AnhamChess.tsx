@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Chess, type Move, type Square } from "chess.js";
+import { AssistantChat } from "@/components/assistant/AssistantChat";
 
 type AnhamChessProps = {
   locale: "ru" | "en";
@@ -159,5 +160,21 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
         <p className="chess-room__saved">✓ {ru ? "Партия сохраняется на этом устройстве" : "Game saved on this device"}</p>
       </aside>
     </div>
+    <section className="chess-room__discussion" aria-labelledby="chess-discussion-title">
+      <div className="chess-room__discussion-head">
+        <b aria-hidden="true">𓂀</b>
+        <div><span>{ru ? "Разбор партии" : "Game discussion"}</span><h2 id="chess-discussion-title">{ru ? "Обсудить партию с Anham" : "Discuss the game with Anham"}</h2></div>
+      </div>
+      <AssistantChat
+        endpoint="/api/assistant/chess"
+        intro={ru ? "Я вижу текущую позицию. Спросите о последнем ходе, ошибке, угрозах или плане — разберём партию вместе." : "I can see the current position. Ask about the last move, a mistake, threats, or a plan — we can review the game together."}
+        locale={locale}
+        placeholder={ru ? "Спросите Anham о партии…" : "Ask Anham about the game…"}
+        requestContext={{ fen, pgn: game.pgn() }}
+        suggestions={ru
+          ? ["Как ты оцениваешь позицию?", "Где я ошибся?", "Какой у меня лучший план?"]
+          : ["How do you assess the position?", "Where did I go wrong?", "What is my best plan?"]}
+      />
+    </section>
   </section>;
 }
