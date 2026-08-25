@@ -9,6 +9,8 @@ const karenChess = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
 const clientChess = readFileSync("app/(client)/cabinet/chess/page.tsx", "utf8");
 const styles = readFileSync("app/globals.css", "utf8");
 const chessAssistant = readFileSync("app/api/assistant/chess/route.ts", "utf8");
+const chessState = readFileSync("app/api/chess/state/route.ts", "utf8");
+const chessMemoryMigration = readFileSync("supabase/migrations/20260825080000_chess_coach_memory.sql", "utf8");
 
 describe("Anham chess", () => {
   it("is reachable from both the website cabinet and the mobile app", () => {
@@ -72,5 +74,20 @@ describe("Anham chess", () => {
     expect(chessAssistant).toContain("await supabase.auth.getUser()");
     expect(chessAssistant).toContain("CURRENT POSITION (authoritative FEN)");
     expect(chessAssistant).toContain("history.fen() === position.fen()");
+  });
+
+  it("uses larger pieces in both modern and legacy mobile browsers", () => {
+    expect(styles).toContain("font-size:clamp(2.25rem,9vw,5rem)");
+    expect(styles).toContain("font-size:clamp(2.25rem,11.75cqi,5rem)");
+  });
+
+  it("persists games and coaching conversations per account", () => {
+    expect(chess).toContain('fetch("/api/chess/state")');
+    expect(chess).toContain('historyEndpoint={preview ? undefined : "/api/assistant/chess"}');
+    expect(chessState).toContain('from("chess_games")');
+    expect(chessAssistant).toContain('from("chess_conversations")');
+    expect(chessAssistant).toContain("PAST GAMES FOR COACHING MEMORY");
+    expect(chessMemoryMigration).toContain("enable row level security");
+    expect(chessMemoryMigration).toContain("(select auth.uid()) = user_id");
   });
 });
