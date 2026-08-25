@@ -53,7 +53,7 @@ export async function POST(request: Request) {
   const messages = sanitizeChatMessages(payload.messages);
   if (!messages) return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
 
-  const context = payload.requestContext as { fen?: unknown; pgn?: unknown } | null;
+  const context = payload.requestContext as { fen?: unknown; pgn?: unknown; level?: unknown } | null;
   if (!context || typeof context.fen !== "string" || context.fen.length > 120) {
     return NextResponse.json({ error: "Позиция партии недоступна." }, { status: 400 });
   }
@@ -72,6 +72,8 @@ export async function POST(request: Request) {
   }
 
   const english = payload.locale === "en";
+  const levels = ["beginner", "casual", "intermediate", "advanced", "grandmaster"];
+  const level = typeof context.level === "string" && levels.includes(context.level) ? context.level : "beginner";
   const [{ data: pastGames }, { data: activeGame }] = await Promise.all([
     auth.supabase.from("chess_games").select("pgn,result,status,updated_at")
       .eq("user_id", auth.user.id).order("updated_at", { ascending: false }).limit(8),
@@ -81,7 +83,7 @@ export async function POST(request: Request) {
   const memory = (pastGames ?? []).map((game, index) =>
     `${index + 1}. ${game.status}${game.result ? `, result ${game.result}` : ""}; PGN: ${game.pgn || "no moves"}`
   ).join("\n");
-  const system = `You are Anham, a patient personal chess coach and playing partner. The person plays White and Anham plays Black. Teach the person how to think: explain rules when needed, ask guiding questions, identify recurring mistakes from remembered games, praise specific improvement, and adapt explanations to their apparent level. Do not merely give a move without explaining the idea. Name only legal candidate moves in algebraic notation and never invent pieces or moves absent from the authoritative position. Reply in ${english ? "English" : "Russian"} unless the person writes in another language.\n\nCURRENT POSITION (authoritative FEN):\n${position.fen()}\n\nCURRENT GAME HISTORY:\n${pgn || "No validated move history is available; analyze the FEN only."}\n\nPAST GAMES FOR COACHING MEMORY:\n${memory || "This is the first remembered game."}`;
+  const system = `You are Anham, a patient personal chess coach and playing partner. The person plays White and Anham plays Black. Their explicitly selected chess level is ${level}. Adapt vocabulary, depth, hints, and teaching pace to that level; for beginners explain rules and notation, while for advanced and grandmaster players use deeper positional and tactical analysis. Teach the person how to think, ask guiding questions, identify recurring mistakes from remembered games, and praise specific improvement. Do not merely give a move without explaining the idea. Name only legal candidate moves in algebraic notation and never invent pieces or moves absent from the authoritative position. Reply in ${english ? "English" : "Russian"} unless the person writes in another language.\n\nCURRENT POSITION (authoritative FEN):\n${position.fen()}\n\nCURRENT GAME HISTORY:\n${pgn || "No validated move history is available; analyze the FEN only."}\n\nPAST GAMES FOR COACHING MEMORY:\n${memory || "This is the first remembered game."}`;
   const result = await askAssistantTeam(system, messages, 1200, "best");
 
   if (result.status === "unavailable") {

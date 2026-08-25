@@ -3,6 +3,7 @@ import { Chess } from "chess.js";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
+const levels = ["beginner", "casual", "intermediate", "advanced", "grandmaster"] as const;
 
 async function authenticated() {
   const supabase = await createSupabaseServerClient();
@@ -14,10 +15,28 @@ async function authenticated() {
 export async function GET() {
   const auth = await authenticated();
   if (!auth) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
-  const { data } = await auth.supabase.from("chess_games")
-    .select("id,current_fen,pgn,updated_at")
-    .eq("user_id", auth.user.id).eq("status", "active").maybeSingle();
-  return NextResponse.json({ game: data ?? null });
+  const [{ data: game }, { data: preference }] = await Promise.all([
+    auth.supabase.from("chess_games").select("id,current_fen,pgn,updated_at")
+      .eq("user_id", auth.user.id).eq("status", "active").maybeSingle(),
+    auth.supabase.from("chess_preferences").select("skill_level")
+      .eq("user_id", auth.user.id).maybeSingle()
+  ]);
+  return NextResponse.json({ game: game ?? null, level: preference?.skill_level ?? "beginner" });
+}
+
+export async function PATCH(request: Request) {
+  const auth = await authenticated();
+  if (!auth) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
+  const body = await request.json().catch(() => null) as { level?: unknown } | null;
+  if (!body || typeof body.level !== "string" || !levels.includes(body.level as typeof levels[number])) {
+    return NextResponse.json({ error: "Некорректный уровень." }, { status: 400 });
+  }
+  const { error } = await auth.supabase.from("chess_preferences").upsert(
+    { user_id: auth.user.id, skill_level: body.level, updated_at: new Date().toISOString() },
+    { onConflict: "user_id" }
+  );
+  if (error) return NextResponse.json({ error: "Не удалось сохранить уровень." }, { status: 500 });
+  return NextResponse.json({ level: body.level });
 }
 
 export async function POST(request: Request) {

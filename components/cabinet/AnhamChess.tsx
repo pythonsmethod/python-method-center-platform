@@ -10,6 +10,11 @@ type AnhamChessProps = {
   storageScope?: string;
 };
 
+type ChessLevel = "beginner" | "casual" | "intermediate" | "advanced" | "grandmaster";
+
+const chessLevels: ChessLevel[] = ["beginner", "casual", "intermediate", "advanced", "grandmaster"];
+const levelDepth: Record<ChessLevel, number> = { beginner: -1, casual: 0, intermediate: 1, advanced: 2, grandmaster: 3 };
+
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const pieces: Record<string, string> = {
   // One solid symbol set for both colours plus VS15 keeps iOS from turning
@@ -42,13 +47,14 @@ function minimax(game: Chess, depth: number, alpha: number, beta: number): numbe
   return best;
 }
 
-function chooseAnhamMove(game: Chess): Move | null {
+function chooseAnhamMove(game: Chess, level: ChessLevel): Move | null {
   const moves = game.moves({ verbose: true });
+  if (level === "beginner") return moves[Math.floor(Math.random() * moves.length)] ?? null;
   let best = -Infinity;
   let choices: Move[] = [];
   for (const move of moves) {
     game.move(move);
-    const value = minimax(game, 2, -Infinity, Infinity);
+    const value = minimax(game, levelDepth[level], -Infinity, Infinity);
     game.undo();
     if (value > best) { best = value; choices = [move]; }
     else if (value === best) choices.push(move);
@@ -67,23 +73,29 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
   const [thinking, setThinking] = useState(false);
   const [ready, setReady] = useState(false);
   const [remoteReady, setRemoteReady] = useState(preview);
+  const [level, setLevel] = useState<ChessLevel>("beginner");
 
   useEffect(() => {
     const saved = window.localStorage.getItem(storageKey);
+    const savedLevel = window.localStorage.getItem(`${storageKey}-level`);
+    if (savedLevel && chessLevels.includes(savedLevel as ChessLevel)) setLevel(savedLevel as ChessLevel);
     if (saved) {
       try { gameRef.current.load(saved); setFen(gameRef.current.fen()); } catch { window.localStorage.removeItem(storageKey); }
     }
     setReady(true);
   }, [storageKey]);
   useEffect(() => { if (ready) window.localStorage.setItem(storageKey, fen); }, [fen, ready, storageKey]);
+  useEffect(() => { if (ready) window.localStorage.setItem(`${storageKey}-level`, level); }, [level, ready, storageKey]);
 
   useEffect(() => {
     if (preview) return;
     let cancelled = false;
     void fetch("/api/chess/state")
       .then((response) => response.ok ? response.json() : null)
-      .then((payload: { game?: { current_fen?: string; pgn?: string } | null } | null) => {
-        if (cancelled || !payload?.game) return;
+      .then((payload: { game?: { current_fen?: string; pgn?: string } | null; level?: ChessLevel } | null) => {
+        if (cancelled || !payload) return;
+        if (payload.level && chessLevels.includes(payload.level)) setLevel(payload.level);
+        if (!payload.game) return;
         try {
           const restored = new Chess();
           if (payload.game.pgn) restored.loadPgn(payload.game.pgn);
@@ -110,6 +122,17 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
     return () => window.clearTimeout(timer);
   }, [fen, preview, ready, remoteReady]);
 
+  function changeLevel(nextLevel: ChessLevel) {
+    setLevel(nextLevel);
+    if (!preview) {
+      void fetch("/api/chess/state", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ level: nextLevel })
+      });
+    }
+  }
+
   const game = gameRef.current;
   const targets = selected
     ? game.moves({ square: selected, verbose: true }).map((move) => move.to)
@@ -128,7 +151,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
   function playAnham() {
     setThinking(true);
     window.setTimeout(() => {
-      const move = chooseAnhamMove(gameRef.current);
+      const move = chooseAnhamMove(gameRef.current, level);
       if (move) gameRef.current.move(move);
       setFen(gameRef.current.fen());
       setThinking(false);
@@ -174,6 +197,17 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       <div><span>{ru ? "Игра с ИИ-помощником" : "Play with your AI assistant"}</span><h1 id="anham-chess-title">{ru ? "Шахматы с Anham" : "Chess with Anham"}</h1></div>
       <div className="chess-room__opponent"><b>✣</b><span><strong>Anham</strong><small>{ru ? "в сети" : "online"}</small></span><i aria-label={ru ? "В сети" : "Online"} /></div>
     </header>
+    <div className="chess-room__level">
+      <span id="chess-level-label">{ru ? "Ваш уровень" : "Your level"}</span>
+      <div aria-labelledby="chess-level-label" role="radiogroup">
+        {chessLevels.map((item) => {
+          const labels = ru
+            ? { beginner: "Новичок", casual: "Любитель", intermediate: "Средний", advanced: "Продвинутый", grandmaster: "Гроссмейстер" }
+            : { beginner: "Beginner", casual: "Casual", intermediate: "Intermediate", advanced: "Advanced", grandmaster: "Grandmaster" };
+          return <button aria-checked={level === item} className={level === item ? "is-active" : undefined} key={item} onClick={() => changeLevel(item)} role="radio" type="button">{labels[item]}</button>;
+        })}
+      </div>
+    </div>
     <div className="chess-room__statusbar">
       <div aria-live="polite" className={`chess-room__status${thinking ? " is-thinking" : ""}`}>{status()}</div>
       <button aria-label={ru ? "Начать новую партию" : "Start a new game"} onClick={newGame} type="button">↻ <span>{ru ? "Заново" : "Restart"}</span></button>
@@ -198,7 +232,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       <aside className="chess-room__panel">
         <div className="chess-room__tip"><b>✣</b><p><strong>{ru ? "Подсказка Anham" : "Anham’s tip"}</strong>{ru ? "Нажмите на фигуру, затем на подсвеченное поле. Пешка на последней линии автоматически станет ферзём." : "Tap a piece, then a highlighted square. A pawn reaching the last rank is promoted to a queen."}</p></div>
         <div className="chess-room__actions"><button onClick={takeBack} type="button">↶ {ru ? "Вернуть ход" : "Take back"}</button><button onClick={newGame} type="button">＋ {ru ? "Новая партия" : "New game"}</button></div>
-        <p className="chess-room__saved">✓ {ru ? "Партия сохраняется на этом устройстве" : "Game saved on this device"}</p>
+        <p className="chess-room__saved">✓ {ru ? "Партия и уровень сохраняются в вашем аккаунте" : "Game and level are saved to your account"}</p>
       </aside>
     </div>
     <section className="chess-room__discussion" aria-labelledby="chess-discussion-title">
@@ -212,7 +246,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
         intro={ru ? "Я ваш шахматный наставник. Вижу текущую позицию и помню прошлые партии: объясню правила, помогу найти идею и разберу ошибки без готового ответа вместо вас." : "I am your chess coach. I can see the current position and remember past games: I will explain rules, help you find ideas, and review mistakes without simply playing for you."}
         locale={locale}
         placeholder={ru ? "Спросите Anham о партии…" : "Ask Anham about the game…"}
-        requestContext={{ fen, pgn: game.pgn() }}
+        requestContext={{ fen, pgn: game.pgn(), level }}
         suggestions={ru
           ? ["Научи меня находить хороший ход", "Какую ошибку я повторяю?", "Объясни план в этой позиции"]
           : ["Teach me how to find a good move", "What mistake do I keep repeating?", "Explain the plan in this position"]}
