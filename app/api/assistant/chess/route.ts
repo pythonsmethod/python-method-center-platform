@@ -21,14 +21,27 @@ function limited(userId: string) {
   return current.count > 20;
 }
 
-export async function POST(request: Request) {
+async function authenticated() {
   const supabase = await createSupabaseServerClient();
-  const { data: { user } } = supabase
-    ? await supabase.auth.getUser()
-    : { data: { user: null } };
+  if (!supabase) return null;
+  const { data: { user } } = await supabase.auth.getUser();
+  return user ? { supabase, user } : null;
+}
 
-  if (!user) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
-  if (limited(user.id)) {
+export async function GET() {
+  const auth = await authenticated();
+  if (!auth) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
+  const { data } = await auth.supabase.from("chess_conversations")
+    .select("role,content").eq("user_id", auth.user.id)
+    .order("created_at", { ascending: false }).limit(40);
+  const messages = (data ?? []).reverse().map((row) => ({ role: row.role, content: row.content }));
+  return NextResponse.json({ messages });
+}
+
+export async function POST(request: Request) {
+  const auth = await authenticated();
+  if (!auth) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
+  if (limited(auth.user.id)) {
     return NextResponse.json({ error: "Слишком много сообщений подряд. Подождите минуту." }, { status: 429 });
   }
 
@@ -59,12 +72,28 @@ export async function POST(request: Request) {
   }
 
   const english = payload.locale === "en";
-  const system = `You are Anham, a warm and precise chess partner. Discuss only the chess game shown below. The person plays White and Anham plays Black. Explain ideas clearly, name legal candidate moves in algebraic notation, and never invent pieces or moves that are absent from the position. Be concise unless the person asks for a deep analysis. Reply in ${english ? "English" : "Russian"} unless the person writes in another language.\n\nCURRENT POSITION (authoritative FEN):\n${position.fen()}\n\nVALIDATED GAME HISTORY:\n${pgn || "No validated move history is available; analyze the FEN only."}`;
+  const [{ data: pastGames }, { data: activeGame }] = await Promise.all([
+    auth.supabase.from("chess_games").select("pgn,result,status,updated_at")
+      .eq("user_id", auth.user.id).order("updated_at", { ascending: false }).limit(8),
+    auth.supabase.from("chess_games").select("id").eq("user_id", auth.user.id)
+      .eq("status", "active").maybeSingle()
+  ]);
+  const memory = (pastGames ?? []).map((game, index) =>
+    `${index + 1}. ${game.status}${game.result ? `, result ${game.result}` : ""}; PGN: ${game.pgn || "no moves"}`
+  ).join("\n");
+  const system = `You are Anham, a patient personal chess coach and playing partner. The person plays White and Anham plays Black. Teach the person how to think: explain rules when needed, ask guiding questions, identify recurring mistakes from remembered games, praise specific improvement, and adapt explanations to their apparent level. Do not merely give a move without explaining the idea. Name only legal candidate moves in algebraic notation and never invent pieces or moves absent from the authoritative position. Reply in ${english ? "English" : "Russian"} unless the person writes in another language.\n\nCURRENT POSITION (authoritative FEN):\n${position.fen()}\n\nCURRENT GAME HISTORY:\n${pgn || "No validated move history is available; analyze the FEN only."}\n\nPAST GAMES FOR COACHING MEMORY:\n${memory || "This is the first remembered game."}`;
   const result = await askAssistantTeam(system, messages, 1200, "best");
 
   if (result.status === "unavailable") {
     return NextResponse.json({ error: english ? "Anham is temporarily unavailable." : "Anham временно недоступен." }, { status: 503 });
   }
   if (result.status === "error") return NextResponse.json({ error: result.message }, { status: 502 });
+  const question = messages[messages.length - 1]?.content?.trim() ?? "";
+  if (question) {
+    await auth.supabase.from("chess_conversations").insert([
+      { game_id: activeGame?.id ?? null, user_id: auth.user.id, role: "user", content: question.slice(0, 8000), position_fen: position.fen() },
+      { game_id: activeGame?.id ?? null, user_id: auth.user.id, role: "assistant", content: result.reply.slice(0, 8000), position_fen: position.fen() }
+    ]);
+  }
   return NextResponse.json({ reply: result.reply });
 }

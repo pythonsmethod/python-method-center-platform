@@ -66,6 +66,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
   const [selected, setSelected] = useState<Square | null>(null);
   const [thinking, setThinking] = useState(false);
   const [ready, setReady] = useState(false);
+  const [remoteReady, setRemoteReady] = useState(preview);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(storageKey);
@@ -75,6 +76,39 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
     setReady(true);
   }, [storageKey]);
   useEffect(() => { if (ready) window.localStorage.setItem(storageKey, fen); }, [fen, ready, storageKey]);
+
+  useEffect(() => {
+    if (preview) return;
+    let cancelled = false;
+    void fetch("/api/chess/state")
+      .then((response) => response.ok ? response.json() : null)
+      .then((payload: { game?: { current_fen?: string; pgn?: string } | null } | null) => {
+        if (cancelled || !payload?.game) return;
+        try {
+          const restored = new Chess();
+          if (payload.game.pgn) restored.loadPgn(payload.game.pgn);
+          else if (payload.game.current_fen) restored.load(payload.game.current_fen);
+          gameRef.current = restored;
+          setFen(restored.fen());
+          setSelected(null);
+        } catch { /* Keep the valid device copy. */ }
+      })
+      .catch(() => undefined)
+      .finally(() => { if (!cancelled) setRemoteReady(true); });
+    return () => { cancelled = true; };
+  }, [preview]);
+
+  useEffect(() => {
+    if (!ready || !remoteReady || preview) return;
+    const timer = window.setTimeout(() => {
+      void fetch("/api/chess/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "save", fen, pgn: gameRef.current.pgn() })
+      });
+    }, 550);
+    return () => window.clearTimeout(timer);
+  }, [fen, preview, ready, remoteReady]);
 
   const game = gameRef.current;
   const targets = selected
@@ -118,6 +152,13 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
 
   function newGame() {
     game.reset(); setSelected(null); setThinking(false); setFen(game.fen());
+    if (!preview) {
+      void fetch("/api/chess/state", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "new", fen: game.fen(), pgn: "" })
+      });
+    }
   }
 
   function takeBack() {
@@ -167,13 +208,14 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       </div>
       <AssistantChat
         endpoint="/api/assistant/chess"
-        intro={ru ? "Я вижу текущую позицию. Спросите о последнем ходе, ошибке, угрозах или плане — разберём партию вместе." : "I can see the current position. Ask about the last move, a mistake, threats, or a plan — we can review the game together."}
+        historyEndpoint={preview ? undefined : "/api/assistant/chess"}
+        intro={ru ? "Я ваш шахматный наставник. Вижу текущую позицию и помню прошлые партии: объясню правила, помогу найти идею и разберу ошибки без готового ответа вместо вас." : "I am your chess coach. I can see the current position and remember past games: I will explain rules, help you find ideas, and review mistakes without simply playing for you."}
         locale={locale}
         placeholder={ru ? "Спросите Anham о партии…" : "Ask Anham about the game…"}
         requestContext={{ fen, pgn: game.pgn() }}
         suggestions={ru
-          ? ["Как ты оцениваешь позицию?", "Где я ошибся?", "Какой у меня лучший план?"]
-          : ["How do you assess the position?", "Where did I go wrong?", "What is my best plan?"]}
+          ? ["Научи меня находить хороший ход", "Какую ошибку я повторяю?", "Объясни план в этой позиции"]
+          : ["Teach me how to find a good move", "What mistake do I keep repeating?", "Explain the plan in this position"]}
       />
     </section>
   </section>;
