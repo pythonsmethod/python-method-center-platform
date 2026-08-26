@@ -2,15 +2,15 @@
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-export function validateEmail(email: string): string | null {
+export function validateEmail(email: string, locale: "ru" | "en" = "ru"): string | null {
   const trimmed = email.trim();
 
   if (!trimmed) {
-    return "Введите email.";
+    return locale === "ru" ? "Введите email." : "Enter your email.";
   }
 
   if (trimmed.length > 320 || !emailPattern.test(trimmed)) {
-    return "Введите корректный email.";
+    return locale === "ru" ? "Введите корректный email." : "Enter a valid email address.";
   }
 
   return null;
@@ -31,17 +31,17 @@ export function normalizePhone(phone: string): string {
   return raw.startsWith("+") ? `+${digits}` : digits;
 }
 
-export function validatePhone(phone: string): string | null {
+export function validatePhone(phone: string, locale: "ru" | "en" = "ru"): string | null {
   const digits = normalizePhone(phone).replace(/\D/g, "");
 
   if (!digits) {
-    return "Введите номер телефона — по нему с вами свяжется команда.";
+    return locale === "ru" ? "Введите номер телефона — по нему с вами свяжется команда." : "Enter a phone number so the team can contact you.";
   }
 
   // 7 digits is the shortest national number in use, 15 the international
   // maximum (E.164).
   if (digits.length < 7 || digits.length > 15) {
-    return "Проверьте номер телефона: он должен содержать от 7 до 15 цифр, вместе с кодом страны.";
+    return locale === "ru" ? "Проверьте номер телефона: он должен содержать от 7 до 15 цифр, вместе с кодом страны." : "Check the phone number: it must contain 7 to 15 digits including the country code.";
   }
 
   return null;
@@ -49,22 +49,23 @@ export function validatePhone(phone: string): string | null {
 
 export function validateNewPassword(
   password: string,
-  confirm: string
+  confirm: string,
+  locale: "ru" | "en" = "ru"
 ): string | null {
   if (!password || !confirm) {
-    return "Заполните оба поля пароля.";
+    return locale === "ru" ? "Заполните оба поля пароля." : "Complete both password fields.";
   }
 
   if (password.length < 6) {
-    return "Пароль должен быть не короче 6 символов.";
+    return locale === "ru" ? "Пароль должен быть не короче 6 символов." : "The password must be at least 6 characters.";
   }
 
   if (password.length > 72) {
-    return "Пароль должен быть короче 72 символов.";
+    return locale === "ru" ? "Пароль должен быть короче 72 символов." : "The password must be shorter than 72 characters.";
   }
 
   if (password !== confirm) {
-    return "Пароли не совпадают.";
+    return locale === "ru" ? "Пароли не совпадают." : "The passwords do not match.";
   }
 
   return null;

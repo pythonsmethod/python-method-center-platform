@@ -2,14 +2,7 @@ import { NextResponse } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { PENDING_EMAIL_COOKIE } from "@/lib/auth/pending-email";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-
-function sanitizeNextPath(value: string | null): string {
-  if (!value || !value.startsWith("/") || value.startsWith("//")) {
-    return "/cabinet";
-  }
-
-  return value;
-}
+import { sanitizeNextPath } from "@/lib/auth/safe-next-path";
 
 const OTP_TYPES: EmailOtpType[] = [
   "signup",

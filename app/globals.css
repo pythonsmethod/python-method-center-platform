@@ -26,6 +26,17 @@
   box-sizing: border-box;
 }
 
+h1,
+h2,
+h3 {
+  overflow-wrap: anywhere;
+}
+
+.anham-companion__welcome-close {
+  min-height: 32px;
+  min-width: 32px;
+}
+
 html,
 body {
   margin: 0;
@@ -2028,6 +2039,24 @@ code {
 }
 
 /* --- Case message thread (Karen <-> client) --- */
+
+.support-thread {
+  display: grid;
+  gap: 14px;
+  margin-top: 14px;
+}
+
+.support-thread__messages {
+  background: var(--surface-muted);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  display: grid;
+  gap: 10px;
+  max-height: 440px;
+  min-height: 100px;
+  overflow-y: auto;
+  padding: 12px;
+}
 
 .case-thread {
   display: grid;

@@ -8,7 +8,7 @@ import {
   emailExactMatchPattern,
   getStripe,
   normalizePayerEmail,
-  productFromAmount
+  resolveStripeProduct
 } from "@/lib/payments/stripe";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
@@ -241,7 +241,11 @@ async function handlePaidSession(
     profileId = byEmail?.id ?? null;
   }
 
-  const product = productFromAmount(amountCents, session.currency);
+  const product = resolveStripeProduct({
+    metadata: session.metadata,
+    amountCents,
+    currency: session.currency
+  });
 
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
@@ -301,7 +305,8 @@ async function handlePaidSession(
         source: "stripe_webhook",
         stripe_event_id: eventId,
         stripe_session_id: session.id,
-        customer_email: customerEmail
+        customer_email: customerEmail,
+        stripe_metadata: session.metadata
       }
     })
     .select("id")

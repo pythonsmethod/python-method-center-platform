@@ -15,6 +15,14 @@ export type ClientSupportRequest = {
   status: string;
   created_at: string;
   updated_at: string;
+  messages: SupportRequestMessage[];
+};
+
+export type SupportRequestMessage = {
+  id: string;
+  sender_role: string;
+  body: string;
+  created_at: string;
 };
 
 export const STAFF_ASSIGNABLE_SUPPORT_STATUSES = [

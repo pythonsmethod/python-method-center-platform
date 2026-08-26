@@ -59,6 +59,18 @@ export async function middleware(request: NextRequest) {
     .some((cookie) => cookie.name.startsWith("sb-"));
 
   if (!hasAuthCookie) {
+    const protectedPath = ["/cabinet", "/admin", "/onboarding"].some(
+      (prefix) => request.nextUrl.pathname === prefix || request.nextUrl.pathname.startsWith(`${prefix}/`)
+    );
+
+    if (protectedPath) {
+      const login = request.nextUrl.clone();
+      login.pathname = "/login";
+      login.search = "";
+      login.searchParams.set("next", `${request.nextUrl.pathname}${request.nextUrl.search}`);
+      return NextResponse.redirect(login);
+    }
+
     captureReferral(request, response);
     return response;
   }

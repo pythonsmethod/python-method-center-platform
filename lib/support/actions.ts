@@ -187,3 +187,165 @@ export async function updateSupportRequestStatus(
 
   return { status: "success", message: "Статус обновлён." };
 }
+
+export async function sendClientSupportMessage(
+  _previousState: StaffActionState,
+  formData: FormData
+): Promise<StaffActionState> {
+  const requestId = String(formData.get("requestId") ?? "");
+  const body = String(formData.get("body") ?? "").trim();
+  const locale = String(formData.get("locale") ?? "ru") === "en" ? "en" : "ru";
+
+  if (!isUuid(requestId) || !body || body.length > 8000) {
+    return errorState(
+      locale === "en"
+        ? "Enter a message of up to 8,000 characters."
+        : "Введите сообщение до 8000 символов."
+    );
+  }
+
+  const authClient = await createSupabaseServerClient();
+  const supabase = createSupabaseServiceClient();
+  if (!authClient || !supabase) {
+    return errorState(
+      locale === "en" ? "The service is temporarily unavailable." : SERVICE_UNAVAILABLE_MESSAGE
+    );
+  }
+
+  const { data: { user } } = await authClient.auth.getUser();
+  if (!user) {
+    return errorState(locale === "en" ? "Sign in to send a message." : "Войдите, чтобы отправить сообщение.");
+  }
+
+  const { data: request } = await supabase
+    .from("support_requests")
+    .select("id, profile_id, case_id, subject")
+    .eq("id", requestId)
+    .eq("profile_id", user.id)
+    .maybeSingle();
+
+  if (!request) {
+    return errorState(locale === "en" ? "Request not found." : "Обращение не найдено.");
+  }
+
+  const { data: message, error } = await supabase
+    .from("support_request_messages")
+    .insert({
+      support_request_id: request.id,
+      profile_id: user.id,
+      sender_id: user.id,
+      sender_role: "client",
+      body
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    return errorState(error.message);
+  }
+
+  await Promise.all([
+    supabase
+      .from("support_requests")
+      .update({ status: "in_progress" })
+      .eq("id", request.id),
+    notifyTeam({
+      kind: "support_request",
+      dedupeKey: `support_message:${message.id}`,
+      title: "💬 Новый ответ клиента в обращении",
+      lines: [
+        `Клиент: ${user.email ?? user.id}`,
+        `Тема: ${request.subject.slice(0, 120)}`,
+        "Откройте обращение, чтобы прочитать и ответить."
+      ],
+      link: adminLink(`/admin/requests#request-${request.id}`)
+    }),
+    writeAuditLog({
+      profileId: user.id,
+      caseId: request.case_id,
+      actorId: user.id,
+      actorRole: "client",
+      action: "support_message_created",
+      entityTable: "support_request_messages",
+      entityId: message.id
+    })
+  ]);
+
+  revalidatePath("/cabinet/chat");
+  revalidatePath("/admin/requests");
+  return {
+    status: "success",
+    message: locale === "en" ? "Message sent." : "Сообщение отправлено."
+  };
+}
+
+export async function sendStaffSupportMessage(
+  _previousState: StaffActionState,
+  formData: FormData
+): Promise<StaffActionState> {
+  const requestId = String(formData.get("requestId") ?? "");
+  const body = String(formData.get("body") ?? "").trim();
+
+  if (!isUuid(requestId) || !body || body.length > 8000) {
+    return errorState("Введите сообщение до 8000 символов.");
+  }
+
+  const auth = await getStaffUserState();
+  if (auth.status !== "authorized") {
+    return errorState("Нет доступа.");
+  }
+
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) {
+    return errorState("Service role key не настроен.");
+  }
+
+  const { data: request } = await supabase
+    .from("support_requests")
+    .select("id, profile_id, case_id")
+    .eq("id", requestId)
+    .maybeSingle();
+
+  if (!request) {
+    return errorState("Обращение не найдено.");
+  }
+  if (!request.profile_id) {
+    return errorState("Это обращение гостя. Ответьте по указанному email.");
+  }
+
+  const { data: message, error } = await supabase
+    .from("support_request_messages")
+    .insert({
+      support_request_id: request.id,
+      profile_id: request.profile_id,
+      sender_id: auth.userId,
+      sender_role: auth.role,
+      body
+    })
+    .select("id")
+    .single();
+
+  if (error) {
+    return errorState(error.message);
+  }
+
+  await Promise.all([
+    supabase
+      .from("support_requests")
+      .update({ status: "waiting_on_client" })
+      .eq("id", request.id),
+    writeAuditLog({
+      profileId: request.profile_id,
+      caseId: request.case_id,
+      actorId: auth.userId,
+      actorRole: auth.role,
+      action: "support_message_created",
+      entityTable: "support_request_messages",
+      entityId: message.id
+    })
+  ]);
+
+  revalidatePath("/admin/requests");
+  revalidatePath("/cabinet/chat");
+  return { status: "success", message: "Ответ сохранён и отправлен клиенту в кабинет." };
+}

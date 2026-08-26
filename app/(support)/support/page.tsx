@@ -28,6 +28,7 @@ export default async function SupportPage() {
           <h2>{t.guestTitle}</h2>
           <p>{t.guestText}</p>
           <PublicSupportForm
+            locale={locale}
             labels={{
               email: t.formEmail,
               category: t.formCategory,

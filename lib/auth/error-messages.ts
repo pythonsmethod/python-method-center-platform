@@ -23,7 +23,7 @@ export type AuthErrorInfo = {
   message: string;
 };
 
-const MESSAGES: Record<AuthErrorCode, string> = {
+const MESSAGES_RU: Record<AuthErrorCode, string> = {
   invalid_credentials:
     "Email или пароль не подходят. Проверьте раскладку клавиатуры и лишние пробелы. Если пароль не вспоминается — нажмите «Забыли пароль?» и задайте новый.",
   email_not_confirmed:
@@ -48,6 +48,19 @@ const MESSAGES: Record<AuthErrorCode, string> = {
     "Не получилось. Попробуйте ещё раз, а если ошибка повторяется — напишите команде."
 };
 
+const MESSAGES_EN: Record<AuthErrorCode, string> = {
+  invalid_credentials: "The email or password is incorrect. Check for typing errors, or use ‘Forgot password?’ to set a new password.",
+  email_not_confirmed: "Your account exists, but the email is not confirmed yet. Open the link in the email or resend it below.",
+  already_registered: "This email is already registered. Switch to Sign in, or use ‘Forgot password?’ to set a new password.",
+  rate_limited: "Too many attempts. Wait a minute and try again.",
+  weak_password: "The password must be at least 6 characters.",
+  invalid_email: "Check that the email address is written correctly.",
+  signup_disabled: "Registration is currently closed. Contact the team and we will help you.",
+  email_send_failed: "The account was not created because the confirmation email could not be sent. Contact the team and we will help you.",
+  server_error: "Something went wrong on our side. Try again in a minute, and contact the team if it continues.",
+  unknown: "It did not work. Try again, and contact the team if the error continues."
+};
+
 // Order matters: the first pattern that matches wins, so the narrow cases
 // ("email not confirmed") are listed before the broad ones.
 const PATTERNS: Array<[RegExp, AuthErrorCode]> = [
@@ -66,18 +79,19 @@ const PATTERNS: Array<[RegExp, AuthErrorCode]> = [
   [/database error|unexpected_failure|internal (server )?error/i, "server_error"]
 ];
 
-export function translateAuthError(rawMessage: string): AuthErrorInfo {
+export function translateAuthError(rawMessage: string, locale: "ru" | "en" = "ru"): AuthErrorInfo {
   const raw = String(rawMessage ?? "");
+  const messages = locale === "en" ? MESSAGES_EN : MESSAGES_RU;
 
   for (const [pattern, code] of PATTERNS) {
     if (pattern.test(raw)) {
-      return { code, message: MESSAGES[code] };
+      return { code, message: messages[code] };
     }
   }
 
-  return { code: "unknown", message: MESSAGES.unknown };
+  return { code: "unknown", message: messages.unknown };
 }
 
-export function authErrorMessage(code: AuthErrorCode): string {
-  return MESSAGES[code];
+export function authErrorMessage(code: AuthErrorCode, locale: "ru" | "en" = "ru"): string {
+  return (locale === "en" ? MESSAGES_EN : MESSAGES_RU)[code];
 }

@@ -19,6 +19,7 @@ import {
 } from "@/lib/auth/error-messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import { sanitizeNextPath } from "@/lib/auth/safe-next-path";
 import { resolveStaffLandingPath } from "@/lib/auth/staff-landing";
 
 function errorState(message: string, code?: AuthErrorCode): AuthActionState {
@@ -35,16 +36,6 @@ function readCredentials(formData: FormData) {
   const password = String(formData.get("password") ?? "");
 
   return { email, password };
-}
-
-function sanitizeNextPath(value: FormDataEntryValue | null): string {
-  const nextPath = String(value ?? "/cabinet");
-
-  if (!nextPath.startsWith("/") || nextPath.startsWith("//")) {
-    return "/cabinet";
-  }
-
-  return nextPath;
 }
 
 async function getEmailRedirectTo(nextPath?: string): Promise<string> {
@@ -91,6 +82,7 @@ export async function signInWithPassword(
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -100,7 +92,7 @@ export async function signInWithPassword(
   const { email, password } = readCredentials(formData);
 
   if (!email || !password) {
-    return errorState("Введите email и пароль.");
+    return errorState(locale === "ru" ? "Введите email и пароль." : "Enter your email and password.");
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({
@@ -109,7 +101,7 @@ export async function signInWithPassword(
   });
 
   if (error) {
-    const { code, message } = translateAuthError(error.message);
+    const { code, message } = translateAuthError(error.message, locale);
 
     return errorState(message, code);
   }
@@ -140,6 +132,7 @@ export async function signUpWithPassword(
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -150,10 +143,10 @@ export async function signUpWithPassword(
   const nextPath = sanitizeNextPath(formData.get("next"));
 
   if (!email || !password) {
-    return errorState("Введите email и пароль.");
+    return errorState(locale === "ru" ? "Введите email и пароль." : "Enter your email and password.");
   }
 
-  const emailError = validateEmail(email);
+  const emailError = validateEmail(email, locale);
 
   if (emailError) {
     return errorState(emailError);
@@ -164,14 +157,15 @@ export async function signUpWithPassword(
   // then reads "Invalid login credentials" and thinks the site is broken.
   const passwordError = validateNewPassword(
     password,
-    String(formData.get("confirm") ?? "")
+    String(formData.get("confirm") ?? ""),
+    locale
   );
 
   if (passwordError) {
     return errorState(passwordError);
   }
 
-  const phoneError = validatePhone(String(formData.get("phone") ?? ""));
+  const phoneError = validatePhone(String(formData.get("phone") ?? ""), locale);
 
   if (phoneError) {
     return errorState(phoneError);
@@ -192,7 +186,7 @@ export async function signUpWithPassword(
   });
 
   if (error) {
-    const { code, message } = translateAuthError(error.message);
+    const { code, message } = translateAuthError(error.message, locale);
 
     return errorState(message, code);
   }
@@ -202,7 +196,7 @@ export async function signUpWithPassword(
   // was just typed is not saved anywhere. Left unsaid, the person leaves the
   // form believing the account now has their new password.
   if (data.user && (data.user.identities?.length ?? 0) === 0) {
-    const { message } = translateAuthError("User already registered");
+    const { message } = translateAuthError("User already registered", locale);
 
     return errorState(message, "already_registered");
   }
@@ -260,6 +254,7 @@ export async function resendConfirmationEmail(
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -269,7 +264,7 @@ export async function resendConfirmationEmail(
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
-  const emailError = validateEmail(email);
+  const emailError = validateEmail(email, locale);
 
   if (emailError) {
     return errorState(emailError);
@@ -284,7 +279,7 @@ export async function resendConfirmationEmail(
   });
 
   if (error) {
-    const { code, message } = translateAuthError(error.message);
+    const { code, message } = translateAuthError(error.message, locale);
 
     return errorState(message, code);
   }
@@ -304,6 +299,7 @@ export async function requestPasswordReset(
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -313,7 +309,7 @@ export async function requestPasswordReset(
   const email = String(formData.get("email") ?? "")
     .trim()
     .toLowerCase();
-  const validationError = validateEmail(email);
+  const validationError = validateEmail(email, locale);
 
   if (validationError) {
     return errorState(validationError);
@@ -333,14 +329,15 @@ export async function requestPasswordReset(
   // way, so the form can't be used to probe which emails are registered.
   if (error && /rate|limit/i.test(error.message)) {
     return errorState(
-      "Слишком много запросов подряд. Подождите минуту и попробуйте ещё раз."
+      locale === "ru" ? "Слишком много запросов подряд. Подождите минуту и попробуйте ещё раз." : "Too many requests. Wait a minute and try again."
     );
   }
 
   return {
     status: "success",
-    message:
-      "Если такой аккаунт существует, мы отправили на этот email письмо со ссылкой для смены пароля. Проверьте почту (и папку «Спам»)."
+    message: locale === "ru"
+      ? "Если такой аккаунт существует, мы отправили на этот email письмо со ссылкой для смены пароля. Проверьте почту (и папку «Спам»)."
+      : "If an account exists for this email, we sent a password-reset link. Check your inbox and spam folder."
   };
 }
 
@@ -350,6 +347,7 @@ export async function updatePassword(
   _previousState: AuthActionState,
   formData: FormData
 ): Promise<AuthActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -358,7 +356,7 @@ export async function updatePassword(
 
   const password = String(formData.get("password") ?? "");
   const confirm = String(formData.get("confirm") ?? "");
-  const validationError = validateNewPassword(password, confirm);
+  const validationError = validateNewPassword(password, confirm, locale);
 
   if (validationError) {
     return errorState(validationError);
@@ -370,7 +368,7 @@ export async function updatePassword(
 
   if (!user) {
     return errorState(
-      "Ссылка для смены пароля недействительна или устарела. Запросите новую на странице «Забыли пароль?»."
+      locale === "ru" ? "Ссылка для смены пароля недействительна или устарела. Запросите новую на странице «Забыли пароль?»." : "This password-reset link is invalid or expired. Request a new link from ‘Forgot password?’."
     );
   }
 
@@ -378,17 +376,17 @@ export async function updatePassword(
 
   if (error) {
     if (/same password|different from the old/i.test(error.message)) {
-      return errorState("Новый пароль совпадает со старым — придумайте другой.");
+      return errorState(locale === "ru" ? "Новый пароль совпадает со старым — придумайте другой." : "The new password matches the old one. Choose a different password.");
     }
 
     return errorState(
-      "Не удалось обновить пароль. Запросите новую ссылку и попробуйте ещё раз."
+      locale === "ru" ? "Не удалось обновить пароль. Запросите новую ссылку и попробуйте ещё раз." : "The password could not be updated. Request a new link and try again."
     );
   }
 
   return {
     status: "success",
-    message: "Пароль обновлён. Теперь можно перейти в кабинет."
+    message: locale === "ru" ? "Пароль обновлён. Теперь можно перейти в кабинет." : "Your password has been updated. You can now open your cabinet."
   };
 }
 

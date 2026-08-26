@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { usePathname } from "next/navigation";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { ANHAM_OPEN_EVENT, type AnhamOpenDetail } from "@/components/assistant/AnhamOpenButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
@@ -33,6 +34,7 @@ export function AssistantWidget({
   tier = "guest"
 }: AssistantWidgetProps) {
   const t = getDictionary(locale).widget;
+  const pathname = usePathname();
   const tierCopy = tier === "guest" ? null : t.tiers[tier];
   const header = tierCopy?.header ?? t.header;
   const intro = tierCopy?.intro ?? t.intro;
@@ -50,7 +52,12 @@ export function AssistantWidget({
   // on their own or being guided by Анхам. Shown once per browser.
   useEffect(() => {
     // The first-visit greeting belongs to the public consultant only.
-    if (tier !== "guest") {
+    if (
+      tier !== "guest" ||
+      ["/login", "/recovery", "/reset-password", "/support", "/onboarding", "/payment"].some(
+        (route) => pathname === route || pathname.startsWith(`${route}/`)
+      )
+    ) {
       return;
     }
 
@@ -69,7 +76,7 @@ export function AssistantWidget({
         clearTimeout(welcomeTimer.current);
       }
     };
-  }, [tier]);
+  }, [pathname, tier]);
 
   // Anything on the page can ask him to open: the hero buttons, a card, the
   // closing call. They were sending people to the support page instead,

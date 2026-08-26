@@ -11,6 +11,7 @@ import { formatDateTime } from "@/lib/i18n/format";
 import { supportStatusLabel } from "@/lib/i18n/status-labels";
 import { getOwnSupportRequests } from "@/lib/support/queries";
 import { SupportRequestForm } from "../SupportRequestForm";
+import { SupportRequestThread } from "@/components/support/SupportRequestThread";
 
 export const dynamic = "force-dynamic";
 
@@ -113,7 +114,13 @@ export default async function CabinetChatPage() {
                         {supportStatusLabel(request.status, locale)}
                       </span>
                     </div>
-                    {request.body ? <p>{request.body}</p> : null}
+                    <SupportRequestThread
+                      labels={t.supportThread}
+                      locale={locale}
+                      messages={request.messages}
+                      requestId={request.id}
+                      viewer="client"
+                    />
                   </li>
                 ))}
               </ul>

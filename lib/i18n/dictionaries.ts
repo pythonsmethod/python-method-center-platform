@@ -82,7 +82,17 @@ const ru = {
       requestText: "Технические вопросы, оплата, доступ — всё, что не про ваш кейс.",
       requestsLabel: "Ваши обращения",
       requestsTitle: "История обращений",
-      requestsEmpty: "Обращений пока нет. Напишите нам, если что-то не работает."
+      requestsEmpty: "Обращений пока нет. Напишите нам, если что-то не работает.",
+      supportThread: {
+        you: "Вы",
+        client: "Клиент",
+        team: "Команда центра",
+        reply: "Продолжить переписку",
+        placeholder: "Напишите следующий вопрос или ответ…",
+        send: "Отправить",
+        sending: "Отправка…",
+        empty: "Переписка пока пуста."
+      }
     },
     profileForm: {
       name: "Имя и фамилия",
@@ -1288,7 +1298,17 @@ const en: typeof ru = {
       requestText: "Technical questions, payment, access — anything that is not about your case.",
       requestsLabel: "Your requests",
       requestsTitle: "Request history",
-      requestsEmpty: "No requests yet. Write to us if something is not working."
+      requestsEmpty: "No requests yet. Write to us if something is not working.",
+      supportThread: {
+        you: "You",
+        client: "Client",
+        team: "The center's team",
+        reply: "Continue the conversation",
+        placeholder: "Write your next question or reply…",
+        send: "Send",
+        sending: "Sending…",
+        empty: "The conversation is empty."
+      }
     },
     profileForm: {
       name: "First and last name",
