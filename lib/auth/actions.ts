@@ -19,6 +19,7 @@ import {
 } from "@/lib/auth/error-messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import { resolveStaffLandingPath } from "@/lib/auth/staff-landing";
 
 function errorState(message: string, code?: AuthErrorCode): AuthActionState {
   return { status: "error", message, code };
@@ -122,13 +123,14 @@ export async function signInWithPassword(
   if (nextPath === "/cabinet" && data.user) {
     const { data: profile } = await supabase
       .from("profiles")
-      .select("role")
+      .select("email, role")
       .eq("id", data.user.id)
       .maybeSingle();
 
-    if (profile?.role === "admin" || profile?.role === "support") {
-      nextPath = "/admin";
-    }
+    nextPath = resolveStaffLandingPath(
+      profile?.role,
+      profile?.email ?? data.user.email
+    ) ?? nextPath;
   }
 
   redirect(nextPath);
