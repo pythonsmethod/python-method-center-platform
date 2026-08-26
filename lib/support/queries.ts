@@ -1,4 +1,7 @@
-import type { ClientSupportRequest } from "@/lib/support/types";
+import type {
+  ClientSupportRequest,
+  SupportRequestMessage
+} from "@/lib/support/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
@@ -36,9 +39,34 @@ export async function getOwnSupportRequests(
     return { status: "error", message: error.message };
   }
 
+  const requests = (data ?? []) as Omit<ClientSupportRequest, "messages">[];
+  const requestIds = requests.map((request) => request.id);
+  const { data: messageRows, error: messagesError } = requestIds.length
+    ? await supabase
+        .from("support_request_messages")
+        .select("id, support_request_id, sender_role, body, created_at")
+        .in("support_request_id", requestIds)
+        .order("created_at", { ascending: true })
+        .limit(1000)
+    : { data: [], error: null };
+
+  if (messagesError) {
+    return { status: "error", message: messagesError.message };
+  }
+
+  const messagesByRequest = new Map<string, SupportRequestMessage[]>();
+  for (const row of messageRows ?? []) {
+    const list = messagesByRequest.get(row.support_request_id) ?? [];
+    list.push(row as SupportRequestMessage & { support_request_id: string });
+    messagesByRequest.set(row.support_request_id, list);
+  }
+
   return {
     status: "ready",
-    requests: (data ?? []) as ClientSupportRequest[]
+    requests: requests.map((request) => ({
+      ...request,
+      messages: messagesByRequest.get(request.id) ?? []
+    }))
   };
 }
 
@@ -56,6 +84,7 @@ export type StaffSupportRequestItem = {
     full_name: string | null;
     phone: string | null;
   } | null;
+  messages: SupportRequestMessage[];
 };
 
 export type StaffSupportRequestsResult =
@@ -91,8 +120,36 @@ export async function getStaffSupportRequests(): Promise<StaffSupportRequestsRes
     return { status: "error", message: error.message };
   }
 
+  const requests = (data ?? []) as unknown as Omit<
+    StaffSupportRequestItem,
+    "messages"
+  >[];
+  const requestIds = requests.map((request) => request.id);
+  const { data: messageRows, error: messagesError } = requestIds.length
+    ? await supabase
+        .from("support_request_messages")
+        .select("id, support_request_id, sender_role, body, created_at")
+        .in("support_request_id", requestIds)
+        .order("created_at", { ascending: true })
+        .limit(5000)
+    : { data: [], error: null };
+
+  if (messagesError) {
+    return { status: "error", message: messagesError.message };
+  }
+
+  const messagesByRequest = new Map<string, SupportRequestMessage[]>();
+  for (const row of messageRows ?? []) {
+    const list = messagesByRequest.get(row.support_request_id) ?? [];
+    list.push(row as SupportRequestMessage & { support_request_id: string });
+    messagesByRequest.set(row.support_request_id, list);
+  }
+
   return {
     status: "ready",
-    requests: (data ?? []) as unknown as StaffSupportRequestItem[]
+    requests: requests.map((request) => ({
+      ...request,
+      messages: messagesByRequest.get(request.id) ?? []
+    }))
   };
 }

@@ -61,6 +61,7 @@ type AuthFormProps = {
   // Which tab opens first. The header has separate "Вход" and
   // "Регистрация" entries, and the second must not land on the login form.
   initialMode?: AuthMode;
+  locale?: "ru" | "en";
 };
 
 function messageClassName(state: AuthActionState): string {
@@ -71,7 +72,8 @@ export function AuthForm({
   nextPath,
   supabaseConfigured,
   labels = defaultLabels,
-  initialMode = "login"
+  initialMode = "login",
+  locale = "ru"
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   // Every field is held here, not left to the browser. React empties an
@@ -145,6 +147,7 @@ export function AuthForm({
         className="auth-form"
       >
         <input name="next" type="hidden" value={nextPath} />
+        <input name="locale" type="hidden" value={locale} />
         <label className="field">
           <span>{labels.email}</span>
           <input
@@ -238,6 +241,7 @@ export function AuthForm({
         {activeState.message ? (
           <p
             aria-live="polite"
+            role={activeState.status === "error" ? "alert" : "status"}
             className={messageClassName(activeState)}
             ref={messageRef}
           >

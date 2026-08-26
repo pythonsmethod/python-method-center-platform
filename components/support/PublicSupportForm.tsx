@@ -17,7 +17,7 @@ type PublicSupportFormLabels = {
   submitting: string;
 };
 
-export function PublicSupportForm({ labels }: { labels: PublicSupportFormLabels }) {
+export function PublicSupportForm({ labels, locale }: { labels: PublicSupportFormLabels; locale: "ru" | "en" }) {
   const [state, action, pending] = useActionState(
     submitPublicSupportRequest,
     initialSupportRequestActionState
@@ -29,6 +29,7 @@ export function PublicSupportForm({ labels }: { labels: PublicSupportFormLabels 
 
   return (
     <form action={action} className="auth-form">
+      <input name="locale" type="hidden" value={locale} />
       {/* Honeypot: humans never see it, bots fill it. */}
       <input
         aria-hidden="true"
@@ -63,7 +64,7 @@ export function PublicSupportForm({ labels }: { labels: PublicSupportFormLabels 
         {pending ? labels.submitting : labels.submit}
       </button>
       {state.status === "error" ? (
-        <p className="form-message form-message--error">{state.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
       ) : null}
     </form>
   );

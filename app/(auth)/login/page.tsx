@@ -8,6 +8,7 @@ import { getLocale } from "@/lib/i18n/locale";
 import { AuthForm } from "./AuthForm";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { sanitizeNextPath } from "@/lib/auth/safe-next-path";
 
 import Link from "next/link";
 
@@ -28,16 +29,6 @@ export const metadata: Metadata = {
 
 function readParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
-}
-
-function sanitizeNextPath(value: string | string[] | undefined): string {
-  const nextPath = Array.isArray(value) ? value[0] : value;
-
-  if (!nextPath || !nextPath.startsWith("/") || nextPath.startsWith("//")) {
-    return "/cabinet";
-  }
-
-  return nextPath;
 }
 
 export default async function LoginPage({ searchParams }: LoginPageProps) {
@@ -103,6 +94,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           ) : null}
 
           <AuthForm
+            locale={locale}
             labels={{
               tabLogin: t.tabLogin,
               tabSignup: t.tabSignup,

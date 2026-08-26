@@ -72,6 +72,26 @@ export function productFromAmount(
   return null;
 }
 
+export function productFromMetadata(
+  metadata: Record<string, string> | null | undefined
+): PaymentProduct | null {
+  const value = metadata?.product ?? metadata?.plan ?? metadata?.payment_product;
+  if (value === "support_5_weeks") return value;
+  if (value === "support_15_weeks" || value === "support_100_days") {
+    return "support_15_weeks";
+  }
+  return null;
+}
+
+export function resolveStripeProduct(input: {
+  metadata?: Record<string, string> | null;
+  amountCents?: number | null;
+  currency?: string | null;
+}): PaymentProduct | null {
+  return productFromMetadata(input.metadata) ??
+    productFromAmount(input.amountCents, input.currency);
+}
+
 export function servicePeriodEnd(
   product: ServicePeriodProduct,
   startsAt: Date

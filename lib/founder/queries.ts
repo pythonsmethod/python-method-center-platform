@@ -219,6 +219,36 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     }
   );
 
+  const [readyForReview, failedDocuments, expiredActivePeriods, unmatchedPayments] = await Promise.all([
+    countRows(supabase, "client_cases", { type: "eq", column: "status", value: "ready_for_review" }),
+    countRows(supabase, "uploaded_documents", { type: "eq", column: "document_status", value: "failed" }),
+    supabase.from("service_periods").select("id", { count: "exact", head: true }).eq("status", "active").lte("ends_at", new Date().toISOString()),
+    supabase.from("notification_events").select("id", { count: "exact", head: true }).eq("kind", "payment").like("dedupe_key", "payment_unmatched:%")
+  ]);
+
+  systems.push(
+    {
+      name: "Кейсы готовы к разбору",
+      ok: readyForReview === 0,
+      detail: readyForReview === 0 ? "Очередь пуста" : `${readyForReview} кейсов требуют проверки и перевода на следующий этап`
+    },
+    {
+      name: "Очередь обработки документов",
+      ok: failedDocuments === 0,
+      detail: failedDocuments === 0 ? "Ошибок обработки нет" : `${failedDocuments} документов завершились ошибкой — требуется повтор`
+    },
+    {
+      name: "Истёкшие активные периоды",
+      ok: (expiredActivePeriods.count ?? 0) === 0,
+      detail: `${expiredActivePeriods.count ?? 0} периодов имеют active после ends_at`
+    },
+    {
+      name: "Непривязанные платежи Stripe",
+      ok: (unmatchedPayments.count ?? 0) === 0,
+      detail: `${unmatchedPayments.count ?? 0} платежей требуют ручной проверки`
+    }
+  );
+
   const since7d = daysAgo(7);
   const since30d = daysAgo(30);
 

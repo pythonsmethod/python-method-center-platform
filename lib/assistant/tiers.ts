@@ -74,10 +74,11 @@ export async function resolveAssistantTierForUi(): Promise<AssistantTier> {
     }
 
     const { data } = await supabase
-      .from("payments")
+      .from("service_periods")
       .select("product")
       .eq("profile_id", user.id)
-      .eq("status", "paid")
+      .eq("status", "active")
+      .gt("ends_at", new Date().toISOString())
       .in("product", ["support_5_weeks", "support_15_weeks"])
       .limit(1);
 
@@ -128,23 +129,24 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
       };
     }
 
-    const [caseResult, paymentsResult] = await Promise.all([
+    const [caseResult, periodsResult] = await Promise.all([
       supabase
         .from("client_cases")
         .select("id, case_number, status, direction, created_at")
         .eq("profile_id", user.id)
         .maybeSingle(),
       supabase
-        .from("payments")
-        .select("product, status, paid_at")
+        .from("service_periods")
+        .select("product, status, starts_at, ends_at")
         .eq("profile_id", user.id)
-        .eq("status", "paid")
-        .order("paid_at", { ascending: false })
+        .eq("status", "active")
+        .gt("ends_at", new Date().toISOString())
+        .order("ends_at", { ascending: false })
     ]);
 
     const caseRow = caseResult.data;
-    const paidPayments = paymentsResult.data ?? [];
-    const supportPayments = paidPayments.filter((row) =>
+    const activePeriods = periodsResult.data ?? [];
+    const supportPayments = activePeriods.filter((row) =>
       isPaidSupportProduct(row.product)
     );
     const hasPaidSupport = supportPayments.length > 0;

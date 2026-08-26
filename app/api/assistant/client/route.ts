@@ -133,7 +133,8 @@ export async function POST(request: Request) {
   const guard = await guardAssistantRequest({
     tier: audience.tier,
     profileId: audience.profileId,
-    ip
+    ip,
+    locale: (body as { locale?: unknown })?.locale === "en" ? "en" : "ru"
   });
 
   if (!guard.allowed) {

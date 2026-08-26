@@ -1,6 +1,8 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { writeAuditLog } from "@/lib/audit/log";
+import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
@@ -89,6 +91,7 @@ export async function sendStaffCaseMessage(
 ): Promise<StaffActionState> {
   const caseId = String(formData.get("caseId") ?? "");
   const body = String(formData.get("body") ?? "").trim();
+  let successMessage = "Сообщение отправлено клиенту.";
 
   if (!isUuid(caseId)) {
     return errorState("Некорректный идентификатор кейса.");
@@ -112,7 +115,7 @@ export async function sendStaffCaseMessage(
 
   const { data: caseRow } = await supabase
     .from("client_cases")
-    .select("id, profile_id")
+    .select("id, profile_id, status")
     .eq("id", caseId)
     .maybeSingle();
 
@@ -132,7 +135,57 @@ export async function sendStaffCaseMessage(
     return errorState(`Не удалось отправить: ${error.message}`);
   }
 
-  revalidatePath(`/admin/cases/${caseId}`);
+  // The first real staff reply means the submitted case is now being
+  // actively reviewed. The status predicate makes this transition
+  // concurrency-safe and prevents later lifecycle states from moving back.
+  if (caseRow.status === "ready_for_review") {
+    const { data: transitionedCase, error: transitionError } = await supabase
+      .from("client_cases")
+      .update({ status: "in_review" })
+      .eq("id", caseRow.id)
+      .eq("status", "ready_for_review")
+      .select("id")
+      .maybeSingle();
 
-  return { status: "success", message: "Сообщение отправлено клиенту." };
+    if (transitionError) {
+      successMessage =
+        "Сообщение отправлено клиенту, но статус кейса не обновился автоматически. Обновите его вручную.";
+    }
+
+    if (transitionedCase) {
+      await Promise.all([
+        writeAuditLog({
+          profileId: caseRow.profile_id,
+          caseId: caseRow.id,
+          actorId: auth.userId,
+          actorRole: auth.role,
+          action: "case_state_updated",
+          entityTable: "client_cases",
+          entityId: caseRow.id,
+          metadata: {
+            from_status: "ready_for_review",
+            to_status: "in_review",
+            trigger: "first_staff_reply"
+          }
+        }),
+        writeLifecycleEvent({
+          profileId: caseRow.profile_id,
+          caseId: caseRow.id,
+          eventType: "status_changed",
+          fromStatus: "ready_for_review",
+          toStatus: "in_review",
+          actorId: auth.userId,
+          actorRole: auth.role,
+          metadata: { trigger: "first_staff_reply" }
+        })
+      ]);
+    }
+  }
+
+  revalidatePath(`/admin/cases/${caseId}`);
+  revalidatePath("/admin/cases");
+  revalidatePath("/admin");
+  revalidatePath("/cabinet");
+
+  return { status: "success", message: successMessage };
 }

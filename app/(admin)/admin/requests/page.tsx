@@ -7,6 +7,18 @@ import { formatDateTime } from "@/lib/i18n/format";
 import { supportStatusLabel } from "@/lib/i18n/status-labels";
 import { getStaffSupportRequests } from "@/lib/support/queries";
 import { RequestStatusButtons } from "./RequestStatusButtons";
+import { SupportRequestThread } from "@/components/support/SupportRequestThread";
+
+const staffThreadLabels = {
+  you: "Вы",
+  client: "Клиент",
+  team: "Команда центра",
+  reply: "Ответ клиенту",
+  placeholder: "Напишите ответ — он сохранится в переписке клиента…",
+  send: "Отправить ответ",
+  sending: "Отправка…",
+  empty: "Переписка пока пуста."
+};
 
 export default async function StaffSupportRequestsPage() {
   const auth = await getRequiredStaffUser("/admin/requests");
@@ -69,7 +81,7 @@ export default async function StaffSupportRequestsPage() {
         ) : (
           <ul className="document-list">
             {requestsResult.requests.map((request) => (
-              <li className="document-list__item" key={request.id}>
+              <li className="document-list__item" id={`request-${request.id}`} key={request.id}>
                 <div>
                   <strong>{request.subject}</strong>
                   <span>{formatDateTime(request.created_at)}</span>
@@ -77,7 +89,6 @@ export default async function StaffSupportRequestsPage() {
                     {supportStatusLabel(request.status)}
                   </span>
                 </div>
-                {request.body ? <p>{request.body}</p> : null}
                 <dl>
                   <div>
                     <dt>Клиент</dt>
@@ -108,7 +119,30 @@ export default async function StaffSupportRequestsPage() {
                       )}
                     </dd>
                   </div>
+                  <div>
+                    <dt>Кому поступило</dt>
+                    <dd>Служба поддержки</dd>
+                  </div>
                 </dl>
+                {request.profile_id ? (
+                  <SupportRequestThread
+                    labels={staffThreadLabels}
+                    locale="ru"
+                    messages={request.messages}
+                    requestId={request.id}
+                    viewer="staff"
+                  />
+                ) : (
+                  <div className="notice notice--warning">
+                    <strong>Гость без личного кабинета</strong>
+                    <p>Ответьте по email — переписка на сайте гостю недоступна.</p>
+                    {request.contact_email ? (
+                      <a className="button button--secondary button--compact" href={`mailto:${request.contact_email}`}>
+                        Ответить по email
+                      </a>
+                    ) : null}
+                  </div>
+                )}
                 <RequestStatusButtons
                   currentStatus={request.status}
                   requestId={request.id}

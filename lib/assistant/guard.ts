@@ -134,8 +134,16 @@ export async function guardAssistantRequest(input: {
   tier: AssistantTier;
   profileId: string | null;
   ip: string;
+  locale?: "ru" | "en";
 }): Promise<GuardDecision> {
   const mode = getPublicAssistantMode();
+  const en = input.locale === "en";
+  const registerInvite = en
+    ? "I enjoyed talking with you. More personal guidance is available in your cabinet after registration, where the assistant can follow your situation step by step. If your question is urgent, contact the human team through Support."
+    : REGISTER_INVITE;
+  const busyInvite = en
+    ? "The public assistant is receiving many requests right now. Register to continue calmly in your cabinet. For an urgent question, contact the human team through Support."
+    : BUSY_INVITE;
 
   if (input.tier === "guest") {
     if (mode === "off") {
@@ -143,12 +151,12 @@ export async function guardAssistantRequest(input: {
         allowed: false,
         status: 503,
         message:
-          "Помощник сейчас недоступен. Напишите нам через страницу «Поддержка» — ответит живой человек."
+          en ? "The assistant is temporarily unavailable. Contact the human team through Support." : "Помощник сейчас недоступен. Напишите нам через страницу «Поддержка» — ответит живой человек."
       };
     }
 
     if (mode === "registered_only") {
-      return { allowed: false, status: 403, message: REGISTER_INVITE };
+      return { allowed: false, status: 403, message: registerInvite };
     }
   }
 
@@ -167,8 +175,8 @@ export async function guardAssistantRequest(input: {
       status: 429,
       message:
         input.tier === "guest"
-          ? REGISTER_INVITE
-          : "На сегодня лимит сообщений помощнику исчерпан — он снова будет доступен завтра. Если вопрос срочный, напишите команде: там отвечает живой человек."
+          ? registerInvite
+          : en ? "Your assistant message limit is reached for today. It will be available again tomorrow. Contact the human team for urgent questions." : "На сегодня лимит сообщений помощнику исчерпан — он снова будет доступен завтра. Если вопрос срочный, напишите команде: там отвечает живой человек."
     };
   }
 
@@ -194,7 +202,7 @@ export async function guardAssistantRequest(input: {
         link: adminLink()
       });
 
-      return { allowed: false, status: 429, message: BUSY_INVITE };
+      return { allowed: false, status: 429, message: busyInvite };
     }
   }
 

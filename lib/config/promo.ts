@@ -9,10 +9,12 @@
 // English copy and the assistant, so the three can never drift apart.
 export const FREE_REVIEW_DEADLINE_RU = "1 сентября 2026 года";
 export const FREE_REVIEW_DEADLINE_EN = "1 September 2026";
+export const FREE_REVIEW_DEADLINE_UTC = "2026-09-02T00:00:00.000Z";
 
 // How long the review takes, and how long questions stay open afterwards.
 export const REVIEW_WORKING_DAYS = 3;
 
-export function isFreeReviewActive(): boolean {
-  return process.env.NEXT_PUBLIC_FREE_REVIEW?.trim().toLowerCase() !== "off";
+export function isFreeReviewActive(now = new Date()): boolean {
+  return process.env.NEXT_PUBLIC_FREE_REVIEW?.trim().toLowerCase() !== "off" &&
+    now.getTime() < Date.parse(FREE_REVIEW_DEADLINE_UTC);
 }

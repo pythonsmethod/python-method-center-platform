@@ -2,6 +2,8 @@ import { describe, expect, it } from "vitest";
 import {
   PLAN_DURATION_DAYS,
   productFromAmount,
+  productFromMetadata,
+  resolveStripeProduct,
   servicePeriodEnd
 } from "@/lib/payments/stripe";
 
@@ -23,6 +25,17 @@ describe("productFromAmount", () => {
 
   it("returns null for non-USD currencies", () => {
     expect(productFromAmount(144000, "eur")).toBeNull();
+  });
+});
+
+describe("Stripe metadata mapping", () => {
+  it("uses explicit Payment Link metadata before amount", () => {
+    expect(productFromMetadata({ product: "support_5_weeks" })).toBe("support_5_weeks");
+    expect(resolveStripeProduct({ metadata: { product: "support_100_days" }, amountCents: 1, currency: "usd" })).toBe("support_15_weeks");
+  });
+
+  it("keeps exact amount as a legacy fallback", () => {
+    expect(resolveStripeProduct({ metadata: {}, amountCents: 144000, currency: "usd" })).toBe("support_5_weeks");
   });
 });
 

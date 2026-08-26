@@ -46,12 +46,14 @@ export async function submitPublicSupportRequest(
   _previousState: SupportRequestActionState,
   formData: FormData
 ): Promise<SupportRequestActionState> {
+  const en = formData.get("locale") === "en";
   const validation = validatePublicSupportInput({
     email: String(formData.get("email") ?? ""),
     category: String(formData.get("category") ?? ""),
     message: String(formData.get("message") ?? ""),
     consent: formData.get("consent") === "on",
-    honeypot: String(formData.get("website") ?? "")
+    honeypot: String(formData.get("website") ?? ""),
+    locale: formData.get("locale") === "en" ? "en" : "ru"
   });
 
   if ("error" in validation) {
@@ -64,7 +66,7 @@ export async function submitPublicSupportRequest(
 
   if (isRateLimited(clientKey)) {
     return errorState(
-      "Слишком много обращений подряд. Подождите немного и попробуйте ещё раз."
+      en ? "Too many requests. Wait a little and try again." : "Слишком много обращений подряд. Подождите немного и попробуйте ещё раз."
     );
   }
 
@@ -72,7 +74,7 @@ export async function submitPublicSupportRequest(
 
   if (!supabase) {
     return errorState(
-      "Сервис временно недоступен. Напишите нам на email, указанный ниже."
+      en ? "The service is temporarily unavailable. Email us using the address below." : "Сервис временно недоступен. Напишите нам на email, указанный ниже."
     );
   }
 
@@ -95,7 +97,7 @@ export async function submitPublicSupportRequest(
 
   if (insertError) {
     return errorState(
-      "Не удалось отправить сообщение. Попробуйте ещё раз через минуту."
+      en ? "The message could not be sent. Try again in a minute." : "Не удалось отправить сообщение. Попробуйте ещё раз через минуту."
     );
   }
 
@@ -113,7 +115,8 @@ export async function submitPublicSupportRequest(
 
   return {
     status: "success",
-    message:
-      "Сообщение отправлено. Мы ответим на указанный email в течение 24 часов (в рабочие дни)."
+    message: en
+      ? "Your message has been sent. We will reply to the provided email within 24 hours on business days."
+      : "Сообщение отправлено. Мы ответим на указанный email в течение 24 часов (в рабочие дни)."
   };
 }

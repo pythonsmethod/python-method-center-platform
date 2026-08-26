@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
@@ -11,7 +11,7 @@ import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { listOpenEscalations } from "@/lib/escalations/queries";
 import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { hasAssistantEnv } from "@/lib/assistant/router";
-import { canSeeProviderNames } from "@/lib/auth/require-founder";
+import { canSeeProviderNames, isFounderEmail } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { getStaffCases } from "@/lib/cases/staff-queries";
@@ -54,6 +54,12 @@ export default async function AdminPage() {
         </div>
       </div>
     );
+  }
+
+  // /admin is Karen's operational workspace. The founder has a separate
+  // overview and should never be presented with Karen's personal cabinet.
+  if (auth.role === "admin" && isFounderEmail(auth.email)) {
+    redirect("/admin/founder");
   }
 
   const [knowledge, escalations, unread, casesResult] = await Promise.all([
