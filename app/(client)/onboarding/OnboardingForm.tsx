@@ -147,7 +147,7 @@ export function OnboardingForm({
       </button>
 
       {state.message ? (
-        <p className="form-message form-message--error">{state.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
       ) : null}
     </form>
   );

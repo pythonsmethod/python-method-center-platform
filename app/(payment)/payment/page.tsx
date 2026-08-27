@@ -92,8 +92,11 @@ export default async function PaymentPage() {
         signedIn={Boolean(profileId)}
       />
 
+      {/* Level 2: the promo panel above already carries this page's h1.
+          Visually identical — see .page-header h2 in globals.css. */}
       <PageHeader
         eyebrow={t.eyebrow}
+        headingLevel={2}
         title={t.title}
         description={t.description}
       />

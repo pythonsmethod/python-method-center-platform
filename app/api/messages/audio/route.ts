@@ -123,8 +123,10 @@ export async function POST(request: Request) {
     .upload(audioPath, bytes, { contentType: file.type, upsert: false });
 
   if (uploadError) {
+    console.error("case audio upload failed", uploadError);
+
     return NextResponse.json(
-      { error: `Не удалось сохранить аудио: ${uploadError.message}` },
+      { error: "Не удалось сохранить аудио. Попробуйте ещё раз." },
       { status: 502 }
     );
   }
@@ -150,8 +152,10 @@ export async function POST(request: Request) {
   if (insertError || !message) {
     await supabase.storage.from(CASE_AUDIO_BUCKET).remove([audioPath]);
 
+    console.error("case audio message insert failed", insertError);
+
     return NextResponse.json(
-      { error: `Не удалось отправить сообщение: ${insertError?.message ?? "ошибка"}` },
+      { error: "Не удалось отправить сообщение. Попробуйте ещё раз." },
       { status: 502 }
     );
   }

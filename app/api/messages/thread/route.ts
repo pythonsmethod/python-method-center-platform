@@ -62,7 +62,12 @@ export async function GET(request: Request) {
   const result = await getCaseMessages(caseId);
 
   if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 502 });
+    console.error("case thread read failed", result.error);
+
+    return NextResponse.json(
+      { error: "Не удалось загрузить переписку." },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({ messages: result.messages });

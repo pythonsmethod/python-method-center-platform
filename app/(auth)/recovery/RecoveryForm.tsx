@@ -19,7 +19,7 @@ export function RecoveryForm({ labels }: RecoveryFormProps) {
   );
 
   if (state.status === "success") {
-    return <p className="form-message form-message--success">{state.message}</p>;
+    return <p aria-live="polite" className="form-message form-message--success" role="status">{state.message}</p>;
   }
 
   return (
@@ -38,7 +38,7 @@ export function RecoveryForm({ labels }: RecoveryFormProps) {
         {pending ? labels.submitting : labels.submit}
       </button>
       {state.status === "error" ? (
-        <p className="form-message form-message--error">{state.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
       ) : null}
     </form>
   );

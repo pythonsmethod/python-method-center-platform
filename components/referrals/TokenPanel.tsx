@@ -105,7 +105,7 @@ export function TokenPanel({ balance, transactions, locale }: TokenPanelProps) {
             </p>
           ) : null}
           {state.status === "error" ? (
-            <p className="form-message form-message--error">{state.message}</p>
+            <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
           ) : null}
         </form>
       )}

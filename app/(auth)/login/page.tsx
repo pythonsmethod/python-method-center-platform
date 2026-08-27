@@ -22,10 +22,16 @@ type LoginPageProps = {
 
 // Query parameters only choose the post-login destination or the visible
 // form tab. They never create a distinct document for search engines.
-export const metadata: Metadata = {
-  alternates: { canonical: "/login" },
-  robots: { index: false, follow: false }
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).login;
+
+  return {
+    title: t.title,
+    description: t.description,
+    alternates: { canonical: "/login" },
+    robots: { index: false, follow: false }
+  };
+}
 
 function readParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;
@@ -62,7 +68,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </Link>
         <div className="auth-app__story-copy">
           <span className="auth-app__eyebrow">{t.eyebrow}</span>
-          <h1>{t.title}</h1>
+          <div className="auth-app__story-title">{t.title}</div>
           <p>{t.description}</p>
           <div className="auth-app__guide">
             <AnhamAvatar
@@ -75,14 +81,14 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
         </div>
       </aside>
 
-      <main className="auth-app__main">
+      <div className="auth-app__main">
         <section className="auth-app__card" aria-label={t.title}>
           <div className="auth-app__mobile-brand" aria-hidden="true">
             <IconAnkh />
             <strong>Python Method Center</strong>
           </div>
           <p className="auth-app__welcome">{t.eyebrow}</p>
-          <h2>{t.title}</h2>
+          <h1>{t.title}</h1>
 
           <AuthSetupNotice
             labels={strings.setup}
@@ -94,7 +100,6 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
           ) : null}
 
           <AuthForm
-            locale={locale}
             labels={{
               tabLogin: t.tabLogin,
               tabSignup: t.tabSignup,
@@ -129,7 +134,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
             {privacyNote}
           </p>
         </section>
-      </main>
+      </div>
     </div>
   );
 }

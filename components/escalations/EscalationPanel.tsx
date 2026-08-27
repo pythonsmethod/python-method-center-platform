@@ -31,7 +31,7 @@ export function EscalationPanel({ escalations, loadError }: EscalationPanelProps
 
   if (loadError) {
     return (
-      <p className="form-message form-message--error">
+      <p aria-live="assertive" className="form-message form-message--error" role="alert">
         Красные флаги недоступны: {loadError}
       </p>
     );
@@ -49,7 +49,7 @@ export function EscalationPanel({ escalations, loadError }: EscalationPanelProps
   return (
     <div className="escalation-list">
       {state.status === "error" ? (
-        <p className="form-message form-message--error">{state.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
       ) : null}
       <ul>
         {escalations.map((item) => {

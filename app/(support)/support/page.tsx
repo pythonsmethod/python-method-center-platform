@@ -1,8 +1,17 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { PublicSupportForm } from "@/components/support/PublicSupportForm";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
+
+// Indexed and listed in the sitemap: without its own title and description
+// this page competed with the home page for the same search snippet.
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).support;
+
+  return { title: t.title, description: t.description };
+}
 
 export default async function SupportPage() {
   const locale = await getLocale();

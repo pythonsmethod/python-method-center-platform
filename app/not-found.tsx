@@ -6,7 +6,14 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
   return {
-    title: locale === "ru" ? "Страница не найдена — Python Method" : "Page not found — Python Method",
+    title: locale === "ru" ? "Страница не найдена" : "Page not found",
+    description:
+      locale === "ru"
+        ? "Такой страницы на сайте нет."
+        : "This page does not exist on the site.",
+    // The root layout points every page at itself. An address that returns
+    // 404 must not name itself the canonical version of anything.
+    alternates: { canonical: null },
     robots: { index: false, follow: false }
   };
 }

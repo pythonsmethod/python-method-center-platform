@@ -441,7 +441,7 @@ export function AssistantChat({
             {progress ?? t.sending}
           </div>
         ) : null}
-        {error ? <p className="form-message form-message--error">{error}</p> : null}
+        {error ? <p aria-live="assertive" className="form-message form-message--error" role="alert">{error}</p> : null}
       </div>
 
       {memoryCapture && memoryState !== "dismissed" ? (
@@ -455,7 +455,7 @@ export function AssistantChat({
                 <button disabled={memoryState === "saving"} onClick={() => void saveMemory("client_answers")} type="button">{locale === "ru" ? "В память ответов клиентам" : "To client-answer memory"}</button>
                 <button disabled={memoryState === "saving"} onClick={() => { setMemoryState("dismissed"); setMemoryMessage(null); }} type="button">{locale === "ru" ? "Не сохранять" : "Do not save"}</button>
               </div>
-              {memoryMessage ? <p className="form-message form-message--error">{memoryMessage}</p> : null}
+              {memoryMessage ? <p aria-live="assertive" className="form-message form-message--error" role="alert">{memoryMessage}</p> : null}
             </>
           )}
         </div>

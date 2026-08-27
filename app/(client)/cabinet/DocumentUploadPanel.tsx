@@ -251,7 +251,7 @@ export function DocumentUploadPanel({
             {uploading ? labels.uploading : labels.uploadCta}
           </button>
           {state.message ? (
-            <p className={stateClassName(state)}>{state.message}</p>
+            <p aria-live="polite" role="status" className={stateClassName(state)}>{state.message}</p>
           ) : null}
         </form>
 
@@ -262,7 +262,7 @@ export function DocumentUploadPanel({
           </div>
 
           {openError ? (
-            <p className="form-message form-message--error">{openError}</p>
+            <p aria-live="assertive" className="form-message form-message--error" role="alert">{openError}</p>
           ) : null}
 
           {documents.length === 0 ? (

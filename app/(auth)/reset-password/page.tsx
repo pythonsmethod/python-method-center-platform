@@ -1,9 +1,16 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { ResetPasswordForm } from "./ResetPasswordForm";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).resetPassword;
+
+  return { title: t.title, description: t.description };
+}
 
 // Reached from the emailed recovery link via /auth/callback: by the time the
 // user is here, the recovery session is already established. Without a

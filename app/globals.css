@@ -750,6 +750,18 @@ main {
   max-width: 760px;
 }
 
+/* A page that already carries its h1 elsewhere asks PageHeader for a level
+   2 heading (see /payment). It is the same title in the same place, so it
+   keeps the h1 appearance rather than shrinking to a section heading. */
+.page-header h2 {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 1;
+  margin: 0;
+  max-width: 920px;
+}
+
 /* A page title can be one long word — "конфиденциальности" — and at the
    36px floor of the h1 clamp it was wider than a phone, pushing the whole
    page sideways. Titled pages take a smaller floor on a narrow screen so
@@ -761,6 +773,7 @@ main {
    to break — a page-title problem must not become a site-wide one. */
 @media (max-width: 520px) {
   .page-header h1,
+  .page-header h2,
   /* The legal documents repeat their title inside the article, in caps.
      "ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ" is one word wider than a narrow phone. */
   .offer-doc__title {
@@ -3410,9 +3423,9 @@ code {
   accent-color: var(--accent);
   cursor: pointer;
   flex-shrink: 0;
-  height: 18px;
-  margin-top: 2px;
-  width: 18px;
+  height: 24px;
+  margin-top: 0;
+  width: 24px;
 }
 
 .offer-gate__label a {
@@ -6329,6 +6342,18 @@ main {
   max-width: 760px;
 }
 
+/* A page that already carries its h1 elsewhere asks PageHeader for a level
+   2 heading (see /payment). It is the same title in the same place, so it
+   keeps the h1 appearance rather than shrinking to a section heading. */
+.page-header h2 {
+  color: var(--accent-strong);
+  font-family: var(--font-serif);
+  font-size: clamp(36px, 7vw, 72px);
+  line-height: 1;
+  margin: 0;
+  max-width: 920px;
+}
+
 /* A page title can be one long word — "конфиденциальности" — and at the
    36px floor of the h1 clamp it was wider than a phone, pushing the whole
    page sideways. Titled pages take a smaller floor on a narrow screen so
@@ -6340,6 +6365,7 @@ main {
    to break — a page-title problem must not become a site-wide one. */
 @media (max-width: 520px) {
   .page-header h1,
+  .page-header h2,
   /* The legal documents repeat their title inside the article, in caps.
      "ПОЛИТИКА КОНФИДЕНЦИАЛЬНОСТИ" is one word wider than a narrow phone. */
   .offer-doc__title {
@@ -6549,8 +6575,9 @@ p {
 
 .auth-reveal input {
   accent-color: var(--accent);
-  height: 20px;
-  width: 20px;
+  flex-shrink: 0;
+  height: 24px;
+  width: 24px;
 }
 
 /* Offered only when the account exists but its email is unconfirmed. */
@@ -8517,9 +8544,9 @@ code {
   accent-color: var(--accent);
   cursor: pointer;
   flex-shrink: 0;
-  height: 18px;
-  margin-top: 2px;
-  width: 18px;
+  height: 24px;
+  margin-top: 0;
+  width: 24px;
 }
 
 .offer-gate__label a {
@@ -11496,7 +11523,11 @@ code {
   text-transform: uppercase;
 }
 
-.auth-app__story h1 {
+.auth-app__story-title {
+  /* Was the page h1 until the h1 moved into the card, which is the only
+     part of this page a phone shows. Colour is now explicit: it used to
+     come from the global h1 rule. */
+  color: var(--accent-strong);
   font-family: var(--font-serif);
   font-size: clamp(2.7rem, 5.5vw, 5rem);
   line-height: 0.98;
@@ -11542,12 +11573,13 @@ code {
 
 .auth-app__mobile-brand { display: none; }
 .auth-app__welcome { color: #846716 !important; margin: 0 0 0.45rem; }
-.auth-app__card > h2 { color: #1f1c17; font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 2.7rem); margin: 0 0 1.8rem; }
+.auth-app__card > h1 { color: #1f1c17; font-family: var(--font-serif); font-size: clamp(2rem, 4vw, 2.7rem); margin: 0 0 1.8rem; }
 .auth-app__card .auth-panel { background: #fff; border-color: #ddd7c9; border-radius: 22px; box-shadow: 0 18px 50px rgba(55, 43, 20, 0.09); padding: 1.15rem; }
 .auth-app__card .auth-tabs { background: #eeeae0; border-radius: 14px; padding: 5px; }
-.auth-app__card .auth-tab { border-radius: 10px; color: #746e62; }
+.auth-app__card .auth-tab { border-radius: 10px; color: #6b6558; }
 .auth-app__card .auth-tab--active { background: #fff; border-color: transparent; box-shadow: 0 3px 12px rgba(40, 30, 12, 0.08); color: #6d5211; }
 .auth-app__card .field { color: #403b32; font-size: 0.85rem; font-weight: 700; }
+.auth-app__card .field span { color: #403b32; }
 .auth-app__card .field input { background: #faf9f6; border: 1px solid #d9d4c8; border-radius: 12px; color: #1f1c17; min-height: 52px; padding: 0.8rem 0.9rem; }
 .auth-app__card .field input:focus { border-color: #a98524; box-shadow: 0 0 0 3px rgba(169, 133, 36, 0.14); outline: 0; }
 .auth-app__card .field__hint, .auth-app__card .auth-reveal { color: #756f64; }
@@ -11556,7 +11588,7 @@ code {
 .auth-app__card .button:disabled { cursor: not-allowed; opacity: 0.55; }
 .auth-app__card .auth-help { margin-top: 1rem; text-align: center; }
 .auth-app__card .auth-help a { color: #725916; font-weight: 700; text-underline-offset: 3px; }
-.auth-app__privacy { color: #777166 !important; font-size: 0.75rem; line-height: 1.5; margin: 1.2rem auto 0; max-width: 20rem; text-align: center; }
+.auth-app__privacy { color: #6f6a5e !important; font-size: 0.75rem; line-height: 1.5; margin: 1.2rem auto 0; max-width: 20rem; text-align: center; }
 
 @media (max-width: 860px) {
   .auth-app { display: block; }
@@ -11567,7 +11599,7 @@ code {
 
 @media (max-width: 520px) {
   .auth-app__main { align-items: flex-start; border-radius: 24px 24px 0 0; padding: 1.4rem 1rem 2.5rem; }
-  .auth-app__card > h2 { font-size: 2rem; margin-bottom: 1.25rem; text-align: center; }
+  .auth-app__card > h1 { font-size: 2rem; margin-bottom: 1.25rem; text-align: center; }
   .auth-app__welcome { text-align: center; }
   .auth-app__mobile-brand { margin-bottom: 2rem; }
   .auth-app__card .auth-panel { border-radius: 18px; padding: 0.9rem; }
@@ -11800,8 +11832,9 @@ body.welcome-active > main {
 
 .auth-remember input {
   accent-color: #b58a1f;
-  height: 20px;
-  width: 20px;
+  flex-shrink: 0;
+  height: 24px;
+  width: 24px;
 }
 
 .app-auth-modal {

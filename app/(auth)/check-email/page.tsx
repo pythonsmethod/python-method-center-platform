@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { cookies } from "next/headers";
 import { PageHeader } from "@/components/PageHeader";
@@ -10,6 +11,12 @@ import { CheckEmailActions } from "./CheckEmailActions";
 type CheckEmailPageProps = {
   searchParams?: Promise<{ message?: string | string[] }>;
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).checkEmail;
+
+  return { title: t.title, description: t.description };
+}
 
 function readParam(value: string | string[] | undefined): string | undefined {
   return Array.isArray(value) ? value[0] : value;

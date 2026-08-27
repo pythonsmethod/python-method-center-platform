@@ -44,7 +44,7 @@ export function WelcomeScreen({
         <LanguageSwitcher locale={locale} />
       </header>
 
-      <main className="app-welcome__content">
+      <div className="app-welcome__content">
         <div className="app-welcome__anham">
           <span aria-hidden="true" className="app-welcome__orbit app-welcome__orbit--one" />
           <span aria-hidden="true" className="app-welcome__orbit app-welcome__orbit--two" />
@@ -71,7 +71,7 @@ export function WelcomeScreen({
           </a>
         </div>
         <p className="app-welcome__note">{labels.note}</p>
-      </main>
+      </div>
 
       {(["login", "signup"] as const).map((mode) => (
         <div
