@@ -92,20 +92,22 @@ export async function generateMetadata(): Promise<Metadata> {
     formatDetection: {
       telephone: false
     },
+    // Generated from public/images/anham-master.png, which stays the master
+    // artwork. It was being linked here directly: a 1.66 MB 1024x1024 PNG,
+    // unoptimised, fetched as the browser-tab icon of every page. The
+    // favicon below is 1.7 KB.
     icons: {
       apple: [
         {
-          url: "/images/anham-master.png",
-          sizes: "1024x1024",
+          url: "/icons/apple-touch-icon.png",
+          sizes: "180x180",
           type: "image/png"
         }
       ],
       icon: [
-        {
-          url: "/images/anham-master.png",
-          sizes: "1024x1024",
-          type: "image/png"
-        }
+        { url: "/icons/favicon-32.png", sizes: "32x32", type: "image/png" },
+        { url: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },
+        { url: "/icons/icon-512.png", sizes: "512x512", type: "image/png" }
       ]
     },
     verification: verificationTokens(),

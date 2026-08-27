@@ -5679,8 +5679,10 @@ code {
 /* Someone who asked for less motion gets a still, calm Анхам — eyes open,
    nothing turning. */
 @media (prefers-reduced-motion: reduce) {
+  .anham,
   .anham__art,
   .anham__lids,
+  .anham__lid,
   .anham__ring,
   .anham__aura i {
     animation: none;
@@ -5775,12 +5777,23 @@ code {
 
 .anham-companion__welcome {
   background: var(--surface);
+  /* Anchored to the viewport rather than stacked inside the companion.
+     As a flex child it resized the fixed companion the moment it appeared,
+     which the layout-instability API scores as a 0.38 shift on every first
+     page view — past the 0.25 "poor" threshold. The offsets below
+     reproduce where it used to land: the companion's own bottom inset plus
+     the 64px figure and the 12px flex gap it used to sit above.
+     Percentages, not 100vw: on a fixed element a percentage resolves
+     against the viewport without the scrollbar, so this cannot spill. */
+  bottom: calc(clamp(14px, 3vw, 28px) + 76px);
   border: 1px solid var(--accent);
   border-radius: 16px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   padding: 1.1rem 1.2rem;
-  position: relative;
-  width: min(320px, 100%);
+  position: fixed;
+  right: clamp(14px, 3vw, 28px);
+  width: min(320px, calc(100% - 28px));
+  z-index: 60;
 }
 
 .anham-companion__welcome-close {
@@ -5829,8 +5842,10 @@ code {
   }
 
   .anham-companion__welcome {
+    bottom: 88px;
+    right: 12px;
     text-align: center;
-    width: 100%;
+    width: calc(100% - 24px);
   }
 
   .anham-companion__welcome-title {
@@ -10873,8 +10888,10 @@ code {
 /* Someone who asked for less motion gets a still, calm Анхам — eyes open,
    nothing turning. */
 @media (prefers-reduced-motion: reduce) {
+  .anham,
   .anham__art,
   .anham__lids,
+  .anham__lid,
   .anham__ring,
   .anham__aura i {
     animation: none;
@@ -10944,12 +10961,23 @@ code {
 
 .anham-companion__welcome {
   background: var(--surface);
+  /* Anchored to the viewport rather than stacked inside the companion.
+     As a flex child it resized the fixed companion the moment it appeared,
+     which the layout-instability API scores as a 0.38 shift on every first
+     page view — past the 0.25 "poor" threshold. The offsets below
+     reproduce where it used to land: the companion's own bottom inset plus
+     the 64px figure and the 12px flex gap it used to sit above.
+     Percentages, not 100vw: on a fixed element a percentage resolves
+     against the viewport without the scrollbar, so this cannot spill. */
+  bottom: calc(clamp(14px, 3vw, 28px) + 76px);
   border: 1px solid var(--accent);
   border-radius: 16px;
   box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
   padding: 1.1rem 1.2rem;
-  position: relative;
-  width: min(320px, 100%);
+  position: fixed;
+  right: clamp(14px, 3vw, 28px);
+  width: min(320px, calc(100% - 28px));
+  z-index: 60;
 }
 
 .anham-companion__welcome-close {
@@ -10998,7 +11026,9 @@ code {
   }
 
   .anham-companion__welcome {
-    width: 100%;
+    bottom: 88px;
+    right: 12px;
+    width: calc(100% - 24px);
   }
 
   .anham-companion__figure .anham {
@@ -11927,7 +11957,11 @@ body.welcome-active > main {
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .app-welcome__orbit { animation: none; }
+  /* Both here rather than in the shared Анхам block above: the rules that
+     start these animations are declared later in this file at the same
+     specificity, so an earlier override loses on source order. */
+  .app-welcome__orbit,
+  .app-welcome__anham > .anham { animation: none; }
 }
 /* Python Method mobile application shell */
 .native-app-route > .site-header,
