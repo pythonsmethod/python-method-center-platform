@@ -72,6 +72,7 @@ export default async function CabinetDocumentsPage() {
                   {t.timelineText}
                 </p>
                 <DocumentTimeline
+                  audience="client"
                   labels={dict.timeline}
                   locale={locale}
                   documents={documentResult.documents}

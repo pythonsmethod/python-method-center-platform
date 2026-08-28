@@ -14,7 +14,7 @@ import type {
   DocumentIntakeStatus,
   UploadedDocument
 } from "@/lib/documents/types";
-import { documentStatusLabel } from "@/lib/i18n/status-labels";
+import { clientDocumentStatusLabel } from "@/lib/i18n/status-labels";
 import { formatDateTime } from "@/lib/i18n/format";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { getSupabaseBrowserClient } from "@/lib/supabase/client";
@@ -70,7 +70,7 @@ function formatFileSize(value: unknown, unknownLabel: string): string {
 }
 
 function formatDocumentStatus(status: DocumentIntakeStatus, locale: Locale): string {
-  return documentStatusLabel(status, locale);
+  return clientDocumentStatusLabel(status, locale);
 }
 
 function stateClassName(state: UploadState): string {

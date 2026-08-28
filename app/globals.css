@@ -12025,6 +12025,23 @@ body:has(.pm-app) > .site-footer { display: none; }
     display: none;
   }
 
+  /* Анхам rests above the dock, not inside it.
+     The bar is fixed at z-index 60 and painted after him, so on a phone the
+     button that opens the assistant sat entirely underneath it: a tap at the
+     centre of the figure landed on a dock link instead. 126px is the height
+     the page already reserves for the bar in body's padding, so this uses
+     the same number rather than a second guess at it. The open panel is
+     untouched — it takes the whole screen and hides the dock itself. */
+  body:has(.public-mobile-dock) .anham-companion {
+    bottom: calc(126px + env(safe-area-inset-bottom));
+  }
+
+  /* The greeting keeps its old distance above the figure: 64px of button
+     plus the 12px gap it used to sit across. */
+  body:has(.public-mobile-dock) .anham-companion__welcome {
+    bottom: calc(126px + env(safe-area-inset-bottom) + 76px);
+  }
+
   .anham-companion.is-open {
     align-items: stretch;
     bottom: max(12px, env(safe-area-inset-bottom));

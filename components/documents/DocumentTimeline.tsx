@@ -5,7 +5,10 @@ import {
   buildDocumentTimeline,
   type TimelineDocument
 } from "@/lib/documents/timeline";
-import { documentStatusLabel } from "@/lib/i18n/status-labels";
+import {
+  clientDocumentStatusLabel,
+  documentStatusLabel
+} from "@/lib/i18n/status-labels";
 import type { Locale } from "@/lib/i18n/locale";
 
 type DocumentTimelineProps<T extends TimelineDocument> = {
@@ -16,6 +19,9 @@ type DocumentTimelineProps<T extends TimelineDocument> = {
   // The staff view adds an "open file" button; the client view adds
   // nothing. Rendering stays on the server either way.
   renderAction?: (document: T) => ReactNode;
+  // Who is reading. The team needs the queue's own vocabulary; the client
+  // needs to know whether their file is being worked on or done.
+  audience?: "client" | "staff";
 };
 
 function dayLabel(dayKey: string, locale: Locale): string {
@@ -38,12 +44,15 @@ function timeLabel(createdAt: string, locale: Locale): string {
 // upload of the same file name is marked as a new version — so "the same
 // blood test, three months later" reads as exactly that.
 export function DocumentTimeline<T extends TimelineDocument>({
+  audience = "staff",
   documents,
   emptyText,
   locale = "ru",
   renderAction,
   labels: t
 }: DocumentTimelineProps<T>) {
+  const statusLabel =
+    audience === "client" ? clientDocumentStatusLabel : documentStatusLabel;
   const rounds = buildDocumentTimeline(documents);
 
   if (rounds.length === 0) {
@@ -77,7 +86,7 @@ export function DocumentTimeline<T extends TimelineDocument>({
                   <span>
                     {timeLabel(document.created_at, locale)}
                     {document.document_status
-                      ? ` · ${documentStatusLabel(document.document_status, locale)}`
+                      ? ` · ${statusLabel(document.document_status, locale)}`
                       : ""}
                   </span>
                 </div>

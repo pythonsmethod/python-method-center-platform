@@ -323,7 +323,11 @@
 .app-quick__icon { align-items: center; background: var(--app-soft); border-radius: 50%; color: var(--app-accent); display: flex; font-size: .75rem; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
 .app-quick strong, .app-quick small { display: block; }
 .app-quick strong { font-size: .95rem; }
-.app-quick small { color: var(--app-muted); display: -webkit-box; font-size: .78rem; line-height: 1.4; margin-top: .35rem; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+/* No line clamp. These are written as whole sentences three to nine lines
+   long, so two lines cut every one of them — worst at 1024px, where up to
+   157px of text was hidden and the third card could not be read in full at
+   any width. The cards simply grow; the grid keeps them level. */
+.app-quick small { color: var(--app-muted); display: block; font-size: .78rem; line-height: 1.4; margin-top: .35rem; }
 .app-quick b { color: var(--app-accent); font-size: 1.1rem; }
 
 .app-route { padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 7vw, 6rem); }
