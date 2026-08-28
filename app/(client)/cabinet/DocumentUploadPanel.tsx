@@ -46,6 +46,15 @@ type UploadState =
       message: string;
     };
 
+// A document sits in these states while the queue has not finished with it.
+const PENDING_STATUSES: string[] = ["uploaded", "queued", "processing"];
+
+// Poll quickly at first, then back off: most documents are read within a
+// minute of upload, and the ones that are not will not be ready this hour.
+const FIRST_POLL_MS = 5_000;
+const MAX_POLL_INTERVAL_MS = 60_000;
+const MAX_POLL_WINDOW_MS = 15 * 60_000;
+
 function formatFileSize(value: unknown, unknownLabel: string): string {
   const bytes = typeof value === "number" ? value : Number(value);
 
@@ -89,15 +98,71 @@ export function DocumentUploadPanel({
     setDocuments(initialDocuments);
   }, [initialDocuments]);
 
-  useEffect(() => {
-    const hasWork = documents.some((document) =>
-      ["uploaded", "queued", "processing"].includes(document.document_status)
-    );
-    if (!hasWork) return;
+  // Which documents are still being worked on, as a value that only changes
+  // when something actually moves. The list itself gets a new identity on
+  // every refresh, and keying the poll on that would restart the backoff on
+  // each tick — leaving the fixed 10-second interval it replaces.
+  const pendingSignature = documents
+    .filter((document) => PENDING_STATUSES.includes(document.document_status))
+    .map((document) => `${document.id}:${document.document_status}`)
+    .sort()
+    .join(",");
 
-    const timer = window.setInterval(() => router.refresh(), 10_000);
-    return () => window.clearInterval(timer);
-  }, [documents, router]);
+  // A document waits for the queue, and the queue is drained by a cron that
+  // runs once a day, so "still processing" can mean hours. The old poll
+  // asked the server for the whole page every 10 seconds for as long as the
+  // tab stayed open — around 8,600 full re-renders a day, none of which the
+  // reader was waiting for after the first minute.
+  useEffect(() => {
+    if (!pendingSignature) {
+      return;
+    }
+
+    let delay = FIRST_POLL_MS;
+    let spent = 0;
+    let timer = 0;
+
+    function schedule() {
+      timer = window.setTimeout(() => {
+        // A hidden tab is not being read; wait for it to come back rather
+        // than spending its battery and the server's time.
+        if (document.hidden) {
+          schedule();
+          return;
+        }
+
+        spent += delay;
+        router.refresh();
+
+        if (spent >= MAX_POLL_WINDOW_MS) {
+          return;
+        }
+
+        delay = Math.min(Math.round(delay * 1.6), MAX_POLL_INTERVAL_MS);
+        schedule();
+      }, delay);
+    }
+
+    function onVisible() {
+      if (document.hidden) {
+        return;
+      }
+
+      // Back on screen: answer straight away, then start the ladder again.
+      window.clearTimeout(timer);
+      router.refresh();
+      delay = FIRST_POLL_MS;
+      schedule();
+    }
+
+    schedule();
+    document.addEventListener("visibilitychange", onVisible);
+
+    return () => {
+      window.clearTimeout(timer);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [pendingSignature, router]);
 
   async function handleOpenDocument(document: UploadedDocument) {
     setOpenError("");
@@ -143,7 +208,7 @@ export function DocumentUploadPanel({
       return;
     }
 
-    const validation = validateDocumentFile(file);
+    const validation = validateDocumentFile(file, locale);
 
     if (validation.status === "invalid") {
       setState({

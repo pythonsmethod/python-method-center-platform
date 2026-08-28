@@ -11,6 +11,7 @@ import type {
   UploadedDocument
 } from "@/lib/documents/types";
 import { writeAuditLog } from "@/lib/audit/log";
+import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { enqueueDocumentProcessing } from "@/lib/documents/processing";
@@ -53,15 +54,36 @@ export async function recordUploadedDocumentMetadata(
     redirect("/login?next=/cabinet");
   }
 
+  const locale = await getLocale();
+  const t =
+    locale === "en"
+      ? {
+          badInput: "The upload details are not valid.",
+          wrongPath:
+            "The storage path does not match your account and case.",
+          noCase: "No case was found for your account.",
+          notStored: "The uploaded file was not found in storage."
+        }
+      : {
+          badInput: "Данные загрузки документа некорректны.",
+          wrongPath:
+            "Путь хранения документа не соответствует вашему аккаунту и кейсу.",
+          noCase: "Кейс для вашего аккаунта не найден.",
+          notStored: "Загруженный файл не найден в хранилище."
+        };
+
   if (!isUuid(input.caseId) || !isUuid(input.documentId)) {
-    return errorState("Данные загрузки документа некорректны.");
+    return errorState(t.badInput);
   }
 
-  const validation = validateDocumentFile({
-    name: input.originalFilename,
-    size: input.fileSize,
-    type: input.mimeType
-  });
+  const validation = validateDocumentFile(
+    {
+      name: input.originalFilename,
+      size: input.fileSize,
+      type: input.mimeType
+    },
+    locale
+  );
 
   if (validation.status === "invalid") {
     return errorState(validation.message);
@@ -75,7 +97,7 @@ export async function recordUploadedDocumentMetadata(
   });
 
   if (input.storagePath !== expectedStoragePath) {
-    return errorState("Путь хранения документа не соответствует вашему аккаунту и кейсу.");
+    return errorState(t.wrongPath);
   }
 
   const { data: clientCase, error: caseError } = await supabase
@@ -90,7 +112,7 @@ export async function recordUploadedDocumentMetadata(
   }
 
   if (!clientCase) {
-    return errorState("Кейс для вашего аккаунта не найден.");
+    return errorState(t.noCase);
   }
 
   const objectDirectory = `${user.id}/${input.caseId}/${input.documentId}`;
@@ -106,7 +128,7 @@ export async function recordUploadedDocumentMetadata(
   }
 
   if (!storedObjects?.some((object) => object.name === validation.safeFilename)) {
-    return errorState("Загруженный файл не найден в хранилище.");
+    return errorState(t.notStored);
   }
 
   const { data: document, error: documentError } = await supabase
