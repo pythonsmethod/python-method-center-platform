@@ -4,6 +4,7 @@
   "private": true,
   "description": "Runnable web-first scaffold for the Python Method platform.",
   "scripts": {
+    "postinstall": "node scripts/prepare-stockfish.mjs",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
@@ -19,6 +20,7 @@
     "next": "^15.3.4",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
+    "stockfish.js": "10.0.2",
     "stripe": "^22.3.2"
   },
   "devDependencies": {

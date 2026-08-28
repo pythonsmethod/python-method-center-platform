@@ -1,0 +1,5 @@
+Stockfish chess engine
+Source: https://github.com/niklasf/stockfish.js
+Upstream engine: https://github.com/official-stockfish/Stockfish
+License: GNU General Public License version 3
+License text: https://www.gnu.org/licenses/gpl-3.0.html
