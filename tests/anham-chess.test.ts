@@ -12,6 +12,8 @@ const chessAssistant = readFileSync("app/api/assistant/chess/route.ts", "utf8");
 const chessState = readFileSync("app/api/chess/state/route.ts", "utf8");
 const chessMemoryMigration = readFileSync("supabase/migrations/20260825080000_chess_coach_memory.sql", "utf8");
 const chessLevelMigration = readFileSync("supabase/migrations/20260825124500_chess_skill_level.sql", "utf8");
+const packageJson = readFileSync("package.json", "utf8");
+const stockfishPrepare = readFileSync("scripts/prepare-stockfish.mjs", "utf8");
 
 describe("Anham chess", () => {
   it("is reachable from both the website cabinet and the mobile app", () => {
@@ -106,5 +108,18 @@ describe("Anham chess", () => {
     expect(chessAssistant).toContain("explicitly selected chess level");
     expect(chessLevelMigration).toContain("enable row level security");
     expect(chessLevelMigration).toContain("(select auth.uid()) = user_id");
+  });
+
+  it("uses a real maximum-strength engine for grandmaster games", () => {
+    expect(packageJson).toContain('"stockfish.js": "10.0.2"');
+    expect(packageJson).toContain('"postinstall": "node scripts/prepare-stockfish.mjs"');
+    expect(stockfishPrepare).toContain('"public", "stockfish"');
+    expect(chess).toContain('new Worker("/stockfish/stockfish.js")');
+    expect(chess).toContain('setoption name Skill Level value 20');
+    expect(chess).toContain('go movetime 6000');
+    expect(chess).toContain('level === "grandmaster"');
+    expect(chess).toContain('?? chooseAnhamMove(gameRef.current, "grandmaster")');
+    expect(chess).toContain("searchIdRef.current");
+    expect(chess).toContain("Grandmaster level is powered by");
   });
 });

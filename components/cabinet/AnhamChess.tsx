@@ -11,6 +11,7 @@ type AnhamChessProps = {
 };
 
 type ChessLevel = "beginner" | "casual" | "intermediate" | "advanced" | "grandmaster";
+type EngineMove = { from: Square; to: Square; promotion?: "q" | "r" | "b" | "n" };
 
 const chessLevels: ChessLevel[] = ["beginner", "casual", "intermediate", "advanced", "grandmaster"];
 const levelDepth: Record<ChessLevel, number> = { beginner: -1, casual: 0, intermediate: 1, advanced: 2, grandmaster: 3 };
@@ -62,6 +63,43 @@ function chooseAnhamMove(game: Chess, level: ChessLevel): Move | null {
   return choices[Math.floor(Math.random() * choices.length)] ?? null;
 }
 
+function chooseStockfishMove(fen: string): Promise<EngineMove | null> {
+  return new Promise((resolve) => {
+    const worker = new Worker("/stockfish/stockfish.js");
+    let settled = false;
+    const finish = (move: EngineMove | null) => {
+      if (settled) return;
+      settled = true;
+      window.clearTimeout(timeout);
+      worker.terminate();
+      resolve(move);
+    };
+    const timeout = window.setTimeout(() => finish(null), 12_000);
+
+    worker.onerror = () => finish(null);
+    worker.onmessage = (event: MessageEvent<string>) => {
+      const line = String(event.data);
+      if (line === "uciok") {
+        worker.postMessage("setoption name Skill Level value 20");
+        worker.postMessage("setoption name Hash value 16");
+        worker.postMessage("isready");
+      } else if (line === "readyok") {
+        worker.postMessage(`position fen ${fen}`);
+        worker.postMessage("go movetime 6000");
+      } else if (line.startsWith("bestmove ")) {
+        const uci = line.split(" ")[1] ?? "";
+        if (!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(uci)) return finish(null);
+        finish({
+          from: uci.slice(0, 2) as Square,
+          to: uci.slice(2, 4) as Square,
+          promotion: uci[4] as EngineMove["promotion"]
+        });
+      }
+    };
+    worker.postMessage("uci");
+  });
+}
+
 export function AnhamChess({ locale, preview = false, storageScope = "client" }: AnhamChessProps) {
   const ru = locale === "ru";
   const storageKey = preview
@@ -74,6 +112,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
   const [ready, setReady] = useState(false);
   const [remoteReady, setRemoteReady] = useState(preview);
   const [level, setLevel] = useState<ChessLevel>("beginner");
+  const searchIdRef = useRef(0);
 
   useEffect(() => {
     const saved = window.localStorage.getItem(storageKey);
@@ -150,8 +189,13 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
 
   function playAnham() {
     setThinking(true);
-    window.setTimeout(() => {
-      const move = chooseAnhamMove(gameRef.current, level);
+    const searchId = ++searchIdRef.current;
+    window.setTimeout(async () => {
+      const move = level === "grandmaster"
+        ? (await chooseStockfishMove(gameRef.current.fen()))
+          ?? chooseAnhamMove(gameRef.current, "grandmaster")
+        : chooseAnhamMove(gameRef.current, level);
+      if (searchId !== searchIdRef.current) return;
       if (move) gameRef.current.move(move);
       setFen(gameRef.current.fen());
       setThinking(false);
@@ -174,6 +218,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
   }
 
   function newGame() {
+    searchIdRef.current += 1;
     game.reset(); setSelected(null); setThinking(false); setFen(game.fen());
     if (!preview) {
       void fetch("/api/chess/state", {
@@ -233,6 +278,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
         <div className="chess-room__tip"><b>✣</b><p><strong>{ru ? "Подсказка Anham" : "Anham’s tip"}</strong>{ru ? "Нажмите на фигуру, затем на подсвеченное поле. Пешка на последней линии автоматически станет ферзём." : "Tap a piece, then a highlighted square. A pawn reaching the last rank is promoted to a queen."}</p></div>
         <div className="chess-room__actions"><button onClick={takeBack} type="button">↶ {ru ? "Вернуть ход" : "Take back"}</button><button onClick={newGame} type="button">＋ {ru ? "Новая партия" : "New game"}</button></div>
         <p className="chess-room__saved">✓ {ru ? "Партия и уровень сохраняются в вашем аккаунте" : "Game and level are saved to your account"}</p>
+        <p className="chess-room__engine">{ru ? "Уровень «Гроссмейстер» работает на движке" : "Grandmaster level is powered by"} <a href="/stockfish/NOTICE.txt" target="_blank">Stockfish</a></p>
       </aside>
     </div>
     <section className="chess-room__discussion" aria-labelledby="chess-discussion-title">
