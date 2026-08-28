@@ -5,6 +5,7 @@ import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
+import { apiError, apiErrorLocale } from "@/lib/i18n/api-errors";
 
 export const runtime = "nodejs";
 
@@ -24,11 +25,12 @@ function extensionFor(mimeType: string): string | null {
 }
 
 export async function POST(request: Request) {
+  const locale = await apiErrorLocale();
   const supabase = createSupabaseServiceClient();
   const authClient = await createSupabaseServerClient();
 
   if (!supabase || !authClient) {
-    return NextResponse.json({ error: "Сервис временно недоступен." }, { status: 503 });
+    return NextResponse.json({ error: apiError("serviceUnavailable", locale) }, { status: 503 });
   }
 
   let form: FormData;
@@ -36,19 +38,19 @@ export async function POST(request: Request) {
   try {
     form = await request.formData();
   } catch {
-    return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
+    return NextResponse.json({ error: apiError("badRequest", locale) }, { status: 400 });
   }
 
   const file = form.get("audio");
   const rawDuration = Number(form.get("duration") ?? 0);
 
   if (!(file instanceof Blob) || file.size === 0) {
-    return NextResponse.json({ error: "Аудио не получено." }, { status: 400 });
+    return NextResponse.json({ error: apiError("audioMissing", locale) }, { status: 400 });
   }
 
   if (file.size > MAX_AUDIO_BYTES) {
     return NextResponse.json(
-      { error: "Голосовое слишком длинное (максимум ~10 МБ)." },
+      { error: apiError("audioTooLong", locale) },
       { status: 413 }
     );
   }
@@ -56,7 +58,7 @@ export async function POST(request: Request) {
   const extension = extensionFor(file.type);
 
   if (!extension) {
-    return NextResponse.json({ error: "Неподдерживаемый формат аудио." }, { status: 415 });
+    return NextResponse.json({ error: apiError("audioUnsupported", locale) }, { status: 415 });
   }
 
   // Resolve sender: staff sends into an explicit case, a client into their own.
@@ -70,7 +72,7 @@ export async function POST(request: Request) {
     const requestedCaseId = String(form.get("caseId") ?? "");
 
     if (!isUuid(requestedCaseId)) {
-      return NextResponse.json({ error: "Некорректный кейс." }, { status: 400 });
+      return NextResponse.json({ error: apiError("invalidCase", locale) }, { status: 400 });
     }
 
     const { data: caseRow } = await supabase
@@ -80,7 +82,7 @@ export async function POST(request: Request) {
       .maybeSingle();
 
     if (!caseRow) {
-      return NextResponse.json({ error: "Кейс не найден." }, { status: 404 });
+      return NextResponse.json({ error: apiError("caseNotFound", locale) }, { status: 404 });
     }
 
     caseId = caseRow.id;
@@ -93,7 +95,7 @@ export async function POST(request: Request) {
     } = await authClient.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Войдите в аккаунт." }, { status: 401 });
+      return NextResponse.json({ error: apiError("signInRequired", locale) }, { status: 401 });
     }
 
     const { data: caseRow } = await supabase
@@ -104,7 +106,7 @@ export async function POST(request: Request) {
 
     if (!caseRow) {
       return NextResponse.json(
-        { error: "Сначала заполните анкету — она создаст ваш кейс." },
+        { error: apiError("caseRequired", locale) },
         { status: 400 }
       );
     }
@@ -126,7 +128,7 @@ export async function POST(request: Request) {
     console.error("case audio upload failed", uploadError);
 
     return NextResponse.json(
-      { error: "Не удалось сохранить аудио. Попробуйте ещё раз." },
+      { error: apiError("audioNotSaved", locale) },
       { status: 502 }
     );
   }
@@ -155,7 +157,7 @@ export async function POST(request: Request) {
     console.error("case audio message insert failed", insertError);
 
     return NextResponse.json(
-      { error: "Не удалось отправить сообщение. Попробуйте ещё раз." },
+      { error: apiError("messageNotSent", locale) },
       { status: 502 }
     );
   }

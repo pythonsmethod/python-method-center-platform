@@ -12358,3 +12358,30 @@ body.cabinet-menu-open { overflow: hidden; }
 
 .assistant-memory__actions button:hover:not(:disabled) { background: rgba(190, 142, 55, 0.16); }
 .assistant-memory__actions button:disabled { cursor: wait; opacity: 0.6; }
+
+/* ---------- reading at 200% text size ----------
+   A person who raises the browser's text size is not resizing the window,
+   so every fixed inline box keeps its width while the words inside it grow.
+   Long Russian labels then set a minimum width wider than a phone and push
+   the page sideways: "Зарегистрироваться и оплатить" on /payment, the
+   welcome greeting, the sign-in tabs.
+
+   Deliberately at the end of this file: several rules above exist twice
+   over, and only a block after both copies is certain to win. */
+@media (max-width: 560px) {
+  .button,
+  .app-button,
+  .auth-tab,
+  .app-welcome__eyebrow,
+  .app-welcome__copy h1,
+  .app-welcome__copy p,
+  /* The legal documents are long Russian prose; at 200% a single word in a
+     list item was wider than the line it had to fit on. */
+  .offer-doc p,
+  .offer-doc li,
+  .offer-doc h2,
+  .offer-doc h3 {
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+}

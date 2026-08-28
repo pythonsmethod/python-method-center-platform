@@ -69,10 +69,20 @@ export function sanitizeChatMessages(value: unknown): ChatMessage[] | null {
   return messages;
 }
 
+// Why the assistant could not answer. The message stays for the places
+// that only log it; the code is what lets a route say the same thing in the
+// reader's own language instead of passing the Russian text straight to an
+// English chat window.
+export type AssistantErrorCode =
+  | "overloaded"
+  | "temporarilyDown"
+  | "unreachable"
+  | "emptyReply";
+
 export type AssistantResult =
   | { status: "ok"; reply: string }
   | { status: "unavailable" }
-  | { status: "error"; message: string };
+  | { status: "error"; message: string; code?: AssistantErrorCode };
 
 const CONTINUE_INSTRUCTION =
   "Продолжи ответ ровно с того места, где он оборвался. Не повторяй уже написанное, сохрани язык и закончи мысль кратко и естественно.";
@@ -240,7 +250,11 @@ export async function askClaude(
       .trim();
 
     if (!reply) {
-      return { status: "error", message: "Пустой ответ ассистента." };
+      return {
+        status: "error",
+        code: "emptyReply",
+        message: "Пустой ответ ассистента."
+      };
     }
 
     // A token ceiling is not a completed answer. Ask once for the missing
@@ -277,6 +291,7 @@ export async function askClaude(
     if (error instanceof Anthropic.RateLimitError) {
       return {
         status: "error",
+        code: "overloaded",
         message: "Ассистент перегружен. Попробуйте через минуту."
       };
     }
@@ -284,12 +299,14 @@ export async function askClaude(
     if (error instanceof Anthropic.APIError) {
       return {
         status: "error",
+        code: "temporarilyDown",
         message: "Ассистент временно недоступен. Попробуйте позже."
       };
     }
 
     return {
       status: "error",
+      code: "unreachable",
       message: "Не удалось связаться с ассистентом. Попробуйте позже."
     };
   }

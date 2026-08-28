@@ -25,6 +25,12 @@ import {
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { clientIp } from "@/lib/utils/client-ip";
+import {
+  apiError,
+  apiErrorLocale,
+  assistantFailure
+} from "@/lib/i18n/api-errors";
 
 export const runtime = "nodejs";
 
@@ -70,12 +76,12 @@ function isRateLimited(key: string, limit: number): boolean {
 }
 
 export async function POST(request: Request) {
-  const ip =
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const locale = await apiErrorLocale();
+  const ip = clientIp(request.headers);
 
   if (isRateLimited(`ip:${ip}`, HARD_IP_LIMIT_PER_MINUTE)) {
     return NextResponse.json(
-      { error: "Слишком много сообщений подряд. Подождите минуту." },
+      { error: apiError("rateLimited", locale) },
       { status: 429 }
     );
   }
@@ -85,7 +91,7 @@ export async function POST(request: Request) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
+    return NextResponse.json({ error: apiError("badRequest", locale) }, { status: 400 });
   }
 
   const messages = sanitizeChatMessages(
@@ -93,7 +99,7 @@ export async function POST(request: Request) {
   );
 
   if (!messages) {
-    return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
+    return NextResponse.json({ error: apiError("badRequest", locale) }, { status: 400 });
   }
 
   // Who is asking: a visitor, a registered person, or a paying client.
@@ -109,21 +115,20 @@ export async function POST(request: Request) {
 
   if (attachments === "invalid") {
     return NextResponse.json(
-      { error: "Файлы не прошли проверку. Обновите страницу и попробуйте ещё раз." },
+      { error: apiError("attachmentsRejected", locale) },
       { status: 400 }
     );
   }
 
   if (attachments && audience.tier !== "client") {
     return NextResponse.json({
-      reply:
-        "Чтение приложенных файлов доступно персональному ИИ после начала сопровождения. Сейчас вы можете загрузить анализы в кабинете — их лично разберёт Professor Python."
+      reply: apiError("attachmentsPaidOnly", locale)
     });
   }
 
   if (isRateLimited(`tier:${audience.profileId ?? ip}`, settings.perMinute)) {
     return NextResponse.json(
-      { error: "Слишком много сообщений подряд. Подождите минуту." },
+      { error: apiError("rateLimited", locale) },
       { status: 429 }
     );
   }
@@ -191,13 +196,16 @@ export async function POST(request: Request) {
 
   if (result.status === "unavailable") {
     return NextResponse.json(
-      { error: "ИИ-помощник ещё не подключён. Напишите нам через страницу «Поддержка»." },
+      { error: apiError("assistantUnavailable", locale) },
       { status: 503 }
     );
   }
 
   if (result.status === "error") {
-    return NextResponse.json({ error: result.message }, { status: 502 });
+    return NextResponse.json(
+      { error: assistantFailure(result, locale) },
+      { status: 502 }
+    );
   }
 
   // Red-flag auto-capture, two independent strands (P1-04): the model tags

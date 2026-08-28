@@ -2,9 +2,13 @@
 
 import { headers } from "next/headers";
 import type { SupportRequestActionState } from "@/lib/support/types";
-import { validatePublicSupportInput } from "@/lib/support/validation";
+import {
+  validatePublicSupportInput,
+  type PublicSupportCategory
+} from "@/lib/support/validation";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { clientIp } from "@/lib/utils/client-ip";
 
 // Best-effort per-instance limiter (mirrors the assistant endpoint):
 // smooths bursts and bots; not a hard distributed cap.
@@ -33,6 +37,19 @@ function errorState(message: string): SupportRequestActionState {
   return { status: "error", message };
 }
 
+// What the form offers, mapped onto support_request_category in the
+// database. Everything that was not "payment" used to be filed as
+// "technical", so "Другой вопрос" arrived in the team's queue wearing the
+// wrong label and could not be filtered apart. A sign-in problem genuinely
+// is technical; the enum has no value of its own for it, and adding one is
+// a migration rather than a mapping.
+const DB_CATEGORY: Record<PublicSupportCategory, string> = {
+  login: "technical",
+  other: "other",
+  payment: "payment",
+  technical: "technical"
+};
+
 const categorySubjects: Record<string, string> = {
   login: "Гость: проблема со входом",
   payment: "Гость: вопрос по оплате",
@@ -60,9 +77,7 @@ export async function submitPublicSupportRequest(
     return errorState(validation.error);
   }
 
-  const headerStore = await headers();
-  const clientKey =
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const clientKey = clientIp(await headers());
 
   if (isRateLimited(clientKey)) {
     return errorState(
@@ -85,8 +100,7 @@ export async function submitPublicSupportRequest(
     .from("support_requests")
     .insert({
       profile_id: null,
-      category:
-        validation.category === "payment" ? "payment" : "technical",
+      category: DB_CATEGORY[validation.category],
       status: "open",
       subject: categorySubjects[validation.category],
       body: message,

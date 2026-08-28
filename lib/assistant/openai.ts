@@ -58,6 +58,7 @@ export async function askOpenAi(
     if (response.status === 429) {
       return {
         status: "error",
+        code: "overloaded",
         message: "Ассистент перегружен. Попробуйте через минуту."
       };
     }
@@ -65,6 +66,7 @@ export async function askOpenAi(
     if (!response.ok) {
       return {
         status: "error",
+        code: "temporarilyDown",
         message: "Ассистент временно недоступен. Попробуйте позже."
       };
     }
@@ -79,7 +81,11 @@ export async function askOpenAi(
     let reply = data.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
-      return { status: "error", message: "Пустой ответ ассистента." };
+      return {
+        status: "error",
+        code: "emptyReply",
+        message: "Пустой ответ ассистента."
+      };
     }
 
     if (data.choices?.[0]?.finish_reason === "length") {
@@ -127,6 +133,7 @@ export async function askOpenAi(
   } catch {
     return {
       status: "error",
+      code: "unreachable",
       message: "Не удалось связаться с ассистентом. Попробуйте позже."
     };
   }
