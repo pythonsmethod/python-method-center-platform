@@ -78,9 +78,10 @@ describe("Anham chess", () => {
   });
 
   it("uses larger pieces in both modern and legacy mobile browsers", () => {
-    expect(styles).toContain("font-size:clamp(2.9rem,13.5vw,6.6rem)");
-    expect(styles).toContain("font-size:clamp(2.9rem,16cqi,6.6rem)");
-    expect(styles).toContain("transform:scale(1.25)");
+    expect(styles).toContain("font-size:clamp(2rem,8vw,4.5rem)");
+    expect(styles).toContain("font-size:clamp(2rem,10cqi,4.5rem)");
+    expect(styles).toContain("transform:none");
+    expect(styles).not.toContain("transform:scale(1.25)");
   });
 
   it("persists games and coaching conversations per account", () => {
