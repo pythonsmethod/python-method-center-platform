@@ -24,7 +24,7 @@ export async function getCaseReview(
 
   const { data, error } = await supabase
     .from("case_ai_reviews")
-    .select("summary, draft, documents_fingerprint, documents_count, created_at")
+    .select("id, summary, draft, documents_fingerprint, documents_count, created_at")
     .eq("case_id", caseId)
     .maybeSingle();
 
@@ -33,13 +33,28 @@ export async function getCaseReview(
   }
 
   const current = fingerprintDocuments(documents);
+  const { data: approvals } = await supabase
+    .from("case_review_learning_events")
+    .select("ai_draft, approved_text, approved_at")
+    .eq("review_id", data.id)
+    .eq("documents_fingerprint", data.documents_fingerprint)
+    .order("approved_at", { ascending: false })
+    .limit(100);
+  const matchingApprovals = (approvals ?? []).filter(
+    (approval) => String(approval.ai_draft ?? "") === String(data.draft ?? "")
+  );
+  const latestApproval = matchingApprovals[0] ?? null;
 
   return {
+    id: String(data.id),
     summary: String(data.summary ?? ""),
     draft: String(data.draft ?? ""),
     documentsFingerprint: String(data.documents_fingerprint ?? ""),
     documentsCount: Number(data.documents_count ?? 0),
     createdAt: String(data.created_at ?? ""),
-    isCurrent: String(data.documents_fingerprint ?? "") === current
+    isCurrent: String(data.documents_fingerprint ?? "") === current,
+    approvedText: latestApproval ? String(latestApproval.approved_text ?? "") : null,
+    approvedAt: latestApproval ? String(latestApproval.approved_at ?? "") : null,
+    approvalCount: matchingApprovals.length
   };
 }
