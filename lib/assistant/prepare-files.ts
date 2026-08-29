@@ -72,10 +72,37 @@ async function compressImage(file: File): Promise<{ data: string; mediaType: str
   context.drawImage(bitmap, 0, 0, width, height);
   bitmap.close?.();
 
-  return {
-    data: stripPrefix(canvas.toDataURL("image/jpeg", IMAGE_QUALITY)),
-    mediaType: "image/jpeg"
-  };
+  let outputCanvas = canvas;
+  let quality = IMAGE_QUALITY;
+  let data = stripPrefix(outputCanvas.toDataURL("image/jpeg", quality));
+
+  // Keep the sharp copy whenever it fits. Degrade only an individual image
+  // that would otherwise be rejected by the API size limit.
+  while (base64Bytes(data) > MAX_ATTACHMENT_BYTES && quality > 0.7) {
+    quality = Math.max(0.7, quality - 0.05);
+    data = stripPrefix(outputCanvas.toDataURL("image/jpeg", quality));
+  }
+
+  // A very noisy photo may still be too large as JPEG. Step the dimensions
+  // down only as far as necessary instead of rejecting the analysis.
+  while (
+    base64Bytes(data) > MAX_ATTACHMENT_BYTES &&
+    Math.max(outputCanvas.width, outputCanvas.height) > 1600
+  ) {
+    const resized = document.createElement("canvas");
+    resized.width = Math.max(1, Math.round(outputCanvas.width * 0.85));
+    resized.height = Math.max(1, Math.round(outputCanvas.height * 0.85));
+    const resizedContext = resized.getContext("2d");
+    if (!resizedContext) break;
+    resizedContext.fillStyle = "#ffffff";
+    resizedContext.fillRect(0, 0, resized.width, resized.height);
+    resizedContext.drawImage(outputCanvas, 0, 0, resized.width, resized.height);
+    outputCanvas = resized;
+    quality = Math.max(0.78, quality);
+    data = stripPrefix(outputCanvas.toDataURL("image/jpeg", quality));
+  }
+
+  return { data, mediaType: "image/jpeg" };
 }
 
 export type PrepareResult = {
