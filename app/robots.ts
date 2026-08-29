@@ -21,7 +21,11 @@ export default function robots(): MetadataRoute.Robots {
           "/auth/",
           "/site-preview",
           "/welcome",
-          "/payment/success"
+          "/payment/success",
+          // The English side of the two pages that are public but not for
+          // search. Everything else under /en is meant to be found.
+          "/en/payment/success",
+          "/en/shop"
         ]
       }
     ],

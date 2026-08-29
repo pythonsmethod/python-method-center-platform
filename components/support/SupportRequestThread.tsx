@@ -116,7 +116,7 @@ export function SupportRequestThread({
           {pending ? labels.sending : labels.send}
         </button>
         {state.message ? (
-          <p className={`form-message form-message--${state.status === "success" ? "success" : "error"}`}>
+          <p aria-live="polite" role="status" className={`form-message form-message--${state.status === "success" ? "success" : "error"}`}>
             {state.message}
           </p>
         ) : null}

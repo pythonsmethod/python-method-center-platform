@@ -44,6 +44,41 @@ export const caseStatusLabel = (value: string, locale: Locale = "ru") => labelFo
 export const caseUrgencyLabel = (value: string, locale: Locale = "ru") => labelFor(caseUrgencyLabels, value, locale);
 export const caseDirectionLabel = (value: string, locale: Locale = "ru") => labelFor(caseDirectionLabels, value, locale);
 export const documentStatusLabel = (value: string, locale: Locale = "ru") => labelFor(documentStatusLabels, value, locale);
+
+// What the client is shown for their own uploads.
+//
+// The full list above is the team's: it carries values from two different
+// database lifecycles at once, so a client could meet "Загружен", "В
+// очереди" and "Обрабатывается" as if they were three separate stages of
+// their document, and "Обработан" and "Принят" as if those differed. None
+// of that is theirs to follow. They see the file being worked on, or done —
+// and if it ends badly, the case chat says so in words.
+const clientDocumentStatusLabels: LocalizedLabels = {
+  ru: {
+    ready: "Готово",
+    archived: "В архиве",
+    needs_reupload: "Нужен новый файл",
+    failed: "Нужен новый файл"
+  },
+  en: {
+    ready: "Ready",
+    archived: "Archived",
+    needs_reupload: "Needs a new file",
+    failed: "Needs a new file"
+  }
+};
+
+const clientDocumentInProgress: Record<Locale, string> = {
+  ru: "В работе",
+  en: "In progress"
+};
+
+export function clientDocumentStatusLabel(
+  value: string,
+  locale: Locale = "ru"
+): string {
+  return clientDocumentStatusLabels[locale][value] ?? clientDocumentInProgress[locale];
+}
 export const supportStatusLabel = (value: string, locale: Locale = "ru") => labelFor(supportStatusLabels, value, locale);
 export const lifecycleEventLabel = (value: string, locale: Locale = "ru") => labelFor(lifecycleEventLabels, value, locale);
 export const paymentProductLabel = (value: string, locale: Locale = "ru") => labelFor(paymentProductLabels, value, locale);

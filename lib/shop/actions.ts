@@ -9,6 +9,7 @@ import { validateShopWaitlistInput } from "@/lib/shop/validation";
 import type { ShopWaitlistActionState } from "@/lib/shop/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { clientIp } from "@/lib/utils/client-ip";
 
 const WINDOW_MS = 60 * 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 8;
@@ -67,8 +68,7 @@ export async function joinShopWaitlist(
   }
 
   const headerStore = await headers();
-  const clientKey =
-    headerStore.get("x-forwarded-for")?.split(",")[0]?.trim() ?? "unknown";
+  const clientKey = clientIp(headerStore);
 
   if (isRateLimited(clientKey)) {
     return { status: "error", message: t.errorRateLimited };

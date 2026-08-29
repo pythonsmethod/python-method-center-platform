@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { PaymentPlans } from "@/components/payments/PaymentPlans";
 import { getPaymentPlans } from "@/lib/payments/config";
@@ -13,8 +13,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t.title,
-    description: t.description,
-    alternates: { canonical: "/payment" }
+    description: t.description
+    // Canonical and hreflang are written by the root layout, which is the
+    // only place that knows whether this render is the Russian address or
+    // the English one. Pinning a canonical here dropped the pair.
   };
 }
 
@@ -92,8 +94,11 @@ export default async function PaymentPage() {
         signedIn={Boolean(profileId)}
       />
 
+      {/* Level 2: the promo panel above already carries this page's h1.
+          Visually identical — see .page-header h2 in globals.css. */}
       <PageHeader
         eyebrow={t.eyebrow}
+        headingLevel={2}
         title={t.title}
         description={t.description}
       />

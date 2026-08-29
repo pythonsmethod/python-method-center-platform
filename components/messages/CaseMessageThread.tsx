@@ -213,7 +213,7 @@ export function CaseMessageThread({
   return (
     <div className={`case-thread${expanded ? " case-thread--full" : ""}`}>
       {loadError ? (
-        <p className="form-message form-message--error">
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">
           {t.loadError}: {loadError}. {t.loadErrorTail}</p>
       ) : null}
 
@@ -295,7 +295,7 @@ export function CaseMessageThread({
           </button>
         </div>
         {state.status === "error" ? (
-          <p className="form-message form-message--error">{state.message}</p>
+          <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
         ) : null}
       </form>
 

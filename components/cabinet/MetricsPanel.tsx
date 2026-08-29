@@ -256,6 +256,8 @@ export function MetricsPanel({ rows, labels: t, dateLocale }: MetricsPanelProps)
           </button>
           {addState.message ? (
             <p
+              aria-live="polite"
+              role="status"
               className={`form-message form-message--${
                 addState.status === "success" ? "success" : "error"
               }`}

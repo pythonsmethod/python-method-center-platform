@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { ProfileDetailsForm } from "@/components/cabinet/ProfileDetailsForm";

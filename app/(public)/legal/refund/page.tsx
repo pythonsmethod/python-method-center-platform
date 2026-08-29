@@ -8,7 +8,7 @@ import { REFUND_CONTENT, POLICY_UPDATED_ISO } from "@/lib/legal/policy-content";
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).refund;
 
-  return { title: `${t.title} — Python Method`, description: t.description };
+  return { title: t.title, description: t.description };
 }
 
 export default async function RefundPage() {

@@ -3,6 +3,11 @@ import { Chess } from "chess.js";
 import { sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam } from "@/lib/assistant/router";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import {
+  apiError,
+  apiErrorLocale,
+  assistantFailure
+} from "@/lib/i18n/api-errors";
 
 export const runtime = "nodejs";
 
@@ -29,8 +34,9 @@ async function authenticated() {
 }
 
 export async function GET() {
+  const locale = await apiErrorLocale();
   const auth = await authenticated();
-  if (!auth) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
+  if (!auth) return NextResponse.json({ error: apiError("accessDenied", locale) }, { status: 401 });
   const { data } = await auth.supabase.from("chess_conversations")
     .select("role,content").eq("user_id", auth.user.id)
     .order("created_at", { ascending: false }).limit(40);
@@ -39,28 +45,29 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const locale = await apiErrorLocale();
   const auth = await authenticated();
-  if (!auth) return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
+  if (!auth) return NextResponse.json({ error: apiError("accessDenied", locale) }, { status: 401 });
   if (limited(auth.user.id)) {
-    return NextResponse.json({ error: "Слишком много сообщений подряд. Подождите минуту." }, { status: 429 });
+    return NextResponse.json({ error: apiError("rateLimited", locale) }, { status: 429 });
   }
 
   let body: unknown;
   try { body = await request.json(); }
-  catch { return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 }); }
+  catch { return NextResponse.json({ error: apiError("badRequest", locale) }, { status: 400 }); }
 
   const payload = body as { messages?: unknown; locale?: unknown; requestContext?: unknown };
   const messages = sanitizeChatMessages(payload.messages);
-  if (!messages) return NextResponse.json({ error: "Некорректный запрос." }, { status: 400 });
+  if (!messages) return NextResponse.json({ error: apiError("badRequest", locale) }, { status: 400 });
 
   const context = payload.requestContext as { fen?: unknown; pgn?: unknown; level?: unknown } | null;
   if (!context || typeof context.fen !== "string" || context.fen.length > 120) {
-    return NextResponse.json({ error: "Позиция партии недоступна." }, { status: 400 });
+    return NextResponse.json({ error: apiError("chessPositionMissing", locale) }, { status: 400 });
   }
 
   let position: Chess;
   try { position = new Chess(context.fen); }
-  catch { return NextResponse.json({ error: "Некорректная позиция партии." }, { status: 400 }); }
+  catch { return NextResponse.json({ error: apiError("chessPositionInvalid", locale) }, { status: 400 }); }
 
   let pgn = "";
   if (typeof context.pgn === "string" && context.pgn.length <= 6000) {
@@ -87,9 +94,9 @@ export async function POST(request: Request) {
   const result = await askAssistantTeam(system, messages, 1200, "best");
 
   if (result.status === "unavailable") {
-    return NextResponse.json({ error: english ? "Anham is temporarily unavailable." : "Anham временно недоступен." }, { status: 503 });
+    return NextResponse.json({ error: locale === "en" ? "Anham is temporarily unavailable." : "Anham временно недоступен." }, { status: 503 });
   }
-  if (result.status === "error") return NextResponse.json({ error: result.message }, { status: 502 });
+  if (result.status === "error") return NextResponse.json({ error: assistantFailure(result, locale) }, { status: 502 });
   const question = messages[messages.length - 1]?.content?.trim() ?? "";
   if (question) {
     await auth.supabase.from("chess_conversations").insert([

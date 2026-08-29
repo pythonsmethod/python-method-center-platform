@@ -178,7 +178,7 @@ export function SupplementsPanel({
             </div>
           ) : null}
           {adviceState.status === "error" && adviceState.message ? (
-            <p className="form-message form-message--error">
+            <p aria-live="assertive" className="form-message form-message--error" role="alert">
               {adviceState.message}
             </p>
           ) : null}
@@ -308,6 +308,8 @@ export function SupplementsPanel({
           </button>
           {addState.message ? (
             <p
+              aria-live="polite"
+              role="status"
               className={`form-message form-message--${
                 addState.status === "success" ? "success" : "error"
               }`}

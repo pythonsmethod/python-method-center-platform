@@ -112,7 +112,7 @@ export function ShopWaitlist({ labels, options }: ShopWaitlistProps) {
       <p className="shop-waitlist__note">{labels.note}</p>
 
       {state.status === "error" ? (
-        <p className="form-message form-message--error">{state.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
       ) : null}
     </form>
   );

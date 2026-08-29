@@ -67,7 +67,7 @@ export function CheckEmailActions({ email, labels }: CheckEmailActionsProps) {
       </form>
 
       {state.message ? (
-        <p className={messageClassName(state)}>{state.message}</p>
+        <p aria-live="polite" role="status" className={messageClassName(state)}>{state.message}</p>
       ) : null}
     </>
   );

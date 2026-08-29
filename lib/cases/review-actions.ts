@@ -99,36 +99,42 @@ export async function generateCaseReview(
     );
   }
 
-  const agreed = (extractions ?? []).flatMap((row) =>
-    Array.isArray(row.agreed_values) ? row.agreed_values as TranscribedValue[] : []
+  // Numbered by document, not by filename. A Map keyed on the name keeps
+  // only the last of any repeat, and repeats are normal here: the cabinet
+  // tells people to send a newer version of the same test as a new upload,
+  // and sanitizeOriginalFilename turns every Cyrillic name into the same
+  // run of underscores. Every value from the earlier file then carried the
+  // later file's number, and one number was never printed at all — so
+  // Professor Python read last year's figures labelled as this month's.
+  const numberByDocument = new Map(
+    documents.map((document, index) => [document.id, index + 1])
   );
-  const disputed = (extractions ?? []).flatMap((row) =>
-    Array.isArray(row.disputed_values) ? row.disputed_values as DisputedValue[] : []
+  const numberedFile = (documentId: string, file: string) =>
+    `№${numberByDocument.get(documentId) ?? "?"} «${file}»`;
+
+  const numberedAgreed = (extractions ?? []).flatMap((row) =>
+    Array.isArray(row.agreed_values)
+      ? (row.agreed_values as TranscribedValue[]).map((value) => ({
+          ...value,
+          file: numberedFile(row.document_id, value.file)
+        }))
+      : []
+  );
+  const numberedDisputed = (extractions ?? []).flatMap((row) =>
+    Array.isArray(row.disputed_values)
+      ? (row.disputed_values as DisputedValue[]).map((value) => ({
+          ...value,
+          file: numberedFile(row.document_id, value.file)
+        }))
+      : []
   );
 
-  const fileNumbers = new Map(
-    documents.map((document, index) => [
-      String(document.original_filename ?? "document"),
-      index + 1
-    ])
-  );
-  const numberedFile = (file: string) =>
-    `№${fileNumbers.get(file) ?? "?"} «${file}»`;
-  const numberedAgreed = agreed.map((value) => ({
-    ...value,
-    file: numberedFile(value.file)
-  }));
-  const numberedDisputed = disputed.map((value) => ({
-    ...value,
-    file: numberedFile(value.file)
-  }));
-
-  if (agreed.length === 0 && disputed.length === 0) {
+  if (numberedAgreed.length === 0 && numberedDisputed.length === 0) {
     return errorState("В распознанных документах не найдено содержимого для итогового разбора.");
   }
 
   const context = await buildCaseContext(caseId);
-  const disputedNote = disputed.length > 0
+  const disputedNote = numberedDisputed.length > 0
     ? `\n\nСПОРНЫЕ МЕСТА. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(numberedDisputed)}`
     : `\n\nСПОРНЫХ МЕСТ НЕТ. После разделителя «${CASE_REVIEW_UNREAD_HEADING}» напиши только «НЕТ».`;
 

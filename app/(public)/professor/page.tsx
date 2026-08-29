@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { IconAnkh } from "@/components/icons/EgyptianIcons";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -38,7 +38,7 @@ const PROFESSOR_IMAGE = "/images/professor-python.png";
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).professor;
 
-  return { title: `${t.title} — Python Method`, description: t.lead };
+  return { title: t.title, description: t.lead };
 }
 
 export default async function ProfessorPage() {

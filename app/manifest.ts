@@ -19,12 +19,27 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
     theme_color: "#100d08",
     orientation: "portrait",
     categories: ["health", "lifestyle"],
+    // Chrome wants 192 and 512 before it offers to install, and Android
+    // crops a plain icon to a circle — hence the maskable variant, which
+    // keeps the artwork inside the safe area on the brand-coloured plate.
     icons: [
       {
-        src: "/images/anham-master.png",
-        sizes: "1024x1024",
+        src: "/icons/icon-192.png",
+        sizes: "192x192",
         type: "image/png",
         purpose: "any"
+      },
+      {
+        src: "/icons/icon-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "any"
+      },
+      {
+        src: "/icons/icon-maskable-512.png",
+        sizes: "512x512",
+        type: "image/png",
+        purpose: "maskable"
       }
     ]
   };

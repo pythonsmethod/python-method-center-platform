@@ -130,7 +130,7 @@ export function MetricsUpload({ labels: t }: MetricsUploadProps) {
       <p className="metrics-upload__boundary">{t.boundary}</p>
 
       {stage.kind === "error" ? (
-        <p className="form-message form-message--error">{stage.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{stage.message}</p>
       ) : null}
 
       {stage.kind === "review" && saveState.status !== "success" ? (
@@ -195,6 +195,8 @@ export function MetricsUpload({ labels: t }: MetricsUploadProps) {
 
       {saveState.message ? (
         <p
+          aria-live="polite"
+          role="status"
           className={`form-message form-message--${
             saveState.status === "success" ? "success" : "error"
           }`}

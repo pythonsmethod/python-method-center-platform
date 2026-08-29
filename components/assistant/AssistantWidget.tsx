@@ -69,7 +69,20 @@ export function AssistantWidget({
       return;
     }
 
-    welcomeTimer.current = setTimeout(() => setShowWelcome(true), 1400);
+    welcomeTimer.current = setTimeout(() => {
+      // Marked seen when it is shown, not when it is closed. The flag used
+      // to be written only by dismissWelcome(), so anyone who read the
+      // greeting and simply moved on met it again on the next page — and
+      // this effect re-runs on every route change, so "once per browser"
+      // was in practice "once per page view".
+      try {
+        window.localStorage.setItem(WELCOME_STORAGE_KEY, "seen");
+      } catch {
+        // Private mode: the greeting will simply show again next visit.
+      }
+
+      setShowWelcome(true);
+    }, 1400);
 
     return () => {
       if (welcomeTimer.current) {

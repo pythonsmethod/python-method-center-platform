@@ -41,6 +41,8 @@ export function RequestStatusButtons({
       </div>
       {state.message ? (
         <p
+          aria-live="polite"
+          role="status"
           className={`form-message form-message--${
             state.status === "success" ? "success" : "error"
           }`}

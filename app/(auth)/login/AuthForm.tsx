@@ -61,7 +61,6 @@ type AuthFormProps = {
   // Which tab opens first. The header has separate "Вход" and
   // "Регистрация" entries, and the second must not land on the login form.
   initialMode?: AuthMode;
-  locale?: "ru" | "en";
 };
 
 function messageClassName(state: AuthActionState): string {
@@ -72,8 +71,7 @@ export function AuthForm({
   nextPath,
   supabaseConfigured,
   labels = defaultLabels,
-  initialMode = "login",
-  locale = "ru"
+  initialMode = "login"
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
   // Every field is held here, not left to the browser. React empties an
@@ -123,7 +121,7 @@ export function AuthForm({
 
   return (
     <section className="auth-panel" aria-label={labels.formAria}>
-      <div className="auth-tabs" role="tablist" aria-label={labels.modeAria}>
+      <div className="auth-tabs" role="group" aria-label={labels.modeAria}>
         <button
           aria-pressed={isLogin}
           className={isLogin ? "auth-tab auth-tab--active" : "auth-tab"}
@@ -147,7 +145,6 @@ export function AuthForm({
         className="auth-form"
       >
         <input name="next" type="hidden" value={nextPath} />
-        <input name="locale" type="hidden" value={locale} />
         <label className="field">
           <span>{labels.email}</span>
           <input
@@ -276,7 +273,7 @@ export function AuthForm({
       ) : null}
 
       {resendState.message ? (
-        <p className={messageClassName(resendState)}>{resendState.message}</p>
+        <p aria-live="polite" role="status" className={messageClassName(resendState)}>{resendState.message}</p>
       ) : null}
     </section>
   );

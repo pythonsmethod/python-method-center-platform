@@ -2,6 +2,16 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/env";
 import { SITE_URL } from "@/lib/config/site";
+import {
+  LOCALE_COOKIE,
+  LOCALE_HEADER,
+  PATH_HEADER
+} from "@/lib/i18n/locale";
+import {
+  hasEnglishTwin,
+  localizedHref,
+  readLocaleFromPath
+} from "@/lib/i18n/routing";
 
 const REFERRAL_COOKIE = "pm-ref";
 const REFERRAL_COOKIE_MAX_AGE = 60 * 60 * 24 * 90; // 90 days
@@ -27,6 +37,49 @@ function captureReferral(request: NextRequest, response: NextResponse): void {
   });
 }
 
+// Which language this address asks for, and what to do about it.
+//
+// Russian is served from the bare paths it has always used. English lives
+// under /en, and the middleware turns /en/payment back into /payment before
+// the application sees it, carrying the language in a request header — so
+// there is one copy of every page, not two.
+//
+// A visitor who has pressed EN is moved from a Russian address to its
+// English twin. Nobody is moved on the strength of Accept-Language alone:
+// a crawler arrives with all sorts of language headers, and redirecting it
+// away from an address is how versions of a site stop being seen.
+function resolveLanguageRouting(request: NextRequest): NextResponse | null {
+  const { pathname } = request.nextUrl;
+  const { locale, path } = readLocaleFromPath(pathname);
+
+  if (locale === "en") {
+    // /en/cabinet and the like have no English twin, so there is nothing to
+    // rewrite them to. They are simply not addresses on this site.
+    if (!hasEnglishTwin(path)) {
+      return null;
+    }
+
+    const target = request.nextUrl.clone();
+    target.pathname = path;
+
+    const headers = new Headers(request.headers);
+    headers.set(LOCALE_HEADER, "en");
+    headers.set(PATH_HEADER, path);
+
+    return NextResponse.rewrite(target, { request: { headers } });
+  }
+
+  const chosen = request.cookies.get(LOCALE_COOKIE)?.value;
+
+  if (chosen === "en" && hasEnglishTwin(path)) {
+    const target = request.nextUrl.clone();
+    target.pathname = localizedHref(path, "en");
+    return NextResponse.redirect(target, 307);
+  }
+
+  return null;
+}
+
 export async function middleware(request: NextRequest) {
   const canonicalOrigin = new URL(SITE_URL);
   const forwardedHost = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim();
@@ -44,8 +97,27 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(destination, 308);
   }
 
+  const language = resolveLanguageRouting(request);
+
+  if (language) {
+    // A rewrite still has to carry the referral cookie and, on the English
+    // side, the same session handling as everywhere else — but /en only
+    // covers public pages, where there is no session to refresh.
+    captureReferral(request, language);
+    return language;
+  }
+
+  // Carried on every response built below: the Supabase handler rebuilds
+  // the response object when it refreshes a session, and a header set only
+  // on the first one would be lost at exactly that point.
+  const requestHeaders = new Headers(request.headers);
+  requestHeaders.set(PATH_HEADER, request.nextUrl.pathname);
+
+  const nextWithHeaders = () =>
+    NextResponse.next({ request: { headers: requestHeaders } });
+
   const config = getSupabaseConfig();
-  let response = NextResponse.next({ request });
+  let response = nextWithHeaders();
 
   if (!config) {
     captureReferral(request, response);
@@ -91,7 +163,7 @@ export async function middleware(request: NextRequest) {
         cookiesToSet.forEach(({ name, value }) => {
           request.cookies.set(name, value);
         });
-        response = NextResponse.next({ request });
+        response = nextWithHeaders();
         cookiesToSet.forEach(({ name, value, options }) => {
           response.cookies.set(name, value, options);
         });

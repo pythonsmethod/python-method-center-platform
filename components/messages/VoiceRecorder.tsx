@@ -231,7 +231,7 @@ export function VoiceRecorder({ caseId, onSent, labels: t }: VoiceRecorderProps)
         <p className="voice-recorder__status">{t.sending}</p>
       ) : null}
 
-      {error ? <p className="form-message form-message--error">{error}</p> : null}
+      {error ? <p aria-live="assertive" className="form-message form-message--error" role="alert">{error}</p> : null}
     </div>
   );
 }

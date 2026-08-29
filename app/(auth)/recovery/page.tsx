@@ -1,4 +1,5 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -7,6 +8,12 @@ import { RecoveryForm } from "./RecoveryForm";
 type RecoveryPageProps = {
   searchParams?: Promise<{ message?: string | string[] }>;
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).recovery;
+
+  return { title: t.title, description: t.description };
+}
 
 export default async function RecoveryPage({ searchParams }: RecoveryPageProps) {
   const t = getDictionary(await getLocale()).recovery;
