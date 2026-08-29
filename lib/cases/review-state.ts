@@ -5,6 +5,7 @@
 // takes every form it serves down with it at runtime (E352).
 
 export type CaseReview = {
+  id: string;
   summary: string;
   draft: string;
   documentsFingerprint: string;
@@ -13,6 +14,9 @@ export type CaseReview = {
   // False when the client has uploaded or removed something since this
   // reading was made.
   isCurrent: boolean;
+  approvedText: string | null;
+  approvedAt: string | null;
+  approvalCount: number;
 };
 
 export type CaseReviewActionState = {

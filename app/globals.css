@@ -2046,6 +2046,16 @@ code {
   margin-top: 14px;
 }
 
+.case-review__editor {
+  display: block;
+  width: 100%;
+  min-height: 22rem;
+  resize: vertical;
+  font: inherit;
+  color: inherit;
+  background: transparent;
+}
+
 .support-thread__messages {
   background: var(--surface-muted);
   border: 1px solid var(--line);
