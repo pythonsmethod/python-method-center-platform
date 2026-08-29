@@ -301,19 +301,17 @@ export function AssistantChat({
 
     if (requestedMemory) {
       const commandMessage: ChatMessage = { role: "user", content: trimmed };
-      setMessages([...messages, commandMessage]);
+      const confirmationQuestion: ChatMessage = {
+        role: "assistant",
+        content: locale === "ru"
+          ? "Я подготовил это к сохранению. Подтвердите ниже, что именно сделать: сохранить в метод, в книгу, в память ответов клиентам или не сохранять."
+          : "I prepared this for saving. Please confirm below what to do: save it to the method, the book, client-answer memory, or do not save it."
+      };
+      setMessages([...messages, commandMessage, confirmationQuestion]);
       setInput("");
       setError(null);
-      setPending(true);
-      setMemoryState("saving");
+      setMemoryState("offer");
       setMemoryMessage(null);
-
-      const saved = await saveMemory(requestedMemory, messages);
-      const confirmation = saved
-        ? (locale === "ru" ? "Готово. Я сохранил это в базу знаний и буду учитывать в следующих разговорах." : "Done. I saved this to the knowledge base and will use it in future conversations.")
-        : (locale === "ru" ? "Сохранить в базу знаний не удалось. Сообщение об ошибке показано ниже." : "I could not save this to the knowledge base. The error is shown below.");
-      setMessages([...messages, commandMessage, { role: "assistant", content: confirmation }]);
-      setPending(false);
       return;
     }
 
@@ -473,7 +471,7 @@ export function AssistantChat({
         <div className="assistant-memory" role="status">
           {memoryState === "saved" ? <p>{memoryMessage}</p> : (
             <>
-              <strong>{locale === "ru" ? "Professor Python, сохранить результат этого разговора?" : "Professor Python, save the result of this conversation?"}</strong>
+              <strong>{locale === "ru" ? "Professor Python, что сделать с этим результатом?" : "Professor Python, what should be done with this result?"}</strong>
               <div className="assistant-memory__actions">
                 <button disabled={memoryState === "saving"} onClick={() => void saveMemory("book")} type="button">{locale === "ru" ? "В книгу" : "To the book"}</button>
                 <button disabled={memoryState === "saving"} onClick={() => void saveMemory("method")} type="button">{locale === "ru" ? "В метод" : "To the method"}</button>
