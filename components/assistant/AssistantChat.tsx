@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
+import { memoryCollectionFromCommand, type MemoryCollection } from "@/lib/assistant/memory";
 import {
   prepareFiles,
   splitIntoBatches,
@@ -56,7 +57,7 @@ const chatCopy = {
     provider: "Кто отвечает", best: "Лучший ответ (арбитр выбирает)", both: "Оба вместе (совет)",
     remove: (name: string) => `Убрать ${name}`, attach: "Прикрепить файл или фото",
     attachTitle: "Фото, PDF или текстовый файл — до 30 штук за раз. Снимки сжимаются автоматически, файлы не сохраняются на платформе.",
-    extract: `Это часть присланных файлов (фотографии, сканы или PDF анализов и обследований).\nВыпиши из них максимально полно и дословно всё, что там написано. Ничего не интерпретируй и не добавляй от себя. Указывай источник каждого фрагмента.`
+    extract: `Это одна партия фотографий, сканов или PDF анализов. Выполни только точную расшифровку, без медицинского разбора. Для каждого файла отдельно выпиши все видимые строки: название показателя, результат, знак < или >, единицу, референс, дату и примечание. После первого чтения второй раз сверь каждую цифру и единицу с изображением. Не исправляй и не угадывай. Помечай [НЕЧИТАЕМО: файл, конкретная строка/поле] только если это место видно, но символ действительно нельзя различить. Отсутствующие на странице исследования не считай непрочитанными. Не повторяй замечания.`
   },
   en: {
     tooMany: (count: number) => `You can attach no more than ${count} files at once.`,
@@ -67,7 +68,7 @@ const chatCopy = {
     provider: "Who answers", best: "Best answer (selected by the arbiter)", both: "Both together (panel)",
     remove: (name: string) => `Remove ${name}`, attach: "Attach a file or photo",
     attachTitle: "Photos, PDFs, or text files — up to 30 at once. Images are compressed automatically and files are not stored on the platform.",
-    extract: `This is one part of the attached files (photos, scans, or PDFs of test results and examinations).\nTranscribe everything in them as fully and literally as possible. Do not interpret, assess, or add anything. Identify the source file for each fragment.`
+    extract: `This is one batch of photos, scans, or PDFs of test results. Perform exact transcription only, without medical interpretation. For each file separately, record every visible row: test name, result, < or > sign, unit, reference range, date, and laboratory note. After the first reading, check every number and unit against the image a second time. Do not correct or guess. Use [UNREADABLE: file, exact row/field] only when the location is visible but a character truly cannot be distinguished. Do not call tests absent from the page unreadable. Do not repeat issues.`
   }
 } as const;
 
@@ -294,6 +295,26 @@ export function AssistantChat({
       return;
     }
 
+    const requestedMemory = memoryCapture && attached.length === 0
+      ? memoryCollectionFromCommand(trimmed)
+      : null;
+
+    if (requestedMemory) {
+      const commandMessage: ChatMessage = { role: "user", content: trimmed };
+      const confirmationQuestion: ChatMessage = {
+        role: "assistant",
+        content: locale === "ru"
+          ? "Я подготовил это к сохранению. Подтвердите ниже, что именно сделать: сохранить в метод, в книгу, в память ответов клиентам или не сохранять."
+          : "I prepared this for saving. Please confirm below what to do: save it to the method, the book, client-answer memory, or do not save it."
+      };
+      setMessages([...messages, commandMessage, confirmationQuestion]);
+      setInput("");
+      setError(null);
+      setMemoryState("offer");
+      setMemoryMessage(null);
+      return;
+    }
+
     const visible = attached.length
       ? `${trimmed}${trimmed ? "\n" : ""}📎 ${attached.map((file) => file.name).join(", ")}`
       : trimmed;
@@ -358,7 +379,7 @@ export function AssistantChat({
           { transient: true }
         );
 
-        extracts.push(`— Часть ${index + 1} (${batch.length} файлов) —\n${partReply}`);
+        extracts.push(`${locale === "ru" ? "Партия" : "Batch"} ${index + 1} (${batch.length} ${locale === "ru" ? "файлов" : "files"}):\n${partReply}`);
         read += batch.length;
       }
 
@@ -369,9 +390,9 @@ export function AssistantChat({
           ...messages,
           {
             role: "user",
-            content: `${question}\n\nНиже — выписки из ${attached.length} присланных файлов, прочитанных по частям. Работай с ними как с исходными данными кейса.\n\n${extracts.join(
-              "\n\n"
-            )}`
+            content: locale === "ru"
+              ? `${question}\n\nНиже — проверенные расшифровки ${attached.length} файлов, прочитанных партиями. Объедини их без потери показателей. Удали повторы. Не превращай отсутствующие исследования в «непрочитанные». В конце перечисли только уникальные пометки [НЕЧИТАЕМО] с точным именем файла и строкой; если их нет, напиши «Всё значимое читается».\n\n${extracts.join("\n\n")}`
+              : `${question}\n\nBelow are verified transcriptions of ${attached.length} files read in batches. Combine them without dropping any results. Remove duplicates. Do not turn absent tests into “unreadable” items. At the end, list only unique [UNREADABLE] markers with the exact file and row; if there are none, write “All material information is readable.”\n\n${extracts.join("\n\n")}`
           }
         ],
         null,
@@ -392,25 +413,27 @@ export function AssistantChat({
     }
   }
 
-  async function saveMemory(collection: "book" | "method" | "client_answers") {
-    if (memoryState === "saving") return;
+  async function saveMemory(collection: MemoryCollection, sourceMessages = messages): Promise<boolean> {
+    if (memoryState === "saving") return false;
     setMemoryState("saving");
     setMemoryMessage(null);
 
     try {
       const response = await fetch("/api/assistant/memory", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: contextWindow(messages), collection })
+        headers: { "Content-Type": "application/json", "Accept-Language": locale },
+        body: JSON.stringify({ messages: contextWindow(sourceMessages), collection })
       });
       const data = await response.json().catch(() => null) as { title?: string; error?: string } | null;
       if (!response.ok) throw new Error(data?.error ?? t.errorGeneric);
 
       setMemoryState("saved");
       setMemoryMessage(locale === "ru" ? `Сохранено: ${data?.title ?? "новое знание"}` : `Saved: ${data?.title ?? "new knowledge"}`);
+      return true;
     } catch (memoryError) {
       setMemoryState("offer");
       setMemoryMessage(memoryError instanceof Error ? memoryError.message : t.errorNetwork);
+      return false;
     }
   }
 
@@ -448,7 +471,7 @@ export function AssistantChat({
         <div className="assistant-memory" role="status">
           {memoryState === "saved" ? <p>{memoryMessage}</p> : (
             <>
-              <strong>{locale === "ru" ? "Professor Python, сохранить результат этого разговора?" : "Professor Python, save the result of this conversation?"}</strong>
+              <strong>{locale === "ru" ? "Professor Python, что сделать с этим результатом?" : "Professor Python, what should be done with this result?"}</strong>
               <div className="assistant-memory__actions">
                 <button disabled={memoryState === "saving"} onClick={() => void saveMemory("book")} type="button">{locale === "ru" ? "В книгу" : "To the book"}</button>
                 <button disabled={memoryState === "saving"} onClick={() => void saveMemory("method")} type="button">{locale === "ru" ? "В метод" : "To the method"}</button>

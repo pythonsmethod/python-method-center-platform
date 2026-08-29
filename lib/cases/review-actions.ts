@@ -15,7 +15,9 @@ import {
 } from "@/lib/assistant/transcription";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { getStaffUserState } from "@/lib/auth/require-staff";
+import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { fingerprintDocuments } from "@/lib/cases/case-documents";
+import { diffReviewText } from "@/lib/cases/review-diff";
 import type { CaseReviewActionState } from "@/lib/cases/review-state";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -186,4 +188,47 @@ export async function generateCaseReview(
     status: "success",
     message: `Итог собран из всех документов: ${documents.length}.`
   };
+}
+
+export async function approveCaseReview(
+  _previous: CaseReviewActionState,
+  formData: FormData
+): Promise<CaseReviewActionState> {
+  const locale = formData.get("locale") === "en" ? "en" : "ru";
+  const caseId = String(formData.get("case_id") ?? "");
+  const reviewId = String(formData.get("review_id") ?? "");
+  const approvedText = String(formData.get("approved_text") ?? "").trim();
+  const auth = await getStaffUserState();
+
+  if (auth.status !== "authorized" || resolvePrivateAssistantRole(auth.email) !== "karen") return errorState(locale === "en" ? "Only Professor Python can approve a conclusion." : "Утвердить заключение может только Professor Python.");
+  if (!isUuid(caseId) || !isUuid(reviewId)) return errorState(locale === "en" ? "Invalid review." : "Некорректный разбор.");
+  if (!approvedText || approvedText.length > 8000) return errorState(locale === "en" ? "Enter the approved conclusion (up to 8,000 characters)." : "Введите утверждённое заключение (до 8000 символов).");
+
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return errorState(locale === "en" ? "The database is unavailable." : "База данных недоступна.");
+
+  const { data: review } = await supabase
+    .from("case_ai_reviews")
+    .select("id, case_id, draft, documents_fingerprint")
+    .eq("id", reviewId)
+    .eq("case_id", caseId)
+    .maybeSingle();
+  if (!review) return errorState(locale === "en" ? "The AI draft was not found." : "Черновик ИИ не найден.");
+
+  const diff = diffReviewText(String(review.draft), approvedText);
+  const { error } = await supabase.from("case_review_learning_events").insert({
+    case_id: caseId,
+    review_id: reviewId,
+    ai_draft: String(review.draft),
+    approved_text: approvedText,
+    edit_operations: diff.operations,
+    removed_fragments: diff.removed,
+    added_fragments: diff.added,
+    documents_fingerprint: String(review.documents_fingerprint),
+    approved_by: auth.userId
+  });
+
+  if (error) return errorState(locale === "en" ? "Could not save the approval history. Apply the latest database migration." : "Не удалось сохранить историю утверждения. Примените последнюю миграцию базы данных.");
+  revalidatePath(`/admin/cases/${caseId}`);
+  return { status: "success", message: locale === "en" ? "Approved. The AI draft, edits, and final conclusion have been saved for learning." : "Утверждено. Черновик ИИ, правки и итоговое заключение сохранены для обучения." };
 }

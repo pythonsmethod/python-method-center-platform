@@ -1,7 +1,7 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import { generateCaseReview } from "@/lib/cases/review-actions";
+import { useActionState, useEffect, useState } from "react";
+import { approveCaseReview, generateCaseReview } from "@/lib/cases/review-actions";
 import {
   initialCaseReviewState,
   type CaseReview
@@ -34,7 +34,15 @@ export function CaseReviewPanel({
     generateCaseReview,
     initialCaseReviewState
   );
+  const [approvalState, approvalAction, approvalPending] = useActionState(
+    approveCaseReview,
+    initialCaseReviewState
+  );
   const [copied, setCopied] = useState(false);
+  const [editedText, setEditedText] = useState(review?.approvedText ?? review?.draft ?? "");
+  useEffect(() => {
+    setEditedText(review?.approvedText ?? review?.draft ?? "");
+  }, [review?.id, review?.draft, review?.approvedText]);
   const readyCount = documentStatuses.filter((status) => status === "ready").length;
   const reuploadCount = documentStatuses.filter((status) => status === "needs_reupload").length;
   const allReady = documentsCount > 0 && readyCount === documentsCount;
@@ -50,7 +58,11 @@ export function CaseReviewPanel({
         noDocuments: "В кейсе пока нет загруженных документов.",
         copied: "Скопировано",
         copy: "Копировать",
-        note: "Проверьте текст, сверьте его с документами, дополните или скорректируйте при необходимости, затем отправьте клиенту в личных сообщениях.",
+        approve: "Утвердить заключение",
+        approving: "Сохраняю историю...",
+        note: "Редактируйте прямо здесь. При утверждении система сохранит исходный текст ИИ, всё удалённое и добавленное Кареном и окончательное заключение.",
+        history: "Сохранённых утверждений",
+        approved: "Утверждённая версия",
         verify: "Требует проверки",
         verifyNote: "ИИ не смог уверенно прочитать эти места. Номер и название помогут сразу открыть нужный файл.",
         verified: "Дополнительная проверка не требуется.",
@@ -68,7 +80,11 @@ export function CaseReviewPanel({
         noDocuments: "No documents have been uploaded to this case yet.",
         copied: "Copied",
         copy: "Copy",
-        note: "Review the text against the original documents, amend it if needed, then send it to the client in a private message.",
+        approve: "Approve conclusion",
+        approving: "Saving history...",
+        note: "Edit directly here. On approval, the system saves the original AI text, everything Karen removed or added, and the final conclusion.",
+        history: "Saved approvals",
+        approved: "Approved version",
         verify: "Requires verification",
         verifyNote: "The AI could not read these items confidently. The file number and name take you directly to the right document.",
         verified: "No additional verification is required.",
@@ -77,12 +93,12 @@ export function CaseReviewPanel({
       };
 
   async function copyDraft() {
-    if (!review?.draft) {
+    if (!review?.approvedText) {
       return;
     }
 
     try {
-      await navigator.clipboard.writeText(review.draft);
+      await navigator.clipboard.writeText(review.approvedText);
       setCopied(true);
       window.setTimeout(() => setCopied(false), 2500);
     } catch {
@@ -159,18 +175,42 @@ export function CaseReviewPanel({
             <div className="case-review__draft">
               <div className="case-review__draft-head">
                 <h3>{t.title}</h3>
-                <button
+                {review.approvedText ? <button
                   className="button button--secondary"
                   onClick={() => void copyDraft()}
                   type="button"
                 >
                   {copied ? t.copied : t.copy}
-                </button>
+                </button> : null}
               </div>
-              <pre className="case-review__text">{review.draft}</pre>
+              <form action={approvalAction}>
+                <input name="case_id" type="hidden" value={caseId} />
+                <input name="review_id" type="hidden" value={review.id} />
+                <input name="locale" type="hidden" value={locale} />
+                <textarea
+                  aria-label={t.approved}
+                  className="case-review__text case-review__editor"
+                  maxLength={8000}
+                  name="approved_text"
+                  onChange={(event) => setEditedText(event.target.value)}
+                  rows={18}
+                  value={editedText}
+                />
+                <div className="panel-actions">
+                  <button className="button" disabled={approvalPending || !editedText.trim()} type="submit">
+                    {approvalPending ? t.approving : t.approve}
+                  </button>
+                  {review.approvalCount > 0 ? <span>{t.history}: {review.approvalCount}</span> : null}
+                </div>
+              </form>
               <p className="case-review__draft-note">
                 {t.note}
               </p>
+              {approvalState.message ? (
+                <p className={approvalState.status === "success" ? "form-message form-message--success" : "form-message form-message--error"}>
+                  {approvalState.message}
+                </p>
+              ) : null}
             </div>
           ) : null}
 

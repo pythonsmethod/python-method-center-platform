@@ -8,6 +8,7 @@ import {
   type AssistantProvider
 } from "@/lib/assistant/router";
 import {
+  ATTACHMENT_READING_ACCURACY_RULE,
   buildGuestSystemPrompt,
   buildPaidClientSystemPrompt,
   buildRegisteredSystemPrompt
@@ -179,11 +180,15 @@ export async function POST(request: Request) {
     system += "\n\n## Язык интерфейса посетителя\nПосетитель использует английскую версию сайта — по умолчанию отвечай на английском (если он пишет на другом языке, отвечай на его языке).";
   }
 
+  if (attachments) {
+    system += `\n\n${ATTACHMENT_READING_ACCURACY_RULE}`;
+  }
+
   // Attached files go to Claude, which reads photos and PDFs directly;
   // the arbiter path is skipped rather than answering without seeing them.
   const result = attachments
     ? hasClaudeEnv()
-      ? await askClaude(system, messages, settings.maxTokens, attachments)
+      ? await askClaude(system, messages, 5000, attachments)
       : ({ status: "unavailable" } as const)
     : audience.tier === "client"
       ? await askAnham(system, messages, settings.maxTokens, anhamMode)
