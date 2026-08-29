@@ -4,6 +4,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
+import { memoryCollectionFromCommand, type MemoryCollection } from "@/lib/assistant/memory";
 import {
   prepareFiles,
   splitIntoBatches,
@@ -294,6 +295,28 @@ export function AssistantChat({
       return;
     }
 
+    const requestedMemory = memoryCapture && attached.length === 0
+      ? memoryCollectionFromCommand(trimmed)
+      : null;
+
+    if (requestedMemory) {
+      const commandMessage: ChatMessage = { role: "user", content: trimmed };
+      setMessages([...messages, commandMessage]);
+      setInput("");
+      setError(null);
+      setPending(true);
+      setMemoryState("saving");
+      setMemoryMessage(null);
+
+      const saved = await saveMemory(requestedMemory, messages);
+      const confirmation = saved
+        ? (locale === "ru" ? "Готово. Я сохранил это в базу знаний и буду учитывать в следующих разговорах." : "Done. I saved this to the knowledge base and will use it in future conversations.")
+        : (locale === "ru" ? "Сохранить в базу знаний не удалось. Сообщение об ошибке показано ниже." : "I could not save this to the knowledge base. The error is shown below.");
+      setMessages([...messages, commandMessage, { role: "assistant", content: confirmation }]);
+      setPending(false);
+      return;
+    }
+
     const visible = attached.length
       ? `${trimmed}${trimmed ? "\n" : ""}📎 ${attached.map((file) => file.name).join(", ")}`
       : trimmed;
@@ -392,25 +415,27 @@ export function AssistantChat({
     }
   }
 
-  async function saveMemory(collection: "book" | "method" | "client_answers") {
-    if (memoryState === "saving") return;
+  async function saveMemory(collection: MemoryCollection, sourceMessages = messages): Promise<boolean> {
+    if (memoryState === "saving") return false;
     setMemoryState("saving");
     setMemoryMessage(null);
 
     try {
       const response = await fetch("/api/assistant/memory", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: contextWindow(messages), collection })
+        headers: { "Content-Type": "application/json", "Accept-Language": locale },
+        body: JSON.stringify({ messages: contextWindow(sourceMessages), collection })
       });
       const data = await response.json().catch(() => null) as { title?: string; error?: string } | null;
       if (!response.ok) throw new Error(data?.error ?? t.errorGeneric);
 
       setMemoryState("saved");
       setMemoryMessage(locale === "ru" ? `Сохранено: ${data?.title ?? "новое знание"}` : `Saved: ${data?.title ?? "new knowledge"}`);
+      return true;
     } catch (memoryError) {
       setMemoryState("offer");
       setMemoryMessage(memoryError instanceof Error ? memoryError.message : t.errorNetwork);
+      return false;
     }
   }
 
