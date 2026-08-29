@@ -4,7 +4,7 @@ import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/c
 import { askAssistantTeam, askKarenAssistant } from "@/lib/assistant/router";
 import { staffAssistantView } from "@/lib/assistant/staff-provider";
 import { buildCaseContext } from "@/lib/assistant/case-context";
-import { buildStaffSystemPrompt } from "@/lib/assistant/prompts";
+import { ATTACHMENT_READING_ACCURACY_RULE, buildStaffSystemPrompt } from "@/lib/assistant/prompts";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
@@ -65,6 +65,10 @@ export async function POST(request: Request) {
 
   let system = await buildStaffSystemPrompt(assistantRole);
 
+  if (attachments) {
+    system = `${system}\n\n${ATTACHMENT_READING_ACCURACY_RULE}`;
+  }
+
   // Optional case binding: the assistant on a case page receives a live
   // snapshot of that case from the database (metadata, questionnaire,
   // documents list, payments, history).
@@ -82,7 +86,7 @@ export async function POST(request: Request) {
   // without seeing the file.
   const result = attachments
     ? hasClaudeEnv()
-      ? await askClaude(system, messages, 1500, attachments)
+      ? await askClaude(system, messages, 5000, attachments)
       : ({
           status: "error" as const,
           message: showProviders

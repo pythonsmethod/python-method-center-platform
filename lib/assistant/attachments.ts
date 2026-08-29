@@ -26,8 +26,10 @@ export const MAX_TOTAL_ATTACHMENT_BYTES = 3_200_000;
 // Photos from a phone are far larger than the model needs to read a lab
 // printout. Downscaling keeps the text legible and makes thirty files a
 // matter of seconds instead of minutes.
-export const IMAGE_MAX_DIMENSION = 1600;
-export const IMAGE_QUALITY = 0.72;
+// Small decimal values, reference ranges and units need more detail than a
+// normal chat photo. Request batching still enforces the transport ceiling.
+export const IMAGE_MAX_DIMENSION = 2400;
+export const IMAGE_QUALITY = 0.9;
 
 export const IMAGE_TYPES = [
   "image/jpeg",
