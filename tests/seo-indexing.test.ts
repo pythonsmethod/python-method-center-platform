@@ -1,6 +1,7 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import sitemap from "@/app/sitemap";
+import robots from "@/app/robots";
 import {
   hasEnglishTwin,
   localizedHref,
@@ -56,6 +57,24 @@ describe("search indexing signals", () => {
 
     expect(middleware).toContain("requestHost.toLowerCase() === alternateHost.toLowerCase()");
     expect(middleware).toContain("NextResponse.redirect(destination, 308)");
+  });
+
+  // A page barred in robots.txt is never fetched, so a crawler can never
+  // read the noindex tag on it. Whichever mechanism a page uses, both of
+  // its addresses must use the same one.
+  it("keeps each language out of the index by the same mechanism", () => {
+    const blocked = robots().rules;
+    const disallow = (Array.isArray(blocked) ? blocked : [blocked]).flatMap(
+      (rule) => (Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow])
+    );
+
+    // /shop carries a noindex tag, so neither address may be barred.
+    expect(disallow).not.toContain("/shop");
+    expect(disallow).not.toContain("/en/shop");
+
+    // /payment/success has no tag, so robots.txt is what keeps both out.
+    expect(disallow).toContain("/payment/success");
+    expect(disallow).toContain("/en/payment/success");
   });
 
   it("keeps login query variants out of the index with one canonical URL", () => {
