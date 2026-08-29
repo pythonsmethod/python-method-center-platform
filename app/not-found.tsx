@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { getLocale } from "@/lib/i18n/locale";
 
 export async function generateMetadata(): Promise<Metadata> {

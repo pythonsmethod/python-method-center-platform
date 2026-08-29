@@ -19,6 +19,8 @@ import { isLocale, LOCALE_COOKIE, type Locale } from "@/lib/i18n/locale";
 //
 // A cookie set on a server response has none of those problems, and the
 // domain is widened deliberately so the apex and www share one choice.
+// Writes the choice and nothing else. Where to go with it is decided by the
+// switcher, which is on the client and can load the page afresh.
 export async function setLocale(locale: Locale): Promise<void> {
   if (!isLocale(locale)) {
     return;
@@ -35,4 +37,17 @@ export async function setLocale(locale: Locale): Promise<void> {
     secure: Boolean(domain) || !host.startsWith("localhost"),
     ...(domain ? { domain } : {})
   });
+
+  // Deliberately no redirect from here.
+  //
+  // Every rendered page depends on this cookie, and the browser's router
+  // cache is keyed on the address alone — it has no idea the language just
+  // changed. A redirect issued by this action is followed client-side and
+  // served from that cache: pressing RU from /en/professor landed on
+  // /professor still in English, menu, footer and the lang attribute
+  // included. revalidatePath does not reach that cache either.
+  //
+  // So the switcher navigates for itself, with a full load. Without
+  // JavaScript the form still posts here and the cookie is still written;
+  // the next request is then redirected by the middleware, which reads it.
 }

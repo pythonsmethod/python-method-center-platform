@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";

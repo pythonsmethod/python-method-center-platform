@@ -1,13 +1,15 @@
 import type { Metadata, Viewport } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
 import { isFreeReviewActive } from "@/lib/config/promo";
 import { SITE_URL } from "@/lib/config/site";
 import { socialLinks } from "@/lib/config/socials";
 import { getDictionary } from "@/lib/i18n/dictionaries";
-import { getLocale } from "@/lib/i18n/locale";
+import { getCurrentPath, getLocale } from "@/lib/i18n/locale";
+import { alternatesFor } from "@/lib/i18n/routing";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
+import { LocaleProvider } from "@/components/LocaleLink";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav, type NavViewer } from "@/components/SiteNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -80,7 +82,9 @@ function verificationTokens(): Metadata["verification"] {
 }
 
 export async function generateMetadata(): Promise<Metadata> {
-  const t = getDictionary(await getLocale()).meta;
+  const locale = await getLocale();
+  const t = getDictionary(locale).meta;
+  const alternates = alternatesFor(await getCurrentPath());
 
   return {
     applicationName: "Python Method Center",
@@ -114,7 +118,22 @@ export async function generateMetadata(): Promise<Metadata> {
     // One canonical address per page ("./" resolves to the current path),
     // so search engines never index the same page under two names.
     metadataBase: new URL(SITE_URL),
-    alternates: { canonical: "./" },
+    // Russian lives at the bare address, English under /en. Each page names
+    // itself as its own canonical and points at its twin, so a search engine
+    // is told the two are the same page in two languages rather than left to
+    // guess — which, with the language held in a cookie, it could not do at
+    // all: a crawler has no cookie, so it only ever saw Russian.
+    alternates: alternates
+      ? {
+          canonical: locale === "en" ? alternates.en : alternates.ru,
+          languages: {
+            ru: alternates.ru,
+            en: alternates.en,
+            // Where to send a reader whose language we do not publish.
+            "x-default": alternates.ru
+          }
+        }
+      : { canonical: "./" },
     title: {
       default: t.title,
       template: `%s | Python Method Center`
@@ -151,10 +170,12 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const viewer = await headerViewer();
+  const currentPath = await getCurrentPath();
 
   return (
     <html className={playfair.variable} lang={locale}>
       <body>
+        <LocaleProvider locale={locale}>
         <AppRouteMode />
         <SiteHeader>
           <Link className="brand" href="/">
@@ -162,7 +183,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </Link>
           <div className="site-header__right">
             <SiteNav labels={dict.nav} viewer={viewer} />
-            <LanguageSwitcher locale={locale} />
+            <LanguageSwitcher locale={locale} path={currentPath} />
           </div>
         </SiteHeader>
         <main>{children}</main>
@@ -193,6 +214,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </nav>
           <p className="site-footer__disclaimer">{dict.footer.disclaimer}</p>
         </footer>
+        </LocaleProvider>
       </body>
     </html>
   );

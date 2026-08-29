@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { useRef, useState, type ReactNode } from "react";
 import type { PaymentPlan } from "@/lib/payments/config";
 import { recordPaymentOfferAcceptance } from "@/lib/payments/actions";

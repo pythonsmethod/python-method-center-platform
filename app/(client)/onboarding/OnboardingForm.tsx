@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { useActionState, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { submitOnboarding } from "@/lib/onboarding/actions";

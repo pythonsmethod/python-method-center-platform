@@ -10,7 +10,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { sanitizeNextPath } from "@/lib/auth/safe-next-path";
 
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 
 type LoginPageProps = {
   searchParams?: Promise<{

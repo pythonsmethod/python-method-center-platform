@@ -1,5 +1,5 @@
 import Image from "next/image";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AnhamOpenButton } from "@/components/assistant/AnhamOpenButton";
 import { ScrollReveal } from "@/components/ScrollReveal";

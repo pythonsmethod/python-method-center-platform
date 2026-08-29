@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { PublicSupportForm } from "@/components/support/PublicSupportForm";
 import { getDictionary } from "@/lib/i18n/dictionaries";

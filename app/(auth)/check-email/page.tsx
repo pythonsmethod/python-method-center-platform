@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { cookies } from "next/headers";
 import { PageHeader } from "@/components/PageHeader";
 import { PENDING_EMAIL_COOKIE } from "@/lib/auth/pending-email";

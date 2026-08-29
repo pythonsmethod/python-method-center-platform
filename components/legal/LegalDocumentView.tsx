@@ -1,4 +1,4 @@
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import type { LegalDocument } from "@/lib/legal/policy-content";
 
 type RelatedLink = {
