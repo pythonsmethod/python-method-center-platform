@@ -37,6 +37,9 @@ describe("scheduled online chess with Karen", () => {
     expect(styles).toContain("background-color: #f1f1ed");
     expect(styles).toContain("background-color: #151515");
     expect(styles).toContain("inline-size: min(100%, 760px)");
+    expect(styles).toContain("filter: drop-shadow(0 7px 5px");
+    expect(styles).toContain("3px 3px 0 #765015");
+    expect(styles).toContain("3px 3px 0 #050504");
   });
 
   it("validates every move on the server and enforces turn order", () => {
