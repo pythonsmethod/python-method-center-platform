@@ -63,7 +63,10 @@ function CaseTable({
                   <span className="unread-badge unread-badge--empty">—</span>
                 )}
               </td>
-              <td>{clientCase.profiles?.full_name ?? "Без имени"}</td>
+              <td>
+                {clientCase.profiles?.full_name ?? "Без имени"}
+                {clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
+              </td>
               <td>
                 {clientCase.profiles?.email ?? "—"}
                 <br />
@@ -160,7 +163,7 @@ function CaseCards({
             </span>
             <span className="staff-client-card__body">
               <span className="staff-client-card__name-row">
-                <strong>{name}</strong>
+                <strong>{name}{clientCase.case_number ? ` · ${clientCase.case_number}` : ""}</strong>
                 {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
               </span>
               {clientCase.title ? <span className="staff-client-card__goal">{clientCase.title}</span> : null}
