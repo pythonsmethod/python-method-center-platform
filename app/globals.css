@@ -28,11 +28,6 @@ h3 {
   overflow-wrap: anywhere;
 }
 
-.anham-companion__welcome-close {
-  min-height: 32px;
-  min-width: 32px;
-}
-
 .site-header {
   align-items: center;
   background: var(--background);
@@ -1290,17 +1285,6 @@ h3 {
 /* On a phone he steps aside: smaller, and the panel takes the width it
    needs without ever pushing the page sideways. */
 @media (max-width: 560px) {
-
-  .anham-companion__welcome {
-    bottom: 88px;
-    right: 12px;
-    text-align: center;
-    width: calc(100% - 24px);
-  }
-
-  .anham-companion__welcome-title {
-    margin-inline: 1.5rem;
-  }
 
   .anham-panel {
     max-height: 76vh;
@@ -6088,12 +6072,6 @@ code {
   translate: none;
 }
 
-/* Greeting open: likewise. */
-.anham-companion:has(.anham-companion__welcome) {
-  animation: none;
-  translate: none;
-}
-
 /* One lap of the perimeter, anticlockwise from the bottom-right corner.
    The limits are exact: his own width plus both insets subtracted from the
    viewport, so at the far corner he sits against the edge and never past
@@ -6384,76 +6362,12 @@ code {
 
 /* ---------- first-visit greeting ---------- */
 
-.anham-companion__welcome {
-  background: var(--surface);
-  /* Anchored to the viewport rather than stacked inside the companion.
-     As a flex child it resized the fixed companion the moment it appeared,
-     which the layout-instability API scores as a 0.38 shift on every first
-     page view — past the 0.25 "poor" threshold. The offsets below
-     reproduce where it used to land: the companion's own bottom inset plus
-     the 64px figure and the 12px flex gap it used to sit above.
-     Percentages, not 100vw: on a fixed element a percentage resolves
-     against the viewport without the scrollbar, so this cannot spill. */
-  bottom: calc(clamp(14px, 3vw, 28px) + 76px);
-  border: 1px solid var(--accent);
-  border-radius: 16px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
-  padding: 1.1rem 1.2rem;
-  position: fixed;
-  right: clamp(14px, 3vw, 28px);
-  width: min(320px, calc(100% - 28px));
-  z-index: 60;
-}
-
-.anham-companion__welcome-close {
-  background: none;
-  border: 0;
-  color: var(--muted);
-  cursor: pointer;
-  padding: 0.25rem;
-  position: absolute;
-  right: 0.5rem;
-  top: 0.5rem;
-}
-
-.anham-companion__welcome-title {
-  font-family: var(--font-serif);
-  font-size: 1.05rem;
-  margin: 0 1.5rem 0 0;
-}
-
-.anham-companion__welcome-text {
-  color: var(--muted);
-  font-size: 0.9rem;
-  line-height: 1.55;
-  margin: 0.6rem 0 0;
-}
-
-.anham-companion__welcome-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  margin-top: 0.9rem;
-}
-
-.anham-companion__welcome-note {
-  color: var(--muted);
-  font-size: 0.8rem;
-  margin: 0.75rem 0 0;
-}
-
 /* On a phone he steps aside: smaller, and the panel takes the width it
    needs without ever pushing the page sideways. */
 @media (max-width: 560px) {
   .anham-companion {
     bottom: 12px;
     right: 12px;
-  }
-
-  .anham-companion__welcome {
-    bottom: 88px;
-    right: 12px;
-    width: calc(100% - 24px);
   }
 
   .anham-companion__figure .anham {
@@ -6467,9 +6381,6 @@ code {
     width: calc(100vw - 24px);
   }
 
-  .anham-companion__welcome-actions .button {
-    flex: 1 1 100%;
-  }
 }
 
 /* Анхам on the team's workspace. Professor Python and Anna see the same
@@ -7459,12 +7370,6 @@ body:has(.pm-app) > .site-footer { display: none; }
      untouched — it takes the whole screen and hides the dock itself. */
   body:has(.public-mobile-dock) .anham-companion {
     bottom: calc(126px + env(safe-area-inset-bottom));
-  }
-
-  /* The greeting keeps its old distance above the figure: 64px of button
-     plus the 12px gap it used to sit across. */
-  body:has(.public-mobile-dock) .anham-companion__welcome {
-    bottom: calc(126px + env(safe-area-inset-bottom) + 76px);
   }
 
   .anham-companion.is-open {

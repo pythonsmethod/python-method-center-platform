@@ -1043,13 +1043,6 @@ const ru = {
         ]
       }
     },
-    welcomeTitle:
-      "Привет! Добро пожаловать на платформу Python Method — «Реабилитация без границ».",
-    welcomeText:
-      "Я Анхам, ваш спутник на платформе. Вы можете изучать сайт самостоятельно — или перейти в общение со мной, и я проведу вас, отвечая на вопросы.",
-    welcomeExplore: "Изучать сайт самостоятельно",
-    welcomeChat: "Общаться со мной — проведу вас",
-    welcomeNote: "Я всегда рядом — откройте чат с Анхамом внизу экрана.",
     send: "Отправить",
     sending: "Печатает…",
     placeholder: "Напишите сообщение…",
@@ -2213,13 +2206,6 @@ const en: typeof ru = {
         ]
       }
     },
-    welcomeTitle:
-      "Hello! Welcome to the Python Method platform — “Rehabilitation Without Borders”.",
-    welcomeText:
-      "I am Anham, your platform companion. You can explore the site on your own — or talk to me, and I will guide you and answer your questions.",
-    welcomeExplore: "Explore the site on my own",
-    welcomeChat: "Talk to me — I'll guide you",
-    welcomeNote: "I am always nearby — open Anham at the bottom of the screen.",
     send: "Send",
     sending: "Typing…",
     placeholder: "Write a message…",
