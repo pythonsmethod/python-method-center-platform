@@ -40,6 +40,9 @@ describe("scheduled online chess with Karen", () => {
     expect(styles).toContain("filter: drop-shadow(0 7px 5px");
     expect(styles).toContain("3px 3px 0 #765015");
     expect(styles).toContain("3px 3px 0 #050504");
+    expect(styles).toContain(".chess-board__square > span.is-w");
+    expect(styles).toContain(".chess-board__square > span.is-b");
+    expect(styles).not.toContain(".online-chess__board-frame .chess-board__square > span.is-w");
   });
 
   it("validates every move on the server and enforces turn order", () => {
