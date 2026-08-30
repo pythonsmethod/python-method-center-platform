@@ -1,4 +1,5 @@
-import Link from "next/link";
+import type { Metadata } from "next";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -6,6 +7,12 @@ import { getLocale } from "@/lib/i18n/locale";
 type SuccessPageProps = {
   searchParams?: Promise<Record<string, string | string[] | undefined>>;
 };
+
+export async function generateMetadata(): Promise<Metadata> {
+  const t = getDictionary(await getLocale()).paymentSuccess;
+
+  return { title: t.eyebrow, description: t.description };
+}
 
 export default async function PaymentSuccessPage({
   searchParams
@@ -25,19 +32,10 @@ export default async function PaymentSuccessPage({
 
       {viaPaypal ? (
         <div className="notice notice--success">
-          <span className="panel__label">Оплата через PayPal</span>
-          <h2>Мы проверим платёж вручную</h2>
-          <p>
-            Оплата через PayPal не подтверждается автоматически: её проверяет
-            человек. Обычно это занимает несколько часов в рабочий день. Как
-            только платёж подтвердится, доступ откроется, и мы напишем вам на
-            почту.
-          </p>
-          <p>
-            Чтобы ускорить: пришлите через «Поддержку» подтверждение оплаты —
-            скриншот или номер операции PayPal, и укажите email, которым вы
-            регистрировались.
-          </p>
+          <span className="panel__label">{t.paypalLabel}</span>
+          <h2>{t.paypalTitle}</h2>
+          <p>{t.paypalText1}</p>
+          <p>{t.paypalText2}</p>
         </div>
       ) : null}
 

@@ -21,7 +21,13 @@ export default function robots(): MetadataRoute.Robots {
           "/auth/",
           "/site-preview",
           "/welcome",
-          "/payment/success"
+          "/payment/success",
+          // The English side of the one page that is public but not for
+          // search. /shop is not here in either language on purpose: it
+          // carries a noindex tag instead, and a crawler barred from
+          // fetching the page can never read the tag telling it to stay
+          // away. Everything else under /en is meant to be found.
+          "/en/payment/success"
         ]
       }
     ],

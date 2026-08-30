@@ -1,14 +1,11 @@
 "use client";
 
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { usePathname } from "next/navigation";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { ANHAM_OPEN_EVENT, type AnhamOpenDetail } from "@/components/assistant/AnhamOpenButton";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
-
-const WELCOME_STORAGE_KEY = "pm-assistant-welcome-v1";
 
 // One lap of the perimeter, matching --anham-wander-duration in the CSS.
 const WANDER_MS = 120_000;
@@ -34,49 +31,16 @@ export function AssistantWidget({
   tier = "guest"
 }: AssistantWidgetProps) {
   const t = getDictionary(locale).widget;
-  const pathname = usePathname();
   const tierCopy = tier === "guest" ? null : t.tiers[tier];
   const header = tierCopy?.header ?? t.header;
   const intro = tierCopy?.intro ?? t.intro;
   const suggestions = tierCopy?.suggestions ?? t.suggestions;
   const [open, setOpen] = useState(false);
-  const [showWelcome, setShowWelcome] = useState(false);
   // A question that arrived with the request to open, sent as soon as the
   // window is there to send it from.
   const [pendingQuestion, setPendingQuestion] = useState<string | null>(null);
-  const welcomeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const toggleRef = useRef<HTMLButtonElement | null>(null);
   const companionRef = useRef<HTMLDivElement | null>(null);
-
-  // First-visit greeting: the visitor chooses between exploring the site
-  // on their own or being guided by Анхам. Shown once per browser.
-  useEffect(() => {
-    // The first-visit greeting belongs to the public consultant only.
-    if (
-      tier !== "guest" ||
-      ["/login", "/recovery", "/reset-password", "/support", "/onboarding", "/payment"].some(
-        (route) => pathname === route || pathname.startsWith(`${route}/`)
-      )
-    ) {
-      return;
-    }
-
-    try {
-      if (window.localStorage.getItem(WELCOME_STORAGE_KEY)) {
-        return;
-      }
-    } catch {
-      return;
-    }
-
-    welcomeTimer.current = setTimeout(() => setShowWelcome(true), 1400);
-
-    return () => {
-      if (welcomeTimer.current) {
-        clearTimeout(welcomeTimer.current);
-      }
-    };
-  }, [pathname, tier]);
 
   // Anything on the page can ask him to open: the hero buttons, a card, the
   // closing call. They were sending people to the support page instead,
@@ -87,7 +51,6 @@ export function AssistantWidget({
     function open(event: Event) {
       const ask = (event as CustomEvent<AnhamOpenDetail>).detail?.ask;
 
-      setShowWelcome(false);
       setOpen(true);
 
       if (ask) {
@@ -122,20 +85,6 @@ export function AssistantWidget({
     return () => document.removeEventListener("keydown", onKeyDown);
   }, [open]);
 
-  function dismissWelcome(openChat: boolean) {
-    try {
-      window.localStorage.setItem(WELCOME_STORAGE_KEY, "seen");
-    } catch {
-      // Private mode: the greeting will simply show again next visit.
-    }
-
-    setShowWelcome(false);
-
-    if (openChat) {
-      setOpen(true);
-    }
-  }
-
   // The widget lives in each route group's layout, so moving between groups
   // unmounts and remounts it — and the flight restarted from the corner
   // every time, which reads as him being reset rather than accompanying
@@ -162,42 +111,6 @@ export function AssistantWidget({
       }`}
       ref={companionRef}
     >
-      {showWelcome && !open ? (
-        <div
-          aria-label={header}
-          className="anham-companion__welcome"
-          role="dialog"
-        >
-          <button
-            aria-label={t.toggleClose}
-            className="anham-companion__welcome-close"
-            onClick={() => dismissWelcome(false)}
-            type="button"
-          >
-            ✕
-          </button>
-          <p className="anham-companion__welcome-title">{t.welcomeTitle}</p>
-          <p className="anham-companion__welcome-text">{t.welcomeText}</p>
-          <div className="anham-companion__welcome-actions">
-            <button
-              className="button button--secondary"
-              onClick={() => dismissWelcome(false)}
-              type="button"
-            >
-              {t.welcomeExplore}
-            </button>
-            <button
-              className="button"
-              onClick={() => dismissWelcome(true)}
-              type="button"
-            >
-              {t.welcomeChat}
-            </button>
-          </div>
-          <p className="anham-companion__welcome-note">{t.welcomeNote}</p>
-        </div>
-      ) : null}
-
       {open ? (
         <aside
           aria-label={header}
@@ -242,14 +155,7 @@ export function AssistantWidget({
         aria-expanded={open}
         aria-label={open ? t.toggleClose : t.toggleOpen}
         className="anham-companion__figure"
-        onClick={() => {
-          if (showWelcome) {
-            dismissWelcome(!open);
-            return;
-          }
-
-          setOpen((value) => !value);
-        }}
+        onClick={() => setOpen((value) => !value)}
         ref={toggleRef}
         type="button"
       >

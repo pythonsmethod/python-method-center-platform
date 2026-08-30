@@ -195,6 +195,8 @@ export function SleepPanel({
           </button>
           {saveState.message ? (
             <p
+              aria-live="polite"
+              role="status"
               className={`form-message form-message--${
                 saveState.status === "success" ? "success" : "error"
               }`}
@@ -279,6 +281,8 @@ export function SleepPanel({
 
         {importState.message ? (
           <p
+            aria-live="polite"
+            role="status"
             className={`form-message form-message--${
               importState.status === "success" ? "success" : "error"
             }`}
@@ -347,7 +351,7 @@ export function SleepPanel({
             </div>
           ) : null}
           {adviceState.status === "error" && adviceState.message ? (
-            <p className="form-message form-message--error">
+            <p aria-live="assertive" className="form-message form-message--error" role="alert">
               {adviceState.message}
             </p>
           ) : null}

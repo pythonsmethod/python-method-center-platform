@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -9,7 +9,7 @@ import { OFFER_ARCHIVE_V2_URL, OFFER_VERSION } from "@/lib/legal/offer";
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).offer;
 
-  return { title: `${t.title} — Python Method`, description: t.description };
+  return { title: t.title, description: t.description };
 }
 
 export default async function OfferPage() {

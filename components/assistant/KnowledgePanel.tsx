@@ -115,20 +115,20 @@ export function KnowledgePanel({
           {addPending ? t.saving : t.save}
         </button>
         {addState.status !== "idle" ? (
-          <p className={`form-message form-message--${addState.status}`}>
+          <p aria-live="polite" role="status" className={`form-message form-message--${addState.status}`}>
             {addState.message}
           </p>
         ) : null}
       </form>
 
       {loadError ? (
-        <p className="form-message form-message--error">
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">
           {t.unavailable}: {loadError}. {t.migration}
         </p>
       ) : null}
 
       {toggleState.status === "error" ? (
-        <p className="form-message form-message--error">{toggleState.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{toggleState.message}</p>
       ) : null}
 
       {entries.length > 0 ? (

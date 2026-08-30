@@ -4,17 +4,19 @@ import { getCaseMessages, markThreadRead } from "@/lib/messages/queries";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
+import { apiError, apiErrorLocale } from "@/lib/i18n/api-errors";
 
 export const runtime = "nodejs";
 
 // Live-poll endpoint for the case thread. Staff may read any case;
 // a client only their own.
 export async function GET(request: Request) {
+  const locale = await apiErrorLocale();
   const supabase = createSupabaseServiceClient();
   const authClient = await createSupabaseServerClient();
 
   if (!supabase || !authClient) {
-    return NextResponse.json({ error: "Сервис недоступен." }, { status: 503 });
+    return NextResponse.json({ error: apiError("serviceUnavailable", locale) }, { status: 503 });
   }
 
   const url = new URL(request.url);
@@ -26,7 +28,7 @@ export async function GET(request: Request) {
 
   if (staff.status === "authorized") {
     if (!requestedCaseId || !isUuid(requestedCaseId)) {
-      return NextResponse.json({ error: "Некорректный кейс." }, { status: 400 });
+      return NextResponse.json({ error: apiError("invalidCase", locale) }, { status: 400 });
     }
 
     caseId = requestedCaseId;
@@ -36,7 +38,7 @@ export async function GET(request: Request) {
     } = await authClient.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Нет доступа." }, { status: 401 });
+      return NextResponse.json({ error: apiError("accessDenied", locale) }, { status: 401 });
     }
 
     const { data: caseRow } = await supabase
@@ -53,7 +55,7 @@ export async function GET(request: Request) {
   }
 
   if (!caseId) {
-    return NextResponse.json({ error: "Некорректный кейс." }, { status: 400 });
+    return NextResponse.json({ error: apiError("invalidCase", locale) }, { status: 400 });
   }
 
   // The thread is on screen — incoming messages count as seen.
@@ -62,7 +64,12 @@ export async function GET(request: Request) {
   const result = await getCaseMessages(caseId);
 
   if (result.error) {
-    return NextResponse.json({ error: result.error }, { status: 502 });
+    console.error("case thread read failed", result.error);
+
+    return NextResponse.json(
+      { error: apiError("threadNotLoaded", locale) },
+      { status: 502 }
+    );
   }
 
   return NextResponse.json({ messages: result.messages });

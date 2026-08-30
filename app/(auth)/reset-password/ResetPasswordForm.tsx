@@ -19,7 +19,7 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
   if (state.status === "success") {
     return (
       <div className="auth-form">
-        <p className="form-message form-message--success">{state.message}</p>
+        <p aria-live="polite" className="form-message form-message--success" role="status">{state.message}</p>
         <Link className="button" href="/cabinet">
           {labels.toCabinet}
         </Link>
@@ -53,7 +53,7 @@ export function ResetPasswordForm({ labels }: ResetPasswordFormProps) {
         {pending ? labels.submitting : labels.submit}
       </button>
       {state.status === "error" ? (
-        <p className="form-message form-message--error">
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">
           {state.message} <Link href="/recovery">{labels.requestNew}</Link>
         </p>
       ) : null}

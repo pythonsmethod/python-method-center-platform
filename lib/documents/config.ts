@@ -1,3 +1,5 @@
+import type { Locale } from "@/lib/i18n/locale";
+
 export const DOCUMENT_STORAGE_BUCKET = "client-documents";
 
 export const MAX_DOCUMENT_FILE_SIZE_BYTES = 25 * 1024 * 1024;
@@ -72,39 +74,49 @@ export function resolveAllowedDocumentMimeType(
   return extensionMimeTypes[getFileExtension(filename)] ?? null;
 }
 
-export function validateDocumentFile(input: {
-  name: string;
-  size: number;
-  type: string;
-}): DocumentFileValidationResult {
+// The whole documents section of the cabinet is translated, so a rejected
+// upload must not answer in Russian on an English page.
+const MESSAGES = {
+  ru: {
+    unnamed: "Выберите файл документа с названием.",
+    empty: "Выберите непустой файл документа.",
+    tooLarge: "Файл документа должен быть не больше 25 МБ.",
+    wrongType: "Загрузите файл PDF, PNG, JPG, JPEG или WEBP."
+  },
+  en: {
+    unnamed: "Choose a document file that has a name.",
+    empty: "Choose a document file that is not empty.",
+    tooLarge: "A document file must be 25 MB or smaller.",
+    wrongType: "Upload a PDF, PNG, JPG, JPEG or WEBP file."
+  }
+} as const satisfies Record<Locale, Record<string, string>>;
+
+export function validateDocumentFile(
+  input: {
+    name: string;
+    size: number;
+    type: string;
+  },
+  locale: Locale = "ru"
+): DocumentFileValidationResult {
+  const t = MESSAGES[locale];
+
   if (!input.name.trim()) {
-    return {
-      status: "invalid",
-      message: "Выберите файл документа с названием."
-    };
+    return { status: "invalid", message: t.unnamed };
   }
 
   if (!Number.isFinite(input.size) || input.size <= 0) {
-    return {
-      status: "invalid",
-      message: "Выберите непустой файл документа."
-    };
+    return { status: "invalid", message: t.empty };
   }
 
   if (input.size > MAX_DOCUMENT_FILE_SIZE_BYTES) {
-    return {
-      status: "invalid",
-      message: "Файл документа должен быть не больше 25 МБ."
-    };
+    return { status: "invalid", message: t.tooLarge };
   }
 
   const mimeType = resolveAllowedDocumentMimeType(input.name, input.type);
 
   if (!mimeType) {
-    return {
-      status: "invalid",
-      message: "Загрузите файл PDF, PNG, JPG, JPEG или WEBP."
-    };
+    return { status: "invalid", message: t.wrongType };
   }
 
   return {

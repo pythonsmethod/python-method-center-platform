@@ -57,6 +57,8 @@ export function TelegramSetupPanel() {
 
       {testState.status !== "idle" ? (
         <p
+          aria-live="polite"
+          role="status"
           className={`form-message form-message--${
             testState.status === "success" ? "success" : "error"
           }`}
@@ -77,6 +79,8 @@ export function TelegramSetupPanel() {
 
       {chatsState.status !== "idle" ? (
         <p
+          aria-live="polite"
+          role="status"
           className={`form-message form-message--${
             chatsState.status === "success" ? "success" : "error"
           }`}

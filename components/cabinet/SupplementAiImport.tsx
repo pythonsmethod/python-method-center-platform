@@ -64,7 +64,7 @@ export function SupplementAiImport({ locale }: { locale: Locale }) {
     <button className="button button--secondary supplements-import__pick" disabled={stage.kind === "reading"} onClick={() => inputRef.current?.click()} type="button"><span aria-hidden="true">📎</span>{stage.kind === "reading" ? t.reading : t.pick}</button>
     <input accept={ACCEPT_ATTRIBUTE} className="metrics-upload__input" multiple onChange={(event) => void onPick(event.target.files)} ref={inputRef} type="file" />
     <p className="supplements-import__boundary">{t.boundary}</p>
-    {stage.kind === "error" ? <p className="form-message form-message--error">{stage.message}</p> : null}
+    {stage.kind === "error" ? <p aria-live="assertive" className="form-message form-message--error" role="alert">{stage.message}</p> : null}
     {stage.kind === "review" && saveState.status !== "success" ? <form action={saveAction} className="supplements-import__review">
       <strong>{t.found}</strong>
       <div className="supplements-import__table" role="table">
@@ -78,6 +78,6 @@ export function SupplementAiImport({ locale }: { locale: Locale }) {
       <div className="supplements-import__actions"><button className="button" disabled={savePending || !selected.length} type="submit">{savePending ? "…" : `${t.save} (${selected.length})`}</button><button className="button button--secondary" onClick={() => setStage({ kind: "idle" })} type="button">{t.cancel}</button></div>
       <p className="supplements-import__check">{t.check}</p>
     </form> : null}
-    {saveState.message ? <p className={`form-message form-message--${saveState.status === "success" ? "success" : "error"}`}>{saveState.message}</p> : null}
+    {saveState.message ? <p aria-live="polite" role="status" className={`form-message form-message--${saveState.status === "success" ? "success" : "error"}`}>{saveState.message}</p> : null}
   </section>;
 }

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { packageArt } from "@/components/icons/PackageArt";
 import { egyptianIcons } from "@/components/icons/EgyptianIcons";

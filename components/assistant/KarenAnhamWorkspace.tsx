@@ -49,7 +49,7 @@ export function KarenAnhamWorkspace({
             providerChoice={showProviders}
             suggestions={labels.suggestions}
           />
-        ) : <p className="form-message form-message--error">{labels.unavailable}</p>}
+        ) : <p aria-live="assertive" className="form-message form-message--error" role="alert">{labels.unavailable}</p>}
       </div>
     </section>
   );

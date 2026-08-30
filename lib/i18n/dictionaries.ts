@@ -5,8 +5,8 @@ import {
 import type { Locale } from "@/lib/i18n/locale";
 import type { PluralForms } from "@/lib/i18n/plural";
 
-// Public-site copy in both languages. The client cabinet and the admin
-// workspace stay Russian for now (team-facing).
+// Site copy in both languages: the public pages and the client cabinet.
+// The admin workspace stays Russian — it is read by the team only.
 
 const ru = {
   cabinet: {
@@ -615,7 +615,7 @@ const ru = {
     ogDescription:
       "Цифровой центр восстановления: экспертное сопровождение Professor Python и ИИ-помощник рядом на каждом шаге пути.",
     ogLocale: "ru_RU",
-    reviewTitle: "Разбор анализов от Professor Python — Python Method Center",
+    reviewTitle: "Разбор анализов от Professor Python",
     reviewDescription:
       "Что именно входит в разбор анализов, сколько он занимает и что человек получает в кабинете."
   },
@@ -1043,13 +1043,6 @@ const ru = {
         ]
       }
     },
-    welcomeTitle:
-      "Привет! Добро пожаловать на платформу Python Method — «Реабилитация без границ».",
-    welcomeText:
-      "Я Анхам, ваш спутник на платформе. Вы можете изучать сайт самостоятельно — или перейти в общение со мной, и я проведу вас, отвечая на вопросы.",
-    welcomeExplore: "Изучать сайт самостоятельно",
-    welcomeChat: "Общаться со мной — проведу вас",
-    welcomeNote: "Я всегда рядом — откройте чат с Анхамом внизу экрана.",
     send: "Отправить",
     sending: "Печатает…",
     placeholder: "Напишите сообщение…",
@@ -1110,6 +1103,12 @@ const ru = {
   paymentSuccess: {
     eyebrow: "Оплата получена",
     title: "Благодарим вас!",
+    paypalLabel: "Оплата через PayPal",
+    paypalTitle: "Мы проверим платёж вручную",
+    paypalText1:
+      "Оплата через PayPal не подтверждается автоматически: её проверяет человек. Обычно это занимает несколько часов в рабочий день. Как только платёж подтвердится, доступ откроется, и мы напишем вам на почту.",
+    paypalText2:
+      "Чтобы ускорить: пришлите через «Поддержку» подтверждение оплаты — скриншот или номер операции PayPal, и укажите email, которым вы регистрировались.",
     description: "Ваш платёж успешно принят. Добро пожаловать в сопровождение Python Method.",
     whatNextLabel: "Что происходит дальше",
     steps: [
@@ -1200,6 +1199,8 @@ const ru = {
   checkEmail: {
     eyebrow: "Остался один шаг",
     title: "Проверьте почту",
+    description:
+      "Мы отправили письмо со ссылкой для подтверждения адреса. Если письма нет — проверьте «Спам» и «Промоакции».",
     sentTo: "Мы отправили письмо на адрес",
     sentToUnknown: "Мы отправили письмо на адрес, который вы указали.",
     step1: "Откройте свою почту — там новое письмо от «Python Method».",
@@ -1817,7 +1818,7 @@ const en: typeof ru = {
     ogDescription:
       "A digital recovery center: expert support led by Professor Python, with an AI assistant beside you at every step.",
     ogLocale: "en_US",
-    reviewTitle: "Analyses review by Professor Python — Python Method Center",
+    reviewTitle: "Analyses review by Professor Python",
     reviewDescription:
       "What the analyses review includes, how long it takes, and what arrives in your cabinet."
   },
@@ -2205,13 +2206,6 @@ const en: typeof ru = {
         ]
       }
     },
-    welcomeTitle:
-      "Hello! Welcome to the Python Method platform — “Rehabilitation Without Borders”.",
-    welcomeText:
-      "I am Anham, your platform companion. You can explore the site on your own — or talk to me, and I will guide you and answer your questions.",
-    welcomeExplore: "Explore the site on my own",
-    welcomeChat: "Talk to me — I'll guide you",
-    welcomeNote: "I am always nearby — open Anham at the bottom of the screen.",
     send: "Send",
     sending: "Typing…",
     placeholder: "Write a message…",
@@ -2268,6 +2262,12 @@ const en: typeof ru = {
   paymentSuccess: {
     eyebrow: "Payment received",
     title: "Thank you!",
+    paypalLabel: "Paid through PayPal",
+    paypalTitle: "We will check this payment by hand",
+    paypalText1:
+      "A PayPal payment is not confirmed automatically: a person checks it. This usually takes a few hours on a working day. As soon as it is confirmed your access opens and we write to you by email.",
+    paypalText2:
+      "To speed it up, send us proof of payment through “Support” — a screenshot or the PayPal transaction number — and tell us the email you registered with.",
     description: "Your payment has been received. Welcome to the Python Method support program.",
     whatNextLabel: "What happens next",
     steps: [
@@ -2351,6 +2351,8 @@ const en: typeof ru = {
   checkEmail: {
     eyebrow: "One step left",
     title: "Check your email",
+    description:
+      "We have sent a letter with a link that confirms your address. If it is not there, look in “Spam” and “Promotions”.",
     sentTo: "We have sent an email to",
     sentToUnknown: "We have sent an email to the address you entered.",
     step1: "Open your mailbox — there is a new email from “Python Method”.",

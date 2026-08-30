@@ -323,7 +323,11 @@
 .app-quick__icon { align-items: center; background: var(--app-soft); border-radius: 50%; color: var(--app-accent); display: flex; font-size: .75rem; font-weight: 800; height: 42px; justify-content: center; width: 42px; }
 .app-quick strong, .app-quick small { display: block; }
 .app-quick strong { font-size: .95rem; }
-.app-quick small { color: var(--app-muted); display: -webkit-box; font-size: .78rem; line-height: 1.4; margin-top: .35rem; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+/* No line clamp. These are written as whole sentences three to nine lines
+   long, so two lines cut every one of them — worst at 1024px, where up to
+   157px of text was hidden and the third card could not be read in full at
+   any width. The cards simply grow; the grid keeps them level. */
+.app-quick small { color: var(--app-muted); display: block; font-size: .78rem; line-height: 1.4; margin-top: .35rem; }
 .app-quick b { color: var(--app-accent); font-size: 1.1rem; }
 
 .app-route { padding: clamp(3.5rem, 8vw, 7rem) clamp(1.5rem, 7vw, 6rem); }
@@ -364,8 +368,31 @@
 @media (max-width: 560px) {
   .app-home { border-radius: 0; margin-inline: calc(var(--page-inset) * -1); width: auto; }
   .app-hero { text-align: center; }
-  .app-hero__copy { display: flex; flex-direction: column; align-items: center; }
+  .app-hero__copy { display: flex; flex-direction: column; align-items: center; min-width: 0; }
   .app-hero h1 { font-size: clamp(2.45rem, 13vw, 3.6rem); margin-inline: auto; }
+  /* `anywhere` rather than `break-word`: only the former lowers what the
+     element reports as its minimum width, and it is that number the grid
+     column is sized from. With the browser text size at 200% the headline
+     word alone was wider than the phone, so the whole hero — kicker, lead
+     and buttons with it — was pushed past the right edge. */
+  .app-hero .app-kicker,
+  .app-hero h1,
+  .app-hero__subtitle,
+  .app-hero__lead,
+  .app-trust,
+  .app-status,
+  .app-assistant-card p,
+  .app-mobile-download h2,
+  .app-mobile-download p,
+  .app-mobile-download__links a,
+  .app-mobile-download__links span { overflow-wrap: anywhere; }
+
+  /* Both hero items share one grid track on a phone, so the track is as
+     wide as the wider of them — and the assistant card, not the text, was
+     the one that would not shrink. */
+  .app-hero__visual,
+  .app-assistant-card,
+  .app-mobile-download { max-width: 100%; min-width: 0; }
   .app-hero__lead { margin-inline: auto; max-width: 32rem; }
   .app-actions { justify-content: center; width: 100%; }
   .app-trust { margin-inline: auto; max-width: 28rem; }

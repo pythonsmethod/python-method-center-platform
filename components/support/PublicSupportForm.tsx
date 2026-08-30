@@ -24,7 +24,7 @@ export function PublicSupportForm({ labels, locale }: { labels: PublicSupportFor
   );
 
   if (state.status === "success") {
-    return <p className="form-message form-message--success">{state.message}</p>;
+    return <p aria-live="polite" className="form-message form-message--success" role="status">{state.message}</p>;
   }
 
   return (

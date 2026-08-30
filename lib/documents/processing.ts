@@ -25,6 +25,20 @@ export type ProcessDocumentResult =
   | { status: "needs_reupload"; documentId: string }
   | { status: "failed"; documentId: string };
 
+// A document whose processing broke on our side, not on the file. Nothing
+// used to be said about it: only the unreadable case wrote to the client, so
+// a file that hit a service failure sat in the cabinet looking as if it were
+// still being read. Now the cabinet shows only "in progress" and "ready", so
+// silence here would be the whole story a person gets.
+export function buildDocumentServiceFailureMessage(
+  locale: "ru" | "en",
+  filename: string
+): string {
+  return locale === "en"
+    ? `We could not finish reading “${filename}” — this is a fault on our side, not with your file. The team has been told and will deal with it; you do not need to upload anything again. Your other documents are safe in the case and continue processing.`
+    : `Нам не удалось дочитать файл «${filename}» — это сбой на нашей стороне, а не с вашим файлом. Команда уже знает и разберётся; загружать что-либо заново не нужно. Остальные документы сохранены в кейсе и продолжают обрабатываться.`;
+}
+
 export function buildDocumentReuploadMessage(
   locale: "ru" | "en",
   filename: string
@@ -70,28 +84,33 @@ async function finishFailure(
   await supabase.from("uploaded_documents")
     .update({ document_status: finalStatus }).eq("id", job.document_id);
 
-  if (kind === "unreadable") {
-    const { data: details } = await supabase
-      .from("uploaded_documents")
-      .select("original_filename, profiles(locale)")
-      .eq("id", job.document_id)
-      .maybeSingle();
-    const locale = (details?.profiles as { locale?: string } | null)?.locale === "en" ? "en" : "ru";
-    const filename = String(details?.original_filename ?? (locale === "en" ? "document" : "документ"));
-    const body = buildDocumentReuploadMessage(locale, filename);
+  // Both endings are told to the client, because the cabinet no longer
+  // distinguishes them in the document list: it shows "in progress" until a
+  // file is read and "ready" once it is, and a file that ends here is
+  // neither. The message is the only place the difference is explained.
+  const { data: details } = await supabase
+    .from("uploaded_documents")
+    .select("original_filename, profiles(locale)")
+    .eq("id", job.document_id)
+    .maybeSingle();
+  const locale = (details?.profiles as { locale?: string } | null)?.locale === "en" ? "en" : "ru";
+  const filename = String(details?.original_filename ?? (locale === "en" ? "document" : "документ"));
+  const body =
+    kind === "unreadable"
+      ? buildDocumentReuploadMessage(locale, filename)
+      : buildDocumentServiceFailureMessage(locale, filename);
 
-    const { error: messageError } = await supabase.from("case_messages").insert({
-      case_id: job.case_id,
-      profile_id: job.profile_id,
-      sender_id: null,
-      sender_role: "system",
-      body
-    });
-    if (!messageError) {
-      await supabase.from("document_processing_jobs")
-        .update({ client_notified_at: new Date().toISOString() })
-        .eq("id", job.id).is("client_notified_at", null);
-    }
+  const { error: messageError } = await supabase.from("case_messages").insert({
+    case_id: job.case_id,
+    profile_id: job.profile_id,
+    sender_id: null,
+    sender_role: "system",
+    body
+  });
+  if (!messageError) {
+    await supabase.from("document_processing_jobs")
+      .update({ client_notified_at: new Date().toISOString() })
+      .eq("id", job.id).is("client_notified_at", null);
   }
 
   return { status: finalStatus, documentId: job.document_id };

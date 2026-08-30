@@ -10,9 +10,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const locale = await getLocale();
 
   return {
-    title: locale === "ru"
-      ? "Добро пожаловать — Python Method"
-      : "Welcome — Python Method"
+    title: locale === "ru" ? "Добро пожаловать" : "Welcome"
   };
 }
 

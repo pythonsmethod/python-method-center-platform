@@ -1,6 +1,6 @@
 "use client";
 
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { useActionState, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import { submitOnboarding } from "@/lib/onboarding/actions";
@@ -147,7 +147,7 @@ export function OnboardingForm({
       </button>
 
       {state.message ? (
-        <p className="form-message form-message--error">{state.message}</p>
+        <p aria-live="assertive" className="form-message form-message--error" role="alert">{state.message}</p>
       ) : null}
     </form>
   );

@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Link from "next/link";
+import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -10,8 +10,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
   return {
     title: t.title,
-    description: t.description,
-    alternates: { canonical: "/payment/other" }
+    description: t.description
+    // Canonical and hreflang are written by the root layout, which is the
+    // only place that knows whether this render is the Russian address or
+    // the English one. Pinning a canonical here dropped the pair.
   };
 }
 
