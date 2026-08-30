@@ -52,8 +52,9 @@ export default function ErrorBoundary({
           <div className="panel-actions">
             <button className="button" onClick={() => reset()} type="button">Try again</button>
             {/* A hard navigation clears a failed client tree and stale chunks. */}
-            {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-            <a className="button button--secondary" href="/">Go to home page</a>
+            {/* This block is shown only under html[lang="en"], so it can name
+                the English home outright rather than be redirected to it. */}
+            <a className="button button--secondary" href="/en">Go to home page</a>
           </div>
           <p className="founder-hint">If the error repeats, refresh the page completely and send the code below to the team.</p>
           <p className="founder-hint">Error code: <code>{error.digest ?? "none"}</code></p>

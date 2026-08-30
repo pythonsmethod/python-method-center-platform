@@ -24,6 +24,11 @@ const PUBLIC_PATHS: { path: string; priority: number; lastModified: string }[] =
 // Both addresses of every page, each naming the other. Listing only the
 // Russian ones would leave the English side to be discovered by luck: the
 // language used to live in a cookie, and a crawler carries none.
+// One step below a Russian page's priority, kept to one decimal place.
+function lower(priority: number): number {
+  return Math.max(Math.round((priority - 0.1) * 10) / 10, 0.1);
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const absolute = (path: string) => `${SITE_URL}${path === "/" ? "" : path}`;
 
@@ -46,8 +51,10 @@ export default function sitemap(): MetadataRoute.Sitemap {
     return [
       { url: absolute(pair.ru), ...entry },
       // The English twin is worth a little less on its own: the Russian
-      // address is the one the site has always published.
-      { url: absolute(pair.en), ...entry, priority: Math.max(priority - 0.1, 0.1) }
+      // address is the one the site has always published. Rounded because
+      // 0.8 - 0.1 is 0.7000000000000001 in binary floating point, and that
+      // is what would be written into the published XML.
+      { url: absolute(pair.en), ...entry, priority: lower(priority) }
     ];
   });
 }

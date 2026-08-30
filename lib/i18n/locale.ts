@@ -18,6 +18,25 @@ export const LOCALE_HEADER = "x-pm-locale";
 // to find the same page in the other language.
 export const PATH_HEADER = "x-pm-path";
 
+// Which language to render in, and why no Vary header goes with it.
+//
+// Reading the cookie is what would normally demand "Vary: Cookie": without
+// it a shared cache can hand one visitor the copy it stored for another, in
+// the wrong language. Next 15 writes its own Vary for app-router responses
+// and overwrites anything added beside it, in the middleware or in
+// next.config, so that header cannot be set here at all.
+//
+// It is not needed. Calling cookies() and headers() makes every page that
+// renders through the root layout dynamic, and Vercel serves those with
+// "private, no-cache, no-store" — no shared cache keeps a copy, so there is
+// none to hand to the wrong reader. Verified against production: every HTML
+// response carries that header, and the only cached routes (robots.txt,
+// sitemap.xml) read no cookie and are identical for everyone.
+//
+// The guarantee rests on those pages staying dynamic. Making a page that
+// depends on the language static or publicly cacheable would bring the bug
+// back with no header available to prevent it — give that page its own
+// address under /en instead, the way the public pages already work.
 export async function getLocale(): Promise<Locale> {
   const fromPath = (await headers()).get(LOCALE_HEADER);
 
