@@ -7768,6 +7768,38 @@ body.cabinet-menu-open { overflow: hidden; }
   .online-chess__turn { flex-direction: column; }
 }
 
+.case-conversation-workspace {
+  display: grid;
+  gap: 20px;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+.case-conversation-workspace > .panel { min-width: 0; }
+
+.assistant-msg__use-reply {
+  background: transparent;
+  border: 1px solid rgba(190, 142, 55, 0.55);
+  border-radius: 999px;
+  color: inherit;
+  cursor: pointer;
+  display: block;
+  font: inherit;
+  margin-top: 10px;
+  padding: 7px 11px;
+}
+
+.assistant-msg__use-reply:hover { background: rgba(190, 142, 55, 0.16); }
+
+.case-conversation-workspace__notice {
+  border-left: 3px solid var(--gold, #be8e37);
+  color: var(--muted);
+  padding-left: 10px;
+}
+
+@media (max-width: 900px) {
+  .case-conversation-workspace { grid-template-columns: 1fr; }
+}
+
 /* ---------- reading at 200% text size ----------
    A person who raises the browser's text size is not resizing the window,
    so every fixed inline box keeps its width while the words inside it grow.

@@ -37,6 +37,7 @@ type CaseMessageThreadProps = {
   // label to the English word for "today", which quietly breaks the moment
   // that label is reworded.
   dateLocale: string;
+  externalDraft?: { id: number; text: string } | null;
 };
 
 function senderLabel(role: string, viewer: "client" | "staff",
@@ -102,7 +103,8 @@ export function CaseMessageThread({
   expandable = false,
   labels: t,
   voiceLabels,
-  dateLocale
+  dateLocale,
+  externalDraft = null
 }: CaseMessageThreadProps) {
   const [expanded, setExpanded] = useState(false);
   const action = viewer === "client" ? sendClientCaseMessage : sendStaffCaseMessage;
@@ -111,8 +113,10 @@ export function CaseMessageThread({
     initialStaffActionState
   );
   const [messages, setMessages] = useState<CaseMessage[]>(initialMessages);
+  const [body, setBody] = useState("");
   const listRef = useRef<HTMLDivElement | null>(null);
   const formRef = useRef<HTMLFormElement | null>(null);
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
   const lastCountRef = useRef(initialMessages.length);
   const signedAudioUrlsAtRef = useRef(Date.now());
 
@@ -194,9 +198,20 @@ export function CaseMessageThread({
   useEffect(() => {
     if (state.status === "success") {
       formRef.current?.reset();
+      setBody("");
       void refresh();
     }
   }, [state, refresh]);
+
+  useEffect(() => {
+    if (!externalDraft) {
+      return;
+    }
+
+    setBody(externalDraft.text);
+    textareaRef.current?.focus();
+    textareaRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
+  }, [externalDraft]);
 
   // Keep the view pinned to the latest message.
   useEffect(() => {
@@ -280,12 +295,15 @@ export function CaseMessageThread({
         <textarea
           maxLength={8000}
           name="body"
+          onChange={(event) => setBody(event.target.value)}
           placeholder={
             viewer === "client"
               ? t.placeholderClient
               : t.placeholderStaff
           }
           rows={3}
+          ref={textareaRef}
+          value={body}
         />
         <div className="case-thread__actions">
           <VoiceRecorder
