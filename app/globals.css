@@ -7837,6 +7837,81 @@ body.cabinet-menu-open { overflow: hidden; }
   .case-conversation-workspace { grid-template-columns: 1fr; }
 }
 
+/* Karen's case workspace on phones: keep the reading surface light and the
+   six primary destinations in one unobtrusive row. The navigation gets out
+   of the way completely while the on-screen keyboard is being used. */
+@media (max-width: 720px) {
+  body:has(.karen-case-workspace) {
+    padding-bottom: calc(68px + env(safe-area-inset-bottom));
+  }
+
+  body:has(.karen-case-workspace) .admin-nav {
+    right: 0;
+    bottom: 0;
+    left: 0;
+    padding: 2px 6px max(2px, env(safe-area-inset-bottom));
+    border: 0;
+    border-top: 1px solid rgba(212, 168, 68, 0.12);
+    border-radius: 0;
+    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.26);
+  }
+
+  body:has(.karen-case-workspace) .admin-nav nav {
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 0;
+  }
+
+  body:has(.karen-case-workspace) .admin-nav nav a,
+  body:has(.karen-case-workspace) .admin-nav nav a.admin-nav__founder {
+    min-height: 58px;
+    padding: 6px 1px 4px;
+    border-radius: 0;
+    font-size: clamp(0.54rem, 2.35vw, 0.64rem);
+    white-space: nowrap;
+  }
+
+  body:has(.karen-case-workspace) .admin-nav__icon {
+    font-size: 1.08rem;
+  }
+
+  body:has(.karen-case-workspace):has(textarea:focus) .admin-nav {
+    display: none;
+  }
+
+  .karen-case-workspace .case-conversation-workspace {
+    gap: 12px;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel {
+    padding-inline: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+  }
+
+  .karen-case-workspace .assistant-chat__messages,
+  .karen-case-workspace .case-thread__messages {
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    box-shadow: none;
+    padding-inline: 0;
+  }
+
+  .karen-case-workspace .assistant-msg {
+    border-color: transparent;
+    box-shadow: none;
+  }
+
+  .karen-case-workspace .assistant-chat__form textarea,
+  .karen-case-workspace .case-thread__form textarea {
+    border-color: rgba(212, 168, 68, 0.2);
+    border-radius: 12px;
+    box-shadow: none;
+  }
+}
+
 /* ---------- reading at 200% text size ----------
    A person who raises the browser's text size is not resizing the window,
    so every fixed inline box keeps its width while the words inside it grow.
