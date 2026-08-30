@@ -7755,10 +7755,33 @@ body.cabinet-menu-open { overflow: hidden; }
 .online-chess__appointments button.is-quiet { background: transparent; color: #decf9d; }
 .online-chess__appointments button:disabled { cursor: wait; opacity: .55; }
 
-.online-chess__game { max-width: 720px; margin: 26px auto 0; }
+.online-chess__game { inline-size: min(100%, 780px); margin: 26px auto 0; }
 .online-chess__turn { justify-content: space-between; gap: 10px; margin-bottom: 12px; padding: 12px 14px; border-left: 4px solid #dbb94e; background: rgba(218, 181, 72, .08); }
 .online-chess__turn span { color: #cfc5aa; }
-.online-chess__board-frame { width: 100%; }
+.online-chess__board-frame { inline-size: min(100%, 760px); margin-inline: auto; width: 100%; }
+.online-chess__board-frame .chess-board { border-color: #d8d8d2; }
+.online-chess__board-frame .chess-board__square {
+  font-size: clamp(2.4rem, 11.5cqi, 6.4rem);
+  text-shadow: none;
+}
+.online-chess__board-frame .chess-board__square.is-light {
+  background-color: #f1f1ed;
+  background-image: none;
+}
+.online-chess__board-frame .chess-board__square.is-dark {
+  background-color: #151515;
+  background-image: none;
+}
+.online-chess__board-frame .chess-board__square > span.is-w {
+  color: #fffdf5;
+  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .75));
+  -webkit-text-stroke: 1px #171717;
+}
+.online-chess__board-frame .chess-board__square > span.is-b {
+  color: #101010;
+  filter: drop-shadow(0 2px 1px rgba(255, 255, 255, .28));
+  -webkit-text-stroke: 1px #f4f4ee;
+}
 .online-chess__sync { color: #66d99a; text-align: center; font-weight: 700; }
 
 @media (max-width: 760px) {
