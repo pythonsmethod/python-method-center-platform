@@ -7895,17 +7895,24 @@ body.cabinet-menu-open { overflow: hidden; }
   }
 
   .karen-case-workspace .case-conversation-workspace > .panel {
-    padding-inline: 0;
+    padding: 20px 16px;
     border: 0;
-    border-radius: 0;
-    background: transparent;
-    box-shadow: none;
+    border-radius: 18px;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12);
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:first-child {
+    background: linear-gradient(145deg, #302714, #251f12);
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) {
+    background: #f3ebdd;
+    color: #493724;
   }
 
   .karen-case-workspace .case-conversation-workspace > .panel + .panel {
-    border-top: 1px solid rgba(212, 168, 68, 0.2);
-    margin-top: 8px;
-    padding-top: 28px;
+    border-top: 0;
+    margin-top: 12px;
   }
 
   .karen-case-workspace .assistant-chat__messages,
@@ -7915,6 +7922,47 @@ body.cabinet-menu-open { overflow: hidden; }
     background: rgba(255, 255, 255, 0.018);
     box-shadow: none;
     padding-inline: 12px;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) h2,
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) p {
+    color: #493724;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .panel__label,
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-msg__sender {
+    color: #8a631a;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-thread__messages {
+    background: rgba(91, 65, 31, 0.055);
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-msg,
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-day span {
+    background: #fffaf0;
+    border-color: rgba(126, 91, 34, 0.15);
+    color: #493724;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-msg--own {
+    background: #ead9ad;
+    border-color: rgba(138, 99, 26, 0.2);
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-msg__time,
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-day span,
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-thread__empty {
+    color: #806f5d;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-thread__form textarea {
+    background: #fffaf0;
+    color: #493724;
+  }
+
+  .karen-case-workspace .case-conversation-workspace > .panel:nth-child(2) .case-thread__form textarea::placeholder {
+    color: #91806e;
   }
 
   .karen-case-workspace .assistant-msg {
