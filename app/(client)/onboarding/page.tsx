@@ -15,18 +15,19 @@ async function getProfileDefaults(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return { fullName: "", phone: "" };
+    return { fullName: "", phone: "", countryCode: "" };
   }
 
   const { data } = await supabase
     .from("profiles")
-    .select("full_name, phone")
+    .select("full_name, phone, country_code")
     .eq("id", userId)
     .maybeSingle();
 
   return {
     fullName: String(data?.full_name ?? ""),
-    phone: String(data?.phone ?? "")
+    phone: String(data?.phone ?? ""),
+    countryCode: String(data?.country_code ?? "")
   };
 }
 
@@ -79,7 +80,7 @@ export default async function OnboardingPage() {
       <EmergencyNotice text={strings.support.emergencyText} />
 
       <section className="form-section" aria-label={t.formLabel}>
-        <OnboardingForm labels={t} profileDefaults={profileDefaults} />
+        <OnboardingForm labels={t} locale={locale} profileDefaults={profileDefaults} />
       </section>
     </div>
   );

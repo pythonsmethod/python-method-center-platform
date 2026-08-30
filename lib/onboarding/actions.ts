@@ -21,6 +21,7 @@ import { getLocale } from "@/lib/i18n/locale";
 import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { isCountryCode, isFullName } from "@/lib/profile/identity";
 
 const careRecipientTypes: CareRecipientType[] = [
   "self",
@@ -84,6 +85,7 @@ export async function submitOnboarding(
 
   const fullName = readRequiredText(formData, "fullName");
   const phone = readRequiredText(formData, "phone");
+  const countryCode = readRequiredText(formData, "countryCode").toUpperCase();
   const careRecipientType = readRequiredText(formData, "careRecipientType");
   const primaryGoal = readRequiredText(formData, "primaryGoal");
   const situationDescription = readRequiredText(
@@ -107,8 +109,16 @@ export async function submitOnboarding(
   const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
 
-  if (!fullName || !phone || !primaryGoal || !situationDescription) {
+  if (!fullName || !phone || !countryCode || !primaryGoal || !situationDescription) {
     return errorState(t.errorFields);
+  }
+
+  if (!isFullName(fullName)) {
+    return errorState(t.errorFullName);
+  }
+
+  if (!isCountryCode(countryCode)) {
+    return errorState(t.errorCountry);
   }
 
   if (!isCareRecipientType(careRecipientType)) {
@@ -117,7 +127,7 @@ export async function submitOnboarding(
 
   // Age, before anything is written down.
   if (isGuardianPath) {
-    if (!minorFullName || !minorBirthDate) {
+    if (!minorFullName || !isFullName(minorFullName) || !minorBirthDate) {
       return errorState(t.errorMinorFields);
     }
 
@@ -153,6 +163,7 @@ export async function submitOnboarding(
       email: user.email ?? null,
       full_name: fullName,
       phone,
+      country_code: countryCode,
       status: "active"
     },
     { onConflict: "id" }
@@ -224,6 +235,7 @@ export async function submitOnboarding(
   const payload = {
     full_name: fullName,
     phone,
+    country_code: countryCode,
     care_recipient_type: careRecipientType,
     primary_goal: primaryGoal,
     situation_description: situationDescription,

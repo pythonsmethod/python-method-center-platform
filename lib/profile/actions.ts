@@ -4,6 +4,8 @@ import { revalidatePath } from "next/cache";
 import type { ProfileDetailsActionState } from "@/lib/profile/action-state";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import { getLocale } from "@/lib/i18n/locale";
+import { isFullName } from "@/lib/profile/identity";
 
 
 
@@ -59,8 +61,13 @@ export async function updateProfileDetails(
 
   const fullName = cleanField(formData.get("full_name"), 160);
 
-  if (!fullName) {
-    return errorState("Укажите имя — команде нужно знать, как к вам обращаться.");
+  if (!fullName || !isFullName(fullName)) {
+    const locale = await getLocale();
+    return errorState(
+      locale === "ru"
+        ? "Укажите имя и фамилию полностью."
+        : "Please enter both first and last name."
+    );
   }
 
   const { error } = await supabase

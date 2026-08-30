@@ -15,6 +15,7 @@ import { canSeeProviderNames, isFounderEmail } from "@/lib/auth/require-founder"
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { getStaffCases } from "@/lib/cases/staff-queries";
+import { countryFlag } from "@/lib/profile/identity";
 
 export default async function AdminPage() {
   const auth = await getRequiredStaffUser("/admin");
@@ -205,6 +206,7 @@ export default async function AdminPage() {
                     <strong>
                       {clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "—"}
                       {clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
+                      {clientCase.profiles?.country_code ? ` · ${countryFlag(clientCase.profiles.country_code)}` : ""}
                     </strong>
                     {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
                   </span>
