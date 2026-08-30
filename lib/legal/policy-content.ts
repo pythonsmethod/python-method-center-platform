@@ -60,7 +60,7 @@ const PRIVACY_RU: LegalDocument = {
       ],
       bullets: [
         "Регистрация: email и пароль (пароль хранится у нашего провайдера аутентификации в виде хеша — мы его не видим).",
-        "Профиль: имя, телефон, язык интерфейса.",
+        "Профиль: имя и фамилия, телефон, страна, язык интерфейса.",
         "Анкета: цель обращения, описание ситуации, для кого ведётся сопровождение, подтверждение возраста, а при участии несовершеннолетнего — имя и дата рождения участника и данные родителя или опекуна.",
         "Документы: файлы, которые вы загружаете, — анализы, выписки, снимки.",
         "Переписка: сообщения в вашем кейсе, включая голосовые, и вложения к ним.",
@@ -198,7 +198,7 @@ const PRIVACY_EN: LegalDocument = {
       ],
       bullets: [
         "Registration: email and password (the password is held by our authentication provider as a hash — we never see it).",
-        "Profile: name, phone number, interface language.",
+        "Profile: first and last name, phone number, country, interface language.",
         "Questionnaire: your goal, a description of your situation, who the support is for, age confirmation, and — where a minor takes part — the participant's name and date of birth together with the parent's or guardian's details.",
         "Documents: the files you upload — test results, discharge summaries, scans.",
         "Correspondence: the messages in your case, including voice messages and their attachments.",

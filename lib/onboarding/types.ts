@@ -17,4 +17,5 @@ export const initialOnboardingActionState: OnboardingActionState = {
 export type OnboardingProfileDefaults = {
   fullName: string;
   phone: string;
+  countryCode: string;
 };

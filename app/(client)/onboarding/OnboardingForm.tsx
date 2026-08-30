@@ -3,7 +3,9 @@
 import { Link } from "@/components/LocaleLink";
 import { useActionState, useState } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import type { Locale } from "@/lib/i18n/locale";
 import { submitOnboarding } from "@/lib/onboarding/actions";
+import { COUNTRY_CODES, countryFlag } from "@/lib/profile/identity";
 import {
   initialOnboardingActionState,
   type OnboardingProfileDefaults
@@ -14,11 +16,13 @@ type OnboardingFormProps = {
   // The whole onboarding section of the dictionary. This form carries both
   // consents, and a consent a person cannot read is not consent.
   labels: Dictionary["onboarding"];
+  locale: Locale;
 };
 
 export function OnboardingForm({
   profileDefaults,
-  labels
+  labels,
+  locale
 }: OnboardingFormProps) {
   const [state, formAction, pending] = useActionState(
     submitOnboarding,
@@ -29,6 +33,10 @@ export function OnboardingForm({
   // details, so the person filling the form is never the person described.
   const [recipient, setRecipient] = useState("self");
   const isGuardian = recipient === "minor";
+  const regionNames = new Intl.DisplayNames([locale], { type: "region" });
+  const countries = COUNTRY_CODES
+    .map((code) => ({ code, name: regionNames.of(code) ?? code }))
+    .sort((a, b) => a.name.localeCompare(b.name, locale));
 
   return (
     <form action={formAction} className="onboarding-form">
@@ -38,9 +46,21 @@ export function OnboardingForm({
           autoComplete="name"
           defaultValue={profileDefaults.fullName}
           name="fullName"
+          pattern=".*\\S+\\s+\\S+.*"
           required
+          title={labels.fullNameHint}
           type="text"
         />
+      </label>
+
+      <label className="field">
+        <span>{labels.country}</span>
+        <select defaultValue={profileDefaults.countryCode} name="countryCode" required>
+          <option disabled value="">{labels.countryPlaceholder}</option>
+          {countries.map(({ code, name }) => (
+            <option key={code} value={code}>{countryFlag(code)} {name}</option>
+          ))}
+        </select>
       </label>
 
       <label className="field">

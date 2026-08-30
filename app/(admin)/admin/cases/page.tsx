@@ -16,6 +16,7 @@ import {
   caseUrgencyLabel
 } from "@/lib/i18n/status-labels";
 import { getLocale, type Locale } from "@/lib/i18n/locale";
+import { countryFlag } from "@/lib/profile/identity";
 
 function shortId(value: string): string {
   return value.slice(0, 8);
@@ -66,6 +67,7 @@ function CaseTable({
               <td>
                 {clientCase.profiles?.full_name ?? "Без имени"}
                 {clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
+                {clientCase.profiles?.country_code ? ` · ${countryFlag(clientCase.profiles.country_code)}` : ""}
               </td>
               <td>
                 {clientCase.profiles?.email ?? "—"}
@@ -163,7 +165,10 @@ function CaseCards({
             </span>
             <span className="staff-client-card__body">
               <span className="staff-client-card__name-row">
-                <strong>{name}{clientCase.case_number ? ` · ${clientCase.case_number}` : ""}</strong>
+                <strong>
+                  {name}{clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
+                  {clientCase.profiles?.country_code ? ` · ${countryFlag(clientCase.profiles.country_code)}` : ""}
+                </strong>
                 {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
               </span>
               {clientCase.title ? <span className="staff-client-card__goal">{clientCase.title}</span> : null}
