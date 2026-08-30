@@ -7858,16 +7858,24 @@ body.cabinet-menu-open { overflow: hidden; }
 
   body:has(.karen-case-workspace) .admin-nav nav {
     grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 0;
+    gap: 3px;
   }
 
   body:has(.karen-case-workspace) .admin-nav nav a,
   body:has(.karen-case-workspace) .admin-nav nav a.admin-nav__founder {
     min-height: 58px;
-    padding: 6px 1px 4px;
+    padding: 6px 3px 4px;
     border-radius: 0;
-    font-size: clamp(0.54rem, 2.35vw, 0.64rem);
-    white-space: nowrap;
+    font-size: clamp(0.5rem, 2.15vw, 0.6rem);
+    line-height: 1.08;
+    overflow: hidden;
+    white-space: normal;
+  }
+
+  body:has(.karen-case-workspace) .admin-nav nav a > span:last-child {
+    display: block;
+    max-width: 100%;
+    overflow: hidden;
   }
 
   body:has(.karen-case-workspace) .admin-nav__icon {
@@ -7875,6 +7883,10 @@ body.cabinet-menu-open { overflow: hidden; }
   }
 
   body:has(.karen-case-workspace):has(textarea:focus) .admin-nav {
+    display: none;
+  }
+
+  body:has(.karen-case-workspace) .public-mobile-dock {
     display: none;
   }
 
@@ -7890,13 +7902,19 @@ body.cabinet-menu-open { overflow: hidden; }
     box-shadow: none;
   }
 
+  .karen-case-workspace .case-conversation-workspace > .panel + .panel {
+    border-top: 1px solid rgba(212, 168, 68, 0.2);
+    margin-top: 8px;
+    padding-top: 28px;
+  }
+
   .karen-case-workspace .assistant-chat__messages,
   .karen-case-workspace .case-thread__messages {
     border: 0;
-    border-radius: 0;
-    background: transparent;
+    border-radius: 14px;
+    background: rgba(255, 255, 255, 0.018);
     box-shadow: none;
-    padding-inline: 0;
+    padding-inline: 12px;
   }
 
   .karen-case-workspace .assistant-msg {
