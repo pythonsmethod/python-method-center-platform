@@ -5,13 +5,13 @@ import { DigestRefreshButton } from "@/app/(admin)/admin/medical-digest/DigestRe
 import { getKarenAssistantUserState } from "@/lib/auth/require-karen";
 import { getLocale } from "@/lib/i18n/locale";
 import { listMedicalDigestIssues } from "@/lib/medical-digest/digest";
-import type { MedicalDigestCategory } from "@/lib/medical-digest/types";
+import type { OncologyDigestCategory } from "@/lib/medical-digest/types";
 
 type MedicalDigestPageProps = {
   searchParams: Promise<{ date?: string }>;
 };
 
-const categoryOrder: MedicalDigestCategory[] = ["rehabilitation", "oncology", "discoveries"];
+const categoryOrder: OncologyDigestCategory[] = ["therapeutics", "complementary", "research", "practice"];
 
 export const dynamic = "force-dynamic";
 
@@ -33,16 +33,18 @@ export default async function MedicalDigestPage({ searchParams }: MedicalDigestP
 
   const issues = await listMedicalDigestIssues();
   const selected = issues.find((issue) => issue.issueDate === params.date) ?? issues[0] ?? null;
-  const categoryLabels: Record<MedicalDigestCategory, { title: string; eyebrow: string }> = ru
-    ? {
-        rehabilitation: { title: "Реабилитация", eyebrow: "Восстановление и качество жизни" },
-        oncology: { title: "Онкология", eyebrow: "Клинические исследования и обзоры" },
-        discoveries: { title: "Новые открытия", eyebrow: "Перспективные методы и технологии" }
+  const categoryLabels: Record<OncologyDigestCategory, { title: string; eyebrow: string }> = ru
+      ? {
+        therapeutics: { title: "Препараты, вакцины и технологии", eyebrow: "Новые методы лечения и диагностики" },
+        complementary: { title: "Дополнительные и экспериментальные подходы", eyebrow: "Экстракты, добавки, народные методы и клинические случаи" },
+        research: { title: "Исследования в онкологии", eyebrow: "Новые данные и результаты" },
+        practice: { title: "Что внедряют и используют", eyebrow: "Рекомендации, стандарты и реальная практика" }
       }
     : {
-        rehabilitation: { title: "Rehabilitation", eyebrow: "Recovery and quality of life" },
-        oncology: { title: "Oncology", eyebrow: "Clinical studies and reviews" },
-        discoveries: { title: "New discoveries", eyebrow: "Emerging methods and technologies" }
+        therapeutics: { title: "Drugs, vaccines, and technologies", eyebrow: "New treatment and diagnostic approaches" },
+        complementary: { title: "Complementary and experimental approaches", eyebrow: "Extracts, supplements, traditional approaches, and case reports" },
+        research: { title: "Oncology research", eyebrow: "New evidence and results" },
+        practice: { title: "What is entering practice", eyebrow: "Guidelines, standards, and real-world use" }
       };
   const dateFormatter = new Intl.DateTimeFormat(ru ? "ru-RU" : "en-US", {
     dateStyle: "long",
@@ -60,20 +62,13 @@ export default async function MedicalDigestPage({ searchParams }: MedicalDigestP
       <header className="medical-digest__hero">
         <div>
           <span>{ru ? "Anham · доказательная редакция" : "Anham · evidence desk"}</span>
-          <h1>{ru ? "Утренний медицинский обзор" : "Morning medical digest"}</h1>
+          <h1>{ru ? "Утренний онкологический обзор" : "Morning oncology digest"}</h1>
           <p>{ru
-            ? "Свежие публикации о реабилитации, онкологии и новых медицинских разработках — с прямыми ссылками на первоисточники."
-            : "Recent publications on rehabilitation, oncology, and emerging medical research — with direct links to primary sources."}</p>
+            ? "Исследования в онкологии: что разрабатывают, внедряют и уже используют — с прямыми ссылками на первоисточники."
+            : "Oncology research: what is being developed, introduced, and already used — with direct links to primary sources."}</p>
         </div>
         <DigestRefreshButton locale={locale} />
       </header>
-
-      <div className="medical-digest__trust" role="note">
-        <strong>{ru ? "Как читать обзор" : "How to read this digest"}</strong>
-        <span>{ru
-          ? "Карточки являются редакционным пересказом аннотаций, а не рекомендациями по лечению. Перед клиническим применением откройте полный текст исследования."
-          : "Cards are editorial summaries of abstracts, not treatment recommendations. Review the full study before any clinical application."}</span>
-      </div>
 
       {selected ? (
         <>
@@ -99,7 +94,11 @@ export default async function MedicalDigestPage({ searchParams }: MedicalDigestP
           </section>
 
           {categoryOrder.map((category) => {
-            const articles = selected.articles.filter((article) => article.category === category);
+            const articles = selected.articles.filter((article) =>
+              article.category === category ||
+              (category === "research" && article.category === "oncology") ||
+              (category === "therapeutics" && article.category === "development")
+            );
             if (articles.length === 0) return null;
             const labels = categoryLabels[category];
             return (
@@ -118,6 +117,24 @@ export default async function MedicalDigestPage({ searchParams }: MedicalDigestP
                       <h3>{article.title}</h3>
                       <p>{ru ? article.summaryRu : article.summaryEn}</p>
                       <dl>
+                        <div>
+                          <dt>{ru ? "Результат" : "Reported outcome"}</dt>
+                          <dd>{ru
+                            ? article.outcomeRu || "Результат требует проверки по полному тексту."
+                            : article.outcomeEn || "The outcome requires review of the full text."}</dd>
+                        </div>
+                        <div>
+                          <dt>{ru ? "Доказательность" : "Evidence"}</dt>
+                          <dd>{ru
+                            ? article.evidenceRu || "Уровень доказательности не указан."
+                            : article.evidenceEn || "The evidence level is not stated."}</dd>
+                        </div>
+                        <div>
+                          <dt>{ru ? "Состав, формула и получение" : "Composition, formula, and production"}</dt>
+                          <dd>{ru
+                            ? article.compositionRu || "В аннотации не указано."
+                            : article.compositionEn || "Not specified in the abstract."}</dd>
+                        </div>
                         <div>
                           <dt>{ru ? "Почему важно" : "Why it matters"}</dt>
                           <dd>{ru ? article.significanceRu : article.significanceEn}</dd>
@@ -145,8 +162,8 @@ export default async function MedicalDigestPage({ searchParams }: MedicalDigestP
           <span aria-hidden="true">⌁</span>
           <h2>{ru ? "Первый выпуск ещё не собран" : "The first issue has not been built yet"}</h2>
           <p>{ru
-            ? "Нажмите «Обновить сейчас». Anham найдёт свежие индексированные публикации, подготовит двуязычный разбор и сохранит выпуск в архиве."
-            : "Select “Refresh now.” Anham will find recently indexed publications, prepare a bilingual review, and save the issue to the archive."}</p>
+            ? "Нажмите «Обновить сейчас». Anham найдёт свежие онкологические публикации, подготовит двуязычный разбор и сохранит выпуск в архиве."
+            : "Select “Refresh now.” Anham will find recent oncology publications, prepare a bilingual review, and save the issue to the archive."}</p>
         </section>
       )}
     </div>

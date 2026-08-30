@@ -1,4 +1,19 @@
-export type MedicalDigestCategory = "rehabilitation" | "oncology" | "discoveries";
+export type MedicalDigestCategory =
+  | "research"
+  | "therapeutics"
+  | "complementary"
+  | "practice"
+  // Kept only so oncology articles in already-saved issues remain readable.
+  | "oncology"
+  | "rehabilitation"
+  | "discoveries"
+  | "development";
+
+export type OncologyDigestCategory =
+  | "therapeutics"
+  | "complementary"
+  | "research"
+  | "practice";
 
 export type MedicalDigestArticle = {
   id: string;
@@ -10,6 +25,12 @@ export type MedicalDigestArticle = {
   significanceEn: string;
   limitationsRu: string;
   limitationsEn: string;
+  outcomeRu: string;
+  outcomeEn: string;
+  evidenceRu: string;
+  evidenceEn: string;
+  compositionRu: string;
+  compositionEn: string;
   journal: string;
   publishedAt: string;
   publicationType: string;

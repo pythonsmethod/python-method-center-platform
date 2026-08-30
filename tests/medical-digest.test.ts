@@ -11,8 +11,10 @@ const vercel = readFileSync("vercel.json", "utf8");
 describe("Karen medical digest", () => {
   it("is a private bilingual staff workspace", () => {
     expect(page).toContain("getKarenAssistantUserState");
-    expect(page).toContain("Утренний медицинский обзор");
-    expect(page).toContain("Morning medical digest");
+    expect(page).toContain("Утренний онкологический обзор");
+    expect(page).toContain("Morning oncology digest");
+    expect(page).not.toContain("Как читать обзор");
+    expect(page).not.toContain("How to read this digest");
     expect(page).toContain("Открыть первоисточник");
     expect(page).toContain("Open primary source");
     expect(action).toContain("getKarenAssistantUserState");
@@ -24,6 +26,15 @@ describe("Karen medical digest", () => {
     expect(digest).toContain("Use only the supplied bibliographic record and abstract");
     expect(digest).toContain("limitationsRu");
     expect(digest).toContain("limitationsEn");
+    expect(digest).toContain('category: "therapeutics"');
+    expect(digest).toContain('category: "complementary"');
+    expect(digest).toContain('category: "research"');
+    expect(digest).toContain('category: "practice"');
+    expect(digest).not.toContain('category: "rehabilitation"');
+    expect(digest).toContain("compositionRu");
+    expect(digest).toContain("evidenceRu");
+    expect(digest).toContain("case report");
+    expect(digest).toContain("90 * DAY_MS");
   });
 
   it("persists one issue per day and protects the daily cron", () => {

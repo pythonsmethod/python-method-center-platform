@@ -5,7 +5,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   MedicalDigestArticle,
   MedicalDigestCategory,
-  MedicalDigestIssue
+  MedicalDigestIssue,
+  OncologyDigestCategory
 } from "@/lib/medical-digest/types";
 
 type EuropePmcResult = {
@@ -33,18 +34,22 @@ type DraftArticle = {
   pmid: string | null;
 };
 
-const SEARCHES: Array<{ category: MedicalDigestCategory; query: string }> = [
+const SEARCHES: Array<{ category: OncologyDigestCategory; query: string }> = [
   {
-    category: "rehabilitation",
-    query: '(rehabilitation OR "physical therapy" OR neurorehabilitation) AND HAS_ABSTRACT:Y'
+    category: "therapeutics",
+    query: '(oncology OR cancer OR neoplasm) AND (vaccine OR drug OR immunotherapy OR radiotherapy OR "cell therapy" OR technology OR device OR "novel therapy" OR investigational) AND HAS_ABSTRACT:Y'
   },
   {
-    category: "oncology",
-    query: '(oncology OR cancer OR neoplasm) AND ("clinical trial" OR "systematic review" OR "meta-analysis") AND HAS_ABSTRACT:Y'
+    category: "complementary",
+    query: '(oncology OR cancer OR neoplasm) AND ("complementary medicine" OR "integrative oncology" OR herbal OR "plant extract" OR "natural product" OR "traditional medicine" OR supplement OR "case report" OR remission) AND HAS_ABSTRACT:Y'
   },
   {
-    category: "discoveries",
-    query: '("medical breakthrough" OR "new therapy" OR "novel treatment") AND HAS_ABSTRACT:Y'
+    category: "research",
+    query: '(oncology OR cancer OR neoplasm) AND ("randomized controlled trial" OR "clinical trial" OR "systematic review" OR "meta-analysis" OR preclinical OR "phase I" OR "phase II" OR "phase III") AND HAS_ABSTRACT:Y'
+  },
+  {
+    category: "practice",
+    query: '(oncology OR cancer OR neoplasm) AND (guideline OR "standard of care" OR implementation OR "real-world" OR approved) AND HAS_ABSTRACT:Y'
   }
 ];
 
@@ -87,7 +92,7 @@ async function fetchCategory(
   query: string,
   now: Date
 ): Promise<DraftArticle[]> {
-  const from = isoDate(new Date(now.getTime() - 14 * DAY_MS));
+  const from = isoDate(new Date(now.getTime() - 90 * DAY_MS));
   const to = isoDate(now);
   const fullQuery = `${query} AND FIRST_PDATE:[${from} TO ${to}]`;
   const url = new URL("https://www.ebi.ac.uk/europepmc/webservices/rest/search");
@@ -131,7 +136,7 @@ async function fetchCategory(
 }
 
 async function summarize(article: DraftArticle): Promise<MedicalDigestArticle> {
-  const system = `You are the evidence editor for a private medical research digest. Use only the supplied bibliographic record and abstract. Never infer patient-specific advice, effectiveness beyond the study, or facts absent from the abstract. Return one valid JSON object with exactly these string keys: summaryRu, summaryEn, significanceRu, significanceEn, limitationsRu, limitationsEn. Each value must be 1-2 concise sentences. Russian fields must be entirely Russian; English fields entirely English. State uncertainty and study limitations explicitly. Do not use Markdown.`;
+  const system = `You are the evidence editor for a private oncology research digest. Use only the supplied bibliographic record and abstract. Never infer patient-specific advice, causation, effectiveness beyond the study, regulatory approval, adoption in clinical practice, chemical composition, molecular formula, extraction method, or facts absent from the abstract. The editorial section is ${article.category}; describe the actual development or implementation stage only when the abstract states it. A case report, remission after a folk remedy, supplement, extract, or complementary intervention is an observation and must never be presented as proof that the intervention caused recovery. Use the term cure only if the source explicitly documents durable complete remission, and still state the evidence design. For compositionRu/compositionEn, list active ingredients, molecules, formula, formulation, extraction or manufacturing method only when explicitly stated; otherwise say that the abstract does not specify it. Return one valid JSON object with exactly these string keys: summaryRu, summaryEn, significanceRu, significanceEn, limitationsRu, limitationsEn, outcomeRu, outcomeEn, evidenceRu, evidenceEn, compositionRu, compositionEn. Each value must be 1-2 concise sentences. Russian fields must be entirely Russian; English fields entirely English. State uncertainty and study limitations explicitly. Do not use Markdown.`;
   const result = await askAssistantTeam(system, [{
     role: "user",
     content: `Title: ${article.title}\nJournal: ${article.journal}\nPublication date: ${article.publishedAt}\nPublication type: ${article.publicationType}\nAbstract:\n${article.abstract.slice(0, 7000)}`
@@ -148,7 +153,13 @@ async function summarize(article: DraftArticle): Promise<MedicalDigestArticle> {
     significanceRu: asText(parsed?.significanceRu) || "Клиническое значение требует оценки по полному тексту исследования.",
     significanceEn: asText(parsed?.significanceEn) || "Clinical significance should be assessed from the full study text.",
     limitationsRu: asText(parsed?.limitationsRu) || "Ограничения не извлечены автоматически; требуется ручная проверка.",
-    limitationsEn: asText(parsed?.limitationsEn) || "Limitations were not extracted automatically; manual review is required."
+    limitationsEn: asText(parsed?.limitationsEn) || "Limitations were not extracted automatically; manual review is required.",
+    outcomeRu: asText(parsed?.outcomeRu) || "Заявленный результат требует проверки по полному тексту.",
+    outcomeEn: asText(parsed?.outcomeEn) || "The reported outcome requires review of the full text.",
+    evidenceRu: asText(parsed?.evidenceRu) || "Уровень доказательности не определён автоматически.",
+    evidenceEn: asText(parsed?.evidenceEn) || "The evidence level was not determined automatically.",
+    compositionRu: asText(parsed?.compositionRu) || "Состав, формула или способ получения в аннотации не указаны.",
+    compositionEn: asText(parsed?.compositionEn) || "The abstract does not specify the composition, formula, or production method."
   };
 }
 
@@ -159,7 +170,12 @@ export async function generateMedicalDigest(now = new Date()): Promise<MedicalDi
   const groups = await Promise.all(
     SEARCHES.map(({ category, query }) => fetchCategory(category, query, now))
   );
-  const drafts = groups.flat();
+  const drafts = groups.flat().filter((article, index, all) => {
+    const identity = article.pmid || article.doi || article.title.toLowerCase();
+    return all.findIndex((candidate) =>
+      (candidate.pmid || candidate.doi || candidate.title.toLowerCase()) === identity
+    ) === index;
+  });
   if (drafts.length === 0) throw new Error("No eligible primary-source articles were found");
 
   const articles = await Promise.all(drafts.map(summarize));
