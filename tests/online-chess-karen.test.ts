@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 const component = readFileSync("components/cabinet/OnlineChessWithKaren.tsx", "utf8");
 const route = readFileSync("app/api/chess/online/route.ts", "utf8");
-const migration = readFileSync("supabase/migrations/20260830150852_chess_online_appointments_and_games.sql", "utf8");
+const migration = readFileSync("supabase/migrations/20260830152118_chess_online_appointments_and_games.sql", "utf8");
 const clientPage = readFileSync("app/(client)/cabinet/chess/page.tsx", "utf8");
 const staffPage = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
 
