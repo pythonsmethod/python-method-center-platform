@@ -45,6 +45,18 @@ describe("search indexing signals", () => {
     }
   });
 
+  // Priorities are written into the XML verbatim, and 0.8 - 0.1 is
+  // 0.7000000000000001 in binary floating point.
+  it("writes priorities as search engines expect to read them", () => {
+    for (const entry of sitemap()) {
+      const priority = entry.priority ?? 0;
+
+      expect(priority).toBeGreaterThanOrEqual(0);
+      expect(priority).toBeLessThanOrEqual(1);
+      expect(String(priority)).toMatch(/^(0(\.\d)?|1)$/);
+    }
+  });
+
   it("keeps the English home page at /en rather than /en/", () => {
     const urls = sitemap().map((entry) => entry.url);
 
