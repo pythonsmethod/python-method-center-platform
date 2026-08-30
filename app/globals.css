@@ -7773,14 +7773,28 @@ body.cabinet-menu-open { overflow: hidden; }
   background-image: none;
 }
 .online-chess__board-frame .chess-board__square > span.is-w {
-  color: #fffdf5;
-  filter: drop-shadow(0 2px 1px rgba(0, 0, 0, .75));
-  -webkit-text-stroke: 1px #171717;
+  color: #fff9d9;
+  filter: drop-shadow(0 7px 5px rgba(0, 0, 0, .5));
+  -webkit-text-stroke: .8px #6e4b13;
+  text-shadow:
+    0 -1px 0 #fffef2,
+    1px 0 0 #eedb92,
+    1px 1px 0 #d8bc61,
+    2px 2px 0 #b58c2f,
+    3px 3px 0 #765015,
+    4px 5px 4px rgba(0, 0, 0, .62);
 }
 .online-chess__board-frame .chess-board__square > span.is-b {
-  color: #101010;
-  filter: drop-shadow(0 2px 1px rgba(255, 255, 255, .28));
-  -webkit-text-stroke: 1px #f4f4ee;
+  color: #17130e;
+  filter: drop-shadow(0 7px 5px rgba(0, 0, 0, .62));
+  -webkit-text-stroke: .8px #d9b85c;
+  text-shadow:
+    0 -1px 0 #c5aa64,
+    1px 0 0 #6d5726,
+    1px 1px 0 #493713,
+    2px 2px 0 #251b0b,
+    3px 3px 0 #050504,
+    4px 5px 4px rgba(0, 0, 0, .78);
 }
 .online-chess__sync { color: #66d99a; text-align: center; font-weight: 700; }
 
