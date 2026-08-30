@@ -6,6 +6,7 @@ const route = readFileSync("app/api/chess/online/route.ts", "utf8");
 const migration = readFileSync("supabase/migrations/20260830152118_chess_online_appointments_and_games.sql", "utf8");
 const clientPage = readFileSync("app/(client)/cabinet/chess/page.tsx", "utf8");
 const staffPage = readFileSync("app/(admin)/admin/chess/page.tsx", "utf8");
+const styles = readFileSync("app/globals.css", "utf8");
 
 describe("scheduled online chess with Karen", () => {
   it("offers the appointment and shared board in both languages", () => {
@@ -28,6 +29,14 @@ describe("scheduled online chess with Karen", () => {
     expect(component).toContain("window.setInterval");
     expect(component).toContain("8_000");
     expect(component).toContain("version: selectedAppointment.game.version");
+  });
+
+  it("uses the same large black-and-white board in both cabinets", () => {
+    expect(styles).toContain(".online-chess__board-frame .chess-board__square");
+    expect(styles).toContain("11.5cqi");
+    expect(styles).toContain("background-color: #f1f1ed");
+    expect(styles).toContain("background-color: #151515");
+    expect(styles).toContain("inline-size: min(100%, 760px)");
   });
 
   it("validates every move on the server and enforces turn order", () => {
