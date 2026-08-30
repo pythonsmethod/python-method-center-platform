@@ -28,6 +28,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         clients: "Клиенты",
         documents: "Документы",
         assistant: "ИИ и знания",
+        digest: "Медицинский обзор",
         chess: "Шахматы",
         requests: "Обращения",
         founder: "Обзор",
@@ -41,6 +42,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         clients: "Clients",
         documents: "Documents",
         assistant: "AI & knowledge",
+        digest: "Medical digest",
         chess: "Chess",
         requests: "Requests",
         founder: "Overview",
@@ -57,6 +59,9 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin/documents", label: labels.documents, icon: "▤" },
     ...(privateAssistantRole
       ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
+      : []),
+    ...(privateAssistantRole
+      ? [{ href: "/admin/medical-digest", label: labels.digest, icon: "⌁" }]
       : []),
     ...(auth.status === "authorized"
       ? [{ href: "/admin/chess", label: labels.chess, icon: "♞" }]

@@ -3,6 +3,10 @@
     {
       "path": "/api/documents/process",
       "schedule": "0 15 * * *"
+    },
+    {
+      "path": "/api/medical-digest/generate",
+      "schedule": "10 15 * * *"
     }
   ]
 }
