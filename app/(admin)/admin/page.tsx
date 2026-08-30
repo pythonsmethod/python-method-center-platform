@@ -202,7 +202,10 @@ export default async function AdminPage() {
                 </span>
                 <span className="karen-client-card__content">
                   <span className="karen-client-card__topline">
-                    <strong>{clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "—"}</strong>
+                    <strong>
+                      {clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "—"}
+                      {clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
+                    </strong>
                     {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
                   </span>
                   <span>{clientCase.title ?? label(statusLabels, clientCase.status)}</span>

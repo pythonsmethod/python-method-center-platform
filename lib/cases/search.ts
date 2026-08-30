@@ -21,7 +21,7 @@ function digits(value: string): string {
 // leaving it here too meant a two-digit query hit every number containing
 // those digits — which reads as the search being broken.
 function haystack(item: StaffCaseListItem): string {
-  return [item.profiles?.full_name, item.profiles?.email, item.title, item.id]
+  return [item.profiles?.full_name, item.profiles?.email, item.title, item.case_number, item.id]
     .filter(Boolean)
     .join("\n")
     .toLowerCase();

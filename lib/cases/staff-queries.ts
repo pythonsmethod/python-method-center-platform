@@ -3,6 +3,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type StaffCaseListItem = {
   id: string;
+  case_number: string | null;
   status: string;
   urgency: string;
   direction: string;
@@ -40,7 +41,7 @@ export async function getStaffCases(): Promise<StaffCasesResult> {
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      "id, status, urgency, direction, title, created_at, updated_at, profiles(email, full_name, phone)"
+      "id, case_number, status, urgency, direction, title, created_at, updated_at, profiles(email, full_name, phone)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
