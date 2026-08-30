@@ -20,6 +20,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
+import { CaseConversationWorkspace } from "@/components/cases/CaseConversationWorkspace";
 import { CaseReviewPanel } from "@/components/cases/CaseReviewPanel";
 import { getCaseReview } from "@/lib/cases/review-queries";
 import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
@@ -179,7 +180,10 @@ export default async function StaffCaseDetailPage({
             "Что сейчас происходит с организмом?",
             "Подготовь ответ клиенту",
             "На что обратить внимание в анализах?"
-          ]
+          ],
+          useReply: "Вставить в ответ клиенту",
+          replyUsed: "Перенесено в ответ",
+          reviewBeforeSending: "Ответ Анхама перенесён ниже. Проверьте текст, при необходимости отредактируйте и только затем отправьте клиенту."
         }
       : {
           eyebrow: "Client workspace",
@@ -196,7 +200,10 @@ export default async function StaffCaseDetailPage({
             "What is happening in the body now?",
             "Prepare a client reply",
             "What needs attention in the test results?"
-          ]
+          ],
+          useReply: "Insert into client reply",
+          replyUsed: "Added to reply",
+          reviewBeforeSending: "Anham's answer is in the field below. Review and edit it before sending it to the client."
         };
     const clientName = clientCase.profiles?.full_name
       ?? clientCase.profiles?.email
@@ -210,43 +217,17 @@ export default async function StaffCaseDetailPage({
           description={clientCase.title ?? ""}
         />
 
-        <section className="intake-section" aria-label={copy.conversationTitle}>
-          <div className="panel">
-            <span className="panel__label">{copy.conversationLabel}</span>
-            <h2>{copy.conversationTitle}</h2>
-            <p>{copy.conversationHint}</p>
-            <CaseMessageThread
-              labels={dictionary.cabinet.thread}
-              voiceLabels={dictionary.cabinet.voice}
-              dateLocale={dictionary.cabinet.dateLocale}
-              caseId={clientCase.id}
-              expandable
-              loadError={caseMessages.error}
-              messages={caseMessages.messages}
-              viewer="staff"
-            />
-          </div>
-        </section>
-
-        <section className="intake-section" aria-label={copy.assistantLabel}>
-          <div className="panel">
-            <span className="panel__label">{copy.assistantLabel}</span>
-            <h2 className="staff-assistant__title">
-              <AnhamAvatar className="staff-assistant__face" size={44} state="client" />
-              {copy.assistantTitle}
-            </h2>
-            <p>{copy.assistantHint}</p>
-            <AssistantChat
-              attachments
-              caseId={clientCase.id}
-              endpoint="/api/assistant/staff"
-              intro={copy.assistantIntro}
-              placeholder={copy.assistantPlaceholder}
-              providerChoice={showProviders}
-              suggestions={copy.suggestions}
-            />
-          </div>
-        </section>
+        <CaseConversationWorkspace
+          caseId={clientCase.id}
+          copy={copy}
+          dateLocale={dictionary.cabinet.dateLocale}
+          labels={dictionary.cabinet.thread}
+          loadError={caseMessages.error}
+          locale={locale}
+          messages={caseMessages.messages}
+          providerChoice={showProviders}
+          voiceLabels={dictionary.cabinet.voice}
+        />
       </div>
     );
   }

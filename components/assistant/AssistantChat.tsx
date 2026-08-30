@@ -39,6 +39,9 @@ type AssistantChatProps = {
   initialQuestion?: string | null;
   onInitialQuestionSent?: () => void;
   memoryCapture?: boolean;
+  onUseReply?: (text: string) => void;
+  useReplyLabel?: string;
+  replyUsedLabel?: string;
   // Optional structured context for a purpose-built endpoint. Generic chat
   // endpoints ignore it; the chess endpoint uses it for the live position.
   requestContext?: Record<string, string>;
@@ -87,6 +90,9 @@ export function AssistantChat({
   initialQuestion = null,
   onInitialQuestionSent,
   memoryCapture = false,
+  onUseReply,
+  useReplyLabel,
+  replyUsedLabel,
   requestContext
 }: AssistantChatProps) {
   const t = getDictionary(locale).widget;
@@ -437,6 +443,8 @@ export function AssistantChat({
     }
   }
 
+  const [usedReplyIndex, setUsedReplyIndex] = useState<number | null>(null);
+
   return (
     <div className="assistant-chat">
       <div className="assistant-chat__messages" ref={scrollRef}>
@@ -451,6 +459,20 @@ export function AssistantChat({
             ) : null}
             <div className={`assistant-msg assistant-msg--${message.role}`}>
               {message.content}
+              {message.role === "assistant" && onUseReply ? (
+                <button
+                  className="assistant-msg__use-reply"
+                  onClick={() => {
+                    onUseReply(message.content);
+                    setUsedReplyIndex(index);
+                  }}
+                  type="button"
+                >
+                  {usedReplyIndex === index
+                    ? (replyUsedLabel ?? (locale === "ru" ? "Перенесено в ответ" : "Added to reply"))
+                    : (useReplyLabel ?? (locale === "ru" ? "Вставить в ответ клиенту" : "Insert into client reply"))}
+                </button>
+              ) : null}
             </div>
           </Fragment>
         ))}
