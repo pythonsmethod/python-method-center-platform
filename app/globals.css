@@ -7772,7 +7772,7 @@ body.cabinet-menu-open { overflow: hidden; }
   background-color: #151515;
   background-image: none;
 }
-.online-chess__board-frame .chess-board__square > span.is-w {
+.chess-board__square > span.is-w {
   color: #fff9d9;
   filter: drop-shadow(0 7px 5px rgba(0, 0, 0, .5));
   -webkit-text-stroke: .8px #6e4b13;
@@ -7784,7 +7784,7 @@ body.cabinet-menu-open { overflow: hidden; }
     3px 3px 0 #765015,
     4px 5px 4px rgba(0, 0, 0, .62);
 }
-.online-chess__board-frame .chess-board__square > span.is-b {
+.chess-board__square > span.is-b {
   color: #17130e;
   filter: drop-shadow(0 7px 5px rgba(0, 0, 0, .62));
   -webkit-text-stroke: .8px #d9b85c;
