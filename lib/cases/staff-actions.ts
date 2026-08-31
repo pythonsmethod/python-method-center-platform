@@ -18,6 +18,10 @@ import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 
 const amountPattern = /^\d{1,7}(?:[.,]\d{1,2})?$/;
+// Kept as a hard server-side guard while older browser tabs may still hold
+// the previous form's action identifier. New payments must come from the
+// payment processor webhook, never from an admin-entered amount.
+const MANUAL_PAYMENT_ENTRY_ENABLED = false;
 
 function errorState(message: string): StaffActionState {
   return { status: "error", message };
@@ -128,6 +132,12 @@ export async function recordCasePayment(
   _previousState: StaffActionState,
   formData: FormData
 ): Promise<StaffActionState> {
+  if (!MANUAL_PAYMENT_ENTRY_ENABLED) {
+    return errorState(
+      "Ручная запись оплаты отключена. Оплаты появляются автоматически после подтверждения платёжной системой."
+    );
+  }
+
   const caseId = String(formData.get("caseId") ?? "");
 
   if (!isUuid(caseId)) {
