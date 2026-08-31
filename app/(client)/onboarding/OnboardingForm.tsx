@@ -46,11 +46,10 @@ export function OnboardingForm({
           autoComplete="name"
           defaultValue={profileDefaults.fullName}
           name="fullName"
-          pattern=".*\\S+\\s+\\S+.*"
           required
-          title={labels.fullNameHint}
           type="text"
         />
+        <small className="field__hint">{labels.fullNameHint}</small>
       </label>
 
       <label className="field">
