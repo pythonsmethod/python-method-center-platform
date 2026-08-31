@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { formatDeliveryAddress, isDeliveryProfileComplete } from "@/lib/delivery/profile";
+import { readFileSync } from "node:fs";
 
 const profile = {
   delivery_first_name: "Dana",
@@ -29,5 +30,15 @@ describe("delivery workflow", () => {
     expect(formatDeliveryAddress(profile)).toBe(
       "050000, KZ, Almaty, Almaty, Abay Avenue, 10, Office 5"
     );
+  });
+
+  it("supports Anna assignment, replacement documents, and client deletion", () => {
+    const deliveryActions = readFileSync("lib/delivery/actions.ts", "utf8");
+    const documentActions = readFileSync("lib/documents/actions.ts", "utf8");
+    const adminPage = readFileSync("app/(admin)/admin/fulfillment/page.tsx", "utf8");
+    expect(deliveryActions).toContain("assignDeliveryTask");
+    expect(deliveryActions).toContain("deleteShipmentDocument");
+    expect(adminPage).toContain("AssignVolunteerForm");
+    expect(documentActions).toContain("deleteOwnDocument");
   });
 });

@@ -27,7 +27,8 @@ export async function updateDeliveryProfile(_: DeliveryActionState, form: FormDa
 
   const assignment = await findActiveDeliveryVolunteer(db, profile.delivery_country_code);
   const pendingTaskUpdate = {
-    ...(assignment ? { volunteer_id: assignment.profile_id, status: "preparing" } : { status: "problem" }),
+    volunteer_id: assignment?.profile_id ?? null,
+    status: "preparing",
     country_code: profile.delivery_country_code,
     recipient_name: `${profile.delivery_first_name} ${profile.delivery_last_name}`,
     recipient_email: profile.delivery_email,
@@ -62,11 +63,53 @@ export async function confirmShipment(_: DeliveryActionState, form: FormData): P
   const upload = await db.storage.from("shipment-documents").upload(path, file, { contentType: file.type, upsert: false });
   if (upload.error) return { status: "error", message: upload.error.message };
   const shippedAt = new Date().toISOString();
-  const { error } = await db.from("delivery_tasks").update({ status: "shipped", shipment_document_path: path, shipment_document_name: file.name.slice(0, 200), volunteer_comment: comment, shipped_at: shippedAt }).eq("id", taskId).eq("volunteer_id", auth.userId);
+  const { error } = await db.from("delivery_tasks").update({ status: "shipped", shipment_document_path: path, shipment_document_name: file.name.slice(0, 200), volunteer_comment: comment, shipped_at: shippedAt, client_viewed_at: null }).eq("id", taskId).eq("volunteer_id", auth.userId);
   if (error) { await db.storage.from("shipment-documents").remove([path]); return { status: "error", message: error.message }; }
   await notifyTeam({ kind: "client_message", dedupeKey: `shipment:${taskId}`, title: "📦 Отправление подтверждено", lines: [comment ? `Комментарий: ${comment}` : null, "Фотография документа доступна Анне и клиенту."], link: adminLink("/admin/fulfillment") });
   revalidatePath("/volunteer"); revalidatePath("/admin/fulfillment"); revalidatePath("/cabinet/delivery");
   return { status: "success", message: ru ? "Отправление подтверждено. Анна и клиент видят документ." : "Shipment confirmed. Anna and the client can now see the document." };
+}
+
+export async function deleteShipmentDocument(form: FormData): Promise<void> {
+  const taskId = clean(form, "taskId", 36);
+  const volunteer = await getRequiredVolunteer("/volunteer");
+  const staff = volunteer.status === "authorized" ? null : await getStaffUserState();
+  const db = createSupabaseServiceClient();
+  if (!db || (!taskId || (volunteer.status !== "authorized" && staff?.status !== "authorized"))) return;
+  let query = db.from("delivery_tasks").select("id, volunteer_id, shipment_document_path").eq("id", taskId);
+  if (volunteer.status === "authorized") query = query.eq("volunteer_id", volunteer.userId);
+  const { data: task } = await query.maybeSingle();
+  if (!task?.shipment_document_path) return;
+  const removed = await db.storage.from("shipment-documents").remove([task.shipment_document_path]);
+  if (removed.error) return;
+  await db.from("delivery_tasks").update({
+    status: "preparing",
+    shipment_document_path: null,
+    shipment_document_name: null,
+    volunteer_comment: null,
+    shipped_at: null,
+    client_viewed_at: null
+  }).eq("id", task.id);
+  revalidatePath("/volunteer");
+  revalidatePath("/admin/fulfillment");
+  revalidatePath("/cabinet/delivery");
+}
+
+export async function assignDeliveryTask(_: DeliveryActionState, form: FormData): Promise<DeliveryActionState> {
+  const auth = await getStaffUserState();
+  const ru = await getLocale() === "ru";
+  if (auth.status !== "authorized" || auth.role !== "admin") return { status: "error", message: ru ? "Доступ запрещён." : "Access denied." };
+  const taskId = clean(form, "taskId", 36);
+  const volunteerId = clean(form, "volunteerId", 36);
+  const db = createSupabaseServiceClient();
+  if (!db) return { status: "error", message: ru ? "Сервис временно недоступен." : "Service unavailable." };
+  const { data: profile } = await db.from("profiles").select("id, role").eq("id", volunteerId).maybeSingle();
+  if (!profile || profile.role !== "volunteer") return { status: "error", message: ru ? "Выберите действующего волонтёра." : "Select an active volunteer." };
+  const { error } = await db.from("delivery_tasks").update({ volunteer_id: volunteerId }).eq("id", taskId);
+  if (error) return { status: "error", message: error.message };
+  revalidatePath("/admin/fulfillment");
+  revalidatePath("/volunteer");
+  return { status: "success", message: ru ? "Волонтёр назначен." : "Volunteer assigned." };
 }
 
 export async function inviteDeliveryVolunteer(_: DeliveryActionState, form: FormData): Promise<DeliveryActionState> {

@@ -9,6 +9,7 @@ import { getSupplementsDueCount } from "@/lib/supplements/queries";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { getTokenLedger } from "@/lib/tokens/queries";
 import { redirect } from "next/navigation";
+import { getClientDeliveryUnreadCount } from "@/lib/delivery/queries";
 
 // The name a person gave us, not the front half of their email address.
 // Falls back quietly: a greeting is never worth an error page.
@@ -77,11 +78,14 @@ export default async function CabinetLayout({
   const caseId =
     caseResult.status === "ready" && caseResult.case ? caseResult.case.id : null;
 
-  const [unread, tokens, greetingName, supplementsDue] = await Promise.all([
+  const [unread, tokens, greetingName, supplementsDue, deliveryUnread, documentsAttentionResult] = await Promise.all([
     caseId ? getUnreadForClient(caseId) : Promise.resolve(0),
     getTokenLedger(auth.userId),
     greetingFor(auth.userId, auth.email, dict.friend),
-    getSupplementsDueCount()
+    getSupplementsDueCount(),
+    getClientDeliveryUnreadCount(auth.userId),
+    roleClient?.from("uploaded_documents").select("id", { count: "exact", head: true })
+      .eq("profile_id", auth.userId).in("document_status", ["needs_reupload", "failed"])
   ]);
 
   return (
@@ -93,6 +97,8 @@ export default async function CabinetLayout({
       supplementsDue={supplementsDue}
       tokens={tokens.balance}
       unread={unread}
+      deliveryUnread={deliveryUnread}
+      documentsAttention={documentsAttentionResult?.count ?? 0}
     >
       {children}
     </CabinetShell>

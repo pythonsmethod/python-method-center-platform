@@ -13,7 +13,7 @@ import {
 
 type CabinetShellProps = {
   children: ReactNode; email: string | null; greetingName: string;
-  unread: number; tokens: number; supplementsDue: number;
+  unread: number; deliveryUnread?: number; documentsAttention?: number; tokens: number; supplementsDue: number;
   locale: "ru" | "en"; preview?: boolean; labels: Dictionary["cabinet"];
 };
 
@@ -23,7 +23,7 @@ type NavItem = {
 };
 
 export function CabinetShell({ children, email, greetingName, unread, tokens,
-  supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
+  deliveryUnread = 0, documentsAttention = 0, supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const ru = locale === "ru";
@@ -42,16 +42,16 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
     { title: ru ? "Главное" : "Overview", items: [
       { href: root, label: t.sections.home.title, hint: t.sections.home.hint, icon: IconWingedSun },
       { href: `${root}/account`, label: t.sections.account.title, hint: t.sections.account.hint, icon: IconScales },
-      { href: `${root}/delivery`, label: ru ? "Доставка" : "Delivery", hint: ru ? "Адрес и отправления" : "Address and shipments", icon: IconWingedSun }
+      { href: `${root}/delivery`, label: ru ? "Доставка" : "Delivery", hint: ru ? "Адрес и отправления" : "Address and shipments", icon: IconWingedSun, badge: deliveryUnread }
     ] },
     { title: ru ? "Материалы и трекеры" : "Files and trackers", items: [
-      { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus },
+      { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus, badge: documentsAttention },
       { href: `${root}/metrics`, label: t.sections.metrics.title, hint: t.sections.metrics.hint, icon: IconWater },
       { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue }
     ] },
     { title: ru ? "Общение" : "Communication", items: [
       { href: `${root}/dialog`, label: "Professor Python", hint: ru ? "Личное сопровождение" : "Personal guidance", icon: IconEyeOfHorus, badge: unread },
-      { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh }
+      { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh, badge: unread }
     ] },
     { title: ru ? "Возможности" : "Benefits", items: [
       { href: `${root}/chess`, label: ru ? "Шахматы с Anham" : "Chess with Anham", hint: ru ? "Сыграть онлайн-партию" : "Play an online game", icon: IconEyeOfHorus },

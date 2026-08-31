@@ -1,11 +1,11 @@
 "use client";
 
 import { useActionState } from "react";
-import { confirmShipment } from "@/lib/delivery/actions";
+import { confirmShipment, deleteShipmentDocument } from "@/lib/delivery/actions";
 import { deliveryStatusLabel } from "@/lib/delivery/profile";
 import { initialDeliveryActionState, type DeliveryTask } from "@/lib/delivery/types";
 
-export function DeliveryTaskCard({ task, locale, volunteer = false, documentUrl }: { task: DeliveryTask; locale: "ru" | "en"; volunteer?: boolean; documentUrl?: string | null }) {
+export function DeliveryTaskCard({ task, locale, volunteer = false, admin = false, documentUrl }: { task: DeliveryTask; locale: "ru" | "en"; volunteer?: boolean; admin?: boolean; documentUrl?: string | null }) {
   const [state, action, pending] = useActionState(confirmShipment, initialDeliveryActionState);
   const ru = locale === "ru";
   return <article className="panel fulfillment-task">
@@ -16,6 +16,10 @@ export function DeliveryTaskCard({ task, locale, volunteer = false, documentUrl 
     {task.shipped_at ? <p>{ru ? "Дата отправки" : "Shipped"}: {new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short" }).format(new Date(task.shipped_at))}</p> : null}
     {task.volunteer_comment ? <p><strong>{ru ? "Комментарий о доставке" : "Delivery comment"}:</strong> {task.volunteer_comment}</p> : null}
     {documentUrl ? <a className="button button--secondary" href={documentUrl} rel="noreferrer" target="_blank">{ru ? "Открыть документ с трек-номером" : "Open document with tracking number"}</a> : null}
+    {task.shipment_document_path && (volunteer || admin) ? <form action={deleteShipmentDocument} onSubmit={(event) => { if (!window.confirm(ru ? "Удалить документ и вернуть отправление на повторную загрузку?" : "Delete the document and return the shipment for another upload?")) event.preventDefault(); }}>
+      <input name="taskId" type="hidden" value={task.id} />
+      <button className="button button--danger button--compact" type="submit">{ru ? "Удалить и загрузить заново" : "Delete and upload again"}</button>
+    </form> : null}
     {volunteer && task.status === "preparing" ? <form action={action} className="onboarding-form" encType="multipart/form-data">
       <input name="taskId" type="hidden" value={task.id} />
       <label className="field"><span>{ru ? "Фотография документа, где виден трек-номер" : "Photo of the document showing the tracking number"}</span><input accept="image/jpeg,image/png,image/heic,image/heif,application/pdf" name="document" type="file" required /></label>

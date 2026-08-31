@@ -20,6 +20,7 @@ export type DeliveryProfile = {
 
 export type DeliveryTask = {
   id: string;
+  volunteer_id?: string | null;
   recipient_name: string;
   recipient_email: string;
   recipient_phone: string;
@@ -33,6 +34,8 @@ export type DeliveryTask = {
   shipped_at: string | null;
   created_at: string;
 };
+
+export type DeliveryVolunteer = { id: string; full_name: string | null; email: string | null };
 
 export const DELIVERY_PROFILE_COLUMNS = [
   "delivery_first_name", "delivery_last_name", "delivery_email",

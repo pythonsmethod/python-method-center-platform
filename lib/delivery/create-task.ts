@@ -23,10 +23,8 @@ export async function ensureDeliveryTaskForPayment(
   const delivery = profile as unknown as DeliveryProfile | null;
   if (!delivery || !isDeliveryProfileComplete(delivery)) return { status: "address-required" as const };
   const assignment = await findActiveDeliveryVolunteer(db, delivery.delivery_country_code!);
-  if (!assignment) return { status: "volunteer-required" as const };
-
   const { data, error } = await db.from("delivery_tasks").upsert({
-    volunteer_id: assignment.profile_id,
+    volunteer_id: assignment?.profile_id ?? null,
     payment_id: input.paymentId,
     client_profile_id: input.profileId,
     case_id: input.caseId,
@@ -38,5 +36,8 @@ export async function ensureDeliveryTaskForPayment(
     delivery_instructions: delivery.delivery_instructions,
     quantity: 1
   }, { onConflict: "payment_id", ignoreDuplicates: true }).select("id").maybeSingle();
-  return error ? { status: "error" as const, message: error.message } : { status: "ready" as const, id: data?.id ?? null };
+  return error ? { status: "error" as const, message: error.message } : {
+    status: assignment ? "ready" as const : "assignment-required" as const,
+    id: data?.id ?? null
+  };
 }
