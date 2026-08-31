@@ -27,6 +27,13 @@ export function resolvePrivateAssistantRole(
   return null;
 }
 
+// Professor Python conversations belong to Karen and the client. The founder
+// has broad administrative access elsewhere, but deliberately does not read
+// this private conversation channel.
+export function canAccessProfessorMessages(email: string | null | undefined): boolean {
+  return resolvePrivateAssistantRole(email) === "karen";
+}
+
 export async function getKarenAssistantUserState(): Promise<StaffUserState> {
   const state = await getStaffUserState();
 

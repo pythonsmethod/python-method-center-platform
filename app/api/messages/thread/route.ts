@@ -5,6 +5,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 import { apiError, apiErrorLocale } from "@/lib/i18n/api-errors";
+import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 
 export const runtime = "nodejs";
 
@@ -27,6 +28,9 @@ export async function GET(request: Request) {
   const staff = await getStaffUserState();
 
   if (staff.status === "authorized") {
+    if (!canAccessProfessorMessages(staff.email)) {
+      return NextResponse.json({ error: apiError("accessDenied", locale) }, { status: 403 });
+    }
     if (!requestedCaseId || !isUuid(requestedCaseId)) {
       return NextResponse.json({ error: apiError("invalidCase", locale) }, { status: 400 });
     }

@@ -1,4 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 
 export const CASE_AUDIO_BUCKET = "case-audio";
 const SIGNED_URL_TTL_SECONDS = 3600;
@@ -44,10 +45,11 @@ export async function markThreadRead(
 }
 
 // Unread client messages for staff: total and per case.
-export async function getStaffUnreadCounts(): Promise<{
+export async function getStaffUnreadCounts(email?: string | null): Promise<{
   total: number;
   byCase: Record<string, number>;
 }> {
+  if (!canAccessProfessorMessages(email)) return { total: 0, byCase: {} };
   const supabase = createSupabaseServiceClient();
 
   if (!supabase) {

@@ -235,7 +235,7 @@ export default async function StaffCasesPage({ searchParams }: PageProps) {
 
   const [casesResult, unread] = await Promise.all([
     getStaffCases(),
-    getStaffUnreadCounts()
+    getStaffUnreadCounts(auth.email)
   ]);
 
   const found =

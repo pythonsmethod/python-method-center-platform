@@ -1,11 +1,11 @@
 import { NextResponse } from "next/server";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { CASE_AUDIO_BUCKET } from "@/lib/messages/queries";
-import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 import { apiError, apiErrorLocale } from "@/lib/i18n/api-errors";
+import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 
 export const runtime = "nodejs";
 
@@ -69,6 +69,9 @@ export async function POST(request: Request) {
   let senderRole: string;
 
   if (staff.status === "authorized") {
+    if (!canAccessProfessorMessages(staff.email)) {
+      return NextResponse.json({ error: apiError("accessDenied", locale) }, { status: 403 });
+    }
     const requestedCaseId = String(form.get("caseId") ?? "");
 
     if (!isUuid(requestedCaseId)) {
@@ -160,19 +163,6 @@ export async function POST(request: Request) {
       { error: apiError("messageNotSent", locale) },
       { status: 502 }
     );
-  }
-
-  if (senderRole === "client") {
-    await notifyTeam({
-      kind: "client_message",
-      dedupeKey: `client_message:${message.id}`,
-      title: "🎙 Новое голосовое от клиента",
-      lines: [
-        `Кейс: ${caseId}`,
-        "Откройте чат кейса, чтобы прослушать и ответить."
-      ],
-      link: adminLink(`/admin/cases/${caseId}`)
-    });
   }
 
   return NextResponse.json({ ok: true });
