@@ -22,6 +22,8 @@ import { syncCaseFromOnboarding } from "@/lib/onboarding/case-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isCountryCode, isFullName } from "@/lib/profile/identity";
+import { isDeliveryProfileComplete, readDeliveryProfile } from "@/lib/delivery/profile";
+import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
 
 const careRecipientTypes: CareRecipientType[] = [
   "self",
@@ -108,6 +110,7 @@ export async function submitOnboarding(
   const minorBirthDate = readRequiredText(formData, "minorBirthDate");
   const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
+  const deliveryProfile = readDeliveryProfile(formData);
 
   if (!fullName || !phone || !countryCode || !primaryGoal || !situationDescription) {
     return errorState(t.errorFields);
@@ -119,6 +122,12 @@ export async function submitOnboarding(
 
   if (!isCountryCode(countryCode)) {
     return errorState(t.errorCountry);
+  }
+
+  if (!isDeliveryProfileComplete(deliveryProfile)) {
+    return errorState(uiLocale === "ru"
+      ? "Заполните полный адрес для доставки, email, индекс и телефон с кодом страны."
+      : "Enter the complete delivery address, email, postal code, and a phone number with country code.");
   }
 
   if (!isCareRecipientType(careRecipientType)) {
@@ -164,6 +173,7 @@ export async function submitOnboarding(
       full_name: fullName,
       phone,
       country_code: countryCode,
+      ...deliveryProfile,
       status: "active"
     },
     { onConflict: "id" }
@@ -236,6 +246,7 @@ export async function submitOnboarding(
     full_name: fullName,
     phone,
     country_code: countryCode,
+    delivery: deliveryProfile,
     care_recipient_type: careRecipientType,
     primary_goal: primaryGoal,
     situation_description: situationDescription,
@@ -434,6 +445,20 @@ export async function submitOnboarding(
     writeAuditLogs(auditLogs),
     writeLifecycleEvents(lifecycleEvents)
   ]);
+
+  // A client may have paid before completing the new delivery form. Recheck
+  // paid purchases now so the volunteer task appears without manual work.
+  const serviceDb = createSupabaseServiceClient();
+  if (serviceDb) {
+    const { data: paidPayments } = await serviceDb.from("payments")
+      .select("id, case_id, product").eq("profile_id", user.id).eq("status", "paid");
+    await Promise.all((paidPayments ?? []).map(payment => ensureDeliveryTaskForPayment(serviceDb, {
+      paymentId: payment.id,
+      profileId: user.id,
+      caseId: payment.case_id,
+      product: payment.product
+    })));
+  }
 
   redirect("/cabinet?onboarding=submitted");
 }

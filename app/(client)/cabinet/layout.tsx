@@ -8,6 +8,7 @@ import { getUnreadForClient } from "@/lib/messages/queries";
 import { getSupplementsDueCount } from "@/lib/supplements/queries";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { getTokenLedger } from "@/lib/tokens/queries";
+import { redirect } from "next/navigation";
 
 // The name a person gave us, not the front half of their email address.
 // Falls back quietly: a greeting is never worth an error page.
@@ -65,6 +66,12 @@ export default async function CabinetLayout({
       </CabinetShell>
     );
   }
+
+  const roleClient = createSupabaseServiceClient();
+  const { data: roleProfile } = roleClient
+    ? await roleClient.from("profiles").select("role").eq("id", auth.userId).maybeSingle()
+    : { data: null };
+  if (roleProfile?.role === "volunteer") redirect("/volunteer");
 
   const caseResult = await getClientCaseShell(auth.userId);
   const caseId =

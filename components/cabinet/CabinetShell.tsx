@@ -41,7 +41,8 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
     ] },
     { title: ru ? "Главное" : "Overview", items: [
       { href: root, label: t.sections.home.title, hint: t.sections.home.hint, icon: IconWingedSun },
-      { href: `${root}/account`, label: t.sections.account.title, hint: t.sections.account.hint, icon: IconScales }
+      { href: `${root}/account`, label: t.sections.account.title, hint: t.sections.account.hint, icon: IconScales },
+      { href: `${root}/delivery`, label: ru ? "Доставка" : "Delivery", hint: ru ? "Адрес и отправления" : "Address and shipments", icon: IconWingedSun }
     ] },
     { title: ru ? "Материалы и трекеры" : "Files and trackers", items: [
       { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus },

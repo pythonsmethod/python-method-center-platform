@@ -277,6 +277,11 @@ export default async function StaffCaseDetailPage({
           <ul className="status-list">
             <li>Email: {clientCase.profiles?.email ?? "—"}</li>
             <li>Телефон: {clientCase.profiles?.phone ?? "—"}</li>
+            <li>Email для доставки: {clientCase.profiles?.delivery_email ?? "—"}</li>
+            <li>Телефон для доставки: {clientCase.profiles?.delivery_phone ?? "—"}</li>
+            <li>Получатель: {[clientCase.profiles?.delivery_first_name, clientCase.profiles?.delivery_last_name].filter(Boolean).join(" ") || "—"}</li>
+            <li>Адрес для доставки: {[clientCase.profiles?.delivery_postal_code, clientCase.profiles?.delivery_country_code, clientCase.profiles?.delivery_region, clientCase.profiles?.delivery_city, clientCase.profiles?.delivery_street, clientCase.profiles?.delivery_building, clientCase.profiles?.delivery_unit].filter(Boolean).join(", ") || "—"}</li>
+            {clientCase.profiles?.delivery_instructions ? <li>Дополнительно: {clientCase.profiles.delivery_instructions}</li> : null}
           </ul>
         </div>
         {showAdminControls ? (

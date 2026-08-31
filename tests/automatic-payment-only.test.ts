@@ -25,7 +25,9 @@ describe("automatic payments only", () => {
 
     expect(stripeWebhook).toContain('.from("payments")');
     expect(account).toContain("getOwnPayments");
-    expect(account).toContain("delivery_address");
+    expect(account).toContain("ProfileDetailsForm");
+    expect(readFileSync("app/(client)/cabinet/delivery/page.tsx", "utf8"))
+      .toContain("DeliveryProfileForm");
     expect(onboarding).toContain('.from("onboarding_submissions")');
   });
 });

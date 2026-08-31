@@ -31,6 +31,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         digest: "Онкологический обзор",
         chess: "Шахматы",
         requests: "Обращения",
+        delivery: "Доставки",
         founder: "Обзор",
         home: "На главную сайта",
         logout: "Выйти"
@@ -45,6 +46,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         digest: "Oncology digest",
         chess: "Chess",
         requests: "Requests",
+        delivery: "Deliveries",
         founder: "Overview",
         home: "Website home",
         logout: "Sign out"
@@ -57,6 +59,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
     { href: "/admin", label: labels.today, icon: "⌂" },
     { href: "/admin/cases", label: labels.clients, icon: "♙" },
     { href: "/admin/documents", label: labels.documents, icon: "▤" },
+    { href: "/admin/fulfillment", label: labels.delivery, icon: "▣" },
     ...(privateAssistantRole
       ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
       : []),

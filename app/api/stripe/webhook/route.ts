@@ -13,6 +13,7 @@ import {
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
+import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
 
 export const runtime = "nodejs";
 
@@ -274,7 +275,7 @@ async function handlePaidSession(
         !event.livemode
           ? "Это тестовый режим Stripe, реальные деньги не списывались."
           : null,
-        "Запишите оплату в кейсе клиента — форма записи и включает тариф."
+        "Свяжитесь с разработчиком: ручная запись оплаты отключена."
       ],
       link: adminLink("/admin/cases")
     });
@@ -314,7 +315,7 @@ async function handlePaidSession(
 
   if (paymentError) {
     if (paymentError.code === "23505") {
-      // Reference already recorded (e.g. staff entered it manually first).
+      // Reference already recorded by an earlier webhook delivery.
       return;
     }
 
@@ -332,7 +333,7 @@ async function handlePaidSession(
         `Тариф: ${paymentProductLabel(product)}`,
         `Ошибка базы: ${paymentError.message}`,
         `Референс: ${reference}`,
-        "Клиент оплатил, но доступ не открылся — нужна ручная запись оплаты."
+        "Клиент оплатил, но запись не создана — нужна техническая проверка."
       ],
       link: adminLink("/admin/cases")
     });
@@ -367,7 +368,25 @@ async function handlePaidSession(
     }
   }
 
-  // 5) Referral reward: if this client was invited by someone, the referrer
+  // 5) Create the delivery task when the address and a country volunteer
+  // are ready. Missing prerequisites remain visible instead of inventing data.
+  const delivery = await ensureDeliveryTaskForPayment(supabase, {
+    paymentId: payment.id,
+    profileId,
+    caseId: caseRow?.id ?? null,
+    product
+  });
+  if (!["ready", "not-applicable"].includes(delivery.status)) {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `delivery-not-created:${payment.id}`,
+      title: "📦 Оплата получена, задание доставки ожидает",
+      lines: [delivery.status === "address-required" ? "Клиент должен заполнить полный адрес." : "Для страны не назначен волонтёр."],
+      link: caseRow?.id ? adminLink(`/admin/cases/${caseRow.id}`) : adminLink("/admin/fulfillment")
+    });
+  }
+
+  // 6) Referral reward: if this client was invited by someone, the referrer
   // earns tokens (once per invited person).
   await awardReferralTokensForPayment({
     payerProfileId: profileId,
@@ -375,7 +394,7 @@ async function handlePaidSession(
     amountCents
   });
 
-  // 6) Team ping about the money.
+  // 7) Team ping about the money.
   await notifyTeam({
     kind: "payment",
     dedupeKey: `payment_recorded:${payment.id}`,
