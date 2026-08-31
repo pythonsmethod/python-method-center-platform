@@ -4,7 +4,11 @@ const COUNTRY_CODE_SET = new Set(COUNTRY_CODES);
 const NAME_PART = /^[\p{L}\p{M}][\p{L}\p{M}'’.-]*$/u;
 
 export function isFullName(value: string): boolean {
-  const parts = value.trim().replace(/\s+/g, " ").split(" ");
+  // Mobile keyboards and pasted contacts can use invisible word separators.
+  const parts = value
+    .trim()
+    .replace(/[\s\u200B\u2060]+/gu, " ")
+    .split(" ");
   return parts.length >= 2 && parts.every((part) => NAME_PART.test(part));
 }
 

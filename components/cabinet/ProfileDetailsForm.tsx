@@ -45,7 +45,6 @@ export function ProfileDetailsForm({
           defaultValue={fullName ?? ""}
           maxLength={160}
           name="full_name"
-          pattern=".*\\S+\\s+\\S+.*"
           placeholder={labels.namePlaceholder}
           required
           type="text"
