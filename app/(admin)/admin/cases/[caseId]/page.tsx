@@ -28,6 +28,7 @@ import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThrea
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
+import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 
 type StaffCasePageProps = {
   params: Promise<{
@@ -82,7 +83,7 @@ export default async function StaffCaseDetailPage({
   searchParams
 }: StaffCasePageProps) {
   const { caseId } = await params;
-  const focusedTodayView = (await searchParams).view === "today";
+  const requestedTodayView = (await searchParams).view === "today";
   const auth = await getRequiredStaffUser(`/admin/cases/${caseId}`);
   const locale = await getLocale();
   const paymentCopy = locale === "ru"
@@ -147,6 +148,8 @@ export default async function StaffCaseDetailPage({
   // remains on the client, documents and conversation. This intentionally
   // fails closed when the founder allowlist is not configured.
   const showAdminControls = auth.role === "admin" && canSeeProviderNames(auth.email);
+  const canReadProfessorConversation = canAccessProfessorMessages(auth.email);
+  const focusedTodayView = requestedTodayView && canReadProfessorConversation;
   const detailResult = await getStaffCaseDetail(caseId);
 
   if (detailResult.status === "error") {
@@ -257,7 +260,9 @@ export default async function StaffCaseDetailPage({
     b.created_at.localeCompare(a.created_at)
   );
   const [caseMessages, assistantHistory, review] = await Promise.all([
-    getCaseMessages(clientCase.id),
+    canReadProfessorConversation
+      ? getCaseMessages(clientCase.id)
+      : Promise.resolve({ messages: [], error: null }),
     getAssistantHistoryForCase(clientCase.profile_id, "ru"),
     getCaseReview(clientCase.id, documents)
   ]);
@@ -303,7 +308,7 @@ export default async function StaffCaseDetailPage({
         </div>
       </section>
 
-      <section
+      {canReadProfessorConversation ? <section
         className="intake-section"
         id="case-conversation"
         aria-label="Чат с клиентом"
@@ -326,7 +331,7 @@ export default async function StaffCaseDetailPage({
             viewer="staff"
           />
         </div>
-      </section>
+      </section> : null}
 
       {showAdminControls ? (
         <section className="panel-grid" aria-label="Управление кейсом">

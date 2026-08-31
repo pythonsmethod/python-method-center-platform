@@ -54,6 +54,12 @@ export async function getOwnSupportRequests(
     return { status: "error", message: messagesError.message };
   }
 
+  const service = createSupabaseServiceClient();
+  if (service && requestIds.length) {
+    await service.from("support_request_messages").update({ read_at: new Date().toISOString() })
+      .in("support_request_id", requestIds).neq("sender_role", "client").is("read_at", null);
+  }
+
   const messagesByRequest = new Map<string, SupportRequestMessage[]>();
   for (const row of messageRows ?? []) {
     const list = messagesByRequest.get(row.support_request_id) ?? [];
@@ -138,6 +144,11 @@ export async function getStaffSupportRequests(): Promise<StaffSupportRequestsRes
     return { status: "error", message: messagesError.message };
   }
 
+  if (requestIds.length) {
+    await supabase.from("support_request_messages").update({ read_at: new Date().toISOString() })
+      .in("support_request_id", requestIds).eq("sender_role", "client").is("read_at", null);
+  }
+
   const messagesByRequest = new Map<string, SupportRequestMessage[]>();
   for (const row of messageRows ?? []) {
     const list = messagesByRequest.get(row.support_request_id) ?? [];
@@ -152,4 +163,21 @@ export async function getStaffSupportRequests(): Promise<StaffSupportRequestsRes
       messages: messagesByRequest.get(request.id) ?? []
     }))
   };
+}
+
+export async function getClientSupportUnreadCount(profileId: string): Promise<number> {
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return 0;
+  const { count } = await supabase.from("support_request_messages")
+    .select("id, support_requests!inner(profile_id)", { count: "exact", head: true })
+    .eq("support_requests.profile_id", profileId).neq("sender_role", "client").is("read_at", null);
+  return count ?? 0;
+}
+
+export async function getStaffSupportUnreadCount(): Promise<number> {
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return 0;
+  const { count } = await supabase.from("support_request_messages")
+    .select("id", { count: "exact", head: true }).eq("sender_role", "client").is("read_at", null);
+  return count ?? 0;
 }

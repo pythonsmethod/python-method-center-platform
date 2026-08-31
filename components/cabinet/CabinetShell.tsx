@@ -13,7 +13,7 @@ import {
 
 type CabinetShellProps = {
   children: ReactNode; email: string | null; greetingName: string;
-  unread: number; deliveryUnread?: number; documentsAttention?: number; tokens: number; supplementsDue: number;
+  unread: number; supportUnread?: number; deliveryUnread?: number; documentsAttention?: number; tokens: number; supplementsDue: number;
   locale: "ru" | "en"; preview?: boolean; labels: Dictionary["cabinet"];
 };
 
@@ -23,7 +23,7 @@ type NavItem = {
 };
 
 export function CabinetShell({ children, email, greetingName, unread, tokens,
-  deliveryUnread = 0, documentsAttention = 0, supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
+  supportUnread = 0, deliveryUnread = 0, documentsAttention = 0, supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const ru = locale === "ru";
@@ -51,7 +51,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
     ] },
     { title: ru ? "Общение" : "Communication", items: [
       { href: `${root}/dialog`, label: "Professor Python", hint: ru ? "Личное сопровождение" : "Personal guidance", icon: IconEyeOfHorus, badge: unread },
-      { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh, badge: unread }
+      { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh, badge: supportUnread }
     ] },
     { title: ru ? "Возможности" : "Benefits", items: [
       { href: `${root}/chess`, label: ru ? "Шахматы с Anham" : "Chess with Anham", hint: ru ? "Сыграть онлайн-партию" : "Play an online game", icon: IconEyeOfHorus },
