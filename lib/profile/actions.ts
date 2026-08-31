@@ -23,21 +23,6 @@ function cleanField(value: FormDataEntryValue | null, max: number): string | nul
   return clean.length > 0 ? clean.slice(0, max) : null;
 }
 
-// The address keeps its line breaks — people write addresses in lines.
-function cleanAddress(value: FormDataEntryValue | null): string | null {
-  if (typeof value !== "string") {
-    return null;
-  }
-
-  const clean = value
-    .split("\n")
-    .map((line) => line.trim().replace(/[ \t]+/g, " "))
-    .filter(Boolean)
-    .join("\n");
-
-  return clean.length > 0 ? clean.slice(0, 600) : null;
-}
-
 // The client edits their own row under their own session: RLS allows only
 // their profile, and the database trigger keeps role/status out of reach —
 // so this action needs no service key and cannot touch anyone else.
@@ -74,8 +59,7 @@ export async function updateProfileDetails(
     .from("profiles")
     .update({
       full_name: fullName,
-      phone: cleanField(formData.get("phone"), 40),
-      delivery_address: cleanAddress(formData.get("delivery_address"))
+      phone: cleanField(formData.get("phone"), 40)
     })
     .eq("id", user.id);
 

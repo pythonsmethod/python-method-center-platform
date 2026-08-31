@@ -6,6 +6,7 @@ import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
 import { submitOnboarding } from "@/lib/onboarding/actions";
 import { COUNTRY_CODES, countryFlag } from "@/lib/profile/identity";
+import { DeliveryAddressFields } from "@/components/delivery/DeliveryAddressFields";
 import {
   initialOnboardingActionState,
   type OnboardingProfileDefaults
@@ -72,6 +73,12 @@ export function OnboardingForm({
           type="tel"
         />
       </label>
+
+      <DeliveryAddressFields locale={locale} defaults={{
+        delivery_first_name: profileDefaults.fullName.split(/\s+/)[0] ?? "",
+        delivery_last_name: profileDefaults.fullName.split(/\s+/).slice(1).join(" "),
+        delivery_country_code: profileDefaults.countryCode
+      }} />
 
       <label className="field">
         <span>{labels.recipient}</span>

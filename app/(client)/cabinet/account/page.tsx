@@ -51,7 +51,7 @@ export default async function AccountPage() {
   const { data: profileRow } = supabase
     ? await supabase
         .from("profiles")
-        .select("full_name, phone, delivery_address")
+        .select("full_name, phone")
         .eq("id", auth.userId)
         .maybeSingle()
     : { data: null };
@@ -82,9 +82,6 @@ export default async function AccountPage() {
           </p>
           <ProfileDetailsForm
             labels={dict.profileForm}
-            deliveryAddress={
-              (profileRow?.delivery_address as string | null) ?? null
-            }
             email={auth.email}
             fullName={profileRow?.full_name ?? null}
             phone={profileRow?.phone ?? null}

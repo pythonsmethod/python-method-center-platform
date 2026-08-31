@@ -11,7 +11,6 @@ type ProfileDetailsFormProps = {
   email: string | null;
   fullName: string | null;
   phone: string | null;
-  deliveryAddress: string | null;
 };
 
 // The person's own contact card: name, phone, where the formula ships.
@@ -21,8 +20,7 @@ export function ProfileDetailsForm({
   labels,
   email,
   fullName,
-  phone,
-  deliveryAddress
+  phone
 }: ProfileDetailsFormProps) {
   const [state, formAction, pending] = useActionState(
     updateProfileDetails,
@@ -35,7 +33,7 @@ export function ProfileDetailsForm({
   // page silent, and the address blank again on the next visit. Keying on
   // the saved values remounts the fields exactly when the server has
   // something new to show, and never while someone is typing.
-  const savedKey = `${fullName ?? ""}|${phone ?? ""}|${deliveryAddress ?? ""}`;
+  const savedKey = `${fullName ?? ""}|${phone ?? ""}`;
 
   return (
     <form action={formAction} className="onboarding-form" key={savedKey}>
@@ -59,17 +57,6 @@ export function ProfileDetailsForm({
           name="phone"
           placeholder="+1 424 …"
           type="tel"
-        />
-      </label>
-
-      <label className="field">
-        <span>{labels.address}</span>
-        <textarea
-          defaultValue={deliveryAddress ?? ""}
-          maxLength={600}
-          name="delivery_address"
-          placeholder={labels.addressPlaceholder}
-          rows={3}
         />
       </label>
 

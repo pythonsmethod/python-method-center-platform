@@ -9,7 +9,7 @@ import {
   DOCUMENT_STORAGE_BUCKET,
   validateDocumentFile
 } from "@/lib/documents/config";
-import { recordUploadedDocumentMetadata } from "@/lib/documents/actions";
+import { deleteOwnDocument, recordUploadedDocumentMetadata } from "@/lib/documents/actions";
 import type {
   DocumentIntakeStatus,
   UploadedDocument
@@ -92,6 +92,7 @@ export function DocumentUploadPanel({
   });
   const [isPending, startTransition] = useTransition();
   const [openError, setOpenError] = useState<string>("");
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -193,6 +194,21 @@ export function DocumentUploadPanel({
     } else {
       window.location.assign(data.signedUrl);
     }
+  }
+
+  function handleDeleteDocument(document: UploadedDocument) {
+    if (!window.confirm(locale === "ru" ? "Удалить этот документ без возможности восстановления?" : "Delete this document permanently?")) return;
+    setDeletingId(document.id);
+    startTransition(async () => {
+      const result = await deleteOwnDocument(document.id);
+      if (result.status === "success") {
+        setDocuments(current => current.filter(item => item.id !== document.id));
+        setState({ status: "success", message: result.message });
+      } else {
+        setState({ status: "error", message: result.message });
+      }
+      setDeletingId(null);
+    });
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
@@ -354,6 +370,14 @@ export function DocumentUploadPanel({
                       type="button"
                     >
                       {labels.open}
+                    </button>
+                    <button
+                      className="button button--danger button--compact"
+                      disabled={deletingId === document.id}
+                      onClick={() => handleDeleteDocument(document)}
+                      type="button"
+                    >
+                      {deletingId === document.id ? (locale === "ru" ? "Удаляем…" : "Deleting…") : (locale === "ru" ? "Удалить" : "Delete")}
                     </button>
                   </div>
                   <dl>

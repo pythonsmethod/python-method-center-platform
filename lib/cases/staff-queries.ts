@@ -14,6 +14,18 @@ export type StaffCaseListItem = {
     email: string | null;
     full_name: string | null;
     phone: string | null;
+    delivery_first_name?: string | null;
+    delivery_last_name?: string | null;
+    delivery_email?: string | null;
+    delivery_phone?: string | null;
+    delivery_country_code?: string | null;
+    delivery_region?: string | null;
+    delivery_city?: string | null;
+    delivery_street?: string | null;
+    delivery_building?: string | null;
+    delivery_unit?: string | null;
+    delivery_postal_code?: string | null;
+    delivery_instructions?: string | null;
     country_code?: string | null;
   } | null;
 };
@@ -98,6 +110,18 @@ export type StaffCaseDetail = {
     email: string | null;
     full_name: string | null;
     phone: string | null;
+    delivery_first_name?: string | null;
+    delivery_last_name?: string | null;
+    delivery_email?: string | null;
+    delivery_phone?: string | null;
+    delivery_country_code?: string | null;
+    delivery_region?: string | null;
+    delivery_city?: string | null;
+    delivery_street?: string | null;
+    delivery_building?: string | null;
+    delivery_unit?: string | null;
+    delivery_postal_code?: string | null;
+    delivery_instructions?: string | null;
   } | null;
   onboarding_submissions: StaffOnboardingSubmission[];
   uploaded_documents: StaffCaseDocument[];
@@ -132,7 +156,7 @@ export async function getStaffCaseDetail(
     .from("client_cases")
     .select(
       `id, profile_id, status, urgency, direction, title, summary, created_at, updated_at,
-       profiles(email, full_name, phone),
+       profiles(email, full_name, phone, delivery_first_name, delivery_last_name, delivery_email, delivery_phone, delivery_country_code, delivery_region, delivery_city, delivery_street, delivery_building, delivery_unit, delivery_postal_code, delivery_instructions),
        onboarding_submissions(id, status, submitted_at, payload),
        uploaded_documents(id, original_filename, document_status, created_at),
        payments(id, product, status, amount_cents, currency, processor_reference, paid_at, created_at),

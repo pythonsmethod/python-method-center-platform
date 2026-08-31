@@ -15,6 +15,8 @@ import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { enqueueDocumentProcessing } from "@/lib/documents/processing";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { revalidatePath } from "next/cache";
 
 type RecordUploadedDocumentInput = {
   caseId: string;
@@ -187,4 +189,34 @@ export async function recordUploadedDocumentMetadata(
       document_status: queued ? "queued" : document.document_status
     } as UploadedDocument
   };
+}
+
+export async function deleteOwnDocument(documentId: string): Promise<{ status: "success" | "error"; message: string }> {
+  const supabase = await createSupabaseServerClient();
+  const service = createSupabaseServiceClient();
+  const locale = await getLocale();
+  const failure = locale === "ru" ? "Не удалось удалить документ." : "Could not delete the document.";
+  if (!supabase || !service || !isUuid(documentId)) return { status: "error", message: failure };
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) redirect("/login?next=/cabinet/documents");
+  const { data: document } = await service.from("uploaded_documents")
+    .select("id, profile_id, case_id, storage_path, original_filename")
+    .eq("id", documentId).eq("profile_id", user.id).maybeSingle();
+  if (!document || !document.storage_path.startsWith(`${user.id}/`)) return { status: "error", message: failure };
+  const removed = await service.storage.from(DOCUMENT_STORAGE_BUCKET).remove([document.storage_path]);
+  if (removed.error) return { status: "error", message: removed.error.message };
+  const deleted = await service.from("uploaded_documents").delete().eq("id", document.id).eq("profile_id", user.id);
+  if (deleted.error) return { status: "error", message: deleted.error.message };
+  await writeAuditLog({
+    profileId: user.id,
+    caseId: document.case_id,
+    actorId: user.id,
+    actorRole: "client",
+    action: "document_deleted",
+    entityTable: "uploaded_documents",
+    entityId: document.id,
+    metadata: { original_filename: document.original_filename }
+  });
+  revalidatePath("/cabinet/documents");
+  return { status: "success", message: locale === "ru" ? "Документ удалён." : "Document deleted." };
 }

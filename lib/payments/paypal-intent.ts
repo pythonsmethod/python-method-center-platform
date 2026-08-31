@@ -35,8 +35,7 @@ export async function announcePaypalIntent(product: string): Promise<void> {
       lines: [
         `Тариф: ${paymentProductLabel(product)}`,
         email ? `Аккаунт: ${email}` : "Гость — оплата будет без привязки к аккаунту",
-        "Проверьте PayPal. Когда деньги придут, отметьте оплату в кейсе вручную:",
-        "«Кейсы» → кейс клиента → «Записать оплату»."
+        "Проверьте PayPal. Ручная запись оплаты на сайте отключена."
       ],
       link: adminLink("/admin/cases")
     });
