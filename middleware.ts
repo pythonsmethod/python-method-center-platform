@@ -131,7 +131,7 @@ export async function middleware(request: NextRequest) {
     .some((cookie) => cookie.name.startsWith("sb-"));
 
   if (!hasAuthCookie) {
-    const protectedPath = ["/cabinet", "/admin", "/onboarding"].some(
+    const protectedPath = ["/cabinet", "/admin", "/onboarding", "/volunteer"].some(
       (prefix) => request.nextUrl.pathname === prefix || request.nextUrl.pathname.startsWith(`${prefix}/`)
     );
 

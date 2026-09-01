@@ -4,6 +4,10 @@ import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { LogoutButton } from "@/components/LogoutButton";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
+import { getStaffUnreadCounts } from "@/lib/messages/queries";
+import { getDeliveryAttentionCounts } from "@/lib/delivery/queries";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { getStaffSupportUnreadCount } from "@/lib/support/queries";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
@@ -31,6 +35,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         digest: "Онкологический обзор",
         chess: "Шахматы",
         requests: "Обращения",
+        delivery: "Доставки",
         founder: "Обзор",
         home: "На главную сайта",
         logout: "Выйти"
@@ -45,6 +50,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         digest: "Oncology digest",
         chess: "Chess",
         requests: "Requests",
+        delivery: "Deliveries",
         founder: "Overview",
         home: "Website home",
         logout: "Sign out"
@@ -53,10 +59,20 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
   const privateAssistantRole = auth.status === "authorized"
     ? resolvePrivateAssistantRole(auth.email)
     : null;
+  const db = createSupabaseServiceClient();
+  const [messageCounts, supportUnread, deliveryCounts, documentAttention] = auth.status === "authorized"
+    ? await Promise.all([
+        getStaffUnreadCounts(auth.email),
+        getStaffSupportUnreadCount(),
+        getDeliveryAttentionCounts(),
+        db?.from("uploaded_documents").select("id", { count: "exact", head: true }).in("document_status", ["needs_reupload", "failed"])
+      ])
+    : [{ total: 0, byCase: {} }, 0, { admin: 0 }, undefined];
   const adminNavRoutes = [
     { href: "/admin", label: labels.today, icon: "⌂" },
-    { href: "/admin/cases", label: labels.clients, icon: "♙" },
-    { href: "/admin/documents", label: labels.documents, icon: "▤" },
+    { href: "/admin/cases", label: labels.clients, icon: "♙", badge: messageCounts.total },
+    { href: "/admin/documents", label: labels.documents, icon: "▤", badge: documentAttention?.count ?? 0 },
+    { href: "/admin/fulfillment", label: labels.delivery, icon: "▣", badge: deliveryCounts.admin },
     ...(privateAssistantRole
       ? [{ href: "/admin/assistant", label: labels.assistant, icon: "✦" }]
       : []),
@@ -67,7 +83,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       ? [{ href: "/admin/chess", label: labels.chess, icon: "♞" }]
       : []),
     ...(auth.status === "authorized"
-      ? [{ href: "/admin/requests", label: labels.requests, icon: "✉" }]
+      ? [{ href: "/admin/requests", label: labels.requests, icon: "✉", badge: supportUnread }]
       : [])
   ];
 
@@ -86,6 +102,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
             <Link href={route.href} key={route.href}>
               <span className="admin-nav__icon" aria-hidden="true">{route.icon}</span>
               <span>{route.label}</span>
+              {route.badge ? <b className="unread-badge unread-badge--inline">{route.badge}</b> : null}
             </Link>
           ))}
           {auth.status === "authorized" && auth.role === "admin" ? (

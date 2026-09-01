@@ -66,7 +66,7 @@ export default async function AdminPage() {
   const [knowledge, escalations, unread, casesResult] = await Promise.all([
     listKnowledgeEntries(),
     listOpenEscalations(),
-    getStaffUnreadCounts(),
+    getStaffUnreadCounts(auth.email),
     getStaffCases()
   ]);
   const assistantConfigured = hasAssistantEnv();

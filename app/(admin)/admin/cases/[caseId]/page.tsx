@@ -28,7 +28,7 @@ import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThrea
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
-import { PaymentRecordForm } from "./PaymentRecordForm";
+import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 
 type StaffCasePageProps = {
   params: Promise<{
@@ -83,9 +83,22 @@ export default async function StaffCaseDetailPage({
   searchParams
 }: StaffCasePageProps) {
   const { caseId } = await params;
-  const focusedTodayView = (await searchParams).view === "today";
+  const requestedTodayView = (await searchParams).view === "today";
   const auth = await getRequiredStaffUser(`/admin/cases/${caseId}`);
   const locale = await getLocale();
+  const paymentCopy = locale === "ru"
+    ? {
+        title: "Автоматические оплаты",
+        description:
+          "Здесь появляются только оплаты, автоматически подтверждённые платёжной системой.",
+        empty: "Автоматически подтверждённых оплат пока нет."
+      }
+    : {
+        title: "Automatic payments",
+        description:
+          "Only payments automatically confirmed by the payment processor appear here.",
+        empty: "There are no automatically confirmed payments yet."
+      };
 
   if (auth.status === "missing-env") {
     return (
@@ -130,11 +143,13 @@ export default async function StaffCaseDetailPage({
   // Only the founder sees which model answers; for the team it is simply
   // the assistant.
   const showProviders = canSeeProviderNames(auth.email);
-  // Case status editing and manual payment recording are developer/founder
+  // Case status editing and automatic payment history are developer/founder
   // controls. They stay out of Karen's clinical workspace so his attention
   // remains on the client, documents and conversation. This intentionally
   // fails closed when the founder allowlist is not configured.
   const showAdminControls = auth.role === "admin" && canSeeProviderNames(auth.email);
+  const canReadProfessorConversation = canAccessProfessorMessages(auth.email);
+  const focusedTodayView = requestedTodayView && canReadProfessorConversation;
   const detailResult = await getStaffCaseDetail(caseId);
 
   if (detailResult.status === "error") {
@@ -245,7 +260,9 @@ export default async function StaffCaseDetailPage({
     b.created_at.localeCompare(a.created_at)
   );
   const [caseMessages, assistantHistory, review] = await Promise.all([
-    getCaseMessages(clientCase.id),
+    canReadProfessorConversation
+      ? getCaseMessages(clientCase.id)
+      : Promise.resolve({ messages: [], error: null }),
     getAssistantHistoryForCase(clientCase.profile_id, "ru"),
     getCaseReview(clientCase.id, documents)
   ]);
@@ -265,6 +282,11 @@ export default async function StaffCaseDetailPage({
           <ul className="status-list">
             <li>Email: {clientCase.profiles?.email ?? "—"}</li>
             <li>Телефон: {clientCase.profiles?.phone ?? "—"}</li>
+            <li>Email для доставки: {clientCase.profiles?.delivery_email ?? "—"}</li>
+            <li>Телефон для доставки: {clientCase.profiles?.delivery_phone ?? "—"}</li>
+            <li>Получатель: {[clientCase.profiles?.delivery_first_name, clientCase.profiles?.delivery_last_name].filter(Boolean).join(" ") || "—"}</li>
+            <li>Адрес для доставки: {[clientCase.profiles?.delivery_postal_code, clientCase.profiles?.delivery_country_code, clientCase.profiles?.delivery_region, clientCase.profiles?.delivery_city, clientCase.profiles?.delivery_street, clientCase.profiles?.delivery_building, clientCase.profiles?.delivery_unit].filter(Boolean).join(", ") || "—"}</li>
+            {clientCase.profiles?.delivery_instructions ? <li>Дополнительно: {clientCase.profiles.delivery_instructions}</li> : null}
           </ul>
         </div>
         {showAdminControls ? (
@@ -286,7 +308,7 @@ export default async function StaffCaseDetailPage({
         </div>
       </section>
 
-      <section
+      {canReadProfessorConversation ? <section
         className="intake-section"
         id="case-conversation"
         aria-label="Чат с клиентом"
@@ -309,7 +331,7 @@ export default async function StaffCaseDetailPage({
             viewer="staff"
           />
         </div>
-      </section>
+      </section> : null}
 
       {showAdminControls ? (
         <section className="panel-grid" aria-label="Управление кейсом">
@@ -326,10 +348,10 @@ export default async function StaffCaseDetailPage({
 
           <div className="panel">
             <span className="panel__label">Оплаты</span>
-            <h2>Записать оплату</h2>
-            <PaymentRecordForm caseId={clientCase.id} />
+            <h2>{paymentCopy.title}</h2>
+            <p>{paymentCopy.description}</p>
             {payments.length === 0 ? (
-              <p className="empty-state">Оплат пока нет.</p>
+              <p className="empty-state">{paymentCopy.empty}</p>
             ) : (
               <ul className="status-list">
                 {payments.map((payment) => (

@@ -20,7 +20,7 @@ const ru = {
       metrics: { title: "Динамика", hint: "Ваши показатели на графике" },
       supplements: { title: "Мои добавки", hint: "Чек-лист приёма на день" },
       sleep: { title: "Мой сон", hint: "Дневник сна и режим" },
-      chat: { title: "Связь с центром", hint: "Поддержка и ИИ-помощник" },
+      chat: { title: "Чат с поддержкой", hint: "Переписка с Анной и центром" },
       account: { title: "Мой кейс", hint: "Аккаунт, оплаты, история" },
       tokens: { title: "Токены", hint: "Приглашения и скидки" }
     },
@@ -63,8 +63,8 @@ const ru = {
       historyEmpty: "Событий пока нет."
     },
     chat: {
-      eyebrow: "Связь с центром",
-      title: "Поддержка и ИИ-помощник",
+      eyebrow: "Чат с поддержкой",
+      title: "Анна и поддержка центра",
       description: "Вопросы про оплату, доступ и сайт — и вся ваша переписка с помощником.",
       setupNotice: "Раздел требует настройки Supabase Auth",
       caseNoticeTitle: "Про ваш кейс — на главной",
@@ -1242,7 +1242,7 @@ const en: typeof ru = {
       metrics: { title: "Progress", hint: "Your values on a chart" },
       supplements: { title: "My supplements", hint: "Today's intake checklist" },
       sleep: { title: "My sleep", hint: "Sleep diary and routine" },
-      chat: { title: "Contact the center", hint: "Support and the AI assistant" },
+      chat: { title: "Support chat", hint: "Conversation with Anna and the center" },
       account: { title: "My case", hint: "Account, payments, history" },
       tokens: { title: "Tokens", hint: "Invitations and discounts" }
     },
@@ -1285,8 +1285,8 @@ const en: typeof ru = {
       historyEmpty: "No events yet."
     },
     chat: {
-      eyebrow: "Contact the center",
-      title: "Support and the AI assistant",
+      eyebrow: "Support chat",
+      title: "Anna and center support",
       description: "Questions about payment, access and the site — and your whole conversation with the assistant.",
       setupNotice: "This section needs Supabase Auth configured",
       caseNoticeTitle: "About your case — on the home page",
