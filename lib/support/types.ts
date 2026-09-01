@@ -21,7 +21,10 @@ export type ClientSupportRequest = {
 export type SupportRequestMessage = {
   id: string;
   sender_role: string;
-  body: string;
+  body: string | null;
+  audio_path: string | null;
+  audio_duration_seconds: number | null;
+  audioUrl: string | null;
   created_at: string;
 };
 

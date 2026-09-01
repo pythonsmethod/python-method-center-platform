@@ -91,7 +91,8 @@ const ru = {
         placeholder: "Напишите следующий вопрос или ответ…",
         send: "Отправить",
         sending: "Отправка…",
-        empty: "Переписка пока пуста."
+        empty: "Переписка пока пуста.",
+        audioMissing: "Голосовое сообщение временно недоступно."
       }
     },
     profileForm: {
@@ -1313,7 +1314,8 @@ const en: typeof ru = {
         placeholder: "Write your next question or reply…",
         send: "Send",
         sending: "Sending…",
-        empty: "The conversation is empty."
+        empty: "The conversation is empty.",
+        audioMissing: "The voice message is temporarily unavailable."
       }
     },
     profileForm: {

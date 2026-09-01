@@ -5,6 +5,30 @@ import type {
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import type { SupabaseClient } from "@supabase/supabase-js";
+
+export const SUPPORT_AUDIO_BUCKET = "support-audio";
+const SIGNED_URL_TTL_SECONDS = 3600;
+
+type SupportMessageRow = Omit<SupportRequestMessage, "audioUrl"> & {
+  support_request_id: string;
+};
+
+async function signSupportMessages(
+  supabase: SupabaseClient,
+  rows: SupportMessageRow[]
+): Promise<Array<SupportMessageRow & { audioUrl: string | null }>> {
+  return Promise.all(rows.map(async (row) => {
+    let audioUrl: string | null = null;
+    if (row.audio_path) {
+      const { data } = await supabase.storage
+        .from(SUPPORT_AUDIO_BUCKET)
+        .createSignedUrl(row.audio_path, SIGNED_URL_TTL_SECONDS);
+      audioUrl = data?.signedUrl ?? null;
+    }
+    return { ...row, audioUrl };
+  }));
+}
 
 export type ClientSupportRequestsResult =
   | {
@@ -44,7 +68,7 @@ export async function getOwnSupportRequests(
   const { data: messageRows, error: messagesError } = requestIds.length
     ? await supabase
         .from("support_request_messages")
-        .select("id, support_request_id, sender_role, body, created_at")
+        .select("id, support_request_id, sender_role, body, audio_path, audio_duration_seconds, created_at")
         .in("support_request_id", requestIds)
         .order("created_at", { ascending: true })
         .limit(1000)
@@ -54,8 +78,10 @@ export async function getOwnSupportRequests(
     return { status: "error", message: messagesError.message };
   }
 
+  const signer = createSupabaseServiceClient() ?? supabase;
+  const signedRows = await signSupportMessages(signer, (messageRows ?? []) as SupportMessageRow[]);
   const messagesByRequest = new Map<string, SupportRequestMessage[]>();
-  for (const row of messageRows ?? []) {
+  for (const row of signedRows) {
     const list = messagesByRequest.get(row.support_request_id) ?? [];
     list.push(row as SupportRequestMessage & { support_request_id: string });
     messagesByRequest.set(row.support_request_id, list);
@@ -128,7 +154,7 @@ export async function getStaffSupportRequests(): Promise<StaffSupportRequestsRes
   const { data: messageRows, error: messagesError } = requestIds.length
     ? await supabase
         .from("support_request_messages")
-        .select("id, support_request_id, sender_role, body, created_at")
+        .select("id, support_request_id, sender_role, body, audio_path, audio_duration_seconds, created_at")
         .in("support_request_id", requestIds)
         .order("created_at", { ascending: true })
         .limit(5000)
@@ -138,8 +164,9 @@ export async function getStaffSupportRequests(): Promise<StaffSupportRequestsRes
     return { status: "error", message: messagesError.message };
   }
 
+  const signedRows = await signSupportMessages(supabase, (messageRows ?? []) as SupportMessageRow[]);
   const messagesByRequest = new Map<string, SupportRequestMessage[]>();
-  for (const row of messageRows ?? []) {
+  for (const row of signedRows) {
     const list = messagesByRequest.get(row.support_request_id) ?? [];
     list.push(row as SupportRequestMessage & { support_request_id: string });
     messagesByRequest.set(row.support_request_id, list);

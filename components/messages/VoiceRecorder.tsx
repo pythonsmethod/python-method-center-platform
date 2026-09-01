@@ -8,6 +8,8 @@ import { useRouter } from "next/navigation";
 type VoiceRecorderProps = {
   labels: Dictionary["cabinet"]["voice"];
   caseId?: string;
+  supportRequestId?: string;
+  locale?: "ru" | "en";
   onSent?: () => void | Promise<void>;
 };
 
@@ -38,7 +40,7 @@ function formatSeconds(total: number): string {
   return `${minutes}:${String(seconds).padStart(2, "0")}`;
 }
 
-export function VoiceRecorder({ caseId, onSent, labels: t }: VoiceRecorderProps) {
+export function VoiceRecorder({ caseId, supportRequestId, locale = "ru", onSent, labels: t }: VoiceRecorderProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<RecorderPhase>("idle");
   const [seconds, setSeconds] = useState(0);
@@ -154,9 +156,13 @@ export function VoiceRecorder({ caseId, onSent, labels: t }: VoiceRecorderProps)
     if (caseId) {
       form.append("caseId", caseId);
     }
+    if (supportRequestId) {
+      form.append("requestId", supportRequestId);
+    }
+    form.append("locale", locale);
 
     try {
-      const response = await fetch("/api/messages/audio", {
+      const response = await fetch(supportRequestId ? "/api/support/messages/audio" : "/api/messages/audio", {
         method: "POST",
         body: form
       });

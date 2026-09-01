@@ -8,6 +8,7 @@ import { supportStatusLabel } from "@/lib/i18n/status-labels";
 import { getStaffSupportRequests } from "@/lib/support/queries";
 import { RequestStatusButtons } from "./RequestStatusButtons";
 import { SupportRequestThread } from "@/components/support/SupportRequestThread";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 const staffThreadLabels = {
   you: "Вы",
@@ -17,7 +18,8 @@ const staffThreadLabels = {
   placeholder: "Напишите ответ — он сохранится в переписке клиента…",
   send: "Отправить ответ",
   sending: "Отправка…",
-  empty: "Переписка пока пуста."
+  empty: "Переписка пока пуста.",
+  audioMissing: "Голосовое сообщение временно недоступно."
 };
 
 export default async function StaffSupportRequestsPage() {
@@ -131,6 +133,7 @@ export default async function StaffSupportRequestsPage() {
                     messages={request.messages}
                     requestId={request.id}
                     viewer="staff"
+                    voiceLabels={getDictionary("ru").cabinet.voice}
                   />
                 ) : (
                   <div className="notice notice--warning">

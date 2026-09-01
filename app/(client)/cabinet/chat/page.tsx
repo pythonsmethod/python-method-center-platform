@@ -120,6 +120,7 @@ export default async function CabinetChatPage() {
                       messages={request.messages}
                       requestId={request.id}
                       viewer="client"
+                      voiceLabels={dict.voice}
                     />
                   </li>
                 ))}

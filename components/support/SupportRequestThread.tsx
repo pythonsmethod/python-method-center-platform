@@ -8,6 +8,8 @@ import {
 } from "@/lib/support/actions";
 import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { SupportRequestMessage } from "@/lib/support/types";
+import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { VoiceRecorder } from "@/components/messages/VoiceRecorder";
 
 type Labels = {
   you: string;
@@ -18,6 +20,7 @@ type Labels = {
   send: string;
   sending: string;
   empty: string;
+  audioMissing: string;
 };
 
 type Props = {
@@ -26,6 +29,7 @@ type Props = {
   viewer: "client" | "staff";
   locale: "ru" | "en";
   labels: Labels;
+  voiceLabels: Dictionary["cabinet"]["voice"];
 };
 
 function dayLabel(value: string, locale: "ru" | "en"): string {
@@ -41,7 +45,8 @@ export function SupportRequestThread({
   messages,
   viewer,
   locale,
-  labels
+  labels,
+  voiceLabels
 }: Props) {
   const router = useRouter();
   const formRef = useRef<HTMLFormElement | null>(null);
@@ -86,7 +91,12 @@ export function SupportRequestThread({
                     ? (viewer === "client" ? labels.you : labels.client)
                     : labels.team}
                 </span>
-                <p>{message.body}</p>
+                {message.body ? <p>{message.body}</p> : null}
+                {message.audioUrl ? (
+                  <audio controls preload="metadata" src={message.audioUrl} />
+                ) : message.audio_path ? (
+                  <p className="case-msg__missing">{labels.audioMissing}</p>
+                ) : null}
                 <span className="case-msg__time">
                   {new Date(message.created_at).toLocaleTimeString(locale, {
                     hour: "2-digit",
@@ -121,6 +131,12 @@ export function SupportRequestThread({
           </p>
         ) : null}
       </form>
+      <VoiceRecorder
+        labels={voiceLabels}
+        locale={locale}
+        onSent={() => router.refresh()}
+        supportRequestId={requestId}
+      />
     </div>
   );
 }
