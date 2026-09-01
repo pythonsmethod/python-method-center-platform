@@ -1,0 +1,117 @@
+{
+  "_meta": {
+    "purpose": "Универсальные пороги критических значений в канонических единицах.",
+    "rule": "Значение сначала приводится к канонической единице через unit resolver, затем сравнивается с порогом. Напечатанный в документе референс НЕ используется как источник критического порога.",
+    "approval_required": true,
+    "approved_by": null,
+    "approved_at": null,
+    "blocking": "Файл не может использоваться в production, пока approved_by пуст.",
+    "version": "1.0-draft"
+  },
+  "thresholds": [
+    {
+      "analyte": "hemoglobin",
+      "unit": "g/L",
+      "low": 70,
+      "high": null,
+      "delta_rule": {
+        "drop_absolute": 30,
+        "window_days": 30
+      },
+      "note": "Также резкое падение между исследованиями."
+    },
+    {
+      "analyte": "potassium",
+      "unit": "mmol/L",
+      "low": 2.8,
+      "high": 6.2,
+      "requires_check": [
+        "hemolysis_flag"
+      ],
+      "note": "Гемолиз даёт ложную гиперкалиемию. При флаге гемолиза — эскалация с явной пометкой, порог не снимается."
+    },
+    {
+      "analyte": "sodium",
+      "unit": "mmol/L",
+      "low": 120,
+      "high": 158
+    },
+    {
+      "analyte": "glucose",
+      "unit": "mmol/L",
+      "low": 2.5,
+      "high": 25.0,
+      "requires_check": [
+        "fasting_status"
+      ]
+    },
+    {
+      "analyte": "platelets",
+      "unit": "10^9/L",
+      "low": 30,
+      "high": 1000
+    },
+    {
+      "analyte": "neutrophils_abs",
+      "unit": "10^9/L",
+      "low": 0.5,
+      "high": null
+    },
+    {
+      "analyte": "wbc",
+      "unit": "10^9/L",
+      "low": 1.0,
+      "high": 50.0
+    },
+    {
+      "analyte": "calcium_total",
+      "unit": "mmol/L",
+      "low": 1.6,
+      "high": 3.2,
+      "requires_check": [
+        "albumin_correction"
+      ],
+      "note": "Требуется коррекция по альбумину; без альбумина эскалация всё равно происходит."
+    },
+    {
+      "analyte": "creatinine",
+      "unit": "umol/L",
+      "low": null,
+      "high": 400,
+      "delta_rule": {
+        "rise_ratio": 1.5,
+        "window_days": 7
+      }
+    },
+    {
+      "analyte": "inr",
+      "unit": "ratio",
+      "low": null,
+      "high": 5.0
+    },
+    {
+      "analyte": "bilirubin_total",
+      "unit": "umol/L",
+      "low": null,
+      "high": 100
+    }
+  ],
+  "text_red_flags": {
+    "note": "Текстовые красные флаги в заключениях. Маршрутизируются как критические значения.",
+    "patterns_ru": [
+      "подозрение на злокачественн",
+      "новообразовани",
+      "срочная госпитализац",
+      "немедленно обратит",
+      "угрожающ",
+      "экстренн"
+    ],
+    "patterns_en": [
+      "suspicious for malignancy",
+      "urgent referral",
+      "immediate medical attention",
+      "critical result",
+      "life-threatening"
+    ]
+  }
+}
