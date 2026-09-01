@@ -125,7 +125,7 @@ Support does **not** handle tests, state, recommendations, conclusions, route, o
 ## 7. When AI must stop the process
 
 AI must **stop** its normal flow and switch to the safety path when:
-- a **red flag** of an acute/life-threatening situation appears (see §9);
+- signs of an acute/life-threatening situation appear — AI sends the person to emergency services (see §9);
 - a document is unreadable, blurred, cropped or damaged — AI stops and asks the client to re-upload before drawing any conclusion;
 - the required data for a step is missing — AI stops rather than fabricating values;
 - it detects it would otherwise have to guess, interpret state, or promise a result.
@@ -153,35 +153,18 @@ On any red flag, on any case question, on Karen's decision-bearing replies, and 
 
 ---
 
-## 9. Red Flag Escalation Rules
+## 9. Acute situations
 
-> **Canonical source:** RED_FLAG_EVENT_AND_URGENCY_PROTOCOL_V1. This section is synchronized to that protocol. The legacy assumption that *all* red flags route only to Karen is replaced by the dual-routing model below.
+**There is no escalation mechanism, by the owner's decision.** The centre does rehabilitation and recovery; it is not an emergency service, and a person in an acute state needs an ambulance, not a platform that promises to notice. An automatic alert would promise a kind of care the centre does not provide — which is more dangerous than its absence, because somebody might rely on it.
 
-AI reacts under this protocol if a request shows signs of an acute state. Red flags fall into two canonical categories:
+When a request shows signs of an acute state — physical (severe pain, difficulty breathing, loss of consciousness, bleeding, signs of stroke or heart attack) or psychological (suicidal thoughts, self-harm language, acute crisis) — AI does exactly two things, immediately and without waiting for anyone:
 
-- **Physical / medical red flags** (non-exhaustive): severe/sharp pain; difficulty breathing or suffocation; loss of consciousness, fainting, confusion; bleeding; sharp deterioration; seizures; signs of stroke or heart attack (numbness, facial asymmetry, chest pain).
-- **Psychological / crisis red flags** (non-exhaustive): suicidal thoughts, self-harm language, panic crisis, severe emotional destabilization, danger to self or others.
+1. **Tells the person plainly to contact emergency services now** (112 in Europe, 911 in the USA, 103 for an ambulance) or the nearest emergency department, without softening and without dissuading.
+2. **Says briefly what in the message was concerning** — observation only, no diagnosis.
 
-**On any doubt, AI treats the situation as acute — in favor of client safety.**
+It may also ask the person to write to the team through the support page, so the team knows — as the person's own action, not the platform's. AI creates no event, sends no alert, and never tells the person that the team has been notified or will respond quickly. On any doubt, AI treats the situation as acute.
 
-**9.1 What AI must do immediately (both categories).** When a red flag appears, AI responds **immediately** and does not wait for any human before giving safety guidance. AI **simultaneously**:
-1. **Advises urgent professional help when appropriate** — tells the client this may be an urgent situation and that they should contact appropriate emergency medical services, a doctor, or local urgent care depending on the situation, without softening and without dissuading.
-2. **Briefly explains what was detected as concerning** — observation only, with no diagnosis, treatment, guarantees, or medical decision-making.
-3. **Confirms the message reached the responsible human team** — tells the client their urgent message has been sent to the responsible human team and that the team will review it as soon as possible.
-4. **Creates a red_flag_event** (via System) and **notifies the responsible human** per the routing below.
-
-**9.2 Canonical human routing.**
-
-| Red flag category | Human notified immediately |
-|---|---|
-| Physical / medical | **Karen** |
-| Psychological / crisis | **Anna / Support** |
-
-**9.3 Priority marker vs durable case state.** AI/System may mark the red_flag_event as `requires_immediate_review`. This is a **transient priority marker only** and is **not** the same as durable case urgency or status. AI/System must **never** write `case_urgency` or `case_status`.
-
-**9.4 Hard prohibitions during red-flag handling.** AI must never: diagnose; prescribe; assign durable case urgency; change case status; change support route; reassure falsely; minimize risk; or tell the client to wait for Karen instead of seeking urgent help.
-
-**Human role after escalation:** the notified human (Karen for physical/medical, Anna/support for psychological/crisis) reviews the critical item as soon as possible. **Only Karen** can assign durable case urgency, change case status, change support route, or make case-level decisions. Notified humans accompany and support; they do **not** replace emergency services.
+The platform states on every relevant page that it does not provide emergency care. That statement stays.
 
 ---
 

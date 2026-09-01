@@ -6,9 +6,7 @@ import { LogoutButton } from "@/components/LogoutButton";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
-import { EscalationPanel } from "@/components/escalations/EscalationPanel";
 import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
-import { listOpenEscalations } from "@/lib/escalations/queries";
 import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import { canSeeProviderNames, isFounderEmail } from "@/lib/auth/require-founder";
@@ -63,9 +61,8 @@ export default async function AdminPage() {
     redirect("/admin/founder");
   }
 
-  const [knowledge, escalations, unread, casesResult] = await Promise.all([
+  const [knowledge, unread, casesResult] = await Promise.all([
     listKnowledgeEntries(),
-    listOpenEscalations(),
     getStaffUnreadCounts(auth.email),
     getStaffCases()
   ]);
@@ -108,9 +105,7 @@ export default async function AdminPage() {
         eyebrow: "Рабочий кабинет Карена",
         title: "Сегодня",
         messages: "Новых сообщений",
-        flags: "Красных флагов",
         clients: "Клиентов в работе",
-        attention: "Требует внимания",
         queue: "Очередь на сегодня",
         queueHint: "Сначала показаны срочные кейсы и непрочитанные сообщения.",
         open: "Открыть клиента",
@@ -128,9 +123,7 @@ export default async function AdminPage() {
         eyebrow: "Karen's workspace",
         title: "Today",
         messages: "New messages",
-        flags: "Red flags",
         clients: "Active clients",
-        attention: "Needs attention",
         queue: "Today's queue",
         queueHint: "Urgent cases and unread messages appear first.",
         open: "Open client",
@@ -168,22 +161,11 @@ export default async function AdminPage() {
             <b>{unread.total}</b>
             <span>{copy.messages}</span>
           </Link>
-          <a href="#karen-flags">
-            <b>{escalations.escalations.length}</b>
-            <span>{copy.flags}</span>
-          </a>
           <Link href="/admin/cases">
             <b>{casesResult.status === "ready" ? casesResult.cases.length : "—"}</b>
             <span>{copy.clients}</span>
           </Link>
         </div>
-
-        {(escalations.escalations.length > 0 || escalations.error) ? (
-          <div className="karen-mobile-alert" id="karen-flags">
-            <span className="panel__label">{copy.attention}</span>
-            <EscalationPanel escalations={escalations.escalations} loadError={escalations.error} />
-          </div>
-        ) : null}
 
         <div className="karen-mobile-section-head">
           <div>
@@ -249,14 +231,6 @@ export default async function AdminPage() {
 
       <div className="admin-split">
         <section aria-label="Рабочие разделы" className="admin-split__work">
-          <div className="panel panel--alert">
-            <span className="panel__label">Требует внимания</span>
-            <h2>Красные флаги</h2>
-            <EscalationPanel
-              escalations={escalations.escalations}
-              loadError={escalations.error}
-            />
-          </div>
           <div className="panel">
             <span className="panel__label">Сессия</span>
             <h2>{auth.email ?? "Сотрудник"}</h2>

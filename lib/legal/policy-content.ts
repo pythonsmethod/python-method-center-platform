@@ -111,22 +111,14 @@ const PRIVACY_RU: LegalDocument = {
       ]
     },
     {
-      heading: "7. Оповещения о критических ситуациях",
-      paragraphs: [
-        "Если в разговоре с помощником прозвучит признак состояния, требующего немедленного внимания человека, платформа создаёт событие и сразу оповещает команду через Telegram. Это сделано ради безопасности, и мы говорим об этом прямо, потому что часть данных при этом покидает платформу.",
-        "В оповещение попадают: идентификатор события, ваш email (для гостя сайта — отметка, что связаться нельзя), идентификатор кейса, время и фрагмент вашего сообщения длиной не более 600 символов. Полностью сообщение, документы и история кейса в оповещение не попадают.",
-        "Само событие и тот же фрагмент сохраняются в базе для разбора командой."
-      ]
-    },
-    {
-      heading: "8. Гости сайта, счётчики и cookie",
+      heading: "7. Гости сайта, счётчики и cookie",
       paragraphs: [
         "Чтобы помощник на главной странице не был исчерпан одним посетителем, обращения гостей считаются. Для счётчика IP-адрес не сохраняется: он необратимо преобразуется в хеш с секретной солью, и в базе остаётся только этот хеш. Восстановить из него адрес нельзя, и ни с каким профилем он не связывается.",
         "Мы используем cookie: технические cookie сессии — чтобы вы оставались в системе, и cookie выбранного языка. Рекламных и трекинговых cookie на платформе нет, сторонние аналитические системы не подключены."
       ]
     },
     {
-      heading: "9. Сколько мы храним данные",
+      heading: "8. Сколько мы храним данные",
       paragraphs: [
         "Данные вашего кейса хранятся, пока идёт сопровождение, и после его завершения — потому что к пройденному пути возвращаются: вы можете вернуться через год, и история должна быть на месте.",
         "Записи об оплатах и согласиях мы храним дольше остальных данных: они подтверждают, на каких условиях и когда вы приняли договор, и нужны для отчётности.",
@@ -134,7 +126,7 @@ const PRIVACY_RU: LegalDocument = {
       ]
     },
     {
-      heading: "10. Ваши права",
+      heading: "9. Ваши права",
       paragraphs: [
         "Напишите на pythonsusa@gmail.com с адреса, на который зарегистрирован кабинет, и укажите, что именно вам нужно. Мы отвечаем в течение 30 дней."
       ],
@@ -148,27 +140,27 @@ const PRIVACY_RU: LegalDocument = {
       ]
     },
     {
-      heading: "11. Несовершеннолетние участники",
+      heading: "10. Несовершеннолетние участники",
       paragraphs: [
         "Регистрацию проходит человек 21 года и старше. Если сопровождение нужно тому, кто младше, анкету заполняет родитель или законный опекун, отдельно подтверждая это в анкете и указывая данные участника. Согласие на обработку данных ребёнка даёт взрослый, и оно записывается отдельной строкой.",
         "Мы не собираем данные детей напрямую и не обращаемся к ним минуя взрослого."
       ]
     },
     {
-      heading: "12. Безопасность",
+      heading: "11. Безопасность",
       paragraphs: [
         "Соединение с сайтом шифруется. Документы и голосовые сообщения лежат в закрытых хранилищах и выдаются по временным ссылкам. Разграничение доступа действует на уровне базы данных. Действия с кейсом записываются в журнал.",
         "Ни одна система не защищена абсолютно. Если произойдёт утечка, затрагивающая ваши данные, мы сообщим вам об этом — через кабинет или на email."
       ]
     },
     {
-      heading: "13. Изменения политики",
+      heading: "12. Изменения политики",
       paragraphs: [
         "Если этот документ изменится, наверху страницы поменяется дата редакции. О существенных изменениях мы сообщим в кабинете или на email."
       ]
     },
     {
-      heading: "14. Как с нами связаться",
+      heading: "13. Как с нами связаться",
       paragraphs: [
         "По любым вопросам о данных: pythonsusa@gmail.com. Почтовый адрес: Pythons & Co, 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025, USA."
       ]
@@ -249,22 +241,14 @@ const PRIVACY_EN: LegalDocument = {
       ]
     },
     {
-      heading: "7. Alerts about critical situations",
-      paragraphs: [
-        "If a conversation with the assistant contains a sign of a condition that needs a person's immediate attention, the platform creates an event and alerts the team through Telegram at once. This exists for safety, and we say so plainly, because part of the data leaves the platform when it happens.",
-        "The alert contains: the event identifier, your email (for a site visitor, a note that you cannot be contacted), the case identifier, the time, and an excerpt of your message no longer than 600 characters. The full message, your documents and your case history are not included.",
-        "The event itself and the same excerpt are stored in the database for the team to review."
-      ]
-    },
-    {
-      heading: "8. Site visitors, counters and cookies",
+      heading: "7. Site visitors, counters and cookies",
       paragraphs: [
         "So that one visitor cannot exhaust the assistant on the front page, visitors' messages are counted. The IP address is not stored for that counter: it is irreversibly turned into a hash with a secret salt, and only the hash remains in the database. The address cannot be recovered from it, and it is not linked to any profile.",
         "We use cookies: technical session cookies, so that you stay signed in, and a cookie for your chosen language. There are no advertising or tracking cookies on the platform, and no third-party analytics are connected."
       ]
     },
     {
-      heading: "9. How long we keep data",
+      heading: "8. How long we keep data",
       paragraphs: [
         "The data of your case is kept while the support programme runs, and afterwards — because people come back to the road they have travelled: you may return a year later, and the history should still be there.",
         "Records of payments and consents are kept longer than the rest: they show on what terms and when you accepted the contract, and they are needed for accounting.",
@@ -272,7 +256,7 @@ const PRIVACY_EN: LegalDocument = {
       ]
     },
     {
-      heading: "10. Your rights",
+      heading: "9. Your rights",
       paragraphs: [
         "Write to pythonsusa@gmail.com from the address your cabinet is registered to and tell us what you need. We answer within 30 days."
       ],
@@ -286,27 +270,27 @@ const PRIVACY_EN: LegalDocument = {
       ]
     },
     {
-      heading: "11. Participants under 21",
+      heading: "10. Participants under 21",
       paragraphs: [
         "Registration is completed by a person aged 21 or over. If the support is needed by someone younger, the questionnaire is filled in by a parent or legal guardian, who confirms this separately in the form and gives the participant's details. Consent to the processing of a child's data is given by the adult, and it is recorded as a separate entry.",
         "We do not collect children's data directly and do not approach a child without the adult."
       ]
     },
     {
-      heading: "12. Security",
+      heading: "11. Security",
       paragraphs: [
         "The connection to the site is encrypted. Documents and voice messages sit in private storage and are served through temporary links. Access separation is enforced at the database level. Actions on a case are written to a log.",
         "No system is absolutely secure. If a breach affecting your data occurs, we will tell you about it — through your cabinet or by email."
       ]
     },
     {
-      heading: "13. Changes to this policy",
+      heading: "12. Changes to this policy",
       paragraphs: [
         "If this document changes, the revision date at the top of the page changes with it. We will announce material changes in your cabinet or by email."
       ]
     },
     {
-      heading: "14. How to reach us",
+      heading: "13. How to reach us",
       paragraphs: [
         "For any question about data: pythonsusa@gmail.com. Postal address: Pythons & Co, 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025, USA."
       ]
@@ -374,14 +358,14 @@ const REFUND_RU: LegalDocument = {
       ]
     },
     {
-      heading: "8. Смена тарифа",
+      heading: "7. Смена тарифа",
       paragraphs: [
         "Перейти с 5 недель на 100 дней можно: вы доплачиваете разницу, а пройденное время засчитывается. Обратный переход с возвратом разницы не предусмотрен — работа по расширенной программе к этому моменту уже ведётся.",
         "Напишите нам, и мы посчитаем доплату лично для вашего случая."
       ]
     },
     {
-      heading: "9. Куда писать",
+      heading: "8. Куда писать",
       paragraphs: [
         "По любому вопросу об оплате: pythonsusa@gmail.com или страница «Поддержка» в кабинете. Мы отвечаем на email в течение 24 часов в рабочие дни.",
         "Если что-то в условиях непонятно — спросите до оплаты. Мы отвечаем на такие вопросы лично и не считаем их лишними."
@@ -450,14 +434,14 @@ const REFUND_EN: LegalDocument = {
       ]
     },
     {
-      heading: "8. Changing your plan",
+      heading: "7. Changing your plan",
       paragraphs: [
         "You can move from the five-week programme to the 100-day one: you pay the difference and the time already spent counts towards it. Moving back, with the difference returned, is not provided for — by that point the work on the longer programme is already under way.",
         "Write to us and we will calculate the difference for your particular case."
       ]
     },
     {
-      heading: "9. Where to write",
+      heading: "8. Where to write",
       paragraphs: [
         "For any question about payment: pythonsusa@gmail.com, or the Support page in your cabinet. We answer email within 24 hours on working days.",
         "If anything in the terms is unclear, ask before you pay. We answer such questions personally and never consider them a nuisance."

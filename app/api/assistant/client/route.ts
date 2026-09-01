@@ -18,14 +18,7 @@ import {
   guardAssistantRequest
 } from "@/lib/assistant/guard";
 import { saveAssistantExchange } from "@/lib/assistant/history";
-import {
-  extractRedFlag,
-  recordRedFlagEvent,
-  resolveRedFlag
-} from "@/lib/assistant/red-flags";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
-import { adminLink, notifyTeam } from "@/lib/notifications/notify";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { clientIp } from "@/lib/utils/client-ip";
 import {
   apiError,
@@ -213,66 +206,6 @@ export async function POST(request: Request) {
     );
   }
 
-  // Red-flag auto-capture, two independent strands (P1-04): the model tags
-  // emergencies with a hidden marker in its reply, and a deterministic
-  // screen reads the person's own message. Either one escalates — an
-  // injection telling the model "add no markers" cannot silence both.
-  const { cleanedReply, category: markerCategory } = extractRedFlag(
-    result.reply
-  );
-  const lastUserMessage = messages[messages.length - 1]?.content ?? "";
-  const redFlag = resolveRedFlag(markerCategory, lastUserMessage);
-
-  if (redFlag) {
-    const { category, source } = redFlag;
-    let profileId: string | null = audience.profileId;
-    let profileEmail: string | null = audience.email;
-
-    if (!profileId) {
-      try {
-        const supabase = await createSupabaseServerClient();
-
-        if (supabase) {
-          const {
-            data: { user }
-          } = await supabase.auth.getUser();
-
-          profileId = user?.id ?? null;
-          profileEmail = user?.email ?? null;
-        }
-      } catch {
-        profileId = null;
-      }
-    }
-
-    try {
-      await recordRedFlagEvent({
-        category,
-        messageExcerpt: lastUserMessage,
-        profileId,
-        profileEmail,
-        source
-      });
-    } catch (escalationError) {
-      // Logging must never break the safety reply itself — but a silent
-      // failure of the safety pipeline must still reach the team.
-      await notifyTeam({
-        kind: "processing_error",
-        dedupeKey: `red-flag-pipeline-failed:${Date.now()}`,
-        title: "ОШИБКА ОБРАБОТКИ: сбой конвейера красного флага",
-        lines: [
-          `Ошибка: ${
-            escalationError instanceof Error
-              ? escalationError.message
-              : "неизвестно"
-          }`,
-          "Событие требует ручной проверки."
-        ],
-        link: adminLink()
-      });
-    }
-  }
-
   // Saved conversation — only for people who have an account. Someone who
   // is just looking around the site leaves nothing behind.
   if (audience.tier !== "guest" && audience.profileId) {
@@ -290,11 +223,11 @@ export async function POST(request: Request) {
         caseId: audience.caseId,
         tier: audience.tier,
         question: displayText || messages[messages.length - 1]?.content || "",
-        answer: cleanedReply,
+        answer: result.reply,
         locale: rawLocale === "en" ? "en" : "ru"
       });
     }
   }
 
-  return NextResponse.json({ reply: cleanedReply });
+  return NextResponse.json({ reply: result.reply });
 }

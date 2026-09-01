@@ -10,7 +10,6 @@ export type LifecycleEventType =
   | "service_period_started"
   | "service_period_completed"
   | "support_requested"
-  | "escalation_created"
   | "consent_recorded"
   | "admin_note_added";
 

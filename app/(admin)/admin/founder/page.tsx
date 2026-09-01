@@ -90,12 +90,6 @@ export default async function FounderPage() {
           <b>{formatMoney(m.revenueTotalCents)}</b>
           <span>всего оплачено на платформе</span>
         </div>
-        <div
-          className={`founder-metric${m.openEscalations > 0 ? " founder-metric--alert" : ""}`}
-        >
-          <b>{m.openEscalations}</b>
-          <span>открытых красных флагов</span>
-        </div>
         <div className="founder-metric">
           <b>{m.openRequests}</b>
           <span>открытых обращений</span>

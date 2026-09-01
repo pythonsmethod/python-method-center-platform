@@ -57,12 +57,8 @@ which is preserved separately.
     A visitor without an account leaves no record anywhere; only the last
     twelve messages are replayed to the model, so a long history costs
     nothing extra per question
-- Automated red-flag workflow: the client assistant tags emergencies with a
-  hidden marker; the server strips it, records an `escalation_events` row
-  (physical → Karen, psychological → support) and pushes an external
-  Telegram notification
 - External team notifications (Telegram, `notification_events` delivery log
-  with retry/dedupe/status): red flags, new client messages (text and voice),
+  with retry/dedupe/status): new client messages (text and voice),
   new support requests, payments, processing errors
 - Payments: Stripe Payment Links on `/payment` behind a mandatory offer
   checkbox, plus a server-side Stripe webhook
@@ -72,8 +68,7 @@ which is preserved separately.
 - Public support page `/support`: guest contact form (no account needed,
   honeypot + rate limiting + consent), prominent emergency notice, links to
   password recovery and login
-- Staff workspace (`/admin`, roles `support`/`admin`): red-flag escalation
-  panel, case list/detail with chat and management controls, manual payment
+- Staff workspace (`/admin`, roles `support`/`admin`): case list/detail with chat and management controls, manual payment
   recording (still available as fallback), document intake, support request
   queue (guest requests show their reply-to email)
 - Audit log and case lifecycle event writing via the server-only service role

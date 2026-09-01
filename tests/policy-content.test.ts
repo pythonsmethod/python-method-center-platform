@@ -98,14 +98,6 @@ describe("privacy policy disclosures", () => {
       }
     }
   });
-
-  it("discloses the size of the excerpt that leaves the platform", () => {
-    // recordRedFlagEvent sends up to 600 characters of the client's own
-    // message to Telegram. If that limit changes, this page has to change
-    // with it — a policy that understates what leaves is worse than none.
-    expect(allText(PRIVACY_CONTENT.ru)).toContain("600");
-    expect(allText(PRIVACY_CONTENT.en)).toContain("600");
-  });
 });
 
 describe("refund terms", () => {

@@ -89,11 +89,6 @@ ${promoContext()}
 Не преуменьшай риск. При сомнении, экстренная ли ситуация, — действуй как при экстренной.
 `;
 
-const RED_FLAG_MARKER_RULE = `
-## Служебный маркер (обязательно)
-Если в сообщении клиента ты распознал красный флаг и применил экстренный протокол, добавь В САМОМ КОНЦЕ своего ответа служебный маркер на отдельной строке: [RED_FLAG:physical] для физических/медицинских признаков или [RED_FLAG:psychological] для психологического кризиса. Система автоматически уберёт маркер из ответа и немедленно уведомит команду центра. Никогда не упоминай маркер в тексте ответа и не добавляй его без реального красного флага.
-`;
-
 // Level 1 — public site. Deliberately narrow: the center, the method,
 // registration, tariffs, the first step. Refuses to be a general-purpose
 // chatbot, both to protect the brand and to keep the public endpoint cheap.
@@ -158,7 +153,7 @@ ${GUEST_SCOPE_RULE}${PROVOCATION_RULE}${AI_LEVELS_LADDER}
 
 ## Стиль
 Тёплый, спокойный, уважительный, без давления. ГЛАВНОЕ ПРАВИЛО ТОНА: никогда не начинай ответ со слов «нет», «не могу», «мне нельзя» — человек в тяжёлой ситуации от этого пугается и уходит. Сначала — что ты МОЖЕШЬ для него сделать; ограничения упоминай мягко, внутри ответа. Отвечай на языке собеседника (по умолчанию русский). Не выдумывай факты о центре — чего не знаешь, того не называй. Исключение: при красных флагах действуй прямо и однозначно — там ясность важнее мягкости.
-${PLATFORM_CONTEXT}${ASSISTANT_IDENTITY}${RED_FLAG_MARKER_RULE}${knowledge}`;
+${PLATFORM_CONTEXT}${ASSISTANT_IDENTITY}${knowledge}`;
 }
 
 // Level 2 — after registration. Knows the person's own progress and drives
@@ -192,7 +187,7 @@ ${
 
 ## Стиль
 Тёплый, спокойный, конкретный. Никогда не начинай со слов «нет» или «не могу». Обращайся к человеку как к тому, кто уже с нами, — он не посетитель, а участник пути. Отвечай кратко и по делу. Исключение: при красных флагах действуй прямо и однозначно.
-${PLATFORM_CONTEXT}${ASSISTANT_IDENTITY}${RED_FLAG_MARKER_RULE}${knowledge}`;
+${PLATFORM_CONTEXT}${ASSISTANT_IDENTITY}${knowledge}`;
 }
 
 // Level 3 — after payment. Works with the actual case: documents, history,
@@ -235,7 +230,7 @@ ${
 
 ## Стиль
 Тёплый, внимательный, как человек, который давно ведёт этого клиента и помнит его историю. Никогда не начинай со слов «нет» или «не могу». Говори конкретно, опираясь на его данные. Отвечай на языке клиента. Исключение: при красных флагах действуй прямо и однозначно.
-${UNTRUSTED_ATTACHMENTS_RULE}${PLATFORM_CONTEXT}${ASSISTANT_IDENTITY}${RED_FLAG_MARKER_RULE}${knowledge}`;
+${UNTRUSTED_ATTACHMENTS_RULE}${PLATFORM_CONTEXT}${ASSISTANT_IDENTITY}${knowledge}`;
 }
 
 // The team assistant drafts inside the method, for Professor Python to

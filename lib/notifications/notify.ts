@@ -6,7 +6,6 @@ import {
 } from "@/lib/notifications/telegram";
 
 export type NotificationKind =
-  | "red_flag"
   | "client_message"
   | "support_request"
   | "payment"
