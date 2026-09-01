@@ -28,16 +28,56 @@ function row(overrides: Partial<TranscribedValue> = {}): TranscribedValue {
     section: "Таблица осмотра",
     label: "Курение (да, нет)",
     value: "нет",
+    reference: "-",
+    referenceConfirmed: false,
     confident: true,
     note: "-",
     ...overrides
   };
 }
 
+// The interval decides the unit, so the two readings have to agree on it
+// separately from agreeing on the value.
+describe("сверка референсного интервала между чтениями", () => {
+  it("совпавший интервал отмечается подтверждённым", () => {
+    const first = [row({ label: "Гемоглобин", value: "96", reference: "120-155" })];
+    const second = [row({ label: "Гемоглобин", value: "96", reference: "120 – 155" })];
+
+    const { agreed, disputed } = compareTranscriptions(first, second);
+
+    expect(disputed).toHaveLength(0);
+    expect(agreed).toHaveLength(1);
+    expect(agreed[0].referenceConfirmed).toBe(true);
+  });
+
+  it("разные интервалы не спорят о значении, но снимают подтверждение", () => {
+    // The readings saw the same number, so the value is not in dispute.
+    // They saw different scales, so nothing about the unit follows from it.
+    const first = [row({ label: "Гемоглобин", value: "9.6", reference: "12-15.5" })];
+    const second = [row({ label: "Гемоглобин", value: "9.6", reference: "120-155" })];
+
+    const { agreed, disputed } = compareTranscriptions(first, second);
+
+    expect(disputed).toHaveLength(0);
+    expect(agreed).toHaveLength(1);
+    expect(agreed[0].value).toBe("9.6");
+    expect(agreed[0].referenceConfirmed).toBe(false);
+  });
+
+  it("интервал, увиденный одним чтением, не подтверждён", () => {
+    const first = [row({ label: "Ферритин", value: "43", reference: "30-400" })];
+    const second = [row({ label: "Ферритин", value: "43", reference: "-" })];
+
+    const { agreed } = compareTranscriptions(first, second);
+
+    expect(agreed[0].referenceConfirmed).toBe(false);
+  });
+});
+
 describe("reading the reader's answer", () => {
   it("takes a well-formed line apart", () => {
     const [parsed] = parseTranscription(
-      "IMG_6219.jpeg :: Биохимия 17.07.2026 :: Креатинин :: 71 мкмоль/л :: ДА :: -"
+      "IMG_6219.jpeg :: Биохимия 17.07.2026 :: Креатинин :: 71 мкмоль/л :: 62 - 106 :: ДА :: -"
     );
 
     expect(parsed).toEqual({
@@ -45,9 +85,39 @@ describe("reading the reader's answer", () => {
       section: "Биохимия 17.07.2026",
       label: "Креатинин",
       value: "71 мкмоль/л",
+      reference: "62 - 106",
+      // Settled by comparing the two readings, not by one of them.
+      referenceConfirmed: false,
       confident: true,
       note: "-"
     });
+  });
+
+  it("reads a line written before the interval was asked for", () => {
+    // Six fields, the shape the reader used until the reference interval
+    // was added. The confidence answer is found by what it says, so the
+    // older line still parses instead of sliding by one field.
+    const [parsed] = parseTranscription(
+      "IMG_6219.jpeg :: Биохимия :: Креатинин :: 71 мкмоль/л :: ДА :: -"
+    );
+
+    expect(parsed.value).toBe("71 мкмоль/л");
+    expect(parsed.reference).toBe("");
+    expect(parsed.confident).toBe(true);
+    expect(parsed.note).toBe("-");
+  });
+
+  it("does not mistake an interval that reads \"нет\" for the answer", () => {
+    // A laboratory that printed no interval, and a reader that wrote the
+    // word rather than a dash. Position five is checked first, so the real
+    // answer is still found in position six.
+    const [parsed] = parseTranscription(
+      "IMG_6219.jpeg :: Анкета :: Курение :: нет :: нет :: ДА :: -"
+    );
+
+    expect(parsed.value).toBe("нет");
+    expect(parsed.reference).toBe("нет");
+    expect(parsed.confident).toBe(true);
   });
 
   it("keeps the explanation of what was unclear", () => {
