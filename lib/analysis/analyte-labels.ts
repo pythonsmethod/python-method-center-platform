@@ -3,8 +3,8 @@ import { canonicaliseUnitSpelling } from "@/lib/analysis/unit-resolver";
 
 // Which показатель a line of a laboratory form is about.
 //
-// Everything downstream — the conversion table, the critical thresholds,
-// the biological variation figure — is keyed by an analyte code. A form
+// Everything downstream — the conversion table, the biological variation
+// figure, the interpretation blockers — is keyed by an analyte code. A form
 // prints a caption instead: «Гемоглобин», «HGB», «Hb», «Гемоглобин (HGB)».
 // Turning the one into the other is this file's whole job.
 //

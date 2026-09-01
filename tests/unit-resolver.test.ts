@@ -60,9 +60,8 @@ describe("приёмочные случаи спецификации", () => {
   });
 
   it("глюкоза 500 при интервале 70–100 даёт 27.75 mmol/L", () => {
-    // The value behind the specification's critical-value case: 500 mg/dL
-    // is a number no laboratory prints in mmol/L, and the interval is the
-    // only thing that says so.
+    // 500 mg/dL is a number no laboratory prints in mmol/L, and the
+    // interval is the only thing that says so.
     const r = resolveUnit({
       analyte: "glucose",
       value: 500,
