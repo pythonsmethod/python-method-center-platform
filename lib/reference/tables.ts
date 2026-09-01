@@ -1,11 +1,12 @@
+import analyteLabels from "@/config/reference/analyte_labels.json";
 import analyteUnits from "@/config/reference/analyte_units.json";
 import biologicalVariation from "@/config/reference/biological_variation.json";
 import criticalValues from "@/config/reference/critical_values.json";
 import interpretationBlockers from "@/config/reference/interpretation_blockers.json";
 import unitAliases from "@/config/reference/unit_aliases.json";
 
-// The four reference tables the analysis modules read, and the one place
-// they are read from.
+// The reference tables the analysis modules read, and the one place they
+// are read from.
 //
 // They are data, not code: a threshold, a conversion factor or a biological
 // variation figure is a clinical fact that a doctor signs off, and a fact
@@ -25,7 +26,13 @@ export const REFERENCE_TABLES = {
   // How one unit is spelled in the forms of different countries. A table
   // of spellings rather than clinical facts: it carries no factor and no
   // threshold, only the knowledge that «г/л» and «g/L» are one unit.
-  unitAliases
+  unitAliases,
+  // How a показатель is captioned in a form, against the same analyte
+  // codes the tables above use. Also spellings rather than facts, and
+  // deliberately the only such dictionary: a second list of analyte codes
+  // is a second thing to keep in step, which is a second thing to get
+  // wrong.
+  analyteLabels
 } as const;
 
 export type ReferenceTableName = keyof typeof REFERENCE_TABLES;
@@ -39,7 +46,8 @@ export function referenceSetVersion(): string {
     `variation=${biologicalVariation._meta.version}`,
     `critical=${criticalValues._meta.version}`,
     `blockers=${interpretationBlockers._meta.version}`,
-    `aliases=${unitAliases._meta.version}`
+    `aliases=${unitAliases._meta.version}`,
+    `labels=${analyteLabels._meta.version}`
   ].join(";");
 }
 
