@@ -2,6 +2,7 @@ import analyteUnits from "@/config/reference/analyte_units.json";
 import biologicalVariation from "@/config/reference/biological_variation.json";
 import criticalValues from "@/config/reference/critical_values.json";
 import interpretationBlockers from "@/config/reference/interpretation_blockers.json";
+import unitAliases from "@/config/reference/unit_aliases.json";
 
 // The four reference tables the analysis modules read, and the one place
 // they are read from.
@@ -20,7 +21,11 @@ export const REFERENCE_TABLES = {
   analyteUnits,
   biologicalVariation,
   criticalValues,
-  interpretationBlockers
+  interpretationBlockers,
+  // How one unit is spelled in the forms of different countries. A table
+  // of spellings rather than clinical facts: it carries no factor and no
+  // threshold, only the knowledge that «г/л» and «g/L» are one unit.
+  unitAliases
 } as const;
 
 export type ReferenceTableName = keyof typeof REFERENCE_TABLES;
@@ -33,7 +38,8 @@ export function referenceSetVersion(): string {
     `units=${analyteUnits._meta.version}`,
     `variation=${biologicalVariation._meta.version}`,
     `critical=${criticalValues._meta.version}`,
-    `blockers=${interpretationBlockers._meta.version}`
+    `blockers=${interpretationBlockers._meta.version}`,
+    `aliases=${unitAliases._meta.version}`
   ].join(";");
 }
 
