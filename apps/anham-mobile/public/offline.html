@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+    <meta name="theme-color" content="#020403" />
+    <title>Anham · offline</title>
+    <style>
+      html,body{height:100%;margin:0;background:#020403;color:#f3ecd9;font-family:Arial,sans-serif}
+      body{display:grid;place-items:center;padding:24px;box-sizing:border-box;text-align:center}
+      main{max-width:360px}img{width:132px;height:132px;object-fit:cover;border-radius:50%;border:1px solid #c79a39}
+      h1{font:32px Georgia,serif;color:#edd17b}p{line-height:1.6;color:#c9c3ae}
+    </style>
+  </head>
+  <body>
+    <main>
+      <img src="/images/anham-master.png" alt="" />
+      <h1>Anham</h1>
+      <p id="message">Нет подключения. Ваши личные данные не сохраняются на этом экране. Подключитесь к интернету и откройте приложение снова.</p>
+    </main>
+    <script>
+      if (!navigator.language.toLowerCase().startsWith("ru")) {
+        document.documentElement.lang = "en";
+        document.getElementById("message").textContent =
+          "You are offline. Your personal data is not stored on this screen. Reconnect and open the app again.";
+      }
+    </script>
+  </body>
+</html>
