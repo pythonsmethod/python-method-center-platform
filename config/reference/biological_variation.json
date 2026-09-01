@@ -1,0 +1,173 @@
+{
+  "_meta": {
+    "purpose": "Порог значимого изменения показателя при неизвестном CVa лаборатории.",
+    "note": "CVi — внутрииндивидуальная биологическая вариация, %. Величина физиологическая, не зависит от лаборатории и страны. Значения ориентировочные и ОБЯЗАНЫ быть сверены с EFLM Biological Variation Database до production.",
+    "formula_exact": "RCV = 2.77 * sqrt(CVa^2 + CVi^2)  — применяется, если CVa лаборатории известен.",
+    "formula_default": "RCV = 3.46 * CVi  — применяется по умолчанию.",
+    "derivation": "3.46 получено подстановкой минимально допустимой аналитической характеристики CVa <= 0.75*CVi в точную формулу: 2.77*sqrt(0.5625+1)*CVi = 3.46*CVi. Это консервативная граница: система скорее промолчит, чем объявит ложный тренд. При CVa <= 0.50*CVi (желательный уровень) коэффициент составил бы 3.10.",
+    "asymmetry_note": "Для показателей с CVi > 20% (ferritin, CRP, triglycerides, ALT, folate, cortisol) распределение логнормальное, и симметричный порог занижает чувствительность к росту. Логарифмический RCV — Phase 2, отдельным решением.",
+    "version": "1.0"
+  },
+  "analytes": {
+    "albumin": {
+      "cvi_percent": 3.2,
+      "rcv_default_percent": 11.1
+    },
+    "alp": {
+      "cvi_percent": 6.5,
+      "rcv_default_percent": 22.5
+    },
+    "alt_enzyme": {
+      "cvi_percent": 20.0,
+      "rcv_default_percent": 69.2
+    },
+    "ast_enzyme": {
+      "cvi_percent": 12.0,
+      "rcv_default_percent": 41.5
+    },
+    "bilirubin_total": {
+      "cvi_percent": 22.0,
+      "rcv_default_percent": 76.1
+    },
+    "calcium_total": {
+      "cvi_percent": 2.0,
+      "rcv_default_percent": 6.9
+    },
+    "chloride": {
+      "cvi_percent": 1.2,
+      "rcv_default_percent": 4.2
+    },
+    "cholesterol_total": {
+      "cvi_percent": 6.0,
+      "rcv_default_percent": 20.8
+    },
+    "cortisol": {
+      "cvi_percent": 20.0,
+      "rcv_default_percent": 69.2
+    },
+    "creatinine": {
+      "cvi_percent": 6.0,
+      "rcv_default_percent": 20.8
+    },
+    "crp": {
+      "cvi_percent": 42.0,
+      "rcv_default_percent": 145.3
+    },
+    "ferritin": {
+      "cvi_percent": 15.0,
+      "rcv_default_percent": 51.9
+    },
+    "folate": {
+      "cvi_percent": 24.0,
+      "rcv_default_percent": 83.0
+    },
+    "ft3": {
+      "cvi_percent": 7.9,
+      "rcv_default_percent": 27.3
+    },
+    "ft4": {
+      "cvi_percent": 5.7,
+      "rcv_default_percent": 19.7
+    },
+    "ggt": {
+      "cvi_percent": 14.0,
+      "rcv_default_percent": 48.4
+    },
+    "glucose": {
+      "cvi_percent": 5.6,
+      "rcv_default_percent": 19.4
+    },
+    "hba1c": {
+      "cvi_percent": 1.9,
+      "rcv_default_percent": 6.6
+    },
+    "hdl": {
+      "cvi_percent": 7.3,
+      "rcv_default_percent": 25.3
+    },
+    "hemoglobin": {
+      "cvi_percent": 2.8,
+      "rcv_default_percent": 9.7
+    },
+    "iron": {
+      "cvi_percent": 27.0,
+      "rcv_default_percent": 93.4
+    },
+    "ldl": {
+      "cvi_percent": 8.3,
+      "rcv_default_percent": 28.7
+    },
+    "magnesium": {
+      "cvi_percent": 3.6,
+      "rcv_default_percent": 12.5
+    },
+    "mcv": {
+      "cvi_percent": 1.3,
+      "rcv_default_percent": 4.5
+    },
+    "neutrophils_abs": {
+      "cvi_percent": 16.0,
+      "rcv_default_percent": 55.4
+    },
+    "phosphate": {
+      "cvi_percent": 8.5,
+      "rcv_default_percent": 29.4
+    },
+    "platelets": {
+      "cvi_percent": 8.0,
+      "rcv_default_percent": 27.7
+    },
+    "potassium": {
+      "cvi_percent": 4.6,
+      "rcv_default_percent": 15.9
+    },
+    "rbc": {
+      "cvi_percent": 3.2,
+      "rcv_default_percent": 11.1
+    },
+    "sodium": {
+      "cvi_percent": 0.5,
+      "rcv_default_percent": 1.7
+    },
+    "testosterone_total": {
+      "cvi_percent": 9.3,
+      "rcv_default_percent": 32.2
+    },
+    "total_protein": {
+      "cvi_percent": 2.8,
+      "rcv_default_percent": 9.7
+    },
+    "transferrin_saturation": {
+      "cvi_percent": 26.0,
+      "rcv_default_percent": 90.0
+    },
+    "triglycerides": {
+      "cvi_percent": 20.0,
+      "rcv_default_percent": 69.2
+    },
+    "tsh": {
+      "cvi_percent": 19.0,
+      "rcv_default_percent": 65.7
+    },
+    "urea": {
+      "cvi_percent": 12.0,
+      "rcv_default_percent": 41.5
+    },
+    "uric_acid": {
+      "cvi_percent": 8.6,
+      "rcv_default_percent": 29.8
+    },
+    "vitamin_b12": {
+      "cvi_percent": 13.0,
+      "rcv_default_percent": 45.0
+    },
+    "vitamin_d_25oh": {
+      "cvi_percent": 12.0,
+      "rcv_default_percent": 41.5
+    },
+    "wbc": {
+      "cvi_percent": 11.0,
+      "rcv_default_percent": 38.1
+    }
+  }
+}

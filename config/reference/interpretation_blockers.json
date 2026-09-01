@@ -1,0 +1,127 @@
+{
+  "_meta": {
+    "purpose": "Показатели, которые нельзя интерпретировать без сопутствующего показателя или контекста.",
+    "behaviour": "При отсутствии спутника показатель получает статус interpretation_blocked, не участвует в выводах Анхама и порождает запрос в Missing Data Intelligence. Значение при этом остаётся видимым в таблице и участвует в Safety Screen.",
+    "window_days_default": 30,
+    "version": "1.0"
+  },
+  "rules": [
+    {
+      "analyte": "ferritin",
+      "requires": [
+        "crp"
+      ],
+      "window_days": 30,
+      "reason": "Белок острой фазы: при воспалении нормальный ферритин не исключает дефицита железа."
+    },
+    {
+      "analyte": "calcium_total",
+      "requires": [
+        "albumin"
+      ],
+      "window_days": 30,
+      "reason": "Без коррекции по альбумину значение не отражает свободный кальций."
+    },
+    {
+      "analyte": "tsh",
+      "requires": [
+        "ft4"
+      ],
+      "window_days": 60,
+      "reason": "Изолированный ТТГ не разделяет субклинические и центральные нарушения."
+    },
+    {
+      "analyte": "iron",
+      "requires": [
+        "transferrin_saturation",
+        "collection_time"
+      ],
+      "window_days": 7,
+      "reason": "Выраженный суточный ритм; изолированное значение малоинформативно."
+    },
+    {
+      "analyte": "creatinine",
+      "requires": [
+        "age",
+        "sex"
+      ],
+      "window_days": null,
+      "reason": "Без демографии невозможно рассчитать eGFR."
+    },
+    {
+      "analyte": "vitamin_b12",
+      "requires": [
+        "homocysteine_or_mma"
+      ],
+      "window_days": 60,
+      "applies_when": {
+        "value_between": [
+          148,
+          258
+        ],
+        "unit": "pmol/L"
+      },
+      "reason": "Пограничный B12 не подтверждает и не исключает дефицит."
+    },
+    {
+      "analyte": "hemoglobin",
+      "requires": [
+        "mcv"
+      ],
+      "window_days": 30,
+      "reason": "Без индексов невозможно различить типы анемии."
+    },
+    {
+      "analyte": "alt_enzyme",
+      "requires": [
+        "ggt",
+        "alp",
+        "bilirubin_total"
+      ],
+      "window_days": 30,
+      "reason": "Паттерн важнее отдельного фермента."
+    },
+    {
+      "analyte": "vitamin_d_25oh",
+      "requires": [
+        "calcium_total"
+      ],
+      "window_days": 60,
+      "reason": "Без кальция невозможно оценить значимость дефицита."
+    },
+    {
+      "analyte": "albumin",
+      "requires": [
+        "crp"
+      ],
+      "window_days": 30,
+      "reason": "Снижение при гемодилюции, воспалении и нарушении синтеза неразличимо."
+    },
+    {
+      "analyte": "cortisol",
+      "requires": [
+        "collection_time"
+      ],
+      "window_days": 0,
+      "reason": "Без времени забора значение не интерпретируется вообще."
+    },
+    {
+      "analyte": "hba1c",
+      "requires": [
+        "no_anemia",
+        "no_recent_transfusion"
+      ],
+      "window_days": 90,
+      "reason": "При анемии, гемолизе и недавней трансфузии показатель недостоверен."
+    },
+    {
+      "analyte": "potassium",
+      "requires": [
+        "hemolysis_flag"
+      ],
+      "window_days": 0,
+      "severity": "safety",
+      "reason": "Гемолиз даёт ложную гиперкалиемию — риск ложной или пропущенной эскалации."
+    }
+  ]
+}

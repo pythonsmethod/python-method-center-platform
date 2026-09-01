@@ -1,0 +1,641 @@
+{
+  "_meta": {
+    "purpose": "Определение единицы измерения по напечатанному в документе референсному интервалу и приведение к канонической единице.",
+    "rule": "Единица НИКОГДА не угадывается по значению. Сначала явная единица в документе, затем отпечаток интервала, затем — unresolved.",
+    "version": "1.0"
+  },
+  "analytes": {
+    "hemoglobin": {
+      "canonical": "g/L",
+      "alt": [
+        {
+          "unit": "g/dL",
+          "factor": 10.0,
+          "ref_low_range": [
+            10.0,
+            14.0
+          ],
+          "ref_high_range": [
+            14.0,
+            18.5
+          ]
+        },
+        {
+          "unit": "mmol/L",
+          "factor": 16.11,
+          "ref_low_range": [
+            6.8,
+            8.2
+          ],
+          "ref_high_range": [
+            9.0,
+            11.5
+          ]
+        }
+      ]
+    },
+    "albumin": {
+      "canonical": "g/L",
+      "alt": [
+        {
+          "unit": "g/dL",
+          "factor": 10.0,
+          "ref_low_range": [
+            3.0,
+            4.0
+          ],
+          "ref_high_range": [
+            4.8,
+            5.5
+          ]
+        }
+      ]
+    },
+    "total_protein": {
+      "canonical": "g/L",
+      "alt": [
+        {
+          "unit": "g/dL",
+          "factor": 10.0,
+          "ref_low_range": [
+            6.0,
+            6.8
+          ],
+          "ref_high_range": [
+            8.0,
+            8.7
+          ]
+        }
+      ]
+    },
+    "glucose": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.05551,
+          "ref_low_range": [
+            60,
+            80
+          ],
+          "ref_high_range": [
+            95,
+            110
+          ]
+        }
+      ]
+    },
+    "creatinine": {
+      "canonical": "umol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 88.4,
+          "ref_low_range": [
+            0.4,
+            0.8
+          ],
+          "ref_high_range": [
+            1.0,
+            1.4
+          ]
+        }
+      ]
+    },
+    "urea": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.1665,
+          "ref_low_range": [
+            15,
+            25
+          ],
+          "ref_high_range": [
+            40,
+            50
+          ]
+        }
+      ],
+      "warning": "BUN — ДРУГОЙ показатель, не мочевина. BUN mg/dL x 0.357 = urea mmol/L. Не путать."
+    },
+    "bun": {
+      "canonical": "mmol/L_urea",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.357,
+          "ref_low_range": [
+            6,
+            9
+          ],
+          "ref_high_range": [
+            18,
+            24
+          ]
+        }
+      ],
+      "warning": "Хранится отдельно от urea. Конвертация в мочевину допустима только с явной пометкой."
+    },
+    "uric_acid": {
+      "canonical": "umol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 59.48,
+          "ref_low_range": [
+            2.5,
+            3.6
+          ],
+          "ref_high_range": [
+            6.0,
+            7.5
+          ]
+        }
+      ]
+    },
+    "calcium_total": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.2495,
+          "ref_low_range": [
+            8.2,
+            8.9
+          ],
+          "ref_high_range": [
+            10.0,
+            10.6
+          ]
+        }
+      ]
+    },
+    "magnesium": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.4114,
+          "ref_low_range": [
+            1.6,
+            1.9
+          ],
+          "ref_high_range": [
+            2.2,
+            2.6
+          ]
+        }
+      ]
+    },
+    "phosphate": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.3229,
+          "ref_low_range": [
+            2.3,
+            2.8
+          ],
+          "ref_high_range": [
+            4.3,
+            4.9
+          ]
+        }
+      ]
+    },
+    "bilirubin_total": {
+      "canonical": "umol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 17.1,
+          "ref_low_range": [
+            0.0,
+            0.3
+          ],
+          "ref_high_range": [
+            1.0,
+            1.4
+          ]
+        }
+      ]
+    },
+    "cholesterol_total": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.02586,
+          "ref_low_range": [
+            0,
+            150
+          ],
+          "ref_high_range": [
+            180,
+            220
+          ]
+        }
+      ]
+    },
+    "hdl": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.02586,
+          "ref_low_range": [
+            35,
+            45
+          ],
+          "ref_high_range": [
+            60,
+            90
+          ]
+        }
+      ]
+    },
+    "ldl": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.02586,
+          "ref_low_range": [
+            0,
+            100
+          ],
+          "ref_high_range": [
+            115,
+            160
+          ]
+        }
+      ]
+    },
+    "triglycerides": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 0.01129,
+          "ref_low_range": [
+            0,
+            60
+          ],
+          "ref_high_range": [
+            130,
+            200
+          ]
+        }
+      ]
+    },
+    "iron": {
+      "canonical": "umol/L",
+      "alt": [
+        {
+          "unit": "ug/dL",
+          "factor": 0.1791,
+          "ref_low_range": [
+            40,
+            70
+          ],
+          "ref_high_range": [
+            150,
+            180
+          ]
+        }
+      ]
+    },
+    "ferritin": {
+      "canonical": "ug/L",
+      "alt": [
+        {
+          "unit": "ng/mL",
+          "factor": 1.0,
+          "ref_low_range": [
+            10,
+            30
+          ],
+          "ref_high_range": [
+            120,
+            400
+          ]
+        }
+      ],
+      "note": "ng/mL и ug/L численно идентичны. Конвертация не требуется, но единица фиксируется как заявленная."
+    },
+    "transferrin_saturation": {
+      "canonical": "%",
+      "alt": []
+    },
+    "vitamin_d_25oh": {
+      "canonical": "nmol/L",
+      "alt": [
+        {
+          "unit": "ng/mL",
+          "factor": 2.496,
+          "ref_low_range": [
+            20,
+            32
+          ],
+          "ref_high_range": [
+            60,
+            110
+          ]
+        }
+      ]
+    },
+    "vitamin_b12": {
+      "canonical": "pmol/L",
+      "alt": [
+        {
+          "unit": "pg/mL",
+          "factor": 0.738,
+          "ref_low_range": [
+            180,
+            250
+          ],
+          "ref_high_range": [
+            800,
+            1100
+          ]
+        },
+        {
+          "unit": "ng/L",
+          "factor": 0.738,
+          "ref_low_range": [
+            180,
+            250
+          ],
+          "ref_high_range": [
+            800,
+            1100
+          ]
+        }
+      ]
+    },
+    "folate": {
+      "canonical": "nmol/L",
+      "alt": [
+        {
+          "unit": "ng/mL",
+          "factor": 2.266,
+          "ref_low_range": [
+            2.5,
+            4.5
+          ],
+          "ref_high_range": [
+            17,
+            25
+          ]
+        }
+      ]
+    },
+    "tsh": {
+      "canonical": "mIU/L",
+      "alt": [
+        {
+          "unit": "uIU/mL",
+          "factor": 1.0,
+          "ref_low_range": [
+            0.2,
+            0.6
+          ],
+          "ref_high_range": [
+            4.0,
+            5.0
+          ]
+        }
+      ]
+    },
+    "ft4": {
+      "canonical": "pmol/L",
+      "alt": [
+        {
+          "unit": "ng/dL",
+          "factor": 12.87,
+          "ref_low_range": [
+            0.7,
+            1.0
+          ],
+          "ref_high_range": [
+            1.5,
+            2.0
+          ]
+        }
+      ]
+    },
+    "ft3": {
+      "canonical": "pmol/L",
+      "alt": [
+        {
+          "unit": "pg/mL",
+          "factor": 1.536,
+          "ref_low_range": [
+            1.8,
+            2.5
+          ],
+          "ref_high_range": [
+            3.8,
+            4.6
+          ]
+        }
+      ]
+    },
+    "cortisol": {
+      "canonical": "nmol/L",
+      "alt": [
+        {
+          "unit": "ug/dL",
+          "factor": 27.59,
+          "ref_low_range": [
+            4,
+            8
+          ],
+          "ref_high_range": [
+            19,
+            25
+          ]
+        }
+      ]
+    },
+    "testosterone_total": {
+      "canonical": "nmol/L",
+      "alt": [
+        {
+          "unit": "ng/dL",
+          "factor": 0.03467,
+          "ref_low_range": [
+            200,
+            300
+          ],
+          "ref_high_range": [
+            800,
+            1100
+          ]
+        },
+        {
+          "unit": "ng/mL",
+          "factor": 3.467,
+          "ref_low_range": [
+            2.0,
+            3.0
+          ],
+          "ref_high_range": [
+            8.0,
+            11.0
+          ]
+        }
+      ]
+    },
+    "crp": {
+      "canonical": "mg/L",
+      "alt": [
+        {
+          "unit": "mg/dL",
+          "factor": 10.0,
+          "ref_low_range": [
+            0,
+            0.1
+          ],
+          "ref_high_range": [
+            0.3,
+            1.0
+          ]
+        }
+      ]
+    },
+    "hba1c": {
+      "canonical": "%_NGSP",
+      "alt": [
+        {
+          "unit": "mmol/mol_IFCC",
+          "formula": "ngsp = ifcc/10.929 + 2.15",
+          "ref_low_range": [
+            20,
+            24
+          ],
+          "ref_high_range": [
+            38,
+            48
+          ]
+        }
+      ]
+    },
+    "alt_enzyme": {
+      "canonical": "U/L",
+      "alt": [
+        {
+          "unit": "ukat/L",
+          "factor": 60.0,
+          "ref_low_range": [
+            0,
+            0.2
+          ],
+          "ref_high_range": [
+            0.5,
+            0.9
+          ]
+        }
+      ]
+    },
+    "ast_enzyme": {
+      "canonical": "U/L",
+      "alt": [
+        {
+          "unit": "ukat/L",
+          "factor": 60.0,
+          "ref_low_range": [
+            0,
+            0.2
+          ],
+          "ref_high_range": [
+            0.5,
+            0.9
+          ]
+        }
+      ]
+    },
+    "ggt": {
+      "canonical": "U/L",
+      "alt": []
+    },
+    "alp": {
+      "canonical": "U/L",
+      "alt": []
+    },
+    "sodium": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mEq/L",
+          "factor": 1.0
+        }
+      ]
+    },
+    "potassium": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mEq/L",
+          "factor": 1.0
+        }
+      ]
+    },
+    "chloride": {
+      "canonical": "mmol/L",
+      "alt": [
+        {
+          "unit": "mEq/L",
+          "factor": 1.0
+        }
+      ]
+    },
+    "platelets": {
+      "canonical": "10^9/L",
+      "alt": [
+        {
+          "unit": "10^3/uL",
+          "factor": 1.0
+        }
+      ]
+    },
+    "wbc": {
+      "canonical": "10^9/L",
+      "alt": [
+        {
+          "unit": "10^3/uL",
+          "factor": 1.0
+        }
+      ]
+    },
+    "neutrophils_abs": {
+      "canonical": "10^9/L",
+      "alt": [
+        {
+          "unit": "10^3/uL",
+          "factor": 1.0
+        }
+      ]
+    },
+    "rbc": {
+      "canonical": "10^12/L",
+      "alt": [
+        {
+          "unit": "10^6/uL",
+          "factor": 1.0
+        }
+      ]
+    },
+    "mcv": {
+      "canonical": "fL",
+      "alt": []
+    },
+    "inr": {
+      "canonical": "ratio",
+      "alt": []
+    }
+  }
+}
