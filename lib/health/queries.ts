@@ -1,5 +1,6 @@
 import type { QuestionnaireVersion } from "@/lib/health/questionnaire";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import type { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export type StoredVersion = QuestionnaireVersion & {
   id: string;
@@ -94,4 +95,30 @@ export async function hasQuestionnaire(): Promise<boolean> {
     .select("id", { count: "exact", head: true });
 
   return error ? false : (count ?? 0) > 0;
+}
+
+// The newest questionnaire of one person, read with a service client.
+//
+// The two readers above run under the person's own session and RLS. The
+// document worker has no session — it runs for whoever uploaded — so it
+// reads through the service role, scoped by an explicit profile id.
+export async function getLatestQuestionnaireFor(
+  service: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
+  profileId: string
+): Promise<StoredVersion | null> {
+  const { data, error } = await service
+    .from("health_questionnaire_versions")
+    .select(
+      "id, created_at, birth_date, sex, height_cm, weight_kg, complaints, chronic_conditions, surgeries, allergies, habits, pregnancy_status, cycle_status, cycle_note, self_description"
+    )
+    .eq("profile_id", profileId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (error || !data) {
+    return null;
+  }
+
+  return toVersion(data as Record<string, unknown>);
 }

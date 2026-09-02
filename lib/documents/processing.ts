@@ -1,4 +1,10 @@
+import { ASSISTANT_MODEL } from "@/lib/assistant/claude";
+import { METADATA_SYSTEM_PROMPT, parseMetadata, type DocumentHeader } from "@/lib/assistant/metadata";
 import { askAssistantWithAttachments } from "@/lib/assistant/router";
+import { relateDocument, resolveIdentity, type IdentityVerdict } from "@/lib/analysis/identity";
+import { runAnalysis, type PriorLabValue } from "@/lib/analysis/pipeline";
+import { hasAllVersions } from "@/lib/analysis/versions";
+import { getLatestQuestionnaireFor } from "@/lib/health/queries";
 import {
   compareTranscriptions,
   parseTranscription,
@@ -21,6 +27,7 @@ type ProcessingJob = {
 export type ProcessDocumentResult =
   | { status: "idle" }
   | { status: "ready"; documentId: string }
+  | { status: "identity_mismatch"; documentId: string }
   | { status: "retrying"; documentId: string }
   | { status: "needs_reupload"; documentId: string }
   | { status: "failed"; documentId: string };
@@ -46,6 +53,87 @@ export function buildDocumentReuploadMessage(
   return locale === "en"
     ? `We could not read “${filename}” after several attempts. Please upload this file again as a clear scan or a sharper, evenly lit photograph with the whole page visible. If it is a large PDF, split it into smaller parts. Your other documents remain safely attached to the case and continue processing.`
     : `Нам не удалось распознать файл «${filename}» после нескольких попыток. Пожалуйста, загрузите именно этот файл ещё раз: лучше в виде чёткого скана или резкой фотографии при ровном освещении, чтобы страница целиком попадала в кадр. Большой PDF можно разделить на несколько частей. Остальные документы сохранены в кейсе и продолжают обрабатываться.`;
+}
+
+// The header names somebody else. The file is not read further and the
+// person is asked, not accused: a maiden name, a typo in the profile or a
+// relative's document under the family plan are all ordinary explanations,
+// and the team settles it by hand.
+export function buildIdentityMismatchMessage(
+  locale: "ru" | "en",
+  filename: string,
+  printedName: string | null
+): string {
+  const who = printedName ? `«${printedName}»` : locale === "en" ? "another name" : "другое имя";
+
+  return locale === "en"
+    ? `The file “${filename}” seems to belong to someone else: the header shows ${who}. We have not read it further. If it is yours — for example, a former surname or a typo in your profile — write to us in the case chat and we will check it by hand. If it was attached by mistake, simply remove it.`
+    : `Файл «${filename}», похоже, относится к другому человеку: в шапке указано ${who}. Дальше мы его не читали. Если это ваш документ — например, прежняя фамилия или опечатка в профиле, — напишите нам в чат кейса, и мы проверим вручную. Если файл попал случайно, просто удалите его.`;
+}
+
+export function buildDuplicateMessage(locale: "ru" | "en", filename: string): string {
+  return locale === "en"
+    ? `The file “${filename}” is the same document you already uploaded, so it was not added a second time. Your earlier copy stays in the case.`
+    : `Файл «${filename}» — тот же документ, что вы уже загружали, поэтому второй раз он не добавлен. Ваша прежняя копия остаётся в кейсе.`;
+}
+
+async function readLocaleAndFilename(
+  supabase: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
+  documentId: string
+): Promise<{ locale: "ru" | "en"; filename: string }> {
+  const { data } = await supabase
+    .from("uploaded_documents")
+    .select("original_filename, profiles(locale)")
+    .eq("id", documentId)
+    .maybeSingle();
+  const locale = (data?.profiles as { locale?: string } | null)?.locale === "en" ? "en" : "ru";
+
+  return {
+    locale,
+    filename: String(data?.original_filename ?? (locale === "en" ? "document" : "документ"))
+  };
+}
+
+async function tellClient(
+  supabase: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
+  job: ProcessingJob,
+  body: string
+): Promise<void> {
+  const { error } = await supabase.from("case_messages").insert({
+    case_id: job.case_id,
+    profile_id: job.profile_id,
+    sender_id: null,
+    sender_role: "system",
+    body
+  });
+  if (!error) {
+    await supabase.from("document_processing_jobs")
+      .update({ client_notified_at: new Date().toISOString() })
+      .eq("id", job.id).is("client_notified_at", null);
+  }
+}
+
+async function finishIdentityMismatch(
+  job: ProcessingJob,
+  header: DocumentHeader,
+  verdict: IdentityVerdict
+): Promise<ProcessDocumentResult> {
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return { status: "failed", documentId: job.document_id };
+
+  await supabase.from("document_processing_jobs").update({
+    status: "identity_mismatch",
+    locked_at: null,
+    last_error: verdict.reasons.join(" "),
+    updated_at: new Date().toISOString()
+  }).eq("id", job.id);
+  await supabase.from("uploaded_documents")
+    .update({ document_status: "identity_mismatch" }).eq("id", job.document_id);
+
+  const { locale, filename } = await readLocaleAndFilename(supabase, job.document_id);
+  await tellClient(supabase, job, buildIdentityMismatchMessage(locale, filename, header.fullName));
+
+  return { status: "identity_mismatch", documentId: job.document_id };
 }
 
 function retryAt(attempts: number): string {
@@ -173,6 +261,54 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
     return finishFailure(job, "unreadable", loaded?.skipped[0]?.reason ?? "Storage unavailable");
   }
 
+  // --- metadata_pre_extraction ---
+  // A cheap pass over the header only. It answers two questions before the
+  // document is read in full: whose it is, and whether the case already
+  // holds this study. Not full OCR, on purpose: the header is a few lines.
+  await supabase.from("document_processing_jobs")
+    .update({ status: "pre_extracting", updated_at: new Date().toISOString() }).eq("id", job.id);
+
+  const headerRead = await askAssistantWithAttachments(
+    METADATA_SYSTEM_PROMPT,
+    [{ role: "user", content: "Прочитай только шапку этого документа по заданному формату." }],
+    600,
+    loaded.attachments
+  );
+  if (headerRead.status !== "ok") {
+    return finishFailure(
+      job,
+      "service",
+      headerRead.status === "error" ? headerRead.message : "Reading provider is not configured"
+    );
+  }
+  const header = parseMetadata(headerRead.reply);
+
+  // --- identity_resolver ---
+  // Name from the profile, date of birth from the questionnaire. Neither is
+  // guessed from the document itself.
+  const [{ data: profile }, questionnaire] = await Promise.all([
+    supabase.from("profiles").select("full_name").eq("id", job.profile_id).maybeSingle(),
+    getLatestQuestionnaireFor(supabase, job.profile_id)
+  ]);
+  const identity = resolveIdentity(header, {
+    fullName: profile?.full_name ? String(profile.full_name) : null,
+    birthDate: questionnaire?.birth_date ?? null
+  });
+
+  await supabase.from("uploaded_documents").update({
+    header,
+    identity_status: identity.status,
+    identity_reasons: identity.reasons
+  }).eq("id", job.document_id);
+
+  if (identity.status === "mismatch") {
+    return finishIdentityMismatch(job, header, identity);
+  }
+
+  await supabase.from("document_processing_jobs")
+    .update({ status: "processing", updated_at: new Date().toISOString() }).eq("id", job.id);
+
+  // --- full_extraction ---
   const prompt = "Перепиши всё содержимое этого документа по заданному формату. Не пропускай ни одной строки, даты, подписи или части заключения.";
   // Run the two independent readings sequentially. Parallel vision requests
   // hit provider rate limits on real multi-file cases and wasted both reads;
@@ -227,13 +363,136 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
     return finishFailure(job, "service", extractionError.message);
   }
 
-  await supabase.from("document_processing_jobs").update({
-    status: "ready",
-    locked_at: null,
-    last_error: null,
-    updated_at: new Date().toISOString()
-  }).eq("id", job.id);
-  await supabase.from("uploaded_documents")
-    .update({ document_status: "ready" }).eq("id", job.document_id);
+  // --- duplicate_version_detection ---
+  const { data: siblings } = await supabase
+    .from("uploaded_documents")
+    .select("id, header, version_of_document_id, document_extractions(source_fingerprint)")
+    .eq("case_id", job.case_id)
+    .neq("id", job.document_id)
+    .is("archived_at", null);
+  const existing = (siblings ?? []).map((row) => {
+    const extraction = Array.isArray(row.document_extractions)
+      ? row.document_extractions[0]
+      : row.document_extractions;
+
+    return {
+      documentId: String(row.id),
+      fingerprint: String((extraction as { source_fingerprint?: string } | null)?.source_fingerprint ?? ""),
+      header: (row.header as DocumentHeader | null) ?? null
+    };
+  });
+  const relation = relateDocument({ fingerprint: loaded.fingerprint, header }, existing);
+
+  await supabase.from("uploaded_documents").update({
+    duplicate_of_document_id: relation.kind === "duplicate" ? relation.of : null,
+    version_of_document_id: relation.kind === "version" ? relation.of : null
+  }).eq("id", job.document_id);
+
+  const markReady = async () => {
+    await supabase.from("document_processing_jobs").update({
+      status: "ready",
+      locked_at: null,
+      last_error: null,
+      updated_at: new Date().toISOString()
+    }).eq("id", job.id);
+    await supabase.from("uploaded_documents")
+      .update({ document_status: "ready" }).eq("id", job.document_id);
+  };
+
+  if (relation.kind === "duplicate") {
+    // Nothing new to analyse, and analysing it would put every value on the
+    // timeline twice. The person is told, and the earlier copy stands.
+    await markReady();
+    const { locale, filename } = await readLocaleAndFilename(supabase, job.document_id);
+    await tellClient(supabase, job, buildDuplicateMessage(locale, filename));
+    return { status: "ready", documentId: job.document_id };
+  }
+
+  // --- unit_resolution → analysis_rcv ---
+  // Earlier values of the case are the companions and the baseline. A
+  // report that has since been corrected is left out: a trend through the
+  // original and its correction would show a change that never happened.
+  const superseded = new Set<string>(
+    (siblings ?? [])
+      .map((row) => row.version_of_document_id)
+      .filter((id): id is string => typeof id === "string")
+  );
+  if (relation.kind === "version") superseded.add(relation.of);
+
+  const { data: priorRows } = await supabase
+    .from("lab_values")
+    .select("document_id, analyte, measured_on, value_canonical, unit_resolved, unit_resolution_method, reference_low, reference_high, position_in_reference")
+    .eq("case_id", job.case_id)
+    .neq("document_id", job.document_id);
+  const prior: PriorLabValue[] = (priorRows ?? [])
+    .filter((row) => !superseded.has(String(row.document_id)))
+    .map((row) => ({
+      documentId: row.document_id ? String(row.document_id) : null,
+      analyte: row.analyte ? String(row.analyte) : null,
+      measured_on: row.measured_on ? String(row.measured_on) : null,
+      value_canonical: row.value_canonical === null ? null : Number(row.value_canonical),
+      unit_resolved: row.unit_resolved ? String(row.unit_resolved) : null,
+      unit_resolution_method: String(row.unit_resolution_method),
+      reference_low: row.reference_low === null ? null : Number(row.reference_low),
+      reference_high: row.reference_high === null ? null : Number(row.reference_high),
+      position_in_reference: row.position_in_reference === null ? null : Number(row.position_in_reference)
+    }));
+
+  const run = runAnalysis({
+    documents: [{
+      documentId: job.document_id,
+      collectionDate: header.collectionDate,
+      agreed: comparison.agreed.map((value) => ({
+        label: value.label,
+        value: value.value,
+        reference: value.reference,
+        referenceConfirmed: value.referenceConfirmed
+      }))
+    }],
+    prior,
+    questionnaire,
+    extractionModelVersion: ASSISTANT_MODEL
+  });
+
+  // The five fields are a constraint in the table as well; this is the
+  // earlier, plainer refusal.
+  if (!hasAllVersions(run.versions)) {
+    return finishFailure(job, "service", "Analysis run is missing a version field");
+  }
+
+  const { data: runRow, error: runError } = await supabase.from("analysis_runs").insert({
+    case_id: job.case_id,
+    profile_id: job.profile_id,
+    document_id: job.document_id,
+    ...run.versions,
+    unit_unresolved: run.unitUnresolved,
+    human_review_count: run.humanReview.length,
+    blocked: run.blocked,
+    requests: run.requests,
+    trends: run.trends,
+    excluded: run.excluded
+  }).select("id").single();
+  if (runError || !runRow) {
+    return finishFailure(job, "service", runError?.message ?? "Analysis run not stored");
+  }
+
+  // Reprocessing replaces this document's values rather than adding to them.
+  await supabase.from("lab_values").delete().eq("document_id", job.document_id);
+  if (run.labValues.length > 0) {
+    const { error: valuesError } = await supabase.from("lab_values").insert(
+      run.labValues.map(({ document_id, ...record }) => ({
+        ...record,
+        document_id,
+        case_id: job.case_id,
+        profile_id: job.profile_id,
+        analysis_run_id: runRow.id
+      }))
+    );
+    if (valuesError) {
+      return finishFailure(job, "service", valuesError.message);
+    }
+  }
+
+  await markReady();
   return { status: "ready", documentId: job.document_id };
 }

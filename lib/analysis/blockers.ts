@@ -276,7 +276,11 @@ export type InterpretableMeasurement = Measurement & {
 
 export function forInterpretation(
   measurements: Measurement[],
-  personFacts: Partial<Record<FactName, boolean>> = {}
+  personFacts: Partial<Record<FactName, boolean>> = {},
+  // Where to look for companions. By default the same list; a run passes
+  // the whole case, because the CRP that makes today's ferritin readable
+  // may sit in a document from last month.
+  companions: Measurement[] = measurements
 ): { interpretable: InterpretableMeasurement[]; blocked: BlockAssessment[] } {
   const interpretableOnes: InterpretableMeasurement[] = [];
   const blocked: BlockAssessment[] = [];
@@ -288,7 +292,7 @@ export function forInterpretation(
       continue;
     }
 
-    const assessment = assessBlockers(measurement, measurements, personFacts);
+    const assessment = assessBlockers(measurement, companions, personFacts);
 
     if (assessment.status === "blocked") {
       blocked.push(assessment);

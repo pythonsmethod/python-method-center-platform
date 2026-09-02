@@ -88,7 +88,7 @@ export default async function CabinetLayout({
     getSupplementsDueCount(),
     getClientDeliveryUnreadCount(auth.userId),
     roleClient?.from("uploaded_documents").select("id", { count: "exact", head: true })
-      .eq("profile_id", auth.userId).in("document_status", ["needs_reupload", "failed"]),
+      .eq("profile_id", auth.userId).in("document_status", ["needs_reupload", "failed", "identity_mismatch"]),
     hasQuestionnaire()
   ]);
 

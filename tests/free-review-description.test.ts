@@ -4,8 +4,15 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { OFFER_CONTENT } from "@/lib/legal/offer-content";
 import {
   FREE_REVIEW_DEADLINE_EN,
-  FREE_REVIEW_DEADLINE_RU
+  FREE_REVIEW_DEADLINE_RU,
+  isFreeReviewActive
 } from "@/lib/config/promo";
+
+// The promotion has a real end date and switches itself off on it. The
+// checks on its wording can only run while it is on: after the deadline
+// the copy is gone by design, and a test that demanded it back would be
+// asking the site to advertise an offer that has ended.
+const whilePromoRuns = it.skipIf(!isFreeReviewActive());
 
 // What the free format actually is, pinned in one place.
 //
@@ -32,7 +39,7 @@ function freeReviewCopy(locale: "ru" | "en"): string {
 }
 
 describe("what the free format is described as", () => {
-  it("shows the September 1 deadline without advertising a future price", async () => {
+  whilePromoRuns("shows the September 1 deadline without advertising a future price", async () => {
     expect(FREE_REVIEW_DEADLINE_RU).toBe("1 сентября 2026 года");
     expect(FREE_REVIEW_DEADLINE_EN).toBe("1 September 2026");
 
@@ -143,7 +150,7 @@ describe("the contract describes the free format the same way", () => {
 });
 
 describe("the assistant tells visitors the same thing", () => {
-  it("describes the free format by the person's state, not by the sale", () => {
+  whilePromoRuns("describes the free format by the person's state, not by the sale", () => {
     // A visitor who asks the assistant must hear what the page says. A
     // difference between the two is exactly what reads as a catch.
     return buildGuestSystemPrompt().then((prompt) => {
