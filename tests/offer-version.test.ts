@@ -32,9 +32,10 @@ import { OFFER_VERSION } from "@/lib/legal/offer";
 const FINGERPRINTS: Record<string, string> = {
   "oferta-v4": "012a725c1a4ed0aab17db4aa4b8151daeecf0b2abbb39b39e86c782a4276c27d",
   "oferta-v5": "934468238b7b8fb154cc52738b24770c43a95f7dee75a3c1c33ae3217cd079dc",
-  // v6 (2026-09-02): the analyses review becomes a paid format at 500 USD;
-  // the free launch offer is gone from clause 3.
-  "oferta-v6": "c88b7acd406a2227fce701209f486386bc8c03876c3e248258fe0c6d38121c0a"
+  // v6 (2026-09-02): the analyses review becomes a paid format at 500 USD,
+  // service fee included; the free launch offer is gone from clause 3.
+  // Re-fingerprinted once before release, while no client had accepted it.
+  "oferta-v6": "e68be9bf8018ab69a781d4c2d5baa0236e6110515055aac16c32828c351c4e56"
 };
 
 function fingerprint(): string {

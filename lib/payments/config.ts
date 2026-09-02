@@ -11,10 +11,12 @@ export const PLAN_100D_TOTAL_USD = 3675;
 
 // The analyses review, set by the founder (02.09.2026) at $500 as a paid
 // format in its own right, once the launch promotion that offered it free
-// had ended. The same 5% service fee applies, so the Stripe Payment Link
-// must be created for $525.
+// had ended. Unlike the two support programmes, the 5% service fee is
+// included in this price rather than added to it — 500 is what the person
+// pays, so the Stripe Payment Link must be created for exactly $500. The
+// contract says so in clause 3.
 export const REVIEW_PRICE_USD = 500;
-export const REVIEW_TOTAL_USD = 525;
+export const REVIEW_TOTAL_USD = 500;
 
 // The database id of the review predates its price: it was created for the
 // free preliminary assessment and is kept so that earlier records stay

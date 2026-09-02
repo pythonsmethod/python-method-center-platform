@@ -949,7 +949,7 @@ const ru = {
     title: "Разбор анализов от Professor Python",
     text: "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
     // The amount is rendered on its own line and never wraps mid-number.
-    price: "500 USD + 5% сбор = 525 USD",
+    price: "500 USD, сервисный сбор включён",
     cta: "Заказать разбор",
     note: "Разбор является экспертным мнением и не заменяет консультацию врача."
   },
@@ -961,7 +961,7 @@ const ru = {
     lead: "Без мелкого шрифта. Семь вопросов, которые обычно не решаются задать.",
     items: [
       { q: "Что входит?", a: "Личный разбор ваших анализов от Professor Python: обратная связь по состоянию организма и рекомендации — что с этим делать. Всё приходит файлом в личный кабинет с пометкой, что это ответ Professor Python." },
-      { q: "Сколько это стоит?", a: "500 USD плюс сервисный сбор 5% за обработку международного платежа — итого 525 USD. Оплата один раз, за один разбор." },
+      { q: "Сколько это стоит?", a: "500 USD. Сервисный сбор за обработку международного платежа уже включён в эту цену — вы платите ровно 500. Оплата один раз, за один разбор." },
       { q: "Сколько ждать?", a: "До трёх рабочих дней после того, как вы загрузили анализы." },
       { q: "Можно ли задать вопросы?", a: "Да. В течение трёх рабочих дней после разбора открыт чат с Professor Python — вопросы идут напрямую ему." },
       { q: "Придётся ли потом покупать сопровождение?", a: "Нет. Это остаётся на ваше усмотрение — разбор ни к чему не обязывает." },
@@ -1021,7 +1021,7 @@ const ru = {
   },
   payment: {
     eyebrow: "Оплата",
-    title: "Тарифы сопровождения",
+    title: "Тарифы",
     description:
       "Оплата проходит через защищённую страницу Stripe. Платформа не хранит данные карт.",
     planLabel: "Тариф",
@@ -1055,11 +1055,11 @@ const ru = {
     offerHint:
       "Чтобы перейти к оплате, отметьте оба пункта выше.",
     refundLink: "Подробные условия оплаты и возврата",
-    feeNote: "К каждому тарифу добавляется сервисный сбор 5%.",
+    feeNote: "К тарифам сопровождения добавляется сервисный сбор 5%; в цену разбора анализов он уже включён.",
     planReviewTitle: "Разбор анализов",
     planReviewDesc:
       "Личный разбор ваших анализов от Professor Python без сопровождения: обратная связь по состоянию организма и рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата с ним. Один раз, ни к чему не обязывает.",
-    planReviewPrice: "$500 + 5% сбор = $525",
+    planReviewPrice: "$500 — сервисный сбор включён",
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
       "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Professor Python отправляет свою формулу — 200 капсул; вы оплачиваете только доставку ($180).",
@@ -2092,7 +2092,7 @@ const en: typeof ru = {
     badge: "Analyses review",
     title: "Analyses review by Professor Python",
     text: "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
-    price: "$500 + 5% fee = $525",
+    price: "$500, service fee included",
     cta: "Order the review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
   },
@@ -2101,7 +2101,7 @@ const en: typeof ru = {
     lead: "No small print. Seven questions people usually do not dare to ask.",
     items: [
       { q: "What is included?", a: "A personal review of your test results by Professor Python: feedback on the state of your body and recommendations — what to do about it. Everything arrives as a file in your personal cabinet, marked as Professor Python's answer." },
-      { q: "How much does it cost?", a: "500 USD plus a 5% service fee for processing an international payment — 525 USD in total. Paid once, for one review." },
+      { q: "How much does it cost?", a: "500 USD. The service fee for processing an international payment is already included — you pay exactly 500. Paid once, for one review." },
       { q: "How long does it take?", a: "Up to three working days after you upload your test results." },
       { q: "Can I ask questions?", a: "Yes. For three working days after the review, a chat with Professor Python is open — your questions go directly to him." },
       { q: "Will I have to buy a support programme afterwards?", a: "No. That remains your decision — the review does not oblige you to anything." },
@@ -2159,7 +2159,7 @@ const en: typeof ru = {
   },
   payment: {
     eyebrow: "Payment",
-    title: "Support plans",
+    title: "Plans",
     description:
       "Payment goes through a secure Stripe page. The platform does not store card data.",
     planLabel: "Plan",
@@ -2189,11 +2189,11 @@ const en: typeof ru = {
     offerHint:
       "To proceed to payment, please tick both boxes above.",
     refundLink: "Full payment and refund terms",
-    feeNote: "A 5% service fee is added to each plan.",
+    feeNote: "A 5% service fee is added to the support plans; the analyses review price already includes it.",
     planReviewTitle: "Analyses review",
     planReviewDesc:
       "A personal review of your test results by Professor Python without the support programme: feedback on the state of your body and recommendations as a file in your cabinet — within three working days, then three working days of open chat with him. Once, and without obligation.",
-    planReviewPrice: "$500 + 5% fee = $525",
+    planReviewPrice: "$500 — service fee included",
     plan5Title: "Support — 5 weeks",
     plan5Desc:
       "Case review, plan and team support for 5 weeks. As a gift, Professor Python sends his formula — 200 capsules; you only pay for delivery ($180).",

@@ -68,7 +68,7 @@ const PRIVACY_RU: LegalDocument = {
         "Показатели, добавки и сон: значения, которые вы вносите сами, состав приёма и записи о сне — время засыпания и подъёма, продолжительность, ваша оценка самочувствия и заметки. Сюда же попадает то, что вы переносите файлом из приложения часов, кольца или браслета.",
         "Оплаты: сумма, тариф, валюта, дата и ссылка на платёж у платёжного провайдера. Данные банковской карты к нам не поступают и у нас не хранятся никогда.",
         "Согласия: отметка о принятии оферты и согласия на обработку данных — с датой, версией документа и языком, на котором вы его читали.",
-        "Служебные записи: журнал действий с кейсом, события эскалации, счётчики обращений к помощнику."
+        "Служебные записи: журнал действий с кейсом, счётчики обращений к помощнику."
       ]
     },
     {
@@ -98,7 +98,7 @@ const PRIVACY_RU: LegalDocument = {
         "PayPal — альтернативный способ оплаты для стран, где недоступен основной. Получает те же платёжные сведения.",
         "Anthropic (США) — модель, на которой работает ИИ-помощник. Получает текст вашего сообщения, историю диалога, вложения к сообщению и краткую справку по вашему кейсу.",
         "OpenAI (США) — вторая модель, используемая как проверяющая инстанция для части ответов. Получает текст обращения и подготовленный ответ.",
-        "Telegram — канал оповещения команды. Что именно туда уходит, описано в разделе 7.",
+        "Telegram — служебные уведомления команде: новое обращение или сообщение в поддержку (его тема), оплата и её сумма, сбой обработки. Туда уходят идентификаторы, тема и ссылка на рабочее место — не ваши документы, не переписка по кейсу и не содержимое анализов.",
         "Государственные органы — только если этого прямо требует закон."
       ]
     },
@@ -198,7 +198,7 @@ const PRIVACY_EN: LegalDocument = {
         "Metrics, supplements and sleep: the values you enter yourself, your intake plan, and your sleep records — bedtime and wake-up time, duration, your own rating of how you felt, and notes. This also covers what you bring over as a file from the app of a watch, ring or bracelet.",
         "Payments: amount, plan, currency, date and a reference to the payment held by the payment provider. Card details never reach us and are never stored by us.",
         "Consents: the record that you accepted the offer and consented to the processing of your data — with the date, the version of the document and the language you read it in.",
-        "Service records: the log of actions on your case, escalation events, and counters of assistant usage."
+        "Service records: the log of actions on your case and counters of assistant usage."
       ]
     },
     {
@@ -228,7 +228,7 @@ const PRIVACY_EN: LegalDocument = {
         "PayPal — an alternative payment route for countries where the main one is unavailable. Receives the same payment details.",
         "Anthropic (USA) — the model the AI assistant runs on. Receives the text of your message, the conversation history, the attachments to your message and a brief summary of your case.",
         "OpenAI (USA) — a second model used to review part of the answers. Receives the text of the enquiry and the prepared answer.",
-        "Telegram — the team's alert channel. What exactly goes there is described in section 7.",
+        "Telegram — service notifications to the team: a new support request or message (its subject), a payment and its amount, a processing failure. What goes there is identifiers, the subject and a link to the workspace — not your documents, not your case correspondence and not the content of your test results.",
         "Public authorities — only where the law directly requires it."
       ]
     },
@@ -310,7 +310,7 @@ const REFUND_RU: LegalDocument = {
       heading: "1. Что можно попробовать до оплаты",
       paragraphs: [
         "Помощник центра на сайте и в личном кабинете, дневник показателей и чек-лист добавок доступны до всякой оплаты. Мы намеренно устроили так, чтобы вы платили не вслепую.",
-        "Разбор анализов (500 USD + 5% сбор) и сопровождение оплачиваются по договору-оферте. Разбор начинается сразу после оплаты, поэтому на него распространяются те же правила, что и на сопровождение, — они описаны ниже."
+        "Разбор анализов (500 USD, сервисный сбор включён) и сопровождение оплачиваются по договору-оферте. Разбор начинается сразу после оплаты, поэтому на него распространяются те же правила, что и на сопровождение, — они описаны ниже."
       ]
     },
     {
@@ -386,7 +386,7 @@ const REFUND_EN: LegalDocument = {
       heading: "1. What you can try before paying",
       paragraphs: [
         "The centre's assistant on the site and in your cabinet, the metrics diary and the supplement checklist are available before any payment. We arranged it this way deliberately, so that you are not paying blind.",
-        "The analyses review (500 USD + 5% fee) and the support programmes are paid under the offer contract. The review begins immediately after payment, so the same rules apply to it as to the support programmes — they are set out below."
+        "The analyses review (500 USD, service fee included) and the support programmes are paid under the offer contract. The review begins immediately after payment, so the same rules apply to it as to the support programmes — they are set out below."
       ]
     },
     {

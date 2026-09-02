@@ -158,7 +158,7 @@ export async function sendTestNotification(): Promise<TestNotificationState> {
     lines: [
       "Это проверочное сообщение из кабинета основателя.",
       `Отправлено: ${stamp} UTC.`,
-      "Если вы это читаете — красные флаги, оплаты и обращения тоже дойдут."
+      "Если вы это читаете — оплаты, сообщения и обращения тоже дойдут."
     ],
     link: adminLink("/admin/founder")
   });

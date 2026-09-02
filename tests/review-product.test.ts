@@ -26,13 +26,15 @@ describe("разбор анализов — платный формат за 500
 
       expect(first.product).toBe(REVIEW_PRODUCT);
       expect(first.priceLine).toContain("500");
-      expect(first.priceLine).toContain("525");
+      // The fee is inside the price, so no second number appears anywhere.
+      expect(first.priceLine).not.toContain("525");
     }
   });
 
   it("узнаётся по сумме и по метке в оплате, но не открывает периода сопровождения", () => {
-    expect(REVIEW_TOTAL_USD).toBe(525);
-    expect(productFromAmount(52500, "usd")).toBe(REVIEW_PRODUCT);
+    expect(REVIEW_TOTAL_USD).toBe(500);
+    expect(productFromAmount(50000, "usd")).toBe(REVIEW_PRODUCT);
+    expect(productFromAmount(52500, "usd")).toBeNull();
     expect(productFromMetadata({ product: "preliminary_assessment" })).toBe(REVIEW_PRODUCT);
     expect(productFromMetadata({ product: "review" })).toBe(REVIEW_PRODUCT);
     expect(isPlanProduct(REVIEW_PRODUCT)).toBe(false);
@@ -41,15 +43,19 @@ describe("разбор анализов — платный формат за 500
   it("описан в договоре с ценой, и договор получил новую версию", () => {
     expect(OFFER_VERSION).toBe("oferta-v6");
     expect(clause("ru")).toContain("Разбор анализов — 500 USD");
-    expect(clause("ru")).toContain("500 USD + 5% = 525 USD");
+    expect(clause("ru")).toContain("Итог по формату «Разбор анализов»: 500 USD.");
+    expect(clause("ru")).toContain("включён в эту цену");
+    expect(clause("ru")).not.toContain("525");
     expect(clause("en")).toContain("Analyses review — 500 USD");
-    expect(clause("en")).toContain("500 USD + 5% = 525 USD");
+    expect(clause("en")).toContain("Total for the analyses review: 500 USD.");
+    expect(clause("en")).not.toContain("525");
   });
 
   it("ассистент называет цену и не предлагает бесплатного", async () => {
     const prompt = await buildGuestSystemPrompt();
 
-    expect(prompt).toContain("$525");
+    expect(prompt).toContain("$500");
+    expect(prompt).not.toContain("$525");
     expect(prompt).not.toMatch(/бесплатн(ая|ый|ую|о) (предварительн|оценк|разбор)/i);
   });
 });
