@@ -89,7 +89,6 @@ describe("privacy policy disclosures", () => {
         "Supabase",
         "Vercel",
         "Stripe",
-        "PayPal",
         "Anthropic",
         "OpenAI",
         "Telegram"

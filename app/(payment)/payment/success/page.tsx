@@ -4,23 +4,15 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 
-type SuccessPageProps = {
-  searchParams?: Promise<Record<string, string | string[] | undefined>>;
-};
-
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).paymentSuccess;
 
   return { title: t.eyebrow, description: t.description };
 }
 
-export default async function PaymentSuccessPage({
-  searchParams
-}: SuccessPageProps) {
+export default async function PaymentSuccessPage() {
   const locale = await getLocale();
   const t = getDictionary(locale).paymentSuccess;
-  const params = await searchParams;
-  const viaPaypal = params?.method === "paypal";
 
   return (
     <div className="page-shell">
@@ -29,15 +21,6 @@ export default async function PaymentSuccessPage({
         title={t.title}
         description={t.description}
       />
-
-      {viaPaypal ? (
-        <div className="notice notice--success">
-          <span className="panel__label">{t.paypalLabel}</span>
-          <h2>{t.paypalTitle}</h2>
-          <p>{t.paypalText1}</p>
-          <p>{t.paypalText2}</p>
-        </div>
-      ) : null}
 
       <section className="panel-grid" aria-label={t.whatNextLabel}>
         <div className="panel panel--promo">

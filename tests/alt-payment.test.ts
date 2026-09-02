@@ -19,7 +19,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 // card had just failed was shown the way out in a language they might not
 // read.
 
-const METHOD_IDS = ["bank", "crypto", "paypal", "wise", "other"] as const;
+const METHOD_IDS = ["bank", "crypto", "wise", "other"] as const;
 
 // What must never appear on a public page again. Requisites for a transfer
 // or a wallet address are country-specific, and a US company has to know

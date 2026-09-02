@@ -8,7 +8,6 @@
 export const ALT_PAYMENT_METHODS = [
   "bank",
   "crypto",
-  "paypal",
   "wise",
   "other"
 ] as const;
@@ -97,7 +96,6 @@ export function validateAltPaymentInput(
 export const altPaymentMethodLabels: Record<AltPaymentMethodId, string> = {
   bank: "Банковский перевод",
   crypto: "Криптовалюта (USDT и другие)",
-  paypal: "PayPal",
   wise: "Wise / Revolut",
   other: "Другой способ (расскажу в комментарии)"
 };

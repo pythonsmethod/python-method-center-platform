@@ -789,7 +789,6 @@ const ru = {
     methodLabels: {
       bank: "Банковский перевод",
       crypto: "Криптовалюта (USDT и другие)",
-      paypal: "PayPal",
       wise: "Wise / Revolut",
       other: "Другой способ (расскажу в комментарии)"
     },
@@ -1071,12 +1070,6 @@ const ru = {
   paymentSuccess: {
     eyebrow: "Оплата получена",
     title: "Благодарим вас!",
-    paypalLabel: "Оплата через PayPal",
-    paypalTitle: "Мы проверим платёж вручную",
-    paypalText1:
-      "Оплата через PayPal не подтверждается автоматически: её проверяет человек. Обычно это занимает несколько часов в рабочий день. Как только платёж подтвердится, доступ откроется, и мы напишем вам на почту.",
-    paypalText2:
-      "Чтобы ускорить: пришлите через «Поддержку» подтверждение оплаты — скриншот или номер операции PayPal, и укажите email, которым вы регистрировались.",
     description: "Ваш платёж успешно принят. Добро пожаловать в сопровождение Python Method.",
     whatNextLabel: "Что происходит дальше",
     steps: [
@@ -1959,7 +1952,6 @@ const en: typeof ru = {
     methodLabels: {
       bank: "Bank transfer",
       crypto: "Cryptocurrency (USDT and others)",
-      paypal: "PayPal",
       wise: "Wise / Revolut",
       other: "Another way (I will explain in the comment)"
     },
@@ -2194,12 +2186,6 @@ const en: typeof ru = {
   paymentSuccess: {
     eyebrow: "Payment received",
     title: "Thank you!",
-    paypalLabel: "Paid through PayPal",
-    paypalTitle: "We will check this payment by hand",
-    paypalText1:
-      "A PayPal payment is not confirmed automatically: a person checks it. This usually takes a few hours on a working day. As soon as it is confirmed your access opens and we write to you by email.",
-    paypalText2:
-      "To speed it up, send us proof of payment through “Support” — a screenshot or the PayPal transaction number — and tell us the email you registered with.",
     description: "Your payment has been received. Welcome to the Python Method support program.",
     whatNextLabel: "What happens next",
     steps: [
