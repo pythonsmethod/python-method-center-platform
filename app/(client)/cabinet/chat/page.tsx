@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
-import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -128,8 +127,6 @@ export default async function CabinetChatPage() {
           </div>
         </div>
       </section>
-
-      <EmergencyNotice text={strings.support.emergencyText} />
     </>
   );
 }

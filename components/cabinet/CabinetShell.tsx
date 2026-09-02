@@ -14,7 +14,7 @@ import {
 type CabinetShellProps = {
   children: ReactNode; email: string | null; greetingName: string;
   unread: number; supportUnread?: number; deliveryUnread?: number; documentsAttention?: number; tokens: number; supplementsDue: number;
-  // One when the health questionnaire has never been filled in. It is the
+  // One when the health picture has never been filled in. It is the
   // half of the picture the analyses do not carry, so an empty one is worth
   // a mark in the sidebar rather than a page nobody finds.
   questionnaireDue?: number;
@@ -49,7 +49,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
       { href: `${root}/delivery`, label: ru ? "Доставка" : "Delivery", hint: ru ? "Адрес и отправления" : "Address and shipments", icon: IconWingedSun, badge: deliveryUnread }
     ] },
     { title: ru ? "Материалы и трекеры" : "Files and trackers", items: [
-      { href: `${root}/health`, label: ru ? "Анкета здоровья" : "Health questionnaire", hint: ru ? "Ваша картина своими словами" : "Your picture in your own words", icon: IconDjed, badge: questionnaireDue },
+      { href: `${root}/health`, label: ru ? "Картина здоровья" : "Health picture", hint: ru ? "Жалобы, диагнозы, ваш рассказ" : "Complaints, diagnoses, your own words", icon: IconDjed, badge: questionnaireDue },
       { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus, badge: documentsAttention },
       { href: `${root}/metrics`, label: t.sections.metrics.title, hint: t.sections.metrics.hint, icon: IconWater },
       { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue }
@@ -89,7 +89,6 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
         </div>)}
       </nav>
       <div className="web-cab__sidebar-foot">
-        <Link className="web-cab__emergency" href="/support#emergency">{t.sos}</Link>
         {preview ? null : <form action={logoutAction}><button type="submit">{t.logout}</button></form>}
       </div>
     </aside>

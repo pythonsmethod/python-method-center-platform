@@ -20,7 +20,6 @@ const ru = {
       account: { title: "Мой кейс", hint: "Аккаунт, оплаты, история" },
       tokens: { title: "Токены", hint: "Приглашения и скидки" }
     },
-    sos: "Экстренная помощь",
     logout: "Выйти из аккаунта",
     greeting: "Здравствуйте",
     greetingNote: "Мы рады видеть вас сегодня",
@@ -636,7 +635,7 @@ const ru = {
     team: "Для команды",
     socials: "Социальные сети",
     disclaimer:
-      "Платформа не является медицинским учреждением и не заменяет наблюдение лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи (112 / 911)."
+      "Платформа не является медицинским учреждением и не заменяет наблюдение лечащего врача."
   },
   landing: {
     eyebrow: "Цифровой центр восстановления",
@@ -932,7 +931,7 @@ const ru = {
     personalText: "Разбор вашего случая делает он сам, а не ассистент и не команда.",
     howTitle: "Что происходит, когда вы пишете",
     howText: "Вы заполняете анкету и загружаете свои документы — анализы, заключения, выписки. Он читает их сам, на любом языке. Ответ приходит в личный кабинет с пометкой, что это ответ Professor Python. Помощник центра помогает ориентироваться, но выводы по вашему состоянию даёт только он.",
-    boundaryText: "Professor Python — специалист по восстановлению организма и автор метода. Он не врач, платформа не является медицинским учреждением, и сопровождение не заменяет наблюдение вашего лечащего врача. При экстренных состояниях обращайтесь в местную службу экстренной помощи.",
+    boundaryText: "Professor Python — специалист по восстановлению организма и автор метода. Он не врач, платформа не является медицинским учреждением, и сопровождение не заменяет наблюдение вашего лечащего врача.",
     // The eyebrow above the heading, so the block does not print the same
     // sentence twice.
     companyLabel: "Компания",
@@ -1103,16 +1102,6 @@ const ru = {
     cardText1: "Форма «Написать команде» находится в",
     cabinetLink: "личном кабинете",
     cardText2: ". Команда ответит по контактам, указанным в вашей анкете.",
-    // One line, kept above the form. The full block sits at the foot of
-    // the page now; someone whose life is in danger must not have to read
-    // to the bottom to learn that we are not the number to call.
-    emergencyShort:
-      "Если сейчас есть угроза жизни — не пишите нам, звоните 112 (Европа) или 911 (США).",
-    emergencyShortLink: "Подробнее",
-    emergencyLabel: "Экстренные ситуации",
-    emergencyTitle: "Платформа не оказывает экстренную помощь",
-    emergencyText:
-      "При угрозе жизни, резком ухудшении состояния или мыслях о причинении себе вреда немедленно звоните в местную службу экстренной помощи (112 в Европе, 911 в США) или обратитесь в ближайшую больницу. Не ждите ответа команды через платформу.",
     guestLabel: "Нет аккаунта или не получается войти?",
     guestTitle: "Напишите нам прямо здесь",
     guestText:
@@ -1209,7 +1198,6 @@ const en: typeof ru = {
       account: { title: "My case", hint: "Account, payments, history" },
       tokens: { title: "Tokens", hint: "Invitations and discounts" }
     },
-    sos: "Emergency help",
     logout: "Sign out",
     greeting: "Hello",
     greetingNote: "Good to see you today",
@@ -1815,7 +1803,7 @@ const en: typeof ru = {
     team: "For the team",
     socials: "Social media",
     disclaimer:
-      "The platform is not a medical institution and does not replace your doctor's care. In an emergency, call your local emergency service (112 / 911)."
+      "The platform is not a medical institution and does not replace your doctor's care."
   },
   landing: {
     eyebrow: "Digital recovery center",
@@ -2078,7 +2066,7 @@ const en: typeof ru = {
     personalText: "Your case is reviewed by him, not by an assistant and not by the team.",
     howTitle: "What happens when you write",
     howText: "You fill in the questionnaire and upload your documents — test results, reports, discharge notes. He reads them himself, in any language. The answer arrives in your cabinet marked as an answer from Professor Python. The centre's assistant helps you find your way, but the conclusions about your state come from him alone.",
-    boundaryText: "Professor Python is a specialist in the recovery of the body and the author of the method. He is not a physician, the platform is not a medical institution, and the support programme does not replace your own doctor's care. In an emergency, call your local emergency service.",
+    boundaryText: "Professor Python is a specialist in the recovery of the body and the author of the method. He is not a physician, the platform is not a medical institution, and the support programme does not replace your own doctor's care.",
     companyLabel: "The company",
     companyTitle: "Who stands behind the centre",
     companyText: "The programme is provided by Pythons & Co, registered in the USA: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. The terms of the work are in the offer agreement.",
@@ -2237,13 +2225,6 @@ const en: typeof ru = {
     cardText1: "The “Write to the team” form is in your",
     cabinetLink: "personal account",
     cardText2: ". The team will reply using the contacts from your questionnaire.",
-    emergencyShort:
-      "If life is in danger right now, do not write to us — call 112 (Europe) or 911 (USA).",
-    emergencyShortLink: "More",
-    emergencyLabel: "Emergencies",
-    emergencyTitle: "The platform does not provide emergency care",
-    emergencyText:
-      "If there is a threat to life, a sharp deterioration, or thoughts of self-harm, immediately call your local emergency service (112 in Europe, 911 in the USA) or go to the nearest hospital. Do not wait for the team to reply through the platform.",
     guestLabel: "No account, or can't sign in?",
     guestTitle: "Write to us right here",
     guestText:

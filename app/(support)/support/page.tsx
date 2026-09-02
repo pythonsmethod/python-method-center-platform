@@ -21,16 +21,6 @@ export default async function SupportPage() {
     <div className="page-shell">
       <PageHeader eyebrow={t.eyebrow} title={t.title} description={t.description} />
 
-      {/* People come here to write, so the form is the first thing they
-          meet and the full emergency block sits at the foot of the page.
-          What stays here is one line, because the assistant routes people
-          in crisis to this page: someone whose life is in danger must not
-          have to read to the bottom to learn that we are not the number
-          to call. The footer carries 112/911 on every page as well. */}
-      <p className="support-emergency-line">
-        {t.emergencyShort} <a href="#emergency">{t.emergencyShortLink}</a>
-      </p>
-
       <section className="panel-grid">
         <div className="panel">
           <span className="panel__label">{t.guestLabel}</span>
@@ -84,12 +74,6 @@ export default async function SupportPage() {
           <p>{t.helpPaymentText}</p>
         </div>
       </section>
-
-      <div className="notice notice--warning" id="emergency" role="note">
-        <span className="panel__label">{t.emergencyLabel}</span>
-        <h2>{t.emergencyTitle}</h2>
-        <p>{t.emergencyText}</p>
-      </div>
     </div>
   );
 }

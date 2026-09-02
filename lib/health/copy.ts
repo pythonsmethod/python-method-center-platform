@@ -10,10 +10,10 @@ import type { Locale } from "@/lib/i18n/locale";
 
 export const questionnaireCopy = {
   ru: {
-    eyebrow: "Анкета здоровья",
+    eyebrow: "Картина здоровья",
     title: "Расскажите о себе",
     intro:
-      "Анализы не описывают человека. Цифры бывают в норме, когда человеку плохо, и вне нормы по причине, которой лаборатория не видит. Эта анкета — та половина картины, которую не печатают на бланке.",
+      "Анализы не описывают человека. Цифры бывают в норме, когда человеку плохо, и вне нормы по причине, которой лаборатория не видит. Это та половина картины, которую не печатают на бланке.",
     note:
       "Заполнять всё сразу не нужно. Возвращайтесь и дополняйте её в любой момент: каждое сохранение остаётся в истории, поэтому видно не только как есть сейчас, но и что изменилось.",
 
@@ -64,31 +64,31 @@ export const questionnaireCopy = {
     ownTitle: "Ваша картина целиком",
     own: "Опишите всё своими словами",
     ownHint:
-      "Самое важное поле анкеты. Стандартные вопросы подходят не всем, и то, что действительно имеет значение, часто не помещается ни в одну графу. Напишите так, как рассказали бы человеку: с чего началось, что менялось, что уже пробовали, что вас тревожит.",
+      "Самое важное поле здесь. Стандартные вопросы подходят не всем, и то, что действительно имеет значение, часто не помещается ни в одну графу. Напишите так, как рассказали бы человеку: с чего началось, что менялось, что уже пробовали, что вас тревожит.",
     ownPlaceholder:
       "Пишите свободно и столько, сколько нужно. Это читают вместе с анализами.",
 
-    submit: "Сохранить анкету",
+    submit: "Сохранить",
     submitting: "Сохраняем…",
     requiredMark: "обязательно",
 
-    versionsTitle: "История анкеты",
+    versionsTitle: "История изменений",
     versionsIntro:
       "Прежние версии сохраняются целиком и не переписываются. Так видно, что появилось, а что ушло.",
-    versionsEmpty: "Пока это единственная версия анкеты.",
+    versionsEmpty: "Пока это единственная версия.",
     savedOn: "Сохранено",
     currentVersion: "Текущая версия",
     emptyField: "не заполнено",
     unavailable:
-      "Анкета сейчас недоступна. Попробуйте обновить страницу чуть позже.",
-    notFilled: "Анкета ещё не заполнена",
+      "Раздел сейчас недоступен. Попробуйте обновить страницу чуть позже.",
+    notFilled: "Картина здоровья ещё не заполнена",
     yearsShort: "лет"
   },
   en: {
-    eyebrow: "Health questionnaire",
+    eyebrow: "Health picture",
     title: "Tell us about yourself",
     intro:
-      "Test results do not describe a person. Numbers can sit inside every reference interval while someone feels awful, and outside one for a reason the laboratory cannot see. This questionnaire is the half of the picture that never gets printed on the form.",
+      "Test results do not describe a person. Numbers can sit inside every reference interval while someone feels awful, and outside one for a reason the laboratory cannot see. This is the half of the picture that never gets printed on the form.",
     note:
       "There is no need to fill it all in at once. Come back and add to it whenever you like: every save is kept, so what changed is as visible as how things are now.",
 
@@ -139,15 +139,15 @@ export const questionnaireCopy = {
     ownTitle: "Your whole picture",
     own: "Describe everything in your own words",
     ownHint:
-      "The most important field here. A standard questionnaire does not fit everybody, and what actually matters often fits into none of the boxes. Write it as you would tell a person: how it began, what changed, what you have already tried, what worries you.",
+      "The most important field here. A standard form does not fit everybody, and what actually matters often fits into none of the boxes. Write it as you would tell a person: how it began, what changed, what you have already tried, what worries you.",
     ownPlaceholder:
       "Write freely, and at whatever length you need. This is read alongside your results.",
 
-    submit: "Save questionnaire",
+    submit: "Save",
     submitting: "Saving…",
     requiredMark: "required",
 
-    versionsTitle: "Questionnaire history",
+    versionsTitle: "Change history",
     versionsIntro:
       "Earlier versions are kept whole and never rewritten, so what appeared and what went away are both visible.",
     versionsEmpty: "This is the only version so far.",
@@ -155,8 +155,8 @@ export const questionnaireCopy = {
     currentVersion: "Current version",
     emptyField: "not filled in",
     unavailable:
-      "The questionnaire is unavailable right now. Please refresh the page in a little while.",
-    notFilled: "The questionnaire is not filled in yet",
+      "The section is unavailable right now. Please refresh the page in a little while.",
+    notFilled: "The health picture is not filled in yet",
     yearsShort: "years"
   }
 } as const satisfies Record<Locale, object>;

@@ -76,13 +76,6 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
     expect(t.boundaryText).toContain(expected);
   });
 
-  it("still tells someone in an emergency where to go", () => {
-    const expected =
-      locale === "ru" ? "экстренной помощи" : "emergency service";
-
-    expect(t.boundaryText).toContain(expected);
-  });
-
   it("never puts him in the doctor's place", () => {
     // The boundary paragraph is where "medical institution" and "medical
     // service" appear in order to be denied, so it is excluded.
@@ -168,9 +161,9 @@ describe("the boundary paragraph is still printed", () => {
   it("is rendered by the page, not merely present in the dictionary", () => {
     // It used to sit under the list of what he will not do. That list is
     // gone by the founder's call, and the paragraph came within one line of
-    // going with it: without it the page reads as a medical service and
-    // says nowhere what to do in an emergency. A dictionary entry nobody
-    // renders would pass every other test in this file.
+    // going with it: without it the page reads as a medical service. A
+    // dictionary entry nobody renders would pass every other test in this
+    // file.
     const page = readFileSync(
       join(process.cwd(), "app/(public)/professor/page.tsx"),
       "utf8"

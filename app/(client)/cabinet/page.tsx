@@ -22,9 +22,9 @@ const copy = {
     appTitle: "Больше возможностей — в приложении",
     appText: "Ежедневная сводка, персональные напоминания и расширенные функции аккаунта доступны в приложении Python Method Center.",
     appCta: "Узнать о приложении", protected: "Защищённый диалог", askAnham: "Спросить Анхама",
-    hqTitle: "Анкета здоровья не заполнена",
+    hqTitle: "Картина здоровья не заполнена",
     hqText: "Анализы не описывают человека. Расскажите своими словами, что вас беспокоит и что важно знать о вас — это читают вместе с вашими документами.",
-    hqCta: "Заполнить анкету"
+    hqCta: "Заполнить картину здоровья"
   },
   en: {
     eyebrow: "Contact the center", title: "We are here when you need us",
@@ -37,9 +37,9 @@ const copy = {
     appTitle: "More features in the app",
     appText: "Daily summaries, personal reminders, and expanded account features are available in the Python Method Center app.",
     appCta: "Learn about the app", protected: "Protected conversation", askAnham: "Ask Anham",
-    hqTitle: "Your health questionnaire is empty",
+    hqTitle: "Your health picture is empty",
     hqText: "Test results do not describe a person. Tell us in your own words what troubles you and what matters about you — it is read alongside your documents.",
-    hqCta: "Fill in the questionnaire"
+    hqCta: "Fill in the health picture"
   }
 } as const satisfies Record<Locale, object>;
 

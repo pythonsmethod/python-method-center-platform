@@ -2,7 +2,6 @@ import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
-import { EmergencyNotice } from "@/components/EmergencyNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import type { OnboardingProfileDefaults } from "@/lib/onboarding/types";
@@ -76,8 +75,6 @@ export default async function OnboardingPage() {
           <p>{t.noticeText}</p>
         </div>
       </section>
-
-      <EmergencyNotice text={strings.support.emergencyText} />
 
       <section className="form-section" aria-label={t.formLabel}>
         <OnboardingForm labels={t} locale={locale} profileDefaults={profileDefaults} />

@@ -121,7 +121,7 @@ describe("the two address families", () => {
   });
 
   it("keeps a query string and a fragment where they belong", () => {
-    expect(localizedHref("/support#emergency", "en")).toBe("/en/support#emergency");
+    expect(localizedHref("/support#form", "en")).toBe("/en/support#form");
     expect(localizedHref("/payment?plan=5w", "en")).toBe("/en/payment?plan=5w");
     // No twin, so nothing changes — including the query.
     expect(localizedHref("/login?mode=signup", "en")).toBe("/login?mode=signup");
