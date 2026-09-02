@@ -5,7 +5,6 @@ import { PaymentPlans } from "@/components/payments/PaymentPlans";
 import { getPaymentPlans } from "@/lib/payments/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
-import { isFreeReviewActive } from "@/lib/config/promo";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,8 +39,6 @@ export default async function PaymentPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const t = dict.payment;
-  const promo = dict.promo;
-  const freeReview = isFreeReviewActive();
 
   let profileId: string | null = null;
   const supabase = await createSupabaseServerClient();
@@ -61,20 +58,15 @@ export default async function PaymentPage() {
 
   return (
     <div className="page-shell payment-page">
-      <section className="panel panel--promo payment-page__promo">
-        <span className="panel__label">{promo.badge}</span>
-        <h1>{freeReview ? promo.titleFree : promo.titlePaid}</h1>
-        <p>{freeReview ? promo.textFree : promo.textPaid}</p>
-        <p className="price-line">
-          {freeReview ? promo.priceFree : promo.pricePaid}
-          <span className="price-amount">{promo.priceAmount}</span>
-        </p>
-        <div className="panel-actions">
-          <Link className="button" href="/login">
-            {freeReview ? promo.ctaFree : promo.cta}
-          </Link>
-        </div>
-      </section>
+      {/* Three formats, one list. The review used to have a panel of its
+          own above the cards, from the days it was the free offer; as a
+          plan it is a card like the other two, and a panel repeating the
+          card's text word for word was the same paragraph twice. */}
+      <PageHeader
+        eyebrow={t.eyebrow}
+        title={t.title}
+        description={t.description}
+      />
 
       <PaymentPlans
         labels={{
@@ -92,15 +84,6 @@ export default async function PaymentPage() {
         plans={plans}
         signInHref="/login?mode=signup&next=/payment"
         signedIn={Boolean(profileId)}
-      />
-
-      {/* Level 2: the promo panel above already carries this page's h1.
-          Visually identical — see .page-header h2 in globals.css. */}
-      <PageHeader
-        eyebrow={t.eyebrow}
-        headingLevel={2}
-        title={t.title}
-        description={t.description}
       />
 
       <section className="panel-grid" aria-label={t.offerLabel}>

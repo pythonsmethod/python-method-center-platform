@@ -16,8 +16,8 @@ const caseDirectionLabels: LocalizedLabels = {
   en: { recovery: "Recovery", rehabilitation: "Rehabilitation", preservation: "Condition preservation", not_set: "Not set" }
 };
 const documentStatusLabels: LocalizedLabels = {
-  ru: { uploaded: "Загружен", queued: "В очереди", ready: "Обработан", processing: "Обрабатывается", accepted: "Принят", needs_reupload: "Нужна повторная загрузка", failed: "Временная ошибка обработки", archived: "В архиве" },
-  en: { uploaded: "Uploaded", queued: "Queued", ready: "Processed", processing: "Processing", accepted: "Accepted", needs_reupload: "Upload again", failed: "Temporary processing error", archived: "Archived" }
+  ru: { uploaded: "Загружен", queued: "В очереди", ready: "Обработан", processing: "Обрабатывается", accepted: "Принят", needs_reupload: "Нужна повторная загрузка", failed: "Временная ошибка обработки", identity_mismatch: "Похоже, документ другого человека", archived: "В архиве" },
+  en: { uploaded: "Uploaded", queued: "Queued", ready: "Processed", processing: "Processing", accepted: "Accepted", needs_reupload: "Upload again", failed: "Temporary processing error", identity_mismatch: "Looks like someone else's document", archived: "Archived" }
 };
 const supportStatusLabels: LocalizedLabels = {
   ru: { open: "Открыт", in_progress: "В работе", waiting_on_client: "Ждёт вашего ответа", escalated_to_karen: "Передан Professor Python", resolved: "Решён", closed: "Закрыт" },
@@ -28,8 +28,8 @@ const lifecycleEventLabels: LocalizedLabels = {
   en: { case_created: "Case created", onboarding_submitted: "Questionnaire submitted", status_changed: "Case status changed", payment_recorded: "Payment recorded", service_period_started: "Support period started", service_period_completed: "Support period completed", support_requested: "Support request sent", escalation_created: "Escalation created", consent_recorded: "Consent recorded", admin_note_added: "Team note added" }
 };
 const paymentProductLabels: LocalizedLabels = {
-  ru: { preliminary_assessment: "Предварительная оценка", support_5_weeks: "Сопровождение — 5 недель", support_15_weeks: "Сопровождение — 100 дней", test_access: "Архивный тестовый доступ" },
-  en: { preliminary_assessment: "Preliminary assessment", support_5_weeks: "Support — 5 weeks", support_15_weeks: "Support — 100 days", test_access: "Archived test access" }
+  ru: { preliminary_assessment: "Разбор анализов", support_5_weeks: "Сопровождение — 5 недель", support_15_weeks: "Сопровождение — 100 дней", test_access: "Архивный тестовый доступ" },
+  en: { preliminary_assessment: "Analyses review", support_5_weeks: "Support — 5 weeks", support_15_weeks: "Support — 100 days", test_access: "Archived test access" }
 };
 const paymentStatusLabels: LocalizedLabels = {
   ru: { not_required: "Не требуется", pending: "Ожидает оплаты", paid: "Оплачен", failed: "Не прошёл", refunded: "Возвращён", partially_refunded: "Возвращён частично" },
@@ -58,13 +58,17 @@ const clientDocumentStatusLabels: LocalizedLabels = {
     ready: "Готово",
     archived: "В архиве",
     needs_reupload: "Нужен новый файл",
-    failed: "Нужен новый файл"
+    failed: "Нужен новый файл",
+    // Stopped before reading: the header names somebody else. The case chat
+    // explains and asks the person to confirm or remove the file.
+    identity_mismatch: "Нужна проверка"
   },
   en: {
     ready: "Ready",
     archived: "Archived",
     needs_reupload: "Needs a new file",
-    failed: "Needs a new file"
+    failed: "Needs a new file",
+    identity_mismatch: "Needs checking"
   }
 };
 

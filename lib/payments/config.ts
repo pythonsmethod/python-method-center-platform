@@ -9,12 +9,26 @@ import { getPaypalLink } from "@/lib/payments/paypal";
 export const PLAN_5W_TOTAL_USD = 1440;
 export const PLAN_100D_TOTAL_USD = 3675;
 
+// The analyses review, set by the founder (02.09.2026) at $500 as a paid
+// format in its own right, once the launch promotion that offered it free
+// had ended. Unlike the two support programmes, the 5% service fee is
+// included in this price rather than added to it — 500 is what the person
+// pays, so the Stripe Payment Link must be created for exactly $500. The
+// contract says so in clause 3.
+export const REVIEW_PRICE_USD = 500;
+export const REVIEW_TOTAL_USD = 500;
+
+// The database id of the review predates its price: it was created for the
+// free preliminary assessment and is kept so that earlier records stay
+// readable. Never show the id; show the plan's title.
+export const REVIEW_PRODUCT = "preliminary_assessment" as const;
+
 // Legacy database/payment id. Never show this value as "15 weeks" to users:
 // the canonical public name and actual duration are both 100 days.
 export const SUPPORT_100_DAY_PRODUCT = "support_15_weeks" as const;
 
 export type PaymentPlan = {
-  product: "support_5_weeks" | typeof SUPPORT_100_DAY_PRODUCT;
+  product: typeof REVIEW_PRODUCT | "support_5_weeks" | typeof SUPPORT_100_DAY_PRODUCT;
   title: string;
   description: string;
   priceLine: string;
@@ -38,6 +52,16 @@ export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
   const t = getDictionary(locale).payment;
 
   return [
+    {
+      product: REVIEW_PRODUCT,
+      title: t.planReviewTitle,
+      description: t.planReviewDesc,
+      priceLine: t.planReviewPrice,
+      paymentLinkUrl: readPaymentLink(
+        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW
+      ),
+      paypalUrl: getPaypalLink(REVIEW_PRODUCT)
+    },
     {
       product: "support_5_weeks",
       title: t.plan5Title,

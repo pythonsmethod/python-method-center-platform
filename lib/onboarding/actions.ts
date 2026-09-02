@@ -460,5 +460,10 @@ export async function submitOnboarding(
     })));
   }
 
-  redirect("/cabinet?onboarding=submitted");
+  // Straight on to the health questionnaire rather than the cabinet home.
+  // The form just submitted is the contract and the contact details; the
+  // picture of the person is the next thing the centre needs, and it is
+  // asked for while they are still filling things in rather than left for
+  // them to discover in a menu.
+  redirect("/cabinet/health?onboarding=submitted");
 }

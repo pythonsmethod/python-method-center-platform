@@ -20,7 +20,6 @@ export const lifecycleLabels: Record<string, string> = {
   service_period_started: "Начался период сопровождения",
   service_period_completed: "Период сопровождения завершён",
   support_requested: "Запрошена поддержка",
-  escalation_created: "Создана эскалация",
   consent_recorded: "Записано согласие",
   admin_note_added: "Добавлена заметка команды"
 };
@@ -46,7 +45,6 @@ export const actorRoleLabels: Record<string, string> = {
 };
 
 export const notificationKindLabels: Record<string, string> = {
-  red_flag: "красный флаг",
   client_message: "сообщение клиента",
   support_request: "обращение",
   payment: "оплата",

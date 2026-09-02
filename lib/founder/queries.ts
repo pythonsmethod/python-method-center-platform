@@ -4,9 +4,6 @@ import {
 } from "@/lib/assistant/guard";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import {
-  isFreeReviewActive
-} from "@/lib/config/promo";
-import {
   actorRoleLabels,
   auditActionLabels,
   caseStatusLabels,
@@ -27,14 +24,12 @@ export type FounderMetrics = {
   paidPayments30d: number;
   revenue30dCents: number;
   revenueTotalCents: number;
-  openEscalations: number;
   openRequests: number;
   documents: number;
   messages7d: number;
 };
 
 export type TimelineKind =
-  | "escalation"
   | "payment"
   | "message"
   | "request"
@@ -74,7 +69,6 @@ const emptyMetrics: FounderMetrics = {
   paidPayments30d: 0,
   revenue30dCents: 0,
   revenueTotalCents: 0,
-  openEscalations: 0,
   openRequests: 0,
   documents: 0,
   messages7d: 0
@@ -138,18 +132,6 @@ export async function getFounderOverview(): Promise<FounderOverview> {
         : "Не настроены TELEGRAM_BOT_TOKEN / TELEGRAM_CHAT_ID"
     },
     {
-      // A reminder that does not depend on anyone remembering. The paid
-      // review is not described in the offer at all — the contract lists the
-      // free assessment, 5 weeks and 100 days, and nothing else. While the
-      // review is free this is harmless; the moment it is switched to paid,
-      // the center would be selling something its contract does not mention.
-      name: "Услуга «Разбор анализов» в договоре",
-      ok: isFreeReviewActive(),
-      detail: isFreeReviewActive()
-        ? "Разбор сейчас бесплатный — договор описывать его не обязан"
-        : "ВКЛЮЧЁН ПЛАТНЫЙ РЕЖИМ, а услуги «Разбор анализов» нет в оферте. Внесите её в договор (lib/legal/offer-content.ts) и поднимите версию, прежде чем принимать оплату."
-    },
-    {
       name: "Автозапись оплат (Stripe webhook)",
       ok: Boolean(
         process.env.STRIPE_SECRET_KEY?.trim() &&
@@ -164,21 +146,16 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     {
       name: "Кнопки оплаты на сайте",
       ok: Boolean(
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
+        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW?.trim() &&
+          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
           process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
       ),
       detail:
+        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW?.trim() &&
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
-          ? "Обе ссылки на тарифы активны"
-          : "Заданы не все ссылки на тарифы"
-    },
-    {
-      name: "Акция «Бесплатный разбор»",
-      ok: true,
-      detail: isFreeReviewActive()
-        ? "Включена — разбор анализов бесплатный"
-        : "Выключена — акция завершена"
+          ? "Все три ссылки на тарифы активны"
+          : "Заданы не все ссылки на тарифы (разбор, 5 недель, 100 дней)"
     }
   ];
 
@@ -258,11 +235,9 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     activeSupport,
     newClients7d,
     documents,
-    openEscalations,
     openRequests,
     messages7d,
     paymentsAll,
-    escalationRows,
     paymentRows,
     messageRows,
     requestRows,
@@ -283,11 +258,6 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       value: since7d
     }),
     countRows(supabase, "uploaded_documents"),
-    countRows(supabase, "escalation_events", {
-      type: "eq",
-      column: "status",
-      value: "open"
-    }),
     countRows(supabase, "support_requests", {
       type: "eq",
       column: "status",
@@ -304,11 +274,6 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       .eq("status", "paid")
       .order("created_at", { ascending: false })
       .limit(200),
-    supabase
-      .from("escalation_events")
-      .select("id, category, routing_target, status, created_at, case_id, profile_id")
-      .order("created_at", { ascending: false })
-      .limit(TIMELINE_PER_SOURCE),
     supabase
       .from("payments")
       .select("id, amount_cents, currency, product, status, created_at, case_id")
@@ -387,22 +352,6 @@ export async function getFounderOverview(): Promise<FounderOverview> {
   );
 
   const timeline: FounderTimelineItem[] = [];
-
-  for (const row of escalationRows.data ?? []) {
-    timeline.push({
-      id: `esc-${row.id}`,
-      at: row.created_at,
-      kind: "escalation",
-      title:
-        row.category === "physical_medical"
-          ? "🔴 Красный флаг — физический/медицинский"
-          : "🔴 Красный флаг — психологический кризис",
-      detail: `Маршрут: ${row.routing_target === "karen" ? "Professor Python" : "поддержка"} · ${
-        row.status === "open" ? "не обработан" : "обработан"
-      }${row.profile_id ? "" : " · гость сайта"}`,
-      href: row.case_id ? `/admin/cases/${row.case_id}` : "/admin"
-    });
-  }
 
   for (const row of paymentRows.data ?? []) {
     timeline.push({
@@ -514,8 +463,7 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       paidPayments30d: recentPaid.length,
       revenue30dCents,
       revenueTotalCents,
-      openEscalations,
-      openRequests,
+        openRequests,
       documents,
       messages7d
     },

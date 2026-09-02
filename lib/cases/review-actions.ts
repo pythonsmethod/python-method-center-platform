@@ -14,6 +14,7 @@ import {
   type TranscribedValue
 } from "@/lib/assistant/transcription";
 import { buildCaseContext } from "@/lib/assistant/case-context";
+import { formatMachineFindings, type StoredRun } from "@/lib/analysis/findings";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { fingerprintDocuments } from "@/lib/cases/case-documents";
@@ -133,6 +134,26 @@ export async function generateCaseReview(
     return errorState("В распознанных документах не найдено содержимого для итогового разбора.");
   }
 
+  // The newest analysis run: what modules 1, 3 and 4 made of these same
+  // values. A reading without one would be a reading without the unit
+  // check, the blockers or the threshold — the state the pipeline exists
+  // to end — so it is refused rather than made.
+  const { data: runRow } = await supabase
+    .from("analysis_runs")
+    .select("id, human_review_count, unit_unresolved, blocked, requests, trends")
+    .eq("case_id", caseId)
+    .order("created_at", { ascending: false })
+    .limit(1)
+    .maybeSingle();
+
+  if (!runRow) {
+    return errorState(
+      "Прогон анализа для этого кейса ещё не выполнен — дождитесь обработки последнего документа и попробуйте снова."
+    );
+  }
+
+  const findings = formatMachineFindings(runRow as unknown as StoredRun);
+
   const context = await buildCaseContext(caseId);
   const disputedNote = numberedDisputed.length > 0
     ? `\n\nСПОРНЫЕ МЕСТА. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(numberedDisputed)}`
@@ -145,7 +166,7 @@ export async function generateCaseReview(
         role: "user",
         content: `Вот значения, переписанные из документов клиента и подтверждённые двумя независимыми чтениями. Сначала подготовь готовый клиентский текст, затем короткий блок проверки. Опирайся только на эти данные.\n\n${formatAgreed(
           numberedAgreed
-        )}${disputedNote}`
+        )}${disputedNote}\n\nМАШИННАЯ ПРОВЕРКА (единицы, блокираторы, порог значимости):\n${findings}`
       }
     ],
     4000
@@ -170,6 +191,7 @@ export async function generateCaseReview(
       draft: parsed.parts.draft,
       documents_fingerprint: fingerprintDocuments(documents),
       documents_count: documents.length,
+      analysis_run_id: runRow.id,
       created_by: auth.userId,
       created_at: new Date().toISOString()
     },

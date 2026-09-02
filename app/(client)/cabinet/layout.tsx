@@ -4,6 +4,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
+import { hasQuestionnaire } from "@/lib/health/queries";
 import { getUnreadForClient } from "@/lib/messages/queries";
 import { getSupplementsDueCount } from "@/lib/supplements/queries";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -79,7 +80,7 @@ export default async function CabinetLayout({
   const caseId =
     caseResult.status === "ready" && caseResult.case ? caseResult.case.id : null;
 
-  const [unread, supportUnread, tokens, greetingName, supplementsDue, deliveryUnread, documentsAttentionResult] = await Promise.all([
+  const [unread, supportUnread, tokens, greetingName, supplementsDue, deliveryUnread, documentsAttentionResult, questionnaireFilled] = await Promise.all([
     caseId ? getUnreadForClient(caseId) : Promise.resolve(0),
     getClientSupportUnreadCount(auth.userId),
     getTokenLedger(auth.userId),
@@ -87,7 +88,8 @@ export default async function CabinetLayout({
     getSupplementsDueCount(),
     getClientDeliveryUnreadCount(auth.userId),
     roleClient?.from("uploaded_documents").select("id", { count: "exact", head: true })
-      .eq("profile_id", auth.userId).in("document_status", ["needs_reupload", "failed"])
+      .eq("profile_id", auth.userId).in("document_status", ["needs_reupload", "failed", "identity_mismatch"]),
+    hasQuestionnaire()
   ]);
 
   return (
@@ -102,6 +104,7 @@ export default async function CabinetLayout({
       supportUnread={supportUnread}
       deliveryUnread={deliveryUnread}
       documentsAttention={documentsAttentionResult?.count ?? 0}
+      questionnaireDue={questionnaireFilled ? 0 : 1}
     >
       {children}
     </CabinetShell>

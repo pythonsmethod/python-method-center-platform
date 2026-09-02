@@ -21,6 +21,8 @@
 // its own readings agree puts the same judgement in charge of checking
 // itself.
 
+import { referenceRangesMatch } from "@/lib/analysis/reference-range";
+
 export const TRANSCRIPTION_SEPARATOR = " :: ";
 
 export type TranscribedValue = {
@@ -30,6 +32,15 @@ export type TranscribedValue = {
   section: string;
   label: string;
   value: string;
+  // The reference interval printed beside the value, exactly as printed.
+  // It is the fingerprint of the unit: 9.6 beside "12-15.5" and 96 beside
+  // "120-155" are the same haemoglobin written on two different scales,
+  // and nothing else on the form says which scale was used.
+  reference: string;
+  // Whether both readings found the same interval. An interval only one
+  // reading saw, or the two disagreed on, decides no unit: the difference
+  // between the two readings is a factor of ten in what the value means.
+  referenceConfirmed: boolean;
   confident: boolean;
   // What exactly is unclear, in the reader's own words.
   note: string;
@@ -60,12 +71,13 @@ export const TRANSCRIPTION_SYSTEM_PROMPT = `Ты переписываешь со
 ## Формат ответа
 Одна строка на одно значение. Ровно шесть полей, разделитель ${TRANSCRIPTION_SEPARATOR.trim()}:
 
-ФАЙЛ${TRANSCRIPTION_SEPARATOR}РАЗДЕЛ${TRANSCRIPTION_SEPARATOR}НАЗВАНИЕ СТРОКИ${TRANSCRIPTION_SEPARATOR}ЗНАЧЕНИЕ${TRANSCRIPTION_SEPARATOR}ДА или НЕТ${TRANSCRIPTION_SEPARATOR}примечание
+ФАЙЛ${TRANSCRIPTION_SEPARATOR}РАЗДЕЛ${TRANSCRIPTION_SEPARATOR}НАЗВАНИЕ СТРОКИ${TRANSCRIPTION_SEPARATOR}ЗНАЧЕНИЕ${TRANSCRIPTION_SEPARATOR}РЕФЕРЕНС${TRANSCRIPTION_SEPARATOR}ДА или НЕТ${TRANSCRIPTION_SEPARATOR}примечание
 
 - ФАЙЛ — имя файла, как оно названо перед изображением. Не выдумывай имя.
 - РАЗДЕЛ — заголовок бланка или исследования, к которому относится строка.
 - НАЗВАНИЕ СТРОКИ — подпись поля ровно как напечатана, включая скобки и единицы.
 - ЗНАЧЕНИЕ — ровно то, что напечатано. Единицы измерения оставляй как в бланке.
+- РЕФЕРЕНС — референсный интервал, напечатанный в бланке рядом с этой строкой, ровно как напечатан: «12-15.5», «120 - 155», «до 5,0». Если рядом ничего не напечатано — поставь прочерк. Не бери интервал из другой строки и не вычисляй его сам.
 - ДА или НЕТ — уверен ли ты в прочтении этой строки полностью.
 - Примечание — если НЕТ, напиши, что именно не разобрал и почему (блик, сгиб, обрезан край, размыто). Если ДА, поставь прочерк.
 
@@ -135,17 +147,35 @@ export function parseTranscription(reply: string): TranscribedValue[] {
       continue;
     }
 
-    const [file, section, label, value, confidence, ...rest] = parts;
+    const [file, section, label, value, ...tail] = parts;
 
     if (!file || !label) {
       continue;
     }
+
+    // The reference interval was added to the format after the first
+    // documents had already been read. A model also drops a field now and
+    // then. So the confidence answer is found by what it says rather than
+    // by where it sits: it is the да/нет, and whatever precedes it is the
+    // interval. Reading position five first means an interval that itself
+    // says "нет" cannot be mistaken for the answer.
+    const answers = (part: string | undefined) =>
+      /^(да|нет|yes|no)/i.test((part ?? "").trim());
+
+    const hasReference = answers(tail[1]);
+    const reference = hasReference ? (tail[0] ?? "") : "";
+    const confidence = hasReference ? tail[1] : tail[0];
+    const rest = tail.slice(hasReference ? 2 : 1);
 
     rows.push({
       file,
       section,
       label,
       value,
+      reference,
+      // Settled by the comparison of the two readings, never by one of
+      // them alone.
+      referenceConfirmed: false,
       // Anything that is not an explicit yes counts as unsure. A reading
       // that forgot to answer the question is not a confident reading.
       //
@@ -220,7 +250,15 @@ export function compareTranscriptions(
       continue;
     }
 
-    agreed.push(row);
+    // The value agreed. Whether the interval beside it also agreed is a
+    // separate question with a separate consequence: a disagreement there
+    // does not put the value in dispute — the two readings saw the same
+    // number — but it does mean the interval cannot be used to decide the
+    // unit. An unconfirmed interval resolves nothing.
+    agreed.push({
+      ...row,
+      referenceConfirmed: referenceRangesMatch(row.reference, match.reference)
+    });
   }
 
   for (const row of second) {

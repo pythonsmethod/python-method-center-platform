@@ -32,7 +32,7 @@ import type { Locale } from "@/lib/i18n/locale";
 // days more than anything actually delivers.
 //
 // --- v4 amendment, clause 3 ---------------------------------------------
-// The free format was described in the contract as an assessment that
+// The review was once the free launch format; v6 makes it a paid one at
 // "helps you understand the direction and decide whether you need the
 // support programme". The founder's correction: it is not a step towards a
 // sale. It is an assessment of where the person stands today and what is
@@ -45,7 +45,7 @@ import type { Locale } from "@/lib/i18n/locale";
 //
 // Nothing about what is delivered, what it costs or what the client is
 // entitled to changes; only the description of the purpose. tests/
-// free-review-description.test.ts now checks the contract as well as the
+// review-product.test.ts now checks the contract as well as the
 // site, so the two cannot drift apart again.
 //
 // This wording has not been reviewed by a lawyer.
@@ -93,13 +93,12 @@ const RU: OfferDocument = {
     {
       heading: "3. Форматы участия",
       paragraphs: [
-        "Предварительная аналитика ресурсного состояния — бесплатно. После регистрации в личном кабинете вам доступна бесплатная предварительная аналитика. Вы отправляете свои данные, наш AI собирает и структурирует их в готовый файл, Professor Python формирует предварительную ориентирующую оценку вашего ресурсного состояния, и вы получаете ответ с пометкой, что это ответ Professor Python.",
-        "Это ориентирующая оценка, а не полный разбор: она показывает, где вы находитесь сейчас и что происходит с показателями вашего организма. Предоставляется один раз. Полный разбор, рекомендации и сопровождение входят в платные форматы ниже.",
+        "Разбор анализов — 500 USD. Личный разбор ваших анализов от Professor Python без сопровождения: обратная связь по состоянию организма и рекомендации файлом в личный кабинет — до трёх рабочих дней после загрузки документов, затем три рабочих дня открытого чата с Professor Python для вопросов. Предоставляется один раз за одну оплату и ни к чему не обязывает: переходить на сопровождение или нет, вы решаете сами. Сервисный сбор за обработку международного платежа включён в эту цену: к оплате ровно 500 USD.",
         "Сопровождение 5 недель — 1 200 USD. Полный разбор ваших документов и показателей, заключение Professor Python и 5 недель индивидуального сопровождения: ваша восстановительная программа, её корректировки и возможность задавать вопросы на всём протяжении срока.",
         "Сопровождение 100 дней — 3 500 USD. Для тех, кому нужна длительная работа: восстановление в динамике, прохождение нескольких этапов, поддержка в периоды лечения. Качество работы во всех форматах одинаковое — отличается только продолжительность участия Professor Python.",
-        "Формула Professor Python. На обоих форматах сопровождения Professor Python отправляет свою формулу от своего имени как подарок: 200 капсул на формате «5 недель» и 600 капсул на формате «100 дней». На формате «5 недель» доставка формулы оплачивается отдельно — 180 USD, и входит в итоговую сумму к оплате. На формате «100 дней» доставку Professor Python берёт на себя. В бесплатную предварительную аналитику формула не входит.",
-        "Итоговая сумма к оплате. К каждому платежу добавляется сервисный сбор за обработку международного платежа — 5%. Итог по формату «5 недель»: 1 200 USD + 5% + 180 USD доставки = 1 440 USD. Итог по формату «100 дней»: 3 500 USD + 5% = 3 675 USD.",
-        "Переход на сопровождение. Предварительная аналитика бесплатна, поэтому при переходе на платное сопровождение оплачивается полная стоимость выбранного формата. Ваш кейс и история сохраняются и доступны Professor Python при старте сопровождения.",
+        "Формула Professor Python. На обоих форматах сопровождения Professor Python отправляет свою формулу от своего имени как подарок: 200 капсул на формате «5 недель» и 600 капсул на формате «100 дней». На формате «5 недель» доставка формулы оплачивается отдельно — 180 USD, и входит в итоговую сумму к оплате. На формате «100 дней» доставку Professor Python берёт на себя. В разбор анализов формула не входит.",
+        "Итоговая сумма к оплате. К платежам за сопровождение добавляется сервисный сбор за обработку международного платежа — 5%; в цену разбора анализов он уже включён. Итог по формату «5 недель»: 1 200 USD + 5% + 180 USD доставки = 1 440 USD. Итог по формату «100 дней»: 3 500 USD + 5% = 3 675 USD. Итог по формату «Разбор анализов»: 500 USD.",
+        "Переход на сопровождение. Разбор анализов оплачивается отдельно, и при переходе на сопровождение оплачивается полная стоимость выбранного формата. Ваш кейс и история сохраняются и доступны Professor Python при старте сопровождения.",
         "Продление. Любое сопровождение можно продлить по вашему желанию — столько раз, сколько вам нужно."
       ]
     },
@@ -215,13 +214,12 @@ const EN: OfferDocument = {
     {
       heading: "3. Ways to take part",
       paragraphs: [
-        "Preliminary analysis of your resource state — free of charge. After registering in your personal cabinet, a free preliminary analysis is available to you. You send your data, our AI collects and structures it into a prepared file, Professor Python forms a preliminary orienting assessment of your resource state, and you receive a reply marked as Professor Python's answer.",
-        "This is an orienting assessment, not a full review: it shows where you stand today and what is happening with your body's markers. It is provided once. A full review, recommendations and the support programme are part of the paid formats below.",
+        "Analyses review — 500 USD. A personal review of your test results by Professor Python without the support programme: feedback on the state of your body and recommendations as a file in your personal cabinet — within three working days of uploading your documents, followed by three working days of open chat with Professor Python for questions. Provided once per payment and without obligation: whether to move on to a support programme is your decision. The service fee for processing an international payment is included in this price: exactly 500 USD is payable.",
         "Support programme, 5 weeks — 1,200 USD. A full review of your documents and indicators, Professor Python's conclusion, and 5 weeks of individual support: your recovery programme, its adjustments, and the ability to ask questions throughout the period.",
         "Support programme, 100 days — 3,500 USD. For those who need longer work: recovery followed over time, moving through several stages, and support during periods of treatment. The quality of the work is the same in every format — only the length of Professor Python's involvement differs.",
-        "Professor Python's formula. On both support formats Professor Python sends his formula personally, as a gift: 200 capsules on the 5-week format and 600 capsules on the 100-day format. On the 5-week format, delivery of the formula is paid separately — 180 USD, included in the final amount payable. On the 100-day format Professor Python covers delivery himself. The formula is not part of the free preliminary analysis.",
-        "The final amount payable. A service fee for processing an international payment — 5% — is added to every payment. Total for the 5-week format: 1,200 USD + 5% + 180 USD delivery = 1,440 USD. Total for the 100-day format: 3,500 USD + 5% = 3,675 USD.",
-        "Moving to the support programme. The preliminary analysis is free, so when you move to a paid support programme the full price of the chosen format is payable. Your case and your history are kept and are available to Professor Python when the support programme starts.",
+        "Professor Python's formula. On both support formats Professor Python sends his formula personally, as a gift: 200 capsules on the 5-week format and 600 capsules on the 100-day format. On the 5-week format, delivery of the formula is paid separately — 180 USD, included in the final amount payable. On the 100-day format Professor Python covers delivery himself. The formula is not part of the analyses review.",
+        "The final amount payable. A service fee for processing an international payment — 5% — is added to the support programmes; the analyses review price already includes it. Total for the 5-week format: 1,200 USD + 5% + 180 USD delivery = 1,440 USD. Total for the 100-day format: 3,500 USD + 5% = 3,675 USD. Total for the analyses review: 500 USD.",
+        "Moving to the support programme. The analyses review is paid separately, and when you move to a support programme the full price of the chosen format is payable. Your case and your history are kept and are available to Professor Python when the support programme starts.",
         "Extension. Any support programme can be extended if you wish — as many times as you need."
       ]
     },

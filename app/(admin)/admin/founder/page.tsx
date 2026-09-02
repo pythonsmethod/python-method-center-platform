@@ -90,12 +90,6 @@ export default async function FounderPage() {
           <b>{formatMoney(m.revenueTotalCents)}</b>
           <span>всего оплачено на платформе</span>
         </div>
-        <div
-          className={`founder-metric${m.openEscalations > 0 ? " founder-metric--alert" : ""}`}
-        >
-          <b>{m.openEscalations}</b>
-          <span>открытых красных флагов</span>
-        </div>
         <div className="founder-metric">
           <b>{m.openRequests}</b>
           <span>открытых обращений</span>
@@ -115,8 +109,8 @@ export default async function FounderPage() {
           <span className="panel__label">История</span>
           <h2>Что происходит на платформе</h2>
           <p>
-            Последние {overview.timeline.length} событий: красные флаги, оплаты,
-            сообщения, обращения, изменения кейсов и записи аудита — в одной
+            Последние {overview.timeline.length} событий: оплаты, сообщения,
+            обращения, изменения кейсов и записи аудита — в одной
             хронологии.
           </p>
 

@@ -8017,3 +8017,39 @@ body.cabinet-menu-open { overflow: hidden; }
 .medical-digest__card { background:#fff; border:1px solid var(--digest-line); border-radius:18px; box-shadow:0 12px 30px rgba(25,49,41,.06); display:flex; flex-direction:column; min-width:0; padding:22px; }.medical-digest__meta { align-items:center; color:#738079; display:flex; font-size:.7rem; gap:10px; justify-content:space-between; text-transform:uppercase; }.medical-digest__meta span { background:var(--digest-mint); border-radius:999px; color:#2e6253; font-weight:800; max-width:70%; overflow:hidden; padding:5px 8px; text-overflow:ellipsis; white-space:nowrap; }.medical-digest__card h3 { color:var(--digest-ink); font-family:Georgia,"Times New Roman",serif; font-size:1.2rem; line-height:1.35; margin:16px 0 10px; }.medical-digest__card>p { color:#53605b; line-height:1.58; margin:0; }.medical-digest__card dl { display:grid; gap:11px; margin:18px 0; }.medical-digest__card dl>div { border-left:2px solid #c8aa6d; padding-left:11px; }.medical-digest__card dt { color:#35584d; font-size:.72rem; font-weight:900; letter-spacing:.04em; margin-bottom:3px; text-transform:uppercase; }.medical-digest__card dd { color:#65716c; font-size:.82rem; line-height:1.5; margin:0; }.medical-digest__card footer { align-items:center; border-top:1px solid #edf1ef; display:flex; gap:14px; justify-content:space-between; margin-top:auto; padding-top:15px; }.medical-digest__card footer span { color:#7a8681; font-size:.72rem; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }.medical-digest__card footer a { color:#286b57; flex:0 0 auto; font-size:.76rem; font-weight:900; text-decoration:none; }
 .medical-digest__empty { background:linear-gradient(145deg,#fff,#f4f8f5); border:1px dashed #afc5ba; border-radius:20px; padding:clamp(36px,8vw,80px) 24px; text-align:center; }.medical-digest__empty>span { color:#a78343; font-size:2.8rem; }.medical-digest__empty h2 { color:var(--digest-ink); font-family:Georgia,"Times New Roman",serif; margin:8px 0; }.medical-digest__empty p { color:#68756f; line-height:1.6; margin:0 auto; max-width:650px; }
 @media (max-width:780px) { .medical-digest__hero,.medical-digest__issue-head { align-items:flex-start; flex-direction:column; }.medical-digest__refresh,.medical-digest__refresh button { width:100%; }.medical-digest__refresh button { justify-content:center; }.medical-digest__archive { max-width:100%; width:100%; }.medical-digest__grid { grid-template-columns:minmax(0,1fr); } }
+
+/* The health questionnaire: the person's own account of themselves.
+   Long-form on purpose — the fields people write most in are the widest,
+   and the sections keep a long form readable rather than dense. */
+.hq__lead { color: var(--muted); line-height: 1.65; margin: 0 0 22px; max-width: 70ch; }
+.hq { display: grid; gap: 18px; }
+.hq--history { margin-top: 34px; }
+.hq--history h2 { font-size: 1.25rem; margin: 0; }
+.hq-form { display: grid; gap: 22px; }
+.hq__group { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; display: grid; gap: 16px; padding: clamp(16px, 3vw, 24px); }
+.hq__group > legend { color: var(--accent-strong); font-size: 1rem; font-weight: 800; padding: 0 8px; }
+/* The free description is the field that matters most, so it reads as the
+   centre of the form rather than the last box before the button. */
+.hq__group--own { border-color: var(--accent); }
+.hq__row { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); }
+.hq__note { color: var(--muted); font-size: 0.85rem; line-height: 1.55; margin: 0; }
+.hq__required { color: var(--muted); font-style: normal; font-weight: 600; }
+.hq__field--missing input, .hq__field--missing select, .hq__field--missing textarea { border-color: #b3261e; }
+.hq__field--missing > span { color: #b3261e; }
+.hq__actions { display: grid; }
+.hq__actions .button { justify-self: start; }
+.hq-history { display: grid; gap: 10px; list-style: none; margin: 14px 0 0; padding: 0; }
+.hq-history__item { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.hq-history__item summary { cursor: pointer; font-weight: 700; padding: 13px 16px; }
+.hq-history__fields { display: grid; gap: 12px; margin: 0; padding: 0 16px 16px; }
+.hq-history__fields dt { color: var(--accent-strong); font-size: 0.78rem; font-weight: 800; letter-spacing: 0.03em; margin-bottom: 4px; text-transform: uppercase; }
+.hq-history__fields dd { color: var(--text); line-height: 1.6; margin: 0; white-space: pre-wrap; }
+@media (max-width: 640px) {
+  .hq__actions .button { justify-self: stretch; }
+}
+.hq-nudge { align-items:center; border:1px solid var(--wc-gold); border-radius:14px; color:var(--wc-text); display:grid; gap:14px; grid-template-columns:auto 1fr auto; margin-top:18px; padding:18px 20px; text-decoration:none; }
+.hq-nudge__icon { align-items:center; border:1px solid var(--wc-gold); border-radius:50%; color:var(--wc-bright); display:flex; height:44px; justify-content:center; width:44px; }
+.hq-nudge strong { display:block; }
+.hq-nudge small { color:var(--wc-text); display:block; line-height:1.55; margin-top:4px; }
+.hq-nudge__cta { color:var(--wc-bright); font-size:.75rem; font-weight:800; white-space:nowrap; }
+@media (max-width:640px) { .hq-nudge { grid-template-columns:auto 1fr; } .hq-nudge__cta { grid-column:1 / -1; } }

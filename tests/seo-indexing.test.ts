@@ -13,10 +13,11 @@ describe("search indexing signals", () => {
   it("publishes one canonical HTTPS host and dated public URLs", () => {
     const entries = sitemap();
 
-    // Nine public pages, each in two languages. Listing only the Russian
+    // Eight public pages, each in two languages. Listing only the Russian
     // side would leave the English one to be found by luck: the language
-    // used to live in a cookie, and a crawler carries none.
-    expect(entries).toHaveLength(18);
+    // used to live in a cookie, and a crawler carries none. (/review is a
+    // permanent redirect to the plans now, and a redirect is not a page.)
+    expect(entries).toHaveLength(16);
     expect(entries.every((entry) => entry.url.startsWith("https://pythonmethodcenter.com"))).toBe(true);
     expect(entries.every((entry) => entry.lastModified instanceof Date)).toBe(true);
   });
@@ -28,8 +29,8 @@ describe("search indexing signals", () => {
     const russian = urls.filter((url) => !url.includes("/en"));
     const english = urls.filter((url) => url.includes("/en"));
 
-    expect(russian).toHaveLength(9);
-    expect(english).toHaveLength(9);
+    expect(russian).toHaveLength(8);
+    expect(english).toHaveLength(8);
     expect(new Set(urls).size).toBe(urls.length);
 
     // Both entries of a pair carry the same alternates, so whichever one a

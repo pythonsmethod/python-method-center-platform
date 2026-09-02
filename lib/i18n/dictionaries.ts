@@ -1,7 +1,3 @@
-import {
-  FREE_REVIEW_DEADLINE_EN,
-  FREE_REVIEW_DEADLINE_RU
-} from "@/lib/config/promo";
 import type { Locale } from "@/lib/i18n/locale";
 import type { PluralForms } from "@/lib/i18n/plural";
 
@@ -612,10 +608,6 @@ const ru = {
     // payment — which is what the site *has*, not what a person comes for.
     description:
       "Восстановление под личным сопровождением Professor Python: он лично разбирает ваши анализы, а ИИ-помощник рядом каждый день.",
-    // Kept separate because it is only true while the promo runs. The
-    // layout appends it when NEXT_PUBLIC_FREE_REVIEW is on, so switching
-    // the promo off cannot leave a stale "бесплатно" in search results.
-    descriptionFree: "Первый разбор — бесплатно.",
     ogTitle: "Python Method Center — реабилитация без границ",
     ogDescription:
       "Цифровой центр восстановления: экспертное сопровождение Professor Python и ИИ-помощник рядом на каждом шаге пути.",
@@ -630,8 +622,7 @@ const ru = {
     "/login": "Вход",
     "/cabinet": "Кабинет",
     "/admin": "Рабочее место",
-    "/payment": "Сопровождение",
-    "/review": "Бесплатный разбор",
+    "/payment": "Тарифы",
     "/support": "Поддержка",
     signup: "Регистрация",
     sections: "Разделы сайта"
@@ -710,9 +701,9 @@ const ru = {
         { title: "Регистрация", text: "Создайте аккаунт на платформе." },
         { title: "Анкета", text: "Заполните анкету о себе — она создаёт ваш кейс." }
       ],
-      freeLabel: "Бесплатный разбор анализов",
-      freeNote: "Подарок центра первым клиентам",
-      free: [
+      reviewLabel: "Разбор анализов",
+      reviewNote: "500 USD — разовый разбор с рекомендациями, без сопровождения",
+      review: [
         { title: "Документы", text: "Загрузите свои анализы и чек-апы." },
         {
           title: "Разбор",
@@ -791,6 +782,7 @@ const ru = {
     note:
       "Оплата вне сайта проверяется человеком, поэтому доступ открывается не мгновенно — обычно в тот же рабочий день.",
     planLabels: {
+      preliminary_assessment: "Разбор анализов — 500 USD",
       support_5_weeks: "Сопровождение — 5 недель",
       support_15_weeks: "Сопровождение — 100 дней",
       undecided: "Ещё не решил(а) — нужен совет"
@@ -948,68 +940,36 @@ const ru = {
     companyText: "Программа предоставляется компанией Pythons & Co, зарегистрированной в США: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. Условия работы — в договоре-оферте.",
     offerLink: "Читать договор",
     ctaTitle: "Начать с ним работать",
-    ctaText: "Первый шаг не требует оплаты: заполните анкету и загрузите документы — он посмотрит вашу ситуацию и скажет, где вы находитесь сейчас.",
-    ctaFree: "Бесплатный разбор",
+    ctaText: "Заполните анкету, загрузите документы и закажите разбор — он посмотрит вашу ситуацию и скажет, где вы находитесь сейчас и что с этим делать.",
+    ctaReview: "Разбор анализов — 500 USD",
     ctaPlans: "Тарифы сопровождения"
   },
-  promo: {
-    badge: "🎁 Акция для первых клиентов",
-    titleFree: "Бесплатная предварительная оценка от Professor Python",
-    textFree:
-      "Зарегистрируйтесь, заполните анкету и загрузите свои анализы — помощник центра соберёт и структурирует их в готовый файл, а Professor Python лично сформирует предварительную аналитику вашего ресурсного состояния: где вы находитесь сейчас и что происходит с показателями вашего организма. Ответ придёт файлом в личный кабинет с пометкой, что это ответ Professor Python, — до трёх рабочих дней, затем три дня открытого чата для вопросов. Это картина вашего состояния на сегодня, а не полный разбор с рекомендациями. Предоставляется один раз и бесплатно.",
-    titlePaid: "Разбор анализов от Professor Python",
-    textPaid:
-      "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
+  review: {
+    badge: "Разбор анализов",
+    title: "Разбор анализов от Professor Python",
+    text: "Личный разбор ваших анализов от Professor Python без полного сопровождения: обратная связь по состоянию организма, рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата, чтобы задать любые вопросы.",
     // The amount is rendered on its own line and never wraps mid-number.
-    pricePaid: "Условия после завершения акции уточняйте у команды",
-    priceFree: `Бесплатно до ${FREE_REVIEW_DEADLINE_RU}`,
-    priceAmount: "",
-    cta: "Получить разбор",
-    ctaFree: "Получить бесплатную оценку",
-    note: "Предварительная оценка является экспертным мнением и не заменяет консультацию врача."
+    price: "500 USD, сервисный сбор включён",
+    cta: "Заказать разбор",
+    note: "Разбор является экспертным мнением и не заменяет консультацию врача."
   },
   // Подарок без объяснений читается как уловка. Здесь — ответы на вопросы,
   // которые человек задаёт себе молча и уходит, не задав.
-  promoDetails: {
+  // Seven questions people ask themselves and leave without asking.
+  reviewDetails: {
     title: "Что именно вы получите",
-    lead: "Без мелкого шрифта. Восемь вопросов, которые обычно не решаются задать.",
+    lead: "Без мелкого шрифта. Семь вопросов, которые обычно не решаются задать.",
     items: [
-      {
-        q: "Почему это бесплатно?",
-        a: `Это предложение для первых клиентов центра и действует до ${FREE_REVIEW_DEADLINE_RU}.`
-      },
-      {
-        q: "Что входит?",
-        a: "Предварительная аналитика вашего ресурсного состояния от Professor Python: где вы находитесь сейчас и что происходит с показателями вашего организма. Полный разбор с рекомендациями по восстановлению входит в платные форматы."
-      },
-      {
-        q: "В каком виде придёт ответ?",
-        a: "Отдельным файлом — он появится в вашем личном кабинете."
-      },
-      {
-        q: "Сколько ждать?",
-        a: "До трёх рабочих дней после того, как вы загрузили анализы."
-      },
-      {
-        q: "Можно ли задать вопросы?",
-        a: "Да. В течение трёх рабочих дней после разбора открыт чат с Professor Python — вопросы идут напрямую ему."
-      },
-      {
-        q: "Придётся ли потом покупать сопровождение?",
-        a: "Нет. Это остаётся на ваше усмотрение — разбор ни к чему не обязывает."
-      },
-      {
-        q: "Это полный разбор или предварительный?",
-        a: "Предварительный. Это картина вашего состояния на сегодня, а не полный разбор с рекомендациями — полный разбор входит в платные форматы сопровождения. Предоставляется один раз."
-      },
-      {
-        q: "Какие анализы подойдут?",
-        a: "Любые анализы и чек-апы, сданные за последние 30 дней."
-      }
+      { q: "Что входит?", a: "Личный разбор ваших анализов от Professor Python: обратная связь по состоянию организма и рекомендации — что с этим делать. Всё приходит файлом в личный кабинет с пометкой, что это ответ Professor Python." },
+      { q: "Сколько это стоит?", a: "500 USD. Сервисный сбор за обработку международного платежа уже включён в эту цену — вы платите ровно 500. Оплата один раз, за один разбор." },
+      { q: "Сколько ждать?", a: "До трёх рабочих дней после того, как вы загрузили анализы." },
+      { q: "Можно ли задать вопросы?", a: "Да. В течение трёх рабочих дней после разбора открыт чат с Professor Python — вопросы идут напрямую ему." },
+      { q: "Придётся ли потом покупать сопровождение?", a: "Нет. Это остаётся на ваше усмотрение — разбор ни к чему не обязывает." },
+      { q: "Чем разбор отличается от сопровождения?", a: "Разбор — разовая обратная связь и рекомендации по вашим анализам. Сопровождение — это программа восстановления на 5 недель или 100 дней, её корректировки и постоянная связь с Professor Python по ходу." },
+      { q: "Какие анализы подойдут?", a: "Любые анализы и чек-апы, сданные за последние 30 дней." }
     ],
-    pageCtaTitle: "Как получить предварительную оценку",
-    pageCtaText:
-      "Создайте аккаунт, заполните анкету и загрузите анализы — Professor Python возьмёт их в работу.",
+    pageCtaTitle: "Как заказать разбор",
+    pageCtaText: "Создайте аккаунт, заполните анкету и загрузите анализы — Professor Python возьмёт их в работу.",
     pageCta: "Создать аккаунт и получить оценку"
   },
   widget: {
@@ -1061,7 +1021,7 @@ const ru = {
   },
   payment: {
     eyebrow: "Оплата",
-    title: "Тарифы сопровождения",
+    title: "Тарифы",
     description:
       "Оплата проходит через защищённую страницу Stripe. Платформа не хранит данные карт.",
     planLabel: "Тариф",
@@ -1095,7 +1055,11 @@ const ru = {
     offerHint:
       "Чтобы перейти к оплате, отметьте оба пункта выше.",
     refundLink: "Подробные условия оплаты и возврата",
-    feeNote: "К каждому тарифу добавляется сервисный сбор 5%.",
+    feeNote: "К тарифам сопровождения добавляется сервисный сбор 5%; в цену разбора анализов он уже включён.",
+    planReviewTitle: "Разбор анализов",
+    planReviewDesc:
+      "Личный разбор ваших анализов от Professor Python без сопровождения: обратная связь по состоянию организма и рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата с ним. Один раз, ни к чему не обязывает.",
+    planReviewPrice: "$500 — сервисный сбор включён",
     plan5Title: "Сопровождение — 5 недель",
     plan5Desc:
       "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Professor Python отправляет свою формулу — 200 капсул; вы оплачиваете только доставку ($180).",
@@ -1823,7 +1787,6 @@ const en: typeof ru = {
     title: "Python Method Center — recovery support",
     description:
       "Recovery guided personally by Professor Python: he reviews your analyses himself, with an AI assistant beside you every day.",
-    descriptionFree: "The first review is free.",
     ogTitle: "Python Method Center — rehabilitation without borders",
     ogDescription:
       "A digital recovery center: expert support led by Professor Python, with an AI assistant beside you at every step.",
@@ -1838,8 +1801,7 @@ const en: typeof ru = {
     "/login": "Sign in",
     "/cabinet": "My account",
     "/admin": "Workspace",
-    "/payment": "Support program",
-    "/review": "Free review",
+    "/payment": "Plans",
     "/support": "Help",
     signup: "Sign up",
     sections: "Site sections"
@@ -1920,9 +1882,9 @@ const en: typeof ru = {
           text: "Tell us about yourself — this creates your case."
         }
       ],
-      freeLabel: "Free analyses review",
-      freeNote: "A gift from the center to its first clients",
-      free: [
+      reviewLabel: "Analyses review",
+      reviewNote: "500 USD — a one-time review with recommendations, no support programme",
+      review: [
         { title: "Documents", text: "Upload your test results and check-ups." },
         {
           title: "Review",
@@ -2001,6 +1963,7 @@ const en: typeof ru = {
     note:
       "A payment made outside the site is checked by a person, so access does not open instantly — usually the same working day.",
     planLabels: {
+      preliminary_assessment: "Analyses review — 500 USD",
       support_5_weeks: "Support programme — 5 weeks",
       support_15_weeks: "Support programme — 100 days",
       undecided: "Not decided yet — I need advice"
@@ -2121,65 +2084,32 @@ const en: typeof ru = {
     companyText: "The programme is provided by Pythons & Co, registered in the USA: 1331 Amherst Ave, Apt PH5, Los Angeles, CA 90025. The terms of the work are in the offer agreement.",
     offerLink: "Read the contract",
     ctaTitle: "Start working with him",
-    ctaText: "The first step costs nothing: fill in the questionnaire and upload your documents — he will look at your situation and tell you where you stand today.",
-    ctaFree: "Free review",
+    ctaText: "Fill in the questionnaire, upload your documents and order the review — he will look at your situation and tell you where you stand today and what to do about it.",
+    ctaReview: "Analyses review — 500 USD",
     ctaPlans: "Support plans"
   },
-  promo: {
-    badge: "🎁 Early clients offer",
-    titleFree: "Free preliminary assessment by Professor Python",
-    textFree:
-      "Create an account, fill in the questionnaire and upload your test results — the center's assistant collects and structures them into a prepared file, and Professor Python personally forms a preliminary analysis of your resource state: where you stand today and what is happening with your body's markers. The answer arrives as a file in your personal cabinet, marked as Professor Python's answer, within three working days, followed by three days of open chat for questions. This is a picture of your state today, not a full review with recommendations. Provided once, free of charge.",
-    titlePaid: "Analyses review by Professor Python",
-    textPaid:
-      "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
-    pricePaid: "Ask the team about terms after the offer ends",
-    priceFree: `Free until ${FREE_REVIEW_DEADLINE_EN}`,
-    priceAmount: "",
-    cta: "Get the review",
-    ctaFree: "Get the free review",
+  review: {
+    badge: "Analyses review",
+    title: "Analyses review by Professor Python",
+    text: "A personal review of your test results by Professor Python without the full support program: feedback on your condition, recommendations as a file in your personal cabinet within three working days, followed by three working days of open chat to ask any questions.",
+    price: "$500, service fee included",
+    cta: "Order the review",
     note: "The review is an expert opinion and does not replace a doctor's consultation."
   },
-  promoDetails: {
+  reviewDetails: {
     title: "What exactly you get",
-    lead: "No small print. The eight questions people usually don't dare to ask.",
+    lead: "No small print. Seven questions people usually do not dare to ask.",
     items: [
-      {
-        q: "Why is it free?",
-        a: `This offer is for the centre's first clients and runs until ${FREE_REVIEW_DEADLINE_EN}.`
-      },
-      {
-        q: "What is included?",
-        a: "A preliminary analysis of your resource state by Professor Python: where you stand today and what is happening with your body's markers. A full review with recommendations for recovery is part of the paid formats."
-      },
-      {
-        q: "In what form does the answer come?",
-        a: "As a separate file — it appears in your personal cabinet."
-      },
-      {
-        q: "How long does it take?",
-        a: "Up to three working days after you upload your test results."
-      },
-      {
-        q: "Can I ask questions?",
-        a: "Yes. For three working days after the review, a chat with Professor Python is open — your questions go straight to him."
-      },
-      {
-        q: "Will I have to buy a support plan afterwards?",
-        a: "No. That stays entirely up to you — the review commits you to nothing."
-      },
-      {
-        q: "Is this a full review or a preliminary one?",
-        a: "Preliminary. It is a picture of where your state stands today, not a full review with recommendations — the full review is part of the paid support formats. Provided once."
-      },
-      {
-        q: "Which test results are suitable?",
-        a: "Any tests and check-ups taken within the last 30 days."
-      }
+      { q: "What is included?", a: "A personal review of your test results by Professor Python: feedback on the state of your body and recommendations — what to do about it. Everything arrives as a file in your personal cabinet, marked as Professor Python's answer." },
+      { q: "How much does it cost?", a: "500 USD. The service fee for processing an international payment is already included — you pay exactly 500. Paid once, for one review." },
+      { q: "How long does it take?", a: "Up to three working days after you upload your test results." },
+      { q: "Can I ask questions?", a: "Yes. For three working days after the review, a chat with Professor Python is open — your questions go directly to him." },
+      { q: "Will I have to buy a support programme afterwards?", a: "No. That remains your decision — the review does not oblige you to anything." },
+      { q: "How is the review different from a support programme?", a: "The review is one-time feedback and recommendations on your test results. A support programme is a recovery programme over 5 weeks or 100 days, its adjustments, and ongoing contact with Professor Python along the way." },
+      { q: "Which test results are suitable?", a: "Any tests and check-ups taken within the last 30 days." }
     ],
-    pageCtaTitle: "How to get the review",
-    pageCtaText:
-      "Create an account, fill in the questionnaire and upload your test results — Professor Python will take them from there.",
+    pageCtaTitle: "How to order the review",
+    pageCtaText: "Create an account, fill in the questionnaire and upload your test results — Professor Python will take them from there.",
     pageCta: "Create an account and get the review"
   },
   widget: {
@@ -2229,7 +2159,7 @@ const en: typeof ru = {
   },
   payment: {
     eyebrow: "Payment",
-    title: "Support plans",
+    title: "Plans",
     description:
       "Payment goes through a secure Stripe page. The platform does not store card data.",
     planLabel: "Plan",
@@ -2259,7 +2189,11 @@ const en: typeof ru = {
     offerHint:
       "To proceed to payment, please tick both boxes above.",
     refundLink: "Full payment and refund terms",
-    feeNote: "A 5% service fee is added to each plan.",
+    feeNote: "A 5% service fee is added to the support plans; the analyses review price already includes it.",
+    planReviewTitle: "Analyses review",
+    planReviewDesc:
+      "A personal review of your test results by Professor Python without the support programme: feedback on the state of your body and recommendations as a file in your cabinet — within three working days, then three working days of open chat with him. Once, and without obligation.",
+    planReviewPrice: "$500 — service fee included",
     plan5Title: "Support — 5 weeks",
     plan5Desc:
       "Case review, plan and team support for 5 weeks. As a gift, Professor Python sends his formula — 200 capsules; you only pay for delivery ($180).",

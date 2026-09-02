@@ -2,7 +2,6 @@ import { Link } from "@/components/LocaleLink";
 import {
   IconAnkh,
   IconEyeOfHorus,
-  IconPapyrus,
   IconScales,
   IconWater,
   IconWingedSun
@@ -24,9 +23,8 @@ export function PublicMobileDock({ locale, viewer }: PublicMobileDockProps) {
       : { href: "/login", label: ru ? "Вход / Регистрация" : "Sign in / Sign up" };
   const items = [
     { href: "/", label: ru ? "Главная" : "Home", Icon: IconWingedSun },
-    { href: "/payment", label: ru ? "Сопровождение" : "Program", Icon: IconScales },
+    { href: "/payment", label: ru ? "Тарифы" : "Plans", Icon: IconScales },
     { href: "/shop", label: ru ? "Магазин" : "Shop", Icon: IconEyeOfHorus },
-    { href: "/review", label: ru ? "Бесплатный разбор" : "Free review", Icon: IconPapyrus },
     { href: "/support", label: ru ? "Поддержка" : "Support", Icon: IconWater },
     { ...account, Icon: IconAnkh }
   ];

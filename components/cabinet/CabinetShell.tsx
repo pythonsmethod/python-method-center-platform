@@ -7,13 +7,17 @@ import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { logoutAction } from "@/lib/auth/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import {
-  IconAnkh, IconEyeOfHorus, IconLotus, IconPapyrus,
+  IconAnkh, IconDjed, IconEyeOfHorus, IconLotus, IconPapyrus,
   IconScales, IconScarab, IconWater, IconWingedSun
 } from "@/components/icons/EgyptianIcons";
 
 type CabinetShellProps = {
   children: ReactNode; email: string | null; greetingName: string;
   unread: number; supportUnread?: number; deliveryUnread?: number; documentsAttention?: number; tokens: number; supplementsDue: number;
+  // One when the health questionnaire has never been filled in. It is the
+  // half of the picture the analyses do not carry, so an empty one is worth
+  // a mark in the sidebar rather than a page nobody finds.
+  questionnaireDue?: number;
   locale: "ru" | "en"; preview?: boolean; labels: Dictionary["cabinet"];
 };
 
@@ -23,7 +27,7 @@ type NavItem = {
 };
 
 export function CabinetShell({ children, email, greetingName, unread, tokens,
-  supportUnread = 0, deliveryUnread = 0, documentsAttention = 0, supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
+  supportUnread = 0, deliveryUnread = 0, documentsAttention = 0, questionnaireDue = 0, supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const ru = locale === "ru";
@@ -45,6 +49,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
       { href: `${root}/delivery`, label: ru ? "Доставка" : "Delivery", hint: ru ? "Адрес и отправления" : "Address and shipments", icon: IconWingedSun, badge: deliveryUnread }
     ] },
     { title: ru ? "Материалы и трекеры" : "Files and trackers", items: [
+      { href: `${root}/health`, label: ru ? "Анкета здоровья" : "Health questionnaire", hint: ru ? "Ваша картина своими словами" : "Your picture in your own words", icon: IconDjed, badge: questionnaireDue },
       { href: `${root}/documents`, label: t.sections.documents.title, hint: t.sections.documents.hint, icon: IconPapyrus, badge: documentsAttention },
       { href: `${root}/metrics`, label: t.sections.metrics.title, hint: t.sections.metrics.hint, icon: IconWater },
       { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue }

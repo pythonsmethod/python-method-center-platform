@@ -9,6 +9,7 @@ import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const KNOWN_PRODUCTS = new Set([
+  "preliminary_assessment",
   "support_5_weeks",
   "support_15_weeks"
 ]);

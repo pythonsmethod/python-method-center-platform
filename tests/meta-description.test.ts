@@ -23,13 +23,6 @@ const LOCALES = ["ru", "en"] as const;
 // Deliberately below Google's ~160 so the appended promo line survives.
 const MAX_LENGTH = 155;
 
-function fullDescription(locale: (typeof LOCALES)[number]): string {
-  const t = getDictionary(locale).meta;
-
-  // Mirrors app/layout.tsx with the promo on — the worst case for length.
-  return `${t.description} ${t.descriptionFree}`;
-}
-
 describe("the site description in search results", () => {
   it("names the person doing the work", () => {
     for (const locale of LOCALES) {
@@ -53,20 +46,13 @@ describe("the site description in search results", () => {
     }
   });
 
-  it("fits in a search result even with the promo line appended", () => {
+
+});
+
+describe("meta description length", () => {
+  it("fits in a search result", () => {
     for (const locale of LOCALES) {
-      expect(fullDescription(locale).length).toBeLessThanOrEqual(MAX_LENGTH);
+      expect(getDictionary(locale).meta.description.length).toBeLessThanOrEqual(MAX_LENGTH);
     }
-  });
-
-  it("keeps the free review out of the base line", () => {
-    // If "бесплатно" were baked into `description`, switching
-    // NEXT_PUBLIC_FREE_REVIEW=off would leave a promise the site no longer
-    // keeps sitting in Google for weeks.
-    expect(getDictionary("ru").meta.description).not.toContain("бесплатн");
-    expect(getDictionary("en").meta.description.toLowerCase()).not.toContain("free");
-
-    expect(getDictionary("ru").meta.descriptionFree).toContain("бесплатно");
-    expect(getDictionary("en").meta.descriptionFree.toLowerCase()).toContain("free");
   });
 });
