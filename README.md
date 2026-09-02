@@ -9,8 +9,7 @@ which is preserved separately.
 - Next.js App Router + TypeScript; bilingual public site (RU default, EN via
   the `pm-locale` cookie switcher); the client cabinet and staff workspace are
   Russian-first
-- Public landing page with the client journey, first-clients promo
-  (`NEXT_PUBLIC_FREE_REVIEW`), and a footer legal/emergency line
+- Public landing page with the client journey, first-clients promo, and a footer legal/emergency line
 - Supabase Auth email/password: sign-up, sign-in, logout, callback route,
   session-refresh middleware, and full password recovery
   (`/recovery` → email link → `/reset-password`, expired links handled)

@@ -307,10 +307,10 @@ const REFUND_RU: LegalDocument = {
     "Коротко: возврат средств после оплаты не предусмотрен, потому что работа над вашим кейсом начинается в день оплаты. Мы говорим об этом до оплаты, а не после — на странице оплаты вы подтверждаете это отдельной отметкой. Ниже подробно: почему так, что происходит, если что-то пойдёт не по плану, и что делать при ошибке списания.",
   sections: [
     {
-      heading: "1. Что вы можете попробовать бесплатно",
+      heading: "1. Что можно попробовать до оплаты",
       paragraphs: [
-        "Разбор анализов — бесплатный формат. Вы заполняете анкету, загружаете документы и получаете обратную связь, ничего не оплачивая. Здесь нечего возвращать, и решение об оплате вы принимаете, уже увидев, как мы работаем.",
-        "Помощник на сайте и в кабинете тоже доступен до всякой оплаты. Мы намеренно устроили так, чтобы вы платили не вслепую."
+        "Помощник центра на сайте и в личном кабинете, дневник показателей и чек-лист добавок доступны до всякой оплаты. Мы намеренно устроили так, чтобы вы платили не вслепую.",
+        "Разбор анализов (500 USD + 5% сбор) и сопровождение оплачиваются по договору-оферте. Разбор начинается сразу после оплаты, поэтому на него распространяются те же правила, что и на сопровождение, — они описаны ниже."
       ]
     },
     {
@@ -383,10 +383,10 @@ const REFUND_EN: LegalDocument = {
     "In short: no refund is provided after payment, because work on your case begins on the day you pay. We say this before you pay rather than after — on the payment page you confirm it with a separate tick. Below is the detail: why it works this way, what happens if something does not go to plan, and what to do about a billing error.",
   sections: [
     {
-      heading: "1. What you can try without paying",
+      heading: "1. What you can try before paying",
       paragraphs: [
-        "The test-result review is a free format. You fill in the questionnaire, upload your documents and receive feedback without paying anything. There is nothing to refund here, and you make the decision to pay having already seen how we work.",
-        "The assistant, on the site and in your cabinet, is also available before any payment. We arranged it this way deliberately, so that you are not paying blind."
+        "The centre's assistant on the site and in your cabinet, the metrics diary and the supplement checklist are available before any payment. We arranged it this way deliberately, so that you are not paying blind.",
+        "The analyses review (500 USD + 5% fee) and the support programmes are paid under the offer contract. The review begins immediately after payment, so the same rules apply to it as to the support programmes — they are set out below."
       ]
     },
     {

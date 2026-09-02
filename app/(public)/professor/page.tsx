@@ -145,8 +145,8 @@ export default async function ProfessorPage() {
         <h2>{t.ctaTitle}</h2>
         <p>{t.ctaText}</p>
         <div className="panel-actions">
-          <Link className="button" href="/review">
-            {t.ctaFree}
+          <Link className="button" href="/payment">
+            {t.ctaReview}
           </Link>
           <Link className="button button--secondary" href="/payment">
             {t.ctaPlans}

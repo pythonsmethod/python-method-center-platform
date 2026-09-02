@@ -3,7 +3,6 @@ import { Link } from "@/components/LocaleLink";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AnhamOpenButton } from "@/components/assistant/AnhamOpenButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
-import { isFreeReviewActive } from "@/lib/config/promo";
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -23,8 +22,7 @@ export default async function HomePage() {
     resolveAssistantTierForUi()
   ]);
   const t = getDictionary(locale).landing;
-  const promo = getDictionary(locale).promo;
-  const freeReview = isFreeReviewActive();
+  const review = getDictionary(locale).review;
   const startHref = tier === "guest" ? "/login" : "/cabinet";
   const anhamName = locale === "ru" ? "Анхам" : "Anham";
   const mobile = locale === "ru"
@@ -60,7 +58,7 @@ export default async function HomePage() {
       };
   const mobileSteps = [
     ...t.paths.common,
-    ...(freeReview ? [{ title: t.paths.freeLabel, text: t.paths.freeNote }] : []),
+    { title: t.paths.reviewLabel, text: t.paths.reviewNote },
     { title: mobile.supportTitle, text: mobile.supportText },
     { title: mobile.communicationTitle, text: mobile.communicationText },
     { title: mobile.appStepTitle, text: mobile.appStepText }
@@ -130,9 +128,9 @@ export default async function HomePage() {
       </section>
 
       <nav className="app-quick" aria-label={t.howTitle}>
-        <Link data-scroll-reveal href="/review">
+        <Link data-scroll-reveal href="/payment">
           <span className="app-quick__icon" aria-hidden="true">01</span>
-          <span><strong>{promo.badge}</strong><small>{freeReview ? promo.titleFree : promo.titlePaid}</small></span>
+          <span><strong>{review.title}</strong><small>{review.price}</small></span>
           <b aria-hidden="true">→</b>
         </Link>
         <Link data-scroll-reveal href={startHref}>
@@ -162,7 +160,7 @@ export default async function HomePage() {
           ))}
           <li data-scroll-reveal>
             <span>{t.paths.common.length + 1}</span>
-            <div><h3>{t.paths.freeLabel}</h3><p>{t.paths.freeNote}</p></div>
+            <div><h3>{t.paths.reviewLabel}</h3><p>{t.paths.reviewNote}</p></div>
           </li>
         </ol>
         <div className="app-mobile-route">

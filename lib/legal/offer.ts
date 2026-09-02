@@ -23,7 +23,13 @@ import type { Locale } from "@/lib/i18n/locale";
 //
 // v5 (2026-08-21) corrects the stated geographic reach from 34 to 36
 // countries. Services, prices and entitlements remain unchanged.
-export const OFFER_VERSION = "oferta-v5";
+//
+// v6 (2026-09-02) ends the launch promotion. The analyses review, which
+// clause 3 described as free for the centre's first clients, becomes a paid
+// format at 500 USD + 5% = 525 USD, delivered once per payment. Prices and
+// entitlements of the two support programmes are unchanged. Anyone who
+// accepted v5 or earlier is recorded as having accepted that edition.
+export const OFFER_VERSION = "oferta-v6";
 
 // The superseded edition, kept reachable because clients accepted it and
 // clause 12 says their terms do not change.

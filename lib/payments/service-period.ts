@@ -1,5 +1,5 @@
 import type { createSupabaseServiceClient } from "@/lib/supabase/service";
-import { PLAN_DURATION_DAYS, type ServicePeriodProduct } from "@/lib/payments/stripe";
+import { PLAN_DURATION_DAYS, type PeriodProduct } from "@/lib/payments/stripe";
 
 // Opening the support period is what actually turns a payment into access.
 //
@@ -21,12 +21,12 @@ type ServiceClient = NonNullable<ReturnType<typeof createSupabaseServiceClient>>
 export type ServicePeriodOutcome =
   | { status: "opened"; endsAt: string }
   | { status: "extended"; endsAt: string }
-  // The free preliminary assessment buys no period, and saying so is not
-  // the same as failing.
+  // The analyses review buys no period, and saying so is not the same as
+  // failing.
   | { status: "not-applicable" }
   | { status: "failed"; message: string };
 
-export function isPlanProduct(product: string): product is ServicePeriodProduct {
+export function isPlanProduct(product: string): product is PeriodProduct {
   return product in PLAN_DURATION_DAYS;
 }
 

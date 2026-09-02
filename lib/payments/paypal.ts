@@ -6,10 +6,12 @@
 // and the person is told plainly that access opens after confirmation.
 
 export type PayPalProduct =
+  | "preliminary_assessment"
   | "support_5_weeks"
   | "support_15_weeks";
 
 const ENV_BY_PRODUCT: Record<PayPalProduct, string> = {
+  preliminary_assessment: "NEXT_PUBLIC_PAYPAL_LINK_REVIEW",
   support_5_weeks: "NEXT_PUBLIC_PAYPAL_LINK_5W",
   support_15_weeks: "NEXT_PUBLIC_PAYPAL_LINK_15W"
 };
@@ -17,6 +19,7 @@ const ENV_BY_PRODUCT: Record<PayPalProduct, string> = {
 // Links are read from NEXT_PUBLIC_* on purpose: the payment page renders
 // them into the markup, and there is nothing secret about a payment link.
 const RAW_LINKS: Record<PayPalProduct, string | undefined> = {
+  preliminary_assessment: process.env.NEXT_PUBLIC_PAYPAL_LINK_REVIEW,
   support_5_weeks: process.env.NEXT_PUBLIC_PAYPAL_LINK_5W,
   support_15_weeks: process.env.NEXT_PUBLIC_PAYPAL_LINK_15W
 };

@@ -7,7 +7,6 @@ import { alternatesFor } from "@/lib/i18n/routing";
 // them entirely.
 const PUBLIC_PATHS: { path: string; priority: number; lastModified: string }[] = [
   { path: "/", priority: 1, lastModified: "2026-08-22" },
-  { path: "/review", priority: 0.9, lastModified: "2026-08-22" },
   { path: "/professor", priority: 0.8, lastModified: "2026-08-22" },
   { path: "/payment", priority: 0.9, lastModified: "2026-08-22" },
   // /shop is deliberately absent: it asks search engines not to index it

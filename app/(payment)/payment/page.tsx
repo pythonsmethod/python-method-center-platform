@@ -5,7 +5,6 @@ import { PaymentPlans } from "@/components/payments/PaymentPlans";
 import { getPaymentPlans } from "@/lib/payments/config";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
-import { isFreeReviewActive } from "@/lib/config/promo";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -40,8 +39,7 @@ export default async function PaymentPage() {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const t = dict.payment;
-  const promo = dict.promo;
-  const freeReview = isFreeReviewActive();
+  const review = dict.review;
 
   let profileId: string | null = null;
   const supabase = await createSupabaseServerClient();
@@ -61,19 +59,14 @@ export default async function PaymentPage() {
 
   return (
     <div className="page-shell payment-page">
+      {/* The review explained once, above the three plans. Its pay button
+          is the plan card below, like the other two — one way to pay, not
+          a second door. */}
       <section className="panel panel--promo payment-page__promo">
-        <span className="panel__label">{promo.badge}</span>
-        <h1>{freeReview ? promo.titleFree : promo.titlePaid}</h1>
-        <p>{freeReview ? promo.textFree : promo.textPaid}</p>
-        <p className="price-line">
-          {freeReview ? promo.priceFree : promo.pricePaid}
-          <span className="price-amount">{promo.priceAmount}</span>
-        </p>
-        <div className="panel-actions">
-          <Link className="button" href="/login">
-            {freeReview ? promo.ctaFree : promo.cta}
-          </Link>
-        </div>
+        <span className="panel__label">{review.badge}</span>
+        <h1>{review.title}</h1>
+        <p>{review.text}</p>
+        <p className="price-line">{review.price}</p>
       </section>
 
       <PaymentPlans

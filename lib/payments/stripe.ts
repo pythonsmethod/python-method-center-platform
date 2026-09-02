@@ -2,6 +2,8 @@ import Stripe from "stripe";
 import {
   PLAN_100D_TOTAL_USD,
   PLAN_5W_TOTAL_USD,
+  REVIEW_PRODUCT,
+  REVIEW_TOTAL_USD,
   type PaymentPlan
 } from "@/lib/payments/config";
 
@@ -11,9 +13,14 @@ export type PaymentProduct = PaymentPlan["product"];
 // can create it while already-issued access remains valid.
 export type ServicePeriodProduct = PaymentProduct | "test_access";
 
+// The products that open a support period. The analyses review is paid and
+// buys no period: it is delivered once, as a file, and the case chat opens
+// for a few days by the contract rather than by a timer here.
+export type PeriodProduct = Exclude<ServicePeriodProduct, typeof REVIEW_PRODUCT>;
+
 // Support-period length per product ("support_15_weeks" is the internal
 // enum id of the 100-day plan — the storefront label changed, the id didn't).
-export const PLAN_DURATION_DAYS: Record<ServicePeriodProduct, number> = {
+export const PLAN_DURATION_DAYS: Record<PeriodProduct, number> = {
   support_5_weeks: 35,
   support_15_weeks: 100,
   test_access: 14
@@ -61,6 +68,10 @@ export function productFromAmount(
     return null;
   }
 
+  if (amountCents === REVIEW_TOTAL_USD * 100) {
+    return REVIEW_PRODUCT;
+  }
+
   if (amountCents === PLAN_5W_TOTAL_USD * 100) {
     return "support_5_weeks";
   }
@@ -76,6 +87,9 @@ export function productFromMetadata(
   metadata: Record<string, string> | null | undefined
 ): PaymentProduct | null {
   const value = metadata?.product ?? metadata?.plan ?? metadata?.payment_product;
+  if (value === REVIEW_PRODUCT || value === "review" || value === "analyses_review") {
+    return REVIEW_PRODUCT;
+  }
   if (value === "support_5_weeks") return value;
   if (value === "support_15_weeks" || value === "support_100_days") {
     return "support_15_weeks";
@@ -93,7 +107,7 @@ export function resolveStripeProduct(input: {
 }
 
 export function servicePeriodEnd(
-  product: ServicePeriodProduct,
+  product: PeriodProduct,
   startsAt: Date
 ): Date {
   const ends = new Date(startsAt);

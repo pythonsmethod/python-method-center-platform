@@ -7,8 +7,7 @@ export type AppRoute = {
 // and "Кабинет" to someone signed in, so it is rendered separately.
 export const navRoutes: AppRoute[] = [
   { href: "/", label: "Главная" },
-  { href: "/payment", label: "Сопровождение" },
+  { href: "/payment", label: "Тарифы" },
   { href: "/shop", label: "Магазин" },
-  { href: "/review", label: "Бесплатный разбор" },
   { href: "/support", label: "Поддержка" }
 ];
