@@ -41,23 +41,6 @@ h3 {
   z-index: 10;
 }
 
-/* One line above the support form, where the full emergency block used to
-   stand. Quiet enough not to shout at everyone with a password problem,
-   marked clearly enough that someone in danger sees it before typing. */
-.support-emergency-line {
-  border-left: 3px solid var(--warning);
-  color: var(--muted);
-  font-size: 14px;
-  line-height: 1.55;
-  margin: 20px 0 0;
-  padding-left: 12px;
-}
-
-.support-emergency-line a {
-  color: var(--accent);
-  white-space: nowrap;
-}
-
 /* Attaching a printout, and the comparison of the last two sets. */
 .metrics-upload__input {
   display: none;
@@ -466,9 +449,8 @@ h3 {
   }
 }
 
-/* The one paragraph the page cannot lose: he is not a physician, this is
-   not a medical institution, and here is where to go in an emergency.
-   Quiet, at the end of the block about how the work happens — the list of
+/* The one paragraph the page cannot lose: he is not a physician and this
+   is not a medical institution. Quiet, at the end of the block about how the work happens — the list of
    refusals that used to carry it is gone. */
 .professor-legal {
   border-top: 1px solid var(--line);
@@ -7596,7 +7578,6 @@ body.cabinet-menu-open { overflow: hidden; }
 .web-cab__nav-link i { font-size:1.2rem; font-style:normal; }
 .web-cab__sidebar-foot { border-top:1px solid var(--wc-line); display:grid; gap:6px; margin-top:22px; padding-top:14px; }
 .web-cab__sidebar-foot a,.web-cab__sidebar-foot button { background:transparent; border:0; border-radius:8px; color:var(--wc-muted); cursor:pointer; font-size:.72rem; padding:9px; text-align:left; width:100%; }
-.web-cab__sidebar-foot .web-cab__emergency { color:#e7b95c; }
 .web-cab__workspace { min-width:0; }
 .web-cab__topbar { backdrop-filter:blur(18px); background:rgba(7,8,6,.88); border-bottom:1px solid var(--wc-line); gap:18px; min-height:82px; padding:12px clamp(22px,3vw,44px); position:sticky; top:0; z-index:30; }
 .web-cab__welcome { display:flex; flex:1; flex-direction:column; }

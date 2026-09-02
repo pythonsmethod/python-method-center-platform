@@ -2,7 +2,6 @@ import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { SLEEP_ADVICE_SYSTEM_PROMPT } from "@/lib/sleep/prompt";
-import { detectRedFlagInMessage } from "@/lib/assistant/red-flags";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 
 // The sleep tracker is the tool most likely to pull the platform over its
@@ -11,10 +10,9 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 // breathing at night" into a diary field is one sentence away from being
 // told what they have.
 //
-// These hold the three boundaries that keep the tool honest: the assistant
-// does not diagnose or prescribe, the promise about devices matches what
-// the code can actually do, and a person describing an emergency is sent to
-// a doctor rather than filed away.
+// These hold the two boundaries that keep the tool honest: the assistant
+// does not diagnose or prescribe, and the promise about devices matches
+// what the code can actually do.
 
 describe("what the assistant is forbidden to do with sleep", () => {
   it("is told not to diagnose — including by hinting", () => {
@@ -42,16 +40,6 @@ describe("what the assistant is forbidden to do with sleep", () => {
 
   it("promises no result", () => {
     expect(SLEEP_ADVICE_SYSTEM_PROMPT).toContain("Не обещай результат");
-  });
-});
-
-describe("a note that is not about sleep at all", () => {
-  it("is recognised by the same screen the chat uses", () => {
-    // The note field is free text. Someone will write the thing they are
-    // frightened of into it, and a diary must not swallow that sentence.
-    expect(detectRedFlagInMessage("под утро задыхаюсь, страшно")).toBe("physical");
-    expect(detectRedFlagInMessage("боль в груди ночью")).toBe("physical");
-    expect(detectRedFlagInMessage("душно, поздно поел")).toBeNull();
   });
 });
 

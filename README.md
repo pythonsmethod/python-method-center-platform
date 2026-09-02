@@ -9,7 +9,7 @@ which is preserved separately.
 - Next.js App Router + TypeScript; bilingual public site (RU default, EN via
   the `pm-locale` cookie switcher); the client cabinet and staff workspace are
   Russian-first
-- Public landing page with the client journey, first-clients promo, and a footer legal/emergency line
+- Public landing page with the client journey and a footer legal line
 - Supabase Auth email/password: sign-up, sign-in, logout, callback route,
   session-refresh middleware, and full password recovery
   (`/recovery` → email link → `/reset-password`, expired links handled)
@@ -65,7 +65,7 @@ which is preserved separately.
   idempotency that records payments automatically, activates the service
   period, and alerts the team (unmatched payments go to manual review)
 - Public support page `/support`: guest contact form (no account needed,
-  honeypot + rate limiting + consent), prominent emergency notice, links to
+  honeypot + rate limiting + consent), links to
   password recovery and login
 - Staff workspace (`/admin`, roles `support`/`admin`): case list/detail with chat and management controls, manual payment
   recording (still available as fallback), document intake, support request
@@ -87,7 +87,7 @@ notification delivery requires the Telegram env vars to be set.
 - `/cabinet` — client cabinet
 - `/payment`, `/payment/success` — tariffs, Stripe Payment Links
 - `/legal/offer` — public offer
-- `/support` — public support (guest form + emergency notice)
+- `/support` — public support (guest form)
 - `/admin`, `/admin/cases`, `/admin/documents`, `/admin/requests` — staff
 - `/api/assistant/client`, `/api/assistant/staff` — AI endpoints
 - `/api/assistant/history` — the signed-in person's saved AI conversation

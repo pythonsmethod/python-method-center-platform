@@ -124,9 +124,8 @@ export default async function ProfessorPage() {
             in the contract a client accepts at payment.
 
             This paragraph is not. Without it the page reads as a medical
-            service, which it is not, and there would be nowhere on it that
-            says where to go in an emergency. So it stays, quietly, at the
-            end of the block about how the work actually happens. */}
+            service, which it is not. So it stays, quietly, at the end of
+            the block about how the work actually happens. */}
         <p className="professor-legal">{t.boundaryText}</p>
       </section>
 

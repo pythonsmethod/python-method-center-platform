@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { askAssistantTeam } from "@/lib/assistant/router";
-import { detectRedFlagInMessage } from "@/lib/assistant/red-flags";
 import { listGuidance } from "@/lib/assistant/knowledge";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import type {
@@ -49,13 +48,6 @@ function isSaneDate(value: string): boolean {
 
   return value >= "2020-01-01" && value <= limit.toISOString().slice(0, 10);
 }
-
-// The deterministic crisis screen, run over what the person wrote in the
-// note. It does not escalate and does not diagnose: it puts the emergency
-// route in front of someone who has just written that they cannot breathe
-// at night, instead of filing that sentence away in a diary.
-const RED_FLAG_REPLY =
-  "Мы сохранили запись. То, что вы описали, — не про режим сна: с этим нужно к врачу, а если состояние повторяется или пугает вас, вызывайте скорую. Напишите об этом и Professor Python в чат кейса.";
 
 export async function saveNight(
   _previous: SleepActionState,
@@ -135,10 +127,6 @@ export async function saveNight(
   }
 
   refresh();
-
-  if (note && detectRedFlagInMessage(note)) {
-    return { status: "error", message: RED_FLAG_REPLY };
-  }
 
   return { status: "success", message: "Ночь записана." };
 }
