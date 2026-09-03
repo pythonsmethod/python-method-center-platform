@@ -108,6 +108,7 @@ All new public tables have RLS enabled, no client policies, and explicit `anon`/
 2. Case direction — no direction is human-confirmed. Owner action: Karen completes the secure operational queue. Each confirmation can update direction/status through an audited server action.
 3. Analysis consent — no Case has the required accepted consent set. Owner action: approve/use a lawful secure consent flow for a suitable Case. The canonical pipeline can then run without further architecture work.
 4. Cron HTTP acceptance — new runtime is not yet deployed. Owner action: none if CI/deployment succeeds; the authenticated acceptance call continues after deployment.
+5. Merge gate — the primary project preview is Ready/SUCCESS, but the unrelated `anham-mobile-app` Vercel project reports FAILURE on the PR. Owner action: repair or explicitly waive that repository check; merge and production acceptance then continue.
 
 ## 12. Final workstream table
 
@@ -121,6 +122,6 @@ All new public tables have RLS enabled, no client policies, and explicit `anon`/
 ## 13. Commits and deployment
 
 - Branch: `codex/close-operational-core-2026-09-03`
-- PR URL: pending
+- PR URL: https://github.com/pythonsmethod/python-method-center-platform/pull/118
 - Merge SHA: pending
 - Production deployment ID: pending post-merge
