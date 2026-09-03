@@ -1,0 +1,451 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "phase_2_5c_closure_47_target_benchmark",
+  "providerVersion": "pretrained-ocr-v2.1-2024-08-07",
+  "parserVersion": "clinical-closure-v1",
+  "total": 47,
+  "metrics": {
+    "auto_verified_targets": 0,
+    "needs_review_targets": 47,
+    "source_only_targets": 1,
+    "source_evidence_captured": 47,
+    "missed_targets": 0,
+    "false_verified_targets": 0,
+    "independent_source_reviewed_targets": 47,
+    "region_provenance_targets": 47,
+    "token_provenance_targets": 0,
+    "target_regressions": 0,
+    "schema_gap_targets": 0
+  },
+  "rows": [
+    {
+      "target_id": "r_modality",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_exam_date",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_comparison",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_density",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_mammo_mass",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_us_mass",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_laterality_site",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_birads",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "r_recommendation",
+      "source_capture": 1,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_modality",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_exam_date",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_left_mass",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_washout",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_nme",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_right",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_birads",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_recommendation",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "m_biopsy",
+      "source_capture": 2,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "p_modality",
+      "source_capture": 4,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "p_date",
+      "source_capture": 4,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "p_clip",
+      "source_capture": 4,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "p_birads",
+      "source_capture": 4,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "p_recommendation",
+      "source_capture": 4,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_specimen",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_diagnosis",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_grade",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_tubule",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_nuclear",
+      "source_capture": 7,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_mitoses",
+      "source_capture": 7,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_lvi",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_microcalc",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_er",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_er_pct",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_pr",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_her2",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "h_method",
+      "source_capture": 5,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_procedure",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_date",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_laterality",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_clock",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_nipple",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_samples",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_clip",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_success",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_path_link",
+      "source_capture": 8,
+      "closure_result": "SOURCE_ONLY_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_size",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    },
+    {
+      "target_id": "b_recommendation",
+      "source_capture": 8,
+      "closure_result": "EXACT_SOURCE_MATCH_NEEDS_REVIEW",
+      "independently_verified": true,
+      "independent_method": "VISUAL_SOURCE_SEPARATE_FROM_PARSER",
+      "region_provenance_result": true,
+      "token_provenance_result": false
+    }
+  ],
+  "limitations": [
+    "Independent means visual source review separate from parser output; no second human reviewer participated.",
+    "All extracted candidates remain NEEDS_REVIEW; source matching does not promote them to VERIFIED.",
+    "Region coordinates are block provenance, not complete supporting-token provenance.",
+    "b_path_link is source-only and no deterministic cross-document identity is inferred."
+  ]
+}

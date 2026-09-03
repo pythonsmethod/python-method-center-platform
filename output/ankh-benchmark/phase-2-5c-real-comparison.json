@@ -1,0 +1,769 @@
+{
+  "schemaVersion": "1.0",
+  "phase": "2.5C",
+  "status": "OCR_REPLAYED_EXACT_VALUE_GOLD_GATE_OPEN",
+  "historicalBaseline": {
+    "method": "Python regex presence, not TypeScript parser",
+    "matched": 46,
+    "total": 47,
+    "falseVerified": null,
+    "needsReviewRecall": null,
+    "provenanceCompleteness": null
+  },
+  "after": {
+    "matched": null,
+    "total": 47,
+    "falseVerified": null,
+    "needsReviewRecall": null,
+    "provenanceCompleteness": null,
+    "regressions": null
+  },
+  "blocker": "OCR replay completed and temporary inputs deleted as authorized. Independent expected values and full supporting token IDs remain unavailable; 47-target parser coverage is not exact-value Gold evaluation.",
+  "facts": [
+    {
+      "id": "r_modality",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_modality",
+        "capture": 1,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "r_exam_date",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_exam_date",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "r_comparison",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_comparison",
+        "capture": 1,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "r_density",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_density",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "r_mammo_mass",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_mammo_mass",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "r_us_mass",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_us_mass",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "r_laterality_site",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_laterality_site",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "r_birads",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_birads",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "r_recommendation",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "r_recommendation",
+        "capture": 1,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "m_modality",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_modality",
+        "capture": 2,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "m_exam_date",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_exam_date",
+        "capture": 2,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "m_left_mass",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_left_mass",
+        "capture": 2,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "m_washout",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_washout",
+        "capture": 2,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "m_nme",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_nme",
+        "capture": 2,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "m_right",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_right",
+        "capture": 2,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "m_birads",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_birads",
+        "capture": 2,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "m_recommendation",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_recommendation",
+        "capture": 2,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "m_biopsy",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "m_biopsy",
+        "capture": 2,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "p_modality",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "p_modality",
+        "capture": 4,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "p_date",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "p_date",
+        "capture": 4,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "p_clip",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "p_clip",
+        "capture": 4,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "p_birads",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "p_birads",
+        "capture": 4,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "p_recommendation",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "p_recommendation",
+        "capture": 4,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "h_specimen",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_specimen",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_diagnosis",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_diagnosis",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_grade",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_grade",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_tubule",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_tubule",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_nuclear",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_nuclear",
+        "capture": 7,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_mitoses",
+      "historicalRegexMatch": false,
+      "after": null,
+      "status": "GOLD_ANNOTATION_CORRECTED_SOURCE_SCORE_2",
+      "parserCoverage": {
+        "id": "h_mitoses",
+        "capture": 7,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "NEEDS_REVIEW"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "h_lvi",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_lvi",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_microcalc",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_microcalc",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "h_er",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_er",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": true,
+        "afterRoutes": [
+          "NEEDS_REVIEW"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "h_er_pct",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_er_pct",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": true,
+        "afterRoutes": [
+          "NEEDS_REVIEW"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "h_pr",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_pr",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": true,
+        "afterRoutes": [
+          "NEEDS_REVIEW"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "h_her2",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_her2",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": true,
+        "afterRoutes": [
+          "NEEDS_REVIEW"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "h_method",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "h_method",
+        "capture": 5,
+        "beforeMatched": false,
+        "afterMatched": true,
+        "afterRoutes": [
+          "NEEDS_REVIEW"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "b_procedure",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_procedure",
+        "capture": 8,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "b_date",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_date",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_laterality",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_laterality",
+        "capture": 8,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    },
+    {
+      "id": "b_clock",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_clock",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_nipple",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_nipple",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_samples",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_samples",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_clip",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_clip",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_success",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_success",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_path_link",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_path_link",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_size",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_size",
+        "capture": 8,
+        "beforeMatched": false,
+        "afterMatched": false,
+        "afterRoutes": [],
+        "regionProvenance": false,
+        "status": "NOT_EXTRACTED"
+      }
+    },
+    {
+      "id": "b_recommendation",
+      "historicalRegexMatch": true,
+      "after": null,
+      "status": "EXACT_VALUE_NOT_ADJUDICATED",
+      "parserCoverage": {
+        "id": "b_recommendation",
+        "capture": 8,
+        "beforeMatched": true,
+        "afterMatched": true,
+        "afterRoutes": [
+          "VERIFIED"
+        ],
+        "regionProvenance": true,
+        "status": "SOURCE_TEXT_MATCH"
+      }
+    }
+  ],
+  "parserCoverageAudit": {
+    "before": 11,
+    "after": 16,
+    "total": 47,
+    "targetRegressions": 0,
+    "lostParserFacts": 0,
+    "artifact": "phase-2-5c-parser-coverage.json"
+  }
+}

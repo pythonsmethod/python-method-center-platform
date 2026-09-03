@@ -1,0 +1,52 @@
+{
+  "schemaVersion": "1.0",
+  "datasetId": "ankh-first-real-clinical-case-minimized",
+  "datasetKind": "real_consented_task_scoped",
+  "logicalDocuments": 5,
+  "sourceScreenshots": 8,
+  "goldFacts": 47,
+  "documentClassification": { "correct": 5, "total": 5, "rate": 1 },
+  "factRecall": { "correct": 46, "total": 47, "rate": 0.9787234042553191 },
+  "byCategory": {
+    "modality": { "correct": 3, "total": 3, "rate": 1 },
+    "date": { "correct": 5, "total": 5, "rate": 1 },
+    "finding": { "correct": 3, "total": 3, "rate": 1 },
+    "measurement": { "correct": 6, "total": 6, "rate": 1 },
+    "site": { "correct": 3, "total": 3, "rate": 1 },
+    "birads": { "correct": 3, "total": 3, "rate": 1 },
+    "recommendation": { "correct": 5, "total": 5, "rate": 1 },
+    "procedure": { "correct": 5, "total": 5, "rate": 1 },
+    "specimen": { "correct": 1, "total": 1, "rate": 1 },
+    "pathology": { "correct": 6, "total": 7, "rate": 0.8571428571428571 },
+    "biomarker": { "correct": 5, "total": 5, "rate": 1 },
+    "link": { "correct": 1, "total": 1, "rate": 1 }
+  },
+  "provenanceAvailability": { "correct": 46, "total": 46, "rate": 1 },
+  "needsReviewRouting": { "correct": 3, "total": 3, "rate": 1 },
+  "missedFactRate": 0.02127659574468085,
+  "falseVerified": 0,
+  "missed": [{ "document": "doc04", "fact": "h_mitoses", "category": "pathology" }],
+  "ocr": {
+    "httpSuccess": { "correct": 8, "total": 8, "rate": 1 },
+    "pages": 8,
+    "characters": 23002,
+    "tokens": 4212,
+    "tables": 0,
+    "meanLatencyMsPerScreenshot": 1661.625,
+    "meanTokenConfidenceRange": [0.95, 0.98],
+    "imageQualityScoreRange": [0.98, 0.99],
+    "estimatedListPriceUsd": 0.012,
+    "actualInvoicedCostUsd": null
+  },
+  "security": {
+    "containsDirectIdentifiers": false,
+    "containsRawDocumentText": false,
+    "fullCoordinateArtifact": "/home/pythonmethodcenter/ankh-real-benchmark-full.json",
+    "rawResponsesCommitted": false
+  },
+  "notes": [
+    "Each mobile screenshot is one OCR page; logical report pages overlap.",
+    "No table objects were emitted, including for the biomarker table.",
+    "No medical interpretation was performed."
+  ]
+}
