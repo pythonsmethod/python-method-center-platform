@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pythonmethod.center/schemas/ankh-gold-dataset-1.0.json",
+  "title": "Ankh deidentified laboratory Gold Dataset",
+  "type": "object",
+  "required": ["datasetId", "version", "createdAt", "datasetKind", "documents"],
+  "properties": {
+    "datasetId": { "type": "string", "minLength": 1 },
+    "version": { "type": "string", "minLength": 1 },
+    "createdAt": { "type": "string", "format": "date-time" },
+    "datasetKind": { "enum": ["real_deidentified", "synthetic_development"] },
+    "documents": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["documentId", "datasetKind", "deidentified", "metadataSanitization", "layoutId", "layoutClasses", "language", "sourceType", "pageCount", "truth"],
+        "properties": {
+          "documentId": { "type": "string" },
+          "datasetKind": { "enum": ["real_deidentified", "synthetic_development"] },
+          "deidentified": { "const": true },
+          "metadataSanitization": {
+            "type": "object",
+            "required": ["visibleTextReviewed", "filenameReviewed", "embeddedPropertiesReviewed"],
+            "properties": {
+              "visibleTextReviewed": { "const": true },
+              "filenameReviewed": { "const": true },
+              "embeddedPropertiesReviewed": { "const": true }
+            }
+          },
+          "layoutId": { "type": "string" },
+          "layoutClasses": { "type": "array", "items": { "type": "string" } },
+          "language": { "type": "string" },
+          "sourceType": { "enum": ["pdf_text", "scan", "mobile_photo", "synthetic"] },
+          "pageCount": { "type": "integer", "minimum": 1 },
+          "truth": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["observationId", "page", "originalTestName", "expectedValueOriginal", "expectedNumericValue", "expectedComparator", "expectedUnit", "expectedReferenceLow", "expectedReferenceHigh", "expectedLabFlag", "expectedCollectionDate", "expectedParseability", "expectedVerificationStatus"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

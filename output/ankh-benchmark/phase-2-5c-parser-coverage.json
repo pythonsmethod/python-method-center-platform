@@ -1,0 +1,478 @@
+{
+  "schemaVersion": "2.0",
+  "kind": "47_target_parser_coverage_audit",
+  "logicalDocuments": 5,
+  "sourceCaptures": 8,
+  "providerVersion": "pretrained-ocr-v2.1-2024-08-07",
+  "historicalRegexMatched": 46,
+  "total": 47,
+  "beforeMatched": 11,
+  "afterMatched": 16,
+  "targetRegressions": 0,
+  "lostParserFacts": 0,
+  "falseVerified": null,
+  "provenanceCompleteness": null,
+  "limitations": [
+    "Source-pattern coverage is not an independently adjudicated exact-value benchmark.",
+    "Retained historical Gold stores no expected values or full supporting token IDs.",
+    "Region provenance is not complete token-level fact provenance.",
+    "Dates are counted only if emitted as EVENT_DATE; source dates are not exported."
+  ],
+  "facts": [
+    {
+      "id": "r_modality",
+      "capture": 1,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "r_exam_date",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "r_comparison",
+      "capture": 1,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "r_density",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "r_mammo_mass",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "r_us_mass",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "r_laterality_site",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "r_birads",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "r_recommendation",
+      "capture": 1,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "m_modality",
+      "capture": 2,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "m_exam_date",
+      "capture": 2,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "m_left_mass",
+      "capture": 2,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "m_washout",
+      "capture": 2,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "m_nme",
+      "capture": 2,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "m_right",
+      "capture": 2,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "m_birads",
+      "capture": 2,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "m_recommendation",
+      "capture": 2,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "m_biopsy",
+      "capture": 2,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "p_modality",
+      "capture": 4,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "p_date",
+      "capture": 4,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "p_clip",
+      "capture": 4,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "p_birads",
+      "capture": 4,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "p_recommendation",
+      "capture": 4,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "h_specimen",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_diagnosis",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_grade",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_tubule",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_nuclear",
+      "capture": 7,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_mitoses",
+      "capture": 7,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "NEEDS_REVIEW"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "h_lvi",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_microcalc",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "h_er",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": true,
+      "afterRoutes": [
+        "NEEDS_REVIEW"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "h_er_pct",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": true,
+      "afterRoutes": [
+        "NEEDS_REVIEW"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "h_pr",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": true,
+      "afterRoutes": [
+        "NEEDS_REVIEW"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "h_her2",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": true,
+      "afterRoutes": [
+        "NEEDS_REVIEW"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "h_method",
+      "capture": 5,
+      "beforeMatched": false,
+      "afterMatched": true,
+      "afterRoutes": [
+        "NEEDS_REVIEW"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "b_procedure",
+      "capture": 8,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "b_date",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_laterality",
+      "capture": 8,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    },
+    {
+      "id": "b_clock",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_nipple",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_samples",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_clip",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_success",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_path_link",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_size",
+      "capture": 8,
+      "beforeMatched": false,
+      "afterMatched": false,
+      "afterRoutes": [],
+      "regionProvenance": false,
+      "status": "NOT_EXTRACTED"
+    },
+    {
+      "id": "b_recommendation",
+      "capture": 8,
+      "beforeMatched": true,
+      "afterMatched": true,
+      "afterRoutes": [
+        "VERIFIED"
+      ],
+      "regionProvenance": true,
+      "status": "SOURCE_TEXT_MATCH"
+    }
+  ]
+}

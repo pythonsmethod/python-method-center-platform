@@ -1,0 +1,148 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "phase_2_9_real_world_validation_readiness",
+  "evaluatedAt": "2026-09-03",
+  "policyVersion": "phase-2.7-shadow-v1",
+  "policyChanged": false,
+  "protocolStatus": "PROPOSED_NOT_APPROVED",
+  "proposedRequirements": {
+    "minimumRealCases": 5,
+    "minimumIndependentlyReviewedRealCases": 5,
+    "minimumRealDocuments": 15,
+    "minimumLayoutFamilies": 5,
+    "requiredLanguages": [
+      "en",
+      "ru"
+    ],
+    "minimumSourceTypes": 3,
+    "minimumDocumentTypes": 4,
+    "requiredQualityBands": [
+      "high",
+      "medium",
+      "low"
+    ],
+    "minimumCorrectedOrAddendum": 1,
+    "requireExactProvenanceForEveryTarget": true,
+    "maximumFalseAutoVerified": 0
+  },
+  "syntheticFixturesCountedAsRealCases": false,
+  "productionMutation": false,
+  "coverage": {
+    "realCaseCount": 1,
+    "independentlyReviewedRealCaseCount": 0,
+    "realDocumentCount": 5,
+    "layoutFamilies": [
+      "real-clinical-mixed-images"
+    ],
+    "languages": [
+      "en"
+    ],
+    "sourceTypes": [
+      "mobile_photo"
+    ],
+    "documentTypes": [
+      "RADIOLOGY",
+      "PATHOLOGY",
+      "PROCEDURE"
+    ],
+    "qualityBands": [
+      "high"
+    ],
+    "correctedOrAddendumCount": 0,
+    "targetsWithExactProvenance": 6,
+    "totalRealTargets": 47,
+    "falseAutoVerifiedCount": 0
+  },
+  "readiness": {
+    "status": "INSUFFICIENT_REAL_WORLD_COVERAGE",
+    "gates": [
+      {
+        "gate": "real_cases",
+        "passed": false,
+        "observed": 1,
+        "required": 5
+      },
+      {
+        "gate": "independent_review",
+        "passed": false,
+        "observed": 0,
+        "required": 5
+      },
+      {
+        "gate": "real_documents",
+        "passed": false,
+        "observed": 5,
+        "required": 15
+      },
+      {
+        "gate": "layout_families",
+        "passed": false,
+        "observed": [
+          "real-clinical-mixed-images"
+        ],
+        "required": 5
+      },
+      {
+        "gate": "languages",
+        "passed": false,
+        "observed": [
+          "en"
+        ],
+        "required": [
+          "en",
+          "ru"
+        ]
+      },
+      {
+        "gate": "source_types",
+        "passed": false,
+        "observed": [
+          "mobile_photo"
+        ],
+        "required": 3
+      },
+      {
+        "gate": "document_types",
+        "passed": false,
+        "observed": [
+          "RADIOLOGY",
+          "PATHOLOGY",
+          "PROCEDURE"
+        ],
+        "required": 4
+      },
+      {
+        "gate": "quality_bands",
+        "passed": false,
+        "observed": [
+          "high"
+        ],
+        "required": [
+          "high",
+          "medium",
+          "low"
+        ]
+      },
+      {
+        "gate": "corrected_or_addendum",
+        "passed": false,
+        "observed": 0,
+        "required": 1
+      },
+      {
+        "gate": "exact_provenance",
+        "passed": false,
+        "observed": 6,
+        "required": 47
+      },
+      {
+        "gate": "false_auto_verified",
+        "passed": true,
+        "observed": 0,
+        "required": 0
+      }
+    ],
+    "passedGateCount": 1,
+    "totalGateCount": 11
+  }
+}
