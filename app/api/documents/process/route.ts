@@ -3,16 +3,11 @@ import { processNextDocument } from "@/lib/documents/processing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { expireElapsedServicePeriods } from "@/lib/payments/expire-periods";
+import { isCronAuthorized, summarizeMaintenance } from "@/lib/maintenance/cron";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
 export const dynamic = "force-dynamic";
-
-function authorized(request: NextRequest): boolean {
-  const secret = process.env.CRON_SECRET?.trim();
-  const authorization = request.headers.get("authorization");
-  return Boolean(secret && authorization === `Bearer ${secret}`);
-}
 
 // How long the run may keep claiming work, and how many documents it may
 // take in one go. maxDuration is 300 seconds, so it stops well before the
@@ -29,7 +24,7 @@ const BATCH_MAX_DOCUMENTS = 60;
 // case never depended on this; what did depend on it was everything that
 // failed once and had to come back.
 export async function GET(request: NextRequest) {
-  if (!authorized(request)) {
+  if (!isCronAuthorized(request.headers.get("authorization"))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -53,16 +48,24 @@ export async function GET(request: NextRequest) {
     documents += 1;
   }
 
-  const expiredPeriods = await expireElapsedServicePeriods();
-
-  return NextResponse.json({
+  const maintenance = await expireElapsedServicePeriods();
+  const durationMs = Date.now() - startedAt;
+  const summary = summarizeMaintenance({
     documents,
-    processed,
-    expiredPeriods,
-    // True when the run hit its budget rather than emptying the queue, so
-    // an operator reading the log can tell the difference.
-    truncated: documents >= BATCH_MAX_DOCUMENTS
+    outcomes: processed,
+    expiredPeriods: maintenance.expiredPeriods,
+    lifecycleEvents: maintenance.lifecycleEvents,
+    casesAligned: maintenance.casesAligned,
+    durationMs,
+    reachedLimit:
+      documents >= BATCH_MAX_DOCUMENTS || durationMs >= BATCH_BUDGET_MS
   });
+
+  console.info("operational-maintenance-complete", {
+    ...summary
+  });
+
+  return NextResponse.json(summary);
 }
 
 // Called by the cabinet right after an upload, so the person who just sent a
