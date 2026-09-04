@@ -453,3 +453,86 @@ failure invisible.
   window rather than a lifetime count. The relevant fact is not the count but
   that the retained window contains no 200 at all, and that no 200 exists in
   the table's history.
+
+---
+
+## 9. Re-verification after the correction pass (same day)
+
+Re-reviewed at PR head `7d52872`, one commit above the head this report was
+written against. The correction pass touched ten files; every one was read in
+full, and every claim below was re-tested rather than accepted.
+
+### 9.1 Findings F1–F7
+
+| # | Verdict | What I verified |
+|---|---|---|
+| **F1** | **PASS** | `OFFER_VERSION` is no longer imported by the webhook. A new resolver reads the payer's own accepted `offer_acceptance` consent for the exact product, at or before settlement, newest first, and returns null when two acceptances share the newest timestamp with different versions. `paid_at` now comes from `event.created` rather than webhook-receipt time, so the comparison uses settlement, not processing. No provenance → `offer_version` null plus a reconciliation item; an unmatched payer → no payment row at all, plus a gate item. Six behavioural tests now cover the property, including "uses accepted v5 even when the current site offer is newer" — the exact case the old test could not fail on. |
+| **F2** | **PASS** | The maintenance call is wrapped. On failure the document summary survives, an `operational-maintenance-failed` line is logged, the response carries `complete: false` and a sanitized `maintenanceError`, and the status is 500. A redaction helper strips bearer/secret/key/token patterns and truncates; a test asserts the secret never reaches the JSON. |
+| **F3** | **PASS** | `OPERATIONAL_CORE_CLOSURE_2026-09-03.md` is deleted. One root-cause statement remains, and it is the one production data supports. |
+| **F4** | **PASS** | The sweep function now writes one sanitized aggregate `audit_logs` row per invocation, zero-change repeats included. A guarded insert added exactly one honestly labelled retrospective row for the sweep already executed. Production: 1 audit row, correctly labelled retrospective. |
+| **F5** | **PASS** | All three inserts and the eligibility count now exclude `completed` and `archived`. Verified in the deployed function body, not only in the migration file. |
+| **F6** | **PASS** | Counts are mutually exclusive: attempted, completed, retried, failed, needs-reupload and other. A test asserts the five categories sum exactly to attempted; `identity_mismatch` lands in "other" rather than being counted as success. |
+| **F7** | **PASS** | PR body and audit document both state 105 files and 783 tests. My own run: 105 files, 783 tests. `git diff --check` clean. |
+
+### 9.2 My own checks at `7d52872`
+
+`npm ci` (372 packages, 0 vulnerabilities), `npm run lint`, `npm run typecheck`,
+`npx vitest run` (**105 files, 783 tests, all passed**), `npm run build`
+(compiled in 27.2 s) and `git diff --check` — all clean.
+
+### 9.3 New finding introduced by the correction pass
+
+**F8 — medium — a second invocation of the sweep will duplicate every open next
+action.** The corrected function changed the dedupe key prefix from
+`operational-sweep-2026-09-03:` to `operational-control-v2:`. The assignments
+insert guards on "no current assignment exists"; the next-actions insert guards
+only on `ON CONFLICT (dedupe_key)`. Production holds 26 open actions under the
+old prefix, so the first run of the corrected function adds 26 more — two open
+actions per Case — while the audit row reports `actions_added: 26` as if it were
+new work.
+
+This does not block the merge: nothing in the PR invokes the function, and the
+function is already live in production, so merging neither creates nor increases
+the risk. It must be fixed before the sweep is next invoked.
+
+*Required action:* add `and not exists (select 1 from public.case_next_actions
+na where na.case_id = cc.id and na.status = 'open')` to the next-actions insert,
+mirroring the guard the assignments insert already has.
+
+### 9.4 Bookkeeping discrepancy
+
+`20260904163000_operational_core_corrections` is **not registered** in
+production's `supabase_migrations.schema_migrations`, although its effects are
+applied: the function body carries the terminal-case filter and the audit write,
+and the retrospective row exists. The three earlier migrations are all
+registered. Re-application is harmless — the audit insert is guarded by `not
+exists` and the function is `create or replace` — but the history should record
+what was applied.
+
+### 9.5 Production after-state, re-checked
+
+| Measure | Value |
+|---|---:|
+| Open next actions | 26 |
+| Cases with more than one open action | 0 |
+| Current assignments | 26 |
+| Operational profiles | 26 |
+| Sweep audit rows | 1 (retrospective) |
+| Payments carrying an `offer_version` | 0 of 5 (no backfill) |
+| Reconciliation items | 5 |
+| Analysis runs / lab values | 0 / 0 |
+
+The mass sweep was not re-run, as claimed.
+
+### 9.6 Verdict
+
+**READY FOR MERGE.** All seven findings are closed, every check passes, and the
+production state matches what the PR describes. Three things remain true and
+must not be read as closed by this merge:
+
+1. Workstream 1 stays **PARTIAL** until a real production HTTP 200 appears in
+   `net._http_response`. That evidence cannot exist before deployment.
+2. Finding F8 must be fixed before the sweep function is invoked again.
+3. The `anham-mobile-app` check is still the only red status. It remains
+   unrelated, and it should be repaired or removed rather than waived a fourth
+   time.
