@@ -15,6 +15,7 @@ import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
 import { resolveAcceptedOfferVersion } from "@/lib/payments/offer-provenance";
+import { writePaymentReconciliation } from "@/lib/payments/reconciliation";
 
 export const runtime = "nodejs";
 
@@ -252,7 +253,7 @@ async function handlePaidSession(
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
   if (!profileId || !product) {
-    await supabase.from("payment_reconciliation_items").upsert({
+    const reconciliation = await writePaymentReconciliation(supabase, {
       stripe_event_id: eventId,
       stripe_session_id: session.id,
       processor_reference: reference,
@@ -270,7 +271,19 @@ async function handlePaidSession(
         : "Stripe payment product is not uniquely supported; offer provenance cannot be resolved.",
       next_action: "Authorized staff must inspect the existing Stripe merchant evidence; do not infer identity, product, or offer version.",
       audit_metadata: { source: "stripe_webhook" }
-    }, { onConflict: "stripe_event_id", ignoreDuplicates: true });
+    });
+    if (reconciliation.status === "failed") {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `payment-reconciliation-write-failed:${eventId}`,
+        title: "ОШИБКА: не сохранена очередь сверки платежа",
+        lines: [
+          "Платёж требует ручной проверки, но защищённая запись очереди не создана.",
+          `Ошибка хранения: ${reconciliation.error}`
+        ],
+        link: adminLink("/admin")
+      });
+    }
 
     // The money is in and we do not know whose it is. Everything needed to
     // find out goes in the alert: what was bought, the address that failed
@@ -376,7 +389,8 @@ async function handlePaidSession(
   }
 
   if (!offerProvenance) {
-    await supabase.from("payment_reconciliation_items").upsert(
+    const reconciliation = await writePaymentReconciliation(
+      supabase,
       {
         stripe_event_id: eventId,
         stripe_session_id: session.id,
@@ -392,9 +406,17 @@ async function handlePaidSession(
         reason: "Payment recorded without a uniquely proven offer-acceptance consent for this product at or before settlement.",
         next_action: "Authorized staff must verify consent provenance; do not infer the current website offer version.",
         audit_metadata: { source: "stripe_webhook", payment_id: payment.id }
-      },
-      { onConflict: "stripe_event_id", ignoreDuplicates: true }
+      }
     );
+    if (reconciliation.status === "failed") {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `payment-reconciliation-write-failed:${eventId}`,
+        title: "ОШИБКА: платёж записан без очереди проверки оферты",
+        lines: ["Факт оплаты сохранён; защищённую запись проверки создать не удалось.", `Ошибка хранения: ${reconciliation.error}`],
+        link: adminLink("/admin")
+      });
+    }
   }
 
   // 4) Service period activation, tied to the payment. Shared with the

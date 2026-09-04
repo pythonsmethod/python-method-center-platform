@@ -39,7 +39,7 @@ describe("Stripe offer-acceptance provenance", () => {
   it("creates one reconciliation gate without weakening payment idempotency", () => {
     const source = readFileSync(join(process.cwd(), "app/api/stripe/webhook/route.ts"), "utf8");
     expect(source).toContain('offer_version: offerProvenance?.version ?? null');
-    expect(source).toContain('onConflict: "stripe_event_id"');
+    expect(source).toContain("writePaymentReconciliation");
     expect(source).toContain("REQUIRES_OWNER_IDENTIFICATION");
     expect(source).toContain('if (paymentError.code === "23505")');
     expect(source).toContain("await openServicePeriod");

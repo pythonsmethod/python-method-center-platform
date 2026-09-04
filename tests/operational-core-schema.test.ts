@@ -18,7 +18,7 @@ describe("server-only operational core schema", () => {
   });
 
   it("excludes terminal Cases and writes aggregate audit evidence for every sweep", () => {
-    const sql = migration("20260904163000_operational_core_corrections.sql");
+    const sql = migration("20260904202655_operational_core_replay_and_upgrade_idempotency.sql");
     expect(sql.match(/status not in \('completed','archived'\)/g)?.length).toBe(4);
     expect(sql).toContain("operational_case_sweep_run");
     expect(sql).toContain("operational_case_sweep_retrospective_reconciliation");
@@ -26,7 +26,7 @@ describe("server-only operational core schema", () => {
   });
 
   it("keeps every active operational status eligible and only excludes terminal status values", () => {
-    const sql = migration("20260904163000_operational_core_corrections.sql");
+    const sql = migration("20260904202655_operational_core_replay_and_upgrade_idempotency.sql");
     for (const status of ["ready_for_review", "in_review", "active_support", "inactive_support"]) {
       expect(sql).not.toContain(`status='${status}'`);
     }

@@ -55,7 +55,7 @@ The code is in PR #118 and the target PMC Vercel preview is successful. Producti
 - All five are `REQUIRES_OWNER_IDENTIFICATION`; Postgres retains event IDs but not the Checkout objects needed for strict matching.
 - Neither available Google identity opened the existing merchant dashboard: one offered account creation and the other returned to password sign-in. A new account was not created.
 - No event was linked, no payment or service period was duplicated, and no customer was guessed.
-- New webhook payments now persist the canonical `OFFER_VERSION`; historical values were not backfilled without consent-time provenance.
+- A new webhook payment receives an offer version only from an accepted consent for the exact profile and product no later than settlement. Missing or ambiguous evidence leaves `offer_version` null, the current compile-time `OFFER_VERSION` is never a fallback, and an idempotent reconciliation gate is required.
 - Stripe test-mode smoke remains blocked by merchant access. Status: **BLOCKED**.
 
 ## Workstream 3 — operational sweep of Cases
@@ -84,7 +84,8 @@ Affected components:
 - `supabase/migrations/20260903204800_operational_core_maintenance.sql`
 - `supabase/migrations/20260903205342_case_operational_control.sql`
 - `supabase/migrations/20260903205711_payment_reconciliation_items.sql`
-- `supabase/migrations/20260904163000_operational_core_corrections.sql`
+- `supabase/migrations/20260904174530_operational_core_corrections.sql` (filename aligned to the identical production registry entry)
+- `supabase/migrations/20260904202655_operational_core_replay_and_upgrade_idempotency.sql`
 - operational maintenance, schema, and Stripe offer-version regression tests
 
 Focused correction pass after independent verification:
@@ -94,14 +95,15 @@ Focused correction pass after independent verification:
 - Document result categories are mutually exclusive and satisfy the recorded arithmetic invariant.
 - The superseded 2026-09-03 closure report was removed; this file is the single current root-cause record.
 - Future operational sweeps exclude `completed` and `archived` Cases and write one sanitized aggregate audit entry per invocation, including zero-change repeats.
-- Migration `20260904163000_operational_core_corrections.sql` creates one honestly labelled retrospective production audit record without replaying the sweep or backdating the event.
+- Migration `20260904174530_operational_core_corrections.sql` creates one honestly labelled retrospective production audit record without replaying the sweep or backdating the event.
+- The subsequent replay/idempotency migration derives retrospective counts from actual rows (including honest 0/0/0 on an empty fresh database), preserves the audit record, and prevents a v1 open operational action from receiving a versioned duplicate.
 
 Verification on the final branch state:
 
 - ESLint: passed.
 - TypeScript: passed.
 - `npm ci --no-audit --no-fund`: passed from the committed lockfile (359 packages installed).
-- Vitest: 105 files, 783 tests passed.
+- Vitest: 107 files, 788 tests passed.
 - Next.js production build: passed.
 - `git diff --check`: passed.
 - Target `python-method-center-platform` Vercel preview: SUCCESS.
@@ -112,6 +114,7 @@ Verification on the final branch state:
 - Production application remains on baseline SHA `eef068f034c4c454019d4bc8091831caef1828c6` until PR merge.
 - Operational migrations are already registered in production.
 - Correction migration `operational_core_corrections` was applied after an aggregate dry-run. It inserted exactly one retrospective audit row, installed the terminal-case filter, retained 26 profiles / 26 current assignments / 26 open actions, and did not invoke the sweep.
+- Replay/idempotency migration is registered in production as `20260904202655 operational_core_replay_and_upgrade_idempotency`; its repository filename matches the registry. It preserved one retrospective row, derived its 26/26/26 counts from actual provenance, retained 26 open actions and 26 current assignments, and installed the semantic open-action guard without invoking the sweep.
 - Post-correction security verification: `anon` and `authenticated` cannot execute the function; `service_role` can. Advisors contain only the expected INFO notices for intentionally policy-free server-only RLS tables, with no new warning or error.
 - Production remained at 0 analysis runs and 0 lab values after the correction.
 - PR #118 is mergeable but GitHub reports `UNSTABLE` solely because of the separate `anham-mobile-app` status.
