@@ -246,6 +246,15 @@ h3 {
   margin-top: 12px;
 }
 
+.case-picture__grid { display: grid; gap: 1rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); margin-top: 1.25rem; }
+.case-picture__grid > section, .case-picture__notes { border: 1px solid var(--line); border-radius: 16px; padding: 1rem; }
+.case-picture__timeline { display: grid; gap: .9rem; padding-left: 1.2rem; }
+.case-picture__timeline li { display: grid; gap: .25rem; }
+.case-picture__timeline time, .case-picture__timeline small { color: var(--muted); }
+.case-picture__trust { color: #7a4d00; font-size: .85rem; font-weight: 700; }
+.case-picture__notes { margin-top: 1rem; }
+.case-picture__notes textarea { box-sizing: border-box; margin-top: .75rem; min-height: 7rem; padding: .8rem; width: 100%; }
+
 /* The page about the person behind the method.
 
    The portrait is a small window by his own request: it used to be a

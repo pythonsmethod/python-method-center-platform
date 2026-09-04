@@ -28,7 +28,9 @@ import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThrea
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
-import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
+import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
+import { CaseAnalyticalPicturePanel } from "@/components/cases/CaseAnalyticalPicturePanel";
+import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 
 type StaffCasePageProps = {
   params: Promise<{
@@ -259,12 +261,13 @@ export default async function StaffCaseDetailPage({
   const events = [...clientCase.case_lifecycle_events].sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
-  const [caseMessages, assistantHistory, review] = await Promise.all([
+  const [caseMessages, assistantHistory, review, casePicture] = await Promise.all([
     canReadProfessorConversation
       ? getCaseMessages(clientCase.id)
       : Promise.resolve({ messages: [], error: null }),
     getAssistantHistoryForCase(clientCase.profile_id, "ru"),
-    getCaseReview(clientCase.id, documents)
+    getCaseReview(clientCase.id, documents),
+    getCaseAnalyticalPicture(clientCase.id)
   ]);
 
   return (
@@ -376,6 +379,15 @@ export default async function StaffCaseDetailPage({
       {/* The assistant's reading of the analyses in this case, waiting when
           he opens it rather than made on demand. Above the file list, so
           the reading and the files it came from sit together. */}
+      <section className="intake-section">
+        <CaseAnalyticalPicturePanel
+          canConfirm={resolvePrivateAssistantRole(auth.email) === "karen"}
+          caseId={clientCase.id}
+          locale={locale}
+          result={casePicture}
+        />
+      </section>
+
       <section className="intake-section" aria-label="Разбор анализов">
         <div className="panel">
           <CaseReviewPanel
