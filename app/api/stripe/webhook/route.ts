@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { paymentProductLabel } from "@/lib/i18n/status-labels";
-import { OFFER_VERSION } from "@/lib/legal/offer";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { describeFailedPayment, stripeDashboardUrl } from "@/lib/payments/failure";
 import { openServicePeriod } from "@/lib/payments/service-period";
@@ -15,6 +14,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
+import { resolveAcceptedOfferVersion } from "@/lib/payments/offer-provenance";
 
 export const runtime = "nodejs";
 
@@ -252,6 +252,26 @@ async function handlePaidSession(
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
   if (!profileId || !product) {
+    await supabase.from("payment_reconciliation_items").upsert({
+      stripe_event_id: eventId,
+      stripe_session_id: session.id,
+      processor_reference: reference,
+      event_type: event.type,
+      livemode: event.livemode,
+      amount_cents: amountCents,
+      currency,
+      candidate_product: product,
+      candidate_profile_id: profileId,
+      status: !profileId
+        ? "REQUIRES_OWNER_IDENTIFICATION"
+        : "INVALID_OR_UNSUPPORTED_PRODUCT",
+      reason: !profileId
+        ? "Stripe payment has no uniquely resolved platform profile; no offer acceptance can be attributed."
+        : "Stripe payment product is not uniquely supported; offer provenance cannot be resolved.",
+      next_action: "Authorized staff must inspect the existing Stripe merchant evidence; do not infer identity, product, or offer version.",
+      audit_metadata: { source: "stripe_webhook" }
+    }, { onConflict: "stripe_event_id", ignoreDuplicates: true });
+
     // The money is in and we do not know whose it is. Everything needed to
     // find out goes in the alert: what was bought, the address that failed
     // to match, why it probably failed, and one tap through to the payment
@@ -291,7 +311,13 @@ async function handlePaidSession(
 
   // 3) Payment record. The unique index on processor_reference makes a
   // concurrent duplicate insert fail closed.
-  const paidAt = new Date();
+  const paidAt = new Date(event.created * 1000);
+  const offerProvenance = await resolveAcceptedOfferVersion(
+    supabase,
+    profileId,
+    product,
+    paidAt
+  );
   const { data: payment, error: paymentError } = await supabase
     .from("payments")
     .insert({
@@ -301,7 +327,7 @@ async function handlePaidSession(
       status: "paid",
       amount_cents: amountCents,
       currency,
-      offer_version: OFFER_VERSION,
+      offer_version: offerProvenance?.version ?? null,
       processor_reference: reference,
       paid_at: paidAt.toISOString(),
       metadata: {
@@ -309,7 +335,13 @@ async function handlePaidSession(
         stripe_event_id: eventId,
         stripe_session_id: session.id,
         customer_email: customerEmail,
-        stripe_metadata: session.metadata
+        stripe_metadata: session.metadata,
+        offer_acceptance: offerProvenance
+          ? {
+              consent_record_id: offerProvenance.consentRecordId,
+              accepted_at: offerProvenance.acceptedAt
+            }
+          : null
       }
     })
     .select("id")
@@ -341,6 +373,28 @@ async function handlePaidSession(
     });
 
     throw new Error(`payment insert failed: ${paymentError.message}`);
+  }
+
+  if (!offerProvenance) {
+    await supabase.from("payment_reconciliation_items").upsert(
+      {
+        stripe_event_id: eventId,
+        stripe_session_id: session.id,
+        processor_reference: reference,
+        event_type: event.type,
+        livemode: event.livemode,
+        amount_cents: amountCents,
+        currency,
+        candidate_product: product,
+        candidate_profile_id: profileId,
+        candidate_case_id: caseRow?.id ?? null,
+        status: "OTHER_BLOCKED_WITH_EXACT_REASON",
+        reason: "Payment recorded without a uniquely proven offer-acceptance consent for this product at or before settlement.",
+        next_action: "Authorized staff must verify consent provenance; do not infer the current website offer version.",
+        audit_metadata: { source: "stripe_webhook", payment_id: payment.id }
+      },
+      { onConflict: "stripe_event_id", ignoreDuplicates: true }
+    );
   }
 
   // 4) Service period activation, tied to the payment. Shared with the

@@ -3,7 +3,11 @@ import { processNextDocument } from "@/lib/documents/processing";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { expireElapsedServicePeriods } from "@/lib/payments/expire-periods";
-import { isCronAuthorized, summarizeMaintenance } from "@/lib/maintenance/cron";
+import {
+  isCronAuthorized,
+  sanitizedMaintenanceError,
+  summarizeMaintenance
+} from "@/lib/maintenance/cron";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -48,24 +52,40 @@ export async function GET(request: NextRequest) {
     documents += 1;
   }
 
-  const maintenance = await expireElapsedServicePeriods();
-  const durationMs = Date.now() - startedAt;
-  const summary = summarizeMaintenance({
-    documents,
-    outcomes: processed,
-    expiredPeriods: maintenance.expiredPeriods,
-    lifecycleEvents: maintenance.lifecycleEvents,
-    casesAligned: maintenance.casesAligned,
-    durationMs,
-    reachedLimit:
-      documents >= BATCH_MAX_DOCUMENTS || durationMs >= BATCH_BUDGET_MS
-  });
+  const documentDurationMs = Date.now() - startedAt;
+  const documentReachedLimit =
+    documents >= BATCH_MAX_DOCUMENTS || documentDurationMs >= BATCH_BUDGET_MS;
 
-  console.info("operational-maintenance-complete", {
-    ...summary
-  });
+  try {
+    const maintenance = await expireElapsedServicePeriods();
+    const durationMs = Date.now() - startedAt;
+    const summary = summarizeMaintenance({
+      documents,
+      outcomes: processed,
+      expiredPeriods: maintenance.expiredPeriods,
+      lifecycleEvents: maintenance.lifecycleEvents,
+      casesAligned: maintenance.casesAligned,
+      durationMs,
+      reachedLimit: documentReachedLimit
+    });
 
-  return NextResponse.json(summary);
+    console.info("operational-maintenance-complete", summary);
+    return NextResponse.json(summary);
+  } catch (error) {
+    const summary = summarizeMaintenance({
+      documents,
+      outcomes: processed,
+      expiredPeriods: 0,
+      lifecycleEvents: 0,
+      casesAligned: 0,
+      durationMs: Date.now() - startedAt,
+      reachedLimit: documentReachedLimit,
+      maintenanceError: sanitizedMaintenanceError(error)
+    });
+
+    console.error("operational-maintenance-failed", summary);
+    return NextResponse.json(summary, { status: 500 });
+  }
 }
 
 // Called by the cabinet right after an upload, so the person who just sent a

@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { describe, expect, it } from "vitest";
-import { isCronAuthorized, summarizeMaintenance } from "@/lib/maintenance/cron";
+import { isCronAuthorized, sanitizedMaintenanceError, summarizeMaintenance } from "@/lib/maintenance/cron";
 
 describe("authenticated operational maintenance", () => {
   it("fails closed when the secret is missing", () => {
@@ -27,7 +27,8 @@ describe("authenticated operational maintenance", () => {
       durationMs: 9,
       reachedLimit: false
     })).toMatchObject({
-      processedCount: 0,
+      documentsAttemptedCount: 0,
+      completedCount: 0,
       failedCount: 0,
       retriedCount: 0,
       complete: true,
@@ -45,13 +46,34 @@ describe("authenticated operational maintenance", () => {
       durationMs: 100,
       reachedLimit: true
     })).toMatchObject({
-      processedCount: 5,
-      failedCount: 2,
+      documentsAttemptedCount: 7,
+      completedCount: 3,
+      failedCount: 1,
       retriedCount: 2,
+      needsReuploadCount: 1,
+      otherOutcomeCount: 0,
       expiredPeriodsCount: 4,
       complete: false,
       truncated: true
     });
+  });
+
+  it("keeps every document outcome mutually exclusive", () => {
+    const summary = summarizeMaintenance({ documents: 8, outcomes: { ready: 3, retrying: 2, failed: 1, needs_reupload: 1, blocked: 1 }, expiredPeriods: 0, lifecycleEvents: 0, casesAligned: 0, durationMs: 20, reachedLimit: false });
+    expect(summary.completedCount + summary.retriedCount + summary.failedCount + summary.needsReuploadCount + summary.otherOutcomeCount).toBe(summary.documentsAttemptedCount);
+  });
+
+  it("reports a sanitized maintenance failure without losing document results", () => {
+    const maintenanceError = sanitizedMaintenanceError(new Error("token=super-secret database unavailable"));
+    const summary = summarizeMaintenance({ documents: 2, outcomes: { ready: 2 }, expiredPeriods: 0, lifecycleEvents: 0, casesAligned: 0, durationMs: 30, reachedLimit: false, maintenanceError });
+    expect(summary).toMatchObject({ documentsAttemptedCount: 2, completedCount: 2, complete: false, maintenanceError: "[redacted] database unavailable" });
+    expect(summary.truncated).toBe(false);
+    expect(JSON.stringify(summary)).not.toContain("super-secret");
+  });
+
+  it("produces the same controlled result when a failed maintenance run is retried", () => {
+    const input = { documents: 1, outcomes: { ready: 1 }, expiredPeriods: 0, lifecycleEvents: 0, casesAligned: 0, durationMs: 10, reachedLimit: false, maintenanceError: "database unavailable" };
+    expect(summarizeMaintenance(input)).toEqual(summarizeMaintenance(input));
   });
 });
 

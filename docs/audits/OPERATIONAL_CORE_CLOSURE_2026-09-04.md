@@ -80,16 +80,28 @@ Affected components:
 - `lib/maintenance/cron.ts`
 - `lib/payments/expire-periods.ts`
 - `app/api/stripe/webhook/route.ts`
+- `lib/payments/offer-provenance.ts`
 - `supabase/migrations/20260903204800_operational_core_maintenance.sql`
 - `supabase/migrations/20260903205342_case_operational_control.sql`
 - `supabase/migrations/20260903205711_payment_reconciliation_items.sql`
+- `supabase/migrations/20260904163000_operational_core_corrections.sql`
 - operational maintenance, schema, and Stripe offer-version regression tests
+
+Focused correction pass after independent verification:
+
+- Offer provenance is resolved from the exact profile's latest accepted `offer_acceptance` for the paid product at or before Stripe settlement. The current site constant is never a fallback. Missing or ambiguous provenance leaves `payments.offer_version` null and creates one reconciliation gate keyed by Stripe event.
+- Document outcomes and operational maintenance outcomes are reported separately. Maintenance failure produces a sanitized `operational-maintenance-failed` log and controlled HTTP 500 with `complete=false`, while retaining the document summary.
+- Document result categories are mutually exclusive and satisfy the recorded arithmetic invariant.
+- The superseded 2026-09-03 closure report was removed; this file is the single current root-cause record.
+- Future operational sweeps exclude `completed` and `archived` Cases and write one sanitized aggregate audit entry per invocation, including zero-change repeats.
+- Migration `20260904163000_operational_core_corrections.sql` creates one honestly labelled retrospective production audit record without replaying the sweep or backdating the event.
 
 Verification on the final branch state:
 
 - ESLint: passed.
 - TypeScript: passed.
-- Vitest: 105 files, 771 tests passed.
+- `npm ci --no-audit --no-fund`: passed from the committed lockfile (359 packages installed).
+- Vitest: 105 files, 783 tests passed.
 - Next.js production build: passed.
 - `git diff --check`: passed.
 - Target `python-method-center-platform` Vercel preview: SUCCESS.
@@ -99,6 +111,9 @@ Verification on the final branch state:
 
 - Production application remains on baseline SHA `eef068f034c4c454019d4bc8091831caef1828c6` until PR merge.
 - Operational migrations are already registered in production.
+- Correction migration `operational_core_corrections` was applied after an aggregate dry-run. It inserted exactly one retrospective audit row, installed the terminal-case filter, retained 26 profiles / 26 current assignments / 26 open actions, and did not invoke the sweep.
+- Post-correction security verification: `anon` and `authenticated` cannot execute the function; `service_role` can. Advisors contain only the expected INFO notices for intentionally policy-free server-only RLS tables, with no new warning or error.
+- Production remained at 0 analysis runs and 0 lab values after the correction.
 - PR #118 is mergeable but GitHub reports `UNSTABLE` solely because of the separate `anham-mobile-app` status.
 - Merge was not performed because the required green-check boundary is not met. Therefore no claim of production deployment or HTTP 200 is made.
 
@@ -118,4 +133,3 @@ Verification on the final branch state:
 | Stripe | Queue and offer-version fix implemented | 5 controlled; object inspection/smoke unavailable | BLOCKED |
 | Cases | Operational ownership/gates implemented | 26/26 controlled; human decisions pending | PARTIALLY CLOSED |
 | Analysis | Existing pipeline retained | consent gate failed safely; no PHI write | BLOCKED_BY_CONSENT |
-

@@ -17,6 +17,22 @@ describe("server-only operational core schema", () => {
     expect(sql).toContain("on conflict(dedupe_key) do nothing");
   });
 
+  it("excludes terminal Cases and writes aggregate audit evidence for every sweep", () => {
+    const sql = migration("20260904163000_operational_core_corrections.sql");
+    expect(sql.match(/status not in \('completed','archived'\)/g)?.length).toBe(4);
+    expect(sql).toContain("operational_case_sweep_run");
+    expect(sql).toContain("operational_case_sweep_retrospective_reconciliation");
+    expect(sql).toContain("idempotent_repeat");
+  });
+
+  it("keeps every active operational status eligible and only excludes terminal status values", () => {
+    const sql = migration("20260904163000_operational_core_corrections.sql");
+    for (const status of ["ready_for_review", "in_review", "active_support", "inactive_support"]) {
+      expect(sql).not.toContain(`status='${status}'`);
+    }
+    expect(sql).toContain("status not in ('completed','archived')");
+  });
+
   it("keeps reconciliation server-only and assigns every historical alert a terminal gate", () => {
     const sql = migration("20260903205711_payment_reconciliation_items.sql");
     expect(sql).toContain("payment_reconciliation_items");
