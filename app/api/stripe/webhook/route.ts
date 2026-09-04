@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { paymentProductLabel } from "@/lib/i18n/status-labels";
+import { OFFER_VERSION } from "@/lib/legal/offer";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { describeFailedPayment, stripeDashboardUrl } from "@/lib/payments/failure";
 import { openServicePeriod } from "@/lib/payments/service-period";
@@ -300,6 +301,7 @@ async function handlePaidSession(
       status: "paid",
       amount_cents: amountCents,
       currency,
+      offer_version: OFFER_VERSION,
       processor_reference: reference,
       paid_at: paidAt.toISOString(),
       metadata: {
