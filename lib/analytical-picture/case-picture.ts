@@ -137,7 +137,10 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
 
   const extractedEvidence = [...(input.extractedEvidence ?? [])];
   const primaryEvidence = extractedEvidence.filter((item) => item.priority === "CRITICAL" || item.priority === "IMPORTANT").slice(0, 25);
-  const reviewable = extractedEvidence.filter((item) => item.priority !== "TECHNICAL");
+  // Karen's mandatory queue is the bounded primary projection. Supporting
+  // evidence remains available in drill-down but cannot silently turn an
+  // intentionally concise review into hundreds of blocking rows.
+  const reviewable = primaryEvidence;
   const completed = reviewable.filter((item) => item.reviewDecision !== "PENDING");
   const critical = reviewable.filter((item) => item.priority === "CRITICAL");
   const criticalCompleted = critical.filter((item) => item.reviewDecision !== "PENDING");

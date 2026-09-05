@@ -14,6 +14,14 @@ export function normalizeEvidenceText(value: string | null): string {
     .toLocaleLowerCase("en-US");
 }
 
+function normalizeFieldValue(value: string | null, label: string): string {
+  const normalized = normalizeEvidenceText(value);
+  const normalizedLabel = normalizeEvidenceText(label).replace(/[:]+$/g, "");
+  return normalizedLabel && normalized.startsWith(normalizedLabel)
+    ? normalized.slice(normalizedLabel.length).replace(/^\s*[:=-]\s*/, "")
+    : normalized;
+}
+
 export function evidencePriority(section: string, label: string): ExtractedClinicalEvidence["priority"] {
   const signal = `${section} ${label}`;
   if (TECHNICAL_PATTERN.test(signal)) return "TECHNICAL";
@@ -30,7 +38,7 @@ export function prepareEvidenceForKaren(items: ExtractedClinicalEvidence[]): Ext
   const unique = new Map<string, ExtractedClinicalEvidence>();
   for (const source of items) {
     const sameReading = source.alternateValue !== null
-      && normalizeEvidenceText(source.value) === normalizeEvidenceText(source.alternateValue);
+      && normalizeFieldValue(source.value, source.label) === normalizeFieldValue(source.alternateValue, source.label);
     const genericNote = /^(?:note|примечани)/i.test(source.section.trim())
       && /^(?:text|текст)$/i.test(source.label.trim());
     const base: ExtractedClinicalEvidence = {

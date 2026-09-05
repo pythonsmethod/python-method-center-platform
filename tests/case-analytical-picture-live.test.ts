@@ -60,7 +60,7 @@ describe("live Case Analytical Picture", () => {
 
   it("normalizes formatting-only disagreements, separates generic notes and removes exact duplicates", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
-      { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
+      { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Nottingham grade: Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
       { file: "synthetic.pdf", section: "Note", label: "Text", first: "First independent note", second: "Second independent note", reason: "разные значения", note: "" },
     ] }, new Set(["doc-a"]));
     const prepared = prepareEvidenceForKaren([...projected, projected[0]]);
@@ -76,6 +76,13 @@ describe("live Case Analytical Picture", () => {
     const item = { id: "e1", documentId: "doc-a", section: "Final Diagnosis", label: "Diagnosis", value: "synthetic", alternateValue: null, category: "PATHOLOGY" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "CRITICAL" as const, reviewDecision: "PENDING" as const, correction: null };
     expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [item] })).reviewSummary).toMatchObject({ required: 1, completed: 0, criticalRequired: 1, criticalCompleted: 0, approvalBlocked: true });
     expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [{ ...item, reviewDecision: "CONFIRMED" }] })).reviewSummary).toMatchObject({ completed: 1, criticalCompleted: 1, approvalBlocked: false });
+  });
+
+  it("bounds the mandatory Karen queue to the 25-item primary projection", () => {
+    const extractedEvidence = Array.from({ length: 40 }, (_, index) => ({ id: `e${index}`, documentId: "doc-a", section: "Final Diagnosis", label: `Diagnosis ${index}`, value: "synthetic", alternateValue: null, category: "PATHOLOGY" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "CRITICAL" as const, reviewDecision: "PENDING" as const, correction: null }));
+    const picture = buildCaseAnalyticalPicture(base({ extractedEvidence }));
+    expect(picture.primaryEvidence).toHaveLength(25);
+    expect(picture.reviewSummary).toMatchObject({ required: 25, criticalRequired: 25, approvalBlocked: true });
   });
 
   it("does not guess categories from substrings or generic diagnosis headings", () => {
