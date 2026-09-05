@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-Last canonical update: 2026-09-03
+Last canonical update: 2026-09-05
 
 ## 1. Current position
 
@@ -277,6 +277,18 @@ Current result under the proposed, not-yet-approved 11-gate engineering protocol
 - no low/medium-quality, corrected/addendum or multi-source-type real coverage.
 
 Phase 2.9 is not closed. Additional authorized real Cases and independent review evidence are genuine source-data requirements that do not exist in the repository.
+
+### Connected in-memory harness — 2026-09-05
+
+An isolated, persistence-free route now connects a Google-like normalized provider result to Clinical Evidence, the unchanged Phase 2.7 shadow trust policy, Evidence Package and Case Analytical Picture. It accepts only `IN_MEMORY_TEST` with external calls and persistence explicitly disabled. A development-only RU/EN screen is gated by `ANKH_HARNESS_ENABLED=true` and returns 404 outside development.
+
+The connected synthetic integration suite now passes 16/16 tests. It covers Case identity, ambiguous document types, unresolved units/dates, incomplete sources, source contradictions, duplicate document versions, cross-Case rejection, false trust promotion, production endpoint isolation, source/candidate corruption and missing/ambiguous source anchors. Source observations are reconstructed from normalized document tokens/spans where uniquely available; candidates are no longer checked against themselves. Missing field-parse/context confidence remains null, and unavailable reference separation is explicitly not evaluated instead of passed. No Supabase environment was used because no database was proven isolated from production. No OCR/LLM/provider call or production write occurred.
+
+Focused connected/trust/provenance regression: 64/64 passed. Full suite: 740 passed with the same 2 unrelated failures in `free-review-description.test.ts`. TypeScript and ESLint passed; `git diff --check` passed with line-ending warnings only.
+
+This harness proves module connectivity only. It does not add a real Case, close Phase 2.9, validate a staging database, authorize PHI transmission, produce a diagnosis, or connect Karen/client decisions.
+
+Controlled Learning / Phase 6 remains a separate open item. This hardening does not implement self-learning and does not improve or claim medical OCR accuracy.
 
 ## 14. Phase 3 status
 
