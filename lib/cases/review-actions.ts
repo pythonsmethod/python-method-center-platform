@@ -19,6 +19,7 @@ import { getStaffUserState } from "@/lib/auth/require-staff";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { fingerprintDocuments } from "@/lib/cases/case-documents";
 import { diffReviewText } from "@/lib/cases/review-diff";
+import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 import type { CaseReviewActionState } from "@/lib/cases/review-state";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -225,6 +226,11 @@ export async function approveCaseReview(
   if (auth.status !== "authorized" || resolvePrivateAssistantRole(auth.email) !== "karen") return errorState(locale === "en" ? "Only Professor Python can approve a conclusion." : "Утвердить заключение может только Professor Python.");
   if (!isUuid(caseId) || !isUuid(reviewId)) return errorState(locale === "en" ? "Invalid review." : "Некорректный разбор.");
   if (!approvedText || approvedText.length > 8000) return errorState(locale === "en" ? "Enter the approved conclusion (up to 8,000 characters)." : "Введите утверждённое заключение (до 8000 символов).");
+
+  const pictureResult = await getCaseAnalyticalPicture(caseId);
+  if (pictureResult.status !== "ready" || pictureResult.picture.reviewSummary.approvalBlocked) {
+    return errorState(locale === "en" ? "Review every critical evidence item in the whole-case picture before approval." : "Перед утверждением проверьте все критические свидетельства в целостной картине кейса.");
+  }
 
   const supabase = createSupabaseServiceClient();
   if (!supabase) return errorState(locale === "en" ? "The database is unavailable." : "База данных недоступна.");

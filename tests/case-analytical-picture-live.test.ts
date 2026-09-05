@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import { buildCaseAnalyticalPicture, type PictureInput } from "@/lib/analytical-picture";
 import { canSavePictureNote } from "@/lib/analytical-picture/review-policy";
 import { projectStoredExtractionEvidence } from "@/lib/analytical-picture/queries";
+import { prepareEvidenceForKaren } from "@/lib/analytical-picture/evidence-presentation";
 
 const document = { id: "doc-a", name: "synthetic.pdf", status: "ready", createdAt: "2026-01-01", identityStatus: "match" };
 const fact = (id: string, date: string | null, unit = "mg/L") => ({
@@ -42,7 +43,7 @@ describe("live Case Analytical Picture", () => {
   });
 
   it("keeps stored extraction evidence review-only and case-bound", () => {
-    const evidence = { id: "e1", documentId: "doc-a", section: "Imaging", label: "Finding", value: "synthetic text", alternateValue: null, category: "RADIOLOGY" as const, trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null } };
+    const evidence = { id: "e1", documentId: "doc-a", section: "Imaging", label: "Finding", value: "synthetic text", alternateValue: null, category: "RADIOLOGY" as const, trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "IMPORTANT" as const, reviewDecision: "PENDING" as const, correction: null };
     expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [evidence] })).extractedEvidence[0].trustState).toBe("SOURCE_ONLY");
     expect(() => buildCaseAnalyticalPicture(base({ extractedEvidence: [{ ...evidence, documentId: "doc-other" }] }))).toThrow("another Case");
   });
@@ -55,6 +56,26 @@ describe("live Case Analytical Picture", () => {
     expect(projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [agreed], disputed: [] }, new Set(["doc-a"]), new Set(["doc-a|Synthetic label|42"]))).toHaveLength(0);
     expect(() => projectStoredExtractionEvidence({ id: "x", documentId: "foreign", agreed: [], disputed: [] }, new Set(["doc-a"]))).toThrow("another Case");
     expect(items.some((item) => (item.trustState as string) === "VERIFIED")).toBe(false);
+  });
+
+  it("normalizes formatting-only disagreements, separates generic notes and removes exact duplicates", () => {
+    const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
+      { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
+      { file: "synthetic.pdf", section: "Note", label: "Text", first: "First independent note", second: "Second independent note", reason: "разные значения", note: "" },
+    ] }, new Set(["doc-a"]));
+    const prepared = prepareEvidenceForKaren([...projected, projected[0]]);
+    expect(prepared).toHaveLength(3);
+    expect(prepared[0]).toMatchObject({ alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY", priority: "CRITICAL" });
+    expect(prepared.slice(1)).toEqual(expect.arrayContaining([
+      expect.objectContaining({ value: "First independent note", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" }),
+      expect.objectContaining({ value: "Second independent note", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" }),
+    ]));
+  });
+
+  it("counts extracted evidence decisions and blocks approval until every critical item is reviewed", () => {
+    const item = { id: "e1", documentId: "doc-a", section: "Final Diagnosis", label: "Diagnosis", value: "synthetic", alternateValue: null, category: "PATHOLOGY" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "CRITICAL" as const, reviewDecision: "PENDING" as const, correction: null };
+    expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [item] })).reviewSummary).toMatchObject({ required: 1, completed: 0, criticalRequired: 1, criticalCompleted: 0, approvalBlocked: true });
+    expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [{ ...item, reviewDecision: "CONFIRMED" }] })).reviewSummary).toMatchObject({ completed: 1, criticalCompleted: 1, approvalBlocked: false });
   });
 
   it("does not guess categories from substrings or generic diagnosis headings", () => {
@@ -100,13 +121,17 @@ describe("live Case Analytical Picture", () => {
   it("scopes every adapter source to the requested Case and stores notes internally", () => {
     const query = readFileSync("lib/analytical-picture/queries.ts", "utf8");
     const action = readFileSync("lib/analytical-picture/actions.ts", "utf8");
+    const approvalAction = readFileSync("lib/cases/review-actions.ts", "utf8");
     expect(query.match(/\.eq\("case_id", caseId\)/g)?.length).toBe(5);
     expect(query).toContain('.in("document_id", [...documentIds])');
     expect(query).not.toContain('.from("lab_values").insert');
-    expect(query).toContain('.contains("metadata", { kind: "case_picture_review" })');
+    expect(query).toContain('metadata?.kind !== "case_picture_evidence_review"');
     expect(action).toContain('visibility: "karen_and_admin"');
     expect(action).toContain('resolvePrivateAssistantRole(auth.email) === "karen"');
+    expect(action).toContain('kind: "case_picture_evidence_review"');
     expect(action).not.toContain("case_messages");
+    expect(approvalAction).toContain("pictureResult.picture.reviewSummary.approvalBlocked");
+    expect(approvalAction.indexOf("pictureResult.picture.reviewSummary.approvalBlocked")).toBeLessThan(approvalAction.indexOf('from("case_review_learning_events")'));
   });
 
   it("ships both Russian and English visible copy", () => {
@@ -115,8 +140,10 @@ describe("live Case Analytical Picture", () => {
     expect(component).toContain("Whole-case picture");
     expect(component).toContain("Это не диагноз");
     expect(component).toContain("It is not a diagnosis");
-    expect(component).toContain("Извлечённые клинические свидетельства");
-    expect(component).toContain("Extracted clinical evidence");
+    expect(component).toContain("Ключевые клинические свидетельства");
+    expect(component).toContain("Key clinical evidence");
+    expect(component).toContain("Подтвердить");
+    expect(component).toContain("Reject");
   });
 
 });

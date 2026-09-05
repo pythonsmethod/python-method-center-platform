@@ -13,6 +13,7 @@ type CaseReviewPanelProps = {
   documentsCount: number;
   documentStatuses?: string[];
   locale?: "ru" | "en";
+  approvalBlocked?: boolean;
 };
 
 // What Professor Python meets when he opens a case: the assistant's reading
@@ -28,7 +29,8 @@ export function CaseReviewPanel({
   review,
   documentsCount,
   documentStatuses = [],
-  locale = "ru"
+  locale = "ru",
+  approvalBlocked = false
 }: CaseReviewPanelProps) {
   const [state, action, pending] = useActionState(
     generateCaseReview,
@@ -67,7 +69,8 @@ export function CaseReviewPanel({
         verifyNote: "ИИ не смог уверенно прочитать эти места. Номер и название помогут сразу открыть нужный файл.",
         verified: "Дополнительная проверка не требуется.",
         stale: "Клиент загрузил новые документы после подготовки текста. Подготовьте его заново.",
-        recognized: "Распознано файлов"
+        recognized: "Распознано файлов",
+        blocked: "Сначала проверьте все критические свидетельства в целостной картине кейса."
       }
     : {
         aria: "Prepared test result review",
@@ -89,7 +92,8 @@ export function CaseReviewPanel({
         verifyNote: "The AI could not read these items confidently. The file number and name take you directly to the right document.",
         verified: "No additional verification is required.",
         stale: "The client uploaded new documents after this text was prepared. Prepare it again.",
-        recognized: "Files recognized"
+        recognized: "Files recognized",
+        blocked: "Review every critical evidence item in the whole-case picture before approval."
       };
 
   async function copyDraft() {
@@ -197,11 +201,12 @@ export function CaseReviewPanel({
                   value={editedText}
                 />
                 <div className="panel-actions">
-                  <button className="button" disabled={approvalPending || !editedText.trim()} type="submit">
+                  <button className="button" disabled={approvalPending || !editedText.trim() || approvalBlocked} type="submit">
                     {approvalPending ? t.approving : t.approve}
                   </button>
                   {review.approvalCount > 0 ? <span>{t.history}: {review.approvalCount}</span> : null}
                 </div>
+                {approvalBlocked ? <p className="notice notice--warning">{t.blocked}</p> : null}
               </form>
               <p className="case-review__draft-note">
                 {t.note}

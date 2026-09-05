@@ -396,6 +396,7 @@ export default async function StaffCaseDetailPage({
             documentStatuses={documents.map((document) => document.document_status)}
             review={review}
             locale={locale}
+            approvalBlocked={casePicture.status === "ready" && casePicture.picture.reviewSummary.approvalBlocked}
           />
         </div>
       </section>

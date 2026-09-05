@@ -28,6 +28,16 @@ The production schema does not yet persist the newer Canonical/Clinical Evidence
 
 The screen reuses service-only `admin_notes`. Notes are internal (`karen_and_admin`) and append-only through this UI. Staff may save a draft; only an address authorized as Karen may mark a note confirmed. A confirmed note is still a review note, not a client response and not an automatic Case decision.
 
+## Karen Review hardening — 2026-09-05
+
+The primary screen is now bounded to at most 25 critical or important clinical rows. Technical/demographic rows and the complete extraction stay available in a closed drill-down; source storage is unchanged.
+
+Formatting-only differences are normalized for comparison, exact duplicates are collapsed, and unrelated generic note rows are preserved separately instead of being reported as one clinical contradiction. These presentation rules do not change source evidence or trust state.
+
+Karen can append `CONFIRMED`, `CORRECTED` or `REJECTED` decisions for a Case-scoped evidence reference. This remains a Karen decision, not a Phase 2.7 Trust Decision, and never promotes evidence to `VERIFIED`. The latest decision drives progress while earlier decisions remain in `admin_notes`.
+
+The conclusion approval UI and server action fail closed while any critical evidence row remains pending. This gate confirms completion of Karen review, not clinical correctness.
+
 ## Remaining gap
 
-This screen does not claim the full clinical chain is live. A later approved staging/production task must connect persisted Canonical Facts, Clinical Evidence, Evidence Packages and Clinical Trust Decisions with exact page/token provenance. Phase 2.9 remains open.
+This screen does not claim the full clinical chain is live. Exact page/token provenance and persisted Clinical Trust Decisions remain absent. A new extraction version creates new evidence references and therefore a new review requirement. Phase 2.9 remains open and production auto-verification remains NO-GO.

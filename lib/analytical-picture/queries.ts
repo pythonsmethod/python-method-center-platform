@@ -2,6 +2,7 @@ import { buildCaseAnalyticalPicture, type ExtractedClinicalEvidence, type Pictur
 import type { DisputedValue, TranscribedValue } from "@/lib/assistant/transcription";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { TrendAssessment } from "@/lib/analysis/trend-gate";
+import { prepareEvidenceForKaren } from "./evidence-presentation";
 
 export type PictureQueryResult =
   | { status: "ready"; picture: ReturnType<typeof buildCaseAnalyticalPicture> }
@@ -25,8 +26,8 @@ export function projectStoredExtractionEvidence(input: { id: string; documentId:
     return signals.size === 1 ? [...signals][0] : "UNKNOWN";
   };
   return [
-    ...input.agreed.flatMap((row, index) => structuredKeys.has(`${input.documentId}|${row.label}|${row.value}`) ? [] : [{ id: `${input.id}-agreed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.value, alternateValue: null, category: classify(row.section, row.label), trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null } }]),
-    ...input.disputed.map((row, index) => ({ id: `${input.id}-disputed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.first, alternateValue: row.second, category: classify(row.section, row.label), trustState: "NEEDS_REVIEW" as const, disputeReason: row.reason, provenance: { level: "DOCUMENT" as const, page: null } })),
+    ...input.agreed.flatMap((row, index) => structuredKeys.has(`${input.documentId}|${row.label}|${row.value}`) ? [] : [{ id: `${input.id}-agreed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.value, alternateValue: null, category: classify(row.section, row.label), trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
+    ...input.disputed.map((row, index) => ({ id: `${input.id}-disputed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.first, alternateValue: row.second, category: classify(row.section, row.label), trustState: "NEEDS_REVIEW" as const, disputeReason: row.reason, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null })),
   ];
 }
 
@@ -38,7 +39,7 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
     supabase.from("uploaded_documents").select("id, original_filename, document_status, created_at").eq("case_id", caseId).is("archived_at", null).order("created_at"),
     supabase.from("lab_values").select("id, document_id, measured_on, label_original, value_original, unit_original, value_canonical, unit_resolved, reference_original, analyte, unit_resolution_method, analysis_run_id").eq("case_id", caseId).order("measured_on"),
     supabase.from("analysis_runs").select("id, document_id, created_at, trends, blocked, requests, excluded").eq("case_id", caseId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
-    supabase.from("admin_notes").select("id, body, author_id, created_at, metadata").eq("case_id", caseId).contains("metadata", { kind: "case_picture_review" }).order("created_at", { ascending: false }),
+    supabase.from("admin_notes").select("id, body, author_id, created_at, metadata").eq("case_id", caseId).order("created_at", { ascending: false }),
   ]);
 
   const firstError = documentsResult.error ?? factsResult.error ?? runResult.error ?? notesResult.error;
@@ -76,14 +77,28 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
     extractedEvidence.push(...projectStoredExtractionEvidence({ id: String(extraction.id), documentId, agreed: (extraction.agreed_values ?? []) as TranscribedValue[], disputed: (extraction.disputed_values ?? []) as DisputedValue[] }, documentIds, structuredKeys));
   }
   const run = runResult.data as { id?: string; created_at?: string; trends?: Record<string, TrendAssessment>; blocked?: PictureInputRun["blocked"]; requests?: string[]; excluded?: PictureInputRun["excluded"] } | null;
-  const notes: PictureReviewNote[] = (notesResult.data ?? []).map((row) => ({
+  const noteRows = notesResult.data ?? [];
+  const notes: PictureReviewNote[] = noteRows.filter((row) => (row.metadata as { kind?: string } | null)?.kind === "case_picture_review").map((row) => ({
     id: String(row.id), body: String(row.body), authorId: row.author_id ? String(row.author_id) : null,
     createdAt: String(row.created_at), state: (row.metadata as { state?: string } | null)?.state === "confirmed" ? "confirmed" : "draft",
+  }));
+  const latestReviews = new Map<string, { decision: ExtractedClinicalEvidence["reviewDecision"]; correction: string | null }>();
+  for (const row of noteRows) {
+    const metadata = row.metadata as { kind?: string; evidence_id?: string; decision?: string; correction?: string } | null;
+    if (metadata?.kind !== "case_picture_evidence_review" || !metadata.evidence_id || latestReviews.has(metadata.evidence_id)) continue;
+    const decision = metadata.decision;
+    if (decision !== "CONFIRMED" && decision !== "CORRECTED" && decision !== "REJECTED") continue;
+    latestReviews.set(metadata.evidence_id, { decision, correction: metadata.correction?.trim() || null });
+  }
+  const preparedEvidence = prepareEvidenceForKaren(extractedEvidence).map((item) => ({
+    ...item,
+    reviewDecision: latestReviews.get(item.id)?.decision ?? "PENDING",
+    correction: latestReviews.get(item.id)?.correction ?? null,
   }));
 
   const newestDocumentAt = documents.reduce((latest, item) => item.createdAt > latest ? item.createdAt : latest, "");
   const analysisCurrent = Boolean(run?.id && run.created_at && run.created_at >= newestDocumentAt);
-  return { status: "ready", picture: buildCaseAnalyticalPicture({ caseId, documents, facts, extractedEvidence, trends: run?.trends ?? {}, blocked: run?.blocked ?? [], requests: run?.requests ?? [], excluded: run?.excluded ?? [], notes, analysisRunId: run?.id ? String(run.id) : null, analysisCurrent }) };
+  return { status: "ready", picture: buildCaseAnalyticalPicture({ caseId, documents, facts, extractedEvidence: preparedEvidence, trends: run?.trends ?? {}, blocked: run?.blocked ?? [], requests: run?.requests ?? [], excluded: run?.excluded ?? [], notes, analysisRunId: run?.id ? String(run.id) : null, analysisCurrent }) };
 }
 
 type PictureInputRun = {
