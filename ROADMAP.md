@@ -131,6 +131,8 @@ Result:
 
 Status: IN PROGRESS — DATA GATE OPEN
 
+Connected-harness checkpoint (2026-09-05): a local in-memory adapter now proves the bounded path `Google normalized result -> Clinical Evidence -> shadow Trust Decision -> Evidence Package -> Case Picture` on synthetic input. It performs no provider call or persistence and fails closed on identity, provenance, ambiguity, conflict, unit/date/reference/row and duplicate-version errors. It reconstructs an immutable source observation from normalized token/span data and checks the extracted candidate against that observation instead of against itself. Missing signals remain unknown. This validates the transformation boundary, not the correctness of OCR against the original image. A real staging database exercise and any new real-Case run remain open gates; this checkpoint does not increase Phase 2.9 coverage.
+
 Goal:
 validate extraction + trust gates on multiple Cases/layouts.
 
@@ -260,6 +262,8 @@ Client response must not simply copy the technical Karen interface.
 ---
 
 # PHASE 6 — CONTROLLED LEARNING
+
+Status: OPEN — not implemented by the connected-harness hardening.
 
 Build:
 - Case-only corrections;

@@ -2,7 +2,7 @@
 
 This file records architectural decisions that must survive chat/thread changes.
 
-Last canonical update: 2026-09-03. New decisions are appended with a new ID; historical decisions are not silently rewritten. If a decision is superseded, record the replacement and reference the prior ID.
+Last canonical update: 2026-09-05. New decisions are appended with a new ID; historical decisions are not silently rewritten. If a decision is superseded, record the replacement and reference the prior ID.
 
 ---
 
@@ -434,3 +434,53 @@ Do not close Phase 2.9 by repeatedly processing the existing eight images from o
 A release-decision audit requires multiple authorized real Cases, independent source review, varied layouts, languages, source types and quality bands, corrected/addendum coverage, exact provenance and controlled false-auto-verification risk under the unchanged policy.
 
 Numeric cohort thresholds remain a proposed protocol until explicitly approved; they are not an architectural fact.
+
+---
+
+## D-039 — Evidence Package is a projection, not a new fact store
+
+Decision:
+Use one provider-neutral Evidence Package to compose references and snapshots from the existing immutable source, Canonical/Clinical fact, provenance and Trust Decision layers. Do not add a parallel Case, fact, workflow or trust table.
+
+---
+
+## D-040 — Trust promotion is monotonic and evidence-bound
+
+Decision:
+A downstream stage may preserve or lower trust. It may raise trust only after a new independent source/OCR signal or a predefined deterministic gate passes, with all integrity checks passing and no unresolved source contradiction. Rephrasing, confidence, repeated summaries, LLM consensus and AI critique are not promotion evidence.
+
+---
+
+## D-041 — AI critique is a one-way safety mechanism
+
+Decision:
+AI critique may find problems and lower trust. It cannot independently produce VERIFIED evidence or satisfy an independent cross-check. A selective second-OCR plan is not authorization to transmit PHI.
+
+---
+
+## D-042 — The whole-client picture is a projection over Evidence Packages
+
+Decision:
+The Case picture orders evidence, compares only like with like, surfaces contradictions and missing context, and carries source/trust references. It does not infer diagnosis or causality and never promotes trust during aggregation.
+
+---
+
+## D-043 — Connected development harness is in-memory and fail-closed
+
+Decision:
+Until a database is independently proven non-production, the connected Ankh harness runs only in memory, with external calls and persistence disabled by contract. Its development screen is unavailable outside `NODE_ENV=development` plus an explicit local enable flag. Synthetic connectivity does not count as real-world validation.
+
+---
+
+## D-044 — Connected integrity compares candidates with immutable normalized source
+
+Decision:
+The connected harness reconstructs a source observation from normalized page
+tokens/spans when a unique anchor exists. Candidate value, unit, reference,
+date and row signals are checked against that separate observation, never a
+copy of the candidate. Missing or ambiguous anchors are `NOT_EVALUATED` and
+fail closed.
+
+Text presence and anatomical context do not manufacture confidence. This check
+validates extraction/transformation behavior only; it is not an independent
+reread of the original image and cannot prove OCR correctness.

@@ -5,3 +5,4 @@ export * from "./benchmark";
 export * from "./clinical-adapter";
 export * from "./validation-readiness";
 export * from "./validation-intake";
+export * from "./evidence-package";

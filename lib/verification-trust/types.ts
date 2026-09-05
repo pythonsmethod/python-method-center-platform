@@ -28,7 +28,7 @@ export const TRUST_REASON_CODES = [
 ] as const;
 export type TrustReasonCode = typeof TRUST_REASON_CODES[number];
 export type DeterministicCheckName = "NUMERIC_PARSE" | "UNIT_VALUE_SEPARATION" | "REFERENCE_VALUE_SEPARATION" | "LABEL_VALUE_ASSOCIATION" | "DATE_EVENT_ASSOCIATION" | "LATERALITY_SITE_ASSOCIATION" | "IDEMPOTENCY" | "SOURCE_EXISTS" | "SCHEMA_CONSTRAINTS" | "LAYOUT_CONTRADICTION";
-export type CheckResult = { name: DeterministicCheckName; passed: boolean; detail?: string };
+export type CheckResult = { name: DeterministicCheckName; passed: boolean; status?: "PASSED" | "FAILED" | "NOT_EVALUATED"; detail?: string };
 export type CrossCheckResult = { method: "INDEPENDENT_PARSER" | "SPATIAL_REEVALUATION" | "EXACT_SOURCE_SPAN" | "SECOND_OCR_PROVIDER"; independentSignal: boolean; passed: boolean; detail?: string };
 
 export type TrustCandidate = {
