@@ -7,20 +7,32 @@ import {
 
 describe("private expert assistant access", () => {
   const original = process.env.KAREN_EMAILS;
+  const originalPrimary = process.env.KAREN_PRIMARY_EMAIL;
   const originalFounders = process.env.FOUNDER_EMAILS;
 
   afterEach(() => {
     if (original === undefined) delete process.env.KAREN_EMAILS;
     else process.env.KAREN_EMAILS = original;
+    if (originalPrimary === undefined) delete process.env.KAREN_PRIMARY_EMAIL;
+    else process.env.KAREN_PRIMARY_EMAIL = originalPrimary;
     if (originalFounders === undefined) delete process.env.FOUNDER_EMAILS;
     else process.env.FOUNDER_EMAILS = originalFounders;
   });
 
   it("fails closed when no email is configured", () => {
     delete process.env.KAREN_EMAILS;
+    delete process.env.KAREN_PRIMARY_EMAIL;
 
     expect(karenAllowlist()).toEqual([]);
     expect(isKarenAssistantEmail("admin@example.com")).toBe(false);
+  });
+
+  it("adds a primary Karen address without replacing the existing allowlist", () => {
+    process.env.KAREN_EMAILS = "existing@example.com";
+    process.env.KAREN_PRIMARY_EMAIL = " primary@example.com ";
+
+    expect(karenAllowlist()).toEqual(["existing@example.com", "primary@example.com"]);
+    expect(isKarenAssistantEmail("PRIMARY@example.com")).toBe(true);
   });
 
   it("allows only configured emails, case-insensitively", () => {

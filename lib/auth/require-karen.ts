@@ -4,7 +4,8 @@ import { isFounderEmail } from "@/lib/auth/require-founder";
 export type PrivateAssistantRole = "founder" | "karen";
 
 export function karenAllowlist(): string[] {
-  return (process.env.KAREN_EMAILS ?? "")
+  return [process.env.KAREN_EMAILS ?? "", process.env.KAREN_PRIMARY_EMAIL ?? ""]
+    .join(",")
     .split(",")
     .map((value) => value.trim().toLowerCase())
     .filter(Boolean);
