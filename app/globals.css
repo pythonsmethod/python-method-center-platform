@@ -252,6 +252,10 @@ h3 {
 .case-picture__timeline li { display: grid; gap: .25rem; }
 .case-picture__timeline time, .case-picture__timeline small { color: var(--muted); }
 .case-picture__trust { color: #7a4d00; font-size: .85rem; font-weight: 700; }
+.case-picture__evidence-list > li { border-left: 3px solid #9a6b35; padding-left: .85rem; }
+.case-picture__evidence-review { display: grid; gap: .55rem; margin-top: .75rem; }
+.case-picture__evidence-review textarea { min-height: 4.5rem; width: 100%; }
+.case-picture__reviewed { color: #2f6b45; font-weight: 700; margin: .65rem 0 0; }
 .case-picture__notes { margin-top: 1rem; }
 .case-picture__notes textarea { box-sizing: border-box; margin-top: .75rem; min-height: 7rem; padding: .8rem; width: 100%; }
 

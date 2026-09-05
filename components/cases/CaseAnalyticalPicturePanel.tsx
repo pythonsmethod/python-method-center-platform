@@ -1,11 +1,50 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState } from "react";
-import { saveCasePictureNote, type PictureNoteActionState } from "@/lib/analytical-picture/actions";
+import { useActionState, useState } from "react";
+import { saveCasePictureNote, saveEvidenceReview, type PictureNoteActionState } from "@/lib/analytical-picture/actions";
 import type { CaseAnalyticalPicture } from "@/lib/analytical-picture";
 
 const initialState: PictureNoteActionState = { status: "idle", message: "" };
+
+function EvidenceReviewControls({ caseId, locale, item, labels }: {
+  caseId: string;
+  locale: "ru" | "en";
+  item: CaseAnalyticalPicture["extractedEvidence"][number];
+  labels: { confirmEvidence: string; correctEvidence: string; rejectEvidence: string; correction: string; saved: string };
+}) {
+  const [state, action, pending] = useActionState(saveEvidenceReview, initialState);
+  return <form action={action} className="case-picture__evidence-review">
+    <input name="case_id" type="hidden" value={caseId} />
+    <input name="document_id" type="hidden" value={item.documentId} />
+    <input name="evidence_id" type="hidden" value={item.id} />
+    <input name="locale" type="hidden" value={locale} />
+    {item.reviewDecision === "PENDING" ? <>
+      <textarea aria-label={labels.correction} maxLength={2000} name="correction" placeholder={labels.correction} rows={2} />
+      <div className="panel-actions">
+        <button className="button button--compact" disabled={pending} name="decision" value="CONFIRMED">{labels.confirmEvidence}</button>
+        <button className="button button--secondary button--compact" disabled={pending} name="decision" value="CORRECTED">{labels.correctEvidence}</button>
+        <button className="button button--secondary button--compact" disabled={pending} name="decision" value="REJECTED">{labels.rejectEvidence}</button>
+      </div>
+    </> : <p className="case-picture__reviewed">{labels.saved}: {item.reviewDecision}{item.correction ? ` — ${item.correction}` : ""}</p>}
+    {state.message ? <p aria-live="polite" className={`form-message form-message--${state.status}`}>{state.message}</p> : null}
+  </form>;
+}
+
+function AllEvidenceDetails({ caseId, locale, items, canConfirm, labels, categoryLabel }: {
+  caseId: string;
+  locale: "ru" | "en";
+  items: CaseAnalyticalPicture["extractedEvidence"];
+  canConfirm: boolean;
+  labels: Parameters<typeof EvidenceReviewControls>[0]["labels"] & { allEvidence: string; open: string };
+  categoryLabel: (category: CaseAnalyticalPicture["extractedEvidence"][number]["category"]) => string;
+}) {
+  const [open, setOpen] = useState(false);
+  return <details onToggle={(event) => setOpen(event.currentTarget.open)}>
+    <summary>{labels.allEvidence} ({items.length})</summary>
+    {open ? <ul className="status-list">{items.map((item) => <li key={`all-${item.id}`}><strong>{categoryLabel(item.category)} · {item.section} · {item.label}</strong><br />{item.value ?? "—"}{item.alternateValue !== null ? ` ↔ ${item.alternateValue}` : ""} · <Link href={`/admin/documents/${item.documentId}/view`} target="_blank">{labels.open}</Link>{canConfirm && item.priority !== "TECHNICAL" ? <EvidenceReviewControls caseId={caseId} item={item} labels={labels} locale={locale} /> : null}</li>)}</ul> : null}
+  </details>;
+}
 
 export function CaseAnalyticalPicturePanel({ caseId, locale, result, canConfirm }: {
   caseId: string;
@@ -18,11 +57,11 @@ export function CaseAnalyticalPicturePanel({ caseId, locale, result, canConfirm 
   const t = ru ? {
     aria: "Целостная картина данных клиента", label: "Анхам · вся доступная информация", title: "Целостная картина кейса",
     intro: "Сводка доказательств из всех доступных документов. Это не диагноз и не решение Карен.", unavailable: "Слой данных пока недоступен",
-    documents: "Документы и источники", facts: "Хронология фактов", extracted: "Извлечённые клинические свидетельства", extractedIntro: "Сохранённые прочтения документов. Количество строк не является количеством проверенных клинических фактов.", comparisons: "Сравнения по времени", conflicts: "Противоречия", missing: "Чего не хватает", review: "Требует проверки", notes: "Замечания Карен", noDocuments: "В кейсе нет доступных документов.", noFacts: "Структурированные факты пока отсутствуют. Документы перечислены выше и не считаются обработанными автоматически.", noComparisons: "Для обоснованного сравнения недостаточно сопоставимых датированных данных.", none: "Не выявлено в доступном структурированном слое.", open: "Открыть источник", dateMissing: "дата отсутствует", sourceOnly: "только источник", needsReview: "нужна проверка", potential: "возможное изменение", noChange: "подтверждённой динамики нет", notComparable: "несопоставимо", insufficient: "недостаточно данных", provenance: "Точность ссылки: документ; identity/header, страница и токены не подтверждены в этом сохранённом слое.", notePlaceholder: "Замечание к целостной картине…", saveDraft: "Сохранить черновик", confirm: "Подтвердить замечание", draft: "Черновик", confirmed: "Подтверждено Карен", limitations: "Границы",
+    documents: "Документы и источники", facts: "Хронология фактов", extracted: "Ключевые клинические свидетельства", extractedIntro: "Сначала показаны наиболее значимые строки. Решение Карен не меняет исходный текст и не превращает его автоматически в VERIFIED.", allEvidence: "Все извлечённые строки", comparisons: "Сравнения по времени", conflicts: "Противоречия", missing: "Чего не хватает", review: "Проверка Карен", notes: "Замечания Карен", noDocuments: "В кейсе нет доступных документов.", noFacts: "Структурированные факты пока отсутствуют. Документы перечислены выше и не считаются обработанными автоматически.", noComparisons: "Для обоснованного сравнения недостаточно сопоставимых датированных данных.", none: "Не выявлено в доступном структурированном слое.", open: "Открыть источник", dateMissing: "дата отсутствует", sourceOnly: "только источник", needsReview: "нужна проверка", potential: "возможное изменение", noChange: "подтверждённой динамики нет", notComparable: "несопоставимо", insufficient: "недостаточно данных", provenance: "Точность ссылки: документ; identity/header, страница и токены не подтверждены в этом сохранённом слое.", notePlaceholder: "Замечание к целостной картине…", saveDraft: "Сохранить черновик", confirm: "Подтвердить замечание", draft: "Черновик", confirmed: "Подтверждено Карен", limitations: "Границы", confirmEvidence: "Подтвердить", correctEvidence: "Исправить", rejectEvidence: "Отклонить", correction: "Исправленный текст (обязателен для исправления)", saved: "Решение сохранено", criticalProgress: "Критические пункты", approvalBlocked: "Утверждение заключения заблокировано до проверки всех критических пунктов.",
   } : {
     aria: "Whole-client evidence picture", label: "Anham · all available information", title: "Whole-case picture",
     intro: "An evidence summary across all available documents. It is not a diagnosis or Karen's decision.", unavailable: "The data layer is not available yet",
-    documents: "Documents and sources", facts: "Evidence timeline", extracted: "Extracted clinical evidence", extractedIntro: "Stored document readings. The row count is not a count of verified clinical facts.", comparisons: "Time comparisons", conflicts: "Contradictions", missing: "Missing context", review: "Requires review", notes: "Karen's notes", noDocuments: "No documents are available in this case.", noFacts: "No structured facts are available yet. Documents listed above are not treated as automatically processed.", noComparisons: "There are not enough comparable dated observations for an evidence-based comparison.", none: "None found in the available structured layer.", open: "Open source", dateMissing: "date unavailable", sourceOnly: "source only", needsReview: "review required", potential: "potential change", noChange: "no confirmed change", notComparable: "not comparable", insufficient: "insufficient data", provenance: "Reference precision: document level; identity/header, page and tokens are not confirmed in this stored layer.", notePlaceholder: "Note about the whole-case picture…", saveDraft: "Save draft", confirm: "Confirm note", draft: "Draft", confirmed: "Confirmed by Karen", limitations: "Boundaries",
+    documents: "Documents and sources", facts: "Evidence timeline", extracted: "Key clinical evidence", extractedIntro: "The most significant rows appear first. Karen's decision does not alter source text or automatically make it VERIFIED.", allEvidence: "All extracted rows", comparisons: "Time comparisons", conflicts: "Contradictions", missing: "Missing context", review: "Karen review", notes: "Karen's notes", noDocuments: "No documents are available in this case.", noFacts: "No structured facts are available yet. Documents listed above are not treated as automatically processed.", noComparisons: "There are not enough comparable dated observations for an evidence-based comparison.", none: "None found in the available structured layer.", open: "Open source", dateMissing: "date unavailable", sourceOnly: "source only", needsReview: "review required", potential: "potential change", noChange: "no confirmed change", notComparable: "not comparable", insufficient: "insufficient data", provenance: "Reference precision: document level; identity/header, page and tokens are not confirmed in this stored layer.", notePlaceholder: "Note about the whole-case picture…", saveDraft: "Save draft", confirm: "Confirm note", draft: "Draft", confirmed: "Confirmed by Karen", limitations: "Boundaries", confirmEvidence: "Confirm", correctEvidence: "Correct", rejectEvidence: "Reject", correction: "Corrected text (required when correcting)", saved: "Decision saved", criticalProgress: "Critical items", approvalBlocked: "Conclusion approval is blocked until every critical item is reviewed.",
   };
 
   if (result.status === "unavailable") return <section className="case-picture panel" aria-label={t.aria}><span className="panel__label">{t.label}</span><h2>{t.unavailable}</h2><p>{t.intro}</p></section>;
@@ -55,11 +94,11 @@ export function CaseAnalyticalPicturePanel({ caseId, locale, result, canConfirm 
     <div className="case-picture__grid">
       <section><h3>{t.documents}</h3>{picture.documents.length ? <ul className="status-list">{picture.documents.map((document) => <li key={document.id}><strong>{document.name ?? document.id}</strong> · {statusLabel(document.status)} <Link href={`/admin/documents/${document.id}/view`} target="_blank">{t.open}</Link></li>)}</ul> : <p className="empty-state">{t.noDocuments}</p>}</section>
       <section><h3>{t.facts}</h3>{picture.timeline.length ? <ol className="case-picture__timeline">{picture.timeline.map((fact) => <li key={fact.id}><time>{fact.observedAt ?? t.dateMissing}</time><strong>{fact.label}</strong>: {fact.originalValue}{fact.originalUnit ? ` ${fact.originalUnit}` : ""}{fact.reference ? ` · ${fact.reference}` : ""}<span className="case-picture__trust">{fact.trustState === "SOURCE_ONLY" ? t.sourceOnly : t.needsReview}</span>{fact.documentId ? <Link href={`/admin/documents/${fact.documentId}/view`} target="_blank">{t.open}</Link> : null}<small>{t.provenance}</small></li>)}</ol> : <p className="empty-state">{t.noFacts}</p>}</section>
-      <section><h3>{t.extracted}</h3><p>{t.extractedIntro}</p>{picture.extractedEvidence.length ? <ul className="status-list">{picture.extractedEvidence.map((item) => <li key={item.id}><strong>{categoryLabel(item.category)} · {item.section} · {item.label}</strong><br />{item.value ?? "—"}{item.alternateValue !== null ? ` ↔ ${item.alternateValue}` : ""}<br /><span className="case-picture__trust">{item.trustState === "SOURCE_ONLY" ? t.sourceOnly : t.needsReview}</span>{item.disputeReason ? ` · ${item.disputeReason}` : ""} · <Link href={`/admin/documents/${item.documentId}/view`} target="_blank">{t.open}</Link><br /><small>{t.provenance}</small></li>)}</ul> : <p className="empty-state">{t.none}</p>}</section>
+      <section><h3>{t.extracted}</h3><p>{t.extractedIntro}</p>{picture.primaryEvidence.length ? <ul className="status-list case-picture__evidence-list">{picture.primaryEvidence.map((item) => <li key={item.id}><strong>{categoryLabel(item.category)} · {item.section} · {item.label}</strong><br />{item.value ?? "—"}{item.alternateValue !== null ? ` ↔ ${item.alternateValue}` : ""}<br /><span className="case-picture__trust">{item.trustState === "SOURCE_ONLY" ? t.sourceOnly : t.needsReview}</span>{item.disputeReason ? ` · ${item.disputeReason}` : ""} · <Link href={`/admin/documents/${item.documentId}/view`} target="_blank">{t.open}</Link><br /><small>{t.provenance}</small>{canConfirm ? <EvidenceReviewControls caseId={caseId} item={item} labels={t} locale={locale} /> : null}</li>)}</ul> : <p className="empty-state">{t.none}</p>}<AllEvidenceDetails canConfirm={canConfirm} caseId={caseId} categoryLabel={categoryLabel} items={picture.extractedEvidence} labels={t} locale={locale} /></section>
       <section><h3>{t.comparisons}</h3>{picture.comparisons.length ? <ul className="status-list">{picture.comparisons.map((item) => <li key={item.comparisonKey}><strong>{item.comparisonKey}: {comparisonLabel(item.verdict)}</strong><br />{reasonLabel(item.reasonCode)}<br /><small>{t.needsReview} · {item.evidenceFactIds.length} {ru ? "источн." : "evidence items"}</small></li>)}</ul> : <p className="empty-state">{t.noComparisons}</p>}</section>
       <section><h3>{t.conflicts}</h3>{picture.contradictions.length ? <ul>{picture.contradictions.map((item, index) => <li key={`${item.code}-${item.subject}-${index}`}>{contradictionLabel(item)}</li>)}</ul> : <p>{t.none}</p>}</section>
       <section><h3>{t.missing}</h3><ul>{picture.missingContext.map((item) => <li key={item.code}>{missingLabel(item)}</li>)}</ul></section>
-      <section><h3>{t.review}</h3><p>{picture.reviewQueue.length} / {picture.timeline.length}</p></section>
+      <section><h3>{t.review}</h3><p>{picture.reviewSummary.completed} / {picture.reviewSummary.required}</p><p>{t.criticalProgress}: {picture.reviewSummary.criticalCompleted} / {picture.reviewSummary.criticalRequired}</p>{picture.reviewSummary.approvalBlocked ? <p className="notice notice--warning">{t.approvalBlocked}</p> : null}</section>
     </div>
     <section className="case-picture__notes"><h3>{t.notes}</h3>{picture.notes.length ? <ul className="status-list">{picture.notes.map((note) => <li key={note.id}><strong>{note.state === "confirmed" ? t.confirmed : t.draft}</strong> · <time>{new Date(note.createdAt).toLocaleString(ru ? "ru-RU" : "en-US")}</time><br />{note.body}</li>)}</ul> : <p>{t.none}</p>}
       <form action={action}><input name="case_id" type="hidden" value={caseId} /><input name="locale" type="hidden" value={locale} /><textarea aria-label={t.notePlaceholder} maxLength={4000} name="body" placeholder={t.notePlaceholder} required rows={4} /><div className="panel-actions"><button className="button button--secondary" disabled={pending} name="review_state" value="draft">{t.saveDraft}</button>{canConfirm ? <button className="button" disabled={pending} name="review_state" value="confirmed">{t.confirm}</button> : null}</div></form>{state.message ? <p aria-live="polite" className={`form-message form-message--${state.status}`}>{state.message}</p> : null}

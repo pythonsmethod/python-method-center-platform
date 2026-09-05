@@ -43,6 +43,9 @@ export type ExtractedClinicalEvidence = {
   trustState: "SOURCE_ONLY" | "NEEDS_REVIEW";
   disputeReason: string | null;
   provenance: { level: "DOCUMENT"; page: null };
+  priority: "CRITICAL" | "IMPORTANT" | "SUPPORTING" | "TECHNICAL";
+  reviewDecision: "PENDING" | "CONFIRMED" | "CORRECTED" | "REJECTED";
+  correction: string | null;
 };
 
 export type CaseAnalyticalPicture = {
@@ -50,6 +53,7 @@ export type CaseAnalyticalPicture = {
   documents: PictureDocument[];
   timeline: PictureFact[];
   extractedEvidence: ExtractedClinicalEvidence[];
+  primaryEvidence: ExtractedClinicalEvidence[];
   comparisons: Array<{
     comparisonKey: string;
     verdict: "POTENTIAL_CHANGE" | "NO_CONFIRMED_CHANGE" | "NOT_COMPARABLE" | "INSUFFICIENT_DATA";
@@ -60,6 +64,7 @@ export type CaseAnalyticalPicture = {
   contradictions: Array<{ code: "BLOCKED_EVIDENCE" | "IDENTITY_MISMATCH"; subject: string | null }>;
   missingContext: Array<{ code: "NO_DOCUMENTS" | "NO_STRUCTURED_FACTS" | "MISSING_DATES" | "ANALYSIS_REQUESTS" | "EXCLUDED_EVIDENCE" | "PAGE_TOKEN_PROVENANCE" | "STALE_ANALYSIS"; count?: number }>;
   reviewQueue: PictureFact[];
+  reviewSummary: { required: number; completed: number; criticalRequired: number; criticalCompleted: number; approvalBlocked: boolean };
   notes: PictureReviewNote[];
   limitations: Array<"NOT_DIAGNOSIS" | "NO_CAUSALITY" | "NO_LIVE_TRUST_PERSISTENCE">;
 };
@@ -130,15 +135,29 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
     { code: "PAGE_TOKEN_PROVENANCE" as const },
   ];
 
+  const extractedEvidence = [...(input.extractedEvidence ?? [])];
+  const primaryEvidence = extractedEvidence.filter((item) => item.priority === "CRITICAL" || item.priority === "IMPORTANT").slice(0, 25);
+  const reviewable = extractedEvidence.filter((item) => item.priority !== "TECHNICAL");
+  const completed = reviewable.filter((item) => item.reviewDecision !== "PENDING");
+  const critical = reviewable.filter((item) => item.priority === "CRITICAL");
+  const criticalCompleted = critical.filter((item) => item.reviewDecision !== "PENDING");
   return {
     caseId: input.caseId,
     documents: [...input.documents],
     timeline,
-    extractedEvidence: [...(input.extractedEvidence ?? [])],
+    extractedEvidence,
+    primaryEvidence,
     comparisons,
     contradictions,
     missingContext,
     reviewQueue: timeline.filter((fact) => fact.trustState !== "NEEDS_REVIEW" || fact.provenance.page === null),
+    reviewSummary: {
+      required: reviewable.length,
+      completed: completed.length,
+      criticalRequired: critical.length,
+      criticalCompleted: criticalCompleted.length,
+      approvalBlocked: criticalCompleted.length < critical.length,
+    },
     notes: [...input.notes].sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
     limitations: ["NOT_DIAGNOSIS", "NO_CAUSALITY", "NO_LIVE_TRUST_PERSISTENCE"],
   };
