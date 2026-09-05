@@ -32,10 +32,24 @@ export type PictureReviewNote = {
   createdAt: string;
 };
 
+export type ExtractedClinicalEvidence = {
+  id: string;
+  documentId: string;
+  section: string;
+  label: string;
+  value: string | null;
+  alternateValue: string | null;
+  category: "RADIOLOGY" | "PATHOLOGY" | "PROCEDURE" | "BIOMARKER" | "UNKNOWN";
+  trustState: "SOURCE_ONLY" | "NEEDS_REVIEW";
+  disputeReason: string | null;
+  provenance: { level: "DOCUMENT"; page: null };
+};
+
 export type CaseAnalyticalPicture = {
   caseId: string;
   documents: PictureDocument[];
   timeline: PictureFact[];
+  extractedEvidence: ExtractedClinicalEvidence[];
   comparisons: Array<{
     comparisonKey: string;
     verdict: "POTENTIAL_CHANGE" | "NO_CONFIRMED_CHANGE" | "NOT_COMPARABLE" | "INSUFFICIENT_DATA";
@@ -54,6 +68,7 @@ export type PictureInput = {
   caseId: string;
   documents: PictureDocument[];
   facts: PictureFact[];
+  extractedEvidence?: ExtractedClinicalEvidence[];
   trends: Record<string, TrendAssessment>;
   blocked: Array<{ analyte?: string; reason?: string; request?: string }>;
   requests: string[];
@@ -68,6 +83,9 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
   const documentIds = new Set(input.documents.map((document) => document.id));
   if (input.facts.some((fact) => fact.documentId && !documentIds.has(fact.documentId))) {
     throw new Error("Case picture cannot include a fact from another Case");
+  }
+  if ((input.extractedEvidence ?? []).some((item) => !documentIds.has(item.documentId))) {
+    throw new Error("Case picture cannot include extracted evidence from another Case");
   }
 
   const timeline = [...input.facts].sort((left, right) =>
@@ -116,6 +134,7 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
     caseId: input.caseId,
     documents: [...input.documents],
     timeline,
+    extractedEvidence: [...(input.extractedEvidence ?? [])],
     comparisons,
     contradictions,
     missingContext,
