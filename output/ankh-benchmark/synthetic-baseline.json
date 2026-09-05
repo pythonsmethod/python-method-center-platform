@@ -1,0 +1,75 @@
+{
+  "schemaVersion": "1.0",
+  "datasetId": "ankh-synthetic-development",
+  "datasetVersion": "1.0.0",
+  "datasetKind": "synthetic_development",
+  "parserVersion": "canonical-parser-v1",
+  "providerVersion": "pretrained-ocr-v2.1-2024-08-07",
+  "generatedAt": "2026-09-03T19:55:14.243Z",
+  "documentCount": 3,
+  "pageCount": 4,
+  "metrics": {
+    "criticalNumericExactMatch": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "analyteNameAccuracy": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "unitAccuracy": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "referenceIntervalAccuracy": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "laboratoryFlagAccuracy": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "collectionDateAccuracy": {
+      "correct": 0,
+      "total": 0,
+      "rate": null
+    },
+    "rowAssociationAccuracy": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "provenanceAvailability": {
+      "correct": 7,
+      "total": 7,
+      "rate": 1
+    },
+    "verifiedPrecision": {
+      "correct": 6,
+      "total": 6,
+      "rate": 1
+    },
+    "needsReviewRecall": {
+      "correct": 1,
+      "total": 1,
+      "rate": 1
+    },
+    "missedObservationRate": 0,
+    "falseObservationRate": 0,
+    "duplicateErrorRate": 0,
+    "documentFullPassRate": 1,
+    "latencyMsPerDocument": 506.6666666666667,
+    "latencyMsPerPage": 380,
+    "estimatedProviderCostUsdPerDocument": 0.002,
+    "estimatedProviderCostUsdPerPage": 0.0015
+  },
+  "criticalExtractionErrors": 0,
+  "falseVerifiedCriticalErrors": 0,
+  "errors": [],
+  "securityIssues": []
+}

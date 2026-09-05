@@ -1,0 +1,901 @@
+{
+  "schemaVersion": "1.0",
+  "kind": "phase_2_8_provenance_47_target_benchmark",
+  "sourceArtifact": "phase-2-5c-closure-benchmark.json",
+  "sourceFixture": "clinical-real-minimized-v1.json",
+  "policyVersion": "phase-2.7-shadow-v1",
+  "policyChanged": false,
+  "productionMutation": false,
+  "analysisScope": "PROVENANCE_ISOLATION_ONLY",
+  "candidateSignalSource": "PHASE_2_7_CONTROLLED_CONSTANTS_NOT_REAL_MEASUREMENTS",
+  "trustOutcomeLimitation": "Coverage and precision are not a new empirical trust estimate.",
+  "availableExactTokenReplayTargets": [
+    "h_er",
+    "h_er_pct",
+    "h_her2",
+    "h_method",
+    "h_mitoses",
+    "h_pr"
+  ],
+  "unavailableRawTokenReplayTargets": 41,
+  "total": 47,
+  "rows": [
+    {
+      "targetId": "r_modality",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_exam_date",
+      "evidenceClass": "DATE_EVENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_comparison",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_density",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_mammo_mass",
+      "evidenceClass": "RADIOLOGY_MEASUREMENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_us_mass",
+      "evidenceClass": "RADIOLOGY_MEASUREMENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_laterality_site",
+      "evidenceClass": "LATERALITY_SITE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_birads",
+      "evidenceClass": "RADIOLOGY_CODED_CATEGORY",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "r_recommendation",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_modality",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_exam_date",
+      "evidenceClass": "DATE_EVENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_left_mass",
+      "evidenceClass": "RADIOLOGY_MEASUREMENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_washout",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_nme",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_right",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_birads",
+      "evidenceClass": "RADIOLOGY_CODED_CATEGORY",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_recommendation",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "m_biopsy",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "p_modality",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "p_date",
+      "evidenceClass": "DATE_EVENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "p_clip",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "p_birads",
+      "evidenceClass": "RADIOLOGY_CODED_CATEGORY",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "p_recommendation",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_specimen",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_diagnosis",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_grade",
+      "evidenceClass": "PATHOLOGY_STRUCTURED_SCORE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_tubule",
+      "evidenceClass": "PATHOLOGY_STRUCTURED_SCORE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_nuclear",
+      "evidenceClass": "PATHOLOGY_STRUCTURED_SCORE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_mitoses",
+      "evidenceClass": "PATHOLOGY_STRUCTURED_SCORE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P3",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "INSUFFICIENT_PROVENANCE_LEVEL"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_lvi",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_microcalc",
+      "evidenceClass": "NARRATIVE_SOURCE_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P3"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_er",
+      "evidenceClass": "BIOMARKER_STRUCTURED",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P3",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "INSUFFICIENT_PROVENANCE_LEVEL"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_er_pct",
+      "evidenceClass": "BIOMARKER_STRUCTURED",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P3",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "INSUFFICIENT_PROVENANCE_LEVEL"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_pr",
+      "evidenceClass": "BIOMARKER_STRUCTURED",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P3",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "INSUFFICIENT_PROVENANCE_LEVEL"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_her2",
+      "evidenceClass": "BIOMARKER_STRUCTURED",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P3",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "INSUFFICIENT_PROVENANCE_LEVEL"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "h_method",
+      "evidenceClass": "BIOMARKER_STRUCTURED",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P3",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "INSUFFICIENT_PROVENANCE_LEVEL"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_procedure",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_date",
+      "evidenceClass": "DATE_EVENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_laterality",
+      "evidenceClass": "LATERALITY_SITE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_clock",
+      "evidenceClass": "LATERALITY_SITE",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_nipple",
+      "evidenceClass": "RADIOLOGY_MEASUREMENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_samples",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_clip",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_success",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_path_link",
+      "evidenceClass": "DOCUMENT_RELATION",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "SOURCE_ONLY",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "confidence.contextAssociation>=0.995",
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "POLICY_REQUIREMENT_NOT_MET",
+        "MISSING_TOKEN_PROVENANCE",
+        "SOURCE_AMBIGUOUS"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_size",
+      "evidenceClass": "RADIOLOGY_MEASUREMENT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    },
+    {
+      "targetId": "b_recommendation",
+      "evidenceClass": "PROCEDURE_STRUCTURED_FACT",
+      "humanSourceOutcome": "CONFIRMED",
+      "storedVerificationState": "NEEDS_REVIEW",
+      "wouldAutoVerify": false,
+      "falseAutoVerified": false,
+      "finalShadowState": "NEEDS_REVIEW",
+      "provenanceLevel": "P2",
+      "blockedGates": [
+        "provenance>=P4"
+      ],
+      "reasonCodes": [
+        "MISSING_TOKEN_PROVENANCE"
+      ],
+      "policyVersion": "phase-2.7-shadow-v1"
+    }
+  ],
+  "metrics": {
+    "shadowAutoVerifyPrecision": null,
+    "falseAutoVerifiedCount": 0,
+    "autoVerifyCoverage": 0,
+    "needsReviewRate": 0.9787234042553191,
+    "rejectedRate": 0,
+    "sourceOnlyRate": 0.02127659574468085,
+    "policyBlockReasonDistribution": {
+      "INSUFFICIENT_PROVENANCE_LEVEL": 6,
+      "MISSING_TOKEN_PROVENANCE": 41,
+      "POLICY_REQUIREMENT_NOT_MET": 1,
+      "SOURCE_AMBIGUOUS": 1
+    },
+    "provenanceLevelDistribution": {
+      "P2": 41,
+      "P3": 6
+    },
+    "crossCheckDisagreementRate": 0,
+    "evidenceClassMetrics": {
+      "BIOMARKER_STRUCTURED": {
+        "total": 5,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "DATE_EVENT": {
+        "total": 4,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "DOCUMENT_RELATION": {
+        "total": 1,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "LATERALITY_SITE": {
+        "total": 3,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "NARRATIVE_SOURCE_FACT": {
+        "total": 14,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "PATHOLOGY_STRUCTURED_SCORE": {
+        "total": 4,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "PROCEDURE_STRUCTURED_FACT": {
+        "total": 8,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "RADIOLOGY_CODED_CATEGORY": {
+        "total": 3,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      },
+      "RADIOLOGY_MEASUREMENT": {
+        "total": 5,
+        "autoVerify": 0,
+        "coverage": 0,
+        "precision": null
+      }
+    }
+  }
+}
