@@ -166,6 +166,25 @@ describe("what two readings agree on", () => {
     expect(result.agreed).toHaveLength(1);
   });
 
+  it("ignores presentation-only punctuation in identical prose", () => {
+    const result = compareTranscriptions(
+      [row({ label: "Жалобы", value: "Боль в животе, пояснице." })],
+      [row({ label: "Жалобы", value: "Боль в животе ,пояснице" })]
+    );
+
+    expect(result).toMatchObject({ agreed: [{ value: "Боль в животе, пояснице." }], disputed: [] });
+  });
+
+  it("preserves clinically meaningful operators while normalising prose punctuation", () => {
+    const result = compareTranscriptions(
+      [row({ label: "Результат", value: "< 5.0" })],
+      [row({ label: "Результат", value: "> 5.0" })]
+    );
+
+    expect(result.agreed).toEqual([]);
+    expect(result.disputed).toMatchObject([{ reason: "разные значения" }]);
+  });
+
   it("parses the explicit structured row state", () => {
     const [parsed] = parseTranscription(
       "form.jpg :: УЗИ :: контур :: ровный, неровный :: - :: UNSELECTED_TEMPLATE :: ДА :: печатные варианты"
@@ -262,6 +281,31 @@ describe("what two readings agree on", () => {
       [row({ section: "Гематология", label: "HGB [g/L]", value: "137" })],
     );
     expect(result).toMatchObject({ agreed: [{ value: "137" }], disputed: [] });
+  });
+
+  it("matches a unique label with one OCR character error inside the same section", () => {
+    const result = compareTranscriptions(
+      [row({ section: "Общий анализ мочи", label: "Белок с пирогаллоловым красным", value: "0.08" })],
+      [row({ section: "Общий анализ мочи", label: "Белок с пирогалроловым красным", value: "0.08" })]
+    );
+    expect(result).toMatchObject({ agreed: [{ value: "0.08" }], disputed: [] });
+  });
+
+  it("matches Cyrillic and Latin spellings of pH inside the same section", () => {
+    const result = compareTranscriptions(
+      [row({ section: "Общий анализ мочи", label: "рН", value: "6.0" })],
+      [row({ section: "Общий анализ мочи", label: "pH", value: "6.0" })]
+    );
+    expect(result).toMatchObject({ agreed: [{ value: "6.0" }], disputed: [] });
+  });
+
+  it("does not fuzzy-match labels whose numeric identifiers differ", () => {
+    const result = compareTranscriptions(
+      [row({ section: "Исследование", label: "Образец 17", value: "норма" })],
+      [row({ section: "Исследование", label: "Образец 18", value: "норма" })]
+    );
+    expect(result.agreed).toEqual([]);
+    expect(result.disputed).toHaveLength(2);
   });
 
   it("does not cross-match a repeated label across different sections", () => {
