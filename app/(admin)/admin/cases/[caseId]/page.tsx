@@ -28,6 +28,7 @@ import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThrea
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
+import { ReprocessCaseDocumentsForm } from "./ReprocessCaseDocumentsForm";
 import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { CaseAnalyticalPicturePanel } from "@/components/cases/CaseAnalyticalPicturePanel";
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
@@ -409,6 +410,12 @@ export default async function StaffCaseDetailPage({
             По загрузкам, от свежих к ранним. Повторная загрузка файла с тем
             же названием помечена как новая версия — это динамика клиента.
           </p>
+          {showAdminControls || canReadProfessorConversation ? (
+            <ReprocessCaseDocumentsForm
+              caseId={clientCase.id}
+              locale={locale}
+            />
+          ) : null}
           <DocumentTimeline
             labels={getDictionary("ru").cabinet.timeline}
             documents={documents}

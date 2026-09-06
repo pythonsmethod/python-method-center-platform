@@ -533,3 +533,24 @@ Decision:
 When a mixed ultrasound/form field contains a bare printed state such as `норма`, `увеличен`, `повышена` or `понижена` before entered dimensions, that state is not an agreed fact unless the reading records a visible selection signal (underline, circle, check mark or equivalent). If selection cannot be distinguished from the printed template, the whole observation remains review-visible.
 
 Concrete measurements followed by an assessment, and explicitly marked choices, remain eligible for comparison. The source wording is never deleted or rewritten by this gate.
+
+---
+
+## D-051 — Operator-triggered reprocessing is Case-scoped and audited
+
+Decision:
+Karen/admin may explicitly requeue all active documents in one existing Case
+for a new two-pass reading. The source uploads remain unchanged, the operation
+is written to the audit log and every interactive worker request may claim
+work only from that Case.
+
+Why:
+A global “process next” call can consume another client's older queued job and
+makes a controlled validation replay impossible to attribute. Case scope keeps
+the authorized PHI operation bounded without creating a second queue or Case
+model.
+
+Constraint:
+Reprocessing replaces derived extraction/analysis rows through the existing
+idempotent pipeline. It does not promote evidence trust, approve Karen
+decisions or enable production auto-verification.

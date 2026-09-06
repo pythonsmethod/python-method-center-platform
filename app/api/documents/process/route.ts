@@ -1,8 +1,14 @@
 import { NextRequest, NextResponse } from "next/server";
-import { processNextDocument } from "@/lib/documents/processing";
+import {
+  processNextCaseDocument,
+  processNextDocument
+} from "@/lib/documents/processing";
+import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
+import { getStaffUserState } from "@/lib/auth/require-staff";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { expireElapsedServicePeriods } from "@/lib/payments/expire-periods";
+import { isUuid } from "@/lib/utils/uuid";
 
 export const runtime = "nodejs";
 export const maxDuration = 300;
@@ -70,11 +76,31 @@ export async function GET(request: NextRequest) {
 // condition, which let any account spend the AI budget on other people's
 // documents in a loop; now the caller has to have something of their own in
 // the queue.
-export async function POST() {
+export async function POST(request: NextRequest) {
   const authClient = await createSupabaseServerClient();
   if (!authClient) return NextResponse.json({ error: "Unavailable" }, { status: 503 });
   const { data: { user } } = await authClient.auth.getUser();
   if (!user) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const payload = await request.json().catch(() => ({})) as { caseId?: unknown };
+  const caseId = typeof payload.caseId === "string" ? payload.caseId : null;
+
+  if (caseId) {
+    if (!isUuid(caseId)) {
+      return NextResponse.json({ error: "Invalid case identifier" }, { status: 400 });
+    }
+
+    const staff = await getStaffUserState();
+    const canOperate = staff.status === "authorized" && (
+      staff.role === "admin" || canAccessProfessorMessages(staff.email)
+    );
+    if (!canOperate) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const result = await processNextCaseDocument(caseId);
+    return NextResponse.json({ status: result.status });
+  }
 
   const service = createSupabaseServiceClient();
   if (!service) return NextResponse.json({ error: "Unavailable" }, { status: 503 });
