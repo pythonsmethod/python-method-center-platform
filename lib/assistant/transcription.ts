@@ -222,7 +222,7 @@ export function isExplicitlyUnfilledFormRow(row: TranscribedValue): boolean {
 }
 
 const ADMINISTRATIVE_ROW = /(?:^|\b)(?:ф\.?\s*и\.?\s*о\.?|фамили[яи]|имя|отчество|пациент|patient|дата рождения|date of birth|dob|адрес|address|паспорт|идентификационн(?:ый|ого) номер|учреждение|organization|лаборатори[яи]|врач|doctor|подпись|signature|штрих-?код|номер карты|номер документа)(?:\b|$)/i;
-const ADMINISTRATIVE_SECTION = /^(?:шапка|пациент|patient|идентификация|реквизиты|служебн(?:ые данные|ая информация))$/i;
+const ADMINISTRATIVE_SECTION = /^(?:шапка(?:\s+бланка)?|пациент|patient|идентификация|реквизиты|служебн(?:ые данные|ая информация))$/i;
 
 export function isClinicalContentRow(row: TranscribedValue): boolean {
   if (normaliseKey(row.section) === COVERAGE_SECTION && normaliseKey(row.label) === COVERAGE_LABEL) return false;
