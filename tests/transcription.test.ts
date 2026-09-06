@@ -285,6 +285,19 @@ describe("whole-document content classification", () => {
     const rows = [row({ section: "Заключение", label: "Рукописная запись", value: "[неразборчиво]", confident: false })];
     expect(classifyTranscribedDocument(rows, rows)).toBe("CLINICAL_CONTENT");
   });
+
+  it("treats printed template options explicitly reported as unmarked as empty", () => {
+    const first = [
+      row({ section: "ПЕЧЕНЬ", label: "контур", value: "ровный, неровный, четкий, нечеткий", note: "печатный перечень вариантов, ни один не отмечен" }),
+      row({ section: "СОСУДЫ", label: "воротная вена", value: "-", note: "поле не заполнено" }),
+    ];
+    const second = [
+      row({ section: "ПЕЧЕНЬ", label: "контур", value: "ровный, неровный, четкий, нечеткий", note: "печатный перечень вариантов, ничего не отмечено" }),
+      row({ section: "СОСУДЫ", label: "воротная вена", value: "-", note: "поле не заполнено" }),
+    ];
+
+    expect(classifyTranscribedDocument(first, second)).toBe("EMPTY_TEMPLATE");
+  });
 });
 
 describe("what must never pass quietly", () => {
