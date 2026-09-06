@@ -12,3 +12,7 @@ comment on column public.uploaded_documents.identity_reviewed_at is
   'Time an authorized staff member confirmed that a mismatched document belongs in this Case.';
 comment on column public.uploaded_documents.identity_reviewed_by is
   'Staff actor who confirmed Case membership; the event is also written to audit_logs.';
+
+create index if not exists uploaded_documents_identity_reviewed_by_idx
+  on public.uploaded_documents (identity_reviewed_by)
+  where identity_reviewed_by is not null;
