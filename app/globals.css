@@ -8059,3 +8059,13 @@ body.cabinet-menu-open { overflow: hidden; }
   .public-mobile-dock .public-mobile-dock__icon { display: none; }
   .public-mobile-dock a:focus-visible { outline: 2px solid #9de9ff; outline-offset: -3px; }
 }
+.mobile-header-account { display: none; }
+@media (max-width: 860px), (hover: none) and (pointer: coarse) {
+  .site-header { flex-wrap: wrap; gap: 8px; }
+  body:has(.public-mobile-dock) .site-header__right { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; width: auto; margin-left: auto; }
+  .mobile-header-account { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 6px 10px; border: 1px solid #d4af374d; border-radius: 8px; color: #e6cd8a; font-size: 12px; white-space: nowrap; text-decoration: none; }
+  .mobile-header-account:focus-visible { outline: 2px solid #9de9ff; outline-offset: 2px; }
+  .public-mobile-dock a:last-child { display: none; }
+  .public-mobile-dock { gap: 4px; }
+  .public-mobile-dock a { flex: 1 1 auto; padding-inline: 5px; font-size: clamp(10px, 2.8vw, 12px); }
+}
