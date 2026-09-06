@@ -520,7 +520,7 @@ A provider-neutral visual detector may corroborate an empty printed form by loca
 Decision:
 Independent readings may ignore presentation-only punctuation and may align a one-character OCR variant of a sufficiently descriptive label only when the relation is unique in both directions, remains inside the same section, and preserves every numeric identifier. Cyrillic/Latin `pH` is an explicit orthographic equivalent.
 
-The comparator must not fuzzy-match across sections, repeated labels, different dates/indices, partial sources or uncertain readings. Value comparison still runs after label alignment, and clinically meaningful operators remain significant.
+The comparator must not fuzzy-match across sections, repeated labels, different dates/indices, protected clinical designators (for example IgG/IgM, ALT/AST or T3/T4), partial sources or uncertain readings. Value comparison still runs after label alignment, and clinically meaningful operators remain significant.
 
 Why:
 Formatting and harmless label OCR differences should not inflate Karen's queue, but reducing review load must never manufacture agreement between different medical observations.

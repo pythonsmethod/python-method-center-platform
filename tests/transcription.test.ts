@@ -343,6 +343,25 @@ describe("what two readings agree on", () => {
     expect(result.disputed).toHaveLength(2);
   });
 
+  it.each([
+    ["Антитела IgG", "Антитела IgM"],
+    ["Антитела IgA", "Антитела IgG"],
+    ["Тиреоидный гормон T3", "Тиреоидный гормон T4"],
+    ["Фракция АЛТ", "Фракция АСТ"],
+  ])("never fuzzy-matches distinct clinical designators: %s / %s", (firstLabel, secondLabel) => {
+    const result = compareTranscriptions(
+      [row({ section: "tests", label: firstLabel, value: "10", rowState: "FILLED" })],
+      [row({ section: "tests", label: secondLabel, value: "10", rowState: "FILLED" })]
+    );
+
+    expect(result.agreed).toEqual([]);
+    expect(result.disputed).toHaveLength(2);
+    expect(result.disputed).toEqual(expect.arrayContaining([
+      expect.objectContaining({ label: firstLabel, first: "10", second: null }),
+      expect.objectContaining({ label: secondLabel, first: null, second: "10" }),
+    ]));
+  });
+
   it("does not cross-match a repeated label across different sections", () => {
     const first = [row({ section: "До", label: "Размер", value: "10" }), row({ section: "После", label: "Размер", value: "12" })];
     const second = [row({ section: "Исследование 1", label: "Размер", value: "10" }), row({ section: "Исследование 2", label: "Размер", value: "12" })];

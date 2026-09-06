@@ -190,12 +190,29 @@ function editDistanceAtMostOne(left: string, right: string): boolean {
   return true;
 }
 
+function protectedClinicalDesignators(label: string): string[] {
+  return (label.match(/[A-Za-zА-ЯЁ0-9]+/g) ?? [])
+    .filter((token) =>
+      /\d/.test(token) ||
+      /[A-Za-z]/.test(token) ||
+      /^[А-ЯЁ]{2,8}$/.test(token)
+    )
+    .map((token) => token.toLowerCase().replace(/ё/g, "е"));
+}
+
 function labelsAreConservativelyEquivalent(left: TranscribedValue, right: TranscribedValue): boolean {
   if (normaliseKey(left.file) !== normaliseKey(right.file)) return false;
   if (normaliseKey(left.section) !== normaliseKey(right.section)) return false;
   const a = labelFingerprint(left.label);
   const b = labelFingerprint(right.label);
   if (a === b) return true;
+  // Short Latin analyte suffixes, all-caps clinical abbreviations and
+  // alphanumeric identifiers are semantic, not spelling noise: IgG is not
+  // IgM, ALT is not AST, and T3 is not T4 even when their values happen to
+  // be identical.
+  if (protectedClinicalDesignators(left.label).join("|") !== protectedClinicalDesignators(right.label).join("|")) {
+    return false;
+  }
   // Never smooth over a different date, measurement index or staging code.
   if (a.match(/\d+/g)?.join("|") !== b.match(/\d+/g)?.join("|")) return false;
   // A one-character OCR slip in a sufficiently descriptive label is safe
