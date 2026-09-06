@@ -57,3 +57,21 @@ For every authorized Case:
 Before any document is processed, its metadata must pass the repository intake contract in `lib/verification-trust/validation-intake.ts`. The contract requires a non-PHI Case alias, an authorization reference scoped to Phase 2.9, deidentification/minimization status, unique document IDs, source profile and an explicit independent-review field. It stores no document contents.
 
 Production PHI processing, production auto-verification and Phase 3 production remain NO-GO.
+
+## Validation Case 002 — provisional intake (2026-09-05)
+
+Owner authorization was recorded for three one-page Russian/bilingual laboratory documents in the isolated validation scope. The repository retains only neutral document aliases and a 34-observation deidentified regression shape covering biochemistry, immunoassay and CBC tables. No patient identity, source filename, accession, contact detail, source image or raw OCR response is stored in Git.
+
+The general parser now recognizes expanded/bilingual Russian headers, comma decimals, bounded references, common CBC/thyroid analyte labels, Cyrillic/common laboratory units and explicit high/low flags. The 34/34 fixture result is regression evidence only: exact Document AI token/span replay and independent reviewer adjudication are still absent, so this Case is not yet counted as complete real-world evidence and Phase 2.9 remains open.
+
+## Validation Case 003 — provisional intake (2026-09-05)
+
+The owner authorized isolated Phase 2.9 processing of 15 mobile-photo documents. Existing production readings are read-only validation input: 616 first-pass fragments, 592 second-pass fragments, 212 literal agreements and 693 literal disputes. The set spans laboratory tables, blood gas/electrolytes, abdominal/renal ultrasound, phlebology/Doppler, echocardiography, pathology and thyroid ultrasound.
+
+The audit identified presentation fragmentation as a general comparison failure: one clinical observation may be emitted as separate result, unit and reference rows, or as one combined row in the other pass. `coalesceTranscriptionFragments` now reassembles only suffix-explicit fragments with the same file, section and exact base label before comparison. It never aligns rows by position, never drops orphan fragments and never promotes uncertainty. A unique exact label may also match across differently named sections, but repeated labels are deliberately refused to prevent cross-section swaps.
+
+Source review exposed two additional general failure classes. Explicit empty markers (for example, `не заполнено`, `нет записи` and `пусто`) are now excluded from fact comparison, while uncertain handwriting remains review-visible. Untouched printed forms can also contain complete mutually exclusive option lists that both readers copy identically; known option-list shapes are therefore forced to uncertain unless a single selected value is transcribed. Regression coverage includes all three mechanisms.
+
+Manual source review completed for the laboratory sheets, discharge summary, pathology, two usable ultrasound forms, thyroid ultrasound and both echocardiography pages. Key numeric values and narrative conclusions matched the source where the source was legible. Three uploaded images (the lower portion of one handwritten ultrasound and most of two phlebology/Doppler pages) are themselves cropped/greyed and cannot support independent adjudication; their extracted text remains `NEEDS_REVIEW`. Minimized Gold metrics remain pending, so this provisional intake does not close Case 003 or Phase 2.9.
+
+The handwriting hardening pass adds an explicit non-clinical coverage row to each independent reading (`COMPLETE`, `PARTIAL`, `UNREADABLE`) and character-level instructions for handwriting, abbreviations, signs, decimals and units. A partial word is retained with an uncertainty marker instead of being completed from medical context. If either reader sees an incomplete source, otherwise matching visible rows remain disputed with reason `источник виден не полностью`. This improves safe extraction from handwritten documents but deliberately does not claim recovery of pixels absent from the uploaded image.

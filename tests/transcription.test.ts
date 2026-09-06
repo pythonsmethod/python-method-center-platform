@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   compareTranscriptions,
+  coalesceTranscriptionFragments,
   formatAgreed,
   formatDisputed,
   parseTranscription,
@@ -162,6 +163,103 @@ describe("what two readings agree on", () => {
 
     expect(result.agreed).toHaveLength(1);
   });
+
+  it("reassembles explicit result, unit and reference fragments before comparison", () => {
+    const first = [
+      row({ section: "ОАК", label: "Гемоглобин (HGB)", value: "134", reference: "" }),
+      row({ section: "ОАК", label: "Гемоглобин (HGB) ед.изм.", value: "г/л", reference: "" }),
+      row({ section: "ОАК", label: "Гемоглобин (HGB) референс", value: "117 - 160", reference: "" }),
+    ];
+    const second = [row({ section: "ОАК", label: "Гемоглобин (HGB)", value: "134 г/л", reference: "117–160" })];
+
+    const result = compareTranscriptions(first, second);
+    expect(result.disputed).toHaveLength(0);
+    expect(result.agreed[0]).toMatchObject({ value: "134 г/л", reference: "117 - 160", referenceConfirmed: true });
+  });
+
+  it("reassembles bilingual suffixes and inline reference text", () => {
+    const first = [
+      row({ section: "Биохимия", label: "Трансаминаза-АЛТ", value: "18.6", reference: "" }),
+      row({ section: "Биохимия", label: "Трансаминаза-АЛТ — Өлч. бирд./Ед.Изм.", value: "Ед/л", reference: "" }),
+      row({ section: "Биохимия", label: "Трансаминаза-АЛТ — Ченемин көргөзгүчү/Референсные значения", value: "< 49,00", reference: "" }),
+    ];
+    const second = [row({ section: "Биохимия", label: "Трансаминаза-АЛТ", value: "18.6 Ед/л (Референсные значения < 49,00)", reference: "" })];
+
+    expect(compareTranscriptions(first, second)).toMatchObject({ agreed: [{ value: "18.6 Ед/л", referenceConfirmed: true }], disputed: [] });
+  });
+
+  it("does not discard an orphan presentation fragment", () => {
+    const orphan = row({ label: "Калий ед.изм.", value: "ммоль/л" });
+    expect(coalesceTranscriptionFragments([orphan])).toEqual([orphan]);
+  });
+
+  it("does not promote explicitly empty form fields into clinical facts", () => {
+    const emptyMarkers = ["", "не заполнено", "[не заполнено]", "(нет записи)", "(нет значения)", "(пусто)", "не вписано"];
+
+    for (const value of emptyMarkers) {
+      expect(coalesceTranscriptionFragments([row({ label: "Незаполненное поле", value })])).toEqual([]);
+    }
+  });
+
+  it("keeps uncertain handwriting visible for review", () => {
+    const uncertain = row({ label: "Рукописная пометка", value: "[не разобрано]", confident: false });
+    expect(coalesceTranscriptionFragments([uncertain])).toEqual([uncertain]);
+  });
+
+  it("does not verify an untouched list of mutually exclusive form options", () => {
+    const first = row({ label: "Эхоструктура", value: "однородная, неоднородная (диффузно, очагово)", confident: true });
+    const second = row({ label: "Эхоструктура", value: "однородная, неоднородная (диффузно, очагово)", confident: true });
+
+    const result = compareTranscriptions([first], [second]);
+    expect(result.agreed).toEqual([]);
+    expect(result.disputed).toMatchObject([{ reason: "чтение неуверенное" }]);
+  });
+
+  it("keeps one explicitly selected form option eligible for agreement", () => {
+    const first = row({ label: "Эхоструктура", value: "однородная (подчёркнуто)", confident: true });
+    const second = row({ label: "Эхоструктура", value: "однородная (подчёркнуто)", confident: true });
+
+    expect(compareTranscriptions([first], [second])).toMatchObject({ agreed: [{ value: "однородная (подчёркнуто)" }], disputed: [] });
+  });
+
+  it("never promotes matching handwriting from a partially visible source", () => {
+    const coverage = row({
+      section: "[КОНТРОЛЬ ИСТОЧНИКА]",
+      label: "[ПОКРЫТИЕ ДОКУМЕНТА]",
+      value: "PARTIAL",
+      confident: false,
+      note: "нижняя часть закрыта серым полем",
+    });
+    const handwriting = row({ section: "Заключение", label: "Рукописная строка", value: "Копростаз" });
+
+    const result = compareTranscriptions([coverage, handwriting], [coverage, handwriting]);
+    expect(result.agreed).toEqual([]);
+    expect(result.disputed).toMatchObject([{ label: "Рукописная строка", reason: "источник виден не полностью" }]);
+  });
+
+  it("keeps matching handwriting eligible when both readings saw the complete source", () => {
+    const coverage = row({ section: "[КОНТРОЛЬ ИСТОЧНИКА]", label: "[ПОКРЫТИЕ ДОКУМЕНТА]", value: "COMPLETE" });
+    const handwriting = row({ section: "Заключение", label: "Рукописная строка", value: "Копростаз" });
+
+    expect(compareTranscriptions([coverage, handwriting], [coverage, handwriting]))
+      .toMatchObject({ agreed: [{ label: "Рукописная строка", value: "Копростаз" }], disputed: [] });
+  });
+
+  it("matches a unique exact label when readers name its section differently", () => {
+    const result = compareTranscriptions(
+      [row({ section: "Общий анализ крови", label: "HGB [g/L]", value: "137" })],
+      [row({ section: "Гематология", label: "HGB [g/L]", value: "137" })],
+    );
+    expect(result).toMatchObject({ agreed: [{ value: "137" }], disputed: [] });
+  });
+
+  it("does not cross-match a repeated label across different sections", () => {
+    const first = [row({ section: "До", label: "Размер", value: "10" }), row({ section: "После", label: "Размер", value: "12" })];
+    const second = [row({ section: "Исследование 1", label: "Размер", value: "10" }), row({ section: "Исследование 2", label: "Размер", value: "12" })];
+    const result = compareTranscriptions(first, second);
+    expect(result.agreed).toHaveLength(0);
+    expect(result.disputed).toHaveLength(4);
+  });
 });
 
 describe("what must never pass quietly", () => {
@@ -266,5 +364,12 @@ describe("the instruction given to the reader", () => {
     expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain(
       "Нельзя пропускать строку потому, что она кажется незначительной"
     );
+  });
+
+  it("requires source coverage and character-by-character handwriting review", () => {
+    expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("[ПОКРЫТИЕ ДОКУМЕНТА]");
+    expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("PARTIAL");
+    expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("Читай рукопись посимвольно");
+    expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("Не достраивай слово по медицинскому смыслу");
   });
 });

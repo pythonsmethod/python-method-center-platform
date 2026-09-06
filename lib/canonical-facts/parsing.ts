@@ -48,13 +48,34 @@ const TEST_NAMES: Record<string, string> = {
   hemoglobin: "Hemoglobin",
   haemoglobin: "Hemoglobin",
   ferritin: "Ferritin",
+  "ферритин": "Ferritin",
   alt: "ALT",
+  "алт": "ALT",
   "alanine aminotransferase": "ALT",
   albumin: "Albumin",
   glucose: "Glucose",
   crp: "C-reactive protein",
   "c reactive protein": "C-reactive protein",
-  "c-reactive protein": "C-reactive protein"
+  "c-reactive protein": "C-reactive protein",
+  "гемоглобин": "Hemoglobin",
+  hct: "Hematocrit",
+  "гематокрит": "Hematocrit",
+  rbc: "Erythrocytes",
+  "эритроциты": "Erythrocytes",
+  mcv: "MCV", mch: "MCH", mchc: "MCHC", "rdw-cv": "RDW-CV", "rdw-sd": "RDW-SD",
+  "nrbc#": "NRBC absolute", "nrbc%": "NRBC percent",
+  wbc: "Leukocytes", "лейкоциты": "Leukocytes",
+  "neu#": "Neutrophils absolute", "neu%": "Neutrophils percent",
+  "lym#": "Lymphocytes absolute", "lym%": "Lymphocytes percent",
+  "mon#": "Monocytes absolute", "mon%": "Monocytes percent",
+  "eos#": "Eosinophils absolute", "eos%": "Eosinophils percent",
+  "bas#": "Basophils absolute", "bas%": "Basophils percent",
+  "img#": "Immature granulocytes absolute", "img%": "Immature granulocytes percent",
+  plt: "Platelets", "тромбоциты": "Platelets", mpv: "MPV", pdw: "PDW", pct: "PCT", "p-lcr": "P-LCR",
+  "соэ": "ESR", esr: "ESR",
+  tsh: "TSH", "ттг": "TSH", "тиреотропный гормон": "TSH",
+  "free t4": "Free T4", "т4 свободный": "Free T4", "свободный т4": "Free T4",
+  ast: "AST", "аст": "AST"
 };
 
 export function normalizeTestName(value: string): string | null {
@@ -68,7 +89,21 @@ const SAFE_UNITS: Record<string, string> = {
   "mg/l": "mg/L",
   "ng/ml": "ng/mL",
   "mmol/l": "mmol/L",
-  "u/l": "U/L"
+  "u/l": "U/L",
+  "ед/л": "U/L",
+  "miu/l": "mIU/L",
+  "мме/л": "mIU/L",
+  "pmol/l": "pmol/L",
+  "пмоль/л": "pmol/L",
+  "fl": "fL",
+  "фл": "fL",
+  "pg": "pg",
+  "пг": "pg",
+  "%": "%",
+  "10^9/l": "10^9/L",
+  "10^12/l": "10^12/L",
+  "мм/ч": "mm/h",
+  "mm/h": "mm/h"
 };
 
 export function normalizeUnit(value?: string | null): string | null {

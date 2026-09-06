@@ -309,7 +309,7 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
     .update({ status: "processing", updated_at: new Date().toISOString() }).eq("id", job.id);
 
   // --- full_extraction ---
-  const prompt = "Перепиши всё содержимое этого документа по заданному формату. Не пропускай ни одной строки, даты, подписи или части заключения.";
+  const prompt = "Перепиши всё содержимое этого документа по заданному формату. Не пропускай ни одной строки, даты, подписи или части заключения. Отдельно и посимвольно проверь все рукописные записи; сначала обязательно укажи покрытие документа.";
   // Run the two independent readings sequentially. Parallel vision requests
   // hit provider rate limits on real multi-file cases and wasted both reads;
   // independence means separate calls, not simultaneous calls.
@@ -329,7 +329,7 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
 
   const second = await askAssistantWithAttachments(
     TRANSCRIPTION_SYSTEM_PROMPT,
-    [{ role: "user", content: prompt }],
+    [{ role: "user", content: `${prompt} Это независимая повторная вычитка: заново проверь рукопись, границы листа и однотонные области, не полагаясь на возможное первое чтение.` }],
     8000,
     loaded.attachments
   );

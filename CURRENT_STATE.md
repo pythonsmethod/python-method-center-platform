@@ -278,6 +278,8 @@ Current result under the proposed, not-yet-approved 11-gate engineering protocol
 
 Phase 2.9 is not closed. Additional authorized real Cases and independent review evidence are genuine source-data requirements that do not exist in the repository.
 
+Case 003 mobile-photo hardening now includes a handwriting/source-coverage gate. New readings declare `COMPLETE`, `PARTIAL` or `UNREADABLE` before transcription; coverage rows never enter clinical evidence. Handwriting is explicitly read character by character in both independent passes, partial fragments remain uncertain, and matching text from an incomplete source cannot become agreed evidence. This is implemented and regression-tested locally, but the three historical cropped production images have not been reprocessed and missing pixels cannot be reconstructed.
+
 ### Connected in-memory harness — 2026-09-05
 
 An isolated, persistence-free route now connects a Google-like normalized provider result to Clinical Evidence, the unchanged Phase 2.7 shadow trust policy, Evidence Package and Case Analytical Picture. It accepts only `IN_MEMORY_TEST` with external calls and persistence explicitly disabled. A development-only RU/EN screen is gated by `ANKH_HARNESS_ENABLED=true` and returns 404 outside development.

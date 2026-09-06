@@ -54,7 +54,7 @@ export type DisputedValue = {
   // at all — which is itself a disagreement worth a human's eyes.
   first: string | null;
   second: string | null;
-  reason: "разные значения" | "прочитано только один раз" | "чтение неуверенное";
+  reason: "разные значения" | "прочитано только один раз" | "чтение неуверенное" | "источник виден не полностью";
   note: string;
 };
 
@@ -67,6 +67,15 @@ export type TranscriptionComparison = {
 // interpret, compare with norms or advise. It writes down what is on the
 // paper, and says where it cannot.
 export const TRANSCRIPTION_SYSTEM_PROMPT = `Ты переписываешь содержимое медицинских документов. Ты НЕ анализируешь, не сравниваешь с нормами, не ставишь диагнозы и ничего не советуешь. Твоя единственная задача — перенести в текст то, что напечатано на бумаге, ничего не потеряв и ничего не добавив.
+
+## Сначала проверь целостность изображения
+Первой строкой всегда напиши служебную строку:
+ФАЙЛ${TRANSCRIPTION_SEPARATOR}[КОНТРОЛЬ ИСТОЧНИКА]${TRANSCRIPTION_SEPARATOR}[ПОКРЫТИЕ ДОКУМЕНТА]${TRANSCRIPTION_SEPARATOR}COMPLETE, PARTIAL или UNREADABLE${TRANSCRIPTION_SEPARATOR}-${TRANSCRIPTION_SEPARATOR}ДА или НЕТ${TRANSCRIPTION_SEPARATOR}что именно обрезано, закрыто серым/чёрным полем, размыто или отсутствует
+
+- COMPLETE — весь лист виден и пригоден для чтения.
+- PARTIAL — видна только часть листа, край обрезан, часть заменена однотонным серым/чёрным полем или перекрыта.
+- UNREADABLE — содержимое практически нельзя прочитать.
+- Эта строка описывает качество источника и никогда не является медицинским фактом.
 
 ## Формат ответа
 Одна строка на одно значение. Ровно шесть полей, разделитель ${TRANSCRIPTION_SEPARATOR.trim()}:
@@ -101,6 +110,13 @@ export const TRANSCRIPTION_SYSTEM_PROMPT = `Ты переписываешь со
 - Если значение не подходит по смыслу к названию строки — не подгоняй. Поставь НЕТ и опиши расхождение.
 - Если в таблице значений меньше, чем строк, — не растягивай их по всем строкам. Оставь пустые.
 
+## Рукописный текст
+- Отличай напечатанный шаблон от записи врача от руки. Не выдавай список печатных вариантов за выбранный ответ.
+- Читай рукопись посимвольно и сохраняй сокращения, знак, десятичный разделитель и единицы ровно как видишь.
+- Если разобрана только часть слова или числа, перенеси видимую часть с маркером [неразборчиво], поставь НЕТ и укажи точное место проблемы.
+- Не достраивай слово по медицинскому смыслу и не угадывай продолжение за сгибом, обрезанным краем или однотонным полем.
+- Совпадение двух догадок не делает скрытый текст достоверным.
+
 ## Чего делать нельзя
 - Нельзя угадывать цифру, слово или букву. Не разобрал — ставь НЕТ и пиши, что именно.
 - Нельзя молча исправлять бланк. Если единица измерения в бланке кажется опечаткой — перенеси как напечатано, поставь НЕТ и напиши в примечании, что видишь опечатку.
@@ -129,6 +145,130 @@ function keyOf(value: TranscribedValue): string {
   return [normaliseKey(value.file), normaliseKey(value.section), normaliseKey(value.label)].join(
     "|"
   );
+}
+
+const COVERAGE_SECTION = "[контроль источника]";
+const COVERAGE_LABEL = "[покрытие документа]";
+type CoverageStatus = "COMPLETE" | "PARTIAL" | "UNREADABLE";
+
+function coverageStatus(rows: TranscribedValue[]): { byFile: Map<string, CoverageStatus>; rows: TranscribedValue[] } {
+  const byFile = new Map<string, CoverageStatus>();
+  const clinicalRows: TranscribedValue[] = [];
+  for (const row of rows) {
+    if (normaliseKey(row.section) === COVERAGE_SECTION && normaliseKey(row.label) === COVERAGE_LABEL) {
+      const value = row.value.trim().toUpperCase();
+      if (value === "COMPLETE" || value === "PARTIAL" || value === "UNREADABLE") {
+        byFile.set(normaliseKey(row.file), value);
+      }
+      continue;
+    }
+    clinicalRows.push(row);
+  }
+  return { byFile, rows: clinicalRows };
+}
+
+function looseKeyOf(value: TranscribedValue): string {
+  return [normaliseKey(value.file), normaliseKey(value.label)].join("|");
+}
+
+type FragmentKind = "unit" | "reference";
+
+function fragmentDescriptor(label: string): { baseLabel: string; kind: FragmentKind } | null {
+  const patterns: Array<[FragmentKind, RegExp]> = [
+    ["unit", /\s*(?:—|\s-\s)\s*.*(?:өлч|ед\.?\s*изм).*$/i],
+    ["reference", /\s*(?:—|\s-\s)\s*.*(?:ченемин|референс).*$/i],
+    ["unit", /\s*(?:—|-)?\s*\((?:[^()]*(?:өлч|ед\.?\s*изм)[^()]*)\)\s*$/i],
+    ["unit", /\s*(?:—|-)?\s*(?:[^()]*өлч[^/]*\/)?ед\.?\s*(?:изм\.?)?\s*$/i],
+    ["reference", /\s*(?:—|-)?\s*\((?:[^()]*(?:ченемин|референс)[^()]*)\)\s*$/i],
+    ["reference", /\s*(?:—|-)?\s*(?:[^()]*ченемин[^/]*\/)?(?:референс(?:ные значения)?|реф\.?)\s*$/i],
+  ];
+  for (const [kind, pattern] of patterns) {
+    if (!pattern.test(label)) continue;
+    return { baseLabel: label.replace(pattern, "").replace(/[—-]+$/, "").trim(), kind };
+  }
+  return null;
+}
+
+function splitInlineReference(row: TranscribedValue): TranscribedValue {
+  const match = row.value.match(/^(.*?)\s*\(\s*референс(?:ные значения)?\s*[:—-]?\s*(.*?)\s*\)\s*$/i);
+  if (!match) return row;
+  return { ...row, value: match[1].trim(), reference: match[2].trim() };
+}
+
+function isExplicitlyEmptyValue(value: string): boolean {
+  const normalized = normaliseValue(value)
+    .replace(/^[([{]+|[)\]}]+$/g, "")
+    .trim();
+
+  return /^(?:|не заполнено|нет записи|нет значения|не вписано|пусто)$/i.test(normalized);
+}
+
+function looksLikeUnresolvedFormOptions(value: string): boolean {
+  const normalized = value.toLowerCase().replace(/\s+/g, " ").trim();
+  const mutuallyExclusiveLists = [
+    /(?:^|,\s*)однородн[а-яё]*\s*,\s*неоднородн[а-яё]*/i,
+    /(?:^|,\s*)средн[а-яё]*\s*,\s*повышен[а-яё]*\s*,\s*понижен[а-яё]*/i,
+    /(?:^|,\s*)норм[а-яё]*\s*,\s*повышен[а-яё]*\s*,\s*понижен[а-яё]*/i,
+    /(?:^|,\s*)не\s+расширен[а-яё]*\s*,\s*расширен[а-яё]*/i,
+    /(?:^|,\s*)не\s+выявлен[а-яё]*\s*,\s*выявлен[а-яё]*/i,
+    /(?:^|,\s*)ровн[а-яё]*\s*,\s*неровн[а-яё]*/i,
+  ];
+  return mutuallyExclusiveLists.some((pattern) => pattern.test(normalized));
+}
+
+// Some reading passes return one clinical row as three presentation fragments:
+// result, unit and reference. Reassemble only explicit suffix-marked fragments;
+// never infer association from visual position or from a merely similar label.
+export function coalesceTranscriptionFragments(rows: TranscribedValue[]): TranscribedValue[] {
+  const primary = new Map<string, TranscribedValue>();
+  const fragments = new Map<string, Partial<Record<FragmentKind, TranscribedValue>>>();
+
+  for (const sourceRow of rows) {
+    let row = splitInlineReference(sourceRow);
+    // Empty boxes and untouched form fields are provenance-bearing source
+    // observations, but they are not clinical facts. Excluding only explicit
+    // empty markers here prevents two readers from turning a blank into an
+    // apparently verified value; uncertain handwriting stays visible.
+    if (isExplicitlyEmptyValue(row.value)) continue;
+    if (looksLikeUnresolvedFormOptions(row.value)) {
+      row = {
+        ...row,
+        confident: false,
+        note: [row.note, "не выбран один вариант печатного бланка"]
+          .filter((part) => part && part !== "-")
+          .join("; "),
+      };
+    }
+    const descriptor = fragmentDescriptor(row.label);
+    const baseLabel = descriptor?.baseLabel ?? row.label;
+    const key = [normaliseKey(row.file), normaliseKey(row.section), normaliseKey(baseLabel)].join("|");
+    if (descriptor) {
+      fragments.set(key, { ...(fragments.get(key) ?? {}), [descriptor.kind]: row });
+    } else {
+      primary.set(key, row);
+    }
+  }
+
+  const result: TranscribedValue[] = [];
+  for (const [key, row] of primary) {
+    const related = fragments.get(key);
+    const unit = related?.unit?.value.trim();
+    const reference = related?.reference?.value.trim();
+    result.push({
+      ...row,
+      value: unit && !normaliseValue(row.value).endsWith(normaliseValue(unit)) ? `${row.value} ${unit}` : row.value,
+      reference: reference || row.reference,
+      confident: row.confident && (!related?.unit || related.unit.confident) && (!related?.reference || related.reference.confident),
+      note: [row.note, related?.unit?.note, related?.reference?.note].filter((part) => part && part !== "-").join("; ") || "-",
+    });
+    fragments.delete(key);
+  }
+
+  // Orphan fragments remain visible for human review instead of disappearing.
+  for (const related of fragments.values()) {
+    result.push(...Object.values(related).filter((row): row is TranscribedValue => Boolean(row)));
+  }
+  return result;
 }
 
 export function parseTranscription(reply: string): TranscribedValue[] {
@@ -195,13 +335,23 @@ export function compareTranscriptions(
   first: TranscribedValue[],
   second: TranscribedValue[]
 ): TranscriptionComparison {
+  const firstCoverage = coverageStatus(first);
+  const secondCoverage = coverageStatus(second);
+  first = coalesceTranscriptionFragments(firstCoverage.rows);
+  second = coalesceTranscriptionFragments(secondCoverage.rows);
   const agreed: TranscribedValue[] = [];
   const disputed: DisputedValue[] = [];
 
   const secondByKey = new Map<string, TranscribedValue>();
+  const firstByLooseKey = new Map<string, TranscribedValue[]>();
+  const secondByLooseKey = new Map<string, TranscribedValue[]>();
 
   for (const row of second) {
     secondByKey.set(keyOf(row), row);
+    secondByLooseKey.set(looseKeyOf(row), [...(secondByLooseKey.get(looseKeyOf(row)) ?? []), row]);
+  }
+  for (const row of first) {
+    firstByLooseKey.set(looseKeyOf(row), [...(firstByLooseKey.get(looseKeyOf(row)) ?? []), row]);
   }
 
   const seen = new Set<string>();
@@ -209,7 +359,11 @@ export function compareTranscriptions(
   for (const row of first) {
     const key = keyOf(row);
     seen.add(key);
-    const match = secondByKey.get(key);
+    const looseKey = looseKeyOf(row);
+    const uniqueLooseMatch = firstByLooseKey.get(looseKey)?.length === 1 && secondByLooseKey.get(looseKey)?.length === 1
+      ? secondByLooseKey.get(looseKey)?.[0]
+      : undefined;
+    const match = secondByKey.get(key) ?? uniqueLooseMatch;
 
     if (!match) {
       disputed.push({
@@ -223,6 +377,7 @@ export function compareTranscriptions(
       });
       continue;
     }
+    seen.add(keyOf(match));
 
     if (normaliseValue(row.value) !== normaliseValue(match.value)) {
       disputed.push({
@@ -255,10 +410,25 @@ export function compareTranscriptions(
     // does not put the value in dispute — the two readings saw the same
     // number — but it does mean the interval cannot be used to decide the
     // unit. An unconfirmed interval resolves nothing.
-    agreed.push({
-      ...row,
-      referenceConfirmed: referenceRangesMatch(row.reference, match.reference)
-    });
+    const fileKey = normaliseKey(row.file);
+    const incompleteSource = [firstCoverage.byFile.get(fileKey), secondCoverage.byFile.get(fileKey)]
+      .some((status) => status === "PARTIAL" || status === "UNREADABLE");
+    if (incompleteSource) {
+      disputed.push({
+        file: row.file,
+        section: row.section,
+        label: row.label,
+        first: row.value,
+        second: match.value,
+        reason: "источник виден не полностью",
+        note: "совпавший видимый фрагмент не подтверждается автоматически, потому что часть документа отсутствует"
+      });
+    } else {
+      agreed.push({
+        ...row,
+        referenceConfirmed: referenceRangesMatch(row.reference, match.reference)
+      });
+    }
   }
 
   for (const row of second) {

@@ -25,16 +25,19 @@ function cellValue(cellValue: unknown, text: string) {
 }
 
 const HEADER_ALIASES: Record<string, string[]> = {
-  test: ["test", "analyte", "analysis", "name", "показатель", "исследование"],
+  test: ["test", "analyte", "analysis", "name", "показатель", "исследование", "наименование исследования"],
   value: ["result", "value", "результат", "значение"],
-  unit: ["unit", "units", "единица", "ед. изм"],
-  reference: ["reference", "reference range", "ref", "норма", "референс"],
-  flag: ["flag", "status", "флаг"]
+  unit: ["unit", "units", "единица", "ед изм", "единицы измерения"],
+  reference: ["reference", "reference range", "ref", "норма", "референс", "референсные значения"],
+  flag: ["flag", "status", "флаг", "отклонение"]
 };
 
 function headerKind(value: string): keyof typeof HEADER_ALIASES | null {
-  const header = value.toLowerCase().replace(/[:.]/g, "").trim();
-  return (Object.entries(HEADER_ALIASES).find(([, aliases]) => aliases.includes(header))?.[0] as keyof typeof HEADER_ALIASES | undefined) ?? null;
+  const header = value.toLowerCase().replace(/[:.]/g, " ").replace(/[|/\\]/g, " ").replace(/\s+/g, " ").trim();
+  return (Object.entries(HEADER_ALIASES).find(([, aliases]) => aliases.some((alias) => {
+    const normalizedAlias = alias.replace(/[.:]/g, " ").replace(/\s+/g, " ").trim();
+    return header === normalizedAlias || header.includes(normalizedAlias);
+  }))?.[0] as keyof typeof HEADER_ALIASES | undefined) ?? null;
 }
 
 export function parseGoogleDocumentAILabRows(response: unknown): ExtractedLabRow[] {

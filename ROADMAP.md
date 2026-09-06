@@ -133,6 +133,8 @@ Status: IN PROGRESS — DATA GATE OPEN
 
 Connected-harness checkpoint (2026-09-05): a local in-memory adapter now proves the bounded path `Google normalized result -> Clinical Evidence -> shadow Trust Decision -> Evidence Package -> Case Picture` on synthetic input. It performs no provider call or persistence and fails closed on identity, provenance, ambiguity, conflict, unit/date/reference/row and duplicate-version errors. It reconstructs an immutable source observation from normalized token/span data and checks the extracted candidate against that observation instead of against itself. Missing signals remain unknown. This validates the transformation boundary, not the correctness of OCR against the original image. A real staging database exercise and any new real-Case run remain open gates; this checkpoint does not increase Phase 2.9 coverage.
 
+Handwriting checkpoint (2026-09-05): the existing two-pass transcription now requires source-coverage classification and character-level handwriting review. Partial/cropped sources fail closed even when visible text agrees. Remaining work is a non-production replay on authorized handwritten Cases, source-region provenance capture and human adjudication of uncertain fragments; missing image pixels are not an OCR problem and cannot be inferred safely.
+
 Goal:
 validate extraction + trust gates on multiple Cases/layouts.
 
