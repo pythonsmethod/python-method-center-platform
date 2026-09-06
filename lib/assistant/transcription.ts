@@ -141,10 +141,65 @@ function normaliseKey(value: string): string {
 function normaliseValue(value: string): string {
   return value
     .toLowerCase()
+    .replace(/[‐‑‒–—−]/g, "-")
+    .replace(/[«»“”„\"'`•]/g, " ")
     .replace(/\s+/g, " ")
     .replace(/,/g, ".")
+    // Layout punctuation and spacing vary between independent readings of
+    // the same prose. Keep clinically meaningful operators and decimal
+    // points, but do not turn a comma, bullet or a space before a full stop
+    // into a medical disagreement.
+    .replace(/\s*([:;])\s*/g, " ")
+    .replace(/\s*\.\s*(?!\d)/g, " ")
+    .replace(/\s+([)\]])/g, "$1")
+    .replace(/([(\[])\s+/g, "$1")
+    .replace(/\s+/g, " ")
     .replace(/[.,;]+$/, "")
     .trim();
+}
+
+function labelFingerprint(value: string): string {
+  const normalized = normaliseKey(value).replace(/ё/g, "е");
+  if (/^[рp][нh]$/i.test(normalized.replace(/[^a-zа-я]/gi, ""))) return "ph";
+  return normalized.replace(/[^a-zа-я0-9]/gi, "");
+}
+
+function editDistanceAtMostOne(left: string, right: string): boolean {
+  if (left === right) return true;
+  if (Math.abs(left.length - right.length) > 1) return false;
+  let short = left;
+  let long = right;
+  if (short.length > long.length) [short, long] = [long, short];
+  let edits = 0;
+  for (let i = 0, j = 0; i < short.length || j < long.length;) {
+    if (short[i] === long[j]) {
+      i += 1;
+      j += 1;
+      continue;
+    }
+    edits += 1;
+    if (edits > 1) return false;
+    if (short.length === long.length) {
+      i += 1;
+      j += 1;
+    } else {
+      j += 1;
+    }
+  }
+  return true;
+}
+
+function labelsAreConservativelyEquivalent(left: TranscribedValue, right: TranscribedValue): boolean {
+  if (normaliseKey(left.file) !== normaliseKey(right.file)) return false;
+  if (normaliseKey(left.section) !== normaliseKey(right.section)) return false;
+  const a = labelFingerprint(left.label);
+  const b = labelFingerprint(right.label);
+  if (a === b) return true;
+  // Never smooth over a different date, measurement index or staging code.
+  if (a.match(/\d+/g)?.join("|") !== b.match(/\d+/g)?.join("|")) return false;
+  // A one-character OCR slip in a sufficiently descriptive label is safe
+  // only when the match is unique in both readings (enforced by the caller).
+  return Math.min(a.length, b.length) >= 6 && editDistanceAtMostOne(a, b);
 }
 
 function keyOf(value: TranscribedValue): string {
@@ -411,6 +466,15 @@ export function compareTranscriptions(
     firstByLooseKey.set(looseKeyOf(row), [...(firstByLooseKey.get(looseKeyOf(row)) ?? []), row]);
   }
 
+  const fuzzyMatches = new Map<TranscribedValue, TranscribedValue>();
+  for (const row of first) {
+    const candidates = second.filter((candidate) => labelsAreConservativelyEquivalent(row, candidate));
+    if (candidates.length !== 1) continue;
+    const candidate = candidates[0];
+    const reverseCandidates = first.filter((source) => labelsAreConservativelyEquivalent(source, candidate));
+    if (reverseCandidates.length === 1) fuzzyMatches.set(row, candidate);
+  }
+
   const seen = new Set<string>();
 
   for (const row of first) {
@@ -420,7 +484,7 @@ export function compareTranscriptions(
     const uniqueLooseMatch = firstByLooseKey.get(looseKey)?.length === 1 && secondByLooseKey.get(looseKey)?.length === 1
       ? secondByLooseKey.get(looseKey)?.[0]
       : undefined;
-    const match = secondByKey.get(key) ?? uniqueLooseMatch;
+    const match = secondByKey.get(key) ?? uniqueLooseMatch ?? fuzzyMatches.get(row);
 
     if (!match) {
       disputed.push({

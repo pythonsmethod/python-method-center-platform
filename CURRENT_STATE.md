@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-Last canonical update: 2026-09-05
+Last canonical update: 2026-09-06
 
 ## 1. Current position
 
@@ -281,6 +281,8 @@ Phase 2.9 is not closed. Additional authorized real Cases and independent review
 Case 003 mobile-photo hardening now includes a handwriting/source-coverage gate. New readings declare `COMPLETE`, `PARTIAL` or `UNREADABLE` before transcription; coverage rows never enter clinical evidence. Handwriting is explicitly read character by character in both independent passes, partial fragments remain uncertain, and matching text from an incomplete source cannot become agreed evidence. This is implemented and regression-tested locally, but the three historical cropped production images have not been reprocessed and missing pixels cannot be reconstructed.
 
 The next local hardening increment distinguishes `EMPTY_TEMPLATE` from `CLINICAL_CONTENT`. Identity/header-only blank forms retain source and raw readings but persist no agreed/disputed evidence rows and bypass analysis. A nullable, deidentified content fingerprint supports duplicate detection across re-encoded photos only with matching clinical content plus compatible accession or laboratory/date metadata. The migration is repository-only and is not yet applied to production.
+
+The current Phase 2.9 comparison hardening also separates formatting noise from clinical disagreement. Presentation punctuation may normalize, and a one-character label OCR slip may match only through a unique mutual same-section relation with identical numeric identifiers. Partial sources, uncertain readings, ambiguous labels and different clinical values continue to fail closed. Production auto-verification remains NO-GO.
 
 ### Connected in-memory harness — 2026-09-05
 

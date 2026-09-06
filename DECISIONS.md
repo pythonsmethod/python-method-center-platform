@@ -512,3 +512,15 @@ New transcription passes emit `FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE` or `UNCER
 
 Decision:
 A provider-neutral visual detector may corroborate an empty printed form by locating chromatic ink in the identity/header area and proving its absence from the clinical body. It runs only after two structured OCR passes disagree with empty-form classification because of `UNCERTAIN` clinical rows. It must not suppress any clinical row marked `FILLED`, must not treat monochrome or weak visual evidence as absence, and must fail closed as `INCONCLUSIVE` on decoding errors. Visual evidence changes whole-document routing only; it never creates, edits or verifies a clinical fact.
+
+---
+
+## D-049 — Comparison normalization is bounded and mutually unique
+
+Decision:
+Independent readings may ignore presentation-only punctuation and may align a one-character OCR variant of a sufficiently descriptive label only when the relation is unique in both directions, remains inside the same section, and preserves every numeric identifier. Cyrillic/Latin `pH` is an explicit orthographic equivalent.
+
+The comparator must not fuzzy-match across sections, repeated labels, different dates/indices, partial sources or uncertain readings. Value comparison still runs after label alignment, and clinically meaningful operators remain significant.
+
+Why:
+Formatting and harmless label OCR differences should not inflate Karen's queue, but reducing review load must never manufacture agreement between different medical observations.

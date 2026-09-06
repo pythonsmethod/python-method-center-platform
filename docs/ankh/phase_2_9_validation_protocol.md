@@ -81,3 +81,11 @@ Owner adjudication established that one apparent failure was an identity-only em
 The structured contract is supplemented by a bounded visual check for image uploads. When both OCR passes contain only structured `UNCERTAIN`/empty clinical rows and no clinical `FILLED` row, the detector measures chromatic ink separately in the header and body. Header-only ink can corroborate `EMPTY_TEMPLATE`; body ink or any weak, monochrome or decoder signal remains reviewable. The detector does not read handwriting and cannot promote evidence to `VERIFIED`.
 
 New OCR passes also emit an explicit row-state enum. Provider notes are explanatory only: `EMPTY` and `UNSELECTED_TEMPLATE` are excluded from evidence, `FILLED` is clinical outside administrative sections, and `UNCERTAIN` always remains reviewable.
+
+## Validation Case 004 — comparison-noise hardening (2026-09-06)
+
+The owner authorized processing an existing production Case with six clinical image documents. The first production pass produced 20 literal agreements and 258 review rows. A structural audit showed that 114 rows were intentionally held because the source was partial, seven because at least one reader was uncertain, 108 were one-sided presentation/label differences, and 29 carried different rendered values. These are queue counts, not a count of medical errors.
+
+The comparator now ignores presentation-only prose punctuation while preserving numbers, decimal points and clinical operators. It also accepts a unique, mutual, same-section label match when the labels differ only by the Cyrillic/Latin spelling of `pH` or by one OCR character in a sufficiently descriptive label. Different numeric identifiers are never fuzzy-matched. Ambiguous, repeated, cross-section, partial-source and uncertain candidates remain review-visible; the trust policy and production auto-verification boundary are unchanged.
+
+No source image, raw reading, patient identifier or clinical value from this Case is retained in Git. The production replay result is recorded only as aggregate counts after deployment.
