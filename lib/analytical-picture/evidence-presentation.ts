@@ -34,6 +34,28 @@ function semanticKey(item: ExtractedClinicalEvidence): string {
   return [item.documentId, normalizeEvidenceText(item.section), normalizeEvidenceText(item.label), normalizeEvidenceText(item.value), normalizeEvidenceText(item.alternateValue)].join("|");
 }
 
+function comparableResult(value: string | null, label: string): string {
+  return normalizeFieldValue(value, label)
+    .replace(/\[[^\]]+\]/g, "")
+    .replace(/(?:10\s*\^\s*\d+\s*\/\s*l|mmol\s*\/\s*l|µ?mol\s*\/\s*l|g\s*\/\s*l|mg\s*\/\s*l|ng\s*\/\s*ml|fl|pg|%|u\s*\/\s*l)/gi, "")
+    .replace(/(?:^|\s)[hl+\-](?:\s|$)/gi, " ")
+    .replace(/[^\p{L}\p{N}.,<>]+/gu, " ")
+    .replace(/,(?=\d)/g, ".")
+    .trim();
+}
+
+function nonEmptyResults(item: ExtractedClinicalEvidence): string[] {
+  return [item.value, item.alternateValue]
+    .map((value) => comparableResult(value, item.label))
+    .filter(Boolean);
+}
+
+function moreCompleteValue(item: ExtractedClinicalEvidence): string | null {
+  return [item.value, item.alternateValue]
+    .filter((value): value is string => Boolean(value?.trim()))
+    .sort((left, right) => right.length - left.length)[0] ?? null;
+}
+
 export function prepareEvidenceForKaren(items: ExtractedClinicalEvidence[]): ExtractedClinicalEvidence[] {
   const unique = new Map<string, ExtractedClinicalEvidence>();
   for (const source of items) {
@@ -57,7 +79,34 @@ export function prepareEvidenceForKaren(items: ExtractedClinicalEvidence[]): Ext
       if (!existing || (existing.priority === "TECHNICAL" && item.priority !== "TECHNICAL")) unique.set(key, item);
     }
   }
-  return [...unique.values()].sort((left, right) => {
+  const projected = [...unique.values()];
+  const complementary = new Map<string, ExtractedClinicalEvidence[]>();
+  for (const item of projected) {
+    const results = nonEmptyResults(item);
+    if (results.length !== 1) continue;
+    const key = [item.documentId, normalizeEvidenceText(item.label), results[0]].join("|");
+    complementary.set(key, [...(complementary.get(key) ?? []), item]);
+  }
+
+  const consumed = new Set<string>();
+  const corroborated: ExtractedClinicalEvidence[] = [];
+  for (const group of complementary.values()) {
+    if (group.length < 2) continue;
+    const representative = [...group].sort((left, right) => {
+      const reviewed = Number(right.reviewDecision !== "PENDING") - Number(left.reviewDecision !== "PENDING");
+      return reviewed || String(moreCompleteValue(right)).length - String(moreCompleteValue(left)).length;
+    })[0];
+    group.forEach((item) => consumed.add(item.id));
+    corroborated.push({
+      ...representative,
+      value: moreCompleteValue(representative),
+      alternateValue: null,
+      disputeReason: null,
+      trustState: "SOURCE_ONLY",
+    });
+  }
+
+  return [...projected.filter((item) => !consumed.has(item.id)), ...corroborated].sort((left, right) => {
     const rank = { CRITICAL: 0, IMPORTANT: 1, SUPPORTING: 2, TECHNICAL: 3 } as const;
     return rank[left.priority] - rank[right.priority] || left.section.localeCompare(right.section) || left.label.localeCompare(right.label);
   });

@@ -64,7 +64,15 @@ export type CaseAnalyticalPicture = {
   contradictions: Array<{ code: "BLOCKED_EVIDENCE" | "IDENTITY_MISMATCH"; subject: string | null }>;
   missingContext: Array<{ code: "NO_DOCUMENTS" | "NO_STRUCTURED_FACTS" | "MISSING_DATES" | "ANALYSIS_REQUESTS" | "EXCLUDED_EVIDENCE" | "PAGE_TOKEN_PROVENANCE" | "STALE_ANALYSIS"; count?: number }>;
   reviewQueue: PictureFact[];
-  reviewSummary: { required: number; completed: number; criticalRequired: number; criticalCompleted: number; approvalBlocked: boolean };
+  reviewSummary: {
+    required: number;
+    completed: number;
+    criticalRequired: number;
+    criticalCompleted: number;
+    machineMatched: number;
+    archived: number;
+    approvalBlocked: boolean;
+  };
   notes: PictureReviewNote[];
   limitations: Array<"NOT_DIAGNOSIS" | "NO_CAUSALITY" | "NO_LIVE_TRUST_PERSISTENCE">;
 };
@@ -136,11 +144,19 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
   ];
 
   const extractedEvidence = [...(input.extractedEvidence ?? [])];
-  const primaryEvidence = extractedEvidence.filter((item) => item.priority === "CRITICAL" || item.priority === "IMPORTANT").slice(0, 25);
-  // Karen's mandatory queue is the bounded primary projection. Supporting
-  // evidence remains available in drill-down but cannot silently turn an
-  // intentionally concise review into hundreds of blocking rows.
-  const reviewable = primaryEvidence;
+  const unresolved = extractedEvidence.filter((item) =>
+    item.priority !== "TECHNICAL" && item.trustState === "NEEDS_REVIEW",
+  ).sort((left, right) =>
+    Number(right.reviewDecision === "PENDING") - Number(left.reviewDecision === "PENDING"),
+  );
+  const keyMatched = extractedEvidence.filter((item) =>
+    item.trustState === "SOURCE_ONLY" && (item.priority === "CRITICAL" || item.priority === "IMPORTANT"),
+  );
+  // The primary surface is an exception queue, followed by a small amount of
+  // clinically important matched context. The complete extraction remains in
+  // drill-down, but it is not a 100+ click checklist.
+  const primaryEvidence = [...unresolved, ...keyMatched].slice(0, 25);
+  const reviewable = unresolved;
   const completed = reviewable.filter((item) => item.reviewDecision !== "PENDING");
   const critical = reviewable.filter((item) => item.priority === "CRITICAL");
   const criticalCompleted = critical.filter((item) => item.reviewDecision !== "PENDING");
@@ -159,6 +175,8 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
       completed: completed.length,
       criticalRequired: critical.length,
       criticalCompleted: criticalCompleted.length,
+      machineMatched: extractedEvidence.filter((item) => item.trustState === "SOURCE_ONLY").length,
+      archived: extractedEvidence.filter((item) => item.priority === "TECHNICAL").length,
       approvalBlocked: criticalCompleted.length < critical.length,
     },
     notes: [...input.notes].sort((left, right) => right.createdAt.localeCompare(left.createdAt)),

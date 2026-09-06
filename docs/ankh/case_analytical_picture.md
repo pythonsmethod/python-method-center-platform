@@ -41,3 +41,22 @@ The conclusion approval UI and server action fail closed while any critical evid
 ## Remaining gap
 
 This screen does not claim the full clinical chain is live. Exact page/token provenance and persisted Clinical Trust Decisions remain absent. A new extraction version creates new evidence references and therefore a new review requirement. Phase 2.9 remains open and production auto-verification remains NO-GO.
+
+## Exception-only review projection — 2026-09-06
+
+The complete extraction is now an audit archive, not a click-by-click Karen
+checklist. The primary surface is an exception queue. It contains unresolved
+non-technical disagreements first and a bounded amount of important matched
+context second. Pending exceptions sort ahead of already reviewed ones.
+
+Formatting-equivalent rows and complementary dual-read rows may be collapsed
+only inside the same document and label when every non-empty normalized result
+agrees. For example, `243 / empty` plus `empty / 243 [10^9/L]` becomes one
+source-only observation. `243 / 248` remains review-required. A previously
+recorded Karen decision is preferred as the representative so append-only
+review history is not hidden by projection deduplication.
+
+Matched/source-only and technical rows remain inspectable in the archive but
+have no decision controls. The screen reports unresolved exception, non-blocking
+and technical-archive counts in both Russian and English. None of these
+presentation rules promotes evidence to `VERIFIED`.

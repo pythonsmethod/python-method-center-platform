@@ -122,17 +122,47 @@ describe("live Case Analytical Picture", () => {
     ]));
   });
 
+  it("collapses complementary dual-read rows into one non-blocking source-only item", () => {
+    const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
+      { file: "synthetic.pdf", section: "Hemogram", label: "PLT", first: "243", second: "", reason: "разные значения", note: "" },
+      { file: "synthetic.pdf", section: "CBC", label: "PLT", first: "", second: "243 [10^9/L]", reason: "разные значения", note: "" },
+    ] }, new Set(["doc-a"]));
+    const prepared = prepareEvidenceForKaren(projected);
+    expect(prepared).toHaveLength(1);
+    expect(prepared[0]).toMatchObject({ label: "PLT", value: "243 [10^9/L]", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" });
+  });
+
+  it("preserves a reviewed representative when complementary rows are collapsed", () => {
+    const item = (id: string, section: string, value: string | null, alternateValue: string | null, reviewDecision: "PENDING" | "CORRECTED") => ({ id, documentId: "doc-a", section, label: "PLT", value, alternateValue, category: "UNKNOWN" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: "разные значения", provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision, correction: reviewDecision === "CORRECTED" ? "PLT 243 [10^9/L]" : null });
+    const prepared = prepareEvidenceForKaren([
+      item("pending", "CBC", "243", null, "PENDING"),
+      item("reviewed", "Hemogram", null, "243 [10^9/L]", "CORRECTED"),
+    ]);
+    expect(prepared).toHaveLength(1);
+    expect(prepared[0]).toMatchObject({ id: "reviewed", reviewDecision: "CORRECTED", correction: "PLT 243 [10^9/L]", trustState: "SOURCE_ONLY" });
+  });
+
+  it("keeps a genuine dual-read disagreement in the exception queue", () => {
+    const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
+      { file: "synthetic.pdf", section: "CBC", label: "PLT", first: "243", second: "248", reason: "разные значения", note: "" },
+    ] }, new Set(["doc-a"]));
+    const prepared = prepareEvidenceForKaren(projected);
+    const picture = buildCaseAnalyticalPicture(base({ extractedEvidence: prepared }));
+    expect(prepared[0]).toMatchObject({ trustState: "NEEDS_REVIEW", alternateValue: "248" });
+    expect(picture.reviewSummary).toMatchObject({ required: 1, completed: 0, machineMatched: 0 });
+  });
+
   it("counts extracted evidence decisions and blocks approval until every critical item is reviewed", () => {
     const item = { id: "e1", documentId: "doc-a", section: "Final Diagnosis", label: "Diagnosis", value: "synthetic", alternateValue: null, category: "PATHOLOGY" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "CRITICAL" as const, reviewDecision: "PENDING" as const, correction: null };
     expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [item] })).reviewSummary).toMatchObject({ required: 1, completed: 0, criticalRequired: 1, criticalCompleted: 0, approvalBlocked: true });
     expect(buildCaseAnalyticalPicture(base({ extractedEvidence: [{ ...item, reviewDecision: "CONFIRMED" }] })).reviewSummary).toMatchObject({ completed: 1, criticalCompleted: 1, approvalBlocked: false });
   });
 
-  it("bounds the mandatory Karen queue to the 25-item primary projection", () => {
+  it("bounds the visible exception projection while counting every unresolved exception", () => {
     const extractedEvidence = Array.from({ length: 40 }, (_, index) => ({ id: `e${index}`, documentId: "doc-a", section: "Final Diagnosis", label: `Diagnosis ${index}`, value: "synthetic", alternateValue: null, category: "PATHOLOGY" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "CRITICAL" as const, reviewDecision: "PENDING" as const, correction: null }));
     const picture = buildCaseAnalyticalPicture(base({ extractedEvidence }));
     expect(picture.primaryEvidence).toHaveLength(25);
-    expect(picture.reviewSummary).toMatchObject({ required: 25, criticalRequired: 25, approvalBlocked: true });
+    expect(picture.reviewSummary).toMatchObject({ required: 40, criticalRequired: 40, approvalBlocked: true });
   });
 
   it("does not guess categories from substrings or generic diagnosis headings", () => {
@@ -197,8 +227,8 @@ describe("live Case Analytical Picture", () => {
     expect(component).toContain("Whole-case picture");
     expect(component).toContain("Это не диагноз");
     expect(component).toContain("It is not a diagnosis");
-    expect(component).toContain("Ключевые клинические свидетельства");
-    expect(component).toContain("Key clinical evidence");
+    expect(component).toContain("Очередь исключений");
+    expect(component).toContain("Exception queue");
     expect(component).toContain("Подтвердить");
     expect(component).toContain("Reject");
   });
