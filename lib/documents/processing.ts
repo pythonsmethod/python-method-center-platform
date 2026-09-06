@@ -17,6 +17,7 @@ import { createHash } from "node:crypto";
 import { detectVisualFillEvidence } from "@/lib/documents/visual-fill";
 import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { shouldBlockIdentityMismatch } from "@/lib/documents/identity-review";
 
 const MAX_ATTEMPTS = 3;
 const RETRY_MINUTES = [1, 5, 20];
@@ -299,7 +300,7 @@ async function processClaimedDocument(
 
   const { data: document, error: documentError } = await supabase
     .from("uploaded_documents")
-    .select("id, storage_path, original_filename, metadata, created_at")
+    .select("id, storage_path, original_filename, metadata, created_at, identity_review_status")
     .eq("id", job.document_id)
     .maybeSingle();
   if (documentError || !document) {
@@ -357,7 +358,7 @@ async function processClaimedDocument(
     identity_reasons: identity.reasons
   }).eq("id", job.document_id);
 
-  if (identity.status === "mismatch") {
+  if (shouldBlockIdentityMismatch(identity.status, document.identity_review_status)) {
     return finishIdentityMismatch(job, header, identity);
   }
 

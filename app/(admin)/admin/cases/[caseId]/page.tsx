@@ -29,6 +29,7 @@ import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
 import { CaseManagementForm } from "./CaseManagementForm";
 import { ReprocessCaseDocumentsForm } from "./ReprocessCaseDocumentsForm";
+import { IdentityReviewForm } from "./IdentityReviewForm";
 import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { CaseAnalyticalPicturePanel } from "@/components/cases/CaseAnalyticalPicturePanel";
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
@@ -411,13 +412,28 @@ export default async function StaffCaseDetailPage({
             же названием помечена как новая версия — это динамика клиента.
           </p>
           {showAdminControls || canReadProfessorConversation ? (
-            <ReprocessCaseDocumentsForm
-              caseId={clientCase.id}
-              queuedDocumentCount={documents.filter(
-                (document) => document.document_status === "queued"
-              ).length}
-              locale={locale}
-            />
+            <>
+              <IdentityReviewForm
+                caseId={clientCase.id}
+                documents={documents
+                  .filter((document) =>
+                    document.document_status === "identity_mismatch" &&
+                    document.identity_review_status !== "confirmed_belongs_to_case"
+                  )
+                  .map((document) => ({
+                    id: document.id,
+                    filename: document.original_filename ?? (locale === "ru" ? "Документ" : "Document")
+                  }))}
+                locale={locale}
+              />
+              <ReprocessCaseDocumentsForm
+                caseId={clientCase.id}
+                queuedDocumentCount={documents.filter(
+                  (document) => document.document_status === "queued"
+                ).length}
+                locale={locale}
+              />
+            </>
           ) : null}
           <DocumentTimeline
             labels={getDictionary("ru").cabinet.timeline}

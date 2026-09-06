@@ -43,6 +43,6 @@ describe("staff Case document reprocessing", () => {
     expect(route).toContain("canAccessProfessorMessages(staff.email)");
     expect(processing).toContain('.eq("case_id", caseId)');
     expect(processing).toContain('.eq("status", "queued")');
-    expect(processing).toContain('.eq("status", "queued")\n    .select');
+    expect(processing).toMatch(/\.eq\("status", "queued"\)\r?\n\s+\.select/);
   });
 });
