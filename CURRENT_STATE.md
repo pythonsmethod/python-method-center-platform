@@ -344,3 +344,13 @@ NO-GO.
 The empty-form reader contract now carries an explicit provider-neutral row state (`FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE`, `UNCERTAIN`). A fail-closed visual corroboration layer can distinguish coloured body handwriting from header-only coloured ink on image uploads. It may resolve an otherwise uncertain document as `EMPTY_TEMPLATE` only when both OCR passes use structured row states, neither contains a clinical `FILLED` row, and the image has header-only chromatic ink. Monochrome marks, body ink, weak signals and decoder failures remain `INCONCLUSIVE` and review-visible. Production validation on the authorized empty/filled form pair is still required before this hardening increment can be closed.
 
 Production rollout requires broader validation, staging, human review calibration, operational controls and PHI/compliance closure.
+
+### Karen exception-only review projection — 2026-09-06
+
+The Karen evidence screen now has a local exception-only review projection.
+Exact and complementary two-read matches are collapsed within one document and
+label, while genuine value disagreements remain review-required. Matched and
+technical rows stay in a closed audit archive without confirmation controls.
+This reduces manual clicks but does not enable production auto-verification or
+change source/extracted evidence. Production publication is not part of this
+local increment.

@@ -617,3 +617,29 @@ Why:
 Repeatedly requeueing a confirmed former-name document otherwise reproduces
 the same safe stop. Silently changing identity data or globally weakening the
 resolver would be unsafe.
+
+---
+
+## D-055 — Karen reviews exceptions, not the entire extraction archive
+
+Decision:
+The two-read comparison layer may remove presentation noise and collapse
+complementary rows only when they belong to the same document and normalized
+label and every non-empty normalized result agrees. These rows remain
+`SOURCE_ONLY`; they are not promoted to `VERIFIED`.
+
+The mandatory Karen queue contains unresolved, non-technical disagreements.
+Matched/source-only and technical rows remain visible in an audit drill-down
+without confirmation controls. A real value disagreement remains in the queue,
+and critical unresolved evidence continues to block conclusion approval.
+
+Why:
+Making Karen click every OCR row does not scale and confuses extraction volume
+with uncertainty. The correct human role is adjudicating exceptions, not
+repeating deterministic comparison work.
+
+Constraint:
+This is a presentation and routing decision. It does not authorize automatic
+medical verification, diagnosis, client interpretation or trust-threshold
+weakening. Existing append-only Karen decisions remain authoritative and are
+preferred when projection-level duplicate rows are collapsed.

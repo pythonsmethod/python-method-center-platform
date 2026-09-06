@@ -110,11 +110,12 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
     if (decision !== "CONFIRMED" && decision !== "CORRECTED" && decision !== "REJECTED") continue;
     latestReviews.set(metadata.evidence_id, { decision, correction: metadata.correction?.trim() || null });
   }
-  const preparedEvidence = prepareEvidenceForKaren(extractedEvidence).map((item) => ({
+  const reviewedEvidence = extractedEvidence.map((item) => ({
     ...item,
     reviewDecision: latestReviews.get(item.id)?.decision ?? "PENDING",
     correction: latestReviews.get(item.id)?.correction ?? null,
   }));
+  const preparedEvidence = prepareEvidenceForKaren(reviewedEvidence);
 
   const newestDocumentAt = documents.reduce((latest, item) => item.createdAt > latest ? item.createdAt : latest, "");
   const analysisCurrent = Boolean(run?.id && run.created_at && run.created_at >= newestDocumentAt);

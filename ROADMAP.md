@@ -242,6 +242,11 @@ Build:
 Goal:
 Karen understands a prepared Case in ~30–90 seconds where feasible.
 
+Current increment: an exception-only review projection is implemented locally.
+Matched/source-only and technical evidence stays available for audit without
+becoming a mandatory checklist; unresolved discrepancies remain routed to
+Karen. Production acceptance and workload calibration remain open.
+
 Core UI:
 - Case summary;
 - data quality badge;
