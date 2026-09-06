@@ -25,6 +25,8 @@ import { referenceRangesMatch } from "@/lib/analysis/reference-range";
 
 export const TRANSCRIPTION_SEPARATOR = " :: ";
 
+export type TranscribedRowState = "FILLED" | "EMPTY" | "UNSELECTED_TEMPLATE" | "UNCERTAIN";
+
 export type TranscribedValue = {
   // The file this was read from, exactly as it is named in the case, so a
   // person can find it.
@@ -41,6 +43,9 @@ export type TranscribedValue = {
   // reading saw, or the two disagreed on, decides no unit: the difference
   // between the two readings is a factor of ten in what the value means.
   referenceConfirmed: boolean;
+  // Explicit structural state returned by new readers. Optional only so
+  // historical raw readings remain replayable through the legacy fallback.
+  rowState?: TranscribedRowState;
   confident: boolean;
   // What exactly is unclear, in the reader's own words.
   note: string;
@@ -78,15 +83,16 @@ export const TRANSCRIPTION_SYSTEM_PROMPT = `Ты переписываешь со
 - Эта строка описывает качество источника и никогда не является медицинским фактом.
 
 ## Формат ответа
-Одна строка на одно значение. Ровно шесть полей, разделитель ${TRANSCRIPTION_SEPARATOR.trim()}:
+Одна строка на одно значение. Ровно восемь полей, разделитель ${TRANSCRIPTION_SEPARATOR.trim()}:
 
-ФАЙЛ${TRANSCRIPTION_SEPARATOR}РАЗДЕЛ${TRANSCRIPTION_SEPARATOR}НАЗВАНИЕ СТРОКИ${TRANSCRIPTION_SEPARATOR}ЗНАЧЕНИЕ${TRANSCRIPTION_SEPARATOR}РЕФЕРЕНС${TRANSCRIPTION_SEPARATOR}ДА или НЕТ${TRANSCRIPTION_SEPARATOR}примечание
+ФАЙЛ${TRANSCRIPTION_SEPARATOR}РАЗДЕЛ${TRANSCRIPTION_SEPARATOR}НАЗВАНИЕ СТРОКИ${TRANSCRIPTION_SEPARATOR}ЗНАЧЕНИЕ${TRANSCRIPTION_SEPARATOR}РЕФЕРЕНС${TRANSCRIPTION_SEPARATOR}ROW_STATE${TRANSCRIPTION_SEPARATOR}ДА или НЕТ${TRANSCRIPTION_SEPARATOR}примечание
 
 - ФАЙЛ — имя файла, как оно названо перед изображением. Не выдумывай имя.
 - РАЗДЕЛ — заголовок бланка или исследования, к которому относится строка.
 - НАЗВАНИЕ СТРОКИ — подпись поля ровно как напечатана, включая скобки и единицы.
 - ЗНАЧЕНИЕ — ровно то, что напечатано. Единицы измерения оставляй как в бланке.
 - РЕФЕРЕНС — референсный интервал, напечатанный в бланке рядом с этой строкой, ровно как напечатан: «12-15.5», «120 - 155», «до 5,0». Если рядом ничего не напечатано — поставь прочерк. Не бери интервал из другой строки и не вычисляй его сам.
+- ROW_STATE — строго одно значение: FILLED (поле действительно заполнено), EMPTY (поле пустое), UNSELECTED_TEMPLATE (виден только печатный список вариантов и ни один вариант не выбран) или UNCERTAIN (возможно есть запись/отметка, но её состояние нельзя надёжно определить). Не заменяй эти слова синонимами.
 - ДА или НЕТ — уверен ли ты в прочтении этой строки полностью.
 - Примечание — если НЕТ, напиши, что именно не разобрал и почему (блик, сгиб, обрезан край, размыто). Если ДА, поставь прочерк.
 
@@ -227,6 +233,11 @@ const ADMINISTRATIVE_SECTION = /^(?:шапка(?:\s+бланка)?|данные 
 
 export function isClinicalContentRow(row: TranscribedValue): boolean {
   if (normaliseKey(row.section) === COVERAGE_SECTION && normaliseKey(row.label) === COVERAGE_LABEL) return false;
+  if (row.rowState === "EMPTY" || row.rowState === "UNSELECTED_TEMPLATE") return false;
+  if (row.rowState === "FILLED" || row.rowState === "UNCERTAIN") {
+    if (ADMINISTRATIVE_SECTION.test(row.section.trim())) return false;
+    return !ADMINISTRATIVE_ROW.test(row.label.trim());
+  }
   if (isExplicitlyUnfilledFormRow(row)) return false;
   if (isExplicitlyEmptyValue(row.value) || looksLikeUnresolvedFormOptions(row.value)) return false;
   if (ADMINISTRATIVE_SECTION.test(row.section.trim())) return false;
@@ -255,7 +266,8 @@ export function coalesceTranscriptionFragments(rows: TranscribedValue[]): Transc
     // observations, but they are not clinical facts. Excluding only explicit
     // empty markers here prevents two readers from turning a blank into an
     // apparently verified value; uncertain handwriting stays visible.
-    if (isExplicitlyEmptyValue(row.value)) continue;
+    if (row.rowState === "EMPTY" || row.rowState === "UNSELECTED_TEMPLATE") continue;
+    if (!row.rowState && isExplicitlyEmptyValue(row.value)) continue;
     if (looksLikeUnresolvedFormOptions(row.value)) {
       row = {
         ...row,
@@ -328,10 +340,14 @@ export function parseTranscription(reply: string): TranscribedValue[] {
     const answers = (part: string | undefined) =>
       /^(да|нет|yes|no)/i.test((part ?? "").trim());
 
-    const hasReference = answers(tail[1]);
+    const rowStates: TranscribedRowState[] = ["FILLED", "EMPTY", "UNSELECTED_TEMPLATE", "UNCERTAIN"];
+    const rowStateIndex = tail.findIndex((part) => rowStates.includes(part.trim().toUpperCase() as TranscribedRowState));
+    const rowState = rowStateIndex >= 0 ? tail[rowStateIndex].trim().toUpperCase() as TranscribedRowState : undefined;
+    const hasStructuredState = rowStateIndex >= 0;
+    const hasReference = hasStructuredState ? rowStateIndex > 0 : answers(tail[1]);
     const reference = hasReference ? (tail[0] ?? "") : "";
-    const confidence = hasReference ? tail[1] : tail[0];
-    const rest = tail.slice(hasReference ? 2 : 1);
+    const confidence = hasStructuredState ? tail[rowStateIndex + 1] : hasReference ? tail[1] : tail[0];
+    const rest = hasStructuredState ? tail.slice(rowStateIndex + 2) : tail.slice(hasReference ? 2 : 1);
 
     rows.push({
       file,
@@ -342,6 +358,7 @@ export function parseTranscription(reply: string): TranscribedValue[] {
       // Settled by the comparison of the two readings, never by one of
       // them alone.
       referenceConfirmed: false,
+      rowState,
       // Anything that is not an explicit yes counts as unsure. A reading
       // that forgot to answer the question is not a confident reading.
       //

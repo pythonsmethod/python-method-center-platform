@@ -165,6 +165,15 @@ describe("what two readings agree on", () => {
     expect(result.agreed).toHaveLength(1);
   });
 
+  it("parses the explicit structured row state", () => {
+    const [parsed] = parseTranscription(
+      "form.jpg :: УЗИ :: контур :: ровный, неровный :: - :: UNSELECTED_TEMPLATE :: ДА :: печатные варианты"
+    );
+    expect(parsed.rowState).toBe("UNSELECTED_TEMPLATE");
+    expect(parsed.confident).toBe(true);
+    expect(parsed.reference).toBe("-");
+  });
+
   it("reassembles explicit result, unit and reference fragments before comparison", () => {
     const first = [
       row({ section: "ОАК", label: "Гемоглобин (HGB)", value: "134", reference: "" }),
@@ -264,6 +273,18 @@ describe("what two readings agree on", () => {
 });
 
 describe("whole-document content classification", () => {
+  it("uses structured states instead of wording in notes", () => {
+    const rows = [
+      row({ section: "УЗИ", label: "контур", value: "ровный, неровный", rowState: "UNSELECTED_TEMPLATE", note: "arbitrary provider wording" }),
+      row({ section: "УЗИ", label: "размер", value: "мм", rowState: "EMPTY", note: "arbitrary provider wording" }),
+    ];
+    expect(classifyTranscribedDocument(rows, rows)).toBe("EMPTY_TEMPLATE");
+  });
+
+  it("keeps a structured uncertain row visible for review", () => {
+    const rows = [row({ section: "Заключение", value: "[неразборчиво]", rowState: "UNCERTAIN", confident: false })];
+    expect(classifyTranscribedDocument(rows, rows)).toBe("CLINICAL_CONTENT");
+  });
   it("classifies an identity-only blank form as empty", () => {
     const rows = [
       row({ section: "Шапка бланка", label: "Фамилия, имя", value: "Тестовый Пациент" }),

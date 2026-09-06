@@ -322,6 +322,8 @@ Do not skip phases because a later feature is exciting.
 
 Do not keep adding phases merely to create architecture.
 
+Immediate empty-form gate: validate the structured OCR row-state contract on the Case 003 empty/filled form pair. Close only after production stores `EMPTY_TEMPLATE` with zero evidence rows for the blank source and preserves the filled source as clinical content.
+
 Each new phase must solve a demonstrated gap in:
 - accuracy;
 - safety;

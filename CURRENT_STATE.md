@@ -305,4 +305,6 @@ NO-GO.
 Production auto-verification:
 NO-GO.
 
+The empty-form reader contract now carries an explicit provider-neutral row state (`FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE`, `UNCERTAIN`). Production validation of the new contract is required before this hardening increment can be closed.
+
 Production rollout requires broader validation, staging, human review calibration, operational controls and PHI/compliance closure.
