@@ -181,8 +181,8 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <LanguageSwitcher locale={locale} path={currentPath} />
           </div>
         </SiteHeader>
-        <main>{children}</main>
         <PublicMobileDock locale={locale} viewer={viewer} />
+        <main>{children}</main>
         <footer className="site-footer">
           <span>© Python Method</span>
           {socialLinks.length > 0 ? (

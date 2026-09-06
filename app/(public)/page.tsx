@@ -3,6 +3,7 @@ import { Link } from "@/components/LocaleLink";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AnhamOpenButton } from "@/components/assistant/AnhamOpenButton";
 import { ScrollReveal } from "@/components/ScrollReveal";
+
 import { resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
@@ -13,6 +14,10 @@ import {
   websiteStructuredData
 } from "@/lib/seo/structured-data";
 import "./home.css";
+import "./home-app-promo.css";
+import { HomeAppPromo } from "@/components/home/HomeAppPromo";
+import { HomeJourney } from "@/components/home/HomeJourney";
+import "./home-journey.css";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
 
@@ -22,7 +27,7 @@ export default async function HomePage() {
     resolveAssistantTierForUi()
   ]);
   const t = getDictionary(locale).landing;
-  const review = getDictionary(locale).review;
+
   const startHref = tier === "guest" ? "/login" : "/cabinet";
   const anhamName = locale === "ru" ? "Анхам" : "Anham";
   const mobile = locale === "ru"
@@ -35,7 +40,7 @@ export default async function HomePage() {
         comingSoon: "Скоро",
         journeyTitle: "Как работает центр",
         supportTitle: "Сопровождение",
-        supportText: "Выберите подходящий формат сопровождения — 5 недель или 100 дней.",
+        supportText: "Сопровождение Карена на всём вашем пути.",
         communicationTitle: "Ежедневное общение и поддержка",
         communicationText: "Карен и Анхам остаются рядом, отвечают на вопросы и помогают двигаться дальше.",
         appStepTitle: "Расширенный кабинет в приложении",
@@ -50,7 +55,7 @@ export default async function HomePage() {
         comingSoon: "Coming soon",
         journeyTitle: "How the center works",
         supportTitle: "Support program",
-        supportText: "Choose the right support format — 5 weeks or 100 days.",
+        supportText: "Karen’s guidance throughout your journey.",
         communicationTitle: "Daily communication and support",
         communicationText: "Karen and Anham stay beside you, answer questions and help you keep moving.",
         appStepTitle: "Expanded cabinet in the app",
@@ -82,7 +87,7 @@ export default async function HomePage() {
       <section className="app-hero" aria-labelledby="app-title">
         <div className="app-hero__copy">
           <p className="app-kicker">{t.eyebrow}</p>
-          <h1 id="app-title">{t.title}</h1>
+          <h1 id="app-title" className="app-title-egypt"><span>{t.title}</span></h1>
           <p className="app-hero__subtitle">{t.subtitle}</p>
           <p className="app-hero__lead">{t.heroLead}</p>
 
@@ -91,12 +96,12 @@ export default async function HomePage() {
               {t.heroCtaSelf}
               <span aria-hidden="true">→</span>
             </Link>
-            <AnhamOpenButton className="app-button app-button--secondary">
+            <AnhamOpenButton className="app-button app-button--secondary app-button--anham-desktop">
               {t.heroCtaAnham}
             </AnhamOpenButton>
           </div>
 
-          <p className="app-trust">✓ {t.heroTrust}</p>
+          <p className="app-trust app-trust--desktop">✓ {t.heroTrust}</p>
         </div>
 
         <div className="app-hero__visual" aria-label={t.aiLabel}>
@@ -104,48 +109,17 @@ export default async function HomePage() {
             <span className="app-status"><i /> {t.aiLabel}</span>
             <p>{t.heroBubble}</p>
             <AnhamAvatar size={184} state={tier} title={anhamName} />
+            <AnhamOpenButton className="app-button app-button--secondary app-button--anham-mobile">
+              {t.heroCtaAnham}
+            </AnhamOpenButton>
+            <p className="app-trust app-trust--mobile">✓ {t.heroTrust}</p>
           </div>
-          <aside className="app-mobile-download" aria-labelledby="app-download-title">
-            <div>
-              <p className="app-kicker">{mobile.appEyebrow}</p>
-              <h2 id="app-download-title">{mobile.appTitle}</h2>
-              <p>{mobile.appText}</p>
-            </div>
-            <div className="app-mobile-download__links">
-              {APP_STORE_URL ? (
-                <a href={APP_STORE_URL} rel="noopener noreferrer" target="_blank">{mobile.appStore}</a>
-              ) : (
-                <span aria-label={`${mobile.appStore}: ${mobile.comingSoon}`}>{mobile.appStore}<small>{mobile.comingSoon}</small></span>
-              )}
-              {GOOGLE_PLAY_URL ? (
-                <a href={GOOGLE_PLAY_URL} rel="noopener noreferrer" target="_blank">{mobile.playStore}</a>
-              ) : (
-                <span aria-label={`${mobile.playStore}: ${mobile.comingSoon}`}>{mobile.playStore}<small>{mobile.comingSoon}</small></span>
-              )}
-            </div>
-          </aside>
+          <HomeAppPromo locale={locale} appStore={APP_STORE_URL} googlePlay={GOOGLE_PLAY_URL} />
         </div>
       </section>
 
-      <nav className="app-quick" aria-label={t.howTitle}>
-        <Link data-scroll-reveal href="/payment">
-          <span className="app-quick__icon" aria-hidden="true">01</span>
-          <span><strong>{review.title}</strong><small>{review.price}</small></span>
-          <b aria-hidden="true">→</b>
-        </Link>
-        <Link data-scroll-reveal href={startHref}>
-          <span className="app-quick__icon" aria-hidden="true">02</span>
-          <span><strong>{t.freeTools.title}</strong><small>{t.freeTools.lead}</small></span>
-          <b aria-hidden="true">→</b>
-        </Link>
-        <AnhamOpenButton className="app-quick__button" data-scroll-reveal="">
-          <span className="app-quick__icon" aria-hidden="true">03</span>
-          <span><strong>{anhamName}</strong><small>{t.aiText}</small></span>
-          <b aria-hidden="true">→</b>
-        </AnhamOpenButton>
-      </nav>
-
       <section className="app-route" aria-labelledby="route-title" data-scroll-reveal>
+        <HomeJourney title={mobile.journeyTitle} steps={mobileSteps} />
         <header className="app-section-head">
           <p className="app-kicker">{t.howTitle}</p>
           <h2 id="route-title">{t.paths.lead}</h2>
