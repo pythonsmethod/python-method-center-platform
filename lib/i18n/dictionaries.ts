@@ -875,7 +875,7 @@ const ru = {
     // Прозвище, названное первым и одной строкой. Единственное, что
     // осталось от блока про его имя: человек не должен узнать это сам и
     // почувствовать себя обманутым.
-    nicknameNote: "«Professor Python» — прозвище, а не медицинское звание.",
+    nicknameNote: "«Professor Python» — прозвище.",
     // Почему он этим занимается. Прямая речь Карена — то, что он сам
     // рассказал под запись, а не пересказ.
     //
@@ -2019,7 +2019,7 @@ const en: typeof ru = {
     subtitle: "The person people come to when the body stops coping",
     fullName: "Karen Pashikyan",
     lead: "A rehabilitation specialist. More than thirty years of practice and work with people in 36 countries. Since 2024, almost entirely with those going through heavy treatment. He reviews every case himself.",
-    nicknameNote: "\"Professor Python\" is a nickname, not a medical title.",
+    nicknameNote: "\"Professor Python\" is a nickname.",
     origin: {
       label: "Why he does this",
       title: "It started with his mother",

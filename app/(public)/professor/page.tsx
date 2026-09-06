@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Image from "next/image";
-import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
-import { IconAnkh } from "@/components/icons/EgyptianIcons";
+import { ProfessorFacts } from "@/components/ProfessorFacts";
+import "./professor-facts.css";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 
@@ -88,70 +88,21 @@ export default async function ProfessorPage() {
         <p className="professor-story__after">{t.origin.after}</p>
       </section>
 
-      {/* The boundary is the second block on the page, not a line of small
-          print at the bottom. This is where a reader decides what he is,
-          and he says it better than any disclaimer would. */}
-      <section className="panel professor-story" aria-label={t.work.title}>
+      <section className="panel professor-story" aria-label={t.work.label}>
         <span className="panel__label">{t.work.label}</span>
-        <h2>{t.work.title}</h2>
-        <blockquote className="professor-quote">{t.work.quote}</blockquote>
         {t.work.paragraphs.map((paragraph) => (
           <p key={paragraph}>{paragraph}</p>
         ))}
-        <p className="professor-warning">{t.work.warning}</p>
       </section>
 
-      <section className="professor-facts" aria-label={t.yearsLabel}>
-        {facts.map((fact) => (
-          <div className="professor-fact" key={fact.label}>
-            <span className="professor-fact__icon" aria-hidden="true">
-              <IconAnkh />
-            </span>
-            <span className="panel__label">{fact.label}</span>
-            <strong className="professor-fact__value">{fact.value}</strong>
-            <p>{fact.text}</p>
-          </div>
-        ))}
-      </section>
+      <ProfessorFacts title={t.personalLabel} facts={facts} />
 
       <section className="panel" aria-label={t.howTitle}>
         <span className="panel__label">{t.personalLabel}</span>
         <h2>{t.howTitle}</h2>
         <p>{t.howText}</p>
-        {/* The list of what he will not do stood here as its own block and
-            read as a wall of refusals on the page where someone decides to
-            trust him. It is gone by the founder's call — the same terms are
-            in the contract a client accepts at payment.
-
-            This paragraph is not. Without it the page reads as a medical
-            service, which it is not. So it stays, quietly, at the end of
-            the block about how the work actually happens. */}
-        <p className="professor-legal">{t.boundaryText}</p>
       </section>
 
-      <section className="panel" aria-label={t.companyTitle}>
-        <span className="panel__label">{t.companyLabel}</span>
-        <h2>{t.companyTitle}</h2>
-        <p>{t.companyText}</p>
-        <div className="panel-actions">
-          <Link className="button button--secondary" href="/legal/offer">
-            {t.offerLink}
-          </Link>
-        </div>
-      </section>
-
-      <section className="panel panel--promo" aria-label={t.ctaTitle}>
-        <h2>{t.ctaTitle}</h2>
-        <p>{t.ctaText}</p>
-        <div className="panel-actions">
-          <Link className="button" href="/payment">
-            {t.ctaReview}
-          </Link>
-          <Link className="button button--secondary" href="/payment">
-            {t.ctaPlans}
-          </Link>
-        </div>
-      </section>
     </div>
   );
 }

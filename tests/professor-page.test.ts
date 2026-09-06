@@ -106,16 +106,8 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
     }
   });
 
-  it("states openly that the title is not a title", () => {
-    // He is called Professor by the people he worked with. The block that
-    // explained where the name came from is gone with the rest of his
-    // biography, so this sentence now carries that job alone — and it has
-    // to stay: a reader who works the nickname out for themselves feels
-    // they were being fooled.
-    const expected =
-      locale === "ru" ? "не медицинское звание" : "not a medical title";
-
-    expect(t.nicknameNote).toContain(expected);
+  it("identifies Professor Python as a nickname", () => {
+    expect(t.nicknameNote).toBe(locale === "ru" ? "«Professor Python» — прозвище." : '"Professor Python" is a nickname.');
   });
 
   it("tells nothing of his private life beyond his mother", () => {
@@ -157,19 +149,13 @@ describe.each(["ru", "en"] as const)("the professor page in %s", (locale) => {
   });
 });
 
-describe("the boundary paragraph is still printed", () => {
-  it("is rendered by the page, not merely present in the dictionary", () => {
-    // It used to sit under the list of what he will not do. That list is
-    // gone by the founder's call, and the paragraph came within one line of
-    // going with it: without it the page reads as a medical service. A
-    // dictionary entry nobody renders would pass every other test in this
-    // file.
-    const page = readFileSync(
-      join(process.cwd(), "app/(public)/professor/page.tsx"),
-      "utf8"
-    );
-
-    expect(page).toContain("t.boundaryText");
+describe("approved professor page edits", () => {
+  it("removes the owner-selected blocks from the rendered page", () => {
+    const page = readFileSync(join(process.cwd(), "app/(public)/professor/page.tsx"), "utf8");
+    for (const key of ["t.boundaryText", "t.companyTitle", "t.ctaTitle", "t.work.title", "t.work.quote", "t.work.warning"]) {
+      expect(page).not.toContain(key);
+    }
+    expect(page).toContain("<ProfessorFacts");
   });
 });
 

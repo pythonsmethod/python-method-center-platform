@@ -1,0 +1,13 @@
+.professor-orbit { width: 100%; max-width: 480px; margin: 24px auto; }
+.professor-orbit__system { position: relative; aspect-ratio: 1; background: radial-gradient(ellipse at center, #bc913a1a, #63d6f508 35%, transparent 65%); }
+.professor-orbit__system h2 { position: absolute; inset: 36% 34%; margin: 0; display: grid; place-items: center; text-align: center; color: #f1d28a; font: 600 clamp(14px, 3.8vw, 21px)/1.3 var(--font-serif); }
+.professor-orbit svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: none; stroke: #e4bc61; stroke-width: 1.2; filter: drop-shadow(0 0 3px #6edbff66); }
+.professor-orbit svg circle { stroke: #68cde960; stroke-width: .7; }
+.professor-orbit ul { list-style: none; padding: 0; margin: 0; }
+.professor-orbit li { position: absolute; width: 32%; aspect-ratio: 1; transform: translate(-50%, -50%); }
+.professor-orbit button { width: 100%; height: 100%; min-height: 44px; border: 1px solid #dbb34e; border-radius: 50%; background: radial-gradient(circle at 35% 20%, #514022, #211b11 65%, #141511); color: #f7e5b2; box-shadow: inset 0 0 0 3px #d5a93814, 0 0 6px #dfb85545, 0 0 13px #54c9ee30; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px; font: inherit; cursor: pointer; }
+.professor-orbit button span { font-size: clamp(10px, 2.7vw, 13px); line-height: 1.2; }
+.professor-orbit button strong { font: 600 clamp(14px, 3.8vw, 23px)/1.2 var(--font-serif); }
+.professor-orbit button[aria-pressed="true"] { border-color: #fff0b2; background: radial-gradient(circle at 35% 20%, #816432, #3e3019 68%, #251f13); box-shadow: 0 0 9px #eac45766, 0 0 17px #62d8fc55; }
+.professor-orbit button:focus-visible { outline: 2px solid #9de9ff; outline-offset: 4px; }
+.professor-orbit__detail { margin: -5% auto 0; min-height: 4.5em; max-width: 360px; padding-inline: 12px; text-align: center; color: var(--muted); font-size: 14px; line-height: 1.5; }

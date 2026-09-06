@@ -178,6 +178,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </Link>
           <div className="site-header__right">
             <SiteNav labels={dict.nav} viewer={viewer} />
+            <Link className="mobile-header-account" href={viewer === "staff" ? "/admin" : viewer === "client" ? "/cabinet" : "/login"}>
+              {viewer === "staff" ? (locale === "ru" ? "Рабочее место" : "Workspace") : viewer === "client" ? (locale === "ru" ? "Кабинет" : "Account") : (locale === "ru" ? "Вход / Регистрация" : "Sign in / Sign up")}
+            </Link>
             <LanguageSwitcher locale={locale} path={currentPath} />
           </div>
         </SiteHeader>
