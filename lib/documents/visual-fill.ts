@@ -39,9 +39,10 @@ export async function detectVisualFillEvidence(input: Buffer): Promise<VisualFil
         const r = data[offset];
         const g = data[offset + 1];
         const b = data[offset + 2];
-        const max = Math.max(r, g, b);
-        const min = Math.min(r, g, b);
-        const chromaticInk = max < 225 && max - min >= 28;
+        const channels = [r, g, b].sort((left, right) => right - left);
+        // Camera white balance often separates the weakest channel across an
+        // entire tinted sheet. Pen ink instead has one dominant channel.
+        const chromaticInk = channels[0] < 225 && channels[0] - channels[1] >= 28;
         if (y < headerEnd) {
           headerPixels += 1;
           if (chromaticInk) headerInk += 1;

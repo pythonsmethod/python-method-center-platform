@@ -28,4 +28,16 @@ describe("visual medical-form fill evidence", () => {
   it("fails closed for monochrome handwriting", async () => {
     expect((await detectVisualFillEvidence(await form(false, true))).signal).toBe("INCONCLUSIVE");
   });
+
+  it("does not mistake a cyan-tinted photographed sheet for pen ink", async () => {
+    const input = await sharp({
+      create: { width: 384, height: 640, channels: 3, background: { r: 170, g: 205, b: 210 } }
+    }).jpeg().toBuffer();
+
+    expect(await detectVisualFillEvidence(input)).toMatchObject({
+      signal: "INCONCLUSIVE",
+      headerInkRatio: 0,
+      bodyInkRatio: 0,
+    });
+  });
 });
