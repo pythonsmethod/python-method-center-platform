@@ -14,6 +14,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
+import { resolveAcceptedOfferVersion } from "@/lib/payments/offer-provenance";
+import { writePaymentReconciliation } from "@/lib/payments/reconciliation";
 
 export const runtime = "nodejs";
 
@@ -251,6 +253,38 @@ async function handlePaidSession(
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
   if (!profileId || !product) {
+    const reconciliation = await writePaymentReconciliation(supabase, {
+      stripe_event_id: eventId,
+      stripe_session_id: session.id,
+      processor_reference: reference,
+      event_type: event.type,
+      livemode: event.livemode,
+      amount_cents: amountCents,
+      currency,
+      candidate_product: product,
+      candidate_profile_id: profileId,
+      status: !profileId
+        ? "REQUIRES_OWNER_IDENTIFICATION"
+        : "INVALID_OR_UNSUPPORTED_PRODUCT",
+      reason: !profileId
+        ? "Stripe payment has no uniquely resolved platform profile; no offer acceptance can be attributed."
+        : "Stripe payment product is not uniquely supported; offer provenance cannot be resolved.",
+      next_action: "Authorized staff must inspect the existing Stripe merchant evidence; do not infer identity, product, or offer version.",
+      audit_metadata: { source: "stripe_webhook" }
+    });
+    if (reconciliation.status === "failed") {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `payment-reconciliation-write-failed:${eventId}`,
+        title: "ОШИБКА: не сохранена очередь сверки платежа",
+        lines: [
+          "Платёж требует ручной проверки, но защищённая запись очереди не создана.",
+          `Ошибка хранения: ${reconciliation.error}`
+        ],
+        link: adminLink("/admin")
+      });
+    }
+
     // The money is in and we do not know whose it is. Everything needed to
     // find out goes in the alert: what was bought, the address that failed
     // to match, why it probably failed, and one tap through to the payment
@@ -290,7 +324,13 @@ async function handlePaidSession(
 
   // 3) Payment record. The unique index on processor_reference makes a
   // concurrent duplicate insert fail closed.
-  const paidAt = new Date();
+  const paidAt = new Date(event.created * 1000);
+  const offerProvenance = await resolveAcceptedOfferVersion(
+    supabase,
+    profileId,
+    product,
+    paidAt
+  );
   const { data: payment, error: paymentError } = await supabase
     .from("payments")
     .insert({
@@ -300,6 +340,7 @@ async function handlePaidSession(
       status: "paid",
       amount_cents: amountCents,
       currency,
+      offer_version: offerProvenance?.version ?? null,
       processor_reference: reference,
       paid_at: paidAt.toISOString(),
       metadata: {
@@ -307,7 +348,13 @@ async function handlePaidSession(
         stripe_event_id: eventId,
         stripe_session_id: session.id,
         customer_email: customerEmail,
-        stripe_metadata: session.metadata
+        stripe_metadata: session.metadata,
+        offer_acceptance: offerProvenance
+          ? {
+              consent_record_id: offerProvenance.consentRecordId,
+              accepted_at: offerProvenance.acceptedAt
+            }
+          : null
       }
     })
     .select("id")
@@ -339,6 +386,37 @@ async function handlePaidSession(
     });
 
     throw new Error(`payment insert failed: ${paymentError.message}`);
+  }
+
+  if (!offerProvenance) {
+    const reconciliation = await writePaymentReconciliation(
+      supabase,
+      {
+        stripe_event_id: eventId,
+        stripe_session_id: session.id,
+        processor_reference: reference,
+        event_type: event.type,
+        livemode: event.livemode,
+        amount_cents: amountCents,
+        currency,
+        candidate_product: product,
+        candidate_profile_id: profileId,
+        candidate_case_id: caseRow?.id ?? null,
+        status: "OTHER_BLOCKED_WITH_EXACT_REASON",
+        reason: "Payment recorded without a uniquely proven offer-acceptance consent for this product at or before settlement.",
+        next_action: "Authorized staff must verify consent provenance; do not infer the current website offer version.",
+        audit_metadata: { source: "stripe_webhook", payment_id: payment.id }
+      }
+    );
+    if (reconciliation.status === "failed") {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `payment-reconciliation-write-failed:${eventId}`,
+        title: "ОШИБКА: платёж записан без очереди проверки оферты",
+        lines: ["Факт оплаты сохранён; защищённую запись проверки создать не удалось.", `Ошибка хранения: ${reconciliation.error}`],
+        link: adminLink("/admin")
+      });
+    }
   }
 
   // 4) Service period activation, tied to the payment. Shared with the
