@@ -524,3 +524,12 @@ The comparator must not fuzzy-match across sections, repeated labels, different 
 
 Why:
 Formatting and harmless label OCR differences should not inflate Karen's queue, but reducing review load must never manufacture agreement between different medical observations.
+
+---
+
+## D-050 — Bare printed state words require a visible selection signal
+
+Decision:
+When a mixed ultrasound/form field contains a bare printed state such as `норма`, `увеличен`, `повышена` or `понижена` before entered dimensions, that state is not an agreed fact unless the reading records a visible selection signal (underline, circle, check mark or equivalent). If selection cannot be distinguished from the printed template, the whole observation remains review-visible.
+
+Concrete measurements followed by an assessment, and explicitly marked choices, remain eligible for comparison. The source wording is never deleted or rewritten by this gate.

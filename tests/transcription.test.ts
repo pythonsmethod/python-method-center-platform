@@ -6,6 +6,7 @@ import {
   coalesceTranscriptionFragments,
   formatAgreed,
   formatDisputed,
+  looksLikeUnresolvedInlineTemplateChoice,
   parseTranscription,
   TRANSCRIPTION_SYSTEM_PROMPT,
   type TranscribedValue
@@ -250,6 +251,40 @@ describe("what two readings agree on", () => {
     const second = row({ label: "Эхоструктура", value: "однородная (подчёркнуто)", confident: true });
 
     expect(compareTranscriptions([first], [second])).toMatchObject({ agreed: [{ value: "однородная (подчёркнуто)" }], disputed: [] });
+  });
+
+  it("holds back a bare template state copied before handwritten dimensions", () => {
+    const pancreatic = row({
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      value: "норма, головка 28 мм, тело 13 мм, хвост 21 мм",
+      rowState: "FILLED",
+    });
+
+    expect(looksLikeUnresolvedInlineTemplateChoice(pancreatic)).toBe(true);
+    expect(compareTranscriptions([pancreatic], [pancreatic])).toMatchObject({
+      agreed: [],
+      disputed: [{ reason: "чтение неуверенное" }],
+    });
+  });
+
+  it("keeps an explicitly marked template choice eligible for agreement", () => {
+    const pancreatic = row({
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      value: "норма, головка 28 мм, тело 13 мм, хвост 21 мм",
+      rowState: "FILLED",
+      note: "слово «норма» подчёркнуто врачом",
+    });
+
+    expect(looksLikeUnresolvedInlineTemplateChoice(pancreatic)).toBe(false);
+    expect(compareTranscriptions([pancreatic], [pancreatic]).agreed).toHaveLength(1);
+  });
+
+  it("does not reject a concrete measurement followed by an assessment", () => {
+    const spleen = row({ label: "СЕЛЕЗЕНКА: размеры", value: "98×33 мм (норма)" });
+    expect(looksLikeUnresolvedInlineTemplateChoice(spleen)).toBe(false);
+    expect(compareTranscriptions([spleen], [spleen]).agreed).toHaveLength(1);
   });
 
   it("never promotes matching handwriting from a partially visible source", () => {
