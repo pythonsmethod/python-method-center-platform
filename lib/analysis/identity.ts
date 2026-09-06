@@ -107,6 +107,8 @@ export function resolveIdentity(header: DocumentHeader, person: KnownPerson): Id
 export type ExistingDocument = {
   documentId: string;
   fingerprint: string;
+  contentFingerprint?: string | null;
+  contentClassification?: "EMPTY_TEMPLATE" | "CLINICAL_CONTENT" | null;
   header: DocumentHeader | null;
 };
 
@@ -116,7 +118,12 @@ export type DocumentRelation =
   | { kind: "version"; of: string; reason: string };
 
 export function relateDocument(
-  candidate: { fingerprint: string; header: DocumentHeader | null },
+  candidate: {
+    fingerprint: string;
+    contentFingerprint?: string | null;
+    contentClassification?: "EMPTY_TEMPLATE" | "CLINICAL_CONTENT" | null;
+    header: DocumentHeader | null;
+  },
   existing: ExistingDocument[]
 ): DocumentRelation {
   const duplicate = existing.find((doc) => doc.fingerprint === candidate.fingerprint);
@@ -125,14 +132,41 @@ export function relateDocument(
     return { kind: "duplicate", of: duplicate.documentId, reason: "Тот же файл уже загружен в кейс." };
   }
 
+  const contentDuplicate = candidate.contentClassification === "CLINICAL_CONTENT" && candidate.contentFingerprint
+    ? existing.find((doc) => {
+        if (doc.contentClassification !== "CLINICAL_CONTENT" || doc.contentFingerprint !== candidate.contentFingerprint) return false;
+        const a = candidate.header;
+        const b = doc.header;
+        if (!a || !b) return false;
+        if (a.accession && b.accession) return a.accession === b.accession;
+        return Boolean(
+          a.laboratory && b.laboratory && a.collectionDate && b.collectionDate &&
+          a.laboratory.toLowerCase() === b.laboratory.toLowerCase() &&
+          a.collectionDate === b.collectionDate
+        );
+      })
+    : undefined;
+
+  if (contentDuplicate) {
+    return {
+      kind: "duplicate",
+      of: contentDuplicate.documentId,
+      reason: "Содержимое клинических полей совпадает с уже загруженным документом."
+    };
+  }
+
   const header = candidate.header;
 
   if (!header) {
     return { kind: "new" };
   }
 
+  const sameContentKind = (doc: ExistingDocument) =>
+    !candidate.contentClassification || !doc.contentClassification ||
+    candidate.contentClassification === doc.contentClassification;
+
   if (header.accession) {
-    const sameOrder = existing.find((doc) => doc.header?.accession === header.accession);
+    const sameOrder = existing.find((doc) => sameContentKind(doc) && doc.header?.accession === header.accession);
 
     if (sameOrder) {
       return {
@@ -146,6 +180,7 @@ export function relateDocument(
   if (header.laboratory && header.collectionDate) {
     const sameDraw = existing.find(
       (doc) =>
+        sameContentKind(doc) &&
         doc.header?.laboratory?.toLowerCase() === header.laboratory?.toLowerCase() &&
         doc.header?.collectionDate === header.collectionDate
     );

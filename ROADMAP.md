@@ -135,6 +135,8 @@ Connected-harness checkpoint (2026-09-05): a local in-memory adapter now proves 
 
 Handwriting checkpoint (2026-09-05): the existing two-pass transcription now requires source-coverage classification and character-level handwriting review. Partial/cropped sources fail closed even when visible text agrees. Remaining work is a non-production replay on authorized handwritten Cases, source-region provenance capture and human adjudication of uncertain fragments; missing image pixels are not an OCR problem and cannot be inferred safely.
 
+Empty-form/duplicate checkpoint (2026-09-05): repository code classifies header-only untouched forms separately from clinical documents and adds a conservative content fingerprint for re-encoded duplicate photographs. Empty and filled copies of one template remain separate. Production schema/application and real replay remain pending explicit deployment authorization.
+
 Goal:
 validate extraction + trust gates on multiple Cases/layouts.
 

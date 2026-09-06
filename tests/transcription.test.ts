@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  classifyTranscribedDocument,
   compareTranscriptions,
   coalesceTranscriptionFragments,
   formatAgreed,
@@ -259,6 +260,30 @@ describe("what two readings agree on", () => {
     const result = compareTranscriptions(first, second);
     expect(result.agreed).toHaveLength(0);
     expect(result.disputed).toHaveLength(4);
+  });
+});
+
+describe("whole-document content classification", () => {
+  it("classifies an identity-only blank form as empty", () => {
+    const rows = [
+      row({ section: "Шапка", label: "Фамилия, имя", value: "Тестовый Пациент" }),
+      row({ section: "УЗИ", label: "Размер", value: "[не заполнено]" }),
+      row({ section: "УЗИ", label: "Эхоструктура", value: "однородная, неоднородная" }),
+    ];
+    expect(classifyTranscribedDocument(rows, rows)).toBe("EMPTY_TEMPLATE");
+  });
+
+  it("keeps a filled copy of the same form clinical", () => {
+    const rows = [
+      row({ section: "Шапка", label: "Фамилия, имя", value: "Тестовый Пациент" }),
+      row({ section: "УЗИ", label: "Размер", value: "94 мм" }),
+    ];
+    expect(classifyTranscribedDocument(rows, rows)).toBe("CLINICAL_CONTENT");
+  });
+
+  it("does not call uncertain visible handwriting an empty form", () => {
+    const rows = [row({ section: "Заключение", label: "Рукописная запись", value: "[неразборчиво]", confident: false })];
+    expect(classifyTranscribedDocument(rows, rows)).toBe("CLINICAL_CONTENT");
   });
 });
 
