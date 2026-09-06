@@ -6,6 +6,9 @@ export function getReprocessingCopy(locale: "ru" | "en") {
         description:
           "Система заново выполнит две независимые вычитки каждого активного файла. Исходные документы не изменятся.",
         button: "Перечитать все документы",
+        resumeButton: (count: number) => `Продолжить очередь (${count})`,
+        resumeDescription:
+          "В этом кейсе уже есть документы в очереди. Продолжение не перечитывает готовые файлы повторно.",
         pending: "Ставлю документы в очередь…",
         confirm:
           "Повторно обработать все активные документы этого кейса? Это запустит новые ИИ-вычитки.",
@@ -23,6 +26,9 @@ export function getReprocessingCopy(locale: "ru" | "en") {
         description:
           "The system will run two new independent readings of every active file. Source documents will not be changed.",
         button: "Reprocess all documents",
+        resumeButton: (count: number) => `Continue queue (${count})`,
+        resumeDescription:
+          "This case already has queued documents. Continuing does not reprocess completed files.",
         pending: "Adding documents to the queue…",
         confirm:
           "Reprocess every active document in this case? This will start new AI readings.",

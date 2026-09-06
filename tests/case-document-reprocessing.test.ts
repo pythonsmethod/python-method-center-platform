@@ -27,6 +27,10 @@ describe("staff Case document reprocessing", () => {
     expect(en.button).toContain("Reprocess");
     expect(ru.confirmButton).toContain("Да");
     expect(en.confirmButton).toContain("Yes");
+    expect(ru.resumeButton(5)).toContain("5");
+    expect(en.resumeButton(5)).toContain("5");
+    expect(ru.resumeDescription).toContain("не перечитывает готовые");
+    expect(en.resumeDescription).toContain("does not reprocess completed");
     expect(ru.description).toContain("Исходные документы не изменятся");
     expect(en.description).toContain("Source documents will not be changed");
   });
