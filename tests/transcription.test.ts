@@ -294,7 +294,8 @@ describe("whole-document content classification", () => {
     ];
     const second = [
       row({ section: "ПЕЧЕНЬ", label: "контур", value: "ровный, неровный, четкий, нечеткий", note: "печатный шаблон, отметок нет" }),
-      row({ section: "СОСУДЫ", label: "воротная вена", value: "до 14 мм", note: "значение не вписано" }),
+      row({ section: "СОСУДЫ", label: "воротная вена", value: "[не заполнено] мм", note: "-" }),
+      row({ section: "ПЕЧЕНЬ", label: "эхогенность", value: "средняя, повышена, понижена", note: "печатные варианты, отметка не проставлена" }),
       row({ section: "Данные пациента", label: "Возраст", value: "40" }),
       row({ section: "Заголовок", label: "Дата", value: "22.11.24" }),
     ];

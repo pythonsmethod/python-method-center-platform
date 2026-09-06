@@ -197,10 +197,11 @@ function splitInlineReference(row: TranscribedValue): TranscribedValue {
 
 export function isExplicitlyEmptyValue(value: string): boolean {
   const normalized = normaliseValue(value)
+    .replace(/^\[([^\]]+)\](?=\s|$)/, "$1")
     .replace(/^[([{]+|[)\]}]+$/g, "")
     .trim();
 
-  return /^(?:|не заполнено|нет записи|нет значения|не вписано|пусто)$/i.test(normalized);
+  return /^(?:|не заполнено|нет записи|нет значения|не вписано|пусто)(?:\s*(?:мм|см|мл|л|г|мг|ед\.?))?$/i.test(normalized);
 }
 
 export function looksLikeUnresolvedFormOptions(value: string): boolean {
@@ -218,7 +219,7 @@ export function looksLikeUnresolvedFormOptions(value: string): boolean {
 
 export function isExplicitlyUnfilledFormRow(row: TranscribedValue): boolean {
   const note = normaliseValue(row.note);
-  return /(?:не заполнен|не вписан|не отмечен|ничего не отмечено|ни один не отмечен|отметок нет)/i.test(note);
+  return /(?:не заполнен|не вписан|не отмечен|ничего не отмечено|ни один не отмечен|отметок нет|отметка не проставлена)/i.test(note);
 }
 
 const ADMINISTRATIVE_ROW = /(?:^|\b)(?:ф\.?\s*и\.?\s*о\.?|фамили[яи]|имя|отчество|пациент|patient|дата рождения|date of birth|dob|адрес|address|паспорт|идентификационн(?:ый|ого) номер|учреждение|organization|лаборатори[яи]|врач|doctor|подпись|signature|штрих-?код|номер карты|номер документа)(?:\b|$)/i;
