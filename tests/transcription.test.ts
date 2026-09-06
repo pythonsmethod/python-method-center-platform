@@ -301,6 +301,16 @@ describe("whole-document content classification", () => {
     expect(classifyTranscribedDocument(rows, rows)).toBe("EMPTY_TEMPLATE");
   });
 
+  it("does not treat filled identity metadata as clinical content when the provider uses a facility section", () => {
+    const rows = [
+      row({ section: "КАБИНЕТ УЛЬТРАЗВУКОВОЙ ДИАГНОСТИКИ", label: "Возраст", value: "42", rowState: "FILLED" }),
+      row({ section: "КАБИНЕТ УЛЬТРАЗВУКОВОЙ ДИАГНОСТИКИ", label: "Дата (рукописная у заголовка)", value: "13.11.2024", rowState: "FILLED" }),
+      row({ section: "КАБИНЕТ УЛЬТРАЗВУКОВОЙ ДИАГНОСТИКИ", label: "Ф.И.О.", value: "Тест", rowState: "FILLED" }),
+      row({ section: "УЗИ", label: "Размер", value: "мм", rowState: "EMPTY" }),
+    ];
+    expect(classifyTranscribedDocument(rows, rows)).toBe("EMPTY_TEMPLATE");
+  });
+
   it("keeps a structured uncertain row visible for review", () => {
     const rows = [row({ section: "Заключение", value: "[неразборчиво]", rowState: "UNCERTAIN", confident: false })];
     expect(classifyTranscribedDocument(rows, rows)).toBe("CLINICAL_CONTENT");
