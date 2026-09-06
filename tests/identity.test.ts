@@ -45,6 +45,48 @@ describe("дубликаты и версии (приёмочные случаи 
     expect(relateDocument({ fingerprint: "abc", header: null }, existing)).toMatchObject({ kind: "duplicate", of: "old" });
   });
 
+  it("та же заполненная бумага после повторной фотографии — дубликат по клиническому содержимому", () => {
+    const prior = [{
+      ...existing[0],
+      contentFingerprint: "clinical-sha",
+      contentClassification: "CLINICAL_CONTENT" as const,
+    }];
+    expect(relateDocument({
+      fingerprint: "different-photo-bytes",
+      contentFingerprint: "clinical-sha",
+      contentClassification: "CLINICAL_CONTENT",
+      header: header({ accession: "123-45" }),
+    }, prior)).toMatchObject({ kind: "duplicate", of: "old" });
+  });
+
+  it("не объединяет пустой бланк и заполненный экземпляр одного шаблона", () => {
+    const prior = [{
+      ...existing[0],
+      contentFingerprint: null,
+      contentClassification: "EMPTY_TEMPLATE" as const,
+    }];
+    expect(relateDocument({
+      fingerprint: "filled-photo",
+      contentFingerprint: "clinical-sha",
+      contentClassification: "CLINICAL_CONTENT",
+      header: header({ accession: "123-45" }),
+    }, prior)).toEqual({ kind: "new" });
+  });
+
+  it("не считает одинаковые клинические значения дубликатом без совместимой шапки", () => {
+    const prior = [{
+      ...existing[0],
+      contentFingerprint: "clinical-sha",
+      contentClassification: "CLINICAL_CONTENT" as const,
+    }];
+    expect(relateDocument({
+      fingerprint: "different-photo",
+      contentFingerprint: "clinical-sha",
+      contentClassification: "CLINICAL_CONTENT",
+      header: header({ laboratory: "Другая лаборатория", collectionDate: "2026-09-01" }),
+    }, prior)).toEqual({ kind: "new" });
+  });
+
   it("исправленный отчёт — версия, не новое исследование", () => {
     const corrected = relateDocument({ fingerprint: "def", header: header({ accession: "123-45" }) }, existing);
 

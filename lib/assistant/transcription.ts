@@ -195,7 +195,7 @@ function splitInlineReference(row: TranscribedValue): TranscribedValue {
   return { ...row, value: match[1].trim(), reference: match[2].trim() };
 }
 
-function isExplicitlyEmptyValue(value: string): boolean {
+export function isExplicitlyEmptyValue(value: string): boolean {
   const normalized = normaliseValue(value)
     .replace(/^[([{]+|[)\]}]+$/g, "")
     .trim();
@@ -203,7 +203,7 @@ function isExplicitlyEmptyValue(value: string): boolean {
   return /^(?:|не заполнено|нет записи|нет значения|не вписано|пусто)$/i.test(normalized);
 }
 
-function looksLikeUnresolvedFormOptions(value: string): boolean {
+export function looksLikeUnresolvedFormOptions(value: string): boolean {
   const normalized = value.toLowerCase().replace(/\s+/g, " ").trim();
   const mutuallyExclusiveLists = [
     /(?:^|,\s*)однородн[а-яё]*\s*,\s*неоднородн[а-яё]*/i,
@@ -214,6 +214,25 @@ function looksLikeUnresolvedFormOptions(value: string): boolean {
     /(?:^|,\s*)ровн[а-яё]*\s*,\s*неровн[а-яё]*/i,
   ];
   return mutuallyExclusiveLists.some((pattern) => pattern.test(normalized));
+}
+
+const ADMINISTRATIVE_ROW = /(?:^|\b)(?:ф\.?\s*и\.?\s*о\.?|фамили[яи]|имя|отчество|пациент|patient|дата рождения|date of birth|dob|адрес|address|паспорт|идентификационн(?:ый|ого) номер|учреждение|organization|лаборатори[яи]|врач|doctor|подпись|signature|штрих-?код|номер карты|номер документа)(?:\b|$)/i;
+const ADMINISTRATIVE_SECTION = /^(?:шапка|пациент|patient|идентификация|реквизиты|служебн(?:ые данные|ая информация))$/i;
+
+export function isClinicalContentRow(row: TranscribedValue): boolean {
+  if (normaliseKey(row.section) === COVERAGE_SECTION && normaliseKey(row.label) === COVERAGE_LABEL) return false;
+  if (isExplicitlyEmptyValue(row.value) || looksLikeUnresolvedFormOptions(row.value)) return false;
+  if (ADMINISTRATIVE_SECTION.test(row.section.trim())) return false;
+  return !ADMINISTRATIVE_ROW.test(row.label.trim());
+}
+
+export type DocumentContentClassification = "EMPTY_TEMPLATE" | "CLINICAL_CONTENT";
+
+export function classifyTranscribedDocument(
+  first: TranscribedValue[],
+  second: TranscribedValue[]
+): DocumentContentClassification {
+  return [...first, ...second].some(isClinicalContentRow) ? "CLINICAL_CONTENT" : "EMPTY_TEMPLATE";
 }
 
 // Some reading passes return one clinical row as three presentation fragments:

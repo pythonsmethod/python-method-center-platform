@@ -491,3 +491,10 @@ reread of the original image and cannot prove OCR correctness.
 
 Decision:
 Handwritten medical content is read in two independent character-level passes. Each pass must first declare the source image `COMPLETE`, `PARTIAL` or `UNREADABLE`. Coverage metadata is not a clinical fact. If either pass reports a partial or unreadable source, matching visible text remains review-only; agreement cannot reconstruct content hidden by cropping, folds or uniform image regions. Printed option lists without one explicit selection are also review-only.
+
+---
+
+## D-046 — Empty templates and content duplicates are different relations
+
+Decision:
+An identity/header-only medical form with no filled clinical field is retained as an immutable source but classified `EMPTY_TEMPLATE`; it produces no clinical facts and no Karen review queue. A filled copy of the same template is a separate clinical document and is never merged with the empty copy. Byte-identical files remain duplicates. Differently encoded photographs may be content duplicates only when their deidentified agreed clinical fingerprints match and accession or laboratory/date metadata also match.

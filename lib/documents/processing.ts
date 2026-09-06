@@ -6,10 +6,13 @@ import { runAnalysis, type PriorLabValue } from "@/lib/analysis/pipeline";
 import { hasAllVersions } from "@/lib/analysis/versions";
 import { getLatestQuestionnaireFor } from "@/lib/health/queries";
 import {
+  classifyTranscribedDocument,
   compareTranscriptions,
+  isClinicalContentRow,
   parseTranscription,
   TRANSCRIPTION_SYSTEM_PROMPT
 } from "@/lib/assistant/transcription";
+import { createHash } from "node:crypto";
 import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -344,17 +347,29 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
   const firstRows = parseTranscription(first.reply);
   const secondRows = parseTranscription(second.reply);
   const comparison = compareTranscriptions(firstRows, secondRows);
-  if (comparison.agreed.length === 0 && comparison.disputed.length === 0) {
+  const contentClassification = classifyTranscribedDocument(firstRows, secondRows);
+  if (contentClassification === "CLINICAL_CONTENT" && comparison.agreed.length === 0 && comparison.disputed.length === 0) {
     return finishFailure(job, "unreadable", "No readable content found");
   }
+  const fingerprintRows = comparison.agreed
+    .filter(isClinicalContentRow)
+    .map((row) => [row.section, row.label, row.value, row.reference].map((part) => part.toLowerCase().replace(/\s+/g, " ").trim()).join("|"))
+    .sort();
+  const contentFingerprint = contentClassification === "CLINICAL_CONTENT" && fingerprintRows.length > 0
+    ? createHash("sha256").update(fingerprintRows.join("\n"), "utf8").digest("hex")
+    : null;
+  const storedAgreed = contentClassification === "EMPTY_TEMPLATE" ? [] : comparison.agreed;
+  const storedDisputed = contentClassification === "EMPTY_TEMPLATE" ? [] : comparison.disputed;
 
   const { error: extractionError } = await supabase.from("document_extractions").upsert({
     document_id: job.document_id,
     case_id: job.case_id,
     profile_id: job.profile_id,
     source_fingerprint: loaded.fingerprint,
-    agreed_values: comparison.agreed,
-    disputed_values: comparison.disputed,
+    content_fingerprint: contentFingerprint,
+    content_classification: contentClassification,
+    agreed_values: storedAgreed,
+    disputed_values: storedDisputed,
     first_reading: firstRows,
     second_reading: secondRows,
     extracted_at: new Date().toISOString()
@@ -366,7 +381,7 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
   // --- duplicate_version_detection ---
   const { data: siblings } = await supabase
     .from("uploaded_documents")
-    .select("id, header, version_of_document_id, document_extractions(source_fingerprint)")
+    .select("id, header, version_of_document_id, document_extractions(source_fingerprint, content_fingerprint, content_classification)")
     .eq("case_id", job.case_id)
     .neq("id", job.document_id)
     .is("archived_at", null);
@@ -378,10 +393,12 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
     return {
       documentId: String(row.id),
       fingerprint: String((extraction as { source_fingerprint?: string } | null)?.source_fingerprint ?? ""),
+      contentFingerprint: (extraction as { content_fingerprint?: string | null } | null)?.content_fingerprint ?? null,
+      contentClassification: ((extraction as { content_classification?: "EMPTY_TEMPLATE" | "CLINICAL_CONTENT" | null } | null)?.content_classification ?? null),
       header: (row.header as DocumentHeader | null) ?? null
     };
   });
-  const relation = relateDocument({ fingerprint: loaded.fingerprint, header }, existing);
+  const relation = relateDocument({ fingerprint: loaded.fingerprint, contentFingerprint, contentClassification, header }, existing);
 
   await supabase.from("uploaded_documents").update({
     duplicate_of_document_id: relation.kind === "duplicate" ? relation.of : null,
@@ -405,6 +422,14 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
     await markReady();
     const { locale, filename } = await readLocaleAndFilename(supabase, job.document_id);
     await tellClient(supabase, job, buildDuplicateMessage(locale, filename));
+    return { status: "ready", documentId: job.document_id };
+  }
+
+  if (contentClassification === "EMPTY_TEMPLATE") {
+    // The source and both readings remain auditable, but a form containing
+    // only identity/header data and untouched fields contributes no evidence
+    // and creates no Karen review queue.
+    await markReady();
     return { status: "ready", documentId: job.document_id };
   }
 
