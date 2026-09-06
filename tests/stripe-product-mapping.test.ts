@@ -12,8 +12,8 @@ describe("productFromAmount", () => {
     expect(productFromAmount(144000, "usd")).toBe("support_5_weeks");
   });
 
-  it("maps the 100-day total ($3,675) to support_15_weeks", () => {
-    expect(productFromAmount(367500, "USD")).toBe("support_15_weeks");
+  it("maps the 100-day total ($3,855) to support_15_weeks", () => {
+    expect(productFromAmount(385500, "USD")).toBe("support_15_weeks");
   });
 
   it("returns null for unknown amounts (manual review, never guess)", () => {

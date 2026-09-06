@@ -44,6 +44,10 @@ export function PublicSupportForm({ labels, locale }: { labels: PublicSupportFor
         <input autoComplete="email" name="email" required type="email" />
       </label>
       <label className="field">
+        <span>{locale === "ru" ? "Телефон для связи (обязательно)" : "Contact phone (required)"}</span>
+        <input autoComplete="tel" name="phone" required type="tel" maxLength={32} />
+      </label>
+      <label className="field">
         <span>{labels.category}</span>
         <select defaultValue="other" name="category">
           <option value="login">{labels.categoryLogin}</option>

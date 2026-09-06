@@ -35,7 +35,8 @@ const FINGERPRINTS: Record<string, string> = {
   // v6 (2026-09-02): the analyses review becomes a paid format at 500 USD,
   // service fee included; the free launch offer is gone from clause 3.
   // Re-fingerprinted once before release, while no client had accepted it.
-  "oferta-v6": "e68be9bf8018ab69a781d4c2d5baa0236e6110515055aac16c32828c351c4e56"
+  "oferta-v6": "e68be9bf8018ab69a781d4c2d5baa0236e6110515055aac16c32828c351c4e56",
+  "oferta-v7": "f9c3ff506c31edddb158f301b8ec2a371efb733e6bcca4f62a3fbeb16802c0a9"
 };
 
 function fingerprint(): string {

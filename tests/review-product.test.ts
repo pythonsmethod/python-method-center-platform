@@ -41,7 +41,7 @@ describe("разбор анализов — платный формат за 500
   });
 
   it("описан в договоре с ценой, и договор получил новую версию", () => {
-    expect(OFFER_VERSION).toBe("oferta-v6");
+    expect(OFFER_VERSION).toBe("oferta-v7");
     expect(clause("ru")).toContain("Разбор анализов — 500 USD");
     expect(clause("ru")).toContain("Итог по формату «Разбор анализов»: 500 USD.");
     expect(clause("ru")).toContain("включён в эту цену");
