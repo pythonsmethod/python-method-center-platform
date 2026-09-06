@@ -7,12 +7,14 @@ import { hasAllVersions } from "@/lib/analysis/versions";
 import { getLatestQuestionnaireFor } from "@/lib/health/queries";
 import {
   classifyTranscribedDocument,
+  canResolveAsVisuallyEmpty,
   compareTranscriptions,
   isClinicalContentRow,
   parseTranscription,
   TRANSCRIPTION_SYSTEM_PROMPT
 } from "@/lib/assistant/transcription";
 import { createHash } from "node:crypto";
+import { detectVisualFillEvidence } from "@/lib/documents/visual-fill";
 import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -347,7 +349,15 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
   const firstRows = parseTranscription(first.reply);
   const secondRows = parseTranscription(second.reply);
   const comparison = compareTranscriptions(firstRows, secondRows);
-  const contentClassification = classifyTranscribedDocument(firstRows, secondRows);
+  let contentClassification = classifyTranscribedDocument(firstRows, secondRows);
+  if (
+    contentClassification === "CLINICAL_CONTENT" &&
+    canResolveAsVisuallyEmpty(firstRows, secondRows) &&
+    loaded.attachments[0].mediaType.startsWith("image/")
+  ) {
+    const visual = await detectVisualFillEvidence(Buffer.from(loaded.attachments[0].data, "base64"));
+    if (visual.signal === "HEADER_ONLY_CHROMATIC_INK") contentClassification = "EMPTY_TEMPLATE";
+  }
   if (contentClassification === "CLINICAL_CONTENT" && comparison.agreed.length === 0 && comparison.disputed.length === 0) {
     return finishFailure(job, "unreadable", "No readable content found");
   }

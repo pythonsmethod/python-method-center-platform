@@ -505,3 +505,10 @@ An identity/header-only medical form with no filled clinical field is retained a
 
 Decision:
 New transcription passes emit `FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE` or `UNCERTAIN` for every row. Empty-form classification uses this enum instead of free-form provider notes. Historical readings remain replayable through the conservative fallback; `UNCERTAIN` remains reviewable.
+
+---
+
+## D-048 — Visual fill evidence may only lower an empty-form false positive
+
+Decision:
+A provider-neutral visual detector may corroborate an empty printed form by locating chromatic ink in the identity/header area and proving its absence from the clinical body. It runs only after two structured OCR passes disagree with empty-form classification because of `UNCERTAIN` clinical rows. It must not suppress any clinical row marked `FILLED`, must not treat monochrome or weak visual evidence as absence, and must fail closed as `INCONCLUSIVE` on decoding errors. Visual evidence changes whole-document routing only; it never creates, edits or verifies a clinical fact.

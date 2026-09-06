@@ -305,6 +305,6 @@ NO-GO.
 Production auto-verification:
 NO-GO.
 
-The empty-form reader contract now carries an explicit provider-neutral row state (`FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE`, `UNCERTAIN`). Production validation of the new contract is required before this hardening increment can be closed.
+The empty-form reader contract now carries an explicit provider-neutral row state (`FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE`, `UNCERTAIN`). A fail-closed visual corroboration layer can distinguish coloured body handwriting from header-only coloured ink on image uploads. It may resolve an otherwise uncertain document as `EMPTY_TEMPLATE` only when both OCR passes use structured row states, neither contains a clinical `FILLED` row, and the image has header-only chromatic ink. Monochrome marks, body ink, weak signals and decoder failures remain `INCONCLUSIVE` and review-visible. Production validation on the authorized empty/filled form pair is still required before this hardening increment can be closed.
 
 Production rollout requires broader validation, staging, human review calibration, operational controls and PHI/compliance closure.
