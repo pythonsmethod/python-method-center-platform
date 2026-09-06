@@ -304,6 +304,14 @@ run from consuming another client's older queued document. This is an
 operational review tool; it does not promote trust or enable automatic
 verification.
 
+An audited identity-review path is now implemented in the repository. An
+authorized admin/Karen can confirm that explicitly listed files with an
+automatic name mismatch still belong in the existing Case (for example, a
+former surname). The automatic `mismatch` and its reasons remain unchanged;
+the separate human decision is actor/time stamped and audited. Only those
+confirmed files may pass the identity stop on a later Case-scoped two-pass
+reading. Production use remains pending migration and deployment.
+
 The Case reprocessing runner now keeps page refreshes outside the per-document
 loop and exposes a bilingual resume control whenever queued documents already
 exist. A navigation refresh can therefore no longer cancel the batch after its

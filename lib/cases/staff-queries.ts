@@ -80,6 +80,7 @@ export type StaffCaseDocument = {
   id: string;
   original_filename: string | null;
   document_status: string;
+  identity_review_status: string | null;
   created_at: string;
 };
 
@@ -158,7 +159,7 @@ export async function getStaffCaseDetail(
       `id, profile_id, status, urgency, direction, title, summary, created_at, updated_at,
        profiles(email, full_name, phone, delivery_first_name, delivery_last_name, delivery_email, delivery_phone, delivery_country_code, delivery_region, delivery_city, delivery_street, delivery_building, delivery_unit, delivery_postal_code, delivery_instructions),
        onboarding_submissions(id, status, submitted_at, payload),
-       uploaded_documents(id, original_filename, document_status, created_at),
+       uploaded_documents(id, original_filename, document_status, identity_review_status, created_at),
        payments(id, product, status, amount_cents, currency, processor_reference, paid_at, created_at),
        case_lifecycle_events(id, event_type, from_status, to_status, actor_role, notes, created_at)`
     )

@@ -12,6 +12,7 @@ export type DocumentIntakeStatus =
   | "queued"
   | "processing"
   | "ready"
+  | "identity_mismatch"
   | "needs_reupload"
   | "failed"
   | "archived";

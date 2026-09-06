@@ -144,6 +144,11 @@ selected Case and is audited. This supports controlled validation runs but
 does not itself count a Case as independently reviewed or change any trust
 gate.
 
+Identity-review checkpoint (2026-09-06): a repository implementation preserves
+automatic name mismatches while allowing an authorized, audited,
+document-scoped human confirmation to resume the existing two-pass Case
+pipeline. Production rollout and real-Case validation are still pending.
+
 Goal:
 validate extraction + trust gates on multiple Cases/layouts.
 

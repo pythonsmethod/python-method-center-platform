@@ -596,3 +596,24 @@ rule does not infer clinical normality.
 The exclusion covers agreed rows and disputes only when every non-empty side
 is the same kind of unselected standalone template state. Any concrete
 alternative keeps the dispute visible.
+
+---
+
+## D-054 — Manual identity confirmation is separate and auditable
+
+Decision:
+An automatic document identity mismatch remains immutable evidence and blocks
+full extraction by default. An authorized admin/Karen may separately confirm
+that explicitly listed files belong in the existing Case after human review
+(for example, a former surname). The confirmation records actor and time, is
+written to the audit log and permits only those files to enter the existing
+Case-scoped reprocessing path.
+
+The confirmation does not rename the profile, rewrite the printed header,
+erase mismatch reasons, mark a clinical fact VERIFIED or apply to future
+uploads.
+
+Why:
+Repeatedly requeueing a confirmed former-name document otherwise reproduces
+the same safe stop. Silently changing identity data or globally weakening the
+resolver would be unsafe.
