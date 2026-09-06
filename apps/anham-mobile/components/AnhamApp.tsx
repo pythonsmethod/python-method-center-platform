@@ -198,7 +198,7 @@ function Conversation({ tab, t, messages }: { tab: "anham" | "professor"; t: Des
   const end = useRef<HTMLDivElement>(null);
   useEffect(() => { if (messages.length) end.current?.scrollIntoView({ block: "nearest", behavior: "smooth" }); }, [messages.length]);
   const sample = tab === "anham" ? [t.greeting, t.userMessage, t.assistantMessage] : [t.professor1, t.client1, t.professor2];
-  return <div className="ad-messages" role="log" aria-label={t.demonstration} aria-live="polite"><p className="ad-chat-date">{t.today}</p>{sample.map((text, index) => <div key={index} className={`ad-message${index === 1 ? " is-outgoing" : ""}`}>
+  return <div className="ad-messages" role="log" aria-label={t.demonstration} aria-live="polite">{tab === "anham" && <div className="ad-anham-presence" aria-hidden="true"><i className="ad-orbit ad-orbit-one" /><i className="ad-orbit ad-orbit-two" /><span className="ad-stars">✦ · ✧ · ✦</span><Image src="/images/anham-master.png" alt="" width={150} height={150} unoptimized /></div>}<p className="ad-chat-date">{t.today}</p>{sample.map((text, index) => <div key={index} className={`ad-message${index === 1 ? " is-outgoing" : ""}`}>
     {index !== 1 && (tab === "anham" ? <AnhamFace /> : <span className="ad-professor-avatar" aria-hidden="true">P</span>)}<div className="ad-bubble"><p>{text}</p><small>09:{42 + index}{index === 1 && <span aria-hidden="true"> ✓✓</span>}</small></div>
   </div>)}{messages.map((message, index) => <div key={`sent-${index}`} className="ad-message is-outgoing"><div className="ad-bubble"><p>{message.text}</p><small>{t.demoSent}</small></div></div>)}<div ref={end} /></div>;
 }
