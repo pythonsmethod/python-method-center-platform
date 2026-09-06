@@ -284,6 +284,10 @@ The next local hardening increment distinguishes `EMPTY_TEMPLATE` from `CLINICAL
 
 The current Phase 2.9 comparison hardening also separates formatting noise from clinical disagreement. Presentation punctuation may normalize, and a one-character label OCR slip may match only through a unique mutual same-section relation with identical numeric identifiers. Partial sources, uncertain readings, ambiguous labels and different clinical values continue to fail closed. Production auto-verification remains NO-GO.
 
+The fuzzy-label boundary now also preserves short Latin analyte suffixes, all-caps clinical abbreviations and alphanumeric identifiers as semantic designators. Equal values therefore cannot merge distinct observations such as IgG/IgM, IgA/IgG, ALT/AST or T3/T4; uncertain equivalence remains two source-visible review rows.
+
+A regression from Case 004 exposed a mixed printed/handwritten form field where the unmarked template word `норма` was copied before concrete pancreatic dimensions. New readers are instructed to exclude unselected printed options, and the deterministic comparator now holds this narrow pattern for review unless a visible selection signal is recorded. It does not remove source text or infer whether a measurement is clinically normal.
+
 ### Connected in-memory harness — 2026-09-05
 
 An isolated, persistence-free route now connects a Google-like normalized provider result to Clinical Evidence, the unchanged Phase 2.7 shadow trust policy, Evidence Package and Case Analytical Picture. It accepts only `IN_MEMORY_TEST` with external calls and persistence explicitly disabled. A development-only RU/EN screen is gated by `ANKH_HARNESS_ENABLED=true` and returns 404 outside development.

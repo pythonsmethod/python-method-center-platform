@@ -93,6 +93,7 @@ export const TRANSCRIPTION_SYSTEM_PROMPT = `Ты переписываешь со
 - ЗНАЧЕНИЕ — ровно то, что напечатано. Единицы измерения оставляй как в бланке.
 - РЕФЕРЕНС — референсный интервал, напечатанный в бланке рядом с этой строкой, ровно как напечатан: «12-15.5», «120 - 155», «до 5,0». Если рядом ничего не напечатано — поставь прочерк. Не бери интервал из другой строки и не вычисляй его сам.
 - ROW_STATE — строго одно значение: FILLED (поле действительно заполнено), EMPTY (поле пустое), UNSELECTED_TEMPLATE (виден только печатный список вариантов и ни один вариант не выбран) или UNCERTAIN (возможно есть запись/отметка, но её состояние нельзя надёжно определить). Не заменяй эти слова синонимами.
+- Если внутри одного поля есть печатные варианты шаблона («норма», «увеличен», «не увеличен», «повышена», «понижена») и рядом внесены размеры или рукописный текст, не включай печатный вариант в ЗНАЧЕНИЕ без видимого подчёркивания, обведения, галочки или другого однозначного выбора. Перенеси только внесённые данные. Если невозможно понять, выбран ли печатный вариант, поставь ROW_STATE UNCERTAIN и объясни это в примечании.
 - ДА или НЕТ — уверен ли ты в прочтении этой строки полностью.
 - Примечание — если НЕТ, напиши, что именно не разобрал и почему (блик, сгиб, обрезан край, размыто). Если ДА, поставь прочерк.
 
@@ -189,12 +190,29 @@ function editDistanceAtMostOne(left: string, right: string): boolean {
   return true;
 }
 
+function protectedClinicalDesignators(label: string): string[] {
+  return (label.match(/[A-Za-zА-ЯЁ0-9]+/g) ?? [])
+    .filter((token) =>
+      /\d/.test(token) ||
+      /[A-Za-z]/.test(token) ||
+      /^[А-ЯЁ]{2,8}$/.test(token)
+    )
+    .map((token) => token.toLowerCase().replace(/ё/g, "е"));
+}
+
 function labelsAreConservativelyEquivalent(left: TranscribedValue, right: TranscribedValue): boolean {
   if (normaliseKey(left.file) !== normaliseKey(right.file)) return false;
   if (normaliseKey(left.section) !== normaliseKey(right.section)) return false;
   const a = labelFingerprint(left.label);
   const b = labelFingerprint(right.label);
   if (a === b) return true;
+  // Short Latin analyte suffixes, all-caps clinical abbreviations and
+  // alphanumeric identifiers are semantic, not spelling noise: IgG is not
+  // IgM, ALT is not AST, and T3 is not T4 even when their values happen to
+  // be identical.
+  if (protectedClinicalDesignators(left.label).join("|") !== protectedClinicalDesignators(right.label).join("|")) {
+    return false;
+  }
   // Never smooth over a different date, measurement index or staging code.
   if (a.match(/\d+/g)?.join("|") !== b.match(/\d+/g)?.join("|")) return false;
   // A one-character OCR slip in a sufficiently descriptive label is safe
@@ -278,6 +296,20 @@ export function looksLikeUnresolvedFormOptions(value: string): boolean {
   return mutuallyExclusiveLists.some((pattern) => pattern.test(normalized));
 }
 
+// Some ultrasound forms print a bare state word before a blank where
+// dimensions are written. Two readers can copy both the printed word and the
+// handwriting identically even when the word was never selected. Without a
+// visual selection signal this is not an agreed clinical assertion.
+export function looksLikeUnresolvedInlineTemplateChoice(row: TranscribedValue): boolean {
+  if (!/(?:размер|dimensions?|эхогенн|структур|контур)/i.test(row.label)) return false;
+  const value = row.value.toLowerCase().replace(/\s+/g, " ").trim();
+  if (!/^(?:норм[а-яё]*|увеличен[а-яё]*|не увеличен[а-яё]*|повышен[а-яё]*|понижен[а-яё]*)\s*[,.;:]\s*\D{0,40}\d/i.test(value)) {
+    return false;
+  }
+  const note = normaliseValue(row.note);
+  return !/(?:подч[её]ркнут|обвед[её]н|отмечен|галочк|выбран|рукопис)/i.test(note);
+}
+
 export function isExplicitlyUnfilledFormRow(row: TranscribedValue): boolean {
   const note = normaliseValue(row.note);
   return /(?:не заполнен|не вписан|не отмечен|ничего не отмечено|ни один не отмечен|отметок нет|отметк[а-яё]*\s+не\s+(?:проставлен[а-яё]*|сделан[а-яё]*))/i.test(note);
@@ -337,11 +369,11 @@ export function coalesceTranscriptionFragments(rows: TranscribedValue[]): Transc
     // apparently verified value; uncertain handwriting stays visible.
     if (row.rowState === "EMPTY" || row.rowState === "UNSELECTED_TEMPLATE") continue;
     if (!row.rowState && isExplicitlyEmptyValue(row.value)) continue;
-    if (looksLikeUnresolvedFormOptions(row.value)) {
+    if (looksLikeUnresolvedFormOptions(row.value) || looksLikeUnresolvedInlineTemplateChoice(row)) {
       row = {
         ...row,
         confident: false,
-        note: [row.note, "не выбран один вариант печатного бланка"]
+        note: [row.note, "печатный вариант бланка не имеет подтверждённой отметки выбора"]
           .filter((part) => part && part !== "-")
           .join("; "),
       };
