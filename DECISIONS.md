@@ -498,3 +498,10 @@ Handwritten medical content is read in two independent character-level passes. E
 
 Decision:
 An identity/header-only medical form with no filled clinical field is retained as an immutable source but classified `EMPTY_TEMPLATE`; it produces no clinical facts and no Karen review queue. A filled copy of the same template is a separate clinical document and is never merged with the empty copy. Byte-identical files remain duplicates. Differently encoded photographs may be content duplicates only when their deidentified agreed clinical fingerprints match and accession or laboratory/date metadata also match.
+
+---
+
+## D-047 — Structured OCR row state is authoritative
+
+Decision:
+New transcription passes emit `FILLED`, `EMPTY`, `UNSELECTED_TEMPLATE` or `UNCERTAIN` for every row. Empty-form classification uses this enum instead of free-form provider notes. Historical readings remain replayable through the conservative fallback; `UNCERTAIN` remains reviewable.
