@@ -253,6 +253,20 @@ export function classifyTranscribedDocument(
   return [...first, ...second].some(isClinicalContentRow) ? "CLINICAL_CONTENT" : "EMPTY_TEMPLATE";
 }
 
+export function canResolveAsVisuallyEmpty(
+  first: TranscribedValue[],
+  second: TranscribedValue[]
+): boolean {
+  const rows = [...first, ...second].filter((row) =>
+    normaliseKey(row.section) !== COVERAGE_SECTION &&
+    !ADMINISTRATIVE_SECTION.test(row.section.trim()) &&
+    !ADMINISTRATIVE_ROW.test(row.label.trim())
+  );
+  if (rows.length === 0 || rows.some((row) => !row.rowState)) return false;
+  if (rows.some((row) => row.rowState === "FILLED")) return false;
+  return rows.some((row) => row.rowState === "UNCERTAIN");
+}
+
 // Some reading passes return one clinical row as three presentation fragments:
 // result, unit and reference. Reassemble only explicit suffix-marked fragments;
 // never infer association from visual position or from a merely similar label.

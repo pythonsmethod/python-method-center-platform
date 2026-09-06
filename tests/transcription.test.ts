@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
+  canResolveAsVisuallyEmpty,
   classifyTranscribedDocument,
   compareTranscriptions,
   coalesceTranscriptionFragments,
@@ -273,6 +274,25 @@ describe("what two readings agree on", () => {
 });
 
 describe("whole-document content classification", () => {
+  it("allows visual evidence to resolve only structured uncertain clinical rows", () => {
+    const rows = [
+      row({ section: "Шапка", label: "Фамилия", value: "Тест", rowState: "FILLED" }),
+      row({ section: "Заключение", label: "Рукописная строка", value: "[неразборчиво]", rowState: "UNCERTAIN" }),
+      row({ section: "УЗИ", label: "Размер", value: "мм", rowState: "EMPTY" }),
+    ];
+    expect(canResolveAsVisuallyEmpty(rows, rows)).toBe(true);
+  });
+
+  it("never lets visual evidence suppress a structured filled clinical row", () => {
+    const rows = [row({ section: "УЗИ", label: "Размер", value: "94 мм", rowState: "FILLED" })];
+    expect(canResolveAsVisuallyEmpty(rows, rows)).toBe(false);
+  });
+
+  it("fails closed when a historical row has no structured state", () => {
+    const rows = [row({ section: "Заключение", label: "Рукописная строка", value: "[неразборчиво]" })];
+    expect(canResolveAsVisuallyEmpty(rows, rows)).toBe(false);
+  });
+
   it("uses structured states instead of wording in notes", () => {
     const rows = [
       row({ section: "УЗИ", label: "контур", value: "ровный, неровный", rowState: "UNSELECTED_TEMPLATE", note: "arbitrary provider wording" }),
