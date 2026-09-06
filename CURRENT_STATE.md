@@ -292,6 +292,9 @@ The same source also exposed a second representation: one pass isolated the
 bare printed word `норма` as its own value. The evidence projection now drops
 that standalone template state unless the reading records a visible selection
 mark. The raw source reading remains unchanged.
+This applies to both agreed stored rows and historical dispute rows whose
+non-empty sides contain only that same unselected template state; a dispute
+that includes any concrete alternative remains review-visible.
 
 An audited staff-only reprocessing control now requeues every active document
 inside one selected Case and drives only that Case's queue. It is limited to
