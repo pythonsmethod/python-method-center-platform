@@ -12,6 +12,22 @@ export type PictureQueryResult =
   | { status: "ready"; picture: ReturnType<typeof buildCaseAnalyticalPicture> }
   | { status: "unavailable"; message: string };
 
+function isUnselectedStandaloneTemplateDispute(row: DisputedValue): boolean {
+  const values = [row.first, row.second].filter((value): value is string => value !== null);
+  return values.length > 0 && values.every((value) =>
+    looksLikeUnselectedStandaloneTemplateChoice({
+      file: row.file,
+      section: row.section,
+      label: row.label,
+      value,
+      reference: "",
+      referenceConfirmed: false,
+      confident: false,
+      note: row.note,
+    })
+  );
+}
+
 export function projectStoredExtractionEvidence(input: { id: string; documentId: string; agreed: TranscribedValue[]; disputed: DisputedValue[] }, allowedDocumentIds: Set<string>, structuredKeys = new Set<string>()): ExtractedClinicalEvidence[] {
   if (!allowedDocumentIds.has(input.documentId)) throw new Error("Stored extraction belongs to another Case");
   const classify = (section: string, label: string): ExtractedClinicalEvidence["category"] => {
@@ -31,7 +47,7 @@ export function projectStoredExtractionEvidence(input: { id: string; documentId:
   };
   return [
     ...input.agreed.flatMap((row, index) => structuredKeys.has(`${input.documentId}|${row.label}|${row.value}`) || looksLikeUnselectedStandaloneTemplateChoice(row) ? [] : [{ id: `${input.id}-agreed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.value, alternateValue: null, category: classify(row.section, row.label), trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
-    ...input.disputed.map((row, index) => ({ id: `${input.id}-disputed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.first, alternateValue: row.second, category: classify(row.section, row.label), trustState: "NEEDS_REVIEW" as const, disputeReason: row.reason, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null })),
+    ...input.disputed.flatMap((row, index) => isUnselectedStandaloneTemplateDispute(row) ? [] : [{ id: `${input.id}-disputed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.first, alternateValue: row.second, category: classify(row.section, row.label), trustState: "NEEDS_REVIEW" as const, disputeReason: row.reason, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
   ];
 }
 

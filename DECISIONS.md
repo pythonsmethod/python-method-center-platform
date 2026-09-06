@@ -593,3 +593,6 @@ Constraint:
 The raw transcription remains immutable. Concrete measurements, trailing
 assessments and visibly selected options remain eligible for review; this
 rule does not infer clinical normality.
+The exclusion covers agreed rows and disputes only when every non-empty side
+is the same kind of unselected standalone template state. Any concrete
+alternative keeps the dispute visible.

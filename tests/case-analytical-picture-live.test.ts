@@ -76,6 +76,38 @@ describe("live Case Analytical Picture", () => {
     )).toEqual([]);
   });
 
+  it("does not project the same lone template state from a stored dispute", () => {
+    const unselected = {
+      file: "synthetic.pdf",
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      first: "норма",
+      second: "норма",
+      reason: "чтение неуверенное" as const,
+      note: "печатный вариант без отметки",
+    };
+    expect(projectStoredExtractionEvidence(
+      { id: "x", documentId: "doc-a", agreed: [], disputed: [unselected] },
+      new Set(["doc-a"]),
+    )).toEqual([]);
+  });
+
+  it("keeps a concrete disagreement beside a template state review-visible", () => {
+    const disputed = {
+      file: "synthetic.pdf",
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      first: "норма",
+      second: "головка 28 мм",
+      reason: "разные значения" as const,
+      note: "-",
+    };
+    expect(projectStoredExtractionEvidence(
+      { id: "x", documentId: "doc-a", agreed: [], disputed: [disputed] },
+      new Set(["doc-a"]),
+    )).toHaveLength(1);
+  });
+
   it("normalizes formatting-only disagreements, separates generic notes and removes exact duplicates", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
       { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Nottingham grade: Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
