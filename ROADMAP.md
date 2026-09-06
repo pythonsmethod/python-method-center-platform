@@ -137,6 +137,13 @@ Handwriting checkpoint (2026-09-05): the existing two-pass transcription now req
 
 Empty-form/duplicate checkpoint (2026-09-05): repository code classifies header-only untouched forms separately from clinical documents and adds a conservative content fingerprint for re-encoded duplicate photographs. Empty and filled copies of one template remain separate. Production schema/application and real replay remain pending explicit deployment authorization.
 
+Case-scoped replay checkpoint (2026-09-06): the Karen/admin Case workspace can
+now requeue active documents for a new two-pass reading without touching the
+source upload. Each operator-triggered processing request claims only the
+selected Case and is audited. This supports controlled validation runs but
+does not itself count a Case as independently reviewed or change any trust
+gate.
+
 Goal:
 validate extraction + trust gates on multiple Cases/layouts.
 

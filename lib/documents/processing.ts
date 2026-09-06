@@ -243,6 +243,57 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
   if (claimError || !claimed?.[0]) return { status: "idle" };
 
   const job = claimed[0] as ProcessingJob;
+  return processClaimedDocument(supabase, job);
+}
+
+/**
+ * Claims only work that belongs to one Case. This is used by the staff
+ * reprocessing control so an operator cannot accidentally spend the request
+ * on another client's older queued document.
+ */
+export async function processNextCaseDocument(
+  caseId: string
+): Promise<ProcessDocumentResult> {
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return { status: "idle" };
+
+  const now = new Date().toISOString();
+  const { data: candidate, error: candidateError } = await supabase
+    .from("document_processing_jobs")
+    .select("id, document_id, case_id, profile_id, attempts")
+    .eq("case_id", caseId)
+    .eq("status", "queued")
+    .lte("available_at", now)
+    .order("created_at", { ascending: true })
+    .limit(1)
+    .maybeSingle();
+
+  if (candidateError || !candidate) return { status: "idle" };
+
+  // The status predicate is the lock. If the cron worker won the race, this
+  // update returns no row and the caller can safely try again later.
+  const { data: claimed, error: claimError } = await supabase
+    .from("document_processing_jobs")
+    .update({
+      status: "processing",
+      attempts: Number(candidate.attempts ?? 0) + 1,
+      locked_at: now,
+      updated_at: now
+    })
+    .eq("id", candidate.id)
+    .eq("status", "queued")
+    .select("id, document_id, case_id, profile_id, attempts")
+    .maybeSingle();
+
+  if (claimError || !claimed) return { status: "idle" };
+
+  return processClaimedDocument(supabase, claimed as ProcessingJob);
+}
+
+async function processClaimedDocument(
+  supabase: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
+  job: ProcessingJob
+): Promise<ProcessDocumentResult> {
   await supabase.from("uploaded_documents")
     .update({ document_status: "processing" }).eq("id", job.document_id);
 

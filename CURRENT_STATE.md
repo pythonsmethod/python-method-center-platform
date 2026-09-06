@@ -288,6 +288,14 @@ The fuzzy-label boundary now also preserves short Latin analyte suffixes, all-ca
 
 A regression from Case 004 exposed a mixed printed/handwritten form field where the unmarked template word `норма` was copied before concrete pancreatic dimensions. New readers are instructed to exclude unselected printed options, and the deterministic comparator now holds this narrow pattern for review unless a visible selection signal is recorded. It does not remove source text or infer whether a measurement is clinically normal.
 
+An audited staff-only reprocessing control now requeues every active document
+inside one selected Case and drives only that Case's queue. It is limited to
+admin/Karen access, leaves source uploads unchanged and records the operation
+in `audit_logs`. The Case-scoped worker claim prevents an operator-triggered
+run from consuming another client's older queued document. This is an
+operational review tool; it does not promote trust or enable automatic
+verification.
+
 ### Connected in-memory harness — 2026-09-05
 
 An isolated, persistence-free route now connects a Google-like normalized provider result to Clinical Evidence, the unchanged Phase 2.7 shadow trust policy, Evidence Package and Case Analytical Picture. It accepts only `IN_MEMORY_TEST` with external calls and persistence explicitly disabled. A development-only RU/EN screen is gated by `ANKH_HARNESS_ENABLED=true` and returns 404 outside development.
