@@ -573,3 +573,23 @@ Constraint:
 Resume claims only already queued documents in the selected Case through the
 same staff-authorized endpoint. It does not create new source data or alter
 the trust state of extracted evidence.
+
+---
+
+## D-053 — Unselected standalone template states are not evidence
+
+Decision:
+A bare printed form option such as `норма` in a dimensions, echogenicity,
+structure or contour field is excluded from Clinical Evidence unless the
+reader records an unambiguous visible selection mark.
+
+Why:
+Independent readers can segment the same mixed printed/handwritten field
+differently: one may attach the template word to entered measurements while
+another emits it as a standalone value. Neither representation proves that
+the printed option was selected.
+
+Constraint:
+The raw transcription remains immutable. Concrete measurements, trailing
+assessments and visibly selected options remain eligible for review; this
+rule does not infer clinical normality.

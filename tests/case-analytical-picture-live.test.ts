@@ -58,6 +58,24 @@ describe("live Case Analytical Picture", () => {
     expect(items.some((item) => (item.trustState as string) === "VERIFIED")).toBe(false);
   });
 
+  it("does not project a lone unselected printed template state", () => {
+    const unselected = {
+      file: "synthetic.pdf",
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      value: "норма",
+      reference: "",
+      referenceConfirmed: false,
+      rowState: "FILLED" as const,
+      confident: true,
+      note: "-",
+    };
+    expect(projectStoredExtractionEvidence(
+      { id: "x", documentId: "doc-a", agreed: [unselected], disputed: [] },
+      new Set(["doc-a"]),
+    )).toEqual([]);
+  });
+
   it("normalizes formatting-only disagreements, separates generic notes and removes exact duplicates", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
       { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Nottingham grade: Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
