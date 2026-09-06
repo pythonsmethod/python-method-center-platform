@@ -7,6 +7,7 @@ import {
   formatAgreed,
   formatDisputed,
   looksLikeUnresolvedInlineTemplateChoice,
+  looksLikeUnselectedStandaloneTemplateChoice,
   parseTranscription,
   TRANSCRIPTION_SYSTEM_PROMPT,
   type TranscribedValue
@@ -278,6 +279,31 @@ describe("what two readings agree on", () => {
     });
 
     expect(looksLikeUnresolvedInlineTemplateChoice(pancreatic)).toBe(false);
+    expect(compareTranscriptions([pancreatic], [pancreatic]).agreed).toHaveLength(1);
+  });
+
+  it("excludes a lone unselected printed state from clinical evidence", () => {
+    const pancreatic = row({
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      value: "норма",
+      rowState: "FILLED",
+    });
+
+    expect(looksLikeUnselectedStandaloneTemplateChoice(pancreatic)).toBe(true);
+    expect(compareTranscriptions([pancreatic], [pancreatic])).toEqual({ agreed: [], disputed: [] });
+  });
+
+  it("keeps a visibly selected standalone state", () => {
+    const pancreatic = row({
+      section: "УЗИ",
+      label: "ПОДЖЕЛУДОЧНАЯ ЖЕЛЕЗА: размеры",
+      value: "норма",
+      rowState: "FILLED",
+      note: "слово подчёркнуто врачом",
+    });
+
+    expect(looksLikeUnselectedStandaloneTemplateChoice(pancreatic)).toBe(false);
     expect(compareTranscriptions([pancreatic], [pancreatic]).agreed).toHaveLength(1);
   });
 

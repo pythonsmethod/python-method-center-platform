@@ -310,6 +310,19 @@ export function looksLikeUnresolvedInlineTemplateChoice(row: TranscribedValue): 
   return !/(?:подч[её]ркнут|обвед[её]н|отмечен|галочк|выбран|рукопис)/i.test(note);
 }
 
+// A lone printed state word in a form field is not a medical fact unless the
+// reader also records an unambiguous visible selection. Keep it in the raw
+// source reading, but do not project it into clinical evidence.
+export function looksLikeUnselectedStandaloneTemplateChoice(row: TranscribedValue): boolean {
+  if (!/(?:размер|dimensions?|эхогенн|структур|контур)/i.test(row.label)) return false;
+  const value = normaliseValue(row.value);
+  if (!/^(?:норм[а-яё]*|увеличен[а-яё]*|не увеличен[а-яё]*|повышен[а-яё]*|понижен[а-яё]*)$/i.test(value)) {
+    return false;
+  }
+  const note = normaliseValue(row.note);
+  return !/(?:подч[её]ркнут|обвед[её]н|отмечен|галочк|выбран|рукопис)/i.test(note);
+}
+
 export function isExplicitlyUnfilledFormRow(row: TranscribedValue): boolean {
   const note = normaliseValue(row.note);
   return /(?:не заполнен|не вписан|не отмечен|ничего не отмечено|ни один не отмечен|отметок нет|отметк[а-яё]*\s+не\s+(?:проставлен[а-яё]*|сделан[а-яё]*))/i.test(note);
@@ -369,6 +382,7 @@ export function coalesceTranscriptionFragments(rows: TranscribedValue[]): Transc
     // apparently verified value; uncertain handwriting stays visible.
     if (row.rowState === "EMPTY" || row.rowState === "UNSELECTED_TEMPLATE") continue;
     if (!row.rowState && isExplicitlyEmptyValue(row.value)) continue;
+    if (looksLikeUnselectedStandaloneTemplateChoice(row)) continue;
     if (looksLikeUnresolvedFormOptions(row.value) || looksLikeUnresolvedInlineTemplateChoice(row)) {
       row = {
         ...row,

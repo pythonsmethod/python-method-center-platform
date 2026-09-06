@@ -288,6 +288,11 @@ The fuzzy-label boundary now also preserves short Latin analyte suffixes, all-ca
 
 A regression from Case 004 exposed a mixed printed/handwritten form field where the unmarked template word `норма` was copied before concrete pancreatic dimensions. New readers are instructed to exclude unselected printed options, and the deterministic comparator now holds this narrow pattern for review unless a visible selection signal is recorded. It does not remove source text or infer whether a measurement is clinically normal.
 
+The same source also exposed a second representation: one pass isolated the
+bare printed word `норма` as its own value. The evidence projection now drops
+that standalone template state unless the reading records a visible selection
+mark. The raw source reading remains unchanged.
+
 An audited staff-only reprocessing control now requeues every active document
 inside one selected Case and drives only that Case's queue. It is limited to
 admin/Karen access, leaves source uploads unchanged and records the operation

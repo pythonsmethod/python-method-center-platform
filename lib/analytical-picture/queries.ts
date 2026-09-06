@@ -1,5 +1,9 @@
 import { buildCaseAnalyticalPicture, type ExtractedClinicalEvidence, type PictureDocument, type PictureFact, type PictureReviewNote } from "./case-picture";
-import type { DisputedValue, TranscribedValue } from "@/lib/assistant/transcription";
+import {
+  looksLikeUnselectedStandaloneTemplateChoice,
+  type DisputedValue,
+  type TranscribedValue,
+} from "@/lib/assistant/transcription";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { TrendAssessment } from "@/lib/analysis/trend-gate";
 import { prepareEvidenceForKaren } from "./evidence-presentation";
@@ -26,7 +30,7 @@ export function projectStoredExtractionEvidence(input: { id: string; documentId:
     return signals.size === 1 ? [...signals][0] : "UNKNOWN";
   };
   return [
-    ...input.agreed.flatMap((row, index) => structuredKeys.has(`${input.documentId}|${row.label}|${row.value}`) ? [] : [{ id: `${input.id}-agreed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.value, alternateValue: null, category: classify(row.section, row.label), trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
+    ...input.agreed.flatMap((row, index) => structuredKeys.has(`${input.documentId}|${row.label}|${row.value}`) || looksLikeUnselectedStandaloneTemplateChoice(row) ? [] : [{ id: `${input.id}-agreed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.value, alternateValue: null, category: classify(row.section, row.label), trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
     ...input.disputed.map((row, index) => ({ id: `${input.id}-disputed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.first, alternateValue: row.second, category: classify(row.section, row.label), trustState: "NEEDS_REVIEW" as const, disputeReason: row.reason, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null })),
   ];
 }
