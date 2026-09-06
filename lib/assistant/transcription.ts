@@ -228,7 +228,7 @@ export function isExplicitlyUnfilledFormRow(row: TranscribedValue): boolean {
   return /(?:не заполнен|не вписан|не отмечен|ничего не отмечено|ни один не отмечен|отметок нет|отметк[а-яё]*\s+не\s+(?:проставлен[а-яё]*|сделан[а-яё]*))/i.test(note);
 }
 
-const ADMINISTRATIVE_ROW = /(?:^|\b)(?:ф\.?\s*и\.?\s*о\.?|фамили[яи]|имя|отчество|пациент|patient|дата рождения|date of birth|dob|адрес|address|паспорт|идентификационн(?:ый|ого) номер|учреждение|organization|лаборатори[яи]|врач|doctor|подпись|signature|штрих-?код|номер карты|номер документа)(?:\b|$)/i;
+const ADMINISTRATIVE_ROW = /(?:^|\b)(?:ф\.?\s*и\.?\s*о\.?|фамили[яи]|имя|отчество|пациент|patient|возраст|age|дата рождения|дата\s*\([^)]*(?:рукопис|заголов|вверху)[^)]*\)|date of birth|dob|адрес|address|тел\.?|телефон|phone|паспорт|идентификационн(?:ый|ого) номер|учреждение|organization|название кабинета|лаборатори[яи]|врач|doctor|подпись|signature|штрих-?код|номер карты|номер документа)(?:\b|$)/i;
 const ADMINISTRATIVE_SECTION = /^(?:шапка(?:\s+бланка)?|данные пациента|заголовок|пациент|patient|идентификация|реквизиты|служебн(?:ые данные|ая информация))$/i;
 
 export function isClinicalContentRow(row: TranscribedValue): boolean {
