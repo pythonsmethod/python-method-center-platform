@@ -554,3 +554,22 @@ Constraint:
 Reprocessing replaces derived extraction/analysis rows through the existing
 idempotent pipeline. It does not promote evidence trust, approve Karen
 decisions or enable production auto-verification.
+
+---
+
+## D-052 — Case reprocessing resumes the existing queue
+
+Decision:
+The interactive runner refreshes the Case only after its bounded queue pass.
+If navigation, connectivity or a provider call interrupts the pass, staff may
+resume the documents that are still queued without requeueing completed files.
+
+Why:
+A refresh after every document can unmount the client runner and cancel the
+remaining loop. Requeueing the whole Case to recover would duplicate provider
+work and make operational progress misleading.
+
+Constraint:
+Resume claims only already queued documents in the selected Case through the
+same staff-authorized endpoint. It does not create new source data or alter
+the trust state of extracted evidence.

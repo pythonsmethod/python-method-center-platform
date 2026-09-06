@@ -10,6 +10,7 @@ import {
 
 type ReprocessCaseDocumentsFormProps = {
   caseId: string;
+  queuedDocumentCount: number;
   locale: "ru" | "en";
 };
 
@@ -22,6 +23,7 @@ const initialReprocessCaseActionState: ReprocessCaseActionState = {
 
 export function ReprocessCaseDocumentsForm({
   caseId,
+  queuedDocumentCount,
   locale
 }: ReprocessCaseDocumentsFormProps) {
   const copy = useMemo(() => getReprocessingCopy(locale), [locale]);
@@ -31,28 +33,29 @@ export function ReprocessCaseDocumentsForm({
     initialReprocessCaseActionState
   );
   const [progress, setProgress] = useState<string | null>(null);
+  const [resumeRun, setResumeRun] = useState<{ runId: string; queuedCount: number } | null>(null);
   const [armed, setArmed] = useState(false);
   const startedRun = useRef<string | null>(null);
 
   useEffect(() => {
-    if (
-      state.status !== "queued" ||
-      !state.runId ||
-      state.queuedCount < 1 ||
-      startedRun.current === state.runId
-    ) {
+    const run = state.status === "queued" && state.runId
+      ? { runId: state.runId, queuedCount: state.queuedCount }
+      : resumeRun;
+
+    if (!run || run.queuedCount < 1 || startedRun.current === run.runId) {
       return;
     }
 
-    startedRun.current = state.runId;
+    const activeRun = run;
+    startedRun.current = activeRun.runId;
     let cancelled = false;
 
     async function processQueuedDocuments() {
-      setProgress(copy.queued(state.queuedCount));
+      setProgress(copy.queued(activeRun.queuedCount));
       let completed = 0;
 
       try {
-        for (let index = 0; index < state.queuedCount; index += 1) {
+        for (let index = 0; index < activeRun.queuedCount; index += 1) {
           const response = await fetch("/api/documents/process", {
             method: "POST",
             headers: { "content-type": "application/json" },
@@ -65,14 +68,13 @@ export function ReprocessCaseDocumentsForm({
 
           completed += 1;
           if (!cancelled) {
-            setProgress(copy.processing(completed, state.queuedCount));
-            router.refresh();
+            setProgress(copy.processing(completed, activeRun.queuedCount));
           }
         }
 
         if (!cancelled) {
           setProgress(
-            completed === state.queuedCount
+            completed === activeRun.queuedCount
               ? copy.complete(completed)
               : copy.failed
           );
@@ -87,13 +89,28 @@ export function ReprocessCaseDocumentsForm({
     return () => {
       cancelled = true;
     };
-  }, [caseId, copy, router, state.queuedCount, state.runId, state.status]);
+  }, [caseId, copy, resumeRun, router, state.queuedCount, state.runId, state.status]);
 
   return (
     <div>
       <span className="panel__label">{copy.label}</span>
       <h2>{copy.title}</h2>
       <p>{copy.description}</p>
+      {queuedDocumentCount > 0 && !progress ? (
+        <div>
+          <p>{copy.resumeDescription}</p>
+          <button
+            className="button button--secondary"
+            onClick={() => setResumeRun({
+              runId: crypto.randomUUID(),
+              queuedCount: queuedDocumentCount
+            })}
+            type="button"
+          >
+            {copy.resumeButton(queuedDocumentCount)}
+          </button>
+        </div>
+      ) : null}
       {armed ? (
         <form action={formAction}>
           <input name="caseId" type="hidden" value={caseId} />

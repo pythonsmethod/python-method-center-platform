@@ -296,6 +296,12 @@ run from consuming another client's older queued document. This is an
 operational review tool; it does not promote trust or enable automatic
 verification.
 
+The Case reprocessing runner now keeps page refreshes outside the per-document
+loop and exposes a bilingual resume control whenever queued documents already
+exist. A navigation refresh can therefore no longer cancel the batch after its
+first document, and an interrupted run can continue only the remaining queue
+without re-reading completed files.
+
 ### Connected in-memory harness — 2026-09-05
 
 An isolated, persistence-free route now connects a Google-like normalized provider result to Clinical Evidence, the unchanged Phase 2.7 shadow trust policy, Evidence Package and Case Analytical Picture. It accepts only `IN_MEMORY_TEST` with external calls and persistence explicitly disabled. A development-only RU/EN screen is gated by `ANKH_HARNESS_ENABLED=true` and returns 404 outside development.

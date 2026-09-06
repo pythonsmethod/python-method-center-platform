@@ -413,6 +413,9 @@ export default async function StaffCaseDetailPage({
           {showAdminControls || canReadProfessorConversation ? (
             <ReprocessCaseDocumentsForm
               caseId={clientCase.id}
+              queuedDocumentCount={documents.filter(
+                (document) => document.document_status === "queued"
+              ).length}
               locale={locale}
             />
           ) : null}
