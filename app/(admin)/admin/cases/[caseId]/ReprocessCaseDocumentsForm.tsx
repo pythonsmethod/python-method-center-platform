@@ -31,6 +31,7 @@ export function ReprocessCaseDocumentsForm({
     initialReprocessCaseActionState
   );
   const [progress, setProgress] = useState<string | null>(null);
+  const [armed, setArmed] = useState(false);
   const startedRun = useRef<string | null>(null);
 
   useEffect(() => {
@@ -93,18 +94,34 @@ export function ReprocessCaseDocumentsForm({
       <span className="panel__label">{copy.label}</span>
       <h2>{copy.title}</h2>
       <p>{copy.description}</p>
-      <form
-        action={formAction}
-        onSubmit={(event) => {
-          if (!window.confirm(copy.confirm)) event.preventDefault();
-        }}
-      >
-        <input name="caseId" type="hidden" value={caseId} />
-        <input name="locale" type="hidden" value={locale} />
-        <button className="button button--secondary" disabled={pending} type="submit">
-          {pending ? copy.pending : copy.button}
+      {armed ? (
+        <form action={formAction}>
+          <input name="caseId" type="hidden" value={caseId} />
+          <input name="locale" type="hidden" value={locale} />
+          <p>{copy.confirm}</p>
+          <div className="button-row">
+            <button className="button button--secondary" disabled={pending} type="submit">
+              {pending ? copy.pending : copy.confirmButton}
+            </button>
+            <button
+              className="button button--ghost"
+              disabled={pending}
+              onClick={() => setArmed(false)}
+              type="button"
+            >
+              {copy.cancel}
+            </button>
+          </div>
+        </form>
+      ) : (
+        <button
+          className="button button--secondary"
+          onClick={() => setArmed(true)}
+          type="button"
+        >
+          {copy.button}
         </button>
-      </form>
+      )}
       {state.status === "error" ? (
         <p className="form-message form-message--error" role="alert">
           {state.message}
