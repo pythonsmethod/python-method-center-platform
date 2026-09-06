@@ -93,7 +93,7 @@ export async function resolveAssistantTierForUi(): Promise<AssistantTier> {
 // Resolves who is asking and builds their personal context in one pass.
 // Never throws: on any failure the visitor is treated as a guest, which is
 // the safest (narrowest) tier.
-export async function resolveAssistantAudience(): Promise<AssistantAudience> {
+export async function resolveAssistantAudience(accessToken?: string | null): Promise<AssistantAudience> {
   const guest: AssistantAudience = {
     tier: "guest",
     profileId: null,
@@ -103,7 +103,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
   };
 
   try {
-    const auth = await createSupabaseServerClient();
+    const auth = await createSupabaseServerClient(accessToken);
 
     if (!auth) {
       return guest;
@@ -111,7 +111,7 @@ export async function resolveAssistantAudience(): Promise<AssistantAudience> {
 
     const {
       data: { user }
-    } = await auth.auth.getUser();
+    } = await auth.auth.getUser(accessToken || undefined);
 
     if (!user) {
       return guest;
