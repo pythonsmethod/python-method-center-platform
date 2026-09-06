@@ -266,7 +266,8 @@ describe("what two readings agree on", () => {
 describe("whole-document content classification", () => {
   it("classifies an identity-only blank form as empty", () => {
     const rows = [
-      row({ section: "Шапка", label: "Фамилия, имя", value: "Тестовый Пациент" }),
+      row({ section: "Шапка бланка", label: "Фамилия, имя", value: "Тестовый Пациент" }),
+      row({ section: "Шапка бланка", label: "Дата (рукописно)", value: "22.11.24" }),
       row({ section: "УЗИ", label: "Размер", value: "[не заполнено]" }),
       row({ section: "УЗИ", label: "Эхоструктура", value: "однородная, неоднородная" }),
     ];
