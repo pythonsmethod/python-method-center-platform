@@ -484,3 +484,10 @@ fail closed.
 Text presence and anatomical context do not manufacture confidence. This check
 validates extraction/transformation behavior only; it is not an independent
 reread of the original image and cannot prove OCR correctness.
+
+---
+
+## D-045 — Handwriting recognition is source-coverage gated
+
+Decision:
+Handwritten medical content is read in two independent character-level passes. Each pass must first declare the source image `COMPLETE`, `PARTIAL` or `UNREADABLE`. Coverage metadata is not a clinical fact. If either pass reports a partial or unreadable source, matching visible text remains review-only; agreement cannot reconstruct content hidden by cropping, folds or uniform image regions. Printed option lists without one explicit selection are also review-only.

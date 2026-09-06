@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync } from "node:fs";
 import { buildCanonicalFacts, buildCanonicalFactsFromGoogleResponse, canonicalizeLabRow, parseNumericValue, parseReferenceInterval } from "@/lib/canonical-facts";
-import { fixtureA, fixtureB, fixtureC, fixtureD, fixtureE, fixtureF, fixtureG } from "@/tests/fixtures/canonical-lab-facts";
+import { bilingualRussianLabFixture, fixtureA, fixtureB, fixtureC, fixtureD, fixtureE, fixtureF, fixtureG } from "@/tests/fixtures/canonical-lab-facts";
 
 const context = { caseId: "case-synthetic", sourceDocumentId: "document-synthetic", extractionProvider: "google-document-ai", extractionVersion: "pretrained-ocr-v2.1-2024-08-07" };
 
@@ -57,10 +57,20 @@ describe("canonical laboratory fact parsing", () => {
     expect(twice.facts[0].factId).toBe(once.facts[0].factId);
     expect(twice.facts[0].factFingerprint).toBe(once.facts[0].factFingerprint);
   });
+
+  it("keeps a bilingual Russian laboratory table as 34 associated facts", () => {
+    const result = buildCanonicalFacts(bilingualRussianLabFixture, context);
+    expect(result.facts).toHaveLength(34);
+    expect(result.facts.every((fact) => fact.valueNumeric !== null)).toBe(true);
+    expect(result.facts.every((fact) => fact.normalizationStatus === "NORMALIZED")).toBe(true);
+    expect(result.facts.every((fact) => fact.unitNormalized !== null)).toBe(true);
+    expect(result.facts.find((fact) => fact.originalTestName === "Lym%")?.labFlagOriginal).toBe("HIGH");
+    expect(result.facts.find((fact) => fact.originalTestName === "MPV")?.labFlagOriginal).toBe("LOW");
+    expect(result.counters).toMatchObject({ facts_extracted: 34, facts_verified: 34, normalization_unresolved: 0 });
+  });
 });
 
-function googleTableFixture() {
-  const values = ["Test", "Result", "Unit", "Reference", "Flag", "Hemoglobin", "9.6", "g/dL", "12.0–15.5", "LOW"];
+function googleTableFixture(values = ["Test", "Result", "Unit", "Reference", "Flag", "Hemoglobin", "9.6", "g/dL", "12.0–15.5", "LOW"]) {
   let text = "";
   const cells = values.map((value) => {
     const startIndex = text.length;
@@ -81,6 +91,15 @@ describe("Google Document AI to canonical facts integration", () => {
       labFlagOriginal: "LOW", verificationStatus: "VERIFIED", sourcePage: 1
     });
     expect(result.counters).toMatchObject({ documents_processed: 1, facts_extracted: 1, facts_verified: 1 });
+  });
+
+  it("recognizes bilingual and expanded Russian table headers", () => {
+    const result = buildCanonicalFactsFromGoogleResponse(googleTableFixture([
+      "Наименование исследования / Test", "Результат", "Ед. изм.", "Референсные значения", "Отклонение",
+      "Ферритин", "32,9", "ng/ml", "13–150", "",
+    ]), context);
+    expect(result.facts).toHaveLength(1);
+    expect(result.facts[0]).toMatchObject({ normalizedTestName: "Ferritin", valueNumeric: 32.9, unitNormalized: "ng/mL", referenceLow: 13, referenceHigh: 150 });
   });
 });
 

@@ -15,6 +15,22 @@ const validCase: ValidationIntakeCase = {
     qualityBand: "MEDIUM",
     versionKind: "ORIGINAL",
     layoutFamily: "laboratory-table-ru",
+  }, {
+    documentId: "validation-document-002-b",
+    documentType: "LAB",
+    language: "ru",
+    sourceType: "SCAN",
+    qualityBand: "MEDIUM",
+    versionKind: "ORIGINAL",
+    layoutFamily: "laboratory-table-ru-immunoassay",
+  }, {
+    documentId: "validation-document-002-c",
+    documentType: "LAB",
+    language: "ru",
+    sourceType: "SCAN",
+    qualityBand: "MEDIUM",
+    versionKind: "ORIGINAL",
+    layoutFamily: "laboratory-table-ru-cbc",
   }],
 };
 
@@ -29,7 +45,12 @@ describe("Phase 2.9 intake contract", () => {
     duplicate.authorizationReference = "";
     expect(validateValidationIntake([validCase, duplicate])).toEqual({
       valid: false,
-      errors: ["validation-case-003:authorization_reference_required", "validation-document-002-a:duplicate_document_id"],
+      errors: [
+        "validation-case-003:authorization_reference_required",
+        "validation-document-002-a:duplicate_document_id",
+        "validation-document-002-b:duplicate_document_id",
+        "validation-document-002-c:duplicate_document_id",
+      ],
     });
   });
 });
