@@ -3,10 +3,10 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 
 // Pricing set by the founder (23.07.2026): 5 weeks $1,200 (+5% service fee
 // + $180 formula delivery — Karen sends his formula as a gift with the
-// plan); 100 days $3,500 (+5% service fee). Stripe Payment Links must be
-// created with the resulting totals: $1,440 and $3,675.
+// plan); 100 days $3,500 (+5% service fee + $180 delivery). Stripe Payment Links must be
+// created with the resulting totals: $1,440 and $3,855.
 export const PLAN_5W_TOTAL_USD = 1440;
-export const PLAN_100D_TOTAL_USD = 3675;
+export const PLAN_100D_TOTAL_USD = 3855;
 
 // The analyses review, set by the founder (02.09.2026) at $500 as a paid
 // format in its own right, once the launch promotion that offered it free

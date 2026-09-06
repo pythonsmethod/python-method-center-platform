@@ -13,6 +13,7 @@ const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export type PublicSupportInput = {
   email: string;
+  phone: string;
   category: string;
   message: string;
   consent: boolean;
@@ -31,6 +32,12 @@ export function validatePublicSupportInput(
 
   if (!input.email.trim() || !emailPattern.test(input.email.trim())) {
     return { error: en ? "Enter a valid email address for our reply." : "Укажите корректный email для ответа." };
+  }
+
+  const phone = (input.phone ?? "").trim();
+  const digits = phone.replace(/\D/g, "");
+  if (phone.length > 32 || !/^\+?[\d ()-]+$/.test(phone) || digits.length < 7 || digits.length > 15) {
+    return { error: en ? "Enter a valid contact phone number including country code." : "Укажите корректный номер телефона для связи с кодом страны." };
   }
 
   if (!(PUBLIC_SUPPORT_CATEGORIES as readonly string[]).includes(input.category)) {

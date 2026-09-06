@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Link } from "@/components/LocaleLink";
+
 import { PageHeader } from "@/components/PageHeader";
 import { packageArt } from "@/components/icons/PackageArt";
 import { egyptianIcons } from "@/components/icons/EgyptianIcons";
@@ -111,26 +111,7 @@ export default async function ShopPage() {
 
       <ShopWaitlist labels={t.waitlist} options={waitlistOptions} />
 
-      <section className="panel-grid" aria-label={t.nextLabel}>
-        <div className="panel panel--promo">
-          <span className="panel__label">{t.nextLabel}</span>
-          <h2>{t.nextTitle}</h2>
-          <p>{t.nextText}</p>
-          <div className="panel-actions">
-            <Link className="button" href="/login">
-              {t.nextStart}
-            </Link>
-            <Link className="button button--secondary" href="/payment">
-              {t.nextPlans}
-            </Link>
-          </div>
-        </div>
-        <div className="panel">
-          <span className="panel__label">{t.limitsLabel}</span>
-          <h2>{t.limitsTitle}</h2>
-          <p>{t.limitsText}</p>
-        </div>
-      </section>
+
     </div>
   );
 }

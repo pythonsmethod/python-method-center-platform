@@ -21,7 +21,7 @@ export default async function SupportPage() {
     <div className="page-shell">
       <PageHeader eyebrow={t.eyebrow} title={t.title} description={t.description} />
 
-      <section className="panel-grid">
+      <section aria-label={t.guestTitle}>
         <div className="panel">
           <span className="panel__label">{t.guestLabel}</span>
           <h2>{t.guestTitle}</h2>
@@ -42,19 +42,7 @@ export default async function SupportPage() {
             }}
           />
         </div>
-        <div className="panel">
-          <span className="panel__label">{t.label}</span>
-          <h2>{t.cardTitle}</h2>
-          <p>
-            {t.cardText1} <Link href="/cabinet">{t.cabinetLink}</Link>
-            {t.cardText2}
-          </p>
-          <div className="panel-actions">
-            <Link className="button button--secondary" href="/login">
-              {t.loginCta}
-            </Link>
-          </div>
-        </div>
+
       </section>
 
       <section className="panel-grid" aria-label={t.helpLabel}>

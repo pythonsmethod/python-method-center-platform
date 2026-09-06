@@ -66,6 +66,7 @@ export async function submitPublicSupportRequest(
   const en = formData.get("locale") === "en";
   const validation = validatePublicSupportInput({
     email: String(formData.get("email") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
     category: String(formData.get("category") ?? ""),
     message: String(formData.get("message") ?? ""),
     consent: formData.get("consent") === "on",
@@ -95,6 +96,7 @@ export async function submitPublicSupportRequest(
 
   const email = String(formData.get("email") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
 
   const { data: request, error: insertError } = await supabase
     .from("support_requests")
@@ -103,7 +105,7 @@ export async function submitPublicSupportRequest(
       category: DB_CATEGORY[validation.category],
       status: "open",
       subject: categorySubjects[validation.category],
-      body: message,
+      body: `${en ? "Contact phone" : "Телефон для связи"}: ${phone}\n\n${message}`,
       contact_email: email
     })
     .select("id")
