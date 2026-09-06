@@ -685,8 +685,7 @@ const ru = {
     disclaimerText:
       "Python Method не является медицинским учреждением, не ставит диагнозы, не назначает и не отменяет лечение. Сопровождение не заменяет наблюдение лечащего врача. Условия оказания услуг описаны в",
     disclaimerLink: "публичной оферте",
-    heroLead:
-      "Профессиональное сопровождение Professor Python и искусственный интеллект центра рядом с вами на каждом шаге пути к восстановлению и результату.",
+    heroLead: "Профессиональное сопровождение в области реабилитации организма. Professor Python и искусственный интеллект центра рядом с вами на каждом шаге пути к восстановлению и результату.",
     heroCtaSelf: "Начать самостоятельно",
     heroCtaAnham: "Пройти путь с ИИ-помощником",
     heroTrust: "ИИ рядом с вами 24/7 — задавайте вопросы в любой момент",
@@ -1845,8 +1844,7 @@ const en: typeof ru = {
     disclaimerText:
       "Python Method is not a medical institution; it does not diagnose, prescribe or discontinue treatment. The support program does not replace supervision by your physician. The terms of service are described in the",
     disclaimerLink: "public offer",
-    heroLead:
-      "Professional support led by Professor Python, with the center's artificial intelligence beside you at every step toward recovery and results.",
+    heroLead: "Professional support in physical rehabilitation. Professor Python and the center's artificial intelligence are beside you at every step toward recovery and results.",
     heroCtaSelf: "Start on my own",
     heroCtaAnham: "Walk the path with the AI assistant",
     heroTrust: "The AI is with you 24/7 — ask anything, any time",

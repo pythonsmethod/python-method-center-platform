@@ -305,6 +305,8 @@
 .app-button--primary:hover { background: var(--app-accent-strong); }
 .app-button--secondary { background: var(--app-card); border-color: var(--app-line); color: var(--app-text); }
 .app-button--secondary:hover { border-color: var(--app-accent); }
+.app-button--anham-mobile { display: none; }
+.app-trust--mobile { display: none; }
 .app-trust { color: var(--app-muted) !important; font-size: .88rem; margin: 1.2rem 0 0; }
 
 .app-hero__visual { display: grid; place-items: center; }
@@ -356,6 +358,22 @@
 .app-final .app-button { flex: 0 0 auto; }
 
 @media (max-width: 860px) {
+  .app-hero__copy .app-trust--desktop { display: none; }
+  .app-assistant-card .app-trust--mobile {
+    display: block;
+    font-family: inherit;
+    font-size: .88rem;
+    line-height: 1.5;
+    margin: 1rem 0 0;
+    max-width: 100%;
+  }
+  .app-actions .app-button--anham-desktop { display: none; }
+  .app-assistant-card .app-button--anham-mobile {
+    display: inline-flex;
+    margin-top: 1.25rem;
+    width: 100%;
+    line-height: 1.4;
+  }
   .app-home { border-radius: 20px; margin-top: .75rem; }
   .app-hero { grid-template-columns: 1fr; min-height: 0; padding: 3.5rem 1.5rem; }
   .app-hero__visual { margin-top: .5rem; }
@@ -661,4 +679,47 @@
   .app-route { padding-inline: clamp(4rem, 8vw, 8rem); }
   .app-expert { grid-template-columns: minmax(180px, .35fr) minmax(0, 1fr); }
   .app-expert__portrait { height: 164px; width: 164px; }
+}
+
+/* Gilded inscription: layered relief, soft light and a winged sun ornament. */
+.app-hero h1.app-title-egypt {
+  position: relative;
+  isolation: isolate;
+  padding-block: 1.4rem 1.1rem;
+  line-height: 1.12;
+  letter-spacing: -.025em;
+  perspective: 800px;
+  color: #f4d88c;
+}
+.app-title-egypt > span {
+  display: block;
+  background: linear-gradient(165deg, #fff8d9 4%, #ffe9a7 25%, #d8a346 46%, #fff1bc 52%, #e3b75d 72%, #a97728 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 1px 0 #97672a) drop-shadow(0 2px 0 #694415) drop-shadow(0 3px 0 #392b18) drop-shadow(0 8px 6px #0009) drop-shadow(0 0 13px #f5bd4552);
+  transform: rotateX(5deg);
+}
+.app-title-egypt::before {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  inset: -12% -2%;
+  background: radial-gradient(ellipse at 50% 48%, #db9c2726, #65d7ed08 52%, transparent 70%);
+  pointer-events: none;
+}
+.app-title-egypt::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 22%;
+  width: 56%;
+  height: 13px;
+  background: radial-gradient(circle at center, #fff0a8 0 3px, #cc9234 4px 5px, transparent 6px), linear-gradient(90deg, transparent, #b17a29 18%, #efd188 43%, transparent 44% 56%, #efd188 57%, #b17a29 82%, transparent) center / 100% 1px no-repeat, linear-gradient(90deg, transparent 12%, #b99551 35%, transparent 44% 56%, #b99551 65%, transparent 88%) center / 100% 5px no-repeat;
+  filter: drop-shadow(0 0 5px #efc36688);
+  pointer-events: none;
+}
+@media (forced-colors: active) {
+  .app-title-egypt > span { background: none; -webkit-text-fill-color: currentColor; filter: none; transform: none; }
+  .app-title-egypt::before, .app-title-egypt::after { display: none; }
 }
