@@ -1097,7 +1097,9 @@ const ru = {
     guestTitle: "Напишите нам прямо здесь",
     guestText:
       "Форма ниже работает без входа в аккаунт. Ответим на указанный email в течение 24 часов (в рабочие дни).",
+    formName: "Имя и фамилия (обязательно)",
     formEmail: "Email для ответа",
+    formPhone: "Телефон для связи (обязательно)",
     formCategory: "Тема обращения",
     catLogin: "Не получается войти в аккаунт",
     catPayment: "Вопрос по оплате",
@@ -1105,7 +1107,7 @@ const ru = {
     catOther: "Другой вопрос",
     formMessage: "Опишите вопрос",
     formConsent:
-      "Соглашаюсь на обработку указанного email для ответа на моё обращение",
+      "Соглашаюсь на обработку указанных имени, телефона и email для ответа на моё обращение",
     formSubmit: "Отправить сообщение",
     formSubmitting: "Отправляю…",
     helpLabel: "Частые ситуации",
@@ -2211,7 +2213,9 @@ const en: typeof ru = {
     guestTitle: "Write to us right here",
     guestText:
       "The form below works without signing in. We will reply to the email you provide within 24 hours (on business days).",
+    formName: "First and last name (required)",
     formEmail: "Email for our reply",
+    formPhone: "Contact phone (required)",
     formCategory: "Topic",
     catLogin: "Can't sign in to my account",
     catPayment: "Payment question",
@@ -2219,7 +2223,7 @@ const en: typeof ru = {
     catOther: "Other question",
     formMessage: "Describe your question",
     formConsent:
-      "I agree to the processing of this email address for the purpose of replying to my request",
+      "I agree to the processing of the provided name, phone number and email address for the purpose of replying to my request",
     formSubmit: "Send message",
     formSubmitting: "Sending…",
     helpLabel: "Common situations",

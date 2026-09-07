@@ -7,7 +7,6 @@ import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThrea
 import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { formatDateTime } from "@/lib/i18n/format";
-import { supportStatusLabel } from "@/lib/i18n/status-labels";
 import { getOwnSupportRequests } from "@/lib/support/queries";
 import { SupportRequestForm } from "../SupportRequestForm";
 import { SupportRequestThread } from "@/components/support/SupportRequestThread";
@@ -109,9 +108,6 @@ export default async function CabinetChatPage() {
                     <div>
                       <strong>{request.subject}</strong>
                       <span>{formatDateTime(request.created_at, locale)}</span>
-                      <span className="status-badge">
-                        {supportStatusLabel(request.status, locale)}
-                      </span>
                     </div>
                     <SupportRequestThread
                       labels={t.supportThread}

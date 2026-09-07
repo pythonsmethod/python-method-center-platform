@@ -12,6 +12,7 @@ export type PublicSupportCategory = (typeof PUBLIC_SUPPORT_CATEGORIES)[number];
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export type PublicSupportInput = {
+  contactName: string;
   email: string;
   phone: string;
   category: string;
@@ -23,11 +24,23 @@ export type PublicSupportInput = {
 
 export function validatePublicSupportInput(
   input: PublicSupportInput
-): { error: string } | { category: PublicSupportCategory } {
+): { error: string } | { category: PublicSupportCategory; contactName: string } {
   const en = input.locale === "en";
   // Bots fill every field; humans never see this one.
   if (input.honeypot.trim() !== "") {
     return { error: en ? "We could not send the message. Please try again." : "Не удалось отправить сообщение. Попробуйте ещё раз." };
+  }
+
+  const contactName = (input.contactName ?? "").trim().replace(/\s+/g, " ");
+  const nameParts = contactName.split(" ").filter(Boolean);
+  const validNamePart = /^[\p{L}\p{M}][\p{L}\p{M}'’.-]*$/u;
+  if (
+    contactName.length < 3 ||
+    contactName.length > 120 ||
+    nameParts.length < 2 ||
+    nameParts.some((part) => !validNamePart.test(part))
+  ) {
+    return { error: en ? "Enter your first and last name." : "Укажите имя и фамилию." };
   }
 
   if (!input.email.trim() || !emailPattern.test(input.email.trim())) {
@@ -58,5 +71,5 @@ export function validatePublicSupportInput(
     return { error: en ? "Consent to process the provided contact details is required." : "Нужно согласие на обработку указанных контактных данных." };
   }
 
-  return { category: input.category as PublicSupportCategory };
+  return { category: input.category as PublicSupportCategory, contactName };
 }

@@ -2,11 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import {
-  STAFF_ASSIGNABLE_SUPPORT_STATUSES,
-  type StaffAssignableSupportStatus,
-  type SupportRequestActionState
-} from "@/lib/support/types";
+import type { SupportRequestActionState } from "@/lib/support/types";
 import { writeAuditLog } from "@/lib/audit/log";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
@@ -19,14 +15,6 @@ import { isUuid } from "@/lib/utils/uuid";
 
 function errorState(message: string): SupportRequestActionState {
   return { status: "error", message };
-}
-
-function isStaffAssignableStatus(
-  value: string
-): value is StaffAssignableSupportStatus {
-  return (STAFF_ASSIGNABLE_SUPPORT_STATUSES as readonly string[]).includes(
-    value
-  );
 }
 
 export async function createSupportRequest(
@@ -79,7 +67,6 @@ export async function createSupportRequest(
       profile_id: user.id,
       case_id: clientCase?.id ?? null,
       category: "other",
-      status: "open",
       subject,
       body
     })
@@ -129,63 +116,6 @@ export async function createSupportRequest(
     status: "success",
     message: "Сообщение отправлено. Команда ответит вам по указанным контактам."
   };
-}
-
-export async function updateSupportRequestStatus(
-  _previousState: StaffActionState,
-  formData: FormData
-): Promise<StaffActionState> {
-  const auth = await getStaffUserState();
-
-  if (auth.status !== "authorized") {
-    return { status: "error", message: "Нет доступа для изменения статуса." };
-  }
-
-  const requestId = String(formData.get("requestId") ?? "");
-  const nextStatus = String(formData.get("nextStatus") ?? "");
-
-  if (!isUuid(requestId) || !isStaffAssignableStatus(nextStatus)) {
-    return { status: "error", message: "Некорректные данные обращения." };
-  }
-
-  const supabase = createSupabaseServiceClient();
-
-  if (!supabase) {
-    return {
-      status: "error",
-      message: "Service role key не настроен — смена статуса недоступна."
-    };
-  }
-
-  const { data: request, error } = await supabase
-    .from("support_requests")
-    .update({ status: nextStatus })
-    .eq("id", requestId)
-    .select("id, profile_id, case_id")
-    .maybeSingle();
-
-  if (error) {
-    return { status: "error", message: error.message };
-  }
-
-  if (!request) {
-    return { status: "error", message: "Обращение не найдено." };
-  }
-
-  await writeAuditLog({
-    profileId: request.profile_id,
-    caseId: request.case_id,
-    actorId: auth.userId,
-    actorRole: auth.role,
-    action: "support_request_status_changed",
-    entityTable: "support_requests",
-    entityId: request.id,
-    metadata: { next_status: nextStatus }
-  });
-
-  revalidatePath("/admin/requests");
-
-  return { status: "success", message: "Статус обновлён." };
 }
 
 export async function sendClientSupportMessage(
@@ -245,10 +175,6 @@ export async function sendClientSupportMessage(
   }
 
   await Promise.all([
-    supabase
-      .from("support_requests")
-      .update({ status: "in_progress" })
-      .eq("id", request.id),
     notifyTeam({
       kind: "support_request",
       dedupeKey: `support_message:${message.id}`,
@@ -330,10 +256,6 @@ export async function sendStaffSupportMessage(
   }
 
   await Promise.all([
-    supabase
-      .from("support_requests")
-      .update({ status: "waiting_on_client" })
-      .eq("id", request.id),
     writeAuditLog({
       profileId: request.profile_id,
       caseId: request.case_id,
