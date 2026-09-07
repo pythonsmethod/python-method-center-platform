@@ -5,7 +5,9 @@ import { submitPublicSupportRequest } from "@/lib/support/public-actions";
 import { initialSupportRequestActionState } from "@/lib/support/types";
 
 type PublicSupportFormLabels = {
+  name: string;
   email: string;
+  phone: string;
   category: string;
   categoryLogin: string;
   categoryPayment: string;
@@ -40,8 +42,16 @@ export function PublicSupportForm({ labels, locale }: { labels: PublicSupportFor
         type="text"
       />
       <label className="field">
+        <span>{labels.name}</span>
+        <input autoComplete="name" maxLength={120} name="contactName" required type="text" />
+      </label>
+      <label className="field">
         <span>{labels.email}</span>
         <input autoComplete="email" name="email" required type="email" />
+      </label>
+      <label className="field">
+        <span>{labels.phone}</span>
+        <input autoComplete="tel" maxLength={32} name="phone" required type="tel" />
       </label>
       <label className="field">
         <span>{labels.category}</span>

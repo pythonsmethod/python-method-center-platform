@@ -30,7 +30,7 @@ export async function getOwnSupportRequests(
 
   const { data, error } = await supabase
     .from("support_requests")
-    .select("id, subject, body, status, created_at, updated_at")
+    .select("id, subject, body, created_at, updated_at")
     .eq("profile_id", profileId)
     .order("created_at", { ascending: false })
     .limit(50);
@@ -82,9 +82,10 @@ export type StaffSupportRequestItem = {
   case_id: string | null;
   subject: string;
   body: string | null;
-  status: string;
   created_at: string;
   contact_email: string | null;
+  contact_name: string | null;
+  contact_phone: string | null;
   profiles: {
     email: string | null;
     full_name: string | null;
@@ -117,7 +118,7 @@ export async function getStaffSupportRequests(): Promise<StaffSupportRequestsRes
   const { data, error } = await supabase
     .from("support_requests")
     .select(
-      "id, profile_id, case_id, subject, body, status, created_at, contact_email, profiles(email, full_name, phone)"
+      "id, profile_id, case_id, subject, body, created_at, contact_email, contact_name, contact_phone, profiles(email, full_name, phone)"
     )
     .order("created_at", { ascending: false })
     .limit(100);

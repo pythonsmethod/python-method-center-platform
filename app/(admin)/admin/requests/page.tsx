@@ -4,9 +4,7 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { formatDateTime } from "@/lib/i18n/format";
-import { supportStatusLabel } from "@/lib/i18n/status-labels";
 import { getStaffSupportRequests } from "@/lib/support/queries";
-import { RequestStatusButtons } from "./RequestStatusButtons";
 import { SupportRequestThread } from "@/components/support/SupportRequestThread";
 
 const staffThreadLabels = {
@@ -66,7 +64,7 @@ export default async function StaffSupportRequestsPage() {
       <PageHeader
         eyebrow="Рабочее место команды"
         title="Обращения клиентов"
-        description="Сообщения из кабинета. Ответ клиенту отправляется по его контактам (email или телефон), затем статус обновляется здесь."
+        description="Сообщения из кабинета и от гостей. Гостям отвечайте по указанному email."
       />
 
       <section className="intake-section" aria-label="Обращения клиентов">
@@ -85,16 +83,15 @@ export default async function StaffSupportRequestsPage() {
                 <div>
                   <strong>{request.subject}</strong>
                   <span>{formatDateTime(request.created_at)}</span>
-                  <span className="status-badge">
-                    {supportStatusLabel(request.status)}
-                  </span>
                 </div>
                 <dl>
                   <div>
                     <dt>Клиент</dt>
                     <dd>
                       {request.profiles?.full_name ??
-                        (request.profile_id ? "Без имени" : "Гость (без аккаунта)")}
+                        (request.profile_id
+                          ? "Без имени"
+                          : `${request.contact_name ?? "Имя не указано"} (гость без аккаунта)`)}
                     </dd>
                   </div>
                   <div>
@@ -105,7 +102,7 @@ export default async function StaffSupportRequestsPage() {
                   </div>
                   <div>
                     <dt>Телефон</dt>
-                    <dd>{request.profiles?.phone ?? "—"}</dd>
+                    <dd>{request.profiles?.phone ?? request.contact_phone ?? "—"}</dd>
                   </div>
                   <div>
                     <dt>Кейс</dt>
@@ -135,6 +132,7 @@ export default async function StaffSupportRequestsPage() {
                 ) : (
                   <div className="notice notice--warning">
                     <strong>Гость без личного кабинета</strong>
+                    <p>{request.body ?? "Текст сообщения отсутствует."}</p>
                     <p>Ответьте по email — переписка на сайте гостю недоступна.</p>
                     {request.contact_email ? (
                       <a className="button button--secondary button--compact" href={`mailto:${request.contact_email}`}>
@@ -143,10 +141,6 @@ export default async function StaffSupportRequestsPage() {
                     ) : null}
                   </div>
                 )}
-                <RequestStatusButtons
-                  currentStatus={request.status}
-                  requestId={request.id}
-                />
               </li>
             ))}
           </ul>

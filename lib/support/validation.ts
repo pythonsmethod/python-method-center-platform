@@ -12,7 +12,9 @@ export type PublicSupportCategory = (typeof PUBLIC_SUPPORT_CATEGORIES)[number];
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export type PublicSupportInput = {
+  contactName: string;
   email: string;
+  phone: string;
   category: string;
   message: string;
   consent: boolean;
@@ -22,15 +24,33 @@ export type PublicSupportInput = {
 
 export function validatePublicSupportInput(
   input: PublicSupportInput
-): { error: string } | { category: PublicSupportCategory } {
+): { error: string } | { category: PublicSupportCategory; contactName: string } {
   const en = input.locale === "en";
   // Bots fill every field; humans never see this one.
   if (input.honeypot.trim() !== "") {
     return { error: en ? "We could not send the message. Please try again." : "Не удалось отправить сообщение. Попробуйте ещё раз." };
   }
 
+  const contactName = (input.contactName ?? "").trim().replace(/\s+/g, " ");
+  const nameParts = contactName.split(" ").filter(Boolean);
+  const validNamePart = /^[\p{L}\p{M}][\p{L}\p{M}'’.-]*$/u;
+  if (
+    contactName.length < 3 ||
+    contactName.length > 120 ||
+    nameParts.length < 2 ||
+    nameParts.some((part) => !validNamePart.test(part))
+  ) {
+    return { error: en ? "Enter your first and last name." : "Укажите имя и фамилию." };
+  }
+
   if (!input.email.trim() || !emailPattern.test(input.email.trim())) {
     return { error: en ? "Enter a valid email address for our reply." : "Укажите корректный email для ответа." };
+  }
+
+  const phone = (input.phone ?? "").trim();
+  const digits = phone.replace(/\D/g, "");
+  if (phone.length > 32 || !/^\+?[\d ()-]+$/.test(phone) || digits.length < 7 || digits.length > 15) {
+    return { error: en ? "Enter a valid contact phone number including country code." : "Укажите корректный номер телефона для связи с кодом страны." };
   }
 
   if (!(PUBLIC_SUPPORT_CATEGORIES as readonly string[]).includes(input.category)) {
@@ -51,5 +71,5 @@ export function validatePublicSupportInput(
     return { error: en ? "Consent to process the provided contact details is required." : "Нужно согласие на обработку указанных контактных данных." };
   }
 
-  return { category: input.category as PublicSupportCategory };
+  return { category: input.category as PublicSupportCategory, contactName };
 }

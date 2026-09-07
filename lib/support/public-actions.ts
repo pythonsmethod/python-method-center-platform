@@ -7,6 +7,7 @@ import {
   type PublicSupportCategory
 } from "@/lib/support/validation";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
+import { sendGuestSupportEmail } from "@/lib/notifications/guest-support-email";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { clientIp } from "@/lib/utils/client-ip";
 
@@ -65,7 +66,9 @@ export async function submitPublicSupportRequest(
 ): Promise<SupportRequestActionState> {
   const en = formData.get("locale") === "en";
   const validation = validatePublicSupportInput({
+    contactName: String(formData.get("contactName") ?? ""),
     email: String(formData.get("email") ?? ""),
+    phone: String(formData.get("phone") ?? ""),
     category: String(formData.get("category") ?? ""),
     message: String(formData.get("message") ?? ""),
     consent: formData.get("consent") === "on",
@@ -94,6 +97,7 @@ export async function submitPublicSupportRequest(
   }
 
   const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
   const message = String(formData.get("message") ?? "").trim();
 
   const { data: request, error: insertError } = await supabase
@@ -101,10 +105,11 @@ export async function submitPublicSupportRequest(
     .insert({
       profile_id: null,
       category: DB_CATEGORY[validation.category],
-      status: "open",
       subject: categorySubjects[validation.category],
       body: message,
-      contact_email: email
+      contact_name: validation.contactName,
+      contact_email: email,
+      contact_phone: phone
     })
     .select("id")
     .single();
@@ -115,17 +120,29 @@ export async function submitPublicSupportRequest(
     );
   }
 
-  await notifyTeam({
+  const requestLink = adminLink(`/admin/requests#request-${request.id}`);
+
+  await Promise.all([notifyTeam({
     kind: "support_request",
     dedupeKey: `support_request:${request.id}`,
     title: "📨 Новое обращение с сайта (гость)",
     lines: [
       `Тема: ${categorySubjects[validation.category]}`,
+      `Имя: ${validation.contactName}`,
       `Ответить на: ${email}`,
+      `Телефон: ${phone}`,
       "Откройте раздел «Обращения», чтобы прочитать."
     ],
-    link: adminLink("/admin/requests")
-  });
+    link: requestLink
+  }), sendGuestSupportEmail({
+    requestId: request.id,
+    subject: categorySubjects[validation.category],
+    guestName: validation.contactName,
+    guestEmail: email,
+    guestPhone: phone,
+    message,
+    link: requestLink
+  })]);
 
   return {
     status: "success",

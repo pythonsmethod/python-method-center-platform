@@ -29,7 +29,9 @@ export default async function SupportPage() {
           <PublicSupportForm
             locale={locale}
             labels={{
+              name: t.formName,
               email: t.formEmail,
+              phone: t.formPhone,
               category: t.formCategory,
               categoryLogin: t.catLogin,
               categoryPayment: t.catPayment,
