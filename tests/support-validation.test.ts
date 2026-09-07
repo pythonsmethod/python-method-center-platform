@@ -12,6 +12,13 @@ const valid = {
 };
 
 describe("validatePublicSupportInput", () => {
+  it("requires a valid phone in both locales", () => {
+    for (const locale of ["ru", "en"] as const) {
+      for (const phone of ["", "   ", "abc", "123", "1".repeat(16)]) {
+        expect(validatePublicSupportInput({ ...valid, locale, phone })).toHaveProperty("error");
+      }
+    }
+  });
   it("accepts a valid guest request", () => {
     expect(validatePublicSupportInput(valid)).toEqual({
       category: "payment",

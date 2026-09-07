@@ -329,7 +329,7 @@ const REFUND_RU: LegalDocument = {
       heading: "4. Из чего складывается сумма",
       paragraphs: [
         "Сопровождение 5 недель: 1 200 USD программа + 5% сервисный сбор + 180 USD доставка индивидуальной формулы (200 капсул). Итого 1 440 USD.",
-        "Сопровождение 100 дней: 3 500 USD программа + 5% сервисный сбор. Итого 3 675 USD. Индивидуальная формула на весь срок (600 капсул) входит в стоимость.",
+        "Сопровождение 100 дней: 3 500 USD программа + 5% сервисный сбор + 180 USD доставка. Итого 3 855 USD. Индивидуальная формула на весь срок (600 капсул) входит в стоимость.",
         "Сервисный сбор 5% — это комиссия платёжной системы, он указан отдельно, а не спрятан в цене."
       ]
     },
@@ -405,7 +405,7 @@ const REFUND_EN: LegalDocument = {
       heading: "4. What the amount is made of",
       paragraphs: [
         "Five-week support programme: 1,200 USD for the programme + a 5% service fee + 180 USD for delivery of the individual formula (200 capsules). Total 1,440 USD.",
-        "100-day support programme: 3,500 USD for the programme + a 5% service fee. Total 3,675 USD. The individual formula for the whole term (600 capsules) is included.",
+        "100-day support programme: 3,500 USD for the programme + a 5% service fee + 180 USD delivery. Total 3,855 USD. The individual formula for the whole term (600 capsules) is included.",
         "The 5% service fee is the payment system's commission; it is shown separately rather than hidden inside the price."
       ]
     },

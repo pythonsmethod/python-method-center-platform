@@ -740,7 +740,7 @@ const ru = {
     freeTools: {
       badge: "Бесплатно для всех, у кого есть аккаунт",
       title: "Два инструмента — сразу после регистрации",
-      lead: "Это не тариф и не акция. Просто создайте аккаунт — и оба инструмента останутся с вами бесплатно.",
+      lead: "Просто создайте аккаунт — и оба инструмента останутся с вами бесплатно.",
       items: [
         {
           title: "Динамика показателей",
@@ -1062,9 +1062,8 @@ const ru = {
       "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Professor Python отправляет свою формулу — 200 капсул; вы оплачиваете только доставку ($180).",
     plan5Price: "$1 200 + 5% сбор + $180 доставка формулы = $1 440",
     plan100Title: "Сопровождение — 100 дней",
-    plan100Desc:
-      "Расширенное сопровождение кейса командой Python Method на 100 дней. В подарок Professor Python отправляет свою формулу — 600 капсул, и доставку Professor Python берёт на себя.",
-    plan100Price: "$3 500 + 5% сбор = $3 675"
+    plan100Desc: "Расширенное сопровождение кейса командой Python Method на 100 дней. В подарок Professor Python отправляет свою формулу — 600 капсул; стоимость доставки — $180.",
+    plan100Price: "$3 500 + 5% сбор + $180 доставка формулы = $3 855"
   },
   paymentSuccess: {
     eyebrow: "Оплата получена",
@@ -1074,7 +1073,7 @@ const ru = {
     steps: [
       "Оплата привязывается к вашему кейсу автоматически в течение нескольких минут (по аккаунту или email, указанному при оплате). Если через 10 минут её не видно в кабинете — напишите нам.",
       "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
-      "Professor Python лично отправит вам свою формулу в подарок (200 капсул на тарифе «5 недель», 600 капсул на тарифе «100 дней»). На тарифе «5 недель» доставка уже оплачена вами, на «100 дней» доставку Professor Python берёт на себя. Трек-номер придёт в чат.",
+      "Professor Python лично отправит вам свою формулу в подарок (200 капсул на тарифе «5 недель», 600 капсул на тарифе «100 дней»). На обоих тарифах доставка ($180) включена в итоговую сумму оплаты. Трек-номер придёт в чат.",
       "Professor Python и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
     ],
     cabinetCta: "Перейти в кабинет",
@@ -1904,7 +1903,7 @@ const en: typeof ru = {
     freeTools: {
       badge: "Free for everyone with an account",
       title: "Two tools — right after sign-up",
-      lead: "Not a plan and not a promotion. Simply create an account — and both tools stay with you for free.",
+      lead: "Simply create an account — and both tools stay with you for free.",
       items: [
         {
           title: "Progress chart",
@@ -2179,9 +2178,8 @@ const en: typeof ru = {
       "Case review, plan and team support for 5 weeks. As a gift, Professor Python sends his formula — 200 capsules; you only pay for delivery ($180).",
     plan5Price: "$1,200 + 5% fee + $180 formula delivery = $1,440",
     plan100Title: "Support — 100 days",
-    plan100Desc:
-      "Extended case support by the Python Method team for 100 days. As a gift, Professor Python sends his formula — 600 capsules, with delivery at Professor Python's own expense.",
-    plan100Price: "$3,500 + 5% fee = $3,675"
+    plan100Desc: "Extended case support by the Python Method team for 100 days. As a gift, Professor Python sends his formula — 600 capsules; delivery costs $180.",
+    plan100Price: "$3,500 + 5% fee + $180 formula delivery = $3,855"
   },
   paymentSuccess: {
     eyebrow: "Payment received",
@@ -2191,7 +2189,7 @@ const en: typeof ru = {
     steps: [
       "The payment is linked to your case automatically within a few minutes (by your account or the email used at checkout). If you don't see it in your account after 10 minutes — write to us.",
       "The team will confirm the activation of your support program — you will get a message in your account chat.",
-      "Professor Python will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On the “5 weeks” plan the delivery is already paid by you, on the “100 days” plan Professor Python covers the delivery himself. The tracking number will arrive in the chat.",
+      "Professor Python will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On both plans, delivery ($180) is included in the total payment. The tracking number will arrive in the chat.",
       "Professor Python and the team will study your case and begin the support program. All communication happens in your account."
     ],
     cabinetCta: "Go to my account",
