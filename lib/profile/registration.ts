@@ -1,4 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { tryAssistantWelcome } from "@/lib/assistant/outreach";
 
 // The profile row used to appear only when someone finished the
 // questionnaire. Until then a person existed in Supabase Auth and nowhere
@@ -27,7 +28,7 @@ export async function createRegistrationProfile(input: {
 
     // role and status are left to their defaults ("client", "registered") —
     // naming them here would let a registration form set staff fields.
-    await supabase.from("profiles").upsert(
+    const { error } = await supabase.from("profiles").upsert(
       {
         id: input.userId,
         email: input.email,
@@ -36,6 +37,7 @@ export async function createRegistrationProfile(input: {
       },
       { onConflict: "id" }
     );
+    if (!error) await tryAssistantWelcome(input.userId);
   } catch {
     // Deliberately silent: see above.
   }

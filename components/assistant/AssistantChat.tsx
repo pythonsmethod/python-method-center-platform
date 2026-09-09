@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import { AssistantOutreachPreference } from "@/components/assistant/AssistantOutreachPreference";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
@@ -447,6 +448,7 @@ export function AssistantChat({
 
   return (
     <div className="assistant-chat">
+      {historyEndpoint === "/api/assistant/history" ? <AssistantOutreachPreference locale={locale} /> : null}
       <div className="assistant-chat__messages" ref={scrollRef}>
         <div className="assistant-msg assistant-msg--assistant">{intro}</div>
         {restored > 0 ? (

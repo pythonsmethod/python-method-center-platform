@@ -1,8 +1,22 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-Last canonical update: 2026-09-06
+Last canonical update: 2026-09-09
 
 ## 1. Current position
+
+Non-medical chat increment (2026-09-09): saved Anham registration welcome and
+72-hour-minimum follow-ups are implemented locally, with atomic service-only
+delivery, sticky opt-outs and RU/EN history projection. Authorized synthetic
+acceptance on `ankh-staging` is CLOSED: concurrent cron/opt-out and browser
+RU → EN → RU in cabinet/admin passed. Staging exposed and verified fixes for
+busy-preference timeouts and the admin's hardcoded history locale. An optional
+profile UUID allowlist bounds rollout. Daily Hobby-compatible cron is configured;
+`ASSISTANT_OUTREACH_ENABLED` defaults off. No production migration, deploy or
+real-client send occurred. Synthetic fixtures and local keys were removed.
+Full suite: 1,032/1,032 tests;
+TypeScript and ESLint passed. Details and staging gates:
+[`docs/ankh/assistant_outreach.md`](docs/ankh/assistant_outreach.md).
+This increment does not change any clinical phase or production trust gate.
 
 The Ankh document/evidence foundation is implemented through Phase 2.8.
 

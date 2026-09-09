@@ -18,6 +18,7 @@ import {
   guardAssistantRequest
 } from "@/lib/assistant/guard";
 import { saveAssistantExchange } from "@/lib/assistant/history";
+import { isExplicitOutreachRefusal, stopAssistantOutreach } from "@/lib/assistant/outreach";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { clientIp } from "@/lib/utils/client-ip";
 import {
@@ -98,6 +99,25 @@ export async function POST(request: Request) {
 
   // Who is asking: a visitor, a registered person, or a paying client.
   const audience = await resolveAssistantAudience();
+  const latest = messages[messages.length - 1];
+  if (audience.profileId && audience.tier !== "guest" && latest?.role === "user"
+    && isExplicitOutreachRefusal(latest.content)) {
+    // Persist a refusal before any provider/quota check. An AI outage must
+    // never prevent a person from stopping unsolicited messages.
+    try {
+      await stopAssistantOutreach(audience.profileId);
+    } catch {
+      return NextResponse.json({ error: locale === "ru"
+        ? "Не удалось отключить сообщения. Попробуйте ещё раз."
+        : "Could not turn off messages. Please try again." }, { status: 503 });
+    }
+    const reply = locale === "ru"
+      ? "Автоматические сообщения отключены. Вы можете написать мне сами, когда захотите."
+      : "Automatic messages are off. You can still write to me whenever you like.";
+    await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId,
+      tier: audience.tier, question: latest.content, answer: reply, locale });
+    return NextResponse.json({ reply });
+  }
   const settings = TIER_SETTINGS[audience.tier];
 
   // Files in the chat are a paying-client capability: their AI reads the

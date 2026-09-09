@@ -643,3 +643,36 @@ This is a presentation and routing decision. It does not authorize automatic
 medical verification, diagnosis, client interpretation or trust-threshold
 weakening. Existing append-only Karen decisions remain authoritative and are
 preferred when projection-level duplicate rows are collapsed.
+
+---
+
+## D-056 — Proactive Anham chat uses fixed templates and atomic delivery
+
+Decision (2026-09-09): registration welcomes and later non-medical check-ins are
+stored once in the existing `assistant_messages` history. Each delivery retains
+RU/EN template text; active-locale projection does not create another message.
+An account-scoped service-only delivery cursor and PostgreSQL transaction own
+eligibility, preference locking, a minimum 72-hour interval and idempotency.
+Explicit outreach refusal is sticky and cannot be reset by registration or cron.
+
+Why: independent select/insert HTTP calls can duplicate messages, race with
+an opt-out or advance a cursor without saving the message. Fixed organizational
+templates avoid unreviewed medical interpretation and external AI processing.
+
+Constraint: `ASSISTANT_OUTREACH_ENABLED` is off by default. This local increment
+does not authorize a production migration, deploy, real-user send or change to
+Ankh clinical trust gates. The subsequently authorized staging acceptance verified
+real concurrent requests and the RU/EN UI; production activation remains separate.
+See `docs/ankh/assistant_outreach.md`.
+
+### D-056 addendum — skip locked preferences and scope staging sends
+
+Staging showed that waiting for an opt-out lock can exhaust the PostgREST
+statement timeout. The worker now skips locked existing preference rows and
+bounds concurrent initialization to 500 ms, deferring a busy profile to a later
+run. It never assumes the old preference permits a send. The corrective
+migration preserves delivery/cursor atomicity and unique numbering.
+
+`ASSISTANT_OUTREACH_PROFILE_IDS` optionally restricts sends to explicit UUIDs;
+invalid or empty configured scopes fail closed. This allowed real HTTP/browser
+acceptance on a shared staging branch without sending to other tasks' profiles.
