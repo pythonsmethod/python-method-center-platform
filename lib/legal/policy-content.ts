@@ -308,7 +308,7 @@ const REFUND_RU: LegalDocument = {
       heading: "1. Что можно попробовать до оплаты",
       paragraphs: [
         "Помощник центра на сайте и в личном кабинете, дневник показателей и чек-лист добавок доступны до всякой оплаты. Мы намеренно устроили так, чтобы вы платили не вслепую.",
-        "Разбор анализов (500 USD, сервисный сбор включён) и сопровождение оплачиваются по договору-оферте. Разбор начинается сразу после оплаты, поэтому на него распространяются те же правила, что и на сопровождение, — они описаны ниже."
+        "Полный разбор анализов (299 USD до 1 декабря 2026 года по времени Лос-Анджелеса, затем 500 USD; комиссия включена) и сопровождение оплачиваются по договору-оферте. Разбор начинается сразу после оплаты, поэтому на него распространяются те же правила, что и на сопровождение, — они описаны ниже."
       ]
     },
     {
@@ -328,6 +328,7 @@ const REFUND_RU: LegalDocument = {
     {
       heading: "4. Из чего складывается сумма",
       paragraphs: [
+        "Полный разбор анализов с рекомендациями Карена (Professor Python) по восстановлению и реабилитации — 299 USD вместо 500 USD до 1 декабря 2026 года (до 00:00 по времени Лос-Анджелеса). С 1 декабря 2026 года стоимость составляет 500 USD. Это итоговая стоимость без дополнительных сборов, временная цена, не акция.",
         "Сопровождение 5 недель: 1 200 USD программа + 5% сервисный сбор + 180 USD доставка индивидуальной формулы (200 капсул). Итого 1 440 USD.",
         "Сопровождение 100 дней: 3 500 USD программа + 5% сервисный сбор + 180 USD доставка. Итого 3 855 USD. Индивидуальная формула на весь срок (600 капсул) входит в стоимость.",
         "Сервисный сбор 5% — это комиссия платёжной системы, он указан отдельно, а не спрятан в цене."
@@ -384,7 +385,7 @@ const REFUND_EN: LegalDocument = {
       heading: "1. What you can try before paying",
       paragraphs: [
         "The centre's assistant on the site and in your cabinet, the metrics diary and the supplement checklist are available before any payment. We arranged it this way deliberately, so that you are not paying blind.",
-        "The analyses review (500 USD, service fee included) and the support programmes are paid under the offer contract. The review begins immediately after payment, so the same rules apply to it as to the support programmes — they are set out below."
+        "The full test-results review (299 USD until 1 December 2026, Los Angeles time, then 500 USD; processing fee included) and the support programmes are paid under the offer contract. The review begins immediately after payment, so the same rules apply to it as to the support programmes — they are set out below."
       ]
     },
     {
@@ -404,6 +405,7 @@ const REFUND_EN: LegalDocument = {
     {
       heading: "4. What the amount is made of",
       paragraphs: [
+        "A full review of test results with recovery and rehabilitation recommendations from Karen (Professor Python) costs 299 USD instead of 500 USD until 1 December 2026 (before 00:00 Los Angeles time). From 1 December 2026, the price is 500 USD. This is the final price with no additional fees, a temporary price, not a promotion.",
         "Five-week support programme: 1,200 USD for the programme + a 5% service fee + 180 USD for delivery of the individual formula (200 capsules). Total 1,440 USD.",
         "100-day support programme: 3,500 USD for the programme + a 5% service fee + 180 USD delivery. Total 3,855 USD. The individual formula for the whole term (600 capsules) is included.",
         "The 5% service fee is the payment system's commission; it is shown separately rather than hidden inside the price."

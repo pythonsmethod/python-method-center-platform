@@ -31,7 +31,8 @@ import type { Locale } from "@/lib/i18n/locale";
 // are unchanged. Anyone who accepted v5 or earlier is recorded as having
 // accepted that edition.
 // v7 (2026-09-06): owner adds $180 delivery to the 100-day plan, total $3,855.
-export const OFFER_VERSION = "oferta-v7";
+// v8 (2026-09-09): full review at $299 until 1 December 2026, then $500; fees included.
+export const OFFER_VERSION = "oferta-v8";
 
 // The superseded edition, kept reachable because clients accepted it and
 // clause 12 says their terms do not change.
