@@ -1,3 +1,4 @@
+import { getPaymentPlans } from "@/lib/payments/config";
 import {
   getGuestDailyTotalLimit,
   getPublicAssistantMode
@@ -146,12 +147,12 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     {
       name: "Кнопки оплаты на сайте",
       ok: Boolean(
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW?.trim() &&
+        getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
           process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
           process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
       ),
       detail:
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW?.trim() &&
+        getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
         process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
           ? "Все три ссылки на тарифы активны"

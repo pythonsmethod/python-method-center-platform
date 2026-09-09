@@ -368,3 +368,9 @@ technical rows stay in a closed audit archive without confirmation controls.
 This reduces manual clicks but does not enable production auto-verification or
 change source/extracted evidence. Production publication is not part of this
 local increment.
+
+## 2026-09-09 — Tariff release preparation
+
+Owner authorized production publication of the full review (299 USD, fees included, until 1 December 2026 Los Angeles time) and the 100-day support link (3,855 USD). Prepared on current production main, isolated from unrelated local changes. Offer amendment uses v8 because production already used v7. See docs/RELEASE_TARIFFS_2026_09_09.md. Build, typecheck and lint passed; production URL variables configured. No schema/PHI/Ankh phase changes. Release completion and live verification will be recorded after deployment.
+
+Validation follow-up: all 32 targeted tests passed across professor-page, review-product, review-price-deadline and offer-version. git diff --check passed. GO for publishing this scoped release; actual paid transaction remains untested.

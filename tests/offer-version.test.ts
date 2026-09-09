@@ -30,6 +30,7 @@ import { OFFER_VERSION } from "@/lib/legal/offer";
 //
 // Never edit an existing entry.
 const FINGERPRINTS: Record<string, string> = {
+  "oferta-v8": "c55d205e4f4e578598f7ec9f61e30209189976670cd55eac2b013d2875b17513",
   "oferta-v4": "012a725c1a4ed0aab17db4aa4b8151daeecf0b2abbb39b39e86c782a4276c27d",
   "oferta-v5": "934468238b7b8fb154cc52738b24770c43a95f7dee75a3c1c33ae3217cd079dc",
   // v6 (2026-09-02): the analyses review becomes a paid format at 500 USD,
