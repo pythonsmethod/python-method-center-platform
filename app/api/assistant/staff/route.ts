@@ -10,9 +10,13 @@ import { getStaffUserState } from "@/lib/auth/require-staff";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { isUuid } from "@/lib/utils/uuid";
 
+import { saveAssistantExchange } from "@/lib/assistant/history";
+import { memoryCollectionFromCommand } from "@/lib/assistant/memory";
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
+  const questionCreatedAt = new Date().toISOString();
   const auth = await getStaffUserState();
 
   if (auth.status !== "authorized") {
@@ -55,6 +59,29 @@ export async function POST(request: Request) {
     );
   }
 
+  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+  const respondWithReply = async (reply: string) => {
+    const payload = body as { transient?: unknown; displayText?: unknown; locale?: unknown };
+    const persistence = payload.transient === true ? {} : await saveAssistantExchange({
+      profileId: auth.userId,
+      questionCreatedAt,
+      caseId: typeof rawCaseId === "string" && isUuid(rawCaseId) ? rawCaseId : null,
+      tier: assistantRole,
+      question: typeof payload.displayText === "string" && payload.displayText.trim()
+        ? payload.displayText : messages[messages.length - 1].content,
+      answer: reply,
+      locale: payload.locale === "en" ? "en" : "ru"
+    });
+    return NextResponse.json({ reply, ...persistence });
+  };
+
+  const english = (body as { locale?: unknown })?.locale === "en";
+  if ((body as { memoryConfirmation?: unknown })?.memoryConfirmation === true && !attachments && memoryCollectionFromCommand(messages[messages.length - 1].content)) {
+    return respondWithReply(english
+      ? "I prepared this for saving. Please confirm below what to do: save it to the method, the book, client-answer memory, or do not save it."
+      : "Я подготовил это к сохранению. Подтвердите ниже, что именно сделать: сохранить в метод, в книгу, в память ответов клиентам или не сохранять.");
+  }
+
   // A provider named in the request body is honoured only for the founder;
   // for everyone else the choice is made here and the name never comes back.
   const showProviders = canSeeProviderNames(auth.email);
@@ -72,7 +99,7 @@ export async function POST(request: Request) {
   // Optional case binding: the assistant on a case page receives a live
   // snapshot of that case from the database (metadata, questionnaire,
   // documents list, payments, history).
-  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+
 
   if (typeof rawCaseId === "string" && isUuid(rawCaseId)) {
     const caseContext = await buildCaseContext(rawCaseId);
@@ -118,5 +145,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 502 });
   }
 
-  return NextResponse.json({ reply: result.reply });
+  return respondWithReply(result.reply);
 }

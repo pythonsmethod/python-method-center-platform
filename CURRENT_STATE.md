@@ -360,3 +360,7 @@ local increment.
 Owner authorized production publication of the full review (299 USD, fees included, until 1 December 2026 Los Angeles time) and the 100-day support link (3,855 USD). Prepared on current production main, isolated from unrelated local changes. Offer amendment uses v8 because production already used v7. See docs/RELEASE_TARIFFS_2026_09_09.md. Build, typecheck and lint passed; production URL variables configured. No schema/PHI/Ankh phase changes. Release completion and live verification will be recorded after deployment.
 
 Validation follow-up: all 32 targeted tests passed across professor-page, review-product, review-price-deadline and offer-version. git diff --check passed. GO for publishing this scoped release; actual paid transaction remains untested.
+
+## 2026-09-09 — Assistant history publication
+
+Owner authorized production publication. Isolated release codex/publish-assistant-history-20260909 is based on production d9e001f and adds persistence for private founder/Karen chat, dated cross-locale history, older-page loading, explicit errors and bounded acknowledged retries. Existing assistant_messages schema/RLS reused; no migrations, clinical changes or existing-message deletion. Separate concurrent knowledge/persona work is excluded. 1019/1019 release tests pass; see docs/architecture/ASSISTANT_CONVERSATION_HISTORY.md for scope, safeguards and acceptance record.

@@ -647,3 +647,7 @@ preferred when projection-level duplicate rows are collapsed.
 ## 2026-09-09 — Publish the two approved tariffs
 
 Publish temporary full-review price 299 USD with Stripe fees included and the supplied review and 100-day support links, using existing production code as base. Preserve current production offer fingerprints; new review terms are oferta-v8. Other uncommitted local work is outside this release. Existing 500 USD review link is used only from 1 December 2026 onward when no new 500 link is configured.
+
+## 2026-09-09 — Durable assistant history publication boundary
+
+Conversation history is stored in existing assistant_messages, scoped to the authenticated author and private/client tier family; personal/private case dialogues remain separate. Locale is source metadata, not a visibility filter. Original text/timestamps are retained and browsing pagination is separate from bounded model context. Persisted conversation does not authorize knowledge publication or clinical trust promotion. Publish this fix independently of concurrent founder-knowledge/persona work. No schema or production processing-gate change.
