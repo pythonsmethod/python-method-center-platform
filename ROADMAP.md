@@ -348,3 +348,5 @@ Each new phase must solve a demonstrated gap in:
 - workflow;
 - scalability;
 - maintainability.
+
+- 2026-09-09: Publish approved full-review and 100-day payment links; preserve Ankh production boundaries. Retire the 299 USD Stripe link at the 1 December cutoff and verify the 500 USD replacement before that date.

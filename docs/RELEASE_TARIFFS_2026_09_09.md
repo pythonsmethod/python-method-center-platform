@@ -1,0 +1,11 @@
+# Release: review and 100-day payment links — 2026-09-09
+
+Scope: publish the owner-approved 299 USD full review with Karen's recovery/rehabilitation recommendations until 1 December 2026, Los Angeles time, then 500 USD; fees included. Connect the verified 299 USD and 3,855 USD 100-day Stripe Payment Links.
+
+Based on production main 369733f7de8a18baa79e595226bcca70fb5c068c, preserving already-published support/cabinet code and excluding unrelated local edits. The production offer already used v7: this amendment uses v8 and preserves all production fingerprints. Existing preliminary_assessment payment handling, account reference and support-only entitlement behavior remain intact. Delayed 500 USD payments remain recognized. The existing legacy 500 USD link configuration remains the post-deadline fallback.
+
+Changed: lib/config/review.ts, lib/payments/config.ts and stripe.ts, lib/i18n/dictionaries.ts, lib/assistant/prompts.ts, lib/founder/queries.ts, lib/legal/offer.ts, offer-content.ts and policy-content.ts, .env.example, review-product/offer-version tests, new review-price-deadline tests and this release record. Runtime dictionary copy and assistant pricing refresh per request. No schema, PHI transfer, new Ankh processing, medical-digest or cron changes.
+
+Checks: production build, typecheck and lint passed. Initial full suite 980/982 passed; two professor-page numeric-copy checks failed after adding the new price to its CTA. CTA adjusted to the service title; targeted follow-up recorded in CURRENT_STATE. Synthetic suite reported zero critical extraction errors, zero false VERIFIED critical errors and zero security issues. Generated benchmark timestamps are excluded from this release.
+
+Production configuration: NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299=https://buy.stripe.com/5kQdR93o9cy4bDhcxqdnW0E; NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W=https://buy.stripe.com/9B628rgaV2Xu5eTgNGdnW0D. No production secrets downloaded. Checkout URLs were inspected read-only; no money charged. Live release verification must not be described as an end-to-end paid transaction. Retire the 299 USD Stripe link at the December cutoff: changing site price alone does not disable a public Stripe link.

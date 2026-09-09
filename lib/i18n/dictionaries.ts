@@ -1,3 +1,4 @@
+import { getReviewCopy } from "@/lib/config/review";
 import type { Locale } from "@/lib/i18n/locale";
 import type { PluralForms } from "@/lib/i18n/plural";
 
@@ -2290,5 +2291,16 @@ const en: typeof ru = {
 export type Dictionary = typeof ru;
 
 export function getDictionary(locale: Locale): Dictionary {
-  return locale === "en" ? en : ru;
+  const base = locale === "en" ? en : ru;
+  const review = getReviewCopy(locale);
+  return {
+    ...base,
+    review: { ...base.review, title: review.title, text: review.description, price: review.price, note: review.promo.note },
+    reviewDetails: review.details,
+    meta: { ...base.meta, reviewTitle: review.title, reviewDescription: review.price },
+    payment: { ...base.payment, planReviewTitle: review.title, planReviewDesc: review.description, planReviewPrice: review.price },
+    professor: { ...base.professor, ctaReview: review.title },
+    landing: { ...base.landing, paths: { ...base.landing.paths, reviewLabel: review.title, reviewNote: review.price } },
+    altPayment: { ...base.altPayment, planLabels: { ...base.altPayment.planLabels, preliminary_assessment: review.title + " — " + review.price } }
+  };
 }
