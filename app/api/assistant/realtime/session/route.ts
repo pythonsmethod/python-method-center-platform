@@ -6,6 +6,7 @@ import { resolveOutputVoice } from "@/lib/assistant/voice-options-server";
 import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
 import { assistantSource, renderSourceContext } from "@/lib/assistant/source-context";
+import { clientVoiceInstructions } from "@/lib/assistant/client-voice-context";
 
 export const runtime = "nodejs";
 
@@ -32,7 +33,7 @@ export async function POST(request: Request) {
     form.set("sdp", body.sdp);
     form.set("session", JSON.stringify({
       type: "realtime", model: config.model, output_modalities: ["audio"],
-      instructions: withFactualHonesty(`${voiceInstructions(actor, locale)}\n${remembered}`), max_output_tokens: 900,
+      instructions: withFactualHonesty(`${actor.scope === "client" ? await clientVoiceInstructions(request, actor, locale) : voiceInstructions(actor, locale)}\n${remembered}`), max_output_tokens: 900,
       audio: {
         input: { transcription: { model: config.transcriptionModel, language: locale }, turn_detection: { type: "semantic_vad", eagerness: "medium", create_response: false, interrupt_response: true } },
         output: { voice: selectedVoice, speed: 1 },

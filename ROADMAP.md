@@ -19,6 +19,11 @@ docs/ankh/history_recovery_and_honesty_v3.md.
 
 ## North Star
 
+Latest correction: Elena's preview is CLIENT-only, on her own Case/account.
+Former internal delegation is revoked. The rollout remains a single-account
+client pilot, not a public release or paid-tier upgrade. Validate own-context
+voice and client chat history through /cabinet/assistant.
+
 Assistant-only delegation: confirmed owner-approved accounts use /assistant
 without a platform role promotion. Delegate history remains private; suspended,
 closed, anonymous and unlisted accounts are denied. Release verification follows
