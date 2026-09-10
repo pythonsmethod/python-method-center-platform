@@ -10,6 +10,11 @@ staff catalog, internal drafts, other clients, write commands or new extraction.
 RU/EN feature list and voice disclosure updated. Existing production columns
 were checked read-only. Release evidence: docs/ankh/client_complete_tools.md.
 
+Published: PR #167, main 0fd7e266, production
+dpl_6jwmpVh1Ac2dYsiWCdv5YKV9WmVV READY. Full regression 1606 tests passed;
+final integrated checks 144 tests plus TypeScript/ESLint/diff passed. Production
+unauthenticated tools request denied with 401. GO for selected-client testing.
+
 ## Full client assistant preview — 2026-09-09
 
 Owner expanded Elena's pilot to all existing client assistant capabilities.

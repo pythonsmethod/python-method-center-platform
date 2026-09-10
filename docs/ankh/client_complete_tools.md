@@ -46,6 +46,17 @@ and measurement/sleep/supplement diaries. Four provider tool rounds bound one
 answer; unfinished coverage must remain explicit. No impersonated Elena login
 or microphone test. Live authenticated RU/EN acceptance remains pending.
 
-J/K/L. Implementation validated; publication pending. GO for scoped release
-after final checks/build, then selected-client acceptance at /cabinet/assistant.
+J/K/L. Implementation/publication CLOSED; GO for selected-client acceptance at
+/cabinet/assistant. PR #167 merged as 0fd7e26621831840fa6a2319bc6a52d7f0bdc528.
+Preview dpl_8QvZie2PN6hWZ7So2nNopjH11ghk and production
+dpl_6jwmpVh1Ac2dYsiWCdv5YKV9WmVV are READY. A production request without
+authentication to the voice tools endpoint returned 401. No client data or
+provider call was used in that check. Fresh authenticated sessions remain the
+next acceptance step; live microphone and RU/EN client UI are not claimed tested.
+
+Final candidate retained the separately published dangerous-assistance rules.
+Integrated targeted validation: 144 tests in 5 files passed; TypeScript, ESLint
+and git diff --check passed. Receipt version 5 regression: 59 tests passed.
+The unrelated anham-mobile-app project still fails with its existing
+"No Next.js version detected" configuration error; website builds passed.
 General client rollout and clinical processing remain unchanged.
