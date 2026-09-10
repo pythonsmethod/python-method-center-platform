@@ -94,7 +94,11 @@ export class RealtimeTurns {
     if (active?.input.text) {
       const pair: VoiceExchange = { turnId: active.input.id, user: active.input.text, assistant: active.text?.slice(0, 12_000) ?? "", ...(!save ? { state: "interrupted" as const } : {}), ...this.webFields(active) };
       this.options.onTranscript?.(pair); this.completed(pair);
-      if (save) this.contextIds.push(active.input.id, ...active.chainIds, ...(active.outputIds ?? []));
+      // Interruption cancels playback, not the user's contribution. Retain
+      // recognized input even when generation fails or the user interrupts.
+      // Only completed/heard output and its tool chain enter shared context.
+      this.contextIds.push(active.input.id);
+      if (save) this.contextIds.push(...active.chainIds, ...(active.outputIds ?? []));
     }
     if (!save) this.incomplete();
   }

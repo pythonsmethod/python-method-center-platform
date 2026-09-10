@@ -997,6 +997,17 @@ Owner explicitly approved both voice-history production migrations and site enab
 
 The owner confirmed an existing client account for founder-equivalent assistant capabilities. Use an explicit server-only assistant allowlist and /assistant entry point, not a profile role promotion or FOUNDER_EMAILS. Retain own-profile history, account-status checks and existing non-assistant authorization. See docs/ankh/assistant_delegate_access.md.
 
+## 2026-09-09 — Voice conversation continuity
+
+Isolated fix based on main 77258dc: retain recognized user turns after voice interruption, cancellation or failed output; correct instructions denying supplied history; label restored interrupted AI replies. Five new behavioral tests reproduced the loss before correction. No schema, PHI test data or clinical phase changes. Production acceptance remains open; see docs/ankh/voice_conversation_memory.md for validation and exact release step.
+
+## 2026-09-09 — Server conversation recall
+
+Client and private text generation now retrieve own stored conversation server-side: 60 recent rows plus up to 12 older lexical matches, constrained by authenticated profile, tier family and exact personal/Case scope, without locale filtering. Existing staff voice text-bridge calls inherit this context. Bounded, source-tagged excerpts remain unverified conversation; no schema or clinical gate changes. 1550/1550 tests across 168 files PASS; TypeScript, ESLint PASS. Isolated implementation CLOSED / GO for release; production recall acceptance NOT CLOSED. See docs/ankh/server_conversation_recall.md. Retains voice interruption correction 59e9306.
+
+## 2026-09-09 — Lifetime text and voice conversation archive
+
+Owner requires no age-based expiry for saved conversations with clients, Karen and Anna. Existing assistant_messages remains canonical. Native text and realtime tools now search/page/read full own messages of any age and language, including voice transcripts; authenticated owner/tier isolation and original Case labels remain. Do not add a rolling retention purge or replace originals with summaries. Request context/tool budgets do not limit archive age. Existing explicit deletion workflows remain. OpenAI archive calls use Responses store:false with unchanged model/reasoning; Claude uses native tools. Synthetic 2001-record live checks passed for both providers. No schema or clinical-gate change. See docs/ankh/lifetime_conversation_memory.md for limits, final checks and release status.
 ## 2026-09-09 — Elena is a CLIENT preview participant
 
 Owner corrected the scope: own Case/client experience, not staff-equivalent authority. Revoke the delegate grant including stale configuration. Enable only the confirmed account through ANHAM_CLIENT_VOICE_TEST_EMAILS, preserving client tier, own-context checks and no staff tools. Prior delegation decisions are superseded. See docs/ankh/elena_client_voice_pilot.md.

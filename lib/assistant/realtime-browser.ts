@@ -1,6 +1,7 @@
 import { RealtimeTurns, type VoiceExchange, type VoiceTranscript, type VoiceToolCall } from "./realtime-turns";
 import type { VoiceError, VoiceState } from "./realtime-contract";
 import type { Locale } from "@/lib/i18n/locale";
+const isOwnArchiveTool = (name: string) => name === "search_conversation_history" || name === "read_conversation_message";
 
 type Options = { voice?: string; locale: Locale; scope: "client" | "staff"; caseId?: string; onState: (state: VoiceState) => void; onError: (error: VoiceError) => void; onIncomplete: () => void; onDuration: () => void; onExchange: (pair: VoiceExchange, receipt: string) => void; onTranscript?: (text: VoiceTranscript) => void };
 
@@ -90,7 +91,7 @@ export class RealtimeBrowser {
   }
   private fail(error: VoiceError) { this.stop(); this.options.onError(error); this.options.onState("error"); }
   private async readSite(call: VoiceToolCall, userTurn: { id: string; text: string }) {
-    if (this.closed || this.options.scope !== "staff") return { error: "forbidden" };
+    if (this.closed || (this.options.scope !== "staff" && !isOwnArchiveTool(call.name))) return { error: "forbidden" };
     this.options.onState(call.name === "search_web" ? "searching" : "reading");
     if (call.arguments.length > 2000) return { error: "invalid" };
     const response = await fetch("/api/assistant/realtime/tools", {
