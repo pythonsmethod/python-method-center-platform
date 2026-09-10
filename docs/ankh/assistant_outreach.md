@@ -1,8 +1,8 @@
 # Сохранённые сообщения Анхама / Saved Anham outreach
 
 Date: 2026-09-09. Scope: implementation, local regression, authorized synthetic
-staging acceptance and final release preparation. Production untouched; the
-production migration attempt was rejected by automatic approval review.
+staging acceptance and explicitly authorized disabled production rollout.
+Both production migrations are applied; deployment verification is pending.
 
 ## A. Before
 
@@ -26,7 +26,8 @@ jobs already handled document processing and the medical digest.
   processing classifications.
 - Store one row per delivery in **the existing `assistant_messages` history**,
   with immutable RU/EN template copies. The reader chooses the active language
-  without making another delivery or exposing the other-language conversation.
+  without making another delivery. Main's original conversation history remains
+  available in all languages, with private/client tier and case isolation.
 - The client chat has an authenticated stop button. Recognized explicit RU/EN
   refusal commands stop outreach before AI provider/quota checks. A DB trigger
   also catches saved user refusals from other paths, including voice transcripts.
@@ -82,9 +83,9 @@ profiles or contact external services.
 
 ## E. Verification
 
-- `npm test` after integration with current main: **132 files passed, 1,058 tests passed, 0 failures**.
-- New outreach coverage: **54 tests**, including 21 SQL integration cases,
-  30 cron/preferences/registration/history cases and 3 refusal-route cases.
+- `npm test` after integration with main `d810dd8`: **141 files passed, 1,143 tests passed, 0 failures**.
+- New outreach coverage: **55 tests**, including 21 SQL integration cases,
+  30 cron/preferences/registration/history cases and 4 refusal-route cases.
 - `npm run typecheck`: passed, exit 0.
 - `npm run lint`: passed, exit 0; no warnings.
 - `git diff --check`: passed (Git may print Windows line-ending notices).
@@ -159,29 +160,47 @@ other user's preference. State writes cannot reset message numbering.
 Real-user sends, external notifications,
 medical generation, auto-verification, new Case/status models, automatic
 re-enrollment and self-learning. Existing document/clinical production gates
-are unchanged. Production migration/deployment remain pending the explicit
-authorization required by automatic approval review.
+are unchanged. Both production migrations are now explicitly authorized and
+applied; activation and real-user sends remain excluded.
 
 ## J. Phase
 
 **CLOSED for implementation and the authorized synthetic staging acceptance.** This is a separate
 non-medical chat feature, not closure of Ankh clinical Phase 2.9 or Phase 3.
-Final release review and integration are complete. Production rollout is
-**NOT CLOSED**: automatic approval review rejected the migration attempt and
-requires explicit production schema authorization.
+Final release review, integration and production migrations are complete.
+Production rollout is **NOT CLOSED** until deployment verification finishes.
 
 ## K. GO / NO-GO
 
-**GO** for the prepared release after explicit production schema authorization.
+**GO** for the explicitly authorized release with delivery disabled.
 **NO-GO** for production activation or real-client delivery in this task.
 
 ## L. Exact next action
 
-Obtain explicit authorization to apply the two named outreach migrations to
-production project `zdrfttgwnyorifmpqgwe`, then merge/deploy the prepared release
-with outreach disabled. Apply both migrations before the new history reader
-is deployed. Real-client activation and its initial scope remain separate
+Merge/deploy PR #156 with outreach disabled and verify the deployed routes,
+cron authorization and zero delivery. Both production migration prerequisites
+are satisfied. Real-client activation and its initial scope remain separate
 owner decisions.
+
+## Explicitly authorized production rollout — 2026-09-09
+
+After the previous approval rejection, the owner explicitly confirmed both
+named production migrations and publication with automatic messages disabled.
+Applied `assistant_outreach` and `assistant_outreach_skip_busy_preferences`
+unchanged to `zdrfttgwnyorifmpqgwe`, in that order, before deployment. SQL verified
+RLS enabled, no anon/client worker execution or state access, service execution
+enabled, UTC/empty search_path/500ms lock_timeout, state rows=0 and sends=0.
+Security advisors returned INFO only, including the intentional service-only
+state table with no client RLS policies; no WARN/ERROR findings.
+
+Vercel production `ASSISTANT_OUTREACH_ENABLED=false` was saved and its actual
+value verified in project settings before deployment. No secret was revealed.
+Integrated main `d810dd8`: history now retains original content across languages,
+private/client tiers and pagination, while only outreach templates translate.
+Opt-out acknowledgement now returns saved/messages and request timestamps from
+the current persistence API; a new regression verifies an unsaved acknowledgement
+still reports the already-persisted opt-out honestly. Full regression: 1,143/1,143
+tests in 141 files; TypeScript, ESLint and diff check passed.
 
 ## Final release preparation — 2026-09-09
 

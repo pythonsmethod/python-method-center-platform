@@ -11,14 +11,15 @@ acceptance on `ankh-staging` is CLOSED: concurrent cron/opt-out and browser
 RU → EN → RU in cabinet/admin passed. Staging exposed and verified fixes for
 busy-preference timeouts and the admin's hardcoded history locale. An optional
 profile UUID allowlist bounds rollout. Daily Hobby-compatible cron is configured;
-`ASSISTANT_OUTREACH_ENABLED` defaults off. No production migration, deploy or
-real-client send occurred. Synthetic fixtures and local keys were removed.
-Final release review is complete and current `main` tariff changes are merged.
-Production migration was rejected by automatic approval review: explicit
-authorization naming the production schema change is required before rollout.
-No production schema change or deployment occurred. Vercel's project variable
-list has no outreach enable flag, so delivery remains disabled by default.
-Full suite after integration: 1,058/1,058 tests in 132 files;
+`ASSISTANT_OUTREACH_ENABLED` defaults off. Synthetic fixtures and local keys
+were removed. After explicit owner confirmation, both outreach migrations were
+applied to production `zdrfttgwnyorifmpqgwe`; server-only grants and zero sends
+were verified. Vercel production now explicitly has the enable flag set to
+`false`. PR #156 integrates current main through `d810dd8`, preserving history,
+Anna memory, tariffs and safety changes. Publication verification is pending.
+Ordinary history retains all original languages and private/client isolation;
+only stored outreach templates are projected into the active locale.
+Full suite after integration: 1,143/1,143 tests in 141 files;
 TypeScript and ESLint passed. Details and staging gates:
 [`docs/ankh/assistant_outreach.md`](docs/ankh/assistant_outreach.md).
 This increment does not change any clinical phase or production trust gate.

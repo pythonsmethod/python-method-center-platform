@@ -681,7 +681,12 @@ Release preparation: preserve current main's published tariffs. Apply both
 outreach migrations before deploying the new history reader and keep delivery
 disabled. Automatic approval review rejected the production migration under
 the general "next step" authorization; explicit production schema authorization
-is now the pending gate. No production change was executed.
+was the pending gate. The owner subsequently explicitly confirmed both
+production migrations and publication with sending disabled. Both migrations
+are now applied; Vercel production flag is explicitly `false`. Preserve main's
+all-language original history, pagination and private/client tier boundaries;
+translate only saved outreach templates. Opt-out acknowledgements return the
+existing durable-history saved/messages contract, including storage failure.
 
 ## 2026-09-09 — Publish the two approved tariffs
 
