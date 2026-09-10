@@ -838,3 +838,4 @@ as author of the Center methodology. Shared text/voice instructions provide RU/E
 wording and require the exact Latin spelling Professor Python in every language.
 No roles, schema, clinical logic or historical/source text changes.
 See docs/ankh/anham_approved_authorship.md for validation and release evidence.
+Approved authorship published: PR #170, 849d120, production dpl_4D7C8zSB9kcsVo5r3iuhJsgb879c READY.
