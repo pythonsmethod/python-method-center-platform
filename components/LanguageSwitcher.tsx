@@ -3,15 +3,10 @@
 import { useFormStatus } from "react-dom";
 import type { Locale } from "@/lib/i18n/locale";
 import { setLocale } from "@/lib/i18n/set-locale";
-import { localizedHref } from "@/lib/i18n/routing";
+import { languageSwitchHref } from "@/lib/i18n/routing";
 
 type LanguageSwitcherProps = {
   locale: Locale;
-  // The page being read, in Russian address terms. Given where a page has
-  // an address in each language, so the switch lands on the same page rather
-  // than the home one; omitted inside the cabinet, which has one address and
-  // follows the cookie.
-  path?: string;
 };
 
 function LocaleButton({
@@ -48,14 +43,14 @@ function LocaleButton({
   );
 }
 
-export function LanguageSwitcher({ locale, path }: LanguageSwitcherProps) {
+export function LanguageSwitcher({ locale }: LanguageSwitcherProps) {
   const choose = (value: Locale) => {
     // The cookie is written on the server, where it cannot be refused by a
     // privacy mode and cannot end up scoped to the wrong host. Then the page
     // is loaded afresh, at the address that page has in the chosen language.
     void setLocale(value).then(() => {
       window.location.assign(
-        path ? localizedHref(path, value) : window.location.pathname
+        languageSwitchHref(window.location, value)
       );
     });
   };

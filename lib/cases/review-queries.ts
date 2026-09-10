@@ -3,6 +3,7 @@ import {
   type CaseDocumentRow
 } from "@/lib/cases/case-documents";
 import type { CaseReview } from "@/lib/cases/review-state";
+import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 // The stored reading, if there is one. Read with the service key: the
@@ -14,7 +15,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 // convenience, not the case.
 export async function getCaseReview(
   caseId: string,
-  documents: Pick<CaseDocumentRow, "id" | "created_at">[]
+  documents: Pick<CaseDocumentRow, "id" | "created_at">[],
+  locale?: "ru" | "en"
 ): Promise<CaseReview | null> {
   const supabase = createSupabaseServiceClient();
 
@@ -47,8 +49,8 @@ export async function getCaseReview(
 
   return {
     id: String(data.id),
-    summary: String(data.summary ?? ""),
-    draft: String(data.draft ?? ""),
+    summary: normalizeAnhamResponse(String(data.summary ?? ""), locale),
+    draft: normalizeAnhamResponse(String(data.draft ?? ""), locale),
     documentsFingerprint: String(data.documents_fingerprint ?? ""),
     documentsCount: Number(data.documents_count ?? 0),
     createdAt: String(data.created_at ?? ""),

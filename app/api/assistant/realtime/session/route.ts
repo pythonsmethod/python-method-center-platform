@@ -3,6 +3,9 @@ import { issueVoiceReceipt, readVoiceBody, reserveVoiceSession, resolveVoiceActo
 import type { Locale } from "@/lib/i18n/locale";
 import { validatedTimeZone, voiceSiteTools } from "@/lib/assistant/voice-site-tools";
 import { resolveOutputVoice } from "@/lib/assistant/voice-options-server";
+import { getOwnAssistantHistory } from "@/lib/assistant/history";
+import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
+import { assistantSource, renderSourceContext } from "@/lib/assistant/source-context";
 
 export const runtime = "nodejs";
 
@@ -17,11 +20,19 @@ export async function POST(request: Request) {
     const selectedVoice = resolveOutputVoice(actor, body.voice);
     const timeZone = validatedTimeZone(body.timeZone);
     await reserveVoiceSession(actor, config.dailyLimit);
+    const history = await getOwnAssistantHistory(actor.profileId, locale, 24, { private: actor.scope !== "client", caseId: actor.caseId });
+    const remembered = history.status === "ready"
+      ? renderSourceContext(history.messages.map((message, index) => assistantSource({
+          id: `history_${index}`, kind: message.role === "user" ? "user_report" : "ai_draft",
+          origin: "assistant_chat_messages", availability: "available", retrievedAt: new Date().toISOString(),
+          recordedAt: message.created_at, freshness: "historical", scope: "saved conversation only; not proof of facts or actions", data: message.content
+        })))
+      : renderSourceContext([assistantSource({ id: "history", kind: "ai_draft", origin: "assistant_chat_messages", availability: "unavailable", retrievedAt: new Date().toISOString(), scope: "saved conversation", data: null })]);
     const form = new FormData();
     form.set("sdp", body.sdp);
     form.set("session", JSON.stringify({
       type: "realtime", model: config.model, output_modalities: ["audio"],
-      instructions: voiceInstructions(actor, locale), max_output_tokens: 900,
+      instructions: withFactualHonesty(`${voiceInstructions(actor, locale)}\n${remembered}`), max_output_tokens: 900,
       audio: {
         input: { transcription: { model: config.transcriptionModel, language: locale }, turn_detection: { type: "semantic_vad", eagerness: "medium", create_response: false, interrupt_response: true } },
         output: { voice: selectedVoice, speed: 1 },

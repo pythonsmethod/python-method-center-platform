@@ -1,8 +1,160 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Authorized honesty publication — 2026-09-09
+
+The owner explicitly instructed “Публикуй”. The release candidate integrates main
+66fa3bd (PR #158 response style and route-preserving locale changes), while keeping
+the existing history timestamp fix, founder memory and disabled outreach.
+Final merged regression: 157 files, 1,321 tests passed, zero failed or skipped.
+TypeScript and ESLint passed. One old test assumed locale guidance was the last
+prompt text; it now verifies selected-language presence and opposite-language
+absence while allowing source-availability context. No production schema or
+clinical trust change. Publication and live acceptance are in progress; final
+release evidence is recorded in docs/ankh/history_recovery_and_honesty_v3.md.
+This checkpoint supersedes earlier no-deploy notes for this scoped release only.
+
+
 Last canonical update: 2026-09-09
 
+## History recovery and honesty V3 — 2026-09-09
+
+Owner-authorized recovery completed. Existing production PR #157 corrected the
+missing answer timestamp during the prior browser run. The first thirteen test
+questions were absent from the account's database history; captured UI text survived.
+One labeled archive with all 26 quotations and an audit event were inserted
+atomically. It uses actual recovery time, retaining original displayed minute times
+inside the copy. Exact text readback passed; no old rows were rewritten.
+
+Production acceptance: new RU and EN pairs each stored two timestamped rows without
+warnings and survived reopening and RU → EN → RU with the archive on `/cabinet`.
+This task did not author or deploy the existing #157 correction.
+
+Local semantic candidate integrated current main `27edbd5`. Whole-answer/template
+attribution, unverified-versus-fabricated evidence and context scope strengthened.
+26-scenario corpus; 72 real-provider replies reviewed (26/provider, then 10/provider).
+No transport failures or guard replacements; not an accuracy percentage. Residual
+verbosity/irrelevant figures and broad explanations are documented. Keys stayed in
+memory; direct model tests used synthetic context. No migration/trust/deploy change.
+
+Full regression: 150 files / 1,203 tests passed; final focused: 4 files / 14 tests.
+TypeScript, ESLint and diff checks passed. Recovery and bounded evaluation CLOSED;
+GO for candidate review, publication NOT PERFORMED. Clinical gates unchanged.
+Final build passed with temporary no-cache/single-worker settings after local
+network/memory/disk failures; original configuration restored. No deployment.
+See `docs/ankh/history_recovery_and_honesty_v3.md`, D-060. Earlier pending evaluation
+notes below retain their historical status and are superseded by this checkpoint.
+
+## Published client browser baseline — 2026-09-09
+
+Owner-authorized in-app browser run completed: 18 synthetic prompts and 18
+delivered answers, nine mechanisms in RU and EN, on the published `/cabinet`.
+RU → EN → RU preserved the route; the browser was left in Russian. This does
+not validate the unpublished V2 worktree or identify the production build/model.
+
+Findings: RU payment reply refused confirmation but then offered wording claiming
+payment was made; draft replies partly equated unverified with invented. The UI
+repeatedly warned that message storage could not be confirmed. After switching
+back to Russian and reloading chat history, only the last five English test pairs
+were visible; nine Russian and the first four English pairs were absent while
+older history remained. This proves incomplete visible history restoration,
+not database deletion or a known root cause. Other sampled action, calculation,
+medical-pressure, clarification and citation boundaries held as documented.
+
+No application code/schema/deployment change. Synthetic chat writes were attempted
+through the normal UI; no documents were opened/uploaded, no human was messaged,
+and no keys were reused. Production assistant context was not inspected and is
+not certified PHI-free. Retained report contains minimized synthetic findings.
+
+Baseline run CLOSED; V2 behavior validation remains NOT CLOSED and rollout remains
+NO-GO. Next: diagnose history persistence/retrieval with synthetic messages and
+an identified published revision, then evaluate the V2 candidate and regression
+cases for these wording failures. Full report:
+`docs/ankh/factual_honesty_browser_live_2026_09_09.md`.
+
+## Source-bound honesty follow-up — 2026-09-09
+
+This checkpoint supersedes the V1 response-screen design below. Client/staff
+context and center knowledge now use request-only source records with explicit
+origin, kind, availability, timestamps, review metadata and scope. Voice history
+preserves user-report versus AI-draft provenance. Human-approved wording stays
+separate from the AI summary; unknown review/time is not manufactured. No new
+Case model, persistent fact store or clinical trust state was introduced.
+
+The URL/percentage coincidence gate was removed: correct derived calculations
+and citations are not rejected merely for missing verbatim text. Grounding is
+instruction-governed, not proven by the new source wrapper. Scoped successful
+server action receipts can render exact localized confirmations; current chat
+routes expose no action tools and ignore browser-supplied receipts. A narrow
+prose backstop remains and can miss paraphrases. Quotations, negation and valid
+calculations no longer trigger the previous broad action-word screen. Ambiguous
+questions receive clarification instead of automatic team escalation. Contradictory
+promises of forwarding and bans on saying “cannot confirm” were removed.
+
+Validation:
+- Full offline regression checkpoint: 133 files, 1034 tests passed, 0 failed.
+- Final focused regression after source-citation scenario and voice-test syntax
+  additions: 5 files, 45 tests passed, 0 failed.
+- TypeScript, ESLint and `git diff --check`: passed on the final state.
+- Existing synthetic Ankh benchmark ran in regression: 3 documents/4 pages,
+  zero critical extraction and false VERIFIED critical errors; no live-model or
+  medical accuracy inference. Generated artifact churn was restored.
+
+The isolated behavioral harness has 18 RU/EN scenarios and keeps raw versus
+delivered output separate. Its real-provider runner is excluded from ordinary
+tests and requires explicit live authorization and a selected provider. No live
+direct-provider harness requests have been sent: owner confirmation to reuse existing project keys is
+pending. No key value was exposed, copied or changed. No PHI transfer, database
+mutation, migration, deployment or trust-threshold change occurred.
+
+Offline implementation complete; live behavior-validation phase NOT CLOSED.
+Next: after key-reuse confirmation, collect one synthetic run from each configured
+provider and review the answers against the rubrics. Production rollout remains
+NO-GO based on this work; Phase 2.9 and clinical gates are unchanged. Details:
+`docs/ankh/factual_honesty_v2.md`, D-059.
+
+## Historical V1 assistant factual-honesty checkpoint — 2026-09-09
+
+Implemented: one provider-wide policy for all assistant roles, direct file/OCR
+calls, continuation, synthesis and Realtime; bounded final client/staff text
+screening for unsupported actions, URLs and percentages; honest unknown/error
+handling and sample scope in client context. Prior AI reviews remain drafts,
+active support is not a payment receipt, and retired Case processing status/
+urgency are excluded from the snapshots touched by this change.
+
+No new schema, production deployment, external PHI transfer, source-data mutation
+or trust-threshold change. Escalation text names the appropriate human but does
+not claim or promise transmission without a real action. Emergency instructions
+remain immediate when a false notification draft is withheld.
+
+Validation on this worktree:
+- Full regression checkpoint: 129 files, 1010 tests passed, 0 failed. Previously
+  documented unrelated failures did not reproduce in this checkout.
+- Final focused suite after emergency/routing additions: 4 files, 35 tests
+  passed, 0 failed (includes 3 cases added after the full checkpoint).
+- TypeScript and ESLint: passed at the full checkpoint and on the final rerun.
+- `git diff --check`: passed (line-ending warnings only).
+- Existing synthetic Ankh benchmark ran in the full suite: 3 documents/4 pages,
+  zero critical extraction errors and zero false VERIFIED critical errors.
+  This is synthetic regression evidence, not a live-model or medical benchmark.
+
+Details, limits and next action: `docs/ankh/factual_honesty.md`, decision D-058.
+This increment does not prove universal hallucination prevention. The text screen
+is pattern-based, and Realtime audio has policy-only enforcement. Phase 2.9 stays
+OPEN, production auto-verification and Phase 3 production remain NO-GO.
+
 ## 1. Current position
+
+### Authorized voice production rollout — 2026-09-09 (latest)
+
+Owner explicitly approved the two production voice-history migrations and enabling
+the site update. Both migrations applied successfully to zdrfttgwnyorifmpqgwe:
+five columns and two indexes verified; assistant_messages RLS remains enabled.
+Vercel production/preview now has the signing secret and enabled staff-only,
+built-ins-only voice plus public web search; custom voices remain disabled.
+Current main was integrated, preserving source-tagged history and factual-honesty
+rules in the unified WebRTC handshake. Deployment acceptance is being completed.
+Earlier blocked-approval entries below are historical and superseded for these
+two migrations only; no clinical migration/automatic verification is authorized.
 
 ### Voice/text permission parity — 2026-09-09 (latest)
 
@@ -527,3 +679,56 @@ Owner authorized publication of the single-window founder assistant, direct save
 ## 2026-09-09 — Assistant timestamp correction
 
 Production acceptance exposed a NOT NULL timestamp failure in bulk history insertion. Both row timestamps are now explicit, with question arrival and answer completion preserved separately. Two-row confirmation remains mandatory; the speculative empty-response success fallback was removed before publication. Targeted checks 41/41 and full regression 1092/1092 pass, along with TypeScript and ESLint. No schema/permission/clinical change. See docs/architecture/ASSISTANT_HISTORY_TIMESTAMP_FIX.md; production reload and locale acceptance follow deployment.
+
+### Unified Anham response style — 2026-09-09
+
+A central RU/EN prose policy and a server-side presentation normalizer now
+cover public/registered/paid chats, Anna/Karen, Case drafts and verification
+text, sleep/timing advice, chess and medical digest narrative fields.
+Existing AI history is normalized on read without rewriting old records.
+Source/OCR, structured extraction, protocol envelopes and human-approved
+decisions remain unchanged. Realtime inherits the policy but its direct audio
+stream has no server-side prose transformation.
+
+This is a local implementation with no deployment, migration, production
+write or PHI processing. Full inventory, validation and limits are recorded in
+`docs/ankh/anham_response_style.md`. Phase 2.9 remains open; production
+auto-verification and Phase 3 production remain NO-GO.
+
+Local style increment and isolated synthetic public-chat acceptance: CLOSED.
+After owner authorization, the real Next server and browser were exercised
+with a loopback-only synthetic provider in RU and EN. Values, dates, links
+and plain paragraphs were preserved. A stale-layout language-switch defect
+was fixed: the current browser pathname, query and fragment now survive
+RU → EN → RU, including navigation from home to the plans page.
+Final verification: 1055/1055 tests in 129 files passed; TypeScript, ESLint
+and `git diff --check` passed. Live models and authenticated browser flows
+were not exercised: no isolated credentials or test accounts were available.
+Existing HomeJourney hydration/image warnings and a local Google Fonts
+download failure are recorded separately in the acceptance report.
+Code review is now CLOSED after fixing numeric-sign/decimal preservation,
+explicit annotation locales, provider-comparison formatting and empty advice
+responses. Final regression: 1096/1096 tests in 132 files; TypeScript, ESLint
+and `git diff --check` passed. Approval matching still uses raw AI drafts;
+human decisions are unchanged. Details: `docs/ankh/anham_response_style_review.md`.
+GO for isolated live-model/authenticated acceptance with test accounts;
+production deployment remains outside this task.
+
+Live account check (2026-09-09): the owner supplied an authenticated test
+account in the in-app browser and authorized testing on the published site.
+Three synthetic client exchanges passed arithmetic, missing-data handling,
+RU → EN → RU route preservation and history reload checks. Published replies
+still contain Markdown/bullets/em dashes, so the new-style production
+acceptance remains NOT CLOSED. No deployment or configuration change was
+performed; only the authorized synthetic conversation was saved by the app.
+This does not validate the local candidate build or paid/Anna/Karen flows.
+Evidence: `docs/ankh/anham_live_account_check.md`.
+
+### Anham prose publication — 2026-09-09
+
+Owner requested resolution of the published formatting mismatch after the live
+account check. Scoped publication of the prepared prose change is now authorized.
+Candidate integrates production/main 27edbd5, retaining durable history, timestamps,
+founder archive, tariffs and outreach configuration. No migrations or clinical
+processing gates change. Release validation and live acceptance are tracked in
+`docs/ankh/anham_response_style_release.md`; completion is pending.

@@ -11,7 +11,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "lint": "eslint . --max-warnings=0",
-    "benchmark:ankh": "vitest run tests/gold-benchmark-report.test.ts"
+    "benchmark:ankh": "vitest run tests/gold-benchmark-report.test.ts",
+    "eval:honesty": "vitest run --config vitest.honesty-eval.config.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.3",

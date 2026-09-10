@@ -1,5 +1,6 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
+import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
 import {
@@ -22,6 +23,7 @@ import { saveAssistantExchange } from "@/lib/assistant/history";
 import { isExplicitOutreachRefusal, stopAssistantOutreach } from "@/lib/assistant/outreach";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { clientIp } from "@/lib/utils/client-ip";
+import { guardFactualReply } from "@/lib/assistant/factual-honesty";
 import {
   apiError,
   apiErrorLocale,
@@ -122,7 +124,10 @@ export async function POST(request: Request) {
   }
   const settings = TIER_SETTINGS[audience.tier];
 
-  async function respondWithReply(reply: string) {
+  async function respondWithReply(rawReply: string) {
+    const requestedLocale = (body as { locale?: unknown })?.locale;
+    const reply = normalizeAnhamResponse(rawReply, requestedLocale === "ru" || requestedLocale === "en" ? requestedLocale : locale);
+    if (!reply) return NextResponse.json({ error: apiError("assistantEmptyReply", locale) }, { status: 502 });
     const payload = body as { transient?: unknown; displayText?: unknown; locale?: unknown };
     const persistence = audience.profileId && audience.tier !== "guest" && payload.transient !== true
       ? await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId, tier: audience.tier, questionCreatedAt,
@@ -198,9 +203,12 @@ export async function POST(request: Request) {
   // Interface-language hint: the assistant already mirrors the visitor's
   // language, this sets the default for short/ambiguous messages.
   const rawLocale = (body as { locale?: unknown })?.locale;
+  const responseLocale = rawLocale === "en" || rawLocale === "ru" ? rawLocale : locale;
 
-  if (rawLocale === "en") {
-    system += "\n\n## Язык интерфейса посетителя\nПосетитель использует английскую версию сайта — по умолчанию отвечай на английском (если он пишет на другом языке, отвечай на его языке).";
+  if (responseLocale === "en") {
+    system += "\n\nActive interface language: English. Reply in English.";
+  } else {
+    system += "\n\nАктивный язык интерфейса: русский. Отвечай по-русски.";
   }
 
   if (attachments) {
@@ -237,5 +245,10 @@ export async function POST(request: Request) {
   }
   if (result.refusal) result.reply = providerPolicyRefusal(rawLocale === "en" ? "en" : "ru").reply;
 
-  return respondWithReply(result.reply);
+  return respondWithReply(guardFactualReply({
+    reply: result.reply,
+    question: messages[messages.length - 1]?.content ?? "",
+    locale: rawLocale === "en" ? "en" : rawLocale === "ru" ? "ru" : locale,
+    audience: "client"
+  }));
 }

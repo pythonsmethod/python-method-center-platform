@@ -1,9 +1,11 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { askAssistantTeam } from "@/lib/assistant/router";
 import { listGuidance } from "@/lib/assistant/knowledge";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import { apiError, assistantFailure } from "@/lib/i18n/api-errors";
 import type {
   SleepActionState,
   SleepAdviceState,
@@ -255,14 +257,16 @@ export async function getSleepAdvice(
   _previous: SleepAdviceState,
   formData: FormData
 ): Promise<SleepAdviceState> {
+  const locale = formData.get("locale") === "en" ? "en" : "ru";
   const result = await getSleepEntries();
 
   if (result.status !== "ready" || result.entries.length === 0) {
     return {
       status: "error",
       advice: "",
-      message:
-        "Сначала запишите хотя бы одну ночь — тогда будет о чём говорить."
+      message: locale === "en"
+        ? "Record at least one night first so there is something to discuss."
+        : "Сначала запишите хотя бы одну ночь, тогда будет о чём говорить."
     };
   }
 
@@ -275,7 +279,6 @@ export async function getSleepAdvice(
           .join("\n\n")}`
       : "";
 
-  const locale = String(formData.get("locale") ?? "ru");
   const language =
     locale === "en"
       ? "\n\nЧеловек читает английскую версию сайта — ответь по-английски."
@@ -298,12 +301,14 @@ export async function getSleepAdvice(
     return {
       status: "error",
       advice: "",
-      message:
-        answer.status === "unavailable"
-          ? "ИИ-помощник сейчас не настроен. Попробуйте позже."
-          : answer.message
+      message: answer.status === "unavailable"
+        ? apiError("assistantTemporarilyDown", locale)
+        : assistantFailure(answer, locale)
     };
   }
 
-  return { status: "success", advice: answer.reply, message: "" };
+  const advice = normalizeAnhamResponse(answer.reply, locale);
+  return advice
+    ? { status: "success", advice, message: "" }
+    : { status: "error", advice: "", message: apiError("assistantEmptyReply", locale) };
 }

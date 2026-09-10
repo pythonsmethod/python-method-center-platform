@@ -1,5 +1,12 @@
 # Built-in Anham voice launch — 2026-09-09
 
+Latest rollout: owner explicitly approved the two production migrations and
+site enablement. Both applied successfully; all five columns, both indexes and
+enabled RLS verified. Production/preview flags and a server-only signing secret
+configured; built-ins/staff-only enabled, custom voices off, web search enabled.
+Current main integration preserves source-tagged history/factual honesty.
+Earlier blocked status below is historical; production build acceptance follows.
+
 A. Before: five-voice/avatar implementation existed on the preview branch, but
 production flags, signing secret and voice-history schema were not activated.
 

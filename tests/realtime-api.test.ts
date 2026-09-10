@@ -37,7 +37,7 @@ beforeEach(() => {
   mocks.from.mockImplementation((table: string) => {
     const q = { table, filters: [] as unknown[][] }; queries.push(q);
     const result = () => ({ data: table === "profiles" ? profile : table === "client_cases" ? caseRow : [], error: dbError });
-    const chain = { select: vi.fn(() => chain), eq: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), lt: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), gt: vi.fn(() => chain), in: vi.fn(() => chain), is: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), order: vi.fn(() => chain), limit: vi.fn(async () => result()), maybeSingle: vi.fn(async () => result()), upsert: mocks.upsert, then: (resolve: (value: ReturnType<typeof result>) => unknown) => Promise.resolve(result()).then(resolve) };
+    const chain = { select: vi.fn(() => chain), eq: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), lt: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), gt: vi.fn(() => chain), in: vi.fn(() => chain), is: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), order: vi.fn(() => chain), limit: vi.fn(() => chain), maybeSingle: vi.fn(async () => result()), upsert: mocks.upsert, then: (resolve: (value: ReturnType<typeof result>) => unknown) => Promise.resolve(result()).then(resolve) };
     return chain;
   });
   const client = { auth: { getUser: mocks.getUser }, from: mocks.from, rpc: mocks.rpc };
