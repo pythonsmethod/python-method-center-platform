@@ -564,3 +564,10 @@ disconnected and mislabeled every provider error as network failure.
 Now waits up to 8 seconds for the existing peer, with RU/EN status, and distinguishes
 service failures. Authenticated, receipt-bound, quota-limited diagnostics retain only
 enumerated code/voice/locale, no speech or provider message. See docs/ankh/voice_connection_recovery.md.
+
+## 2026-09-10 — Patient voice and thinking-partner behavior
+Release low-eagerness semantic turn detection and the shared RU/EN thinking-partner
+dialogue policy. Implementation and focused regression are closed. Next acceptance:
+one natural Russian microphone conversation with reflective pauses, an unfinished-
+thought correction and a request to test an assumption. See
+docs/ankh/anham_thinking_partner.md.

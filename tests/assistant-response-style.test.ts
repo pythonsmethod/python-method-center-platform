@@ -106,6 +106,10 @@ describe("style is shared without merging roles", () => {
     expect(prompt).toContain(ANHAM_RESPONSE_STYLE);
     expect(prompt).toContain("short paragraphs");
     expect(prompt).toContain("короткими абзацами");
+    expect(prompt).toContain("do not agree automatically");
+    expect(prompt).toContain("не соглашайся автоматически");
+    expect(prompt).toContain("one open, non-leading question");
+    expect(prompt).toContain("один открытый, ненаводящий вопрос");
     expect(prompt).toContain("Style does not change medical boundaries");
   });
 
