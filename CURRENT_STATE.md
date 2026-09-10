@@ -16,8 +16,9 @@ create consent-linked voices from the owners' supplied recordings.
 
 1163 tests / 133 files pass; TypeScript, ESLint and diff checks pass. Browser
 verification covers five choices, preview, Cedar in the actual session request,
-RU–EN–RU preference retention and 390px layout. No real voice creation, provider
-call, deployment or schema change. Personal voices are NOT created: recordings
+RU–EN–RU preference retention and 390px layout. A protected Vercel preview was
+deployed from the validated branch; no real voice creation, provider call or
+schema apply occurred. Personal voices are NOT created: recordings
 and confirmed account eligibility remain missing. See
 `docs/ankh/voice_choices_and_personal_voices.md` (D-061).
 
@@ -42,8 +43,9 @@ RU/EN disclosure/search state and history restoration are verified. Policy versi
 3 supersedes version 2 for newly started sessions. A second, unapplied migration
 adds assistant_messages.web_results; admission checks it before paid audio starts.
 
-OFF by default (ANHAM_WEB_SEARCH_ENABLED=false). No deployment, migration apply,
-new API key, paid call or real PHI was performed. Search sends only a bounded
+OFF by default (ANHAM_WEB_SEARCH_ENABLED=false). The protected Vercel preview
+does not change migration state, provider flags, data-policy version or
+production PHI boundaries. Search sends only a bounded
 public query; common identifier checks are not a complete free-form PHI detector.
 Full local regression: 1133 tests / 132 files pass; TypeScript, ESLint and diff
 checks pass. Production remains NO-GO pending authorized staging/privacy/audio

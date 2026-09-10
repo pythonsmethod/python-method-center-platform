@@ -12,7 +12,8 @@ production/no-PHI gates remain unchanged; see
 Avatar voice UI (D-060): local composer launcher and full-screen call view complete.
 Include one-click opening, Escape/End cleanup, focus restoration, mobile layout
 and transcript/source continuity in the pending authorized staging voice acceptance.
-See docs/ankh/voice_avatar_interface.md. No production enablement in this increment.
+See docs/ankh/voice_avatar_interface.md. A protected Vercel preview is available
+for UI testing; no production enablement in this increment.
 
 Staff voice public internet search (D-059, 2026-09-09): local code and synthetic
 browser/API tests are complete, with signed source persistence and RU/EN inline

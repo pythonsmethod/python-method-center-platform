@@ -791,6 +791,7 @@ per-owner locking and reconciliation of uncertain provider POSTs before retry.
 
 No real personal voices were created in this task; recordings and provider access
 are missing. No account terms were accepted, keys created, paid calls made or
-production enablement performed. Local selector complete; personal voice activation
+production enablement performed. A protected Vercel preview was published from
+the validated branch for synthetic/UI testing; personal voice activation
 and production release remain open. Report and exact next action:
 `docs/ankh/voice_choices_and_personal_voices.md`.
