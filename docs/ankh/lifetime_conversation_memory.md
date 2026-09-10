@@ -109,3 +109,27 @@ verify signed-in text/voice archive lookup against the deployed version.
 - Initial sandbox build could not fetch the existing Google Font (EACCES);
   production build retried with network access. No code workaround applied.
 - `npm run build`: PASS, exit 0, 55/55 static pages generated.
+
+### Release evidence and remaining owner action
+
+PR: https://github.com/pythonsmethod/python-method-center-platform/pull/163
+Code commit: 5beab7ee974565c879c25cec5e8e4e4b618e5c26.
+Platform preview deployment dpl_7NwbGxZGNYqCQ9yx1CMfTYcX5bRi is READY;
+browser homepage loads at
+https://python-method-center-platform-9b0lt46a2-pythonsmethods-projects.vercel.app.
+The browser is signed out of the production assistant, so authenticated text /
+microphone / cross-device acceptance remains NOT RUN.
+
+Separate anham-mobile-app preview fails before application compilation because
+its configured root has no Next.js dependency. Its existing ignored-build command
+cancels production builds; base main deployment GF6q1uhoTcHDiAoC5C6cXVn3U8G4
+is CANCELED. This branch changes neither its root/dependencies nor that setting.
+No successful mobile deployment is claimed.
+
+Production merge was NOT performed: automatic approval review rejected the merge
+because it changes main and auto-deploys production without explicit production
+merge authorization. Do not retry or bypass that rejection without owner approval.
+Local implementation: CLOSED. Production/voice acceptance: NOT CLOSED.
+GO for owner-reviewed production release; NO-GO for claiming production is fixed
+or recall is infallible. Exact next action: owner authorizes merging PR #163, then
+verify production deployment and signed-in text/voice recall.

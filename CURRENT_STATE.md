@@ -766,3 +766,9 @@ Lifetime archive final local regression: 169 files / 1562 tests PASS; TypeScript
 ESLint and diff check PASS; 2/2 synthetic live native provider tests PASS.
 No migrations or production data changes. Release/voice acceptance is tracked in
 `docs/ankh/lifetime_conversation_memory.md`.
+
+PR #163 / commit 5beab7e: Vercel platform preview READY and browser homepage
+verified. Production merge blocked by automatic approval review pending explicit
+owner authorization. No production release claimed. Authenticated voice acceptance
+remains outstanding because the browser is signed out. Full evidence and the
+separate mobile preview configuration failure: lifetime_conversation_memory.md.
