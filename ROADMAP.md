@@ -354,3 +354,8 @@ Each new phase must solve a demonstrated gap in:
 ## 2026-09-09 — Assistant history release
 
 Owner-authorized isolated production publication in progress. Scope: private and client chat persistence, dated multilingual history, pagination and acknowledged retries. 1019/1019 release tests pass. No Ankh phase progression or production data-processing enablement. Final step: deployment readiness and authenticated browser reload verification.
+
+
+## 2026-09-09 — Anna integrated memory and whole-archive retrieval
+
+Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.

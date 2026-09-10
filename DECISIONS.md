@@ -651,3 +651,8 @@ Publish temporary full-review price 299 USD with Stripe fees included and the su
 ## 2026-09-09 — Durable assistant history publication boundary
 
 Conversation history is stored in existing assistant_messages, scoped to the authenticated author and private/client tier family; personal/private case dialogues remain separate. Locale is source metadata, not a visibility filter. Original text/timestamps are retained and browsing pagination is separate from bounded model context. Persisted conversation does not authorize knowledge publication or clinical trust promotion. Publish this fix independently of concurrent founder-knowledge/persona work. No schema or production processing-gate change.
+
+
+## 2026-09-09 — Anna integrated memory and whole-archive retrieval
+
+Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.

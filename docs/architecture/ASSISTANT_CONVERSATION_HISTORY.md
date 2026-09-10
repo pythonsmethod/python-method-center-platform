@@ -76,3 +76,9 @@ Local implementation CLOSED. Production acceptance NOT CLOSED. GO for an isolate
 Owner explicitly requested publication. Release branch codex/publish-assistant-history-20260909 starts at production main d9e001ff9d22d6b6b182d0b79247ef362a8b94b0. The production client API translations/IP handling, safety behavior, accessibility attributes and all unrelated production features are preserved. Separate local founder-knowledge automation, structured case reply rendering and message-edit UI are deliberately excluded; they are not prerequisites for durable history. Existing memory-confirmation interactions use an explicit request flag and now persist their displayed exchange without changing knowledge approval.
 
 Release regression: 1019/1019 tests pass across 129 files, including 37 new history tests. The old Stripe failure belongs to the divergent root workspace and does not fail in this release. Initial client test mocks required adaptation to production's request-locale resolver; all six adapted tests pass. Synthetic benchmark executed as part of full tests: zero critical extraction errors, false VERIFIED critical errors or security issues. No extraction implementation changed. Lint and diff check pass. Production build/live acceptance is recorded in the final publication note.
+
+## Integrated release verification — 2026-09-09
+
+PR #154 was published while this release was being prepared. The release now merges production main addefd6a32c9234c909b59c40a4139626c01e080 and preserves Anna's single-window memory/archive commands. All successful early memory replies use the same durable exchange persistence. This supersedes the earlier scope note excluding the then-unpublished memory changes.
+
+Combined validation: 1041/1041 tests across 132 files passed; production build passed including TypeScript and lint. No schema migrations or new permissions. Authenticated production acceptance follows the final deployment.
