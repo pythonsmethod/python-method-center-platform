@@ -32,7 +32,7 @@ beforeEach(() => {
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 describe("WebRTC lifecycle without a microphone or paid provider", () => {
-  it.each(["read_my_case", "search_web", "read_site_data"])("routes client tool %s through the server boundary", async name => {
+  it.each(["read_my_case", "search_web", "prepare_my_cabinet_action", "execute_my_cabinet_action", "read_site_data"])("routes client tool %s through the server boundary", async name => {
     const s = setup(); await s.call.start();
     vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ output: { result: "synthetic" } })));
     const event = (value: object) => peers[0].channel.onmessage?.({ data: JSON.stringify(value) });

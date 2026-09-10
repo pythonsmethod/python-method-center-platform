@@ -2,7 +2,7 @@ import { safeVoiceDiagnosticCode } from "./voice-diagnostics";
 import { RealtimeTurns, type VoiceExchange, type VoiceTranscript, type VoiceToolCall } from "./realtime-turns";
 import type { VoiceError, VoiceState } from "./realtime-contract";
 import type { Locale } from "@/lib/i18n/locale";
-const isClientTool = (name: string) => name === "search_conversation_history" || name === "read_conversation_message" || name === "read_my_case" || name === "search_web";
+const isClientTool = (name: string) => name === "search_conversation_history" || name === "read_conversation_message" || name === "read_my_case" || name === "search_web" || name === "prepare_my_cabinet_action" || name === "execute_my_cabinet_action";
 
 type Options = { voice?: string; locale: Locale; scope: "client" | "staff"; caseId?: string; onState: (state: VoiceState) => void; onError: (error: VoiceError) => void; onIncomplete: () => void; onDuration: () => void; onExchange: (pair: VoiceExchange, receipt: string) => void; onTranscript?: (text: VoiceTranscript) => void };
 
@@ -124,11 +124,11 @@ export class RealtimeBrowser {
   private async readSite(call: VoiceToolCall, userTurn: { id: string; text: string }) {
     if (this.closed || (this.options.scope !== "staff" && !isClientTool(call.name))) return { error: "forbidden" };
     this.setState(call.name === "search_web" ? "searching" : "reading");
-    if (call.arguments.length > 2000) return { error: "invalid" };
+    if (call.arguments.length > 45_000) return { error: "invalid" };
     const response = await fetch("/api/assistant/realtime/tools", {
       method: "POST", credentials: "same-origin", signal: AbortSignal.any([this.abort.signal, AbortSignal.timeout(call.name === "ask_text_assistant" ? 120000 : call.name === "search_web" ? 35000 : 15000)]),
       headers: { "Content-Type": "application/json", "Accept-Language": this.options.locale },
-      body: JSON.stringify({ name: call.name, arguments: JSON.parse(call.arguments), receipt: this.receipt, scope: this.options.scope, locale: this.options.locale, caseId: this.options.caseId, ...(call.name === "ask_text_assistant" ? { userTurn, previousAssistant: this.previousAssistant } : {}) }),
+      body: JSON.stringify({ name: call.name, arguments: JSON.parse(call.arguments), receipt: this.receipt, scope: this.options.scope, locale: this.options.locale, caseId: this.options.caseId, ...(["ask_text_assistant", "prepare_my_cabinet_action", "execute_my_cabinet_action"].includes(call.name) ? { userTurn, previousAssistant: this.previousAssistant } : {}) }),
     });
     if (!response.ok) return { error: "unavailable", instruction: call.name === "search_web" ? "Internet search failed or is unavailable. Say you could not verify this online; never invent search results or links." : "The site query failed. Say the data is unavailable; do not invent counts or messages." };
     return (await response.json()).output;

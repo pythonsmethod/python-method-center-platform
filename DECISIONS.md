@@ -1089,3 +1089,15 @@ both RU and EN shared response policy. This guides useful visible reasoning; it 
 not a claim of human-brain simulation or access to private chain-of-thought. No
 permission, clinical-trust or evidence boundary changes. Evidence:
 docs/ankh/anham_thinking_partner.md.
+
+## 2026-09-10 — Client voice writes use explicit, one-time confirmation
+Anham may execute only existing client self-service operations from an explicit
+allowlist. Separate preparation from execution. Require an exact localized summary,
+a later Realtime user turn containing an unambiguous confirmation, the same verified
+client and voice receipt, a short expiry and an atomic pending-to-executing claim.
+Persist only the action type and confirmation-token hash in the server-only RLS
+ledger; keep message and health payloads out of that table. A successful server
+receipt is the only basis for claiming completion. Do not extend this authority to
+payments, access, source documents, extracted facts, Case state, clinical decisions,
+deletions, other clients or staff/admin tools. See
+docs/ankh/client_confirmed_voice_actions.md.

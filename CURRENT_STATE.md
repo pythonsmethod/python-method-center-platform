@@ -868,3 +868,15 @@ of assumptions, contradictions, missing links and alternatives through one open
 question at a time. No role, tool, schema, PHI or clinical-gate change. Focused
 validation: 171/171 tests; TypeScript, ESLint and diff check pass. Live microphone
 acceptance remains open; see docs/ankh/anham_thinking_partner.md.
+
+## 2026-09-10 — Confirmed client cabinet actions in voice
+The full client-assistant preview can now prepare and, after a separate explicit
+spoken confirmation, execute owner-scoped self-service actions: Professor message,
+supplement schedule/check-off, profile name/phone, client-entered metric and sleep
+entry. A server-only RLS ledger provides session/profile binding, expiry and atomic
+one-time execution without storing action contents. Payments, documents, Case state,
+clinical decisions, other clients and admin operations remain immutable. The
+production migration is applied with RLS, no `anon`/`authenticated` grants, and
+server-role-only access. Focused regression: 160/160; full suite: 1649/1649;
+production build, TypeScript, ESLint and diff check pass. See
+docs/ankh/client_confirmed_voice_actions.md.

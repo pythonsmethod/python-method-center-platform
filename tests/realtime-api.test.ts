@@ -93,7 +93,7 @@ describe("voice authorization and provider handshake", () => {
     vi.stubEnv("ANHAM_WEB_SEARCH_ENABLED", "true");
     expect((await session(request(sessionBody))).status).toBe(200);
     const config = JSON.parse((vi.mocked(fetch).mock.calls[0][1]!.body as FormData).get("session") as string);
-    expect(config.tools.map((tool: { name: string }) => tool.name)).toEqual(["search_conversation_history", "read_conversation_message", "read_my_case", "search_web"]);
+    expect(config.tools.map((tool: { name: string }) => tool.name)).toEqual(["search_conversation_history", "read_conversation_message", "read_my_case", "prepare_my_cabinet_action", "execute_my_cabinet_action", "search_web"]);
     await expect(resolveVoiceActor(request({}), "staff")).rejects.toMatchObject({ status: 403 });
     await expect(resolveVoiceActor(request({}), "client", userId)).rejects.toMatchObject({ status: 403 });
     vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "");
