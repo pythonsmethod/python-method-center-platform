@@ -1,5 +1,6 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
+import { conversationContext } from "@/lib/assistant/conversation-context";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
@@ -198,6 +199,11 @@ export async function POST(request: Request) {
   } else {
     // Level 1 — public consultant of the center, strictly on topic.
     system = await buildGuestSystemPrompt();
+  }
+
+  if (audience.profileId && audience.tier !== "guest") {
+    system += await conversationContext({ profileId: audience.profileId, private: false,
+      caseId: audience.caseId ?? null }, messages[messages.length - 1].content);
   }
 
   // Interface-language hint: the assistant already mirrors the visitor's

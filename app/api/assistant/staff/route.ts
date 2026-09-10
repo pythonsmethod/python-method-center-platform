@@ -1,5 +1,6 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
+import { conversationContext } from "@/lib/assistant/conversation-context";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { searchKnowledgeArchive } from "@/lib/assistant/knowledge-search";
 import { founderMemoryFromCommand } from "@/lib/assistant/founder-memory";
@@ -129,6 +130,9 @@ export async function POST(request: Request) {
   );
 
   let system = await buildStaffSystemPrompt(assistantRole);
+  system += await conversationContext({ profileId: auth.userId, private: true,
+    caseId: typeof rawCaseId === "string" && isUuid(rawCaseId) ? rawCaseId : null
+  }, messages[messages.length - 1].content);
   if (isAssistantDelegate(auth.email)) system += "\nThis account is an owner-authorized assistant delegate, not Anna or Karen. Use neutral address without calling the person Anna, Karen or founder. The assistant command permissions are the founder assistant's; this does not grant platform administrator authority.";
   const rawLocale = (body as { locale?: unknown })?.locale;
   const responseLocale = rawLocale === "en" || rawLocale === "ru" ? rawLocale : locale;

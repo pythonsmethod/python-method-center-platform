@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-const f = vi.hoisted(() => ({ history: vi.fn(), auth: vi.fn(), staff: vi.fn(), locale: vi.fn(), save: vi.fn(), role: vi.fn(), ask: vi.fn() }));
+const f = vi.hoisted(() => ({ context: vi.fn(), history: vi.fn(), auth: vi.fn(), staff: vi.fn(), locale: vi.fn(), save: vi.fn(), role: vi.fn(), ask: vi.fn() }));
 vi.mock("@/lib/assistant/history", () => ({ getOwnAssistantHistory: f.history, HISTORY_PAGE_SIZE: 60, saveAssistantExchange: f.save }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: f.auth }));
 vi.mock("@/lib/i18n/locale", () => ({ getLocale: f.locale }));
@@ -10,6 +10,7 @@ vi.mock("@/lib/assistant/prompts", () => ({ buildStaffSystemPrompt: async () => 
 vi.mock("@/lib/assistant/case-context", () => ({ buildCaseContext: async () => "" }));
 vi.mock("@/lib/assistant/router", () => ({ askKarenAssistant: f.ask, askAssistantTeam: f.ask }));
 import { GET } from "@/app/api/assistant/history/route";
+vi.mock("@/lib/assistant/conversation-context", () => ({ conversationContext: f.context }));
 import { POST } from "@/app/api/assistant/staff/route";
 const messages = [{ id: "q", role: "user", content: "Question", created_at: "2026-09-09T10:00:00Z", message_sequence: 1 }, { id: "a", role: "assistant", content: "Answer", created_at: "2026-09-09T10:00:01Z", message_sequence: 2 }];
 const get = (query = "") => GET(new Request(`http://localhost/api/assistant/history${query}`));
@@ -22,6 +23,7 @@ beforeEach(() => {
   f.role.mockReturnValue("founder");
   f.ask.mockResolvedValue({ status: "ok", reply: "Answer" });
   f.history.mockResolvedValue({ status: "ready", messages });
+  f.context.mockResolvedValue("Saved conversation: earlier topic");
   f.save.mockResolvedValue({ saved: true, messages });
 });
 describe("history HTTP boundary", () => {
@@ -61,6 +63,12 @@ describe("history HTTP boundary", () => {
   });
 });
 describe("staff exchange persistence integration", () => {
+  it("loads private context for the authenticated staff user and selected Case", async () => {
+    const caseId = "00000000-0000-4000-8000-000000000002";
+    await post({ caseId, profileId: "other-owner" });
+    expect(f.context).toHaveBeenCalledWith({ profileId: "staff-own-id", private: true, caseId }, "Question");
+    expect(f.ask.mock.calls[0][0]).toContain("Saved conversation: earlier topic");
+  });
   it.each(["founder", "karen"])("saves the authenticated %s conversation before returning", async role => {
     f.role.mockReturnValue(role);
     const response = await post({ displayText: "Original question with file names" });
@@ -72,7 +80,8 @@ describe("staff exchange persistence integration", () => {
     expect(f.save).not.toHaveBeenCalled();
   });
   it("returns the reply and an explicit unsaved result on failure", async () => {
-    f.save.mockResolvedValue({ saved: false });
+    f.context.mockResolvedValue("Saved conversation: earlier topic");
+  f.save.mockResolvedValue({ saved: false });
     expect(await (await post()).json()).toEqual({ reply: "Answer", saved: false });
   });
   it("records Karen's confirmation question without saving methodology", async () => {
