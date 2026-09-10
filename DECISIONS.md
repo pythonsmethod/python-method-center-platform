@@ -985,3 +985,7 @@ Owner explicitly approved both voice-history production migrations and site enab
 ## 2026-09-09 — Assistant-only delegation
 
 The owner confirmed an existing client account for founder-equivalent assistant capabilities. Use an explicit server-only assistant allowlist and /assistant entry point, not a profile role promotion or FOUNDER_EMAILS. Retain own-profile history, account-status checks and existing non-assistant authorization. See docs/ankh/assistant_delegate_access.md.
+
+## 2026-09-09 — Voice conversation continuity
+
+Isolated fix based on main 77258dc: retain recognized user turns after voice interruption, cancellation or failed output; correct instructions denying supplied history; label restored interrupted AI replies. Five new behavioral tests reproduced the loss before correction. No schema, PHI test data or clinical phase changes. Production acceptance remains open; see docs/ankh/voice_conversation_memory.md for validation and exact release step.

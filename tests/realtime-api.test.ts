@@ -47,6 +47,14 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  it.each(["ru", "en"] as const)("does not deny supplied conversation memory in %s", locale => {
+    for (const scope of ["client", "founder", "karen"] as const) {
+      const prompt = voiceInstructions({ ...actor, scope }, locale);
+      expect(prompt).toContain("Saved conversation excerpts may be supplied below");
+      expect(prompt).not.toContain("past chat or knowledge-base access");
+      expect(prompt).not.toContain("No records are preloaded");
+    }
+  });
   it("admits only the explicitly delegated client to staff voice without changing their profile role", async () => {
     vi.stubEnv("ANHAM_ASSISTANT_DELEGATE_EMAILS", "delegate@example.test");
     vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");

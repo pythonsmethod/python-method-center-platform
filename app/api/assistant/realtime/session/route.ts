@@ -24,10 +24,13 @@ export async function POST(request: Request) {
     const remembered = history.status === "ready"
       ? renderSourceContext(history.messages.map((message, index) => assistantSource({
           id: `history_${index}`, kind: message.role === "user" ? "user_report" : "ai_draft",
-          origin: "assistant_chat_messages", availability: "available", retrievedAt: new Date().toISOString(),
-          recordedAt: message.created_at, freshness: "historical", scope: "saved conversation only; not proof of facts or actions", data: message.content
+          origin: "assistant_messages", availability: "available", retrievedAt: new Date().toISOString(),
+          recordedAt: message.created_at, freshness: "historical",
+          scope: message.role === "assistant" && message.voice_state === "interrupted"
+            ? "interrupted AI draft; may include words not heard by the user; not a completed reply or confirmed action"
+            : "saved conversation only; not proof of facts or actions", data: message.content
         })))
-      : renderSourceContext([assistantSource({ id: "history", kind: "ai_draft", origin: "assistant_chat_messages", availability: "unavailable", retrievedAt: new Date().toISOString(), scope: "saved conversation", data: null })]);
+      : renderSourceContext([assistantSource({ id: "history", kind: "ai_draft", origin: "assistant_messages", availability: "unavailable", retrievedAt: new Date().toISOString(), scope: "saved conversation", data: null })]);
     const form = new FormData();
     form.set("sdp", body.sdp);
     form.set("session", JSON.stringify({

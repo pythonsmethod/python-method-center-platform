@@ -496,3 +496,7 @@ Fix the confirmed bulk-insert timestamp failure, retain strict storage acknowled
 Owner-authorized publication is in progress; integrate current main, pass regression
 and deployment checks, then verify RU/EN replies and reload on the supplied test account.
 See `docs/ankh/anham_response_style_release.md`. Clinical phase gates remain unchanged.
+
+## 2026-09-09 — Voice conversation continuity
+
+Isolated fix based on main 77258dc: retain recognized user turns after voice interruption, cancellation or failed output; correct instructions denying supplied history; label restored interrupted AI replies. Five new behavioral tests reproduced the loss before correction. No schema, PHI test data or clinical phase changes. Production acceptance remains open; see docs/ankh/voice_conversation_memory.md for validation and exact release step.

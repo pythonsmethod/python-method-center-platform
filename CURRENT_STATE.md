@@ -747,3 +747,9 @@ Candidate integrates production/main 27edbd5, retaining durable history, timesta
 founder archive, tariffs and outreach configuration. No migrations or clinical
 processing gates change. Release validation and live acceptance are tracked in
 `docs/ankh/anham_response_style_release.md`; completion is pending.
+
+## 2026-09-09 — Voice conversation continuity
+
+Isolated fix based on main 77258dc: retain recognized user turns after voice interruption, cancellation or failed output; correct instructions denying supplied history; label restored interrupted AI replies. Five new behavioral tests reproduced the loss before correction. No schema, PHI test data or clinical phase changes. Production acceptance remains open; see docs/ankh/voice_conversation_memory.md for validation and exact release step.
+
+Validation: 1540/1540 tests (167 files), TypeScript, ESLint and diff check PASS. Local correction CLOSED; production release/microphone acceptance pending.
