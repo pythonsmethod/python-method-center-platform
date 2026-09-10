@@ -107,7 +107,8 @@ describe("server response style across audiences and languages", () => {
     for (const locale of ["ru", "en", "ru"] as const) {
       await staff(request(locale));
       const prompt = mocks.provider.mock.lastCall?.[0];
-      expect(prompt.endsWith(locale === "en" ? "Active interface language: English. Reply in English." : "Активный язык интерфейса: русский. Отвечай по-русски.")).toBe(true);
+      expect(prompt).toContain(locale === "en" ? "Active interface language: English. Reply in English." : "Активный язык интерфейса: русский. Отвечай по-русски.");
+      expect(prompt).not.toContain(locale === "en" ? "Активный язык интерфейса: русский. Отвечай по-русски." : "Active interface language: English. Reply in English.");
     }
   });
 });

@@ -1,5 +1,7 @@
 import Anthropic from "@anthropic-ai/sdk";
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
+
+import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
 import {
   isImageType,
   isTextType,
@@ -95,6 +97,7 @@ const CONTINUE_INSTRUCTION =
 const CACHEABLE_SYSTEM_MIN_CHARS = 4000;
 
 function buildSystemParam(system: string) {
+  system = withFactualHonesty(system);
   if (system.length < CACHEABLE_SYSTEM_MIN_CHARS) {
     return system;
   }

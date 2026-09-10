@@ -2,6 +2,8 @@ import { NextResponse } from "next/server";
 import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { buildPaidClientSystemPrompt, buildRegisteredSystemPrompt } from "@/lib/assistant/prompts";
 import { resolveAssistantAudience } from "@/lib/assistant/tiers";
+import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
+import { assistantSource, renderSourceContext } from "@/lib/assistant/source-context";
 
 export const runtime = "nodejs";
 
@@ -28,8 +30,12 @@ export async function POST(request: Request) {
     : await buildRegisteredSystemPrompt(audience.context);
   const history = await getOwnAssistantHistory(audience.profileId, locale, 24);
   const remembered = history.status === "ready"
-    ? history.messages.map((message) => `${message.role === "user" ? "Человек" : "Anham"}: ${message.content}`).join("\n")
-    : "История временно недоступна.";
+    ? renderSourceContext(history.messages.map((message, index) => assistantSource({
+        id: `history_${index}`, kind: message.role === "user" ? "user_report" : "ai_draft",
+        origin: "assistant_chat_messages", availability: "available", retrievedAt: new Date().toISOString(),
+        recordedAt: message.created_at, freshness: "historical", scope: "saved conversation only; not proof of facts or actions", data: message.content
+      })))
+    : renderSourceContext([assistantSource({ id: "history", kind: "ai_draft", origin: "assistant_chat_messages", availability: "unavailable", retrievedAt: new Date().toISOString(), scope: "saved conversation", data: null })]);
   const instructions = `${basePrompt}\n\nЭто живой голосовой разговор. Говори естественно, тепло и кратко, не перебивай. Не ставь диагнозы и не назначай лечение. Вопросы о состоянии, анализах и изменении плана передавай Professor Python. Язык интерфейса: ${locale === "en" ? "English" : "русский"}.\n\nПоследняя сохранённая переписка:\n${remembered}`;
 
   const response = await fetch("https://api.openai.com/v1/realtime/client_secrets", {
@@ -41,7 +47,7 @@ export async function POST(request: Request) {
         type: "realtime",
         model: "gpt-realtime",
         output_modalities: ["audio"],
-        instructions,
+        instructions: withFactualHonesty(instructions),
         max_output_tokens: 900,
         audio: {
           input: {

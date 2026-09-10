@@ -1,4 +1,5 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { assistantSource, renderSourceContext } from "@/lib/assistant/source-context";
 
 export type KnowledgeAudience = "client" | "staff" | "both";
 
@@ -43,28 +44,27 @@ export async function getKnowledgeForPrompt(
   audience: "client" | "staff"
 ): Promise<string> {
   const supabase = createSupabaseServiceClient();
+  const retrievedAt = new Date().toISOString();
+  const render = (availability: "available" | "absent" | "unavailable", data: unknown) => renderSourceContext([
+    assistantSource({ id: "center_knowledge", kind: "center_knowledge", origin: "assistant_knowledge", availability, retrievedAt, scope: `active entries for ${audience}; up to ${MAX_PROMPT_ENTRIES}; not individual client outcomes or action receipts`, data })
+  ]);
 
   if (!supabase) {
-    return "";
+    return render("unavailable", null);
   }
 
   const { data, error } = await supabase
     .from("assistant_knowledge")
-    .select("title, content")
+    .select("id, title, content, created_at")
     .eq("is_active", true)
     .in("audience", [audience, "both"])
     .order("created_at", { ascending: false })
     .limit(MAX_PROMPT_ENTRIES);
 
   if (error || !data || data.length === 0) {
-    return "";
+    return render(error ? "unavailable" : "absent", null);
   }
-
-  const blocks = data.map(
-    (entry) => `### ${entry.title}\n${entry.content}`
-  );
-
-  return `\n\n## База знаний центра (составлена командой — опирайся на неё в первую очередь)\n${blocks.join("\n\n")}`;
+  return render("available", data);
 }
 
 export type GuidanceEntry = {

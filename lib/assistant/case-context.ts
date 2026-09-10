@@ -1,126 +1,38 @@
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
 import { getCaseReview } from "@/lib/cases/review-queries";
-import { formatDateTime } from "@/lib/i18n/format";
-import {
-  caseDirectionLabel,
-  caseStatusLabel,
-  caseUrgencyLabel,
-  documentStatusLabel,
-  lifecycleEventLabel,
-  paymentProductLabel,
-  paymentStatusLabel
-} from "@/lib/i18n/status-labels";
+import { assistantSource, renderSourceContext, type AssistantSource } from "@/lib/assistant/source-context";
 
-const MAX_PAYLOAD_CHARS = 4000;
-const MAX_DOCUMENTS = 30;
-const MAX_PAYMENTS = 15;
-const MAX_EVENTS = 25;
-
-// Builds a text snapshot of one case for the Karen-assistant system prompt.
-// Metadata only: document files themselves are not read here.
-export async function buildCaseContext(caseId: string): Promise<string | null> {
+/** Snapshot projection only: no new store, source reading or trust promotion. */
+export async function buildCaseSources(caseId: string): Promise<AssistantSource[]> {
+  const retrievedAt = new Date().toISOString();
   const result = await getStaffCaseDetail(caseId);
-
-  if (result.status !== "ready" || !result.case) {
-    return null;
+  if (result.status !== "ready" || !result.case || result.case.id !== caseId) {
+    return [assistantSource({ id: "case", kind: "system_record", origin: "client_cases", availability: result.status === "ready" && !result.case ? "absent" : "unavailable", retrievedAt, scope: "selected Case only", data: null })];
   }
-
   const detail = result.case;
-  const lines: string[] = [];
-
-  lines.push(`## Данные кейса из базы центра (снимок на ${formatDateTime(new Date().toISOString())})`);
-  lines.push(
-    `Клиент: ${detail.profiles?.full_name ?? "имя не указано"} · ${detail.profiles?.email ?? "email не указан"} · ${detail.profiles?.phone ?? "телефон не указан"}`
-  );
-  lines.push(
-    `Кейс: статус «${caseStatusLabel(detail.status)}», срочность «${caseUrgencyLabel(detail.urgency)}», направление «${caseDirectionLabel(detail.direction)}». Создан ${formatDateTime(detail.created_at)}, обновлён ${formatDateTime(detail.updated_at)}.`
-  );
-
-  if (detail.summary) {
-    lines.push(`Резюме кейса: ${detail.summary}`);
-  }
-
+  const sources: AssistantSource[] = [];
+  const add = (source: Omit<Parameters<typeof assistantSource>[0], "retrievedAt">) => sources.push(assistantSource({ ...source, retrievedAt }));
+  add({ id: "case", kind: "system_record", origin: "client_cases", availability: "available", recordedAt: detail.updated_at, freshness: "current_snapshot", scope: "selected Case metadata; not clinical verification", data: { id: detail.id, created_at: detail.created_at, direction: detail.direction } });
+  add({ id: "profile", kind: "user_report", origin: "profiles", availability: detail.profiles ? "available" : "absent", scope: "profile contact fields, not independent identity verification", data: detail.profiles ? { full_name: detail.profiles.full_name, email: detail.profiles.email, phone: detail.profiles.phone } : null });
+  add({ id: "case_summary", kind: "ai_draft", origin: "client_cases.summary", availability: detail.summary ? "available" : "absent", scope: "authorship/review unknown; treated conservatively as unverified summary", data: detail.summary });
   const submission = detail.onboarding_submissions?.[0];
-
-  if (submission) {
-    const payloadText = JSON.stringify(submission.payload, null, 1).slice(
-      0,
-      MAX_PAYLOAD_CHARS
-    );
-    lines.push(
-      `\n### Анкета (статус: ${submission.status}${submission.submitted_at ? `, отправлена ${formatDateTime(submission.submitted_at)}` : ""})\n${payloadText}`
-    );
-  } else {
-    lines.push("\n### Анкета\nАнкета ещё не заполнена.");
-  }
-
+  add({ id: "questionnaire", kind: "user_report", origin: "onboarding_submissions", availability: submission ? "available" : "absent", recordedAt: submission?.submitted_at ?? null, scope: "client's own report; payload excerpt up to 4000 characters", data: submission ? { status: submission.status, payload_excerpt: JSON.stringify(submission.payload).slice(0, 4000) } : null });
   const documents = detail.uploaded_documents ?? [];
-  lines.push(`\n### Документы (${documents.length})`);
-
-  if (documents.length === 0) {
-    lines.push("Документы не загружены.");
-  } else {
-    for (const doc of documents.slice(0, MAX_DOCUMENTS)) {
-      lines.push(
-        `- ${doc.original_filename ?? "без имени"} · ${documentStatusLabel(doc.document_status)} · ${formatDateTime(doc.created_at)}`
-      );
-    }
-    if (documents.length > MAX_DOCUMENTS) {
-      lines.push(`…и ещё ${documents.length - MAX_DOCUMENTS} документов.`);
-    }
-    lines.push(
-      "Сами файлы в этот разговор не приложены — здесь ты видишь только их названия и статусы."
-    );
-  }
-
-  // The reading made by the button above the document list. Once it
-  // exists, the assistant in this chat knows what is inside the client's
-  // analyses — it is text in the database by then, and costs nothing to
-  // include. Without this the natural thing to do (ask the assistant) hit
-  // the same wall as before, while the capability sat behind a button
-  // elsewhere on the page.
+  add({ id: "documents", kind: "system_record", origin: "uploaded_documents", availability: documents.length ? "available" : "absent", freshness: "current_snapshot", scope: "selected Case inventory; up to 30 metadata rows shown; metadata_only, file contents not read", data: { inventory_count: documents.length, rows: documents.slice(0, 30).map((doc) => ({ id: doc.id, name: doc.original_filename, document_status: doc.document_status, created_at: doc.created_at })) } });
   const review = await getCaseReview(detail.id, documents);
-
-  if (review) {
-    lines.push(
-      `\n### Разбор загруженных анализов (сделан ассистентом ${formatDateTime(review.createdAt)}, прочитано файлов: ${review.documentsCount}${review.isCurrent ? "" : "; ПОСЛЕ ЭТОГО клиент загрузил новые документы — разбор устарел"})`
-    );
-    lines.push(review.summary);
-    lines.push(
-      "Это твой собственный более ранний разбор этих файлов. Опирайся на него, отвечая про анализы, и говори прямо, что цифры взяты из него, а не прочитаны заново."
-    );
-  } else if (documents.length > 0) {
-    lines.push(
-      "\nИтогового разбора этих файлов ещё нет. Не проси Professor Python вставлять текст анализов вручную и не проси прикладывать их повторно — каждый файл автоматически распознаётся после загрузки. Скажи ему проверить прогресс над списком документов и нажать «Собрать итоговый разбор», когда все файлы будут учтены."
-    );
+  add({ id: "ai_review", kind: "ai_draft", origin: "case_ai_reviews.summary", availability: review ? "available" : "unavailable", recordedAt: review?.createdAt ?? null, humanReviewed: false, freshness: review?.isCurrent ? "unknown" : "historical", scope: "AI summary only; never source facts or a Karen decision, even if another field has approval", data: review ? { text: review.summary, documents_count: review.documentsCount, matches_current_inventory: review.isCurrent } : null });
+  // Approval belongs only to approvedText, never to the separate AI summary.
+  if (review?.approvedText && review.approvedAt) {
+    add({ id: "karen_decision", kind: "human_decision", origin: "case_review_learning_events.approved_text", availability: "available", recordedAt: review.approvedAt, humanReviewed: true, freshness: review.isCurrent ? "current_snapshot" : "historical", scope: "human-approved wording for this document version only; not a VERIFIED clinical fact", data: { text: review.approvedText, matches_current_inventory: review.isCurrent } });
   }
-
   const payments = detail.payments ?? [];
-
-  if (payments.length > 0) {
-    lines.push(`\n### Оплаты (${payments.length})`);
-    for (const payment of payments.slice(0, MAX_PAYMENTS)) {
-      lines.push(
-        `- ${paymentProductLabel(payment.product)} · ${paymentStatusLabel(payment.status)} · ${(payment.amount_cents / 100).toFixed(2)} ${payment.currency} · ${formatDateTime(payment.paid_at ?? payment.created_at)}`
-      );
-    }
-  }
-
+  add({ id: "payments", kind: "system_record", origin: "payments", availability: payments.length ? "available" : "absent", freshness: "current_snapshot", scope: "selected Case; up to 15 payment records; no action performed by this chat", data: payments.slice(0, 15).map((payment) => ({ id: payment.id, product: payment.product, status: payment.status, amount_cents: payment.amount_cents, currency: payment.currency, paid_at: payment.paid_at, created_at: payment.created_at })) });
   const events = detail.case_lifecycle_events ?? [];
+  add({ id: "events", kind: "system_record", origin: "case_lifecycle_events", availability: events.length ? "available" : "absent", freshness: "current_snapshot", scope: "up to 25 historical events; not receipts for actions in this request", data: events.slice(0, 25).map((event) => ({ id: event.id, event_type: event.event_type, created_at: event.created_at })) });
+  add({ id: "event_notes", kind: "user_report", origin: "case_lifecycle_events.notes", availability: events.some((event) => event.notes) ? "available" : "absent", scope: "staff-entered notes; author/review not independently verified", data: events.slice(0, 25).filter((event) => event.notes).map((event) => ({ id: event.id, notes: event.notes, created_at: event.created_at })) });
+  return sources;
+}
 
-  if (events.length > 0) {
-    lines.push(`\n### История кейса (последние ${Math.min(events.length, MAX_EVENTS)} событий)`);
-    for (const event of events.slice(0, MAX_EVENTS)) {
-      const notes = event.notes ? ` — ${event.notes}` : "";
-      lines.push(
-        `- ${formatDateTime(event.created_at)} · ${lifecycleEventLabel(event.event_type)}${notes}`
-      );
-    }
-  }
-
-  lines.push(
-    "\nПравила работы с этими данными: это фактический снимок из системы — не додумывай ничего сверх него; чего в снимке нет, того ты не знаешь. Сводки и черновики — предложения для Professor Python, решения принимает Professor Python."
-  );
-
-  return lines.join("\n");
+export async function buildCaseContext(caseId: string): Promise<string | null> {
+  return renderSourceContext(await buildCaseSources(caseId));
 }

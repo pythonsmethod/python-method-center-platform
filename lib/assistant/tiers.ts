@@ -1,6 +1,4 @@
-import { buildDocumentTimeline } from "@/lib/documents/timeline";
-import { caseStatusLabel } from "@/lib/i18n/status-labels";
-import { caseStatusLabels } from "@/lib/founder/labels";
+import { assistantSource, renderSourceContext, type AssistantSource } from "@/lib/assistant/source-context";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
@@ -27,26 +25,8 @@ export type AssistantAudience = {
   // Human-readable snapshot of the person's own journey, injected into the
   // system prompt for registered and paying clients only.
   context: string | null;
+  sources: AssistantSource[];
 };
-
-const directionLabels: Record<string, string> = {
-  recovery: "восстановление",
-  rehabilitation: "реабилитация",
-  preservation: "сохранение",
-  not_set: "ещё не определено"
-};
-
-function formatDate(value: string | null): string {
-  if (!value) {
-    return "—";
-  }
-
-  return new Date(value).toLocaleDateString("ru-RU", {
-    day: "2-digit",
-    month: "2-digit",
-    year: "numeric"
-  });
-}
 
 // Cheap tier check for the interface only: decides which greeting and which
 // name the chat window shows. The answer itself is always built from the
@@ -99,7 +79,8 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
     profileId: null,
     email: null,
     caseId: null,
-    context: null
+    context: null,
+    sources: []
   };
 
   try {
@@ -125,14 +106,15 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
         profileId: user.id,
         email: user.email ?? null,
         caseId: null,
-        context: null
+        context: null,
+        sources: []
       };
     }
 
     const [caseResult, periodsResult] = await Promise.all([
       supabase
         .from("client_cases")
-        .select("id, case_number, status, direction, created_at")
+        .select("id, case_number, direction, created_at")
         .eq("profile_id", user.id)
         .maybeSingle(),
       supabase
@@ -144,134 +126,39 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
         .order("ends_at", { ascending: false })
     ]);
 
-    const caseRow = caseResult.data;
-    const activePeriods = periodsResult.data ?? [];
-    const supportPayments = activePeriods.filter((row) =>
-      isPaidSupportProduct(row.product)
-    );
-    const hasPaidSupport = supportPayments.length > 0;
+    const retrievedAt = new Date().toISOString();
+    const caseRow = caseResult.error ? null : caseResult.data;
+    const activePeriods = periodsResult.error ? [] : periodsResult.data ?? [];
+    const hasPaidSupport = activePeriods.some((row) => isPaidSupportProduct(row.product));
+    const sources: AssistantSource[] = [
+      assistantSource({ id: "account", kind: "system_record", origin: "authenticated session", availability: "available", retrievedAt, freshness: "current_snapshot", scope: "authenticated account only", data: { email: user.email ?? null } }),
+      assistantSource({ id: "case", kind: "system_record", origin: "client_cases", availability: caseResult.error ? "unavailable" : caseRow ? "available" : "absent", retrievedAt, recordedAt: caseRow?.created_at ?? null, freshness: "current_snapshot", scope: "own Case metadata; not processing classification", data: caseRow ? { id: caseRow.id, created_at: caseRow.created_at, direction: caseRow.direction } : null }),
+      assistantSource({ id: "active_support", kind: "system_record", origin: "service_periods", availability: periodsResult.error ? "unavailable" : activePeriods.length ? "available" : "absent", retrievedAt, freshness: "current_snapshot", scope: "own active service periods; NOT proof of payment", data: activePeriods }),
+      assistantSource({ id: "payments", kind: "system_record", origin: "payments", availability: "not_connected", retrievedAt, scope: "payments not queried in client chat", data: null })
+    ];
 
-    const lines: string[] = [];
-    lines.push(`Собеседник вошёл в аккаунт: ${user.email ?? "email скрыт"}.`);
-
-    if (!caseRow) {
-      lines.push(
-        "Анкета ещё НЕ заполнена — кейса нет. Самый важный следующий шаг для этого человека: заполнить анкету на /onboarding."
-      );
-    } else {
-      lines.push(
-        `Кейс создан ${formatDate(caseRow.created_at)}. Текущий статус: «${
-          caseStatusLabels[caseRow.status] ?? caseStatusLabel(caseRow.status)
-        }». Направление: ${directionLabels[caseRow.direction] ?? caseRow.direction}.`
-      );
+    if (caseRow) {
+      const [documentsResult, eventsResult, periodResult] = await Promise.all([
+        supabase.from("uploaded_documents").select("id, original_filename, created_at").eq("case_id", caseRow.id).order("created_at", { ascending: false }).limit(20),
+        supabase.from("case_lifecycle_events").select("event_type, created_at").eq("case_id", caseRow.id).order("created_at", { ascending: false }).limit(10),
+        supabase.from("service_periods").select("product, status, starts_at, ends_at").eq("case_id", caseRow.id).order("starts_at", { ascending: false }).limit(1)
+      ]);
+      for (const [id, origin, result, scope] of [
+        ["documents", "uploaded_documents", documentsResult, "metadata_only; up to 20 latest own Case documents; sample_count is NOT total; contents not read"],
+        ["events", "case_lifecycle_events", eventsResult, "up to 10 latest own Case events; not proof of any action by this chat"],
+        ["support_history", "service_periods", periodResult, "latest own Case service period; unknown product codes remain unknown"]
+      ] as const) {
+        const rows = result.error ? [] : result.data ?? [];
+        sources.push(assistantSource({ id, kind: "system_record", origin, availability: result.error ? "unavailable" : rows.length ? "available" : "absent", retrievedAt, freshness: "current_snapshot", scope, data: { sample_count: rows.length, rows } }));
+      }
     }
-
-    if (hasPaidSupport) {
-      const products = supportPayments
-        .map((row) =>
-          row.product === "support_5_weeks"
-            ? "«5 недель»"
-            : row.product === "support_15_weeks"
-              ? "«100 дней»"
-              : row.product
-        )
-        .join(", ");
-      lines.push(`Оплачено сопровождение: ${products}. Это активный клиент центра.`);
-    } else {
-      lines.push("Сопровождение пока не оплачено.");
-    }
-
-    if (!caseRow) {
-      return {
-        tier: hasPaidSupport ? "client" : "registered",
-        profileId: user.id,
-        email: user.email ?? null,
-        caseId: null,
-        context: lines.join("\n")
-      };
-    }
-
-    const [documentsResult, eventsResult, periodResult] = await Promise.all([
-      supabase
-        .from("uploaded_documents")
-        .select("id, original_filename, created_at")
-        .eq("case_id", caseRow.id)
-        .order("created_at", { ascending: false })
-        .limit(20),
-      supabase
-        .from("case_lifecycle_events")
-        .select("event_type, to_status, created_at")
-        .eq("case_id", caseRow.id)
-        .order("created_at", { ascending: false })
-        .limit(10),
-      supabase
-        .from("service_periods")
-        .select("product, status, starts_at, ends_at")
-        .eq("case_id", caseRow.id)
-        .order("starts_at", { ascending: false })
-        .limit(1)
-    ]);
-
-    const documents = documentsResult.data ?? [];
-
-    if (documents.length === 0) {
-      lines.push(
-        "Документы НЕ загружены. Без них Professor Python не сможет разобрать ситуацию — это следующий шаг."
-      );
-    } else {
-      // Rounds and repeat versions matter to the conversation: "you sent
-      // fresh blood work on the 15th" is a different sentence from "you
-      // have 7 files".
-      const rounds = buildDocumentTimeline(documents);
-      const updates = rounds.reduce((sum, round) => sum + round.updateCount, 0);
-
-      lines.push(
-        `Загружено документов: ${documents.length} (загрузок по датам: ${rounds.length}${
-          updates > 0
-            ? `, из них повторных версий ранее присланных файлов: ${updates} — клиент присылает динамику`
-            : ""
-        }). Названия файлов: ${documents
-          .map((row) => row.original_filename)
-          .filter(Boolean)
-          .slice(0, 10)
-          .join("; ")}. Содержимое файлов из хранилища тебе НЕ доступно — только названия. Никогда не делай вид, что читал их.${
-          hasPaidSupport
-            ? " Если клиент хочет показать сами анализы — предложи приложить фото или PDF скрепкой прямо в этот чат: приложенное ты читаешь полностью, выписываешь показатели и готовишь к разбору Professor Python. Свой разбор и выводы о состоянии НЕ даёшь — их даёт только Professor Python."
-            : ""
-        }`
-      );
-    }
-
-    const period = periodResult.data?.[0];
-
-    if (period) {
-      const periodLabel =
-        period.product === "support_5_weeks"
-          ? "5 недель"
-          : period.product === "support_15_weeks"
-            ? "100 дней"
-            : "архивный тестовый доступ (14 дней)";
-      lines.push(
-        `Период сопровождения: ${periodLabel}, статус «${period.status}», с ${formatDate(period.starts_at)} по ${formatDate(period.ends_at)}.`
-      );
-    }
-
-    const events = eventsResult.data ?? [];
-
-    if (events.length > 0) {
-      lines.push(
-        `История кейса (последние события): ${events
-          .map((row) => `${formatDate(row.created_at)} — ${row.event_type}`)
-          .join("; ")}.`
-      );
-    }
-
     return {
       tier: hasPaidSupport ? "client" : "registered",
       profileId: user.id,
       email: user.email ?? null,
-      caseId: caseRow.id,
-      context: lines.join("\n")
+      caseId: caseRow?.id ?? null,
+      context: renderSourceContext(sources),
+      sources
     };
   } catch {
     return guest;

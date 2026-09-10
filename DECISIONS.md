@@ -744,3 +744,78 @@ scientific notation remains numeric when evaluating surrounding syntax.
 Generated annotations use explicit surface/field locales; an empty normalized
 advice response is an error. Provider labels preserve content-line boundaries.
 Review evidence: `docs/ankh/anham_response_style_review.md`.
+
+---
+
+---
+
+## D-058 — Factual honesty is provider-wide; text is not an action receipt
+
+Date: 2026-09-09.
+
+One canonical assistant policy is applied last at both text-provider boundaries
+and in Realtime. Facts require available sources; model drafts/consensus and
+user claims do not establish operational actions, medical conclusions or trust.
+Query errors remain unknown, limited samples retain scope, and service access
+does not stand in for payment evidence. Retired Case processing classifications
+are excluded from the assistant snapshots touched by this change.
+
+Client/staff final text is screened for recognizable unsupported action claims,
+URLs and percentages before delivery/history persistence. Without an executed
+handoff, escalation is a proposed human next step, never «Уточню» or a fabricated
+notification. Emergency direction takes precedence over waiting for the team.
+
+This bounded screen is not semantic verification. Voice and structured/OCR outputs
+receive the rule but not conversational replacement. Details and limitations:
+`docs/ankh/factual_honesty.md`. No production deployment or PHI authorization is
+implied; existing clinical trust gates remain unchanged.
+
+---
+
+## D-059 — Source metadata and action receipts replace prompt-string coincidence
+
+Date: 2026-09-09. Supersedes the screening portion of D-058.
+
+Compose assistant context as request-only source projections over existing data:
+system records, user reports, AI drafts, human-approved wording and center knowledge
+remain distinct, with explicit availability, timestamps, review metadata and scope.
+Retrieval time is not observation time, a Case summary is not a clinical fact, and
+approval of one text field never approves a different AI summary. This creates no
+new persistent Case/evidence/trust store and grants no new data access.
+
+Do not treat the presence of a URL or percentage anywhere in a prompt as semantic
+grounding, or reject a correctly derived value merely because it is not verbatim.
+Remove that screen; preserve the factual-honesty instruction and measure behavior.
+Action confirmation must be rendered from successful server receipts bound to the
+same request, actor and Case, never from request-body claims. The current read-only
+chat has no action receipts. A narrower prose check remains a limited backstop.
+Ambiguous questions should first receive a clarification rather than automatic
+team escalation; quoted actions, negation and transparent arithmetic remain useful.
+
+Keep raw model answers and screened answers separate in evaluation reports. A
+transport success is not a factual pass. Offline tests do not close live-model
+behavior validation; record pending access/review and actual failures explicitly.
+No production deployment or PHI processing is authorized by this decision.
+
+---
+
+## D-060 — Preserve attribution in replies and provenance in recovered history
+
+Date: 2026-09-09. Follow-up to D-059.
+
+Reported, confirmed, unverified and refuted information remain distinct throughout
+the entire answer, including suggested customer/public text. Missing payment data
+does not establish a pending transaction; missing assistant context does not prove
+organizational absence. An explicit author's admission may be cited as such; lack
+of verification alone does not establish fabrication. These are model instructions,
+not a universal semantic-verification guarantee.
+
+Recover history only from an available source. For the owner-authorized synthetic
+browser baseline, append a labeled archive retaining original visible wording and
+minute-level times, with actual recovery time and a separate audit event. Do not
+invent second-level timestamps, native row identities or rewrite earlier messages.
+Reuse the canonical history/audit tables; no new store, trust model or PHI gate.
+
+The integrated candidate retains the previously published timestamp correction
+and acknowledges storage only through confirmed records. See
+`docs/ankh/history_recovery_and_honesty_v3.md` for acceptance and limitations.

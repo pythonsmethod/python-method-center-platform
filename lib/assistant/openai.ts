@@ -1,6 +1,8 @@
 import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
 import { isExplicitPolicyError, isFilteredChoice, providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
+import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
+
 // Quality-first flagship. Deployments may pin another available model, but
 // the private expert assistant must not silently fall back to a legacy one.
 const DEFAULT_OPENAI_MODEL = "gpt-5.6-sol";
@@ -22,6 +24,7 @@ export async function askOpenAi(
   maxTokens: number,
   options: { reasoningEffort?: "high" } = {}
 ): Promise<AssistantResult> {
+  system = withFactualHonesty(system);
   const apiKey = process.env.OPENAI_API_KEY?.trim();
 
   if (!apiKey) {

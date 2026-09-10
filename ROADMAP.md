@@ -1,6 +1,26 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Authorized honesty publication — 2026-09-09
+
+The owner explicitly instructed “Публикуй”. The release candidate integrates main
+66fa3bd (PR #158 response style and route-preserving locale changes), while keeping
+the existing history timestamp fix, founder memory and disabled outreach.
+Final merged regression: 157 files, 1,321 tests passed, zero failed or skipped.
+TypeScript and ESLint passed. One old test assumed locale guidance was the last
+prompt text; it now verifies selected-language presence and opposite-language
+absence while allowing source-availability context. No production schema or
+clinical trust change. Publication and live acceptance are in progress; final
+release evidence is recorded in docs/ankh/history_recovery_and_honesty_v3.md.
+This checkpoint supersedes earlier no-deploy notes for this scoped release only.
+
+
 ## North Star
+
+Current recovery/honesty checkpoint (2026-09-09): missing dialogue restored as a
+labeled archive; production RU/EN save/reopen verified after existing PR #157.
+Semantic candidate integrated current main; 72 synthetic live replies reviewed,
+1,203 offline tests passed. GO for scoped candidate review; publication not performed.
+See `docs/ankh/history_recovery_and_honesty_v3.md`. Older pending notes are historical.
 
 Separate non-medical chat increment — 2026-09-09: local implementation and tests
 for saved Anham welcome/check-ins and authorized synthetic staging acceptance
@@ -12,6 +32,24 @@ authorization to merge PR #156 into main (required by automatic approval review)
 then verify the resulting production deployment.
 Production activation remains separate.
 See `docs/ankh/assistant_outreach.md`.
+
+Published client browser baseline (2026-09-09): 18 RU/EN synthetic answers reviewed.
+Incomplete history restoration and payment/uncertainty wording issues observed.
+Next: diagnose persistence/retrieval, then validate the identified V2 candidate;
+the production baseline does not close unpublished V2 behavior validation. See
+`docs/ankh/factual_honesty_browser_live_2026_09_09.md`. No rollout authorized.
+
+Follow-up to the local honesty checkpoint (2026-09-09): typed source projections,
+scoped action receipts, less intrusive fallback behavior and an isolated 18-scenario
+RU/EN live-evaluation harness are implemented. Behavior validation remains OPEN:
+key reuse confirmation, real model samples and semantic review are pending. See
+`docs/ankh/factual_honesty_v2.md`; no production rollout is authorized.
+
+Local assistant hardening checkpoint (2026-09-09): centralized factual-honesty
+policy, bounded client/staff reply screening and honest context failure handling
+implemented. See `docs/ankh/factual_honesty.md`. Next validation for this increment
+is an isolated RU/EN adversarial model evaluation; no production rollout is
+authorized. This does not close Phase 2.9 or advance clinical trust readiness.
 
 Build a system that turns heterogeneous client medical documents into a traceable, longitudinal, reviewable evidence model that allows Ankh to prepare the Case and Karen to understand and decide quickly.
 
