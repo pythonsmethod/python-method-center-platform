@@ -30,6 +30,12 @@ Live gpt-4o-mini-tts requests for Marin/Cedar/Coral/Sage/Verse each returned HTT
 200 and valid WAV using only a fixed synthetic phrase. This proves TTS preview
 availability, not an authenticated end-to-end production WebRTC call.
 
+Preview build for commit 789ed10b9b2d07914fe8495d4a0602a5cf41be77 reached READY
+(`dpl_4GnH6vtTKSSkxkVvNex9CZJnZwuE`). Draft PR #159 is prepared. Synthetic
+browser checks confirm the staff composer avatar opens the full-screen dialog,
+exactly five options are shown, Cedar selection persists into the English call,
+and the chat route remains unchanged when changing language.
+
 F. Existing synthetic benchmark regression: 3 documents / 4 pages, 100% critical
 numeric exact match and verified precision, zero critical false VERIFIED. This
 is regression evidence only, not general clinical validation.
