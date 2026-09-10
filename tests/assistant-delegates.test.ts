@@ -13,9 +13,9 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 describe("owner-delegated assistant without admin promotion", () => {
-  it("allows the confirmed account while retaining client role", async () => {
-    expect(await getPrivateAssistantUserState()).toMatchObject({ status: "authorized", userId: "delegate-id", role: "client" });
-    expect(resolvePrivateAssistantRole("delegate@example.test")).toBe("founder");
+  it("revokes the former delegate even if old configuration remains", async () => {
+    expect(await getPrivateAssistantUserState()).toEqual({ status: "forbidden" });
+    expect(resolvePrivateAssistantRole("delegate@example.test")).toBe(null);
     expect(isFounderEmail("delegate@example.test")).toBe(false);
     expect(canAccessProfessorMessages("delegate@example.test")).toBe(false);
     expect(await f.staff()).toEqual({ status: "forbidden" });

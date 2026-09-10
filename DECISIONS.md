@@ -997,3 +997,6 @@ Client and private text generation now retrieve own stored conversation server-s
 ## 2026-09-09 — Lifetime text and voice conversation archive
 
 Owner requires no age-based expiry for saved conversations with clients, Karen and Anna. Existing assistant_messages remains canonical. Native text and realtime tools now search/page/read full own messages of any age and language, including voice transcripts; authenticated owner/tier isolation and original Case labels remain. Do not add a rolling retention purge or replace originals with summaries. Request context/tool budgets do not limit archive age. Existing explicit deletion workflows remain. OpenAI archive calls use Responses store:false with unchanged model/reasoning; Claude uses native tools. Synthetic 2001-record live checks passed for both providers. No schema or clinical-gate change. See docs/ankh/lifetime_conversation_memory.md for limits, final checks and release status.
+## 2026-09-09 — Elena is a CLIENT preview participant
+
+Owner corrected the scope: own Case/client experience, not staff-equivalent authority. Revoke the delegate grant including stale configuration. Enable only the confirmed account through ANHAM_CLIENT_VOICE_TEST_EMAILS, preserving client tier, own-context checks and no staff tools. Prior delegation decisions are superseded. See docs/ankh/elena_client_voice_pilot.md.

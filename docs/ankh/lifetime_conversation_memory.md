@@ -14,7 +14,7 @@ retention/deletion job or replace original records with summaries. Explicit
 account/data deletion remains governed by its existing workflow; this policy is
 not a promise to reconstruct deleted or never-saved data.
 
-All signed-in assistant users (clients, Anna, Karen, existing authorized delegate)
+All signed-in assistant users (clients, Anna and Karen)
 can search and page through their own assistant archive, regardless of age,
 language or whether the original message was typed or spoken. Long individual
 messages can be read in full by successive chunks. Lookup defaults to the current
@@ -133,3 +133,16 @@ Local implementation: CLOSED. Production/voice acceptance: NOT CLOSED.
 GO for owner-reviewed production release; NO-GO for claiming production is fixed
 or recall is infallible. Exact next action: owner authorizes merging PR #163, then
 verify production deployment and signed-in text/voice recall.
+
+### Owner-approved production release — 2026-09-10
+
+Owner explicitly authorized production publication. Integrated current main
+46f80a6, preserving the client-only pilot and revoked staff delegation from
+PR #164. Resolved overlapping tests to allow only own-archive tools for clients
+while retaining staff-tool denial. Prior approval blocker is resolved; final
+integrated validation and production result follow.
+
+Integrated verification: 170 files / 1567 tests PASS (58.94 s), TypeScript and
+ESLint PASS, diff check PASS. An initial check encountered unresolved merge
+markers after an unavailable local Python command; resolved them with native
+PowerShell and reran the checks above successfully. No failed checks remain.

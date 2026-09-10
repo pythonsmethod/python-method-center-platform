@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { CabinetAnhamCard } from "@/components/cabinet/CabinetAnhamCard";
+import { isClientVoicePilot } from "@/lib/assistant/client-voice-pilot";
 import { IconAnkh, IconDjed, IconEyeOfHorus } from "@/components/icons/EgyptianIcons";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
@@ -65,6 +66,7 @@ export default async function CabinetPage() {
   }
 
   return <div className="web-home">
+    {auth.status !== "missing-env" && isClientVoicePilot(auth.email) ? <Link className="button" href="/cabinet/assistant">{locale === "ru" ? "Мой Анхам — попробовать голосовой разговор" : "My Anham — try a voice conversation"}</Link> : null}
     <header className="web-home__heading">
       <span>{c.eyebrow}</span><h1>{c.title}</h1><p>{c.intro}</p>
     </header>

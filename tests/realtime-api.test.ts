@@ -1,3 +1,4 @@
+vi.mock("@/lib/assistant/client-voice-context", () => ({ clientVoiceInstructions: async () => "Synthetic own-client context" }));
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
 const mocks = vi.hoisted(() => ({ auth: vi.fn(), service: vi.fn(), getUser: vi.fn(), from: vi.fn(), upsert: vi.fn(), rpc: vi.fn() }));
@@ -63,11 +64,23 @@ describe("voice authorization and provider handshake", () => {
       expect(prompt).not.toContain("No records are preloaded");
     }
   });
-  it("admits only the explicitly delegated client to staff voice without changing their profile role", async () => {
+  it("allows a named client pilot only with client scope and no staff tools", async () => {
+    vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");
+    vi.stubEnv("PUBLIC_ASSISTANT_MODE", "off");
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "client@example.test");
+    expect((await session(request(sessionBody))).status).toBe(200);
+    const configuration = JSON.parse((vi.mocked(fetch).mock.calls[0][1]!.body as FormData).get("session") as string);
+    expect(configuration.tools.map((tool: { name: string }) => tool.name)).toEqual(["search_conversation_history", "read_conversation_message"]);
+    expect(configuration.instructions).toContain("Synthetic own-client context");
+    expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(403);
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "");
+    expect((await session(request(sessionBody))).status).toBe(503);
+  });
+  it("denies revoked client delegation even with stale staff configuration", async () => {
     vi.stubEnv("ANHAM_ASSISTANT_DELEGATE_EMAILS", "delegate@example.test");
     vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");
     mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: "delegate@example.test" } }, error: null });
-    expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(200);
+    expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(403);
     expect(profile!.role).toBe("client");
     vi.stubEnv("ANHAM_ASSISTANT_DELEGATE_EMAILS", "");
     expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(403);

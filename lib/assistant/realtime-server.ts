@@ -10,6 +10,7 @@ import { voiceErrorMessage, type VoiceError, type VoiceScope } from "./realtime-
 import type { Locale } from "@/lib/i18n/locale";
 import { platformContext } from "./prompts";
 import { isAssistantDelegate } from "@/lib/auth/assistant-delegates";
+import { isClientVoicePilot } from "./client-voice-pilot";
 
 export type VoiceActor = { profileId: string; scope: VoiceScope; caseId: string | null; tier: "registered" | "client"; email: string | null };
 export class VoiceFailure extends Error {
@@ -82,12 +83,12 @@ function boundedEnv(name: string, fallback: number, max: number) {
 }
 export function voiceConfig(actor: VoiceActor) {
   const staffOnly = process.env.ANHAM_REALTIME_STAFF_ONLY === "true";
-  if (staffOnly && actor.scope === "client") throw new VoiceFailure("unavailable", 503);
+  if (staffOnly && actor.scope === "client" && !isClientVoicePilot(actor.email)) throw new VoiceFailure("unavailable", 503);
   const allowlist = (process.env.ANHAM_REALTIME_TEST_EMAILS ?? "").split(",").map(x => x.trim().toLowerCase()).filter(Boolean);
   const apiKey = process.env.OPENAI_REALTIME_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim();
   const signingKey = process.env.ANHAM_REALTIME_SESSION_SECRET?.trim();
   if (process.env.ANHAM_REALTIME_ENABLED !== "true" || !actor.email || (!staffOnly && !allowlist.includes(actor.email.toLowerCase())) || !apiKey || !signingKey || signingKey.length < 32) throw new VoiceFailure("unavailable", 503);
-  if (actor.scope === "client" && process.env.PUBLIC_ASSISTANT_MODE === "off") throw new VoiceFailure("unavailable", 503);
+  if (actor.scope === "client" && process.env.PUBLIC_ASSISTANT_MODE === "off" && !isClientVoicePilot(actor.email)) throw new VoiceFailure("unavailable", 503);
   return { apiKey, signingKey, model: process.env.OPENAI_REALTIME_MODEL?.trim() || "gpt-realtime", voice: process.env.OPENAI_REALTIME_VOICE?.trim() || "marin", transcriptionModel: process.env.OPENAI_REALTIME_TRANSCRIPTION_MODEL?.trim() || "gpt-4o-mini-transcribe", maxSeconds: boundedEnv("ANHAM_REALTIME_MAX_SECONDS", 300, 900), dailyLimit: boundedEnv("ANHAM_REALTIME_DAILY_SESSIONS", 10, 100) };
 }
 export async function reserveVoiceSession(actor: VoiceActor, dailyLimit: number) {
