@@ -1,3 +1,4 @@
+import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 import { NextResponse } from "next/server";
 import { issueVoiceReceipt, readVoiceBody, reserveVoiceSession, resolveVoiceActor, voiceConfig, voiceFailure, VoiceFailure, voiceInstructions } from "@/lib/assistant/realtime-server";
 import type { Locale } from "@/lib/i18n/locale";
@@ -36,10 +37,10 @@ export async function POST(request: Request) {
     form.set("sdp", body.sdp);
     form.set("session", JSON.stringify({
       type: "realtime", model: config.model, output_modalities: ["audio"],
-      instructions: withFactualHonesty(`${actor.scope === "client" ? await clientVoiceInstructions(request, actor, locale) : voiceInstructions(actor, locale)}\n${remembered}`), max_output_tokens: 900,
+      instructions: withFactualHonesty(`${actor.scope === "client" ? await clientVoiceInstructions(request, actor, locale) : voiceInstructions(actor, locale)}\n${remembered}\n${voiceDeliveryInstructions(locale)}`), max_output_tokens: 900,
       audio: {
         input: { transcription: { model: config.transcriptionModel, language: locale }, turn_detection: { type: "semantic_vad", eagerness: "medium", create_response: false, interrupt_response: true } },
-        output: { voice: selectedVoice, speed: 1 },
+        output: { voice: selectedVoice, speed: ANHAM_VOICE_SPEED },
       }, tools: voiceSiteTools(actor.scope, actor),
     }));
     // Unified WebRTC handshake: no provider credential enters the browser.

@@ -32,6 +32,25 @@ beforeEach(() => {
 });
 afterEach(() => { vi.useRealTimers(); vi.unstubAllGlobals(); });
 describe("WebRTC lifecycle without a microphone or paid provider", () => {
+  it.each(["read_my_case", "search_web", "read_site_data"])("routes client tool %s through the server boundary", async name => {
+    const s = setup(); await s.call.start();
+    vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ output: { result: "synthetic" } })));
+    const event = (value: object) => peers[0].channel.onmessage?.({ data: JSON.stringify(value) });
+    event({ type: "input_audio_buffer.committed", item_id: "u1" });
+    event({ type: "conversation.item.input_audio_transcription.completed", item_id: "u1", transcript: "Help me" });
+    event({ type: "response.created", response: { id: "r1", metadata: { input_item_id: "u1" } } });
+    event({ type: "response.done", response: { id: "r1", status: "completed", output: [{ type: "function_call", id: "f1", call_id: "c1", name, arguments: "{}" }] } });
+    await vi.advanceTimersByTimeAsync(0);
+    if (name === "read_site_data") {
+      expect(fetch).toHaveBeenCalledTimes(1);
+      expect(peers[0].channel.send.mock.calls.some(([raw]) => raw.includes("forbidden"))).toBe(true);
+    } else {
+      expect(fetch).toHaveBeenCalledTimes(2);
+      expect(vi.mocked(fetch).mock.calls[1][0]).toBe("/api/assistant/realtime/tools");
+      expect(JSON.parse(vi.mocked(fetch).mock.calls[1][1]!.body as string)).toMatchObject({ scope: "client", name, receipt: "test-receipt" });
+    }
+    s.call.stop();
+  });
   it("passes the selected voice from the browser to the session API", async () => {
     const callbacks = { onState: vi.fn(), onError: vi.fn(), onIncomplete: vi.fn(), onDuration: vi.fn(), onExchange: vi.fn() };
     const call = new RealtimeBrowser({ ...callbacks, scope: "client", locale: "en", voice: "cedar" });

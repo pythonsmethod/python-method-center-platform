@@ -1,3 +1,4 @@
+import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 import { readVoiceBody, resolveVoiceActor, voiceConfig, voiceFailure, VoiceFailure } from "@/lib/assistant/realtime-server";
 import { resolveOutputVoice } from "@/lib/assistant/voice-options-server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -22,7 +23,7 @@ export async function POST(request: Request) {
     const response = await fetch("https://api.openai.com/v1/audio/speech", {
       method: "POST", headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(20000)]),
-      body: JSON.stringify({ model: "gpt-4o-mini-tts", voice, response_format: "mp3", input: locale === "ru" ? "Здравствуйте! Я Анхам, ваш ИИ-помощник. Так звучит мой голос." : "Hello! I am Anham, your AI assistant. This is what my voice sounds like." }),
+      body: JSON.stringify({ model: "gpt-4o-mini-tts", voice, response_format: "mp3", speed: ANHAM_VOICE_SPEED, instructions: voiceDeliveryInstructions(locale), input: locale === "ru" ? "Здравствуйте! Я Анхам, ваш ИИ-помощник. Так звучит мой голос." : "Hello! I am Anham, your AI assistant. This is what my voice sounds like." }),
     });
     if (!response.ok || !response.body) throw new VoiceFailure("unavailable", 503);
     return new Response(response.body, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" } });
