@@ -1,8 +1,31 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-Last canonical update: 2026-09-06
+Last canonical update: 2026-09-09
 
 ## 1. Current position
+
+Non-medical chat increment (2026-09-09): saved Anham registration welcome and
+72-hour-minimum follow-ups are implemented locally, with atomic service-only
+delivery, sticky opt-outs and RU/EN history projection. Authorized synthetic
+acceptance on `ankh-staging` is CLOSED: concurrent cron/opt-out and browser
+RU → EN → RU in cabinet/admin passed. Staging exposed and verified fixes for
+busy-preference timeouts and the admin's hardcoded history locale. An optional
+profile UUID allowlist bounds rollout. Daily Hobby-compatible cron is configured;
+`ASSISTANT_OUTREACH_ENABLED` defaults off. Synthetic fixtures and local keys
+were removed. After explicit owner confirmation, both outreach migrations were
+applied to production `zdrfttgwnyorifmpqgwe`; server-only grants and zero sends
+were verified. Vercel production now explicitly has the enable flag set to
+`false`. PR #156 integrates current main through `d810dd8`, preserving history,
+Anna memory, tariffs and safety changes. Vercel preview build is READY.
+Automatic approval review rejected merging PR #156 into main because the
+publication confirmation did not explicitly name merge-to-main. Production
+deployment is pending that authorization; no sends occurred.
+Ordinary history retains all original languages and private/client isolation;
+only stored outreach templates are projected into the active locale.
+Full suite after integration: 1,143/1,143 tests in 141 files;
+TypeScript and ESLint passed. Details and staging gates:
+[`docs/ankh/assistant_outreach.md`](docs/ankh/assistant_outreach.md).
+This increment does not change any clinical phase or production trust gate.
 
 The Ankh document/evidence foundation is implemented through Phase 2.8.
 

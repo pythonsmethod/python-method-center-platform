@@ -2,6 +2,17 @@
 
 ## North Star
 
+Separate non-medical chat increment — 2026-09-09: local implementation and tests
+for saved Anham welcome/check-ins and authorized synthetic staging acceptance
+are CLOSED (concurrent cron/opt-out and RU/EN cabinet/admin UI). Final diff review
+and integration with current main are complete. Owner explicitly authorized
+the two production migrations and disabled rollout; migrations are applied and
+production enable flag is `false`. Preview build is READY. Next: explicit
+authorization to merge PR #156 into main (required by automatic approval review),
+then verify the resulting production deployment.
+Production activation remains separate.
+See `docs/ankh/assistant_outreach.md`.
+
 Build a system that turns heterogeneous client medical documents into a traceable, longitudinal, reviewable evidence model that allows Ankh to prepare the Case and Karen to understand and decide quickly.
 
 Accuracy, explainability, safety and workflow efficiency are more important than maximizing automation percentage.

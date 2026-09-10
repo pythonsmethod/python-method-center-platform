@@ -644,6 +644,56 @@ medical verification, diagnosis, client interpretation or trust-threshold
 weakening. Existing append-only Karen decisions remain authoritative and are
 preferred when projection-level duplicate rows are collapsed.
 
+---
+
+## D-056 — Proactive Anham chat uses fixed templates and atomic delivery
+
+Decision (2026-09-09): registration welcomes and later non-medical check-ins are
+stored once in the existing `assistant_messages` history. Each delivery retains
+RU/EN template text; active-locale projection does not create another message.
+An account-scoped service-only delivery cursor and PostgreSQL transaction own
+eligibility, preference locking, a minimum 72-hour interval and idempotency.
+Explicit outreach refusal is sticky and cannot be reset by registration or cron.
+
+Why: independent select/insert HTTP calls can duplicate messages, race with
+an opt-out or advance a cursor without saving the message. Fixed organizational
+templates avoid unreviewed medical interpretation and external AI processing.
+
+Constraint: `ASSISTANT_OUTREACH_ENABLED` is off by default. This local increment
+does not authorize a production migration, deploy, real-user send or change to
+Ankh clinical trust gates. The subsequently authorized staging acceptance verified
+real concurrent requests and the RU/EN UI; production activation remains separate.
+See `docs/ankh/assistant_outreach.md`.
+
+### D-056 addendum — skip locked preferences and scope staging sends
+
+Staging showed that waiting for an opt-out lock can exhaust the PostgREST
+statement timeout. The worker now skips locked existing preference rows and
+bounds concurrent initialization to 500 ms, deferring a busy profile to a later
+run. It never assumes the old preference permits a send. The corrective
+migration preserves delivery/cursor atomicity and unique numbering.
+
+`ASSISTANT_OUTREACH_PROFILE_IDS` optionally restricts sends to explicit UUIDs;
+invalid or empty configured scopes fail closed. This allowed real HTTP/browser
+acceptance on a shared staging branch without sending to other tasks' profiles.
+
+Release preparation: preserve current main's published tariffs. Apply both
+outreach migrations before deploying the new history reader and keep delivery
+disabled. Automatic approval review rejected the production migration under
+the general "next step" authorization; explicit production schema authorization
+was the pending gate. The owner subsequently explicitly confirmed both
+production migrations and publication with sending disabled. Both migrations
+are now applied; Vercel production flag is explicitly `false`. Preserve main's
+all-language original history, pagination and private/client tier boundaries;
+translate only saved outreach templates. Opt-out acknowledgements return the
+existing durable-history saved/messages contract, including storage failure.
+
+After the successful preview build, automatic approval review separately
+rejected the merge-to-main action because the owner confirmation named
+publication but not merging the default branch. No direct-deploy workaround
+was used. Production schema and disabled flag are ready; merge and resulting
+production rollout await explicit merge-to-main authorization.
+
 ## 2026-09-09 — Publish the two approved tariffs
 
 Publish temporary full-review price 299 USD with Stripe fees included and the supplied review and 100-day support links, using existing production code as base. Preserve current production offer fingerprints; new review terms are oferta-v8. Other uncommitted local work is outside this release. Existing 500 USD review link is used only from 1 December 2026 onward when no new 500 link is configured.
