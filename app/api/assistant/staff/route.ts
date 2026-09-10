@@ -13,6 +13,8 @@ import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { isUuid } from "@/lib/utils/uuid";
+import { guardFactualReply } from "@/lib/assistant/factual-honesty";
+import { apiErrorLocale } from "@/lib/i18n/api-errors";
 
 import { saveAssistantExchange } from "@/lib/assistant/history";
 import { memoryCollectionFromCommand } from "@/lib/assistant/memory";
@@ -125,6 +127,9 @@ export async function POST(request: Request) {
     if (archive.unavailable) system += "\nArchive search is temporarily unavailable. Tell Anna in the active language; do not claim to have searched or remembered unavailable notes.";
     else if (!archive.matches) system += "\nArchive keyword search found no matching notes. Do not invent saved notes or claim the archive has no such information.";
   }
+  const rawLocale = (body as { locale?: unknown })?.locale;
+  const locale = rawLocale === "en" ? "en" : rawLocale === "ru" ? "ru" : await apiErrorLocale();
+  system += `\nActive interface language: ${locale}. Answer entirely in this language.`;
 
   if (attachments) {
     system = `${system}\n\n${ATTACHMENT_READING_ACCURACY_RULE}`;
@@ -140,7 +145,11 @@ export async function POST(request: Request) {
 
     if (caseContext) {
       system = `${system}\n\n${caseContext}`;
+    } else {
+      system += "\nCase snapshot unavailable. Do not infer missing documents, payments or case decisions.";
     }
+  } else {
+    system += "\nNo Case snapshot is attached to this request. No live platform analytics are connected.";
   }
   // Attachments go to the one provider that reads photos and PDFs directly.
   // The arbiter path is skipped for such a question rather than answering it
@@ -180,5 +189,11 @@ export async function POST(request: Request) {
   }
   if (result.refusal) result.reply = providerPolicyRefusal((body as { locale?: unknown })?.locale === "en" ? "en" : "ru").reply;
 
-  return respondWithReply(result.reply);
+  const reply = guardFactualReply({
+    reply: result.reply,
+    question: messages[messages.length - 1]?.content ?? "",
+    locale,
+    audience: assistantRole
+  });
+  return respondWithReply(reply);
 }
