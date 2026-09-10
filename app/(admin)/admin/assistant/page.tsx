@@ -22,7 +22,7 @@ export default async function PrivateAssistantPage() {
   const assistantRole = auth.status === "authorized" ? resolvePrivateAssistantRole(auth.email) : null;
   if (!assistantRole) notFound();
 
-  const configured = hasAssistantEnv();
+  const configured = hasAssistantEnv() || Boolean(process.env.OPENAI_REALTIME_API_KEY?.trim());
   if (assistantRole === "karen") {
     const labels = locale === "ru" ? {
       back: "Вернуться обратно",

@@ -15,6 +15,9 @@ export type AssistantHistoryMessage = {
   created_at: string;
   locale: Locale | null;
   message_sequence: number;
+  source?: "text" | "voice_transcript";
+  voice_state?: "completed" | "interrupted";
+  web_results?: import("./web-results").WebResult[];
 };
 
 // A single answer can be long; a whole conversation of them is what makes
@@ -112,8 +115,9 @@ export async function getOwnAssistantHistory(
 
   const { data, error } = await supabase
     .from("assistant_messages")
-    .select("id, role, content, created_at, locale, message_sequence")
+    .select("id, role, content, created_at, locale, message_sequence, source, voice_state, web_results")
     .eq("profile_id", profileId)
+    .eq("conversation_scope", "client")
     .eq("locale", locale)
     .order("message_sequence", { ascending: false })
     .limit(limit);

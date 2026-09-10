@@ -2,6 +2,42 @@
 
 ## North Star
 
+Five-voice selection (D-061): local selector/preview complete. Personal founder/
+Karen voice support is prepared, not activated. Next owner-only inputs: each
+person's consent recording and separate sample, plus confirmed provider eligibility.
+Codex can then perform authorized provisioning and staging acceptance. Existing
+production/no-PHI gates remain unchanged; see
+`docs/ankh/voice_choices_and_personal_voices.md`.
+
+Avatar voice UI (D-060): local composer launcher and full-screen call view complete.
+Include one-click opening, Escape/End cleanup, focus restoration, mobile layout
+and transcript/source continuity in the pending authorized staging voice acceptance.
+See docs/ankh/voice_avatar_interface.md. No production enablement in this increment.
+
+Staff voice public internet search (D-059, 2026-09-09): local code and synthetic
+browser/API tests are complete, with signed source persistence and RU/EN inline
+links. Next: authorized staging application of the two voice migrations, history
+RLS checks, founder/Karen public-search audio continuation and mixed-data privacy
+acceptance. No production enablement or paid/live test performed. See
+`docs/ankh/voice_web_search.md`. Clinical phase sequence is unchanged.
+
+Realtime Anham conversation increment (2026-09-09): local WebRTC UI/API and scoped
+live text, interrupted-turn persistence, paginated staff history and broad
+founder/Karen business-data read tools are implemented for a disabled-by-default,
+non-sensitive account-allowlisted pilot. Next: isolated staging schema/auth/audio
+acceptance with authorized credentials and synthetic speech. No production
+deployment or PHI processing is authorized by this increment; see
+`docs/ankh/realtime_voice.md`. Clinical phase ordering below remains unchanged.
+
+The owner broadened access for both personas to all catalogued site/client data
+(D-058, `docs/ankh/voice_site_data_access.md`). Local coverage is 46 datasets plus
+published site content, with source-specific retrieval and minimal read auditing.
+Staging acceptance must verify both staff personas versus denied client/guest
+access, the new signed data-policy version, audit failure, absent staging tables,
+device-local dates, real tool/audio continuation, long-field reads, client
+disambiguation, history and interruption/save retry in both languages. No raw
+SQL, secret access, business-record writes or bulk document preloading is included.
+
 Build a system that turns heterogeneous client medical documents into a traceable, longitudinal, reviewable evidence model that allows Ankh to prepare the Case and Karen to understand and decide quickly.
 
 Accuracy, explainability, safety and workflow efficiency are more important than maximizing automation percentage.

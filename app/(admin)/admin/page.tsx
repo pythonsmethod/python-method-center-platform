@@ -66,7 +66,7 @@ export default async function AdminPage() {
     getStaffUnreadCounts(auth.email),
     getStaffCases()
   ]);
-  const assistantConfigured = hasAssistantEnv();
+  const assistantConfigured = hasAssistantEnv() || Boolean(process.env.OPENAI_REALTIME_API_KEY?.trim());
   // Only the founder sees which model answers; for the team it is simply
   // the assistant.
   const showProviders = canSeeProviderNames(auth.email);
@@ -211,6 +211,7 @@ export default async function AdminPage() {
             <AssistantChat
               attachments
               endpoint="/api/assistant/staff"
+              locale={locale}
               intro={copy.assistantIntro}
               placeholder={copy.assistantPlaceholder}
               providerChoice={showProviders}
@@ -298,6 +299,7 @@ export default async function AdminPage() {
               <AssistantChat
                 attachments
                 endpoint="/api/assistant/staff"
+                locale={locale}
                 intro="Здравствуйте, Professor Python! Вставьте вопрос клиента, текст анкеты или задачу — помогу с черновиком ответа, выжимкой или планом. Можно прикрепить до 30 фото или PDF за раз (скрепка внизу): снимки сжимаются сами, а если файлов много — я прочитаю их по частям и соберу общий разбор. Файлы нигде не сохраняются."
                 placeholder="Вставьте вопрос или прикрепите файл…"
                 providerChoice={showProviders}

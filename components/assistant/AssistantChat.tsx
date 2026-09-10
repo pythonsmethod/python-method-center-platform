@@ -2,6 +2,9 @@
 
 import { Fragment, useEffect, useRef, useState } from "react";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
+import { voiceCopy } from "@/lib/assistant/realtime-contract";
+import { RealtimeVoice } from "@/components/assistant/RealtimeVoice";
+import { mergeVoiceTranscript, type VoiceChatMessage } from "@/lib/assistant/voice-chat";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
 import { memoryCollectionFromCommand, type MemoryCollection } from "@/lib/assistant/memory";
@@ -11,12 +14,10 @@ import {
   type PreparedFile
 } from "@/lib/assistant/prepare-files";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+import { VoiceWebResults } from "./VoiceWebResults";
 import type { Locale } from "@/lib/i18n/locale";
 
-type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
+type ChatMessage = VoiceChatMessage;
 
 type AssistantChatProps = {
   endpoint: string;
@@ -57,6 +58,7 @@ const chatCopy = {
     inspectFiles: "Посмотри приложенные файлы.",
     reading: (from: number, to: number, total: number) => `Читаю файлы ${from}–${to} из ${total}…`,
     combining: "Собираю общий разбор…", history: "Ваша прошлая переписка", today: "Сегодня",
+    older: "Показать более ранние сообщения", loadingHistory: "Загружаю переписку…", historyError: "Не удалось загрузить переписку.", retryHistory: "Повторить загрузку",
     provider: "Кто отвечает", best: "Лучший ответ (арбитр выбирает)", both: "Оба вместе (совет)",
     remove: (name: string) => `Убрать ${name}`, attach: "Прикрепить файл или фото",
     attachTitle: "Фото, PDF или текстовый файл — до 30 штук за раз. Снимки сжимаются автоматически, файлы не сохраняются на платформе.",
@@ -68,6 +70,7 @@ const chatCopy = {
     inspectFiles: "Please review the attached files.",
     reading: (from: number, to: number, total: number) => `Reading files ${from}–${to} of ${total}…`,
     combining: "Combining the full review…", history: "Your previous conversation", today: "Today",
+    older: "Show earlier messages", loadingHistory: "Loading conversation…", historyError: "Could not load the conversation.", retryHistory: "Retry loading",
     provider: "Who answers", best: "Best answer (selected by the arbiter)", both: "Both together (panel)",
     remove: (name: string) => `Remove ${name}`, attach: "Attach a file or photo",
     attachTitle: "Photos, PDFs, or text files — up to 30 at once. Images are compressed automatically and files are not stored on the platform.",
@@ -101,6 +104,7 @@ export function AssistantChat({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [provider, setProvider] = useState<Provider>("best");
   const [files, setFiles] = useState<PreparedFile[]>([]);
@@ -110,12 +114,25 @@ export function AssistantChat({
   // How many of the messages on screen came from a previous visit — they get
   // a divider so it is clear where today's conversation starts.
   const [restored, setRestored] = useState(0);
+  const [historyBefore, setHistoryBefore] = useState<number | null>(null);
+  const [nextBefore, setNextBefore] = useState<number | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [historyFailed, setHistoryFailed] = useState(false);
+  const [historyRetry, setHistoryRetry] = useState(0);
+  const preserveHistoryScroll = useRef<{ height: number; top: number } | null>(null);
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const voice = useVoiceInput((text) => {
     setInput((current) => (current ? `${current} ${text}` : text));
   });
+  const voiceScope = endpoint === "/api/assistant/staff" ? "staff" : endpoint === "/api/assistant/client" && historyEndpoint ? "client" : null;
+  const effectiveHistoryEndpoint = historyEndpoint ?? (voiceScope === "staff"
+    ? `/api/assistant/realtime/transcript?scope=staff&locale=${locale}${caseId ? `&caseId=${encodeURIComponent(caseId)}` : ""}` : undefined);
+  useEffect(() => {
+    setMessages([]); setRestored(0); setInput(""); setError(null);
+    setHistoryBefore(null); setNextBefore(null); setHistoryFailed(false); preserveHistoryScroll.current = null;
+  }, [locale, endpoint, caseId]);
 
   // Keep a long draft visible like a messenger composer: grow until a
   // comfortable ceiling, then scroll inside the field.
@@ -140,6 +157,11 @@ export function AssistantChat({
     if (!node) {
       return;
     }
+    if (preserveHistoryScroll.current) {
+      const previous = preserveHistoryScroll.current; preserveHistoryScroll.current = null;
+      node.scrollTop = previous.top + node.scrollHeight - previous.height;
+      return;
+    }
 
     const last = node.querySelector<HTMLElement>(
       ".assistant-msg:not(.assistant-msg--pending):last-of-type"
@@ -161,42 +183,48 @@ export function AssistantChat({
     node.scrollTop = node.scrollHeight;
   }, [messages, pending]);
 
-  // Previous conversation of a signed-in person, so they can re-read what
-  // they were told instead of asking again. Failures are silent: an empty
-  // thread is a normal starting point, not an error worth showing.
+  // Staff voice history can be paged back without a 60-message reading limit.
   useEffect(() => {
-    if (!historyEndpoint) {
+    if (!effectiveHistoryEndpoint) {
       return;
     }
 
     let cancelled = false;
+    setHistoryLoading(true); setHistoryFailed(false);
 
     void (async () => {
       try {
-        const response = await fetch(historyEndpoint);
+        const url = new URL(effectiveHistoryEndpoint, window.location.origin);
+        if (historyBefore) url.searchParams.set("before", String(historyBefore));
+        const response = await fetch(url.pathname + url.search);
 
         if (!response.ok) {
-          return;
+          throw new Error();
         }
 
-        const data = (await response.json()) as { messages?: ChatMessage[] };
+        const data = (await response.json()) as { messages?: ChatMessage[]; nextBefore?: number | null };
         const saved = Array.isArray(data.messages) ? data.messages : [];
 
-        if (cancelled || saved.length === 0) {
+        if (cancelled) {
           return;
         }
-
-        setMessages((current) => (current.length > 0 ? current : saved));
-        setRestored(saved.length);
+        setNextBefore(typeof data.nextBefore === "number" ? data.nextBefore : null);
+        if (historyBefore && saved.length) {
+          const node = scrollRef.current;
+          if (node) preserveHistoryScroll.current = { height: node.scrollHeight, top: node.scrollTop };
+          setMessages(current => [...saved, ...current]); setRestored(current => current + saved.length);
+        } else if (saved.length) {
+          setMessages(current => current.length > 0 ? current : saved); setRestored(saved.length);
+        }
       } catch {
-        // Nothing to restore — the conversation simply starts fresh.
-      }
+        if (!cancelled) setHistoryFailed(true);
+      } finally { if (!cancelled) setHistoryLoading(false); }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [historyEndpoint]);
+  }, [effectiveHistoryEndpoint, locale, historyBefore, historyRetry]);
 
   async function addFiles(selected: FileList | null) {
     if (!selected || selected.length === 0) {
@@ -281,7 +309,7 @@ export function AssistantChat({
   const sentQuestion = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!initialQuestion || pending || sentQuestion.current === initialQuestion) {
+    if (!initialQuestion || pending || voiceActive || sentQuestion.current === initialQuestion) {
       return;
     }
 
@@ -291,13 +319,13 @@ export function AssistantChat({
     // `send` intentionally stays out of the dependencies: this effect owns
     // one initial hand-off, and sentQuestion prevents duplicate paid calls.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQuestion, pending, onInitialQuestionSent]);
+  }, [initialQuestion, pending, voiceActive, onInitialQuestionSent]);
 
   async function send(text: string) {
     const trimmed = text.trim();
     const attached = files;
 
-    if ((!trimmed && attached.length === 0) || pending) {
+    if ((!trimmed && attached.length === 0) || pending || voiceActive) {
       return;
     }
 
@@ -447,8 +475,11 @@ export function AssistantChat({
 
   return (
     <div className="assistant-chat">
-      <div className="assistant-chat__messages" ref={scrollRef}>
-        <div className="assistant-msg assistant-msg--assistant">{intro}</div>
+        <div className="assistant-chat__messages" ref={scrollRef}>
+          <div className="assistant-msg assistant-msg--assistant">{intro}</div>
+          {historyLoading ? <p role="status">{c.loadingHistory}</p> : null}
+          {historyFailed ? <p role="alert">{c.historyError} <button type="button" onClick={() => setHistoryRetry(n => n + 1)}>{c.retryHistory}</button></p> : null}
+          {nextBefore && !historyFailed ? <button className="assistant-msg__use-reply" type="button" disabled={historyLoading || voiceActive} onClick={() => setHistoryBefore(nextBefore)}>{c.older}</button> : null}
         {restored > 0 ? (
           <p className="assistant-chat__divider">{c.history}</p>
         ) : null}
@@ -458,8 +489,11 @@ export function AssistantChat({
               <p className="assistant-chat__divider">{c.today}</p>
             ) : null}
             <div className={`assistant-msg assistant-msg--${message.role}`}>
+              {message.source === "voice_transcript" ? <small className="assistant-log__meta">{locale === "ru" ? "Голос · непроверенная расшифровка" : "Voice · unverified transcript"}</small> : null}
+              {message.voice_state === "interrupted" ? <small className="assistant-log__meta">{locale === "ru" ? "Прервано · текст ответа мог прозвучать не полностью" : "Interrupted · reply text may not have been fully spoken"}</small> : null}
               {message.content}
-              {message.role === "assistant" && onUseReply ? (
+              {message.role === "assistant" ? <VoiceWebResults results={message.web_results} locale={locale} /> : null}
+              {message.role === "assistant" && !message.voiceLive && onUseReply ? (
                 <button
                   className="assistant-msg__use-reply"
                   onClick={() => {
@@ -524,6 +558,7 @@ export function AssistantChat({
         <label className="assistant-chat__provider">
           {c.provider}
           <select
+            disabled={voiceActive}
             onChange={(event) => setProvider(event.target.value as Provider)}
             value={provider}
           >
@@ -535,6 +570,7 @@ export function AssistantChat({
         </label>
       ) : null}
 
+
       <form
         className="assistant-chat__form"
         onSubmit={(event) => {
@@ -543,6 +579,7 @@ export function AssistantChat({
         }}
       >
         <textarea
+          disabled={voiceActive}
           maxLength={4000}
           onChange={(event) => setInput(event.target.value)}
           onKeyDown={(event) => {
@@ -554,78 +591,45 @@ export function AssistantChat({
           placeholder={voice.listening ? t.listening : effectivePlaceholder}
           ref={composerRef}
           rows={4}
-          value={voice.interim ? `${input}${input ? " " : ""}${voice.interim}` : input}
+          value={voice.interim ? input + (input ? " " : "") + voice.interim : input}
         />
-        {voice.listening ? (
-          <p className="assistant-chat__voice-hint">
-            {t.voiceHint}
-          </p>
-        ) : null}
+        {voice.listening ? <p className="assistant-chat__voice-hint">{t.voiceHint}</p> : null}
         {allowAttachments && files.length > 0 ? (
           <ul className="assistant-chat__files">
             {files.map((file) => (
               <li key={file.id}>
                 <span>📎 {file.name}</span>
-                <button
-                aria-label={c.remove(file.name)}
-                  onClick={() =>
-                    setFiles((current) =>
-                      current.filter((item) => item.id !== file.id)
-                    )
-                  }
-                  type="button"
-                >
-                  ✕
-                </button>
+                <button aria-label={c.remove(file.name)}
+                  onClick={() => setFiles((current) => current.filter((item) => item.id !== file.id))}
+                  type="button">✕</button>
               </li>
             ))}
           </ul>
         ) : null}
-
         <div className="assistant-chat__actions">
-          {allowAttachments ? (
-            <>
-              <input
-                accept={ACCEPT_ATTRIBUTE}
-                className="assistant-chat__file-input"
-                multiple
-                onChange={(event) => {
-                  void addFiles(event.target.files);
-                  event.target.value = "";
-                }}
-                ref={fileInputRef}
-                type="file"
-              />
-              <button
-                aria-label={c.attach}
-                className="assistant-chat__mic"
-                onClick={() => fileInputRef.current?.click()}
-                title={c.attachTitle}
-                type="button"
-              >
-                📎
-              </button>
-            </>
-          ) : null}
-          {voice.supported ? (
-            <button
-              aria-label={voice.listening ? t.micStop : t.micStart}
-              className={`assistant-chat__mic${voice.listening ? " assistant-chat__mic--on" : ""}`}
-              onClick={voice.toggle}
-              type="button"
-            >
-              🎤
-            </button>
-          ) : null}
-          <button
-            className="button"
-            disabled={pending || (!input.trim() && files.length === 0)}
-            type="submit"
-          >
-            {t.send}
-          </button>
+          {allowAttachments ? <>
+            <input accept={ACCEPT_ATTRIBUTE} className="assistant-chat__file-input" multiple
+              onChange={(event) => { void addFiles(event.target.files); event.target.value = ""; }}
+              ref={fileInputRef} type="file" />
+            <button aria-label={c.attach} disabled={voiceActive} className="assistant-chat__mic"
+              onClick={() => fileInputRef.current?.click()} title={c.attachTitle} type="button">📎</button>
+          </> : null}
+          {voice.supported ? <button
+            aria-label={voice.listening ? t.micStop : t.micStart}
+            disabled={voiceActive || pending}
+            className={"assistant-chat__mic" + (voice.listening ? " assistant-chat__mic--on" : "")}
+            onClick={voice.toggle} type="button">🎤</button> : null}
+          {voiceScope ? <RealtimeVoice
+            key={locale + ":" + voiceScope + ":" + (caseId ?? "own")}
+            locale={locale} scope={voiceScope} caseId={caseId}
+            disabled={pending || historyLoading || voice.listening || files.length > 0 || Boolean(progress)}
+            onActive={setVoiceActive}
+            onTranscript={(text, sessionId) => setMessages(current => mergeVoiceTranscript(current, text, sessionId))}
+          /> : null}
+          <button className="button" disabled={pending || voiceActive || (!input.trim() && files.length === 0)} type="submit">{t.send}</button>
         </div>
       </form>
+      {voiceScope ? <details className="assistant-voice-disclosure"><summary>{voiceCopy[locale].voiceDetails}</summary><p>{voiceScope === "staff" ? voiceCopy[locale].staffDisclosure : voiceCopy[locale].disclosure}</p></details> : null}
     </div>
   );
 }

@@ -32,7 +32,10 @@ export async function GET() {
   return NextResponse.json({
     messages: result.messages.map((message) => ({
       role: message.role,
-      content: message.content
+      content: message.content,
+      source: message.source,
+      voice_state: message.voice_state,
+      web_results: message.web_results
     }))
   });
 }
