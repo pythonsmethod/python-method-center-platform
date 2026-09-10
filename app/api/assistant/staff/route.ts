@@ -1,6 +1,7 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
 import { conversationContext } from "@/lib/assistant/conversation-context";
+import { withConversationArchive } from "@/lib/assistant/conversation-archive";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { searchKnowledgeArchive } from "@/lib/assistant/knowledge-search";
 import { founderMemoryFromCommand } from "@/lib/assistant/founder-memory";
@@ -169,7 +170,8 @@ export async function POST(request: Request) {
   // Attachments go to the one provider that reads photos and PDFs directly.
   // The arbiter path is skipped for such a question rather than answering it
   // without seeing the file.
-  const result = attachments
+  const result = await withConversationArchive({ profileId: auth.userId, private: true,
+    caseId: typeof rawCaseId === "string" && isUuid(rawCaseId) ? rawCaseId : null }, async () => attachments
     ? hasClaudeEnv()
       ? await askClaude(system, messages, 5000, attachments)
       : ({
@@ -186,7 +188,7 @@ export async function POST(request: Request) {
           provider,
           { attribution, deepReasoning: true, locale: responseLocale }
         )
-      : await askKarenAssistant(system, messages, 2200);
+      : await askKarenAssistant(system, messages, 2200));
 
   if (result.status === "unavailable") {
     return NextResponse.json(

@@ -37,7 +37,7 @@ beforeEach(() => {
   mocks.from.mockImplementation((table: string) => {
     const q = { table, filters: [] as unknown[][] }; queries.push(q);
     const result = () => ({ data: table === "profiles" ? profile : table === "client_cases" ? caseRow : [], error: dbError });
-    const chain = { select: vi.fn(() => chain), eq: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), lt: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), gt: vi.fn(() => chain), in: vi.fn(() => chain), is: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), order: vi.fn(() => chain), limit: vi.fn(() => chain), maybeSingle: vi.fn(async () => result()), upsert: mocks.upsert, then: (resolve: (value: ReturnType<typeof result>) => unknown) => Promise.resolve(result()).then(resolve) };
+    const chain = { abortSignal: vi.fn(() => chain), select: vi.fn(() => chain), eq: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), lt: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), gt: vi.fn(() => chain), in: vi.fn(() => chain), is: vi.fn((...args: unknown[]) => { q.filters.push(args); return chain; }), order: vi.fn(() => chain), limit: vi.fn(() => chain), maybeSingle: vi.fn(async () => result()), upsert: mocks.upsert, then: (resolve: (value: ReturnType<typeof result>) => unknown) => Promise.resolve(result()).then(resolve) };
     return chain;
   });
   const client = { auth: { getUser: mocks.getUser }, from: mocks.from, rpc: mocks.rpc };
@@ -47,6 +47,14 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  it("lets signed-in clients search only their own archive in voice", async () => {
+    const response = await siteTool(request({ ...transcriptBody(), name: "search_conversation_history", arguments: {} }));
+    expect(response.status).toBe(200);
+    expect((await response.json()).output.status).toBe("ready");
+    expect(queries.find(q => q.table === "assistant_messages")?.filters).toContainEqual(["profile_id", userId]);
+    const denied = await siteTool(request({ ...transcriptBody(), name: "query_site_records", arguments: { dataset: "profiles" } }));
+    expect(denied.status).toBe(403);
+  });
   it.each(["ru", "en"] as const)("does not deny supplied conversation memory in %s", locale => {
     for (const scope of ["client", "founder", "karen"] as const) {
       const prompt = voiceInstructions({ ...actor, scope }, locale);
@@ -119,7 +127,8 @@ describe("voice authorization and provider handshake", () => {
     const config = JSON.parse(body.get("session") as string);
     expect(config.audio.input.turn_detection.create_response).toBe(false);
     expect(config.audio.input.transcription.language).toBe("en");
-    expect(config.instructions).not.toContain(actor.email); expect(config.tools).toEqual([]);
+    expect(config.instructions).not.toContain(actor.email);
+    expect(config.tools.map((tool: { name: string }) => tool.name)).toEqual(["search_conversation_history", "read_conversation_message"]);
     expect(queries.map(q => q.table)).not.toContain("uploaded_documents");
   });
   it("rejects guests", async () => {

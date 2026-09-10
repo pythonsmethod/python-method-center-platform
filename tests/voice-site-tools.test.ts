@@ -39,8 +39,8 @@ describe("voice civil day", () => {
   });
 });
 describe("permission-scoped read-only site data", () => {
-  it("does not offer or execute tools for clients", async () => {
-    expect(voiceSiteTools("client")).toEqual([]);
+  it("offers only own archive tools to clients and refuses staff site operations", async () => {
+    expect(voiceSiteTools("client").map(tool => tool.name)).toEqual(["search_conversation_history", "read_conversation_message"]);
     await expect(run("registration_counts", {}, { ...actor, scope: "client" })).rejects.toMatchObject({ status: 403 }); expect(queries).toEqual([]);
   });
   it.each(["incoming_messages", "read_incoming_message"])("honors the owner's broadened founder Professor access through %s", async name => {

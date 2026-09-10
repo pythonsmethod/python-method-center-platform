@@ -28,7 +28,7 @@ describe("voice uses existing private text authority", () => {
     await expect(runVoiceTextBridge(request, { ...actor, scope: "client" }, receipt, "en", body)).rejects.toMatchObject({ status: 403 });
     await expect(runVoiceTextBridge(request, actor, receipt, "en", { ...body, arguments: { command: "save" } })).rejects.toMatchObject({ status: 400 });
     expect(mocks.text).not.toHaveBeenCalled();
-    expect(voiceSiteTools("client")).toEqual([]);
+    expect(voiceSiteTools("client").some(tool => tool.name === "ask_text_assistant")).toBe(false);
     expect(voiceSiteTools("karen").some(t => t.name === "ask_text_assistant")).toBe(true);
   });
   it("cannot execute a duplicate turn or claim success on denial", async () => {

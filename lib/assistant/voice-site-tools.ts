@@ -5,11 +5,13 @@ import { STAFF_DATA_TOOLS, runStaffDataTool } from "./site-data-tools";
 import { writeAuditLog } from "@/lib/audit/log";
 import type { Locale } from "@/lib/i18n/locale";
 import { WEB_SEARCH_TOOL } from "./voice-web-search";
+import { CONVERSATION_ARCHIVE_TOOLS } from "./conversation-archive";
 
 // The model chooses among named read operations, never SQL, table or profile IDs.
 export function voiceSiteTools(scope: VoiceActor["scope"]) {
-  if (scope === "client") return [];
+  if (scope === "client") return CONVERSATION_ARCHIVE_TOOLS;
   return [
+    ...CONVERSATION_ARCHIVE_TOOLS,
     { type: "function", name: "ask_text_assistant", description: "Use the same private text assistant for reasoning, methodology, archive memory and explicit remember/save commands. The server uses the actual user transcript, not model-written instructions. Call once per turn and speak the returned reply accurately.", parameters: { type: "object", properties: {}, additionalProperties: false } },
     ...STAFF_DATA_TOOLS,
     ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : []),

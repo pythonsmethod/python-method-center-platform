@@ -27,7 +27,7 @@ afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 describe("public voice web search", () => {
   it.each(["founder", "karen"] as const)("offers public search to %s only when enabled", scope => {
     expect(voiceSiteTools(scope).map(t => t.name)).toContain("search_web");
-    expect(voiceSiteTools("client")).toEqual([]);
+    expect(voiceSiteTools("client").some(tool => tool.name === "search_web")).toBe(false);
     vi.stubEnv("ANHAM_WEB_SEARCH_ENABLED", "false"); expect(voiceSiteTools(scope).map(t => t.name)).not.toContain("search_web");
   });
   it("sends only the bounded public query, requires live search, disables storage and signs cited results", async () => {
