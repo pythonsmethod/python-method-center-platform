@@ -9,6 +9,10 @@ payments and platform roles are unchanged. This supersedes the pilot's earlier
 registered-tier restriction; own-Case and staff denials remain. Publication and
 validation are tracked in docs/ankh/elena_full_client_assistant.md.
 
+Published via PR #165, main b18a8987; production
+dpl_B7YhZ8A6wfwYHWtunAFdTt6SKTef READY. Integrated regression: 1573 tests,
+170 files passed; TypeScript/ESLint/diff passed. GO for own-account client trial.
+
 ## Published honesty release — 2026-09-09 local
 
 Owner-authorized PR #161 is published: main 2e56cbf, Vercel production
