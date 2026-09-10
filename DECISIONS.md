@@ -706,3 +706,7 @@ Conversation history is stored in existing assistant_messages, scoped to the aut
 ## 2026-09-09 — Anna integrated memory and whole-archive retrieval
 
 Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.
+
+## 2026-09-09 — Preserve confirmed history and actual timestamps
+
+Include created_at in both rows of every bulk exchange insert. Record question arrival and answer completion separately; use the same prepared rows for retries. Do not turn empty acknowledgements into saved:true or fabricate sequence IDs. Keep existing two-row insert/readback confirmation and visible storage-failure handling. This is a persistence correction, with no new schema or permission.
