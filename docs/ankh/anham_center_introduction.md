@@ -14,3 +14,11 @@ J/K/L. Publication pending. GO after checks/build; then begin a new conversation
 and ask Anham to introduce itself.
 
 Validation: 83 tests in 4 files passed; TypeScript, ESLint and git diff --check passed. GO for scoped publication.
+
+Release CLOSED / GO for fresh-conversation acceptance. PR #168 merged as
+36a9e94c1435e2a5852424a12d93bd03f86be557. Website preview
+ dpl_8wS9e7SVJdocccTuaLhSkQQWsXU4 and production
+ dpl_DxMxpF1rEcfb82zbvoYqMfvjkbLk are READY. 83 relevant tests passed;
+TypeScript, ESLint and diff checks passed. No live microphone acceptance claimed.
+The separate mobile project retains its unrelated No Next.js version detected
+configuration failure; this update does not modify that project's configuration.

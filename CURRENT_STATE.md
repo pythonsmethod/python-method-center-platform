@@ -825,3 +825,5 @@ Method Center; Professor Python is the human founder/expert. The shared RU/EN
 prompt now fixes the introduction in text and voice, with Russian pronunciation.
 No permissions, schema, clinical changes or historical message rewrites.
 Release evidence: docs/ankh/anham_center_introduction.md.
+
+Introduction correction published: PR #168 / 36a9e94c; production dpl_DxMxpF1rEcfb82zbvoYqMfvjkbLk READY. Fresh-conversation acceptance is next.
