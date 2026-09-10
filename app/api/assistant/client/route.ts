@@ -71,6 +71,7 @@ function isRateLimited(key: string, limit: number): boolean {
 }
 
 export async function POST(request: Request) {
+  const questionCreatedAt = new Date().toISOString();
   const locale = await apiErrorLocale();
   const ip = clientIp(request.headers);
 
@@ -101,6 +102,16 @@ export async function POST(request: Request) {
   const audience = await resolveAssistantAudience();
   const settings = TIER_SETTINGS[audience.tier];
 
+  async function respondWithReply(reply: string) {
+    const payload = body as { transient?: unknown; displayText?: unknown; locale?: unknown };
+    const persistence = audience.profileId && audience.tier !== "guest" && payload.transient !== true
+      ? await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId, tier: audience.tier, questionCreatedAt,
+          question: typeof payload.displayText === "string" && payload.displayText.trim() ? payload.displayText : messages![messages!.length - 1].content,
+          answer: reply, locale: payload.locale === "en" ? "en" : "ru" }) : undefined;
+    return NextResponse.json({ reply, ...persistence });
+  }
+
+
   // Files in the chat are a paying-client capability: their AI reads the
   // analyses they attach. The interface only shows the paperclip on that
   // level, but the check lives here, where it cannot be bypassed.
@@ -116,9 +127,7 @@ export async function POST(request: Request) {
   }
 
   if (attachments && audience.tier !== "client") {
-    return NextResponse.json({
-      reply: apiError("attachmentsPaidOnly", locale)
-    });
+    return respondWithReply(apiError("attachmentsPaidOnly", locale));
   }
 
   if (isRateLimited(`tier:${audience.profileId ?? ip}`, settings.perMinute)) {
@@ -140,7 +149,7 @@ export async function POST(request: Request) {
   if (!guard.allowed) {
     // Delivered as a reply, not as an error: the person should read a warm
     // invitation, not a red technical banner.
-    return NextResponse.json({ reply: guard.message }, { status: 200 });
+    return respondWithReply(guard.message);
   }
 
   const requestedAnhamMode = audience.tier === "client"
@@ -206,31 +215,7 @@ export async function POST(request: Request) {
       { status: 502 }
     );
   }
-
   if (result.refusal) result.reply = providerPolicyRefusal(rawLocale === "en" ? "en" : "ru").reply;
 
-  // Saved conversation — only for people who have an account. Someone who
-  // is just looking around the site leaves nothing behind.
-  if (audience.tier !== "guest" && audience.profileId) {
-    // Reading a large set of files takes several technical requests; only
-    // the conversation itself is worth keeping, so those are marked as
-    // transient by the chat window. `displayText` is what the person
-    // actually saw in the window, without the machine-readable padding.
-    const transient = (body as { transient?: unknown })?.transient === true;
-    const rawDisplay = (body as { displayText?: unknown })?.displayText;
-    const displayText = typeof rawDisplay === "string" ? rawDisplay.trim() : "";
-
-    if (!transient) {
-      await saveAssistantExchange({
-        profileId: audience.profileId,
-        caseId: audience.caseId,
-        tier: audience.tier,
-        question: displayText || messages[messages.length - 1]?.content || "",
-        answer: result.reply,
-        locale: rawLocale === "en" ? "en" : "ru"
-      });
-    }
-  }
-
-  return NextResponse.json({ reply: result.reply });
+  return respondWithReply(result.reply);
 }
