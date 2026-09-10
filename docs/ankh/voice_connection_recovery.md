@@ -32,3 +32,10 @@ L. Verify production; repeat conversation, inspect safe diagnostics if it fails.
 References:
 https://developer.mozilla.org/en-US/docs/Web/API/RTCPeerConnection/iceConnectionState
 https://github.com/openai/openai-node/blob/main/docs/realtime.md
+Release evidence: PR #172, merge 895e2c195fd2802425ffbcc16d9878f1f56fb6bc.
+Website preview dpl_Dh4nDFbstZZdNvh1DyKbLaG3ykur READY. Production
+https://pythonmethodcenter.com READY: dpl_CxPDd9UuA7tBCUJYpKqJpHTamuXT,
+matching merge SHA. Implementation/publication CLOSED; exact incident root cause
+NOT CLOSED pending reproduction/diagnostics. GO for fresh voice testing.
+Separate mobile preview retains pre-compilation Root Directory / No Next.js
+version detected failure; no mobile code changed. No microphone test performed.

@@ -851,3 +851,4 @@ disconnected and mislabeled every provider error as network failure.
 Now waits up to 8 seconds for the existing peer, with RU/EN status, and distinguishes
 service failures. Authenticated, receipt-bound, quota-limited diagnostics retain only
 enumerated code/voice/locale, no speech or provider message. See docs/ankh/voice_connection_recovery.md.
+Voice recovery published: PR #172, 895e2c1, production dpl_CxPDd9UuA7tBCUJYpKqJpHTamuXT READY. Exact screenshot failure remains unproven.
