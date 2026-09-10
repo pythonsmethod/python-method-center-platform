@@ -32,5 +32,11 @@ H/I. No live microphone test or impersonated login as Elena; no new account,
 password, email sending, case creation, bulk rollout or data deletion. Full
 staff internet search and internal operations are intentionally unavailable.
 
-J/K/L. Code validated; publish this correction, verify production route/login
-boundary, then Elena can test her own Case through /cabinet/assistant.
+J/K/L. Implementation and publication CLOSED; GO for Elena's client pilot.
+PR #164 merged as 46f80a6c17a53e0ea347c51b89e786e9c4bdc6fe.
+Production deployment dpl_6KS5i57MJCSdXcDYhvCfBiCDthKk is READY.
+Final focused regression: 64 tests in 3 files passed. Read-only account checks
+confirmed the client role and an existing own Case. Published /assistant routes
+an unauthenticated browser to /login?next=%2Fcabinet through the client cabinet.
+Actual authenticated client voice and microphone remain untested; next action
+is Elena's own-account trial at /cabinet/assistant. General rollout stays off.
