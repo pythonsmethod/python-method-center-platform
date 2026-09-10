@@ -12,3 +12,6 @@ I. Not included: paused Realtime implementation from older branch, expense dashb
 J. Implementation tested; publication pending.
 K. GO for owner-authorized scoped publication; no claim of total attack immunity.
 L. Next: publish PR, verify remote build then production deployment for the exact commit.
+
+## Production acceptance
+PR #166 merged as 5a5b2d321083406c6f9058f3a63bd7811a05ccf2. Preview dpl_53HjTTmjKXvG1P1Q1r7NKqoMqdch READY; production dpl_6uuFt6TGGV1c7346axeoP8AyNbjn READY and assigned pythonmethodcenter.com/www on 2026-09-10 UTC. HTTP /, /en and login return 200; empty realtime session request returns 400 without model work. Separate anham-mobile-app preview failed because its configured root has no Next dependency; the canonical web project built successfully. Publication phase CLOSED. GO for this scoped release; no live adversarial-model guarantee. Existing voice sessions should be restarted to receive new instructions. Broader security/cost dashboard, MFA and restore remain outside this release.
