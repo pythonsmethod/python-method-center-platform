@@ -545,3 +545,9 @@ support, varied brief welcomes/goodbyes and complete word endings at speed 0.95.
 Browser now forwards the pilot's own-case/web tools to existing server authorization.
 No role/schema/clinical changes. 107 relevant tests pass; TS/ESLint/diff pass.
 Acoustic validation remains a live listening task; see docs/ankh/anham_voice_delivery.md.
+## 2026-09-10 — Approved Anham authorship
+Owner approved Anna as developer of the platform and Anham, and Professor Python
+as author of the Center methodology. Shared text/voice instructions provide RU/EN
+wording and require the exact Latin spelling Professor Python in every language.
+No roles, schema, clinical logic or historical/source text changes.
+See docs/ankh/anham_approved_authorship.md for validation and release evidence.
