@@ -1,3 +1,4 @@
+import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
@@ -205,6 +206,8 @@ export async function POST(request: Request) {
       { status: 502 }
     );
   }
+
+  if (result.refusal) result.reply = providerPolicyRefusal(rawLocale === "en" ? "en" : "ru").reply;
 
   // Saved conversation — only for people who have an account. Someone who
   // is just looking around the site leaves nothing behind.

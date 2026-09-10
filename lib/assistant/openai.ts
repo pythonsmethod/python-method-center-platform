@@ -1,4 +1,5 @@
 import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
+import { isExplicitPolicyError, isFilteredChoice, providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
 // Quality-first flagship. Deployments may pin another available model, but
 // the private expert assistant must not silently fall back to a legacy one.
@@ -64,6 +65,7 @@ export async function askOpenAi(
     }
 
     if (!response.ok) {
+      if (await isExplicitPolicyError(response)) return providerPolicyRefusal();
       return {
         status: "error",
         code: "temporarilyDown",
@@ -74,10 +76,11 @@ export async function askOpenAi(
     const data = (await response.json()) as {
       choices?: {
         finish_reason?: string | null;
-        message?: { content?: string | null };
+        message?: { content?: string | null; refusal?: string | null };
       }[];
     };
 
+    if (isFilteredChoice(data.choices?.[0])) return providerPolicyRefusal();
     let reply = data.choices?.[0]?.message?.content?.trim();
 
     if (!reply) {
@@ -114,10 +117,14 @@ export async function askOpenAi(
           })
         });
 
+        if (!continuationResponse.ok && await isExplicitPolicyError(continuationResponse)) {
+          return providerPolicyRefusal();
+        }
         if (continuationResponse.ok) {
           const continuationData = (await continuationResponse.json()) as {
-            choices?: { message?: { content?: string | null } }[];
+            choices?: { finish_reason?: string | null; message?: { content?: string | null; refusal?: string | null } }[];
           };
+          if (isFilteredChoice(continuationData.choices?.[0])) return providerPolicyRefusal();
           const ending = continuationData.choices?.[0]?.message?.content?.trim();
 
           if (ending) {
