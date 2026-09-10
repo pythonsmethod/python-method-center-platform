@@ -267,7 +267,7 @@ export default async function StaffCaseDetailPage({
     canReadProfessorConversation
       ? getCaseMessages(clientCase.id)
       : Promise.resolve({ messages: [], error: null }),
-    getAssistantHistoryForCase(clientCase.profile_id, "ru"),
+    getAssistantHistoryForCase(clientCase.profile_id, locale),
     getCaseReview(clientCase.id, documents, locale),
     getCaseAnalyticalPicture(clientCase.id)
   ]);
@@ -480,17 +480,19 @@ export default async function StaffCaseDetailPage({
 
       <section
         className="intake-section"
-        aria-label="Переписка клиента с ИИ-помощником"
+        aria-label={locale === "ru" ? "Переписка клиента с ИИ-помощником" : "Client conversation with the AI assistant"}
       >
         <div className="panel">
-          <span className="panel__label">Клиент и ИИ-помощник</span>
-          <h2>О чём клиент уже спрашивал помощника</h2>
+          <span className="panel__label">{locale === "ru" ? "Клиент и ИИ-помощник" : "Client and AI assistant"}</span>
+          <h2>{locale === "ru" ? "Переписка клиента с помощником" : "Client conversation with the assistant"}</h2>
           <p>
-            Сохраняется переписка только тех, кто зарегистрирован. Прочитайте
-            её перед ответом — так вы не повторите то, что человек уже узнал.
+            {locale === "ru"
+              ? "Здесь сохранены вопросы клиента, ответы и автоматические сообщения Анхама. Прочитайте переписку перед ответом."
+              : "The client’s questions, replies and Anham’s automatic messages are saved here. Read the conversation before replying."}
           </p>
           <SavedAssistantThread
-            emptyText="Клиент ещё не обращался к ИИ-помощнику."
+            emptyText={locale === "ru" ? "В переписке пока нет сообщений." : "There are no messages in this conversation yet."}
+            locale={locale}
             loadError={
               assistantHistory.status === "error"
                 ? assistantHistory.message

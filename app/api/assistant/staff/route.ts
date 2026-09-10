@@ -1,5 +1,9 @@
+import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
+import { searchKnowledgeArchive } from "@/lib/assistant/knowledge-search";
+import { founderMemoryFromCommand } from "@/lib/assistant/founder-memory";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam, askKarenAssistant } from "@/lib/assistant/router";
@@ -12,10 +16,14 @@ import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { isUuid } from "@/lib/utils/uuid";
 import { apiError, apiErrorLocale, assistantFailure } from "@/lib/i18n/api-errors";
 
+import { saveAssistantExchange } from "@/lib/assistant/history";
+import { memoryCollectionFromCommand } from "@/lib/assistant/memory";
+
 export const runtime = "nodejs";
 
 export async function POST(request: Request) {
   const locale = await apiErrorLocale();
+  const questionCreatedAt = new Date().toISOString();
   const auth = await getStaffUserState();
 
   if (auth.status !== "authorized") {
@@ -59,6 +67,56 @@ export async function POST(request: Request) {
     );
   }
 
+  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+  const respondWithReply = async (rawReply: string) => {
+    const requestedLocale = (body as { locale?: unknown })?.locale;
+    const reply = normalizeAnhamResponse(rawReply, requestedLocale === "ru" || requestedLocale === "en" ? requestedLocale : locale);
+    if (!reply) return NextResponse.json({ error: apiError("assistantEmptyReply", locale) }, { status: 502 });
+    const payload = body as { transient?: unknown; displayText?: unknown; locale?: unknown };
+    const persistence = payload.transient === true ? {} : await saveAssistantExchange({
+      profileId: auth.userId,
+      questionCreatedAt,
+      caseId: typeof rawCaseId === "string" && isUuid(rawCaseId) ? rawCaseId : null,
+      tier: assistantRole,
+      question: typeof payload.displayText === "string" && payload.displayText.trim()
+        ? payload.displayText : messages[messages.length - 1].content,
+      answer: reply,
+      locale: payload.locale === "en" ? "en" : "ru"
+    });
+    return NextResponse.json({ reply, ...persistence });
+  };
+
+  const english = (body as { locale?: unknown })?.locale === "en";
+  if ((body as { memoryConfirmation?: unknown })?.memoryConfirmation === true && !attachments && memoryCollectionFromCommand(messages[messages.length - 1].content)) {
+    return respondWithReply(english
+      ? "I prepared this for saving. Please confirm below what to do: save it to the method, the book, client-answer memory, or do not save it."
+      : "Я подготовил это к сохранению. Подтвердите ниже, что именно сделать: сохранить в метод, в книгу, в память ответов клиентам или не сохранять.");
+  }
+
+  const memory = assistantRole === "founder" ? founderMemoryFromCommand(messages, english) : null;
+  if (memory) {
+    if (attachments || !memory.content || memory.content.length > 8000) {
+      return respondWithReply(english
+        ? "Please write the text after ‘Remember:’. To save my previous answer, write ‘Save this’ without attachments."
+        : "Напишите текст после «Запомни:». Чтобы сохранить мой предыдущий ответ, напишите «Сохрани это» без вложений.");
+    }
+    try {
+      const supabase = createSupabaseServiceClient();
+      if (!supabase) throw new Error("unavailable");
+      const { error } = await supabase.from("assistant_knowledge").insert({
+        ...memory, audience: "staff", collection: "general", topic: "general", created_by: auth.userId
+      });
+      if (error) throw new Error("save failed");
+      return respondWithReply((english
+        ? "Saved to internal assistant memory:\n\n"
+        : "Сохранено во внутреннюю память помощника:\n\n") + memory.content);
+    } catch {
+      return NextResponse.json({ error: english
+        ? "Could not save the note. Please try again."
+        : "Не удалось сохранить заметку. Попробуйте ещё раз." }, { status: 503 });
+    }
+  }
+
   // A provider named in the request body is honoured only for the founder;
   // for everyone else the choice is made here and the name never comes back.
   const showProviders = canSeeProviderNames(auth.email);
@@ -73,6 +131,12 @@ export async function POST(request: Request) {
   system += responseLocale === "en"
     ? "\n\nActive interface language: English. Reply in English."
     : "\n\nАктивный язык интерфейса: русский. Отвечай по-русски.";
+  if (assistantRole === "founder") {
+    const archive = await searchKnowledgeArchive(messages[messages.length - 1].content);
+    system += archive.context;
+    if (archive.unavailable) system += "\nArchive search is temporarily unavailable. Tell Anna in the active language; do not claim to have searched or remembered unavailable notes.";
+    else if (!archive.matches) system += "\nArchive keyword search found no matching notes. Do not invent saved notes or claim the archive has no such information.";
+  }
 
   if (attachments) {
     system = `${system}\n\n${ATTACHMENT_READING_ACCURACY_RULE}`;
@@ -81,7 +145,7 @@ export async function POST(request: Request) {
   // Optional case binding: the assistant on a case page receives a live
   // snapshot of that case from the database (metadata, questionnaire,
   // documents list, payments, history).
-  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+
 
   if (typeof rawCaseId === "string" && isUuid(rawCaseId)) {
     const caseContext = await buildCaseContext(rawCaseId);
@@ -126,9 +190,7 @@ export async function POST(request: Request) {
   if (result.status === "error") {
     return NextResponse.json({ error: showProviders ? result.message : assistantFailure(result, locale) }, { status: 502 });
   }
+  if (result.refusal) result.reply = providerPolicyRefusal((body as { locale?: unknown })?.locale === "en" ? "en" : "ru").reply;
 
-  const reply = normalizeAnhamResponse(result.reply, responseLocale);
-  return reply
-    ? NextResponse.json({ reply })
-    : NextResponse.json({ error: apiError("assistantEmptyReply", locale) }, { status: 502 });
+  return respondWithReply(result.reply);
 }

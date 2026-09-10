@@ -12,6 +12,7 @@ vi.mock("@/lib/assistant/router", () => ({
   askAssistantTeam: mocks.provider, askAnham: mocks.provider, askKarenAssistant: mocks.provider,
   chooseAnhamMode: () => "deep", isAssistantProvider: () => true
 }));
+vi.mock("@/lib/assistant/knowledge-search", () => ({ searchKnowledgeArchive: async () => ({ context: "", matches: 0, unavailable: false }) }));
 vi.mock("@/lib/assistant/knowledge", () => ({ getKnowledgeForPrompt: async () => "" }));
 vi.mock("@/lib/assistant/guard", () => ({ guardAssistantRequest: mocks.guard, guardAnhamDeepRequest: async () => true }));
 vi.mock("@/lib/assistant/history", () => ({ saveAssistantExchange: mocks.save }));

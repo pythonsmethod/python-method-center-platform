@@ -7,7 +7,7 @@ describe("private assistant personas", () => {
 
     expect(prompt).toContain("личный ИИ-помощник Анны");
     expect(prompt).toContain("решениями о продукте, платформе и операциях");
-    expect(prompt).toContain("Анна и Professor Python оба формируют");
+    expect(prompt).toContain("Доступные знания центра уже включены");
     expect(prompt).not.toContain("${METHOD_ALIGNMENT}");
   });
 

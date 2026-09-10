@@ -19,13 +19,13 @@ import sitemap from "@/app/sitemap";
 const clause = (locale: "ru" | "en") =>
   OFFER_CONTENT[locale].sections.flatMap((s) => s.paragraphs ?? []).join("\n");
 
-describe("разбор анализов — платный формат за 500 USD", () => {
+describe("разбор анализов — платный формат с временной ценой 299 USD", () => {
   it("стоит первым среди тарифов, с ценой и итогом", () => {
     for (const locale of ["ru", "en"] as const) {
-      const [first] = getPaymentPlans(locale);
+      const [first] = getPaymentPlans(locale, new Date("2026-09-09T00:00:00Z"));
 
       expect(first.product).toBe(REVIEW_PRODUCT);
-      expect(first.priceLine).toContain("500");
+      expect(first.priceLine).toContain("299 USD");
       // The fee is inside the price, so no second number appears anywhere.
       expect(first.priceLine).not.toContain("525");
     }
@@ -41,20 +41,20 @@ describe("разбор анализов — платный формат за 500
   });
 
   it("описан в договоре с ценой, и договор получил новую версию", () => {
-    expect(OFFER_VERSION).toBe("oferta-v7");
-    expect(clause("ru")).toContain("Разбор анализов — 500 USD");
-    expect(clause("ru")).toContain("Итог по формату «Разбор анализов»: 500 USD.");
-    expect(clause("ru")).toContain("включён в эту цену");
+    expect(OFFER_VERSION).toBe("oferta-v8");
+    expect(clause("ru")).toContain("299 USD вместо 500 USD");
+    expect(clause("ru")).toContain("Итог по формату «Разбор анализов»: 299 USD");
+    expect(clause("ru")).toContain("без дополнительных сборов");
     expect(clause("ru")).not.toContain("525");
-    expect(clause("en")).toContain("Analyses review — 500 USD");
-    expect(clause("en")).toContain("Total for the analyses review: 500 USD.");
+    expect(clause("en")).toContain("299 USD instead of 500 USD");
+    expect(clause("en")).toContain("Total for the analyses review: 299 USD");
     expect(clause("en")).not.toContain("525");
   });
 
   it("ассистент называет цену и не предлагает бесплатного", async () => {
     const prompt = await buildGuestSystemPrompt();
 
-    expect(prompt).toContain("$500");
+    expect(prompt).toContain("500 USD");
     expect(prompt).not.toContain("$525");
     expect(prompt).not.toMatch(/бесплатн(ая|ый|ую|о) (предварительн|оценк|разбор)/i);
   });

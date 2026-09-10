@@ -163,6 +163,9 @@ export async function askAssistantTeam(
         : askOpenAi(system, messages, maxTokens)
     ]);
 
+    if (claudeResult.status === "ok" && claudeResult.refusal) return claudeResult;
+    if (gptResult.status === "ok" && gptResult.refusal) return gptResult;
+
     if (claudeResult.status !== "ok" && gptResult.status !== "ok") {
       return claudeResult.status === "error" ? claudeResult : gptResult;
     }
@@ -195,6 +198,9 @@ export async function askAssistantTeam(
       askClaude(system, messages, maxTokens),
       askOpenAi(system, messages, maxTokens)
     ]);
+
+    if (claudeResult.status === "ok" && claudeResult.refusal) return claudeResult;
+    if (gptResult.status === "ok" && gptResult.refusal) return gptResult;
 
     const parts: string[] = [];
 
@@ -269,6 +275,9 @@ export async function askAnham(
     askClaude(system, messages, maxTokens),
     askOpenAi(system, messages, maxTokens, { reasoningEffort: "high" })
   ]);
+
+  if (claude.status === "ok" && claude.refusal) return claude;
+  if (gpt.status === "ok" && gpt.refusal) return gpt;
 
   if (claude.status !== "ok" || gpt.status !== "ok") {
     if (claude.status === "ok") return claude;

@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import { AssistantOutreachPreference } from "@/components/assistant/AssistantOutreachPreference";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
@@ -12,10 +13,14 @@ import {
 } from "@/lib/assistant/prepare-files";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
+import { formatDateTime } from "@/lib/i18n/format";
 
 type ChatMessage = {
   role: "user" | "assistant";
   content: string;
+  id?: string;
+  created_at?: string;
+  message_sequence?: number;
 };
 
 type AssistantChatProps = {
@@ -77,7 +82,11 @@ const chatCopy = {
 
 type Provider = "best" | "claude" | "gpt" | "both";
 
-export function AssistantChat({
+export function AssistantChat(props: AssistantChatProps) {
+  return <AssistantChatSession key={`${props.endpoint}:${props.caseId ?? "personal"}`} {...props} />;
+}
+
+function AssistantChatSession({
   endpoint,
   intro,
   placeholder,
@@ -95,6 +104,9 @@ export function AssistantChat({
   replyUsedLabel,
   requestContext
 }: AssistantChatProps) {
+  historyEndpoint ??= endpoint === "/api/assistant/staff"
+    ? `/api/assistant/history?scope=private${caseId ? `&caseId=${encodeURIComponent(caseId)}` : ""}`
+    : undefined;
   const t = getDictionary(locale).widget;
   const c = chatCopy[locale];
   const effectivePlaceholder = placeholder ?? t.placeholder;
@@ -102,6 +114,12 @@ export function AssistantChat({
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [historyLoading, setHistoryLoading] = useState(Boolean(historyEndpoint));
+  const [historyError, setHistoryError] = useState(false);
+  const [historyRetry, setHistoryRetry] = useState(0);
+  const [hasMore, setHasMore] = useState(false);
+  const [saveFailed, setSaveFailed] = useState(false);
+  const savedExchange = useRef<ChatMessage[] | null>(null);
   const [provider, setProvider] = useState<Provider>("best");
   const [files, setFiles] = useState<PreparedFile[]>([]);
   const [progress, setProgress] = useState<string | null>(null);
@@ -111,6 +129,7 @@ export function AssistantChat({
   // a divider so it is clear where today's conversation starts.
   const [restored, setRestored] = useState(0);
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const olderScroll = useRef<{ height: number; top: number } | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const composerRef = useRef<HTMLTextAreaElement | null>(null);
   const voice = useVoiceInput((text) => {
@@ -140,6 +159,11 @@ export function AssistantChat({
     if (!node) {
       return;
     }
+    if (olderScroll.current) {
+      node.scrollTop = olderScroll.current.top + node.scrollHeight - olderScroll.current.height;
+      olderScroll.current = null;
+      return;
+    }
 
     const last = node.querySelector<HTMLElement>(
       ".assistant-msg:not(.assistant-msg--pending):last-of-type"
@@ -161,9 +185,7 @@ export function AssistantChat({
     node.scrollTop = node.scrollHeight;
   }, [messages, pending]);
 
-  // Previous conversation of a signed-in person, so they can re-read what
-  // they were told instead of asking again. Failures are silent: an empty
-  // thread is a normal starting point, not an error worth showing.
+  // Restore before sending so a slow history request cannot lose the thread.
   useEffect(() => {
     if (!historyEndpoint) {
       return;
@@ -172,31 +194,71 @@ export function AssistantChat({
     let cancelled = false;
 
     void (async () => {
+      setHistoryLoading(true);
+      setHistoryError(false);
       try {
-        const response = await fetch(historyEndpoint);
+        const response = await fetch(historyEndpoint, { cache: "no-store" });
 
         if (!response.ok) {
-          return;
+          throw new Error("HISTORY_UNAVAILABLE");
         }
 
-        const data = (await response.json()) as { messages?: ChatMessage[] };
+        const data = (await response.json()) as { messages?: ChatMessage[]; hasMore?: boolean };
         const saved = Array.isArray(data.messages) ? data.messages : [];
 
-        if (cancelled || saved.length === 0) {
+        if (cancelled) {
           return;
         }
 
         setMessages((current) => (current.length > 0 ? current : saved));
         setRestored(saved.length);
+        setHasMore(data.hasMore === true);
       } catch {
-        // Nothing to restore — the conversation simply starts fresh.
+        if (!cancelled) setHistoryError(true);
+      } finally {
+        if (!cancelled) setHistoryLoading(false);
       }
     })();
 
     return () => {
       cancelled = true;
     };
-  }, [historyEndpoint]);
+  }, [historyEndpoint, historyRetry]);
+
+  async function loadEarlier() {
+    if (!historyEndpoint || historyLoading) return;
+    const before = messages[0]?.message_sequence;
+    if (!before) return;
+    setHistoryLoading(true);
+    setHistoryError(false);
+    try {
+      const response = await fetch(`${historyEndpoint}${historyEndpoint.includes("?") ? "&" : "?"}before=${before}`, { cache: "no-store" });
+      if (!response.ok) throw new Error("HISTORY_UNAVAILABLE");
+      const data = await response.json() as { messages: ChatMessage[]; hasMore: boolean };
+      if (scrollRef.current) olderScroll.current = { height: scrollRef.current.scrollHeight, top: scrollRef.current.scrollTop };
+      setMessages(current => [...data.messages.filter(item => !current.some(existing => existing.id === item.id)), ...current]);
+      setRestored(current => current + data.messages.length);
+      setHasMore(data.hasMore);
+    } catch { setHistoryError(true); }
+    finally { setHistoryLoading(false); }
+  }
+
+  function appendReply(current: ChatMessage[], reply: string) {
+    const saved = savedExchange.current;
+    setMessages(saved?.length === 2
+      ? [...current.slice(0, -1), ...saved]
+      : [...current, { role: "assistant", content: reply, created_at: new Date().toISOString() }]);
+  }
+
+  function downloadConversation() {
+    const text = messages.map(message => `${message.created_at ? formatDateTime(message.created_at, locale) : ""} · ${message.role === "user" ? (locale === "ru" ? "Вы" : "You") : "Anham"}\n${message.content}`).join("\n\n");
+    const url = URL.createObjectURL(new Blob([text], { type: "text/plain;charset=utf-8" }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `anham-${new Date().toISOString().slice(0, 10)}.txt`;
+    link.click();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  }
 
   async function addFiles(selected: FileList | null) {
     if (!selected || selected.length === 0) {
@@ -239,7 +301,7 @@ export function AssistantChat({
     batch: PreparedFile[] | null,
     // What to keep in the saved conversation: the text the person actually
     // typed, or nothing at all for the technical file-reading requests.
-    save?: { displayText?: string; transient?: boolean }
+    save?: { displayText?: string; transient?: boolean; memoryConfirmation?: boolean }
   ): Promise<string> {
     const response = await fetch(endpoint, {
       method: "POST",
@@ -259,19 +321,24 @@ export function AssistantChat({
         ...(providerChoice ? { provider } : {}),
         ...(caseId ? { caseId } : {}),
         ...(save?.transient ? { transient: true } : {}),
-        ...(save?.displayText ? { displayText: save.displayText } : {}),
+        ...(save?.memoryConfirmation ? { memoryConfirmation: true } : {}),
+        ...(!save?.transient ? { displayText: save?.displayText ?? history[history.length - 1]?.content } : {}),
         ...(requestContext ? { requestContext } : {})
       })
     });
 
     const data = (await response.json().catch(() => null)) as
-      | { reply?: string; error?: string }
+      | { reply?: string; error?: string; saved?: boolean; messages?: ChatMessage[] }
       | null;
 
     if (!response.ok || !data?.reply) {
       throw new Error(data?.error ?? t.errorGeneric);
     }
 
+    if (!save?.transient) {
+      savedExchange.current = data.saved ? data.messages ?? null : null;
+      if (data.saved === false) setSaveFailed(true);
+    }
     return data.reply;
   }
 
@@ -281,7 +348,7 @@ export function AssistantChat({
   const sentQuestion = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!initialQuestion || pending || sentQuestion.current === initialQuestion) {
+    if (!initialQuestion || pending || historyLoading || historyError || sentQuestion.current === initialQuestion) {
       return;
     }
 
@@ -291,13 +358,13 @@ export function AssistantChat({
     // `send` intentionally stays out of the dependencies: this effect owns
     // one initial hand-off, and sentQuestion prevents duplicate paid calls.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQuestion, pending, onInitialQuestionSent]);
+  }, [initialQuestion, pending, historyLoading, historyError, onInitialQuestionSent]);
 
-  async function send(text: string) {
+  async function send(text: string, baseMessages: ChatMessage[] = messages) {
     const trimmed = text.trim();
     const attached = files;
 
-    if ((!trimmed && attached.length === 0) || pending) {
+    if ((!trimmed && attached.length === 0) || pending || historyLoading || historyError) {
       return;
     }
 
@@ -306,18 +373,20 @@ export function AssistantChat({
       : null;
 
     if (requestedMemory) {
-      const commandMessage: ChatMessage = { role: "user", content: trimmed };
-      const confirmationQuestion: ChatMessage = {
-        role: "assistant",
-        content: locale === "ru"
-          ? "Я подготовил это к сохранению. Подтвердите ниже, что именно сделать: сохранить в метод, в книгу, в память ответов клиентам или не сохранять."
-          : "I prepared this for saving. Please confirm below what to do: save it to the method, the book, client-answer memory, or do not save it."
-      };
-      setMessages([...messages, commandMessage, confirmationQuestion]);
+      const commandMessage: ChatMessage = { role: "user", content: trimmed, created_at: new Date().toISOString() };
+      const next = [...baseMessages, commandMessage];
+      setMessages(next);
       setInput("");
       setError(null);
       setMemoryState("offer");
       setMemoryMessage(null);
+      setPending(true);
+      try {
+        const reply = await ask(next, null, { memoryConfirmation: true });
+        appendReply(next, reply);
+      } catch (failure) {
+        setError(failure instanceof Error ? failure.message : t.errorNetwork);
+      } finally { setPending(false); }
       return;
     }
 
@@ -326,8 +395,8 @@ export function AssistantChat({
       : trimmed;
 
     const nextMessages: ChatMessage[] = [
-      ...messages,
-      { role: "user", content: visible }
+      ...baseMessages,
+      { role: "user", content: visible, created_at: new Date().toISOString() }
     ];
 
     setMessages(nextMessages);
@@ -343,7 +412,7 @@ export function AssistantChat({
     try {
       if (attached.length === 0) {
         const reply = await ask(nextMessages, null);
-        setMessages([...nextMessages, { role: "assistant", content: reply }]);
+        appendReply(nextMessages, reply);
         if (memoryCapture) setMemoryState("offer");
         return;
       }
@@ -352,11 +421,11 @@ export function AssistantChat({
 
       if (batches.length === 1) {
         const reply = await ask(
-          [...messages, { role: "user", content: question }],
+          [...baseMessages, { role: "user", content: question }],
           batches[0],
           { displayText: visible }
         );
-        setMessages([...nextMessages, { role: "assistant", content: reply }]);
+        appendReply(nextMessages, reply);
         if (memoryCapture) setMemoryState("offer");
         return;
       }
@@ -393,7 +462,7 @@ export function AssistantChat({
 
       const reply = await ask(
         [
-          ...messages,
+            ...baseMessages,
           {
             role: "user",
             content: locale === "ru"
@@ -405,7 +474,7 @@ export function AssistantChat({
         { displayText: visible }
       );
 
-      setMessages([...nextMessages, { role: "assistant", content: reply }]);
+      appendReply(nextMessages, reply);
       if (memoryCapture) setMemoryState("offer");
     } catch (sendError) {
       setError(
@@ -447,8 +516,11 @@ export function AssistantChat({
 
   return (
     <div className="assistant-chat">
+      {historyEndpoint === "/api/assistant/history" ? <AssistantOutreachPreference locale={locale} /> : null}
       <div className="assistant-chat__messages" ref={scrollRef}>
         <div className="assistant-msg assistant-msg--assistant">{intro}</div>
+        {historyLoading ? <p role="status">{locale === "ru" ? "Загружаю переписку…" : "Loading conversation…"}</p> : null}
+        {hasMore ? <button type="button" disabled={historyLoading || pending} onClick={() => void loadEarlier()}>{locale === "ru" ? "Загрузить более ранние сообщения" : "Load earlier messages"}</button> : null}
         {restored > 0 ? (
           <p className="assistant-chat__divider">{c.history}</p>
         ) : null}
@@ -458,6 +530,7 @@ export function AssistantChat({
               <p className="assistant-chat__divider">{c.today}</p>
             ) : null}
             <div className={`assistant-msg assistant-msg--${message.role}`}>
+              {message.created_at ? <time className="assistant-log__meta" dateTime={message.created_at}>{formatDateTime(message.created_at, locale)}</time> : null}
               {message.content}
               {message.role === "assistant" && onUseReply ? (
                 <button
@@ -488,6 +561,10 @@ export function AssistantChat({
         ) : null}
         {error ? <p aria-live="assertive" className="form-message form-message--error" role="alert">{error}</p> : null}
       </div>
+
+      {historyError ? <p role="alert">{locale === "ru" ? "Не удалось загрузить историю. Попробуйте ещё раз." : "Could not load history. Please try again."} <button type="button" onClick={() => setHistoryRetry(value => value + 1)}>{locale === "ru" ? "Повторить" : "Retry"}</button></p> : null}
+      {saveFailed ? <p role="alert">{locale === "ru" ? "Не удалось подтвердить сохранение сообщения после повторных попыток. До закрытия страницы доступна копия переписки." : "Message storage could not be confirmed after retries. A copy is available until you close this page."} <button type="button" onClick={downloadConversation}>{locale === "ru" ? "Скачать копию" : "Download a copy"}</button></p> : null}
+      {!historyEndpoint && endpoint === "/api/assistant/client" ? <p>{locale === "ru" ? "Чтобы переписка сохранялась между посещениями, войдите в аккаунт." : "Sign in to keep your conversation between visits."}</p> : null}
 
       {memoryCapture && memoryState !== "dismissed" ? (
         <div className="assistant-memory" role="status">
@@ -619,7 +696,7 @@ export function AssistantChat({
           ) : null}
           <button
             className="button"
-            disabled={pending || (!input.trim() && files.length === 0)}
+            disabled={pending || historyLoading || historyError || (!input.trim() && files.length === 0)}
             type="submit"
           >
             {t.send}

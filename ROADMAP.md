@@ -2,6 +2,17 @@
 
 ## North Star
 
+Separate non-medical chat increment — 2026-09-09: local implementation and tests
+for saved Anham welcome/check-ins and authorized synthetic staging acceptance
+are CLOSED (concurrent cron/opt-out and RU/EN cabinet/admin UI). Final diff review
+and integration with current main are complete. Owner explicitly authorized
+the two production migrations and disabled rollout; migrations are applied and
+production enable flag is `false`. Preview build is READY. Next: explicit
+authorization to merge PR #156 into main (required by automatic approval review),
+then verify the resulting production deployment.
+Production activation remains separate.
+See `docs/ankh/assistant_outreach.md`.
+
 Build a system that turns heterogeneous client medical documents into a traceable, longitudinal, reviewable evidence model that allows Ankh to prepare the Case and Karen to understand and decide quickly.
 
 Accuracy, explainability, safety and workflow efficiency are more important than maximizing automation percentage.
@@ -363,3 +374,23 @@ Each new phase must solve a demonstrated gap in:
 - workflow;
 - scalability;
 - maintainability.
+
+- 2026-09-09: Publish approved full-review and 100-day payment links; preserve Ankh production boundaries. Retire the 299 USD Stripe link at the 1 December cutoff and verify the 500 USD replacement before that date.
+
+## 2026-09-09 — Assistant history release
+
+Owner-authorized isolated production publication in progress. Scope: private and client chat persistence, dated multilingual history, pagination and acknowledged retries. 1019/1019 release tests pass. No Ankh phase progression or production data-processing enablement. Final step: deployment readiness and authenticated browser reload verification.
+
+
+## 2026-09-09 — Anna integrated memory and whole-archive retrieval
+
+Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.
+
+## 2026-09-09 — Complete assistant history acceptance
+
+Fix the confirmed bulk-insert timestamp failure, retain strict storage acknowledgement, and publish the isolated change from main. Local regression passes 1092/1092. Close after production reload and RU↔EN checks confirm the dated conversation. No Ankh phase advancement or clinical processing enablement.
+
+### Anham prose release follow-up — 2026-09-09
+Owner-authorized publication is in progress; integrate current main, pass regression
+and deployment checks, then verify RU/EN replies and reload on the supplied test account.
+See `docs/ankh/anham_response_style_release.md`. Clinical phase gates remain unchanged.

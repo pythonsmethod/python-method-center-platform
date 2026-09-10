@@ -1,3 +1,4 @@
+import { REVIEW_TEMPORARY_USD } from "@/lib/config/review";
 import Stripe from "stripe";
 import {
   PLAN_100D_TOTAL_USD,
@@ -68,7 +69,7 @@ export function productFromAmount(
     return null;
   }
 
-  if (amountCents === REVIEW_TOTAL_USD * 100) {
+  if (amountCents === REVIEW_TEMPORARY_USD * 100 || amountCents === REVIEW_TOTAL_USD * 100) {
     return REVIEW_PRODUCT;
   }
 

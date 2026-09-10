@@ -5,7 +5,7 @@ vi.mock("server-only", () => ({}));
 vi.mock("@/lib/assistant/router", () => ({ askAssistantTeam: mocks.provider }));
 vi.mock("@/lib/supabase/service", () => ({ createSupabaseServiceClient: () => {
   const query = {
-    select: () => query, eq: () => query, order: () => query,
+    select: () => query, eq: () => query, in: () => query, order: () => query,
     limit: async () => ({ data: mocks.rows, error: null }),
     insert: mocks.insert,
     upsert: (value: Record<string, unknown>) => { mocks.saved = value; mocks.upsert(value); return query; },
@@ -17,7 +17,7 @@ vi.mock("@/lib/supabase/service", () => ({ createSupabaseServiceClient: () => {
 import { getOwnAssistantHistory, saveAssistantExchange } from "@/lib/assistant/history";
 import { generateMedicalDigest, listMedicalDigestIssues } from "@/lib/medical-digest/digest";
 
-beforeEach(() => { vi.clearAllMocks(); mocks.rows = []; mocks.saved = {}; });
+beforeEach(() => { vi.clearAllMocks(); mocks.rows = []; mocks.saved = {}; mocks.insert.mockImplementation((rows) => ({ select: async () => ({ data: rows, error: null }) })); });
 
 describe("stored prose stays separate from human input and source records", () => {
   it.each(["ru", "en"] as const)("preserves numbers and %s annotations through storage and reload", async (locale) => {
