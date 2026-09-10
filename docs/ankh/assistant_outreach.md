@@ -82,7 +82,7 @@ profiles or contact external services.
 
 ## E. Verification
 
-- `npm test` after integration with current main: **129 files passed, 1,036 tests passed, 0 failures**.
+- `npm test` after integration with current main: **132 files passed, 1,058 tests passed, 0 failures**.
 - New outreach coverage: **54 tests**, including 21 SQL integration cases,
   30 cron/preferences/registration/history cases and 3 refusal-route cases.
 - `npm run typecheck`: passed, exit 0.
@@ -186,9 +186,9 @@ owner decisions.
 ## Final release preparation — 2026-09-09
 
 Reviewed the complete feature diff and merged published tariff changes from
-`origin/main` (`d9e001f`) into `codex/assistant-outreach-disabled-release`.
+`origin/main` (`addefd6`, including the published Anna memory/archive update) into `codex/assistant-outreach-disabled-release`.
 The only merge conflict was in `DECISIONS.md`; both decision records were kept.
-All 1,036 tests, TypeScript, ESLint and diff whitespace checks passed afterward.
+All 1,058 tests, TypeScript, ESLint and diff whitespace checks passed afterward.
 Generated benchmark timestamps were restored; no raw client data or secrets
 were added to the release.
 

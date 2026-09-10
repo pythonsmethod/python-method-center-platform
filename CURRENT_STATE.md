@@ -18,7 +18,7 @@ Production migration was rejected by automatic approval review: explicit
 authorization naming the production schema change is required before rollout.
 No production schema change or deployment occurred. Vercel's project variable
 list has no outreach enable flag, so delivery remains disabled by default.
-Full suite after integration: 1,036/1,036 tests in 129 files;
+Full suite after integration: 1,058/1,058 tests in 132 files;
 TypeScript and ESLint passed. Details and staging gates:
 [`docs/ankh/assistant_outreach.md`](docs/ankh/assistant_outreach.md).
 This increment does not change any clinical phase or production trust gate.
