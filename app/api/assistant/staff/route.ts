@@ -1,3 +1,4 @@
+import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
 import { searchKnowledgeArchive } from "@/lib/assistant/knowledge-search";
 import { founderMemoryFromCommand } from "@/lib/assistant/founder-memory";
@@ -177,6 +178,7 @@ export async function POST(request: Request) {
   if (result.status === "error") {
     return NextResponse.json({ error: result.message }, { status: 502 });
   }
+  if (result.refusal) result.reply = providerPolicyRefusal((body as { locale?: unknown })?.locale === "en" ? "en" : "ru").reply;
 
   return respondWithReply(result.reply);
 }
