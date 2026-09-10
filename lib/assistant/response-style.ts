@@ -19,16 +19,18 @@ export function normalizeAnhamResponse(raw: string, locale?: "ru" | "en"): strin
   // A number followed by a unit may be a measurement with a trailing decimal
   // point, not an ordered-list index. Recognize SI prefixes and ratio units;
   // in ambiguous cases keep the number rather than improve formatting.
-  const startsUnit = (value: string) => /^(?:(?:[yzafpnµμumcdhkMGTPEZY]?(?:mol|kat|IU|U|g|L|l|m|s|Hz|Pa|K)|mmHg|°[CF]|%|мг|г|кг|ммоль|мл|л|МЕ)(?![\p{L}\p{N}_])|[\p{L}µμ]+[/·][\p{L}µμ])/u.test(value);
+  const startsUnit = (value: string) => /^(?:(?:[yzafpnµμumcdhkMGTPEZY]?(?:mol|kat|IU|U|g|L|l|m|s|Hz|Pa|K)|mmHg|°[CF]|%|мг|г|кг|ммоль|мл|л|МЕ)(?![\p{L}\p{N}_])|[\p{L}µμ]+[/·][\p{L}µμ])/u.test(value.trimStart());
   // Collision-free placeholders protect literal URLs, filenames and operators.
   let prefix = "\uE000";
   while (raw.includes(prefix)) prefix += "\uE000";
   const literals: string[] = [];
   const protect = (value: string) => `${prefix}${literals.push(value) - 1}\uE001`;
   const restore = (value: string) => value.replace(new RegExp(`${prefix}(\\d+)\uE001`, "g"), (_match, index: string) => literals[Number(index)]);
+  // Classification ignores Unicode spacing too, without rewriting the source.
+  // Otherwise a minus before NBSP/thin-space measurements becomes a list marker.
   // Protected scientific notation must still count as a number when deciding
   // whether a leading minus/comparator is literal. Inspect without rewriting.
-  const startsMeasurement = (value: string) => /^(?:[+−±-]?[ \t]*(?:\d|[.,]\d)|[<>=≤≥≠≈∼~])/.test(restore(value));
+  const startsMeasurement = (value: string) => /^(?:[+−±-]?[ \t]*(?:\d|[.,]\d)|[<>=≤≥≠≈∼~])/.test(restore(value).trimStart());
   let text = raw.replace(/\r\n?/g, "\n");
 
   const references = new Map<string, string>();

@@ -43,8 +43,8 @@ beforeEach(() => {
 
 describe("server response style across audiences and languages", () => {
   it.each(["ru", "en"] as const)("uses the %s request locale for numeric annotations", async (locale) => {
-    mocks.provider.mockResolvedValue({ status: "ok", reply: "~~5 mg~~\n\n- .5 mg/L\n> 5*10^9/L" });
-    const expected = `${locale === "ru" ? "(зачёркнуто: 5 mg)" : "(struck out: 5 mg)"}\n\n- .5 mg/L\n> 5*10^9/L`;
+    mocks.provider.mockResolvedValue({ status: "ok", reply: "~~5 mg~~\n\n- .5 mg/L\n> 5*10^9/L\n- \u00a0.5 mg/L\n+ \u202f,5 mg/L\n1. \u2009µg/L" });
+    const expected = `${locale === "ru" ? "(зачёркнуто: 5 mg)" : "(struck out: 5 mg)"}\n\n- .5 mg/L\n> 5*10^9/L\n- \u00a0.5 mg/L\n+ \u202f,5 mg/L\n1. \u2009µg/L`;
     expect((await (await client(request(locale))).json()).reply).toBe(expected);
     mocks.role.mockReturnValue("karen");
     expect((await (await staff(request(locale))).json()).reply).toBe(expected);

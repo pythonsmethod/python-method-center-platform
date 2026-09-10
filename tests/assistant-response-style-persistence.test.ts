@@ -21,8 +21,8 @@ beforeEach(() => { vi.clearAllMocks(); mocks.rows = []; mocks.saved = {}; mocks.
 
 describe("stored prose stays separate from human input and source records", () => {
   it.each(["ru", "en"] as const)("preserves numbers and %s annotations through storage and reload", async (locale) => {
-    const answer = "~~5 mg~~\n- .5 mg/L\n> 5*10^9/L";
-    const expected = `${locale === "ru" ? "(зачёркнуто: 5 mg)" : "(struck out: 5 mg)"}\n- .5 mg/L\n> 5*10^9/L`;
+    const answer = "~~5 mg~~\n- .5 mg/L\n> 5*10^9/L\n- \u00a0.5 mg/L\n+ \u202f,5 mg/L\n1. \u2009µg/L";
+    const expected = `${locale === "ru" ? "(зачёркнуто: 5 mg)" : "(struck out: 5 mg)"}\n- .5 mg/L\n> 5*10^9/L\n- \u00a0.5 mg/L\n+ \u202f,5 mg/L\n1. \u2009µg/L`;
     await saveAssistantExchange({ profileId: "synthetic", caseId: null, tier: "client", question: "source", answer, locale });
     const stored = mocks.insert.mock.calls[0][0][1];
     expect(stored.content).toBe(expected);
