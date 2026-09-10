@@ -145,6 +145,18 @@ OPEN, production auto-verification and Phase 3 production remain NO-GO.
 
 ## 1. Current position
 
+### Correction: Elena tests the CLIENT experience — latest
+
+Owner clarified that Elena must use her own client Case, not founder-equivalent
+assistant access. The former delegate grant is revoked in configuration and code,
+including stale delegate environment values. The account remains a client.
+ANHAM_CLIENT_VOICE_TEST_EMAILS enables only the named client's preview through
+/cabinet/assistant, linked from her cabinet; /assistant redirects there.
+Voice uses existing registered/paid client context resolution and checks both
+profile and Case IDs before supplying context. No staff tools, global data or
+knowledge-write access. Staff Anna/Karen behavior remains unchanged. See
+docs/ankh/elena_client_voice_pilot.md; prior delegate notes are superseded.
+
 ### Owner-approved assistant delegate — 2026-09-09
 
 Published: PR #162 merged, production dpl_7mHMy7LdutJkvxRVX9UKATHYrTf5 READY.

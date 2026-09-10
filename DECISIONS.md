@@ -985,3 +985,7 @@ Owner explicitly approved both voice-history production migrations and site enab
 ## 2026-09-09 — Assistant-only delegation
 
 The owner confirmed an existing client account for founder-equivalent assistant capabilities. Use an explicit server-only assistant allowlist and /assistant entry point, not a profile role promotion or FOUNDER_EMAILS. Retain own-profile history, account-status checks and existing non-assistant authorization. See docs/ankh/assistant_delegate_access.md.
+
+## 2026-09-09 — Elena is a CLIENT preview participant
+
+Owner corrected the scope: own Case/client experience, not staff-equivalent authority. Revoke the delegate grant including stale configuration. Enable only the confirmed account through ANHAM_CLIENT_VOICE_TEST_EMAILS, preserving client tier, own-context checks and no staff tools. Prior delegation decisions are superseded. See docs/ankh/elena_client_voice_pilot.md.
