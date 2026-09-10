@@ -1,25 +1,55 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 const { from, authClient, queries } = vi.hoisted(() => ({
   from: vi.fn(), authClient: vi.fn(), queries: [] as Array<{ data: unknown; error: unknown }>
 }));
 vi.mock("@/lib/supabase/server", () => ({ createSupabaseServerClient: authClient }));
 vi.mock("@/lib/supabase/service", () => ({ createSupabaseServiceClient: () => ({ from }) }));
-import { resolveAssistantAudience } from "@/lib/assistant/tiers";
+import { resolveAssistantAudience, resolveAssistantTierForUi } from "@/lib/assistant/tiers";
 
 const ok = (data: unknown) => ({ data, error: null });
 const failed = () => ({ data: null, error: { message: "offline" } });
 const caseRow = { id: "synthetic-case", created_at: "2026-09-01", direction: "recovery", status: "in_review" };
 
 beforeEach(() => {
+  vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "");
   queries.length = 0;
   authClient.mockResolvedValue({ auth: { getUser: async () => ({ data: { user: { id: "synthetic-user", email: "test@example.invalid" } } }) } });
   from.mockImplementation(() => {
     const result = queries.shift();
     const chain: Record<string, unknown> = {};
-    for (const method of ["select", "eq", "gt", "order", "limit", "maybeSingle"]) chain[method] = () => chain;
+    for (const method of ["select", "eq", "gt", "in", "order", "limit", "maybeSingle"]) chain[method] = () => chain;
     chain.then = (resolve: (value: unknown) => unknown) => Promise.resolve(result).then(resolve);
     return chain;
+  });
+});
+afterEach(() => vi.unstubAllEnvs());
+
+describe("owner-authorized full client assistant preview", () => {
+  function authorize(confirmed = true) {
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "test@example.invalid");
+    authClient.mockResolvedValue({ auth: { getUser: async () => ({ data: { user: { id: "synthetic-user", email: "test@example.invalid", email_confirmed_at: confirmed ? "2026-09-09" : null } } }) } });
+  }
+  it("grants full assistant capabilities without inventing payment or support", async () => {
+    authorize(); queries.push(ok(caseRow), ok([]), ok([]), ok([]), ok([]));
+    const audience = await resolveAssistantAudience();
+    expect(audience.tier).toBe("client");
+    expect(audience.caseId).toBe(caseRow.id);
+    expect(audience.sources.find(s => s.id === "active_support")?.availability).toBe("absent");
+    expect(audience.sources.find(s => s.id === "payments")?.availability).toBe("not_connected");
+    expect(audience.sources.find(s => s.id === "assistant_preview")?.scope).toContain("NOT proof of payment");
+  });
+  it("enables the same attachment tier in the UI", async () => {
+    authorize(); queries.push(ok([]));
+    expect(await resolveAssistantTierForUi()).toBe("client");
+  });
+  it("does not grant the preview to unconfirmed emails", async () => {
+    authorize(false); queries.push(ok(null), ok([]));
+    expect((await resolveAssistantAudience()).tier).toBe("registered");
+  });
+  it("revokes the full preview when removed from the allowlist", async () => {
+    authorize(); vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", ""); queries.push(ok(null), ok([]));
+    expect((await resolveAssistantAudience()).tier).toBe("registered");
   });
 });
 

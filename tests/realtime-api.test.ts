@@ -48,6 +48,16 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  it("gives the confirmed preview client the full client tier while keeping own-case and staff boundaries", async () => {
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "client@example.test");
+    mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: actor.email, email_confirmed_at: "2026-09-09" } }, error: null });
+    caseRow = { id: caseId };
+    expect(await resolveVoiceActor(request({}), "client")).toMatchObject({ profileId: userId, caseId, tier: "client", scope: "client" });
+    await expect(resolveVoiceActor(request({}), "staff")).rejects.toMatchObject({ status: 403 });
+    await expect(resolveVoiceActor(request({}), "client", userId)).rejects.toMatchObject({ status: 403 });
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "");
+    expect((await resolveVoiceActor(request({}), "client")).tier).toBe("registered");
+  });
   it("allows a named client pilot only with client scope and no staff tools", async () => {
     vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");
     vi.stubEnv("PUBLIC_ASSISTANT_MODE", "off");

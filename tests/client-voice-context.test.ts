@@ -7,6 +7,15 @@ import type { VoiceActor } from "@/lib/assistant/realtime-server";
 const actor: VoiceActor = { profileId: "own", caseId: "own-case", email: "client@example.test", scope: "client", tier: "registered" };
 beforeEach(() => { vi.resetAllMocks(); f.audience.mockResolvedValue({ profileId: "own", caseId: "own-case", tier: "registered", context: "Own source context" }); f.registered.mockResolvedValue("Client rules"); });
 describe("client voice case isolation", () => {
+  it("uses the full client prompt for a server-authorized client tier", async () => {
+    f.audience.mockResolvedValue({ profileId: "own", caseId: "own-case", tier: "client", context: "Own source context with preview grant" });
+    f.paid.mockResolvedValue("Full client rules");
+    const instructions = await clientVoiceInstructions(new Request("https://test.local"), { ...actor, tier: "client" }, "en");
+    expect(f.paid).toHaveBeenCalledWith("Own source context with preview grant");
+    expect(f.registered).not.toHaveBeenCalled();
+    expect(instructions).toContain("English");
+    expect(instructions).toContain("There are no staff tools");
+  });
   it("reuses the registered client context without upgrading paid entitlements", async () => {
     const instructions = await clientVoiceInstructions(new Request("https://test.local"), actor, "ru");
     expect(f.registered).toHaveBeenCalledWith("Own source context"); expect(f.paid).not.toHaveBeenCalled();

@@ -1,5 +1,14 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Full client assistant preview — 2026-09-09
+
+Owner expanded Elena's pilot to all existing client assistant capabilities.
+Confirmed users on ANHAM_CLIENT_VOICE_TEST_EMAILS receive the client assistant
+tier consistently in text, voice and UI attachments. Actual service periods,
+payments and platform roles are unchanged. This supersedes the pilot's earlier
+registered-tier restriction; own-Case and staff denials remain. Publication and
+validation are tracked in docs/ankh/elena_full_client_assistant.md.
+
 ## Published honesty release — 2026-09-09 local
 
 Owner-authorized PR #161 is published: main 2e56cbf, Vercel production
