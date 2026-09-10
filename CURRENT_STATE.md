@@ -4,6 +4,19 @@ Last canonical update: 2026-09-09
 
 ## 1. Current position
 
+### Voice/text permission parity — 2026-09-09 (latest)
+
+Owner requested voice to have the same powers as text. Staff voice now delegates
+methodology/reasoning/archive and explicit memory commands to the existing staff
+text POST handler with its own authorization rechecked. The actual turn-bound
+browser transcript is used, not a model-supplied command. Private/Case history is
+loaded; one execution per signed session/turn prevents duplicate memory writes.
+Karen destination confirmations remain in the existing chat controls. Source
+queries and internet tools remain available under their existing flags. Policy
+receipts advance to v4; old sessions must restart. No schema or production change
+in this increment. Production rollout still awaits the exact migration approval
+recorded below. See `docs/ankh/voice_text_permissions.md`.
+
 ### Built-in staff voice launch preparation — 2026-09-09 (latest)
 
 The owner deferred personal voice cloning and authorized built-in voices only.

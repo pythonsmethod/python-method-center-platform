@@ -712,7 +712,10 @@ function AssistantChatSession({
             locale={locale} scope={voiceScope} caseId={caseId}
             disabled={pending || historyLoading || historyError || voice.listening || files.length > 0 || Boolean(progress)}
             onActive={setVoiceActive}
-            onTranscript={(text, sessionId) => setMessages(current => mergeVoiceTranscript(current, text, sessionId))}
+            onTranscript={(text, sessionId) => {
+              setMessages(current => mergeVoiceTranscript(current, text, sessionId));
+              if (memoryCapture && !text.live && text.assistant) { setMemoryState("offer"); setMemoryMessage(null); }
+            }}
           /> : null}
           <button
             className="button"

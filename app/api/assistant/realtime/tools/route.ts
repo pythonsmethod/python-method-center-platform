@@ -4,6 +4,7 @@ import { runVoiceSiteTool } from "@/lib/assistant/voice-site-tools";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { Locale } from "@/lib/i18n/locale";
 import { runVoiceWebSearch } from "@/lib/assistant/voice-web-search";
+import { runVoiceTextBridge } from "@/lib/assistant/voice-text-bridge";
 
 export const runtime = "nodejs";
 export async function POST(request: Request) {
@@ -20,7 +21,9 @@ export async function POST(request: Request) {
     const row = Array.isArray(result.data) ? result.data[0] : result.data;
     if (result.error || typeof row?.allowed !== "boolean") throw new VoiceFailure("unavailable", 503);
     if (!row.allowed) throw new VoiceFailure("limit", 429);
-    const output = body.name === "search_web"
+    const output = body.name === "ask_text_assistant"
+      ? await runVoiceTextBridge(request, actor, receipt, locale, body)
+      : body.name === "search_web"
       ? await runVoiceWebSearch(actor, body.arguments, receipt, request.signal)
       : await runVoiceSiteTool(actor, body.name, body.arguments, receipt.timeZone ?? "UTC", new Date(), locale);
     return NextResponse.json({ output }, { headers: { "Cache-Control": "no-store" } });

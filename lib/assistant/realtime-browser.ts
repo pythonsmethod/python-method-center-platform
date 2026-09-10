@@ -15,6 +15,7 @@ export class RealtimeBrowser {
   private duration?: ReturnType<typeof setTimeout>;
   private turns?: RealtimeTurns;
   private receipt = "";
+  private previousAssistant = "";
   constructor(private options: Options) {}
 
   async start() {
@@ -45,7 +46,7 @@ export class RealtimeBrowser {
       this.channel = this.peer.createDataChannel("oai-events");
       this.turns = new RealtimeTurns(event => {
         if (this.channel?.readyState === "open") this.channel.send(JSON.stringify(event));
-      }, pair => this.options.onExchange(pair, this.receipt), this.options.onIncomplete, { onTranscript: this.options.onTranscript, tool: call => this.readSite(call) });
+      }, pair => { this.previousAssistant = pair.assistant; this.options.onExchange(pair, this.receipt); }, this.options.onIncomplete, { onTranscript: this.options.onTranscript, tool: (call, userTurn) => this.readSite(call, userTurn) });
       this.channel.onopen = () => {
         if (this.closed) return;
         clearTimeout(this.timeout);
@@ -88,14 +89,14 @@ export class RealtimeBrowser {
     }
   }
   private fail(error: VoiceError) { this.stop(); this.options.onError(error); this.options.onState("error"); }
-  private async readSite(call: VoiceToolCall) {
+  private async readSite(call: VoiceToolCall, userTurn: { id: string; text: string }) {
     if (this.closed || this.options.scope !== "staff") return { error: "forbidden" };
     this.options.onState(call.name === "search_web" ? "searching" : "reading");
     if (call.arguments.length > 2000) return { error: "invalid" };
     const response = await fetch("/api/assistant/realtime/tools", {
-      method: "POST", credentials: "same-origin", signal: AbortSignal.any([this.abort.signal, AbortSignal.timeout(call.name === "search_web" ? 35000 : 15000)]),
+      method: "POST", credentials: "same-origin", signal: AbortSignal.any([this.abort.signal, AbortSignal.timeout(call.name === "ask_text_assistant" ? 120000 : call.name === "search_web" ? 35000 : 15000)]),
       headers: { "Content-Type": "application/json", "Accept-Language": this.options.locale },
-      body: JSON.stringify({ name: call.name, arguments: JSON.parse(call.arguments), receipt: this.receipt, scope: this.options.scope, locale: this.options.locale, caseId: this.options.caseId }),
+      body: JSON.stringify({ name: call.name, arguments: JSON.parse(call.arguments), receipt: this.receipt, scope: this.options.scope, locale: this.options.locale, caseId: this.options.caseId, ...(call.name === "ask_text_assistant" ? { userTurn, previousAssistant: this.previousAssistant } : {}) }),
     });
     if (!response.ok) return { error: "unavailable", instruction: call.name === "search_web" ? "Internet search failed or is unavailable. Say you could not verify this online; never invent search results or links." : "The site query failed. Say the data is unavailable; do not invent counts or messages." };
     return (await response.json()).output;

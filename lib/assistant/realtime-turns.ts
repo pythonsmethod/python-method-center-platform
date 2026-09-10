@@ -6,7 +6,7 @@ type Output = { id?: string; type?: string; call_id?: string; name?: string; arg
 type Input = { id: string; text?: string; failed?: boolean };
 type Active = { input: Input; responseId?: string; outputIds?: string[]; text?: string; done: boolean; played: boolean; interrupted: boolean; toolsPending: boolean; toolRounds: number; chainIds: string[]; webResults?: WebResult[]; webReceipts?: string[] };
 type Event = { type?: string; item_id?: string; transcript?: string; delta?: string; response_id?: string; response?: { id?: string; status?: string; metadata?: { input_item_id?: string }; output?: Output[] } };
-type Options = { onTranscript?: (text: VoiceTranscript) => void; tool?: (call: VoiceToolCall) => Promise<unknown> };
+type Options = { onTranscript?: (text: VoiceTranscript) => void; tool?: (call: VoiceToolCall, userTurn: { id: string; text: string }) => Promise<unknown> };
 
 // One active input owns every audio and tool response in its turn. Nothing is
 // matched by arrival time or by the newest message visible in the UI.
@@ -70,7 +70,7 @@ export class RealtimeTurns {
     active.chainIds.push(...(active.outputIds ?? []));
     for (const call of calls) {
       let output: unknown;
-      try { output = call.name === "search_web" && (active.webResults?.length ?? 0) >= 3 ? { error: "limit", instruction: "Search limit reached for this turn. Use only existing sources." } : this.options.tool ? await this.options.tool(call) : { error: "unavailable" }; } catch { output = { error: "unavailable", instruction: "Say the requested data could not be read. Never invent an answer." }; }
+      try { output = call.name === "search_web" && (active.webResults?.length ?? 0) >= 3 ? { error: "limit", instruction: "Search limit reached for this turn. Use only existing sources." } : this.options.tool ? await this.options.tool(call, { id: active.input.id, text: active.input.text! }) : { error: "unavailable" }; } catch { output = { error: "unavailable", instruction: "Say the requested data could not be read. Never invent an answer." }; }
       if (this.closed || this.active !== active || active.interrupted) return;
       if (call.name === "search_web" && output && typeof output === "object") {
         const { webReceipt, ...data } = output as Record<string, unknown>;

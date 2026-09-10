@@ -2,6 +2,11 @@
 
 ## North Star
 
+Voice/text parity: reuse the text assistant handler for private reasoning,
+archive retrieval and explicit memory commands, with transcript-bound inputs
+and existing confirmation controls. No new role or unrestricted write API.
+Production launch remains gated by the two previously rejected migrations.
+
 Current voice priority: built-in voices only for founder/Karen. Personal voice
 cloning is deferred by the owner, and recordings are not a release prerequisite.
 Code/regression and staging persistence checks pass. Production launch is pending

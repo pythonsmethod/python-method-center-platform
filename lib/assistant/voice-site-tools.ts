@@ -10,6 +10,7 @@ import { WEB_SEARCH_TOOL } from "./voice-web-search";
 export function voiceSiteTools(scope: VoiceActor["scope"]) {
   if (scope === "client") return [];
   return [
+    { type: "function", name: "ask_text_assistant", description: "Use the same private text assistant for reasoning, methodology, archive memory and explicit remember/save commands. The server uses the actual user transcript, not model-written instructions. Call once per turn and speak the returned reply accurately.", parameters: { type: "object", properties: {}, additionalProperties: false } },
     ...STAFF_DATA_TOOLS,
     ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : []),
     { type: "function", name: "registration_counts", description: "Read exact total currently registered client accounts and new registrations today from the site. Excludes staff accounts. Always use this for registration numbers.", parameters: { type: "object", properties: {}, additionalProperties: false } },

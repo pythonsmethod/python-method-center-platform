@@ -864,3 +864,7 @@ Include created_at in both rows of every bulk exchange insert. Record question a
 ## D-062 — Built-in staff voices first (2026-09-09)
 
 Owner deferred personal voices. Enforce ANHAM_VOICE_BUILTINS_ONLY and restrict initial rollout to verified founder/Karen accounts. Reuse current private history tiers/timestamps and shared safety instructions. Personal recordings are not required. Production migration approval and live acceptance remain explicit launch gates. See docs/ankh/builtin_voice_launch_2026_09_09.md.
+
+## D-063 — Same text authority for staff voice (2026-09-09)
+
+Voice delegates actual recognized user commands to the existing authenticated staff text handler. Model arguments cannot define a write. Actor/Case are session-bound; private history is server-loaded. One execution per signed session/turn prevents duplicate saves. Founder internal notes and Karen confirmation retain text behavior. Receipt policy v4. No new production schema authorization is inferred from the parity request. See docs/ankh/voice_text_permissions.md.
