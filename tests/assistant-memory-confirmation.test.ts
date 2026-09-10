@@ -24,9 +24,9 @@ describe("explicit confirmation before durable AI memory", () => {
     expect(chat).toContain("Do not save");
   });
 
-  it("forbids both private personas from claiming an unconfirmed save", () => {
-    expect(prompts).toContain("никогда не решай назначение сам");
+  it("keeps Karen confirmation and founder server-backed saving", () => {
+    expect(prompts).toContain("Прямые команды Анны");
     expect(prompts).toContain("не выбирай назначение");
-    expect(prompts.match(/обязательно/gi)?.length).toBeGreaterThanOrEqual(2);
+    expect(prompts.match(/обязательно/gi)?.length).toBeGreaterThanOrEqual(1);
   });
 });

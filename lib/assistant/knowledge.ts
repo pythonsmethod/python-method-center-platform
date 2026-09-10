@@ -53,7 +53,7 @@ export async function getKnowledgeForPrompt(
     .select("title, content")
     .eq("is_active", true)
     .in("audience", [audience, "both"])
-    .order("created_at", { ascending: true })
+    .order("created_at", { ascending: false })
     .limit(MAX_PROMPT_ENTRIES);
 
   if (error || !data || data.length === 0) {

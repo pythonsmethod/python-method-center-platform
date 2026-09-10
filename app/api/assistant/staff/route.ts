@@ -1,4 +1,7 @@
 import { NextResponse } from "next/server";
+import { searchKnowledgeArchive } from "@/lib/assistant/knowledge-search";
+import { founderMemoryFromCommand } from "@/lib/assistant/founder-memory";
+import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam, askKarenAssistant } from "@/lib/assistant/router";
@@ -55,6 +58,35 @@ export async function POST(request: Request) {
     );
   }
 
+  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+  const respondWithReply = async (reply: string) => NextResponse.json({ reply });
+
+  const english = (body as { locale?: unknown })?.locale === "en";
+
+  const memory = assistantRole === "founder" ? founderMemoryFromCommand(messages, english) : null;
+  if (memory) {
+    if (attachments || !memory.content || memory.content.length > 8000) {
+      return respondWithReply(english
+        ? "Please write the text after ‘Remember:’. To save my previous answer, write ‘Save this’ without attachments."
+        : "Напишите текст после «Запомни:». Чтобы сохранить мой предыдущий ответ, напишите «Сохрани это» без вложений.");
+    }
+    try {
+      const supabase = createSupabaseServiceClient();
+      if (!supabase) throw new Error("unavailable");
+      const { error } = await supabase.from("assistant_knowledge").insert({
+        ...memory, audience: "staff", collection: "general", topic: "general", created_by: auth.userId
+      });
+      if (error) throw new Error("save failed");
+      return respondWithReply((english
+        ? "Saved to internal assistant memory:\n\n"
+        : "Сохранено во внутреннюю память помощника:\n\n") + memory.content);
+    } catch {
+      return NextResponse.json({ error: english
+        ? "Could not save the note. Please try again."
+        : "Не удалось сохранить заметку. Попробуйте ещё раз." }, { status: 503 });
+    }
+  }
+
   // A provider named in the request body is honoured only for the founder;
   // for everyone else the choice is made here and the name never comes back.
   const showProviders = canSeeProviderNames(auth.email);
@@ -64,6 +96,12 @@ export async function POST(request: Request) {
   );
 
   let system = await buildStaffSystemPrompt(assistantRole);
+  if (assistantRole === "founder") {
+    const archive = await searchKnowledgeArchive(messages[messages.length - 1].content);
+    system += archive.context;
+    if (archive.unavailable) system += "\nArchive search is temporarily unavailable. Tell Anna in the active language; do not claim to have searched or remembered unavailable notes.";
+    else if (!archive.matches) system += "\nArchive keyword search found no matching notes. Do not invent saved notes or claim the archive has no such information.";
+  }
 
   if (attachments) {
     system = `${system}\n\n${ATTACHMENT_READING_ACCURACY_RULE}`;
@@ -72,7 +110,7 @@ export async function POST(request: Request) {
   // Optional case binding: the assistant on a case page receives a live
   // snapshot of that case from the database (metadata, questionnaire,
   // documents list, payments, history).
-  const rawCaseId = (body as { caseId?: unknown })?.caseId;
+
 
   if (typeof rawCaseId === "string" && isUuid(rawCaseId)) {
     const caseContext = await buildCaseContext(rawCaseId);
@@ -118,5 +156,5 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 502 });
   }
 
-  return NextResponse.json({ reply: result.reply });
+  return respondWithReply(result.reply);
 }
