@@ -1,7 +1,7 @@
 import { getReviewCopy } from "@/lib/config/review";
 import { UNTRUSTED_ATTACHMENTS_RULE } from "@/lib/assistant/claude";
 import { ANHAM_RESPONSE_STYLE } from "@/lib/assistant/response-style";
-import { ASSISTANT_IDENTITY, ASSISTANT_NAME_RU } from "@/lib/assistant/identity";
+import { ASSISTANT_IDENTITY, ASSISTANT_NAME_RU, ASSISTANT_INTRODUCTION_RULE } from "@/lib/assistant/identity";
 import { getKnowledgeForPrompt } from "@/lib/assistant/knowledge";
 import type { PrivateAssistantRole } from "@/lib/auth/require-karen";
 import { CHAT_CAPABILITIES, FACTUAL_HONESTY_RULE } from "@/lib/assistant/factual-honesty";
@@ -13,7 +13,7 @@ import { CHAT_CAPABILITIES, FACTUAL_HONESTY_RULE } from "@/lib/assistant/factual
 // AI helps make decisions. Karen makes decisions. The client decides
 // whether to follow recommendations.
 
-export const platformContext = () => `${FACTUAL_HONESTY_RULE}${CHAT_CAPABILITIES}
+export const platformContext = () => `${FACTUAL_HONESTY_RULE}${CHAT_CAPABILITIES}${ASSISTANT_INTRODUCTION_RULE}
 ## О центре
 Python Method Center (pythonmethodcenter.com) — цифровой реабилитационный центр «Реабилитация без границ». Основатель и ведущий эксперт — Professor Python, операционный координатор и поддержка — Анна.
 

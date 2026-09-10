@@ -1032,3 +1032,11 @@ Owner corrected the scope: own Case/client experience, not staff-equivalent auth
 
 ## 2026-09-09 — Publish dangerous-assistance restrictions
 Owner explicitly authorized publication. Scoped release from b18a898 expands shared RU/EN dangerous-assistance rules in text and existing voice without disabling voice or changing access/data. Full regression 1573/1573; added voice/safety checks 69/69; TS/lint/diff pass. See docs/security/DANGEROUS_ASSISTANCE_RELEASE_2026_09_09.md. Remote release verification pending; broader cost-dashboard/security branch remains separate.
+
+## 2026-09-10 — Anham's introduction
+
+Owner corrected the live voice wording: Anham is the AI assistant at Python
+Method Center; Professor Python is the human founder/expert. The shared RU/EN
+prompt now fixes the introduction in text and voice, with Russian pronunciation.
+No permissions, schema, clinical changes or historical message rewrites.
+Release evidence: docs/ankh/anham_center_introduction.md.
