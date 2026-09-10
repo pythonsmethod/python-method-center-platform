@@ -40,7 +40,7 @@ export async function POST(request: Request) {
       audio: {
         input: { transcription: { model: config.transcriptionModel, language: locale }, turn_detection: { type: "semantic_vad", eagerness: "medium", create_response: false, interrupt_response: true } },
         output: { voice: selectedVoice, speed: 1 },
-      }, tools: voiceSiteTools(actor.scope),
+      }, tools: voiceSiteTools(actor.scope, actor),
     }));
     // Unified WebRTC handshake: no provider credential enters the browser.
     const response = await fetch("https://api.openai.com/v1/realtime/calls", {

@@ -2,6 +2,9 @@ import { AsyncLocalStorage } from "node:async_hooks";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { ConversationScope } from "./conversation-context";
 import { isUuid } from "@/lib/utils/uuid";
+import { CLIENT_CASE_TOOL } from "./client-tool-contract";
+import { WEB_SEARCH_TOOL } from "./public-web-tool";
+import { isClientVoicePilot } from "./client-voice-pilot";
 
 // Request-local authority, not persistent memory. The canonical archive remains
 // assistant_messages; each provider receives the same read-only capability.
@@ -14,6 +17,11 @@ export const CONVERSATION_ARCHIVE_TOOLS = [
   { type: "function" as const, name: "read_conversation_message", description: "Read a saved message in full using its returned ID; follow nextOffset until null. Access is restricted to the authenticated speaker's private/client archive. Keep the original Case and speaker distinct.", parameters: { type: "object", properties: { id: { type: "string" }, offset: { type: "integer", minimum: 0 } }, required: ["id"], additionalProperties: false } }
 ];
 export const isConversationArchiveTool = (name: unknown) => CONVERSATION_ARCHIVE_TOOLS.some(tool => tool.name === name);
+export function availableConversationTools() {
+  const scope = conversationArchiveScope();
+  if (!scope?.private && scope?.clientTools && isClientVoicePilot(scope.clientTools.email)) return [...CONVERSATION_ARCHIVE_TOOLS, CLIENT_CASE_TOOL, ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : [])];
+  return CONVERSATION_ARCHIVE_TOOLS;
+}
 const PAGE = 20, CHUNK = 8000;
 const columns = "id,case_id,role,content,created_at,message_sequence,source,voice_state,locale";
 function invalid() { return { status: "invalid", instruction: "Invalid archive arguments; do not invent a result." }; }
@@ -64,5 +72,19 @@ export async function runConversationArchiveTool(scope: ConversationScope, name:
 
 export async function executeConversationArchiveTool(name: unknown, args: unknown) {
   const scope = conversationArchiveScope();
+  if (scope && !scope.private && scope.clientTools && isClientVoicePilot(scope.clientTools.email) && (name === "read_my_case" || name === "search_web")) {
+    const actor = { scope: "client" as const, profileId: scope.profileId, caseId: scope.caseId, email: scope.clientTools.email, tier: "client" as const, clientPreview: true };
+    try {
+      if (name === "read_my_case") return await (await import("./client-case-tools")).readMyCase(actor, args);
+      if ((scope.clientTools.webSearchCalls ?? 0) >= 3) return { status: "limit", instruction: "Use the search results already retrieved in this request." };
+      scope.clientTools.webSearchCalls = (scope.clientTools.webSearchCalls ?? 0) + 1;
+      const { issueVoiceReceipt, verifyVoiceReceipt, voiceConfig } = await import("./realtime-server");
+      const config = voiceConfig(actor);
+      const receipt = verifyVoiceReceipt(issueVoiceReceipt(actor, scope.clientTools.locale, config.signingKey, 300), actor, scope.clientTools.locale);
+      const result = await (await import("./voice-web-search")).runVoiceWebSearch(actor, args, receipt, undefined, "text");
+      (scope.clientTools.webResults ??= []).push(result.webResult);
+      return { status: "ready", ...result.webResult, instruction: "Cite these returned public URLs in your answer. Search is public evidence, not verified Case evidence. Do not claim other actions." };
+    } catch { return { status: "unavailable", instruction: "Lookup failed. Say so; do not invent results." }; }
+  }
   return scope ? runConversationArchiveTool(scope, name, args) : { status: "forbidden" };
 }

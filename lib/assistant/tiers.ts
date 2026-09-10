@@ -17,6 +17,7 @@ export function isPaidSupportProduct(product: unknown): boolean {
 }
 
 export type AssistantAudience = {
+  fullPreview?: boolean;
   tier: AssistantTier;
   profileId: string | null;
   email: string | null;
@@ -158,6 +159,7 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
     }
     return {
       tier: hasPaidSupport || fullPreview ? "client" : "registered",
+      fullPreview,
       profileId: user.id,
       email: user.email ?? null,
       caseId: caseRow?.id ?? null,

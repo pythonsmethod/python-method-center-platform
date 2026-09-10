@@ -1,5 +1,23 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-09 — Same client tools in text and voice
+
+The owner expanded the selected client's pilot beyond the registered/paid
+assistant tier to include all implemented client-facing read capabilities.
+Use a separately reviewed 17-section own-record projection, never the staff
+catalog. Bind record/list reads to authenticated profile and own Case, retain
+source attribution, chunk revisions, quota and audit checks. Internal notes,
+AI clinical drafts, secrets and other clients remain excluded. Read existing
+document extractions only; no automatic extraction or clinical gate promotion.
+
+Reuse public-query-only web search with cited results, request-local text tool
+authority and session-bound voice provenance. Authenticated confirmed pilot
+access is rechecked by server routes; body claims never grant tools. All public
+queries exclude full Case context by construction, but identifier-pattern filters
+and model generalization are defense in depth, not a universal PHI detector.
+Source links are appended server-side to successful text answers and saved in
+the existing conversation history. No new Case, schema or paid-service grant.
+
 ## 2026-09-09 — Full client assistant preview is not paid support
 
 Owner requested full client functionality for Elena's own-Case pilot. Reuse the

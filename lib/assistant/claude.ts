@@ -1,5 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
-import { ARCHIVE_RULE, CONVERSATION_ARCHIVE_TOOLS, conversationArchiveScope, executeConversationArchiveTool } from "./conversation-archive";
+import { ARCHIVE_RULE, availableConversationTools, conversationArchiveScope, executeConversationArchiveTool } from "./conversation-archive";
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
@@ -240,7 +240,7 @@ export async function askClaude(
       max_tokens: maxTokens,
       system: buildSystemParam(system),
       messages: requestMessages,
-      ...(archiveEnabled ? { tools: CONVERSATION_ARCHIVE_TOOLS.map(tool => ({ name: tool.name, description: tool.description, input_schema: tool.parameters as Anthropic.Tool.InputSchema })), tool_choice: { type: round < 4 ? "auto" as const : "none" as const } } : {})
+        ...(archiveEnabled ? { tools: availableConversationTools().map(tool => ({ name: tool.name, description: tool.description, input_schema: tool.parameters as Anthropic.Tool.InputSchema })), tool_choice: { type: round < 4 ? "auto" as const : "none" as const } } : {})
     });
     let response = await call(0);
     for (let round = 0; archiveEnabled && response.stop_reason === "tool_use"; round++) {

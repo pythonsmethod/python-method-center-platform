@@ -1,5 +1,15 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Complete client Anham tool pilot — 2026-09-09
+
+Owner requested the complete client Anham feature set for the selected account.
+The same confirmed pilot now receives own-record tools and public web search
+in text and voice, alongside conversation memory and attachments. A reviewed
+17-section client surface binds every query to its authenticated owner; no
+staff catalog, internal drafts, other clients, write commands or new extraction.
+RU/EN feature list and voice disclosure updated. Existing production columns
+were checked read-only. Release evidence: docs/ankh/client_complete_tools.md.
+
 ## Full client assistant preview — 2026-09-09
 
 Owner expanded Elena's pilot to all existing client assistant capabilities.

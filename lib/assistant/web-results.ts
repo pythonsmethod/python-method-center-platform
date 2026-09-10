@@ -1,6 +1,10 @@
 // Shared display contract. Provider text is data: never HTML or executable Markdown.
 export type WebCitation = { title: string; url: string; start: number; end: number };
 export type WebResult = { text: string; citations: WebCitation[]; searchedAt: string };
+export function webSourceAppendix(results: WebResult[], locale: "ru" | "en") {
+  const urls = [...new Set(results.filter(validWebResult).flatMap(result => result.citations.map(c => c.url)))];
+  return urls.length ? `\n\n${locale === "ru" ? "Источники интернет-поиска" : "Web search sources"}: ${urls.map(url => `[${new URL(url).hostname}](<${url}>)`).join(", ")}.` : "";
+}
 export function publicSourceUrl(value: unknown): string | null {
   if (typeof value !== "string" || value.length > 700) return null;
   try {
