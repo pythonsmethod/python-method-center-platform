@@ -7,6 +7,7 @@ import { runVoiceWebSearch } from "@/lib/assistant/voice-web-search";
 import { runVoiceTextBridge } from "@/lib/assistant/voice-text-bridge";
 import { isConversationArchiveTool, runConversationArchiveTool } from "@/lib/assistant/conversation-archive";
 import { canUseClientTools, readMyCase } from "@/lib/assistant/client-case-tools";
+import { executeClientCabinetAction, prepareClientCabinetAction } from "@/lib/assistant/client-action-tools";
 
 export const runtime = "nodejs";
 export async function POST(request: Request) {
@@ -15,7 +16,7 @@ export async function POST(request: Request) {
     const body = await readVoiceBody(request); locale = body.locale === "en" ? "en" : "ru";
     const actor = await resolveVoiceActor(request, body.scope, body.caseId);
     const receipt = verifyVoiceReceipt(body.receipt, actor, locale);
-    if ((actor.scope === "client" && !isConversationArchiveTool(body.name) && !(canUseClientTools(actor) && (body.name === "read_my_case" || body.name === "search_web"))) || receipt.dataAccessVersion !== VOICE_DATA_ACCESS_VERSION) throw new VoiceFailure("forbidden", 403);
+    if ((actor.scope === "client" && !isConversationArchiveTool(body.name) && !(canUseClientTools(actor) && ["read_my_case", "search_web", "prepare_my_cabinet_action", "execute_my_cabinet_action"].includes(String(body.name)))) || receipt.dataAccessVersion !== VOICE_DATA_ACCESS_VERSION) throw new VoiceFailure("forbidden", 403);
     voiceConfig(actor); // Revoked pilot access and the kill switch take effect on every read.
     const db = createSupabaseServiceClient();
     if (!db) throw new VoiceFailure("unavailable", 503);
@@ -27,6 +28,10 @@ export async function POST(request: Request) {
       ? await runConversationArchiveTool({ profileId: actor.profileId, private: actor.scope !== "client", caseId: actor.caseId }, body.name, body.arguments)
       : body.name === "read_my_case"
       ? await readMyCase(actor, body.arguments)
+      : body.name === "prepare_my_cabinet_action"
+      ? await prepareClientCabinetAction(actor, body.arguments, receipt, locale, body.userTurn)
+      : body.name === "execute_my_cabinet_action"
+      ? await executeClientCabinetAction(actor, body.arguments, receipt, locale, body.userTurn)
       : body.name === "ask_text_assistant"
       ? await runVoiceTextBridge(request, actor, receipt, locale, body)
       : body.name === "search_web"

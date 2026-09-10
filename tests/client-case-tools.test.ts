@@ -61,11 +61,11 @@ describe("client source ownership and provenance", () => {
     count = 12; row = { id, first_reading: "x".repeat(5000) };
     expect(await readMyCase(actor, { section: "document_readings" })).toMatchObject({ status: "ready", totalRecords: 12, nextPage: 1, records: [{ recordId: id, truncated: true }] });
   });
-  it("offers the same tools in voice and text, only with server authority", async () => {
+  it("adds confirmed write actions only to live voice while retaining text read tools", async () => {
     const names = voiceSiteTools("client", actor).map(t => t.name);
-    expect(names).toEqual(["search_conversation_history", "read_conversation_message", "read_my_case", "search_web"]);
+    expect(names).toEqual(["search_conversation_history", "read_conversation_message", "read_my_case", "prepare_my_cabinet_action", "execute_my_cabinet_action", "search_web"]);
     await withConversationArchive({ profileId: actor.profileId, caseId: actor.caseId, private: false, clientTools: { email: actor.email!, locale: "ru" } }, async () => {
-      expect(availableConversationTools().map(t => t.name)).toEqual(names);
+      expect(availableConversationTools().map(t => t.name)).toEqual(["search_conversation_history", "read_conversation_message", "read_my_case", "search_web"]);
       expect((await executeConversationArchiveTool("read_my_case", { section: "payments" })).status).toBe("ready");
     });
     expect(availableConversationTools().map(t => t.name)).not.toContain("read_my_case");
