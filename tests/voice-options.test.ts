@@ -7,6 +7,14 @@ import { inspectVoiceWav, provisionVoice } from "../scripts/ankh/provision-perso
 const actor: VoiceActor = { profileId: "test-person", email: "test@example.test", scope: "founder", tier: "registered", caseId: null };
 afterEach(() => vi.unstubAllEnvs());
 describe("reviewed voice choices", () => {
+  it("hides and rejects personal voices in the authorized built-ins-only release", () => {
+    vi.stubEnv("ANHAM_VOICE_BUILTINS_ONLY", "true");
+    vi.stubEnv("ANHAM_CUSTOM_VOICES_ENABLED", "true");
+    vi.stubEnv("ANHAM_KAREN_VOICE_ID", "voice_synthetic");
+    vi.stubEnv("ANHAM_KAREN_VOICE_CONSENT_ID", "cons_synthetic");
+    expect(availableVoices(actor, "ru").voices).toHaveLength(5);
+    expect(() => resolveOutputVoice(actor, "karen")).toThrow();
+  });
   it.each(BUILTIN_VOICES)("resolves built-in %s without altering persona", voice => {
     expect(resolveOutputVoice(actor, voice)).toBe(voice);
     expect(resolveOutputVoice({ ...actor, scope: "client" }, voice)).toBe(voice);

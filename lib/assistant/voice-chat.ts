@@ -4,6 +4,7 @@ export type VoiceChatMessage = {
   role: "user" | "assistant"; content: string; source?: "text" | "voice_transcript";
   voiceKey?: string; voiceLive?: boolean; voice_state?: "completed" | "interrupted";
   web_results?: WebResult[];
+  id?: string; created_at?: string; message_sequence?: number;
 };
 export function mergeVoiceTranscript(messages: VoiceChatMessage[], text: VoiceTranscript, sessionId: string): VoiceChatMessage[] {
   const result = [...messages];

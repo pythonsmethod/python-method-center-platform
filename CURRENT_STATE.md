@@ -4,6 +4,23 @@ Last canonical update: 2026-09-09
 
 ## 1. Current position
 
+### Built-in staff voice launch preparation — 2026-09-09 (latest)
+
+The owner deferred personal voice cloning and authorized built-in voices only.
+Five built-ins can now be enforced server-side; a staff-only rollout accepts
+verified founder/Karen accounts and denies clients. Voice history integrates with
+the latest private history, timestamps, pagination and shared safety rules from main.
+All 1336 tests / 150 files pass with one worker; TypeScript and ESLint pass.
+Live fixed-phrase TTS returned HTTP 200 and valid WAV for all five voices.
+Both additive voice-history migrations passed on isolated staging; a rolled-back
+synthetic insert/retry verified two rows without duplicates and RLS stayed enabled.
+Production schema changes were rejected by automatic approval review under the
+dedicated-production-task rule. Production voice is NOT launched. Next action:
+explicit approval for the two exact voice migrations, then scoped configuration,
+deployment and authenticated live acceptance. No personal recordings are needed.
+See `docs/ankh/builtin_voice_launch_2026_09_09.md`; this entry supersedes the
+personal-recording prerequisite below.
+
 ### Five selectable voices and personal-voice preparation — 2026-09-09
 
 The avatar call now offers Marin, Cedar, Coral, Sage and Verse, authenticated
@@ -104,6 +121,29 @@ No actual microphone/provider or staging DB validation.
 
 ### Clinical document foundation
 
+
+Non-medical chat increment (2026-09-09): saved Anham registration welcome and
+72-hour-minimum follow-ups are implemented locally, with atomic service-only
+delivery, sticky opt-outs and RU/EN history projection. Authorized synthetic
+acceptance on `ankh-staging` is CLOSED: concurrent cron/opt-out and browser
+RU → EN → RU in cabinet/admin passed. Staging exposed and verified fixes for
+busy-preference timeouts and the admin's hardcoded history locale. An optional
+profile UUID allowlist bounds rollout. Daily Hobby-compatible cron is configured;
+`ASSISTANT_OUTREACH_ENABLED` defaults off. Synthetic fixtures and local keys
+were removed. After explicit owner confirmation, both outreach migrations were
+applied to production `zdrfttgwnyorifmpqgwe`; server-only grants and zero sends
+were verified. Vercel production now explicitly has the enable flag set to
+`false`. PR #156 integrates current main through `d810dd8`, preserving history,
+Anna memory, tariffs and safety changes. Vercel preview build is READY.
+Automatic approval review rejected merging PR #156 into main because the
+publication confirmation did not explicitly name merge-to-main. Production
+deployment is pending that authorization; no sends occurred.
+Ordinary history retains all original languages and private/client isolation;
+only stored outreach templates are projected into the active locale.
+Full suite after integration: 1,143/1,143 tests in 141 files;
+TypeScript and ESLint passed. Details and staging gates:
+[`docs/ankh/assistant_outreach.md`](docs/ankh/assistant_outreach.md).
+This increment does not change any clinical phase or production trust gate.
 
 The Ankh document/evidence foundation is implemented through Phase 2.8.
 
@@ -455,3 +495,22 @@ technical rows stay in a closed audit archive without confirmation controls.
 This reduces manual clicks but does not enable production auto-verification or
 change source/extracted evidence. Production publication is not part of this
 local increment.
+
+## 2026-09-09 — Tariff release preparation
+
+Owner authorized production publication of the full review (299 USD, fees included, until 1 December 2026 Los Angeles time) and the 100-day support link (3,855 USD). Prepared on current production main, isolated from unrelated local changes. Offer amendment uses v8 because production already used v7. See docs/RELEASE_TARIFFS_2026_09_09.md. Build, typecheck and lint passed; production URL variables configured. No schema/PHI/Ankh phase changes. Release completion and live verification will be recorded after deployment.
+
+Validation follow-up: all 32 targeted tests passed across professor-page, review-product, review-price-deadline and offer-version. git diff --check passed. GO for publishing this scoped release; actual paid transaction remains untested.
+
+## 2026-09-09 — Assistant history publication
+
+Owner authorized production publication. Isolated release codex/publish-assistant-history-20260909 is based on production d9e001f and adds persistence for private founder/Karen chat, dated cross-locale history, older-page loading, explicit errors and bounded acknowledged retries. Existing assistant_messages schema/RLS reused; no migrations, clinical changes or existing-message deletion. Separate concurrent knowledge/persona work is excluded. 1019/1019 release tests pass; see docs/architecture/ASSISTANT_CONVERSATION_HISTORY.md for scope, safeguards and acceptance record.
+
+
+## 2026-09-09 — Anna integrated memory and whole-archive retrieval
+
+Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.
+
+## 2026-09-09 — Assistant timestamp correction
+
+Production acceptance exposed a NOT NULL timestamp failure in bulk history insertion. Both row timestamps are now explicit, with question arrival and answer completion preserved separately. Two-row confirmation remains mandatory; the speculative empty-response success fallback was removed before publication. Targeted checks 41/41 and full regression 1092/1092 pass, along with TypeScript and ESLint. No schema/permission/clinical change. See docs/architecture/ASSISTANT_HISTORY_TIMESTAMP_FIX.md; production reload and locale acceptance follow deployment.

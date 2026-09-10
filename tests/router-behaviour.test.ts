@@ -337,3 +337,20 @@ describe("what must never happen on failure", () => {
     }
   });
 });
+
+describe("provider safety refusal routing", () => {
+  it.each(["gpt", "best", "both"] as const)("does not replace a policy refusal in %s mode", async provider => {
+    const refusal = { status: "ok", reply: "safe refusal", refusal: "provider_policy" };
+    askOpenAi.mockResolvedValue(refusal);
+    askClaude.mockResolvedValue(ok("other answer"));
+    expect(await ask(provider)).toEqual(refusal);
+    if (provider === "gpt") expect(askClaude).not.toHaveBeenCalled();
+    else expect(askClaude).toHaveBeenCalledTimes(1);
+  });
+  it("does not synthesize around an explicit policy block", async () => {
+    const refusal = { status: "ok", reply: "safe refusal", refusal: "provider_policy" };
+    askOpenAi.mockResolvedValue(refusal); askClaude.mockResolvedValue(ok("other answer"));
+    expect(await askAnham("system", MESSAGES, 500, "deep")).toEqual(refusal);
+    expect(askClaude).toHaveBeenCalledTimes(1);
+  });
+});

@@ -1,3 +1,4 @@
+import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
@@ -18,6 +19,7 @@ import {
   guardAssistantRequest
 } from "@/lib/assistant/guard";
 import { saveAssistantExchange } from "@/lib/assistant/history";
+import { isExplicitOutreachRefusal, stopAssistantOutreach } from "@/lib/assistant/outreach";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
 import { clientIp } from "@/lib/utils/client-ip";
 import {
@@ -70,6 +72,7 @@ function isRateLimited(key: string, limit: number): boolean {
 }
 
 export async function POST(request: Request) {
+  const questionCreatedAt = new Date().toISOString();
   const locale = await apiErrorLocale();
   const ip = clientIp(request.headers);
 
@@ -98,7 +101,36 @@ export async function POST(request: Request) {
 
   // Who is asking: a visitor, a registered person, or a paying client.
   const audience = await resolveAssistantAudience();
+  const latest = messages[messages.length - 1];
+  if (audience.profileId && audience.tier !== "guest" && latest?.role === "user"
+    && isExplicitOutreachRefusal(latest.content)) {
+    // Persist a refusal before any provider/quota check. An AI outage must
+    // never prevent a person from stopping unsolicited messages.
+    try {
+      await stopAssistantOutreach(audience.profileId);
+    } catch {
+      return NextResponse.json({ error: locale === "ru"
+        ? "Не удалось отключить сообщения. Попробуйте ещё раз."
+        : "Could not turn off messages. Please try again." }, { status: 503 });
+    }
+    const reply = locale === "ru"
+      ? "Автоматические сообщения отключены. Вы можете написать мне сами, когда захотите."
+      : "Automatic messages are off. You can still write to me whenever you like.";
+    const persistence = await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId,
+      tier: audience.tier, question: latest.content, answer: reply, locale, questionCreatedAt });
+    return NextResponse.json({ reply, ...persistence });
+  }
   const settings = TIER_SETTINGS[audience.tier];
+
+  async function respondWithReply(reply: string) {
+    const payload = body as { transient?: unknown; displayText?: unknown; locale?: unknown };
+    const persistence = audience.profileId && audience.tier !== "guest" && payload.transient !== true
+      ? await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId, tier: audience.tier, questionCreatedAt,
+          question: typeof payload.displayText === "string" && payload.displayText.trim() ? payload.displayText : messages![messages!.length - 1].content,
+          answer: reply, locale: payload.locale === "en" ? "en" : "ru" }) : undefined;
+    return NextResponse.json({ reply, ...persistence });
+  }
+
 
   // Files in the chat are a paying-client capability: their AI reads the
   // analyses they attach. The interface only shows the paperclip on that
@@ -115,9 +147,7 @@ export async function POST(request: Request) {
   }
 
   if (attachments && audience.tier !== "client") {
-    return NextResponse.json({
-      reply: apiError("attachmentsPaidOnly", locale)
-    });
+    return respondWithReply(apiError("attachmentsPaidOnly", locale));
   }
 
   if (isRateLimited(`tier:${audience.profileId ?? ip}`, settings.perMinute)) {
@@ -139,7 +169,7 @@ export async function POST(request: Request) {
   if (!guard.allowed) {
     // Delivered as a reply, not as an error: the person should read a warm
     // invitation, not a red technical banner.
-    return NextResponse.json({ reply: guard.message }, { status: 200 });
+    return respondWithReply(guard.message);
   }
 
   const requestedAnhamMode = audience.tier === "client"
@@ -205,29 +235,7 @@ export async function POST(request: Request) {
       { status: 502 }
     );
   }
+  if (result.refusal) result.reply = providerPolicyRefusal(rawLocale === "en" ? "en" : "ru").reply;
 
-  // Saved conversation — only for people who have an account. Someone who
-  // is just looking around the site leaves nothing behind.
-  if (audience.tier !== "guest" && audience.profileId) {
-    // Reading a large set of files takes several technical requests; only
-    // the conversation itself is worth keeping, so those are marked as
-    // transient by the chat window. `displayText` is what the person
-    // actually saw in the window, without the machine-readable padding.
-    const transient = (body as { transient?: unknown })?.transient === true;
-    const rawDisplay = (body as { displayText?: unknown })?.displayText;
-    const displayText = typeof rawDisplay === "string" ? rawDisplay.trim() : "";
-
-    if (!transient) {
-      await saveAssistantExchange({
-        profileId: audience.profileId,
-        caseId: audience.caseId,
-        tier: audience.tier,
-        question: displayText || messages[messages.length - 1]?.content || "",
-        answer: result.reply,
-        locale: rawLocale === "en" ? "en" : "ru"
-      });
-    }
-  }
-
-  return NextResponse.json({ reply: result.reply });
+  return respondWithReply(result.reply);
 }

@@ -5,6 +5,7 @@ import type { Locale } from "@/lib/i18n/locale";
 
 // Provider IDs never come from a browser and never change the assistant persona.
 function personalVoice(id: "founder" | "karen") {
+  if (process.env.ANHAM_VOICE_BUILTINS_ONLY === "true") return null;
   const prefix = `ANHAM_${id.toUpperCase()}_VOICE`;
   const voice = process.env[`${prefix}_ID`]?.trim();
   const consent = process.env[`${prefix}_CONSENT_ID`]?.trim();
@@ -15,7 +16,7 @@ export function availableVoices(actor: VoiceActor, locale: Locale) {
   return {
     defaultVoice: isBuiltinVoice(defaultVoice) ? defaultVoice : "marin",
     preferenceKey: `anham-voice-v1:${createHash("sha256").update(`${actor.profileId}:${actor.scope}`).digest("hex").slice(0, 24)}`,
-    voices: [...builtinVoiceOptions, ...(actor.scope === "client" ? [] : (["founder", "karen"] as const).map(id => ({ id, name: customVoiceName(id, locale), custom: true, available: !!personalVoice(id) })))],
+    voices: [...builtinVoiceOptions, ...(actor.scope === "client" || process.env.ANHAM_VOICE_BUILTINS_ONLY === "true" ? [] : (["founder", "karen"] as const).map(id => ({ id, name: customVoiceName(id, locale), custom: true, available: !!personalVoice(id) })))],
   };
 }
 export function resolveOutputVoice(actor: VoiceActor, selected: unknown): string | { id: string } {

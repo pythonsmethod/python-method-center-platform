@@ -4,8 +4,6 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { KarenAnhamWorkspace } from "@/components/assistant/KarenAnhamWorkspace";
-import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
-import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { hasAssistantEnv } from "@/lib/assistant/router";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
@@ -42,46 +40,35 @@ export default async function PrivateAssistantPage() {
     return <div className="page-shell page-shell--wide karen-ai-page"><KarenAnhamWorkspace configured={configured} labels={labels} locale={locale} showProviders={false} /></div>;
   }
 
-  const knowledge = await listKnowledgeEntries();
   const t = locale === "ru" ? {
     eyebrow: "Персональный ИИ Анны",
-    title: "ИИ основателя и общая база знаний",
-    description: "Здесь Анна ставит задачи, развивает принципы платформы и вместе с Professor Python обучает клиентского Анхама.",
+    title: "Личный помощник Анны",
+    description: "Общайтесь с Анхамом в одном окне. Чтобы добавить знание, напишите «Запомни: …» или «Сохрани это» после его ответа. Анхам также ищет нужные знания во всём архиве.",
     chatLabel: "Рабочий диалог основателя",
     chatTitle: "Личный помощник Анны",
     intro: "Здравствуйте, Анна. Дайте мне задачу, идею или принцип — помогу довести его до сильного решения или знания для системы.",
     placeholder: "Напишите задачу, идею или правило…",
     suggestions: ["Помоги принять решение", "Преврати мою мысль в правило", "Подготовь задание для команды"],
     unavailable: "Личный помощник пока не подключён.",
-    knowledgeLabel: "Общая память",
-    knowledgeTitle: "База знаний Анны и Professor Python",
-    knowledgeDescription: "Вы оба формируете эту память. Для каждого знания выберите, остаётся ли оно внутри или также обучает ИИ клиентов."
   } : {
     eyebrow: "Anna's personal AI",
-    title: "Founder AI and shared knowledge base",
-    description: "Anna assigns work, develops the platform's principles, and trains the client-facing Anham together with Professor Python.",
+    title: "Anna’s personal assistant",
+    description: "Talk to Anham in one window. To add knowledge, write “Remember: …” or “Save this” after an answer. Anham also searches the entire knowledge archive.",
     chatLabel: "Founder workspace",
     chatTitle: "Anna's personal assistant",
     intro: "Hello, Anna. Give me a task, idea, or principle — I will help turn it into a strong decision or durable system knowledge.",
     placeholder: "Write a task, idea, or rule…",
     suggestions: ["Help me make a decision", "Turn my thought into a rule", "Prepare a task for the team"],
     unavailable: "The personal assistant is not connected yet.",
-    knowledgeLabel: "Shared memory",
-    knowledgeTitle: "Anna and Professor Python's knowledge base",
-    knowledgeDescription: "You both shape this memory. For each entry, decide whether it stays internal or also trains the client-facing AI."
   };
 
   return <div className="page-shell page-shell--wide">
     <PageHeader eyebrow={t.eyebrow} title={t.title} description={t.description} />
-    <div className="karen-ai-grid">
+    <div className="anna-ai-workspace">
       <section className="panel" aria-label={t.chatTitle}>
         <span className="panel__label">{t.chatLabel}</span>
         <h2 className="staff-assistant__title"><AnhamAvatar className="staff-assistant__face" size={44} state="client" />{t.chatTitle}</h2>
         {configured ? <AssistantChat attachments endpoint="/api/assistant/staff" intro={t.intro} locale={locale} placeholder={t.placeholder} providerChoice suggestions={t.suggestions} /> : <p className="form-message form-message--error">{t.unavailable}</p>}
-      </section>
-      <section className="panel" aria-label={t.knowledgeTitle}>
-        <span className="panel__label">{t.knowledgeLabel}</span><h2>{t.knowledgeTitle}</h2><p>{t.knowledgeDescription}</p>
-        <KnowledgePanel entries={knowledge.entries} loadError={knowledge.error} locale={locale} role="founder" />
       </section>
     </div>
   </div>;

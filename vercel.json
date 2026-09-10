@@ -1,6 +1,10 @@
 {
   "crons": [
     {
+      "path": "/api/cron/assistant-outreach",
+      "schedule": "20 15 * * *"
+    },
+    {
       "path": "/api/documents/process",
       "schedule": "0 15 * * *"
     },

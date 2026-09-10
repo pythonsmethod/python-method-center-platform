@@ -50,7 +50,8 @@ Object.defineProperty(navigator, "mediaDevices", { configurable: true, value: { 
 Object.defineProperty(window, "RTCPeerConnection", { configurable: true, value: Peer });
 window.fetch = async (url, options) => {
   const address = new URL(String(url), window.location.origin);
-  if (address.pathname.endsWith("/voices")) return Response.json({ voices: [...builtinVoiceOptions, { id: "founder", name: fixtureLocale === "ru" ? "Голос основательницы" : "Founder’s voice", available: false, custom: true }, { id: "karen", name: fixtureLocale === "ru" ? "Голос Карена" : "Karen’s voice", available: false, custom: true }], defaultVoice: "marin", preferenceKey: "anham-voice-v1:synthetic" });
+  if (address.pathname.endsWith("/voices")) return Response.json({ voices: builtinVoiceOptions, defaultVoice: "marin", preferenceKey: "anham-voice-v1:synthetic" });
+  if (address.pathname.endsWith("/history")) return Response.json({ messages: Object.values(stored).flat(), hasMore: false });
   if (address.pathname.endsWith("/preview")) {
     previews++;
     const bytes = new Uint8Array(32044), view = new DataView(bytes.buffer);

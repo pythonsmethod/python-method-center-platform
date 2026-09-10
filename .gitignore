@@ -15,3 +15,6 @@ pnpm-debug.log*
 public/stockfish/stockfish.js
 backup-logs/
 .private/anham-voices/
+
+.vercel
+.env*

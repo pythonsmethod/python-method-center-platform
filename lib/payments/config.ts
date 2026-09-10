@@ -1,3 +1,4 @@
+import { getReviewCopy, reviewPriceUsd, REVIEW_TEMPORARY_USD } from "@/lib/config/review";
 import type { Locale } from "@/lib/i18n/locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 
@@ -8,12 +9,8 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 export const PLAN_5W_TOTAL_USD = 1440;
 export const PLAN_100D_TOTAL_USD = 3855;
 
-// The analyses review, set by the founder (02.09.2026) at $500 as a paid
-// format in its own right, once the launch promotion that offered it free
-// had ended. Unlike the two support programmes, the 5% service fee is
-// included in this price rather than added to it — 500 is what the person
-// pays, so the Stripe Payment Link must be created for exactly $500. The
-// contract says so in clause 3.
+// Standard and historical review total. Current checkout price is calculated
+// by reviewPriceUsd(now), including the temporary 299 USD period.
 export const REVIEW_PRICE_USD = 500;
 export const REVIEW_TOTAL_USD = 500;
 
@@ -44,17 +41,20 @@ function readPaymentLink(value: string | undefined): string | null {
   return url;
 }
 
-export function getPaymentPlans(locale: Locale = "ru"): PaymentPlan[] {
+export function getPaymentPlans(locale: Locale = "ru", now = new Date()): PaymentPlan[] {
   const t = getDictionary(locale).payment;
+  const review = getReviewCopy(locale, now);
 
   return [
     {
       product: REVIEW_PRODUCT,
-      title: t.planReviewTitle,
-      description: t.planReviewDesc,
-      priceLine: t.planReviewPrice,
+      title: review.title,
+      description: review.description,
+      priceLine: review.price,
       paymentLinkUrl: readPaymentLink(
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW
+        reviewPriceUsd(now) === REVIEW_TEMPORARY_USD
+          ? process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299
+          : (process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_500 || process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW)
       )
     },
     {

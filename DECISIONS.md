@@ -795,3 +795,72 @@ production enablement performed. A protected Vercel preview was published from
 the validated branch for synthetic/UI testing; personal voice activation
 and production release remain open. Report and exact next action:
 `docs/ankh/voice_choices_and_personal_voices.md`.
+
+## D-056 — Proactive Anham chat uses fixed templates and atomic delivery
+
+Decision (2026-09-09): registration welcomes and later non-medical check-ins are
+stored once in the existing `assistant_messages` history. Each delivery retains
+RU/EN template text; active-locale projection does not create another message.
+An account-scoped service-only delivery cursor and PostgreSQL transaction own
+eligibility, preference locking, a minimum 72-hour interval and idempotency.
+Explicit outreach refusal is sticky and cannot be reset by registration or cron.
+
+Why: independent select/insert HTTP calls can duplicate messages, race with
+an opt-out or advance a cursor without saving the message. Fixed organizational
+templates avoid unreviewed medical interpretation and external AI processing.
+
+Constraint: `ASSISTANT_OUTREACH_ENABLED` is off by default. This local increment
+does not authorize a production migration, deploy, real-user send or change to
+Ankh clinical trust gates. The subsequently authorized staging acceptance verified
+real concurrent requests and the RU/EN UI; production activation remains separate.
+See `docs/ankh/assistant_outreach.md`.
+
+### D-056 addendum — skip locked preferences and scope staging sends
+
+Staging showed that waiting for an opt-out lock can exhaust the PostgREST
+statement timeout. The worker now skips locked existing preference rows and
+bounds concurrent initialization to 500 ms, deferring a busy profile to a later
+run. It never assumes the old preference permits a send. The corrective
+migration preserves delivery/cursor atomicity and unique numbering.
+
+`ASSISTANT_OUTREACH_PROFILE_IDS` optionally restricts sends to explicit UUIDs;
+invalid or empty configured scopes fail closed. This allowed real HTTP/browser
+acceptance on a shared staging branch without sending to other tasks' profiles.
+
+Release preparation: preserve current main's published tariffs. Apply both
+outreach migrations before deploying the new history reader and keep delivery
+disabled. Automatic approval review rejected the production migration under
+the general "next step" authorization; explicit production schema authorization
+was the pending gate. The owner subsequently explicitly confirmed both
+production migrations and publication with sending disabled. Both migrations
+are now applied; Vercel production flag is explicitly `false`. Preserve main's
+all-language original history, pagination and private/client tier boundaries;
+translate only saved outreach templates. Opt-out acknowledgements return the
+existing durable-history saved/messages contract, including storage failure.
+
+After the successful preview build, automatic approval review separately
+rejected the merge-to-main action because the owner confirmation named
+publication but not merging the default branch. No direct-deploy workaround
+was used. Production schema and disabled flag are ready; merge and resulting
+production rollout await explicit merge-to-main authorization.
+
+## 2026-09-09 — Publish the two approved tariffs
+
+Publish temporary full-review price 299 USD with Stripe fees included and the supplied review and 100-day support links, using existing production code as base. Preserve current production offer fingerprints; new review terms are oferta-v8. Other uncommitted local work is outside this release. Existing 500 USD review link is used only from 1 December 2026 onward when no new 500 link is configured.
+
+## 2026-09-09 — Durable assistant history publication boundary
+
+Conversation history is stored in existing assistant_messages, scoped to the authenticated author and private/client tier family; personal/private case dialogues remain separate. Locale is source metadata, not a visibility filter. Original text/timestamps are retained and browsing pagination is separate from bounded model context. Persisted conversation does not authorize knowledge publication or clinical trust promotion. Publish this fix independently of concurrent founder-knowledge/persona work. No schema or production processing-gate change.
+
+
+## 2026-09-09 — Anna integrated memory and whole-archive retrieval
+
+Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.
+
+## 2026-09-09 — Preserve confirmed history and actual timestamps
+
+Include created_at in both rows of every bulk exchange insert. Record question arrival and answer completion separately; use the same prepared rows for retries. Do not turn empty acknowledgements into saved:true or fabricate sequence IDs. Keep existing two-row insert/readback confirmation and visible storage-failure handling. This is a persistence correction, with no new schema or permission.
+
+## D-062 — Built-in staff voices first (2026-09-09)
+
+Owner deferred personal voices. Enforce ANHAM_VOICE_BUILTINS_ONLY and restrict initial rollout to verified founder/Karen accounts. Reuse current private history tiers/timestamps and shared safety instructions. Personal recordings are not required. Production migration approval and live acceptance remain explicit launch gates. See docs/ankh/builtin_voice_launch_2026_09_09.md.

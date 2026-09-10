@@ -21,7 +21,7 @@ export async function POST(request: Request) {
     const { error } = await db.from("assistant_messages").upsert([
       { role: "user", content: (body.user as string).trim() },
       ...(body.assistant.trim() || webResults.length ? [{ role: "assistant", content: body.assistant.trim(), ...(webResults.length ? { web_results: webResults } : {}) }] : []),
-    ].map(row => ({ ...row, profile_id: actor.profileId, case_id: actor.caseId, tier: actor.tier, locale, conversation_scope: actor.scope, exchange_id: `${receipt.id}:${body.turnId}`, source: "voice_transcript", voice_state: body.state ?? "completed" })), { onConflict: "profile_id,exchange_id,role", ignoreDuplicates: true });
+    ].map(row => ({ ...row, created_at: new Date().toISOString(), profile_id: actor.profileId, case_id: actor.caseId, tier: actor.scope === "client" ? actor.tier : actor.scope, locale, conversation_scope: actor.scope, exchange_id: `${receipt.id}:${body.turnId}`, source: "voice_transcript", voice_state: body.state ?? "completed" })), { onConflict: "profile_id,exchange_id,role", ignoreDuplicates: true });
     if (error) throw new VoiceFailure("unavailable", 503);
     return NextResponse.json({ saved: true }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return voiceFailure(error, locale); }

@@ -47,6 +47,15 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  it("staff-only launch denies clients and admits verified founders without a test email override", async () => {
+    vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");
+    vi.stubEnv("ANHAM_REALTIME_TEST_EMAILS", "");
+    expect((await session(request(sessionBody))).status).toBe(503);
+    expect(fetch).not.toHaveBeenCalled();
+    profile!.role = "admin";
+    mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: "founder@example.test" } }, error: null });
+    expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(200);
+  });
   it("uses a configured Karen voice without changing the founder persona", async () => {
     profile!.role = "admin"; mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: "founder@example.test" } }, error: null });
     vi.stubEnv("ANHAM_CUSTOM_VOICES_ENABLED", "true"); vi.stubEnv("ANHAM_KAREN_VOICE_ID", "voice_test"); vi.stubEnv("ANHAM_KAREN_VOICE_CONSENT_ID", "cons_test");
@@ -158,6 +167,14 @@ describe("voice authorization and provider handshake", () => {
 });
 
 describe("voice history isolation and persistence", () => {
+  it.each(["founder", "karen"] as const)("stores %s voice in the same private history tier as text", async scope => {
+    profile!.role = "admin";
+    const staffActor = { ...actor, email: `${scope}@example.test`, scope };
+    mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: staffActor.email } }, error: null });
+    const receipt = issueVoiceReceipt(staffActor, "en", key, 300);
+    expect((await transcript(request({ ...transcriptBody(), scope: "staff", receipt }))).status).toBe(200);
+    expect(mocks.upsert.mock.calls[0][0]).toEqual(expect.arrayContaining([expect.objectContaining({ tier: scope, conversation_scope: scope, created_at: expect.any(String) })]));
+  });
   it("paginates older history by sequence under the same identity filters", async () => {
     const original = mocks.from.getMockImplementation()!;
     mocks.from.mockImplementation((table: string) => {
@@ -183,7 +200,8 @@ describe("voice history isolation and persistence", () => {
       expect.objectContaining({ role: "user", content: "Hello", profile_id: userId, source: "voice_transcript", conversation_scope: "client" }),
       expect.objectContaining({ role: "assistant", content: "Hi", profile_id: userId, source: "voice_transcript", conversation_scope: "client" }),
     ], { onConflict: "profile_id,exchange_id,role", ignoreDuplicates: true });
-    const first = mocks.upsert.mock.calls[0][0]; await transcript(request(body)); expect(mocks.upsert.mock.calls[1][0]).toEqual(first);
+    const first = mocks.upsert.mock.calls[0][0]; await transcript(request(body));
+    expect(mocks.upsert.mock.calls[1][0]).toEqual(first.map((row: Record<string, unknown>) => ({ ...row, created_at: expect.any(String) })));
   });
   it("reports storage errors instead of saved:true", async () => {
     mocks.upsert.mockResolvedValue({ error: { message: "private detail" } });
