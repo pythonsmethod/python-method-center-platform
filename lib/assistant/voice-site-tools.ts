@@ -8,11 +8,12 @@ import { WEB_SEARCH_TOOL } from "./voice-web-search";
 import { CONVERSATION_ARCHIVE_TOOLS } from "./conversation-archive";
 import { CLIENT_CASE_TOOL } from "./client-tool-contract";
 import { canUseClientTools } from "./client-case-tools";
+import { CLIENT_ACTION_TOOLS } from "./client-action-tools";
 
 // The model chooses among named read operations, never SQL, table or profile IDs.
 export function voiceSiteTools(scope: VoiceActor["scope"], actor?: VoiceActor) {
   if (scope === "client") return actor && canUseClientTools(actor)
-    ? [...CONVERSATION_ARCHIVE_TOOLS, CLIENT_CASE_TOOL, ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : [])]
+    ? [...CONVERSATION_ARCHIVE_TOOLS, CLIENT_CASE_TOOL, ...CLIENT_ACTION_TOOLS, ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : [])]
     : CONVERSATION_ARCHIVE_TOOLS;
   return [
     ...CONVERSATION_ARCHIVE_TOOLS,

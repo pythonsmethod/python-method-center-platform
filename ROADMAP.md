@@ -571,3 +571,10 @@ dialogue policy. Implementation and focused regression are closed. Next acceptan
 one natural Russian microphone conversation with reflective pauses, an unfinished-
 thought correction and a request to test an assumption. See
 docs/ankh/anham_thinking_partner.md.
+
+## 2026-09-10 — Confirmed client cabinet actions in voice
+Release the owner-scoped prepare-confirm-execute path for the existing client voice
+preview. The isolated confirmation-ledger migration is applied. Publish the website
+code, then accept with a synthetic supplement schedule and Professor message;
+do not broaden to payment, documents, Case state or clinical decisions. See
+docs/ankh/client_confirmed_voice_actions.md.

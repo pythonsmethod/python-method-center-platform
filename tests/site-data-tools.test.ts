@@ -29,7 +29,7 @@ afterEach(() => vi.unstubAllEnvs());
 const run = (name: string, args: object = {}, scope: VoiceActor["scope"] = "founder") => runStaffDataTool({ ...actor, scope }, name, args, "ru", now);
 
 describe("catalog matches the repository's real business schema", () => {
-  it("covers every current public business table, explicitly excluding only retired escalation and internal usage buckets", () => {
+  it("covers every current public business table, explicitly excluding retired and internal control tables", () => {
     const schema = new Map<string, Set<string>>();
     for (const name of readdirSync("supabase/migrations").filter(n => n.endsWith(".sql")).sort()) {
       const sql = readFileSync(join("supabase/migrations", name), "utf8").replace(/--[^\n]*/g, "");
@@ -45,8 +45,8 @@ describe("catalog matches the repository's real business schema", () => {
       }
     }
     const covered = new Set(Object.values(SITE_DATASETS).map(d => d.table));
-    expect([...schema.keys()].filter(t => !covered.has(t))).toEqual(expect.arrayContaining(["escalation_events", "assistant_usage"]));
-    expect([...schema.keys()].filter(t => !covered.has(t)).sort()).toEqual(["assistant_usage", "escalation_events"]);
+    expect([...schema.keys()].filter(t => !covered.has(t))).toEqual(expect.arrayContaining(["escalation_events", "assistant_usage", "assistant_client_actions"]));
+    expect([...schema.keys()].filter(t => !covered.has(t)).sort()).toEqual(["assistant_client_actions", "assistant_usage", "escalation_events"]);
     for (const dataset of Object.values(SITE_DATASETS)) {
       expect(schema.has(dataset.table), dataset.table).toBe(true);
       for (const field of [...dataset.fields, dataset.key, dataset.order, ...dataset.numeric]) expect(schema.get(dataset.table)?.has(field), `${dataset.table}.${field}`).toBe(true);
