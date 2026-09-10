@@ -12,7 +12,7 @@ export function mergeVoiceTranscript(messages: VoiceChatMessage[], text: VoiceTr
     const content = role === "user" ? text.user : text.assistant;
     if (!content && !(role === "assistant" && text.webResults?.length)) continue;
     const voiceKey = `${sessionId}:${text.turnId}:${role}`;
-    const message: VoiceChatMessage = { role, content, voiceKey, voiceLive: text.live === true, voice_state: text.state ?? "completed", source: "voice_transcript" };
+    const message: VoiceChatMessage = { role, content, voiceKey, voiceLive: text.live === true, voice_state: text.continuous ? undefined : text.state ?? "completed", source: "voice_transcript" };
     if (role === "assistant" && text.webResults?.length) message.web_results = text.webResults;
     const index = result.findIndex(row => row.voiceKey === voiceKey);
     if (index < 0) {

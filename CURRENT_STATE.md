@@ -1,5 +1,13 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## GPT-Live pilot implementation — 2026-09-10
+
+Existing voice UI now has a gated gpt-live-1 WebRTC adapter with trusted server
+sideband, shared history and existing staff/client backend delegation. Real
+synthetic provider connection passed; production unchanged. Deployment approval,
+server configuration and authenticated user acceptance remain. Phase NOT CLOSED.
+Evidence, limitations and official API references: docs/ankh/gpt_live_pilot.md.
+
 ## Complete client Anham tool pilot — 2026-09-09
 
 Owner requested the complete client Anham feature set for the selected account.

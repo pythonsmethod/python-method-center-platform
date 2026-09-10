@@ -1,3 +1,4 @@
+import { aiFetch } from "@/lib/security/ai-transport";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { VoiceFailure, voiceConfig, type VoiceActor, type Receipt } from "./realtime-server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -73,7 +74,7 @@ export async function runVoiceWebSearch(actor: VoiceActor, args: unknown, sessio
   if (audit.status !== "inserted") throw new VoiceFailure("unavailable", 503);
   let result: WebResult;
   try {
-    const response = await fetch("https://api.openai.com/v1/responses", {
+    const response = await aiFetch("https://api.openai.com/v1/responses", {
       method: "POST", signal: AbortSignal.any([AbortSignal.timeout(30000), ...(signal ? [signal] : [])]),
       headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ model: process.env.OPENAI_WEB_SEARCH_MODEL?.trim() || "gpt-4.1", store: false, tools: [{ type: "web_search", search_context_size: "low", external_web_access: true }], tool_choice: "required", max_output_tokens: 900,

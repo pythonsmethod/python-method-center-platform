@@ -1,5 +1,12 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## GPT-Live pilot — next acceptance gate
+
+Review the implemented Live adapter, approve the specific scoped release, configure
+the existing host for the three pilot accounts, then execute authenticated RU/EN
+voice/memory/tool/interruption/recovery acceptance. Compare voice duration cost and
+separate backend cost before any wider rollout. See docs/ankh/gpt_live_pilot.md.
+
 ## Complete client tool pilot — 2026-09-09
 
 Publish and validate own-Case source retrieval plus public web search for the

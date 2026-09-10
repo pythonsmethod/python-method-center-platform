@@ -1,9 +1,10 @@
 import type { Locale } from "@/lib/i18n/locale";
 
 export type VoiceScope = "client" | "founder" | "karen";
-export type VoiceState = "idle" | "reconnecting" | "permission" | "connecting" | "listening" | "thinking" | "speaking" | "reading" | "searching" | "ended" | "error";
+export type VoiceState = "idle" | "muted" | "paused" | "reconnecting" | "permission" | "connecting" | "listening" | "thinking" | "speaking" | "reading" | "searching" | "ended" | "error";
 export const voiceCopy = {
   ru: {
+    muted: "Микрофон выключен", paused: "Разговор на паузе",
     close: "Закрыть и завершить разговор", conversationText: "Текст голосового разговора",
     callHint: "Говорите с Анхамом. Ваши слова и его ответы появятся здесь и останутся в чате.",
     voiceDetails: "О голосовом разговоре и сохранении текста",
@@ -32,6 +33,7 @@ export const voiceCopy = {
     duration: "Время тестового разговора истекло. Можно начать новый.",
   },
   en: {
+    muted: "Microphone muted", paused: "Conversation paused",
     close: "Close and end conversation", conversationText: "Voice conversation text",
     callHint: "Talk to Anham. Your words and replies will appear here and remain in the chat.",
     voiceDetails: "About voice conversations and saved text",

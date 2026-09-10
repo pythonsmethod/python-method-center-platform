@@ -1,5 +1,16 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-10 — GPT-Live as a voice layer, shared Anham backend
+
+Use exact gpt-live-1 and official unified WebRTC plus trusted server sideband.
+Frontend cannot change session instructions or inject tool results. Reuse current
+staff/client handlers, tools, policies and assistant_messages; no separate persona,
+memory store or model fallback. Preserve overlapping transcript deltas without
+inventing completed turns. Spoken memory writes require existing text confirmation.
+Limit the pilot by explicit server email allowlist and duration/session quotas.
+Production deployment was rejected by automatic approval review pending specific
+release authorization/configuration. Evidence: docs/ankh/gpt_live_pilot.md.
+
 ## 2026-09-09 — Same client tools in text and voice
 
 The owner expanded the selected client's pilot beyond the registered/paid

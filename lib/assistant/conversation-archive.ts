@@ -1,4 +1,5 @@
 import { AsyncLocalStorage } from "node:async_hooks";
+import { currentLiveContext } from "./live-context";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { ConversationScope } from "./conversation-context";
 import { isUuid } from "@/lib/utils/uuid";
@@ -18,6 +19,8 @@ export const CONVERSATION_ARCHIVE_TOOLS = [
 ];
 export const isConversationArchiveTool = (name: unknown) => CONVERSATION_ARCHIVE_TOOLS.some(tool => tool.name === name);
 export function availableConversationTools() {
+  const live = currentLiveContext();
+  if (live) return live.tools;
   const scope = conversationArchiveScope();
   if (!scope?.private && scope?.clientTools && isClientVoicePilot(scope.clientTools.email)) return [...CONVERSATION_ARCHIVE_TOOLS, CLIENT_CASE_TOOL, ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : [])];
   return CONVERSATION_ARCHIVE_TOOLS;
@@ -71,6 +74,8 @@ export async function runConversationArchiveTool(scope: ConversationScope, name:
 }
 
 export async function executeConversationArchiveTool(name: unknown, args: unknown) {
+  const live = currentLiveContext();
+  if (live) return live.run(name, args);
   const scope = conversationArchiveScope();
   if (scope && !scope.private && scope.clientTools && isClientVoicePilot(scope.clientTools.email) && (name === "read_my_case" || name === "search_web")) {
     const actor = { scope: "client" as const, profileId: scope.profileId, caseId: scope.caseId, email: scope.clientTools.email, tier: "client" as const, clientPreview: true };

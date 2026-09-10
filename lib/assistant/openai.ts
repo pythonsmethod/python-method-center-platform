@@ -1,3 +1,4 @@
+import { aiFetch } from "@/lib/security/ai-transport";
 import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
 import { isExplicitPolicyError, isFilteredChoice, providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
@@ -41,7 +42,7 @@ export async function askOpenAi(
   if (conversationArchiveScope()) return askOpenAiArchive({ apiKey, baseUrl, model, system, messages, maxTokens, reasoningEffort: options.reasoningEffort });
 
   try {
-    const response = await fetch(`${baseUrl}/v1/chat/completions`, {
+    const response = await aiFetch(`${baseUrl}/v1/chat/completions`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
@@ -100,7 +101,7 @@ export async function askOpenAi(
 
     if (data.choices?.[0]?.finish_reason === "length") {
       try {
-        const continuationResponse = await fetch(`${baseUrl}/v1/chat/completions`, {
+        const continuationResponse = await aiFetch(`${baseUrl}/v1/chat/completions`, {
           method: "POST",
           headers: {
             Authorization: `Bearer ${apiKey}`,

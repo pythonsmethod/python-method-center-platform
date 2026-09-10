@@ -1,3 +1,4 @@
+import { aiFetch } from "@/lib/security/ai-transport";
 import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 import { NextResponse } from "next/server";
 import { issueVoiceReceipt, readVoiceBody, reserveVoiceSession, resolveVoiceActor, voiceConfig, voiceFailure, VoiceFailure, voiceInstructions } from "@/lib/assistant/realtime-server";
@@ -44,7 +45,7 @@ export async function POST(request: Request) {
       }, tools: voiceSiteTools(actor.scope, actor),
     }));
     // Unified WebRTC handshake: no provider credential enters the browser.
-    const response = await fetch("https://api.openai.com/v1/realtime/calls", {
+    const response = await aiFetch("https://api.openai.com/v1/realtime/calls", {
       method: "POST", headers: { Authorization: `Bearer ${config.apiKey}` }, body: form, signal: AbortSignal.timeout(20_000),
     });
     if (!response.ok) throw new VoiceFailure("connection", 502);

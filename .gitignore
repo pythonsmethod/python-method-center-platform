@@ -18,3 +18,7 @@ backup-logs/
 
 .vercel
 .env*
+
+# Local verification artifacts; release evidence is in docs/ankh/gpt_live_pilot.md.
+output/gpt-live-*.log
+output/gpt-live-docs/

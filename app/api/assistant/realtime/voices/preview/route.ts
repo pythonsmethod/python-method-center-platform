@@ -1,3 +1,4 @@
+import { aiFetch } from "@/lib/security/ai-transport";
 import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 import { readVoiceBody, resolveVoiceActor, voiceConfig, voiceFailure, VoiceFailure } from "@/lib/assistant/realtime-server";
 import { resolveOutputVoice } from "@/lib/assistant/voice-options-server";
@@ -20,7 +21,7 @@ export async function POST(request: Request) {
       if (error || typeof row?.allowed !== "boolean") throw new VoiceFailure("unavailable", 503);
       if (!row.allowed) throw new VoiceFailure("limit", 429);
     }
-    const response = await fetch("https://api.openai.com/v1/audio/speech", {
+    const response = await aiFetch("https://api.openai.com/v1/audio/speech", {
       method: "POST", headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" },
       signal: AbortSignal.any([request.signal, AbortSignal.timeout(20000)]),
       body: JSON.stringify({ model: "gpt-4o-mini-tts", voice, response_format: "mp3", speed: ANHAM_VOICE_SPEED, instructions: voiceDeliveryInstructions(locale), input: locale === "ru" ? "Здравствуйте! Я Анхам, ваш ИИ-помощник. Так звучит мой голос." : "Hello! I am Anham, your AI assistant. This is what my voice sounds like." }),
