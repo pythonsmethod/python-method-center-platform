@@ -369,3 +369,7 @@ Owner authorized production publication. Isolated release codex/publish-assistan
 ## 2026-09-09 — Anna integrated memory and whole-archive retrieval
 
 Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.
+
+## 2026-09-09 — Assistant timestamp correction
+
+Production acceptance exposed a NOT NULL timestamp failure in bulk history insertion. Both row timestamps are now explicit, with question arrival and answer completion preserved separately. Two-row confirmation remains mandatory; the speculative empty-response success fallback was removed before publication. Targeted checks 41/41 and full regression 1092/1092 pass, along with TypeScript and ESLint. No schema/permission/clinical change. See docs/architecture/ASSISTANT_HISTORY_TIMESTAMP_FIX.md; production reload and locale acceptance follow deployment.

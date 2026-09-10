@@ -60,10 +60,13 @@ export async function saveAssistantExchange({
     return { saved: false };
   }
 
+  // Bulk inserts use the union of row keys. Omitting created_at on just the
+  // answer would insert NULL instead of invoking the database default.
+  const answerCreatedAt = new Date().toISOString();
   const rows = [
       {
         id: randomUUID(),
-        ...(questionCreatedAt ? { created_at: questionCreatedAt } : {}),
+        created_at: questionCreatedAt ?? answerCreatedAt,
         profile_id: profileId,
         case_id: caseId,
         role: "user",
@@ -73,6 +76,7 @@ export async function saveAssistantExchange({
       },
       {
         id: randomUUID(),
+        created_at: answerCreatedAt,
         profile_id: profileId,
         case_id: caseId,
         role: "assistant",
