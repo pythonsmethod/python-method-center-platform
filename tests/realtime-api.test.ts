@@ -47,6 +47,15 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  it("admits only the explicitly delegated client to staff voice without changing their profile role", async () => {
+    vi.stubEnv("ANHAM_ASSISTANT_DELEGATE_EMAILS", "delegate@example.test");
+    vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");
+    mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: "delegate@example.test" } }, error: null });
+    expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(200);
+    expect(profile!.role).toBe("client");
+    vi.stubEnv("ANHAM_ASSISTANT_DELEGATE_EMAILS", "");
+    expect((await session(request({ ...sessionBody, scope: "staff" }))).status).toBe(403);
+  });
   it("staff-only launch denies clients and admits verified founders without a test email override", async () => {
     vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true");
     vi.stubEnv("ANHAM_REALTIME_TEST_EMAILS", "");

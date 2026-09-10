@@ -19,6 +19,18 @@ docs/ankh/history_recovery_and_honesty_v3.md.
 
 ## North Star
 
+Assistant-only delegation: confirmed owner-approved accounts use /assistant
+without a platform role promotion. Delegate history remains private; suspended,
+closed, anonymous and unlisted accounts are denied. Release verification follows
+in docs/ankh/assistant_delegate_access.md.
+
+Latest voice rollout: owner approved the two production history migrations;
+applied and verified with RLS intact. PR #159 is merged, production is READY,
+staff-only built-in voices and web search enabled. Founder browser checks pass
+for history/avatar/five options and fixed-phrase preview. Next user-facing
+acceptance is the first real conversation after granting browser microphone
+permission. Earlier migration-approval blockers below are historical.
+
 Voice/text parity: reuse the text assistant handler for private reasoning,
 archive retrieval and explicit memory commands, with transcript-bound inputs
 and existing confirmation controls. No new role or unrestricted write API.

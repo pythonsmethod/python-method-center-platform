@@ -145,6 +145,15 @@ OPEN, production auto-verification and Phase 3 production remain NO-GO.
 
 ## 1. Current position
 
+### Owner-approved assistant delegate — 2026-09-09
+
+Owner confirmed Elena's existing account and explicitly granted assistant access
+equivalent to the founder assistant. A separate server-managed delegate allowlist
+enables /assistant, private text/history and staff voice for that account while
+retaining its client profile role. Admin routes and founder privileges remain
+unchanged. History is scoped to the delegate's own profile. See
+`docs/ankh/assistant_delegate_access.md` for checks and publication status.
+
 ### Authorized voice production rollout — 2026-09-09 (latest)
 
 Owner explicitly approved the two production voice-history migrations and enabling
@@ -153,7 +162,12 @@ five columns and two indexes verified; assistant_messages RLS remains enabled.
 Vercel production/preview now has the signing secret and enabled staff-only,
 built-ins-only voice plus public web search; custom voices remain disabled.
 Current main was integrated, preserving source-tagged history and factual-honesty
-rules in the unified WebRTC handshake. Deployment acceptance is being completed.
+rules in the unified WebRTC handshake. PR #159 merged as cf96d8c; production
+dpl_BzdAZzdwGRLqyoyVNfze5BPYAhb9 reached READY. The actual founder account loaded
+its history and the avatar dialog with exactly five voices. The fixed-phrase
+preview completed without a displayed error. Live microphone acceptance still
+requires the user's browser microphone permission; no live speech was captured.
+1527 tests / 166 files, TypeScript, ESLint and diff checks passed.
 Earlier blocked-approval entries below are historical and superseded for these
 two migrations only; no clinical migration/automatic verification is authorized.
 

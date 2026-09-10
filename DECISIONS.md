@@ -977,3 +977,11 @@ Reuse the canonical history/audit tables; no new store, trust model or PHI gate.
 The integrated candidate retains the previously published timestamp correction
 and acknowledges storage only through confirmed records. See
 `docs/ankh/history_recovery_and_honesty_v3.md` for acceptance and limitations.
+
+## 2026-09-09 — Authorized production voice release
+
+Owner explicitly approved both voice-history production migrations and site enablement. Applied only those two, retained RLS, enabled verified-staff built-ins and web search with custom voices off. PR #159 merged, production READY. Live microphone/transcript acceptance is still separate from deployment success; see docs/ankh/voice_production_release.md.
+
+## 2026-09-09 — Assistant-only delegation
+
+The owner confirmed an existing client account for founder-equivalent assistant capabilities. Use an explicit server-only assistant allowlist and /assistant entry point, not a profile role promotion or FOUNDER_EMAILS. Retain own-profile history, account-status checks and existing non-assistant authorization. See docs/ankh/assistant_delegate_access.md.
