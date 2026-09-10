@@ -31,13 +31,16 @@ export async function runLiveBackend(request: Request, actor: VoiceActor, locale
   const reserve = await db.rpc("bump_assistant_usage", { p_bucket_key: `live:task:${sessionId}:${taskId}`, p_limit: 1 });
   const row = Array.isArray(reserve.data) ? reserve.data[0] : reserve.data;
   if (reserve.error || row?.allowed !== true) throw new VoiceFailure("unavailable", 503);
-  const tools = voiceSiteTools(actor.scope, actor).filter(tool => tool.name !== "ask_text_assistant");
+  // Existing cabinet writes require a completed later confirmation turn.
+  // Live has only overlapping deltas: do not silently inherit those write tools.
+  const permitted = (name: string) => !["ask_text_assistant", "prepare_my_cabinet_action", "execute_my_cabinet_action"].includes(name);
+  const tools = voiceSiteTools(actor.scope, actor).filter(tool => permitted(tool.name));
   let calls = 0;
   const run = async (name: unknown, args: unknown): Promise<Record<string, unknown>> => {
     const current = await resolveVoiceActor(request, actor.scope === "client" ? "client" : "staff", actor.caseId);
     if (current.profileId !== actor.profileId || current.scope !== actor.scope) throw new VoiceFailure("forbidden", 403);
     liveConfig(current);
-    if (++calls > 12 || !voiceSiteTools(current.scope, current).some(t => t.name === name)) throw new VoiceFailure("forbidden", 403);
+    if (++calls > 12 || typeof name !== "string" || !permitted(name) || !voiceSiteTools(current.scope, current).some(t => t.name === name)) throw new VoiceFailure("forbidden", 403);
     const audit = await writeAuditLog({ actorId: actor.profileId, action: "assistant.live.tool", metadata: { sessionId, taskId, name } });
     if (audit.status !== "inserted") throw new VoiceFailure("unavailable", 503);
     if (isConversationArchiveTool(name)) return runConversationArchiveTool({ profileId: actor.profileId, private: actor.scope !== "client", caseId: actor.caseId }, name, args);
