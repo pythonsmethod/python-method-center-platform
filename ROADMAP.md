@@ -1,5 +1,19 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Authorized honesty publication — 2026-09-09
+
+The owner explicitly instructed “Публикуй”. The release candidate integrates main
+66fa3bd (PR #158 response style and route-preserving locale changes), while keeping
+the existing history timestamp fix, founder memory and disabled outreach.
+Final merged regression: 157 files, 1,321 tests passed, zero failed or skipped.
+TypeScript and ESLint passed. One old test assumed locale guidance was the last
+prompt text; it now verifies selected-language presence and opposite-language
+absence while allowing source-availability context. No production schema or
+clinical trust change. Publication and live acceptance are in progress; final
+release evidence is recorded in docs/ankh/history_recovery_and_honesty_v3.md.
+This checkpoint supersedes earlier no-deploy notes for this scoped release only.
+
+
 ## North Star
 
 Current recovery/honesty checkpoint (2026-09-09): missing dialogue restored as a

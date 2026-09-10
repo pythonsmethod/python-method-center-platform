@@ -163,3 +163,14 @@ published response-style and locale changes), rerun regression and verify the
 remote build. After deployment, repeat payment attribution and unverified-evidence
 regressions in RU/EN and verify persistence on the identified production revision.
 Earlier no-deploy notes above are historical; clinical production gates are unchanged.
+
+## Authorized release integration
+
+Integrated published main 66fa3bd / PR #158. The response normalizer and source
+honesty guard both precede persisted client/staff replies. Existing founder memory
+and outreach execution paths are preserved. Final full regression: **157 files,
+1,321/1,321 tests passed, zero skipped**; TypeScript and ESLint passed. The first
+merged run had one assertion failure because the language test assumed its text
+was last; the revised assertion checks correct language and rejects the opposite
+language without coupling the test to source-context ordering. No runtime defect
+was hidden and no production schema changes are included.
