@@ -35,3 +35,11 @@ No account creation, password change, message/email sending or clinical migratio
 
 J/K/L. Implementation complete, release acceptance pending. Next: deploy and
 verify route/access behavior. Revoke by removing the delegate email and redeploy.
+
+Release: PR #162 merged as 77258dcc174ee181ee4036d5592cf3bf95405824.
+Production dpl_7mHMy7LdutJkvxRVX9UKATHYrTf5 is READY. Final focused tests:
+93/93 passed; final TypeScript/ESLint/diff checks passed. Production account
+metadata confirms the approved email matches auth and is confirmed; role remains
+client. Browser /assistant correctly redirects an unsigned-in session to
+/login?next=/assistant. No login as the delegate or microphone session is claimed.
+Deployment CLOSED; GO for the delegate's existing-account sign-in and voice test.

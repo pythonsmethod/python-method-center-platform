@@ -147,6 +147,10 @@ OPEN, production auto-verification and Phase 3 production remain NO-GO.
 
 ### Owner-approved assistant delegate — 2026-09-09
 
+Published: PR #162 merged, production dpl_7mHMy7LdutJkvxRVX9UKATHYrTf5 READY.
+Confirmed account retains client role; /assistant redirects unsigned-in visitors
+to login with its return path. Delegate's actual login/microphone test is pending.
+
 Owner confirmed Elena's existing account and explicitly granted assistant access
 equivalent to the founder assistant. A separate server-managed delegate allowlist
 enables /assistant, private text/history and staff voice for that account while
