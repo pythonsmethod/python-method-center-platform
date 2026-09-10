@@ -1,20 +1,21 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Authorized honesty publication — 2026-09-09
+## Published honesty release — 2026-09-09 local
 
-The owner explicitly instructed “Публикуй”. The release candidate integrates main
-66fa3bd (PR #158 response style and route-preserving locale changes), while keeping
-the existing history timestamp fix, founder memory and disabled outreach.
-Final merged regression: 157 files, 1,321 tests passed, zero failed or skipped.
-TypeScript and ESLint passed. One old test assumed locale guidance was the last
-prompt text; it now verifies selected-language presence and opposite-language
-absence while allowing source-availability context. No production schema or
-clinical trust change. Publication and live acceptance are in progress; final
-release evidence is recorded in docs/ankh/history_recovery_and_honesty_v3.md.
-This checkpoint supersedes earlier no-deploy notes for this scoped release only.
-
-
-Last canonical update: 2026-09-09
+Owner-authorized PR #161 is published: main 2e56cbf, Vercel production
+ dpl_GWncSoocGxmNS4iPad2hJnFCjez5 READY on pythonmethodcenter.com.
+Remote preview and production builds passed. Four RU/EN semantic acceptance
+answers retained payment attribution and unverified-versus-fabricated distinctions.
+All four exchanges survived reopen and RU → EN → RU on /cabinet; database readback
+confirmed eight timestamped chat rows and the retained recovered archive. The old
+open tab required one reload before locale switching worked. Replies remain too
+verbose; RU team-confirmation wording could be more conditional.
+1,321 full tests passed; 116 focused tests after the Unicode-sign integration;
+final TypeScript, ESLint and diff checks passed. Separate mobile-project build
+failure predates this release. No schema or clinical gate change. Scoped release
+CLOSED / GO; historical pending/no-deploy notes below are superseded for this
+release only. Exact evidence and next action:
+docs/ankh/history_recovery_and_honesty_v3.md.
 
 ## History recovery and honesty V3 — 2026-09-09
 

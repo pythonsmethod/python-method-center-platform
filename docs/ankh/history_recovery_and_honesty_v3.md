@@ -1,5 +1,52 @@
 # History recovery and factual honesty V3 — 2026-09-09
 
+## Published release and acceptance — 2026-09-10 UTC / September 9 local
+
+**PUBLISHED; scoped release CLOSED.** This completion record supersedes the
+pre-publication status in the historical sections below. PR #161 merged as
+2e56cbf037de475fcc1864303201271afab99321. The candidate tree matched the merge tree.
+Vercel production deployment dpl_GWncSoocGxmNS4iPad2hJnFCjez5 was READY and served
+pythonmethodcenter.com and www.pythonmethodcenter.com at 01:45 UTC. Its remote build
+completed successfully using the committed configuration. Preview 49980e1 was also
+READY before merge. No local build-resource override was published.
+
+Post-deployment acceptance used four synthetic prompts in the signed-in in-app
+browser: payment-template and unverified-evidence regressions, each in RU and EN.
+All four delivered answers retained the tested distinction: a reported payment
+was not called a confirmed payment, no activation deadline/pending state was
+invented, and an unreviewed number was neither proven nor definitely fabricated.
+These four contextual samples are not an independent statistical accuracy score.
+
+All four questions and answers survived closing/reopening and RU → EN → RU on
+/cabinet. Account-scoped database readback confirmed two saved pairs per locale,
+with non-null timestamps (eight normal chat rows), and one existing recovered
+archive. The archive was also visible after reopening. No storage warning occurred.
+A tab kept open across multiple deployments initially did not change language;
+one reload resolved this, and switching then worked in both directions. No claim
+is made that deployment-time stale-tab behavior was fixed. Browser left in Russian.
+
+Remaining wording issues: replies are longer than requested and include unnecessary
+self-commentary. The RU payment template also says the team will check payment and
+confirm access too categorically; it would be better to make the outcome conditional
+on verification. It does not claim access has already been activated. These remain
+quality limitations, not a guarantee of universal factual correctness.
+
+Release checks: 1,321/1,321 full regression tests (157 files) on the integrated style
+candidate; after main's Unicode numeric-sign fix, 116/116 focused tests (six files).
+Final TypeScript, ESLint and diff checks passed. Both preview and production website
+builds passed. A separate anham-mobile-app Vercel project failed NEXT_NO_VERSION;
+the same error was confirmed on the earlier e683a60 deployment before this release.
+Its production check on the previous main was canceled, not a successful mobile
+build. No mobile configuration was changed or failure concealed.
+
+No schema migration, new clinical workflow, trust change, medical interpretation or
+PHI-processing activation. Synthetic acceptance added eight chat rows through the
+normal UI; no human was messaged and no private identifiers are published here.
+The previously restored archive was not inserted again. GO for this scoped release;
+existing Ankh clinical NO-GO gates remain. Next action: assess the documented
+verbosity, conditional team wording and stale-tab behavior in a separately scoped
+quality follow-up; no additional rollout or clinical phase is implied.
+
 ## A. Before and confirmed cause
 
 The owner authorized recovery and correction after the 18-scenario client browser
