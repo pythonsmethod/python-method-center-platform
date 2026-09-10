@@ -556,3 +556,11 @@ Owner requested more voices while retaining Marin. Added Alloy, Ash, Ballad, Ech
 and Shimmer to the existing five, using the official Realtime supported set.
 Existing selected voice and preference key preserved; no custom voice activation.
 Same localized picker/preview and shared diction apply. Details: docs/ankh/more_voice_choices.md.
+## 2026-09-10 — Voice connection recovery and failure diagnostics
+Screenshot shows interrupted Echo call; exact past failure cannot be reconstructed.
+Production logs around 20:08 UTC show tools 503 and successful transcript saves,
+but no provider data-channel error details. Browser previously ended on transient
+disconnected and mislabeled every provider error as network failure.
+Now waits up to 8 seconds for the existing peer, with RU/EN status, and distinguishes
+service failures. Authenticated, receipt-bound, quota-limited diagnostics retain only
+enumerated code/voice/locale, no speech or provider message. See docs/ankh/voice_connection_recovery.md.

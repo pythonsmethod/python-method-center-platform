@@ -1,7 +1,7 @@
 import type { Locale } from "@/lib/i18n/locale";
 
 export type VoiceScope = "client" | "founder" | "karen";
-export type VoiceState = "idle" | "permission" | "connecting" | "listening" | "thinking" | "speaking" | "reading" | "searching" | "ended" | "error";
+export type VoiceState = "idle" | "reconnecting" | "permission" | "connecting" | "listening" | "thinking" | "speaking" | "reading" | "searching" | "ended" | "error";
 export const voiceCopy = {
   ru: {
     close: "Закрыть и завершить разговор", conversationText: "Текст голосового разговора",
@@ -9,6 +9,8 @@ export const voiceCopy = {
     voiceDetails: "О голосовом разговоре и сохранении текста",
     start: "Говорить с Анхамом", stop: "Завершить разговор", retry: "Попробовать снова",
     idle: "Живой голосовой диалог", permission: "Разрешите доступ к микрофону…",
+    reconnecting: "Связь прервалась. Восстанавливаю соединение…",
+    service: "Голосовой сервис не смог продолжить ответ. Начните разговор снова. Распознанные реплики остаются в окне разговора.",
     connecting: "Подключаюсь…", listening: "Слушаю вас", thinking: "Анхам готовит ответ…",
     speaking: "Анхам говорит", ended: "Разговор завершён", error: "Разговор остановлен",
     reading: "Анхам проверяет данные сайта…", searching: "Анхам ищет в интернете…",
@@ -35,6 +37,8 @@ export const voiceCopy = {
     voiceDetails: "About voice conversations and saved text",
     start: "Talk to Anham", stop: "End conversation", retry: "Try again",
     idle: "Live voice conversation", permission: "Allow microphone access…",
+    reconnecting: "Connection interrupted. Reconnecting…",
+    service: "The voice service could not continue the reply. Start the conversation again. Recognized turns remain in the conversation window.",
     connecting: "Connecting…", listening: "Listening to you", thinking: "Anham is preparing a reply…",
     speaking: "Anham is speaking", ended: "Conversation ended", error: "Conversation stopped",
     reading: "Anham is checking site data…", searching: "Anham is searching the web…",
@@ -56,7 +60,7 @@ export const voiceCopy = {
     duration: "The test conversation time has elapsed. You can start another one.",
   },
 } as const;
-export type VoiceError = "unsupported" | "denied" | "microphone" | "unavailable" | "unauthorized" | "forbidden" | "invalid" | "limit" | "connection" | "playback";
+export type VoiceError = "unsupported" | "denied" | "microphone" | "unavailable" | "unauthorized" | "forbidden" | "invalid" | "limit" | "connection" | "service" | "playback";
 export function voiceErrorMessage(code: unknown, locale: Locale): string {
-  return voiceCopy[locale][typeof code === "string" && ["unsupported", "denied", "microphone", "unavailable", "unauthorized", "forbidden", "invalid", "limit", "connection", "playback"].includes(code) ? code as VoiceError : "connection"];
+  return voiceCopy[locale][typeof code === "string" && ["unsupported", "denied", "microphone", "unavailable", "unauthorized", "forbidden", "invalid", "limit", "connection", "service", "playback"].includes(code) ? code as VoiceError : "connection"];
 }
