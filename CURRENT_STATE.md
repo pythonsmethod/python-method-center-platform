@@ -396,3 +396,56 @@ Owner authorized publication of the single-window founder assistant, direct save
 ## 2026-09-09 — Assistant timestamp correction
 
 Production acceptance exposed a NOT NULL timestamp failure in bulk history insertion. Both row timestamps are now explicit, with question arrival and answer completion preserved separately. Two-row confirmation remains mandatory; the speculative empty-response success fallback was removed before publication. Targeted checks 41/41 and full regression 1092/1092 pass, along with TypeScript and ESLint. No schema/permission/clinical change. See docs/architecture/ASSISTANT_HISTORY_TIMESTAMP_FIX.md; production reload and locale acceptance follow deployment.
+
+### Unified Anham response style — 2026-09-09
+
+A central RU/EN prose policy and a server-side presentation normalizer now
+cover public/registered/paid chats, Anna/Karen, Case drafts and verification
+text, sleep/timing advice, chess and medical digest narrative fields.
+Existing AI history is normalized on read without rewriting old records.
+Source/OCR, structured extraction, protocol envelopes and human-approved
+decisions remain unchanged. Realtime inherits the policy but its direct audio
+stream has no server-side prose transformation.
+
+This is a local implementation with no deployment, migration, production
+write or PHI processing. Full inventory, validation and limits are recorded in
+`docs/ankh/anham_response_style.md`. Phase 2.9 remains open; production
+auto-verification and Phase 3 production remain NO-GO.
+
+Local style increment and isolated synthetic public-chat acceptance: CLOSED.
+After owner authorization, the real Next server and browser were exercised
+with a loopback-only synthetic provider in RU and EN. Values, dates, links
+and plain paragraphs were preserved. A stale-layout language-switch defect
+was fixed: the current browser pathname, query and fragment now survive
+RU → EN → RU, including navigation from home to the plans page.
+Final verification: 1055/1055 tests in 129 files passed; TypeScript, ESLint
+and `git diff --check` passed. Live models and authenticated browser flows
+were not exercised: no isolated credentials or test accounts were available.
+Existing HomeJourney hydration/image warnings and a local Google Fonts
+download failure are recorded separately in the acceptance report.
+Code review is now CLOSED after fixing numeric-sign/decimal preservation,
+explicit annotation locales, provider-comparison formatting and empty advice
+responses. Final regression: 1096/1096 tests in 132 files; TypeScript, ESLint
+and `git diff --check` passed. Approval matching still uses raw AI drafts;
+human decisions are unchanged. Details: `docs/ankh/anham_response_style_review.md`.
+GO for isolated live-model/authenticated acceptance with test accounts;
+production deployment remains outside this task.
+
+Live account check (2026-09-09): the owner supplied an authenticated test
+account in the in-app browser and authorized testing on the published site.
+Three synthetic client exchanges passed arithmetic, missing-data handling,
+RU → EN → RU route preservation and history reload checks. Published replies
+still contain Markdown/bullets/em dashes, so the new-style production
+acceptance remains NOT CLOSED. No deployment or configuration change was
+performed; only the authorized synthetic conversation was saved by the app.
+This does not validate the local candidate build or paid/Anna/Karen flows.
+Evidence: `docs/ankh/anham_live_account_check.md`.
+
+### Anham prose publication — 2026-09-09
+
+Owner requested resolution of the published formatting mismatch after the live
+account check. Scoped publication of the prepared prose change is now authorized.
+Candidate integrates production/main 27edbd5, retaining durable history, timestamps,
+founder archive, tariffs and outreach configuration. No migrations or clinical
+processing gates change. Release validation and live acceptance are tracked in
+`docs/ankh/anham_response_style_release.md`; completion is pending.

@@ -14,8 +14,7 @@ export function isLocale(value: unknown): value is Locale {
 export const LOCALE_HEADER = "x-pm-locale";
 
 // The path the application is serving, without the language prefix. The
-// root layout uses it to write the hreflang pair, and the language switcher
-// to find the same page in the other language.
+// root layout uses it to write the hreflang pair.
 export const PATH_HEADER = "x-pm-path";
 
 // Which language to render in, and why no Vary header goes with it.
@@ -51,8 +50,7 @@ export async function getLocale(): Promise<Locale> {
 }
 
 // Where we are, in the vocabulary of the Russian address space. Falls back
-// to the home page: the only readers are the switcher and the metadata, and
-// neither should throw because a header went missing.
+// to the home page for metadata if a header went missing.
 export async function getCurrentPath(): Promise<string> {
   return (await headers()).get(PATH_HEADER) || "/";
 }

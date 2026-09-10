@@ -1,5 +1,9 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
 import { founderMemoryFromCommand } from "@/lib/assistant/founder-memory";
+vi.mock("@/lib/i18n/api-errors", async (original) => ({
+  ...await original<typeof import("@/lib/i18n/api-errors")>(),
+  apiErrorLocale: async () => "ru"
+}));
 
 const mocks = vi.hoisted(() => ({ insert: vi.fn(), auth: vi.fn(), role: vi.fn(), ask: vi.fn(), search: vi.fn() }));
 vi.mock("@/lib/auth/require-staff", () => ({ getStaffUserState: mocks.auth }));
