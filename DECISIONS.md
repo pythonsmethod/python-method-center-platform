@@ -1011,3 +1011,6 @@ Owner requires no age-based expiry for saved conversations with clients, Karen a
 ## 2026-09-09 — Elena is a CLIENT preview participant
 
 Owner corrected the scope: own Case/client experience, not staff-equivalent authority. Revoke the delegate grant including stale configuration. Enable only the confirmed account through ANHAM_CLIENT_VOICE_TEST_EMAILS, preserving client tier, own-context checks and no staff tools. Prior delegation decisions are superseded. See docs/ankh/elena_client_voice_pilot.md.
+
+## 2026-09-09 — Publish dangerous-assistance restrictions
+Owner explicitly authorized publication. Scoped release from b18a898 expands shared RU/EN dangerous-assistance rules in text and existing voice without disabling voice or changing access/data. Full regression 1573/1573; added voice/safety checks 69/69; TS/lint/diff pass. See docs/security/DANGEROUS_ASSISTANCE_RELEASE_2026_09_09.md. Remote release verification pending; broader cost-dashboard/security branch remains separate.
