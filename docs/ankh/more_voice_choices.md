@@ -20,3 +20,10 @@ L. Publish; compare samples and then start a fresh voice conversation.
 Supported set checked at https://developers.openai.com/api/docs/guides/realtime-conversations
 on 2026-09-10. No TTS-only Fable, Nova or Onyx added to the live voice picker.
 Validation: 113/113 tests across 3 files; TypeScript, scoped ESLint and git diff --check pass.
+
+Release: PR #171 merged as 852b37e07b920e0db0efd9922c0ed6a88808c403.
+Website preview dpl_346DMitVoLG4YFjPyaXoA8R4uboE READY.
+Separate mobile preview retains pre-compilation Root Directory / No Next.js
+version detected failure; no mobile project code changed. Production pending.Production https://pythonmethodcenter.com READY: dpl_DksJhAbY2A87dK6MFVni2QWz4WG2,
+matching merge 852b37e. Implementation/publication CLOSED; GO for user listening.
+Next: refresh the page, compare new voice samples, start a fresh conversation.

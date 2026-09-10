@@ -843,3 +843,4 @@ Owner requested more voices while retaining Marin. Added Alloy, Ash, Ballad, Ech
 and Shimmer to the existing five, using the official Realtime supported set.
 Existing selected voice and preference key preserved; no custom voice activation.
 Same localized picker/preview and shared diction apply. Details: docs/ankh/more_voice_choices.md.
+Ten voice choices published: PR #171, 852b37e, production dpl_DksJhAbY2A87dK6MFVni2QWz4WG2 READY.
