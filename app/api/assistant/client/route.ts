@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
 import {
@@ -116,7 +117,7 @@ export async function POST(request: Request) {
 
   if (attachments && audience.tier !== "client") {
     return NextResponse.json({
-      reply: apiError("attachmentsPaidOnly", locale)
+      reply: normalizeAnhamResponse(apiError("attachmentsPaidOnly", locale), locale)
     });
   }
 
@@ -139,7 +140,7 @@ export async function POST(request: Request) {
   if (!guard.allowed) {
     // Delivered as a reply, not as an error: the person should read a warm
     // invitation, not a red technical banner.
-    return NextResponse.json({ reply: guard.message }, { status: 200 });
+    return NextResponse.json({ reply: normalizeAnhamResponse(guard.message, locale) }, { status: 200 });
   }
 
   const requestedAnhamMode = audience.tier === "client"
@@ -168,9 +169,12 @@ export async function POST(request: Request) {
   // Interface-language hint: the assistant already mirrors the visitor's
   // language, this sets the default for short/ambiguous messages.
   const rawLocale = (body as { locale?: unknown })?.locale;
+  const responseLocale = rawLocale === "en" || rawLocale === "ru" ? rawLocale : locale;
 
-  if (rawLocale === "en") {
-    system += "\n\n## Язык интерфейса посетителя\nПосетитель использует английскую версию сайта — по умолчанию отвечай на английском (если он пишет на другом языке, отвечай на его языке).";
+  if (responseLocale === "en") {
+    system += "\n\nActive interface language: English. Reply in English.";
+  } else {
+    system += "\n\nАктивный язык интерфейса: русский. Отвечай по-русски.";
   }
 
   if (attachments) {
@@ -206,6 +210,11 @@ export async function POST(request: Request) {
     );
   }
 
+  const reply = normalizeAnhamResponse(result.reply, responseLocale);
+  if (!reply) {
+    return NextResponse.json({ error: apiError("assistantEmptyReply", locale) }, { status: 502 });
+  }
+
   // Saved conversation — only for people who have an account. Someone who
   // is just looking around the site leaves nothing behind.
   if (audience.tier !== "guest" && audience.profileId) {
@@ -223,11 +232,11 @@ export async function POST(request: Request) {
         caseId: audience.caseId,
         tier: audience.tier,
         question: displayText || messages[messages.length - 1]?.content || "",
-        answer: result.reply,
-        locale: rawLocale === "en" ? "en" : "ru"
+        answer: reply,
+        locale: responseLocale
       });
     }
   }
 
-  return NextResponse.json({ reply: result.reply });
+  return NextResponse.json({ reply });
 }

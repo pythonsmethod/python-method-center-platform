@@ -1,3 +1,5 @@
+import { ANHAM_RESPONSE_STYLE, normalizeAnhamResponse } from "@/lib/assistant/response-style";
+
 // Produces a client-ready draft and a short human verification list from
 // the values confirmed by two independent document readings.
 
@@ -35,20 +37,21 @@ ${CASE_REVIEW_SUMMARY_MARKER}
 - Обычный объём 250–500 слов. Жёсткий максимум 600 слов. Никаких вступлений о процессе работы, повторов, лишних оговорок и канцелярита.
 
 ## ${CASE_REVIEW_UNREAD_HEADING}
-- Здесь нет анализа и советов. Это компактный технический список только для Professor Python.
+- Здесь нет анализа и советов. Короткими обычными абзацами опиши спорные места только для Professor Python, без списка, нумерации и заголовков внутри раздела.
 - Перенеси каждое спорное место дословно. Для каждого обязательно сохрани номер и название файла, раздел или страницу, название показателя, оба варианта чтения и причину сомнения.
 - Формат одной позиции: «Файл №N, “название”: раздел/страница; показатель. Что проверить: ...»
 - Не переноси этот список в готовый текст клиенту.
 - Если спорных мест нет, выведи после разделителя только слово «${CASE_REVIEW_NO_UNREAD}».
 
-Главное правило: лучше честно не сделать вывод о системе организма, чем заполнить пробел правдоподобной догадкой.`;
+Главное правило: лучше честно не сделать вывод о системе организма, чем заполнить пробел правдоподобной догадкой.
+${ANHAM_RESPONSE_STYLE}`;
 
 export type CaseReviewParts = { summary: string; draft: string };
 export type CaseReviewParseResult =
   | { status: "ok"; parts: CaseReviewParts }
   | { status: "unreadable" };
 
-export function parseCaseReview(raw: string): CaseReviewParseResult {
+export function parseCaseReview(raw: string, locale?: "ru" | "en"): CaseReviewParseResult {
   const text = raw.trim();
   if (!text) return { status: "unreadable" };
 
@@ -58,15 +61,8 @@ export function parseCaseReview(raw: string): CaseReviewParseResult {
     return { status: "unreadable" };
   }
 
-  const draft = text
-    .slice(draftAt + CASE_REVIEW_DRAFT_MARKER.length, summaryAt)
-    .trim()
-    // The model is instructed not to use em dashes, but this final guard
-    // keeps a stray one out of text Karen copies to a client.
-    .replace(/\s*—\s*/g, ". ")
-    .replace(/\.\s*\./g, ".")
-    .trim();
-  const rawSummary = text.slice(summaryAt + CASE_REVIEW_SUMMARY_MARKER.length).trim();
+  const draft = normalizeAnhamResponse(text.slice(draftAt + CASE_REVIEW_DRAFT_MARKER.length, summaryAt), locale);
+  const rawSummary = normalizeAnhamResponse(text.slice(summaryAt + CASE_REVIEW_SUMMARY_MARKER.length), locale);
   const summary = rawSummary.toUpperCase() === CASE_REVIEW_NO_UNREAD ? "" : rawSummary;
 
   return draft

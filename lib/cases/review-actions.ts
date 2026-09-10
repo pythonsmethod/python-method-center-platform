@@ -179,7 +179,7 @@ export async function generateCaseReview(
     );
   }
 
-  const parsed = parseCaseReview(result.reply);
+  const parsed = parseCaseReview(result.reply, locale);
 
   if (parsed.status !== "ok") {
     return errorState("Ассистент вернул ответ, который не удалось разобрать.");

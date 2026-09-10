@@ -6,6 +6,9 @@ import type {
 } from "@/lib/supplements/action-state";
 import { revalidatePath } from "next/cache";
 import { askClaude } from "@/lib/assistant/claude";
+import { normalizeAnhamResponse, withAnhamResponseStyle } from "@/lib/assistant/response-style";
+import { getLocale } from "@/lib/i18n/locale";
+import { apiError, assistantFailure } from "@/lib/i18n/api-errors";
 import { sanitizeTimes } from "@/lib/supplements/schedule";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -191,7 +194,7 @@ const TIMING_SYSTEM_PROMPT = `Ты помощник Python's Method Center. Че
 Жёсткие правила:
 - НИКОГДА не советуй, ЧТО принимать: не предлагай новые добавки, не оценивай сам выбор, не называй дозировки и не советуй их менять.
 - Не ставь диагнозов и не давай лечебных назначений. Что и сколько принимать — решает человек со своим специалистом.
-- Пиши по-русски, тепло и коротко: по одной-две строки на добавку, без вступлений и заключений.
+- Пиши на активном языке интерфейса, тепло и коротко: по одному короткому обычному абзацу на добавку, без вступлений, заголовков и списков.
 - Если сочетание добавок в списке обычно разносят по времени (например, железо и кальций, железо и магний), мягко об этом напомни.
 - В конце одной строкой напомни: это общие ориентиры по времени, а не медицинская рекомендация.`;
 
@@ -199,10 +202,11 @@ export async function getTimingAdvice(
   _previous: TimingAdviceState,
   _formData: FormData
 ): Promise<TimingAdviceState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return { status: "error", advice: "", message: SERVICE_UNAVAILABLE_MESSAGE };
+    return { status: "error", advice: "", message: apiError("serviceUnavailable", locale) };
   }
 
   const {
@@ -213,7 +217,7 @@ export async function getTimingAdvice(
     return {
       status: "error",
       advice: "",
-      message: "Сессия истекла — войдите заново."
+      message: apiError("signInRequired", locale)
     };
   }
 
@@ -227,7 +231,9 @@ export async function getTimingAdvice(
     return {
       status: "error",
       advice: "",
-      message: "Сначала добавьте хотя бы одну добавку — тогда будет что обсуждать."
+      message: locale === "en"
+        ? "Add at least one supplement first so there is something to discuss."
+        : "Сначала добавьте хотя бы одну добавку, тогда будет что обсуждать."
     };
   }
 
@@ -240,7 +246,7 @@ export async function getTimingAdvice(
     .join("\n");
 
   const result = await askClaude(
-    TIMING_SYSTEM_PROMPT,
+    withAnhamResponseStyle(`${TIMING_SYSTEM_PROMPT}\n\n${locale === "en" ? "Reply in English." : "Отвечай по-русски."}`),
     [
       {
         role: "user",
@@ -254,12 +260,14 @@ export async function getTimingAdvice(
     return {
       status: "error",
       advice: "",
-      message:
-        result.status === "unavailable"
-          ? "ИИ-помощник сейчас не настроен. Попробуйте позже."
-          : result.message
+      message: result.status === "unavailable"
+        ? apiError("assistantTemporarilyDown", locale)
+        : assistantFailure(result, locale)
     };
   }
 
-  return { status: "success", advice: result.reply, message: "" };
+  const advice = normalizeAnhamResponse(result.reply, locale);
+  return advice
+    ? { status: "success", advice, message: "" }
+    : { status: "error", advice: "", message: apiError("assistantEmptyReply", locale) };
 }

@@ -268,7 +268,7 @@ export default async function StaffCaseDetailPage({
       ? getCaseMessages(clientCase.id)
       : Promise.resolve({ messages: [], error: null }),
     getAssistantHistoryForCase(clientCase.profile_id, "ru"),
-    getCaseReview(clientCase.id, documents),
+    getCaseReview(clientCase.id, documents, locale),
     getCaseAnalyticalPicture(clientCase.id)
   ]);
 

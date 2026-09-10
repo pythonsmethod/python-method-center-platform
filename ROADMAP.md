@@ -266,6 +266,21 @@ Internal complexity must not leak into the primary Karen view.
 
 # PHASE 5 — CLIENT RESPONSE
 
+Presentation checkpoint (2026-09-09): a shared RU/EN natural-prose rule and
+server-side Markdown normalization are implemented locally across Anham's
+client and staff output surfaces. Machine/source evidence and human decisions
+are excluded. See `docs/ankh/anham_response_style.md`. This closes only the
+local style increment, not Phase 5 or any clinical/production gate.
+Isolated synthetic public-chat browser acceptance is complete in RU/EN;
+language switching also preserves the current route, query and fragment.
+Code review is complete, with numeric-preservation and response-boundary
+regressions fixed (1096 tests passed). Next is isolated live-model and
+authenticated-browser acceptance, requiring authorized keys and test accounts.
+An owner-provided client account was subsequently checked on the published
+site: dialogue/history and RU/EN switching pass, but published formatting
+still violates the new style. A known candidate build in preview/staging
+and the remaining role-specific checks are still required.
+
 Goal:
 turn Karen-approved analysis into clear client communication.
 

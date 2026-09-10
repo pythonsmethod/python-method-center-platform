@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 
 // Phase 0 of the provider-independence migration: freeze what the router
 // does today, before anything is rebuilt on top of a provider interface.
@@ -196,14 +197,28 @@ describe("best — both answer, an arbiter picks", () => {
 });
 
 describe("both — the comparison mode", () => {
+  it("keeps provider boundaries so heading markup can be normalized", async () => {
+    askClaude.mockResolvedValue(ok("## Fact\n- .5 mg/L"));
+    askOpenAi.mockResolvedValue(ok("# Review\n> 5*10^9/L"));
+    const result = await askAssistantTeam("system", MESSAGES, 500, "both", { locale: "en" });
+    expect(result.status === "ok" && normalizeAnhamResponse(result.reply, "en"))
+      .toBe("Claude:\nFact\n- .5 mg/L\n\nGPT:\nReview\n> 5*10^9/L");
+  });
+  it("uses English prose for an unavailable provider on the English surface", async () => {
+    askClaude.mockResolvedValue(ok("Available answer."));
+    askOpenAi.mockResolvedValue(failed());
+    const result = await askAssistantTeam("system", MESSAGES, 500, "both", { locale: "en" });
+    expect(result.status === "ok" && result.reply).toBe("Claude:\nAvailable answer.\n\nGPT is currently unavailable. The available reply is shown above.");
+  });
+
   it("shows the two answers side by side, labelled", async () => {
     askClaude.mockResolvedValue(ok("ответ Claude"));
     askOpenAi.mockResolvedValue(ok("ответ GPT"));
 
     const result = await ask("both");
 
-    expect(result.status === "ok" && result.reply).toContain("— Claude —");
-    expect(result.status === "ok" && result.reply).toContain("— GPT —");
+    expect(result.status === "ok" && result.reply).toContain("Claude:\n");
+    expect(result.status === "ok" && result.reply).toContain("GPT:\n");
   });
 
   it("says which one is missing rather than pretending there was one answer", async () => {
@@ -212,7 +227,7 @@ describe("both — the comparison mode", () => {
 
     const result = await ask("both");
 
-    expect(result.status === "ok" && result.reply).toContain("GPT — сейчас недоступен");
+    expect(result.status === "ok" && result.reply).toContain("GPT сейчас недоступен");
   });
 
   it("passes the failure through when neither answered", async () => {

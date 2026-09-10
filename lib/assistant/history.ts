@@ -1,6 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { AssistantTier } from "@/lib/assistant/tiers";
 import type { Locale } from "@/lib/i18n/locale";
+import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 
 // Conversations with the AI are kept only for people who have an account —
 // registered visitors and paying clients. A person who described their
@@ -64,7 +65,7 @@ export async function saveAssistantExchange({
   }
 
   const userText = trim(question);
-  const assistantText = trim(answer);
+  const assistantText = trim(normalizeAnhamResponse(answer, locale));
 
   if (!userText && !assistantText) {
     return;
@@ -84,7 +85,7 @@ export async function saveAssistantExchange({
         profile_id: profileId,
         case_id: caseId,
         role: "assistant",
-        content: assistantText || "—",
+        content: assistantText,
         tier,
         locale
       }
@@ -129,7 +130,11 @@ export async function getOwnAssistantHistory(
 
   const messages = (data ?? []) as AssistantHistoryMessage[];
 
-  return { status: "ready", messages: messages.slice().reverse() };
+  return { status: "ready", messages: messages.slice().reverse().map((message) =>
+    message.role === "assistant"
+      ? { ...message, content: normalizeAnhamResponse(message.content, locale) }
+      : message
+  ) };
 }
 
 // Staff view: what the person already asked the assistant, so the same
