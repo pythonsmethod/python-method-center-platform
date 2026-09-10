@@ -39,3 +39,12 @@ No independent clinical or universal prose-parser accuracy claim.
 NOT CLOSED until ready deployment and live RU/EN/reload checks. GO for preview
 validation; clinical production gates remain NO-GO. Rollback reference: production
 27edbd56673ee89f0f62ea872276e55d4d1e16a0, deployment dpl_5ZYUpkyFRvSuruGo84fwRSjZ3Wj2.
+
+## Final merged checks
+1265/1265 tests in 149/149 files passed, TypeScript and ESLint exit 0.
+Diff against origin/main passes whitespace check. A merge-index check flagged
+pre-existing CRLF lines in two provider-policy tests; those are unchanged from main.
+Preview f7c75b4: READY, dpl_EdGrHs1LyaQt6JDebGRzg745eZbU, Next.js build 77.8 seconds.
+Guest RU response displays ordinary prose. Linked mobile project check failed
+with No Next.js version detected / Root Directory configuration; mobile config
+and code are unchanged by this PR. The website deployment check passed.
