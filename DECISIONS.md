@@ -677,6 +677,12 @@ migration preserves delivery/cursor atomicity and unique numbering.
 invalid or empty configured scopes fail closed. This allowed real HTTP/browser
 acceptance on a shared staging branch without sending to other tasks' profiles.
 
+Release preparation: preserve current main's published tariffs. Apply both
+outreach migrations before deploying the new history reader and keep delivery
+disabled. Automatic approval review rejected the production migration under
+the general "next step" authorization; explicit production schema authorization
+is now the pending gate. No production change was executed.
+
 ## 2026-09-09 — Publish the two approved tariffs
 
 Publish temporary full-review price 299 USD with Stripe fees included and the supplied review and 100-day support links, using existing production code as base. Preserve current production offer fingerprints; new review terms are oferta-v8. Other uncommitted local work is outside this release. Existing 500 USD review link is used only from 1 December 2026 onward when no new 500 link is configured.

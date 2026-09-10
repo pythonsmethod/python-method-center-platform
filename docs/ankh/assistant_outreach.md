@@ -1,7 +1,8 @@
 # Сохранённые сообщения Анхама / Saved Anham outreach
 
-Date: 2026-09-09. Scope: implementation, local regression and authorized synthetic
-acceptance against the existing `ankh-staging` Supabase branch. Production untouched.
+Date: 2026-09-09. Scope: implementation, local regression, authorized synthetic
+staging acceptance and final release preparation. Production untouched; the
+production migration attempt was rejected by automatic approval review.
 
 ## A. Before
 
@@ -81,7 +82,7 @@ profiles or contact external services.
 
 ## E. Verification
 
-- `npm test`: **128 files passed, 1,032 tests passed, 0 failures**.
+- `npm test` after integration with current main: **129 files passed, 1,036 tests passed, 0 failures**.
 - New outreach coverage: **54 tests**, including 21 SQL integration cases,
   30 cron/preferences/registration/history cases and 3 refusal-route cases.
 - `npm run typecheck`: passed, exit 0.
@@ -155,29 +156,57 @@ other user's preference. State writes cannot reset message numbering.
 
 ## I. Intentionally excluded
 
-Production migration, deployment, real-user sends, external notifications,
+Real-user sends, external notifications,
 medical generation, auto-verification, new Case/status models, automatic
 re-enrollment and self-learning. Existing document/clinical production gates
-are unchanged.
+are unchanged. Production migration/deployment remain pending the explicit
+authorization required by automatic approval review.
 
 ## J. Phase
 
 **CLOSED for implementation and the authorized synthetic staging acceptance.** This is a separate
 non-medical chat feature, not closure of Ankh clinical Phase 2.9 or Phase 3.
-Production rollout is **NOT CLOSED** and was not authorized by this staging task.
+Final release review and integration are complete. Production rollout is
+**NOT CLOSED**: automatic approval review rejected the migration attempt and
+requires explicit production schema authorization.
 
 ## K. GO / NO-GO
 
-**GO** for final diff review and preparation of a separately authorized deployment.
+**GO** for the prepared release after explicit production schema authorization.
 **NO-GO** for production activation or real-client delivery in this task.
 
 ## L. Exact next action
 
-Review the final diff, including both outreach migrations and the staff-locale
-fix. In a separately authorized deployment task, verify target schema, apply
-both migrations before the new history reader is deployed, and keep production
-outreach disabled. Real-client activation and its initial scope remain separate
-owner decisions; a production deployment or activation was not performed here.
+Obtain explicit authorization to apply the two named outreach migrations to
+production project `zdrfttgwnyorifmpqgwe`, then merge/deploy the prepared release
+with outreach disabled. Apply both migrations before the new history reader
+is deployed. Real-client activation and its initial scope remain separate
+owner decisions.
+
+## Final release preparation — 2026-09-09
+
+Reviewed the complete feature diff and merged published tariff changes from
+`origin/main` (`d9e001f`) into `codex/assistant-outreach-disabled-release`.
+The only merge conflict was in `DECISIONS.md`; both decision records were kept.
+All 1,036 tests, TypeScript, ESLint and diff whitespace checks passed afterward.
+Generated benchmark timestamps were restored; no raw client data or secrets
+were added to the release.
+
+Production read-only checks confirmed history prerequisites (`locale`,
+`message_sequence`) and the existing document identity review field. No
+outreach state table existed. Vercel project
+`prj_Lym5X8Vru64nF1iuoW57BGTgtLpE` belongs to the expected platform; its variable
+list showed no `ASSISTANT_OUTREACH_ENABLED` in any environment. Missing is
+disabled in code. The attempted dashboard interaction to add explicit false
+timed out without changing settings. CLI was logged out; no credentials were
+created or modified.
+
+Automatic approval review rejected `assistant_outreach` against production
+`zdrfttgwnyorifmpqgwe` before execution, stating that a general "next step"
+authorization is insufficient for this production schema change. The second
+migration was not attempted. No workaround, production deployment, real-user
+send or clinical gate change occurred. The release must remain unmerged until
+both migration prerequisites are satisfied.
 
 ## Authorized staging acceptance — 2026-09-09
 

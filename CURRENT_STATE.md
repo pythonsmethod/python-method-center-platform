@@ -13,7 +13,12 @@ busy-preference timeouts and the admin's hardcoded history locale. An optional
 profile UUID allowlist bounds rollout. Daily Hobby-compatible cron is configured;
 `ASSISTANT_OUTREACH_ENABLED` defaults off. No production migration, deploy or
 real-client send occurred. Synthetic fixtures and local keys were removed.
-Full suite: 1,032/1,032 tests;
+Final release review is complete and current `main` tariff changes are merged.
+Production migration was rejected by automatic approval review: explicit
+authorization naming the production schema change is required before rollout.
+No production schema change or deployment occurred. Vercel's project variable
+list has no outreach enable flag, so delivery remains disabled by default.
+Full suite after integration: 1,036/1,036 tests in 129 files;
 TypeScript and ESLint passed. Details and staging gates:
 [`docs/ankh/assistant_outreach.md`](docs/ankh/assistant_outreach.md).
 This increment does not change any clinical phase or production trust gate.
