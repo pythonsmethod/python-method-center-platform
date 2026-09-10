@@ -814,3 +814,6 @@ Owner explicitly approved publication of PR #163. Integrated main 46f80a6 and
 preserved the client-only voice pilot and revoked delegation. Prior approval
 blocker is resolved. Integrated verification and deployment evidence are tracked
 in docs/ankh/lifetime_conversation_memory.md.
+
+## 2026-09-09 — Publish dangerous-assistance restrictions
+Owner explicitly authorized publication. Scoped release from b18a898 expands shared RU/EN dangerous-assistance rules in text and existing voice without disabling voice or changing access/data. Full regression 1573/1573; added voice/safety checks 69/69; TS/lint/diff pass. See docs/security/DANGEROUS_ASSISTANCE_RELEASE_2026_09_09.md. Remote release verification pending; broader cost-dashboard/security branch remains separate.
