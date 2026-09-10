@@ -174,3 +174,7 @@ merged run had one assertion failure because the language test assumed its text
 was last; the revised assertion checks correct language and rejects the opposite
 language without coupling the test to source-context ordering. No runtime defect
 was hidden and no production schema changes are included.
+
+Release follow-up: integrated main ae210e9 (PR #160 numeric-sign preservation
+with Unicode spacing). All 116 focused tests in six affected response-style,
+persistence and honesty suites passed. This integration changes no clinical gate.
