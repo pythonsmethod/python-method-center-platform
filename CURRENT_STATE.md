@@ -851,3 +851,12 @@ disconnected and mislabeled every provider error as network failure.
 Now waits up to 8 seconds for the existing peer, with RU/EN status, and distinguishes
 service failures. Authenticated, receipt-bound, quota-limited diagnostics retain only
 enumerated code/voice/locale, no speech or provider message. See docs/ankh/voice_connection_recovery.md.
+
+## 2026-09-10 — Patient voice and thinking-partner behavior
+Realtime semantic VAD now uses low eagerness to give reflective pauses more time.
+Shared RU/EN voice and text instructions stop filler agreement, distinguish support
+for the person from agreement with a conclusion, and require respectful examination
+of assumptions, contradictions, missing links and alternatives through one open
+question at a time. No role, tool, schema, PHI or clinical-gate change. Focused
+validation: 171/171 tests; TypeScript, ESLint and diff check pass. Live microphone
+acceptance remains open; see docs/ankh/anham_thinking_partner.md.

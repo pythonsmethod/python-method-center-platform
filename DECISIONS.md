@@ -1066,3 +1066,15 @@ disconnected and mislabeled every provider error as network failure.
 Now waits up to 8 seconds for the existing peer, with RU/EN status, and distinguishes
 service failures. Authenticated, receipt-bound, quota-limited diagnostics retain only
 enumerated code/voice/locale, no speech or provider message. See docs/ankh/voice_connection_recovery.md.
+
+## 2026-09-10 — Anham listens before challenging conclusions
+Use low semantic-VAD eagerness for live voice so reflective pauses receive more
+time before a turn closes. Keep `interrupt_response: true` so the user can still
+stop Anham. In thinking-aloud, emotional and decision conversations, support the
+person without automatically validating the conclusion: first listen for the full
+picture, then reflect concrete facts, identify assumptions or missing links, offer
+an alternative and ask one open, non-leading question. Apply this conditionally in
+both RU and EN shared response policy. This guides useful visible reasoning; it is
+not a claim of human-brain simulation or access to private chain-of-thought. No
+permission, clinical-trust or evidence boundary changes. Evidence:
+docs/ankh/anham_thinking_partner.md.

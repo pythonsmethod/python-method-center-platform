@@ -121,6 +121,13 @@ describe("voice authorization and provider handshake", () => {
     const response = await session(request({ ...sessionBody, voice })); expect(response.status).toBe(200);
     const body = vi.mocked(fetch).mock.calls[0][1]?.body as FormData;
     const config = JSON.parse(body.get("session") as string); expect(config.audio.output.voice).toBe(voice); expect(config.audio.output.speed).toBe(ANHAM_VOICE_SPEED); expect(config.instructions).toContain(voiceDeliveryInstructions(sessionBody.locale === "en" ? "en" : "ru"));
+    expect(config.audio.input.turn_detection).toEqual({ type: "semantic_vad", eagerness: "low", create_response: false, interrupt_response: true });
+  });
+  it("gives the same patient-listening contract in Russian and English", () => {
+    expect(voiceDeliveryInstructions("ru")).toContain("Дай человеку закончить всю мысль");
+    expect(voiceDeliveryInstructions("ru")).toContain("доброжелательным интеллектуальным оппонентом");
+    expect(voiceDeliveryInstructions("en")).toContain("Let the user finish the whole thought");
+    expect(voiceDeliveryInstructions("en")).toContain("kind intellectual challenger");
   });
   it("rejects custom voice escalation and arbitrary provider IDs before spending", async () => {
     expect((await session(request({ ...sessionBody, voice: "karen" }))).status).toBe(403);
@@ -177,6 +184,7 @@ describe("voice authorization and provider handshake", () => {
     const body = vi.mocked(fetch).mock.calls[0][1]?.body as FormData;
     const config = JSON.parse(body.get("session") as string);
     expect(config.audio.input.turn_detection.create_response).toBe(false);
+    expect(config.audio.input.turn_detection.eagerness).toBe("low");
     expect(config.audio.input.transcription.language).toBe("en");
     expect(config.instructions).not.toContain(actor.email);
     expect(config.tools.map((tool: { name: string }) => tool.name)).toEqual(["search_conversation_history", "read_conversation_message"]);
