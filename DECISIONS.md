@@ -1,5 +1,16 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-09 — Full client assistant preview is not paid support
+
+Owner requested full client functionality for Elena's own-Case pilot. Reuse the
+existing server-managed pilot allowlist and require auth.getUser-confirmed email
+for the expanded client assistant tier. Apply it consistently to UI, text and
+voice; do not create payments, service periods, staff access or a new Case model.
+Source context explicitly labels preview access as not proof of payment/support.
+The earlier registered-tier restriction is superseded for confirmed pilot users.
+Revocation removes this assistant-only grant. Existing client safety and staff
+tool exclusions remain. See docs/ankh/elena_full_client_assistant.md.
+
 This file records architectural decisions that must survive chat/thread changes.
 
 Last canonical update: 2026-09-09. New decisions are appended with a new ID; historical decisions are not silently rewritten. If a decision is superseded, record the replacement and reference the prior ID.

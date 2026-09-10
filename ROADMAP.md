@@ -1,5 +1,11 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Full client assistant pilot — 2026-09-09
+
+Enable all existing client assistant features for the confirmed pilot account,
+including attachments and client-tier text/voice. Keep clinical and public
+rollout gates unchanged. See docs/ankh/elena_full_client_assistant.md.
+
 ## Published honesty release — 2026-09-09 local
 
 Owner-authorized PR #161 is published: main 2e56cbf, Vercel production
@@ -21,7 +27,8 @@ docs/ankh/history_recovery_and_honesty_v3.md.
 
 Latest correction: Elena's preview is CLIENT-only, on her own Case/account.
 Former internal delegation is revoked. The rollout remains a single-account
-client pilot, not a public release or paid-tier upgrade. Validate own-context
+client pilot, not a public release or a paid-service entitlement. The owner later
+authorized the full assistant tier for this pilot. Validate own-context
 voice and client chat history through /cabinet/assistant.
 
 Assistant-only delegation: confirmed owner-approved accounts use /assistant

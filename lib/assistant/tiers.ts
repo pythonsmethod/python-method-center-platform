@@ -1,13 +1,14 @@
 import { assistantSource, renderSourceContext, type AssistantSource } from "@/lib/assistant/source-context";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { hasFullClientAssistantPreview } from "./client-voice-pilot";
 
 // Three levels of the client-facing assistant:
 //   guest      — public site: only the center, the method, registration,
 //                tariffs and the first step. Cheapest, narrowest.
 //   registered — after sign-up: accompanies the person inside their cabinet,
 //                aware of their own case status and what is missing.
-//   client     — after payment: works with their case — documents, history,
+//   client     — active support or owner-granted assistant preview: own case,
 //                the published recommendations of Professor Python.
 export type AssistantTier = "guest" | "registered" | "client";
 
@@ -62,7 +63,7 @@ export async function resolveAssistantTierForUi(): Promise<AssistantTier> {
       .in("product", ["support_5_weeks", "support_15_weeks"])
       .limit(1);
 
-    return (data ?? []).some((row) => isPaidSupportProduct(row.product))
+    return hasFullClientAssistantPreview(user) || (data ?? []).some((row) => isPaidSupportProduct(row.product))
       ? "client"
       : "registered";
   } catch {
@@ -130,12 +131,15 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
     const caseRow = caseResult.error ? null : caseResult.data;
     const activePeriods = periodsResult.error ? [] : periodsResult.data ?? [];
     const hasPaidSupport = activePeriods.some((row) => isPaidSupportProduct(row.product));
+    const fullPreview = hasFullClientAssistantPreview(user);
     const sources: AssistantSource[] = [
       assistantSource({ id: "account", kind: "system_record", origin: "authenticated session", availability: "available", retrievedAt, freshness: "current_snapshot", scope: "authenticated account only", data: { email: user.email ?? null } }),
       assistantSource({ id: "case", kind: "system_record", origin: "client_cases", availability: caseResult.error ? "unavailable" : caseRow ? "available" : "absent", retrievedAt, recordedAt: caseRow?.created_at ?? null, freshness: "current_snapshot", scope: "own Case metadata; not processing classification", data: caseRow ? { id: caseRow.id, created_at: caseRow.created_at, direction: caseRow.direction } : null }),
       assistantSource({ id: "active_support", kind: "system_record", origin: "service_periods", availability: periodsResult.error ? "unavailable" : activePeriods.length ? "available" : "absent", retrievedAt, freshness: "current_snapshot", scope: "own active service periods; NOT proof of payment", data: activePeriods }),
       assistantSource({ id: "payments", kind: "system_record", origin: "payments", availability: "not_connected", retrievedAt, scope: "payments not queried in client chat", data: null })
     ];
+
+    if (fullPreview) sources.push(assistantSource({ id: "assistant_preview", kind: "system_record", origin: "owner-managed client assistant preview", availability: "available", retrievedAt, scope: "assistant capabilities only; NOT proof of payment or active support", data: { full_client_assistant_preview: true } }));
 
     if (caseRow) {
       const [documentsResult, eventsResult, periodResult] = await Promise.all([
@@ -153,7 +157,7 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
       }
     }
     return {
-      tier: hasPaidSupport ? "client" : "registered",
+      tier: hasPaidSupport || fullPreview ? "client" : "registered",
       profileId: user.id,
       email: user.email ?? null,
       caseId: caseRow?.id ?? null,

@@ -10,7 +10,7 @@ import { voiceErrorMessage, type VoiceError, type VoiceScope } from "./realtime-
 import type { Locale } from "@/lib/i18n/locale";
 import { platformContext } from "./prompts";
 import { isAssistantDelegate } from "@/lib/auth/assistant-delegates";
-import { isClientVoicePilot } from "./client-voice-pilot";
+import { isClientVoicePilot, hasFullClientAssistantPreview } from "./client-voice-pilot";
 
 export type VoiceActor = { profileId: string; scope: VoiceScope; caseId: string | null; tier: "registered" | "client"; email: string | null };
 export class VoiceFailure extends Error {
@@ -73,7 +73,7 @@ export async function resolveVoiceActor(request: Request, scope: unknown, rawCas
   if (rawCaseId && ownCase.data?.id !== rawCaseId) throw new VoiceFailure("forbidden", 403);
   const periods = await db.from("service_periods").select("product").eq("profile_id", user.id).eq("status", "active").gt("ends_at", new Date().toISOString()).in("product", ["support_5_weeks", "support_15_weeks"]);
   if (periods.error) throw new VoiceFailure("unavailable", 503);
-  return { profileId: user.id, email: user.email ?? null, scope: "client", caseId: ownCase.data?.id ?? null, tier: (periods.data ?? []).some(row => isPaidSupportProduct(row.product)) ? "client" : "registered" };
+  return { profileId: user.id, email: user.email ?? null, scope: "client", caseId: ownCase.data?.id ?? null, tier: hasFullClientAssistantPreview(user) || (periods.data ?? []).some(row => isPaidSupportProduct(row.product)) ? "client" : "registered" };
 }
 function boundedEnv(name: string, fallback: number, max: number) {
   const raw = process.env[name]?.trim();
