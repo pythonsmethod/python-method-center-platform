@@ -12,19 +12,19 @@ describe("reviewed voice choices", () => {
     vi.stubEnv("ANHAM_CUSTOM_VOICES_ENABLED", "true");
     vi.stubEnv("ANHAM_KAREN_VOICE_ID", "voice_synthetic");
     vi.stubEnv("ANHAM_KAREN_VOICE_CONSENT_ID", "cons_synthetic");
-    expect(availableVoices(actor, "ru").voices).toHaveLength(5);
+    expect(availableVoices(actor, "ru").voices).toHaveLength(10);
     expect(() => resolveOutputVoice(actor, "karen")).toThrow();
   });
   it.each(BUILTIN_VOICES)("resolves built-in %s without altering persona", voice => {
     expect(resolveOutputVoice(actor, voice)).toBe(voice);
     expect(resolveOutputVoice({ ...actor, scope: "client" }, voice)).toBe(voice);
   });
-  it("offers exactly five built-ins and unavailable personal slots without provider references", () => {
+  it("offers all ten built-ins and unavailable personal slots without provider references", () => {
     vi.stubEnv("ANHAM_CUSTOM_VOICES_ENABLED", "false");
     const result = availableVoices(actor, "ru");
-    expect(result.voices.filter(v => v.available)).toHaveLength(5);
+    expect(result.voices.filter(v => v.available)).toHaveLength(10);
     expect(result.voices.filter(v => v.custom)).toEqual(expect.arrayContaining([expect.objectContaining({ name: "Голос Карена", available: false })]));
-    expect(availableVoices({ ...actor, scope: "client" }, "en").voices).toHaveLength(5);
+    expect(availableVoices({ ...actor, scope: "client" }, "en").voices).toHaveLength(10);
     expect(result.preferenceKey).not.toContain(actor.profileId);
     expect(result.preferenceKey).not.toBe(availableVoices({ ...actor, scope: "karen" }, "ru").preferenceKey);
     expect(result.preferenceKey).not.toBe(availableVoices({ ...actor, profileId: "another-person" }, "ru").preferenceKey);

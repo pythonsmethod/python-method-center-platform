@@ -116,7 +116,7 @@ describe("voice authorization and provider handshake", () => {
     const config = JSON.parse((vi.mocked(fetch).mock.calls[0][1]!.body as FormData).get("session") as string);
     expect(config.audio.output.voice).toEqual({ id: "voice_test" }); expect(config.instructions).toContain("founder's private");
   });
-  it.each(["marin", "cedar", "coral", "sage", "verse"])("sends selected %s voice to the actual handshake", async voice => {
+  it.each(["marin", "cedar", "coral", "sage", "verse", "alloy", "ash", "ballad", "echo", "shimmer"])("sends selected %s voice to the actual handshake", async voice => {
     const response = await session(request({ ...sessionBody, voice })); expect(response.status).toBe(200);
     const body = vi.mocked(fetch).mock.calls[0][1]?.body as FormData;
     const config = JSON.parse(body.get("session") as string); expect(config.audio.output.voice).toBe(voice); expect(config.audio.output.speed).toBe(ANHAM_VOICE_SPEED); expect(config.instructions).toContain(voiceDeliveryInstructions(sessionBody.locale === "en" ? "en" : "ru"));
@@ -126,9 +126,9 @@ describe("voice authorization and provider handshake", () => {
     expect((await session(request({ ...sessionBody, voice: { id: "voice_external" } }))).status).toBe(400);
     expect(fetch).not.toHaveBeenCalled(); expect(mocks.rpc).not.toHaveBeenCalled();
   });
-  it("lists only five built-ins to a client without making provider calls", async () => {
+  it("lists all ten built-ins to a client without making provider calls", async () => {
     const response = await voiceList(new Request("https://test.local/api/assistant/realtime/voices?scope=client&locale=en"));
-    expect(response.status).toBe(200); expect((await response.json()).voices).toHaveLength(5); expect(fetch).not.toHaveBeenCalled();
+    expect(response.status).toBe(200); expect((await response.json()).voices).toHaveLength(10); expect(fetch).not.toHaveBeenCalled();
     mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
     expect((await voiceList(new Request("https://test.local/api/assistant/realtime/voices?scope=client"))).status).toBe(401);
   });
@@ -139,6 +139,14 @@ describe("voice authorization and provider handshake", () => {
     const input = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string);
     expect(input.speed).toBe(ANHAM_VOICE_SPEED); expect(input.instructions).toBe(voiceDeliveryInstructions("en")); expect(input.voice).toBe("cedar"); expect(input.input).toContain("AI assistant"); expect(input.input).not.toContain("PRIVATE TEXT");
     expect(mocks.rpc.mock.calls.map(c => c[1].p_limit)).toEqual([5, 20]);
+  });
+  it.each(["alloy", "ash", "ballad", "echo", "shimmer"].flatMap(voice => ["ru", "en"].map(locale => ({ voice, locale }))))("previews new $voice voice in $locale", async ({ voice, locale }) => {
+    vi.mocked(fetch).mockResolvedValue(new Response("synthetic-audio"));
+    expect((await previewVoice(request({ scope: "client", locale, voice }))).status).toBe(200);
+    const input = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string);
+    expect(input.voice).toBe(voice);
+    expect(input.input).toContain(locale === "ru" ? "Здравствуйте" : "Hello");
+    expect(input.instructions).toBe(voiceDeliveryInstructions(locale === "ru" ? "ru" : "en"));
   });
   it("preview respects origin, pilot switch and shared budget", async () => {
     const body = { scope: "client", locale: "en", voice: "marin" };

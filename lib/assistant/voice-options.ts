@@ -1,6 +1,6 @@
 import type { Locale } from "@/lib/i18n/locale";
 
-export const BUILTIN_VOICES = ["marin", "cedar", "coral", "sage", "verse"] as const;
+export const BUILTIN_VOICES = ["marin", "cedar", "coral", "sage", "verse", "alloy", "ash", "ballad", "echo", "shimmer"] as const;
 export type VoiceOption = { id: string; name: string; available: boolean; custom?: boolean };
 export const builtinVoiceOptions: VoiceOption[] = BUILTIN_VOICES.map(id => ({ id, name: id[0].toUpperCase() + id.slice(1), available: true }));
 export function isBuiltinVoice(value: unknown): value is typeof BUILTIN_VOICES[number] {

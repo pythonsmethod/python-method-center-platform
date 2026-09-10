@@ -551,3 +551,8 @@ as author of the Center methodology. Shared text/voice instructions provide RU/E
 wording and require the exact Latin spelling Professor Python in every language.
 No roles, schema, clinical logic or historical/source text changes.
 See docs/ankh/anham_approved_authorship.md for validation and release evidence.
+## 2026-09-10 — More built-in voice choices
+Owner requested more voices while retaining Marin. Added Alloy, Ash, Ballad, Echo
+and Shimmer to the existing five, using the official Realtime supported set.
+Existing selected voice and preference key preserved; no custom voice activation.
+Same localized picker/preview and shared diction apply. Details: docs/ankh/more_voice_choices.md.
