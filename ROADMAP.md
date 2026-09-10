@@ -538,3 +538,10 @@ Method Center; Professor Python is the human founder/expert. The shared RU/EN
 prompt now fixes the introduction in text and voice, with Russian pronunciation.
 No permissions, schema, clinical changes or historical message rewrites.
 Release evidence: docs/ankh/anham_center_introduction.md.
+
+## 2026-09-10 — Warm voice delivery and diction
+Shared RU/EN live/sample delivery instructions add natural warmth, context-sensitive
+support, varied brief welcomes/goodbyes and complete word endings at speed 0.95.
+Browser now forwards the pilot's own-case/web tools to existing server authorization.
+No role/schema/clinical changes. 107 relevant tests pass; TS/ESLint/diff pass.
+Acoustic validation remains a live listening task; see docs/ankh/anham_voice_delivery.md.

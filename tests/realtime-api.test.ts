@@ -1,3 +1,4 @@
+import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 vi.mock("@/lib/assistant/client-voice-context", () => ({ clientVoiceInstructions: async () => "Synthetic own-client context" }));
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
 import { createHmac } from "node:crypto";
@@ -118,7 +119,7 @@ describe("voice authorization and provider handshake", () => {
   it.each(["marin", "cedar", "coral", "sage", "verse"])("sends selected %s voice to the actual handshake", async voice => {
     const response = await session(request({ ...sessionBody, voice })); expect(response.status).toBe(200);
     const body = vi.mocked(fetch).mock.calls[0][1]?.body as FormData;
-    expect(JSON.parse(body.get("session") as string).audio.output.voice).toBe(voice);
+    const config = JSON.parse(body.get("session") as string); expect(config.audio.output.voice).toBe(voice); expect(config.audio.output.speed).toBe(ANHAM_VOICE_SPEED); expect(config.instructions).toContain(voiceDeliveryInstructions(sessionBody.locale === "en" ? "en" : "ru"));
   });
   it("rejects custom voice escalation and arbitrary provider IDs before spending", async () => {
     expect((await session(request({ ...sessionBody, voice: "karen" }))).status).toBe(403);
@@ -136,7 +137,7 @@ describe("voice authorization and provider handshake", () => {
     const response = await previewVoice(request({ scope: "client", locale: "en", voice: "cedar", input: "PRIVATE TEXT" }));
     expect(response.status).toBe(200); expect(response.headers.get("cache-control")).toBe("no-store");
     const input = JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string);
-    expect(input.voice).toBe("cedar"); expect(input.input).toContain("AI assistant"); expect(input.input).not.toContain("PRIVATE TEXT");
+    expect(input.speed).toBe(ANHAM_VOICE_SPEED); expect(input.instructions).toBe(voiceDeliveryInstructions("en")); expect(input.voice).toBe("cedar"); expect(input.input).toContain("AI assistant"); expect(input.input).not.toContain("PRIVATE TEXT");
     expect(mocks.rpc.mock.calls.map(c => c[1].p_limit)).toEqual([5, 20]);
   });
   it("preview respects origin, pilot switch and shared budget", async () => {
