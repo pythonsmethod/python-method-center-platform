@@ -158,7 +158,7 @@ describe("shared bilingual history", () => {
       outreach_translations: { ru: "Приветствие", en: "Welcome" } };
     const filter = vi.fn();
     const eq = vi.fn();
-    const chain = { select: vi.fn(), eq, or: filter, order: vi.fn(), limit: vi.fn() };
+    const chain = { select: vi.fn(), eq, in: filter, order: vi.fn(), limit: vi.fn() };
     chain.select.mockReturnValue(chain); eq.mockReturnValue(chain); filter.mockReturnValue(chain);
     chain.order.mockReturnValue(chain); chain.limit.mockResolvedValue({ data: [row], error: null });
     mocks.from.mockReturnValue(chain);
@@ -170,7 +170,7 @@ describe("shared bilingual history", () => {
         expect(result.messages).toHaveLength(1);
         expect(result.messages[0].id).toBe("saved-once");
         expect(result.messages[0].content).toBe(row.outreach_translations[locale]);
-        expect(filter).toHaveBeenLastCalledWith(`locale.eq.${locale},outreach_number.not.is.null`);
+        expect(filter).toHaveBeenLastCalledWith("tier", ["registered", "client"]);
         expect(eq).toHaveBeenLastCalledWith("profile_id", "owner");
       }
       expect(localizedHref("/cabinet", locale)).toBe("/cabinet");

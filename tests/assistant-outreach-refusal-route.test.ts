@@ -19,7 +19,7 @@ beforeEach(() => {
   mocks.locale = "ru";
   mocks.audience.mockResolvedValue({ profileId: "owner", caseId: null, tier: "registered" });
   mocks.stop.mockResolvedValue(undefined);
-  mocks.save.mockResolvedValue(undefined);
+  mocks.save.mockResolvedValue({ saved: true });
 });
 const request = (text: string) => new Request("https://example.test/api/assistant/client", {
   method: "POST", headers: { "Content-Type": "application/json" },
@@ -34,15 +34,24 @@ describe("explicit refusal before AI processing", () => {
     expect(response.status).toBe(200);
     expect(mocks.stop).toHaveBeenCalledWith("owner");
     expect(mocks.ai).not.toHaveBeenCalled();
-    const { reply } = await response.json();
+    const { reply, saved } = await response.json();
+    expect(saved).toBe(true);
     expect(reply).toContain(locale === "ru" ? "отключены" : "are off");
-    expect(mocks.save).toHaveBeenCalledWith({ profileId: "owner", caseId: null, tier: "registered", question: text, answer: reply, locale });
+    expect(mocks.save).toHaveBeenCalledWith({ profileId: "owner", caseId: null, tier: "registered", question: text, answer: reply, locale, questionCreatedAt: expect.any(String) });
   });
   it("does not falsely acknowledge a failed preference write", async () => {
     mocks.stop.mockRejectedValue(new Error("write failed"));
     const response = await POST(request("unsubscribe"));
     expect(response.status).toBe(503);
     expect(mocks.save).not.toHaveBeenCalled();
+    expect(mocks.ai).not.toHaveBeenCalled();
+  });
+  it("reports an unsaved acknowledgement while keeping the persisted opt-out", async () => {
+    mocks.save.mockResolvedValue({ saved: false });
+    const response = await POST(request("unsubscribe"));
+    expect(response.status).toBe(200);
+    expect(await response.json()).toEqual({ reply: expect.stringContaining("отключены"), saved: false });
+    expect(mocks.stop).toHaveBeenCalledWith("owner");
     expect(mocks.ai).not.toHaveBeenCalled();
   });
 });

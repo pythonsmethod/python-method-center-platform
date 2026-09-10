@@ -359,6 +359,10 @@ Each new phase must solve a demonstrated gap in:
 
 - 2026-09-09: Publish approved full-review and 100-day payment links; preserve Ankh production boundaries. Retire the 299 USD Stripe link at the 1 December cutoff and verify the 500 USD replacement before that date.
 
+## 2026-09-09 — Assistant history release
+
+Owner-authorized isolated production publication in progress. Scope: private and client chat persistence, dated multilingual history, pagination and acknowledged retries. 1019/1019 release tests pass. No Ankh phase progression or production data-processing enablement. Final step: deployment readiness and authenticated browser reload verification.
+
 
 ## 2026-09-09 — Anna integrated memory and whole-archive retrieval
 
