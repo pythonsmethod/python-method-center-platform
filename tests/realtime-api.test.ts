@@ -1,3 +1,4 @@
+import { POST as diagnostic } from "@/app/api/assistant/realtime/diagnostics/route";
 import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 vi.mock("@/lib/assistant/client-voice-context", () => ({ clientVoiceInstructions: async () => "Synthetic own-client context" }));
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
@@ -147,6 +148,20 @@ describe("voice authorization and provider handshake", () => {
     expect(input.voice).toBe(voice);
     expect(input.input).toContain(locale === "ru" ? "Здравствуйте" : "Hello");
     expect(input.instructions).toBe(voiceDeliveryInstructions(locale === "ru" ? "ru" : "en"));
+  });
+  it("records only safe diagnostic metadata after authentication and receipt checks", async () => {
+    const log = vi.spyOn(console, "warn").mockImplementation(() => undefined);
+    try {
+      const body = { locale: "en", scope: "client", receipt: issueVoiceReceipt(actor, "en", key, 300), voice: "echo", code: "private speech", message: "secret" };
+      expect((await diagnostic(request(body))).status).toBe(200);
+      expect(log).toHaveBeenCalledWith("anham_voice_failure", { code: "unknown", voice: "echo", locale: "en" });
+      log.mockClear();
+      expect((await diagnostic(request({ ...body, receipt: "invalid" }))).status).toBe(403);
+      expect((await diagnostic(request(body, "https://evil.test"))).status).toBe(403);
+      expect(log).not.toHaveBeenCalled();
+      mocks.rpc.mockResolvedValue({ data: [{ allowed: false }], error: null });
+      expect((await diagnostic(request(body))).status).toBe(429); expect(log).not.toHaveBeenCalled();
+    } finally { log.mockRestore(); }
   });
   it("preview respects origin, pilot switch and shared budget", async () => {
     const body = { scope: "client", locale: "en", voice: "marin" };

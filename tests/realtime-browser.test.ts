@@ -83,9 +83,64 @@ describe("WebRTC lifecycle without a microphone or paid provider", () => {
     vi.mocked(fetch).mockResolvedValue(new Response(JSON.stringify({ code: "forbidden" }), { status: 403 }));
     const s = setup(); await s.call.start(); expect(s.onError).toHaveBeenCalledWith("forbidden"); expect(track.stop).toHaveBeenCalledOnce();
   });
-  it("closes on network disconnect and does not reconnect automatically", async () => {
+  it("closes after a sustained disconnect without starting a new session", async () => {
     const s = setup(); await s.call.start(); peers[0].connectionState = "disconnected"; peers[0].onconnectionstatechange?.();
-    expect(s.onError).toHaveBeenCalledWith("connection"); expect(track.stop).toHaveBeenCalledOnce(); expect(fetch).toHaveBeenCalledOnce();
+    await vi.advanceTimersByTimeAsync(8000);
+    expect(s.onError).toHaveBeenCalledWith("connection"); expect(track.stop).toHaveBeenCalledOnce(); expect(fetch).toHaveBeenCalledTimes(2);
+  });
+  it("recovers a brief disconnect and cancels the deadline without a new session", async () => {
+    const s = setup(); await s.call.start();
+    peers[0].connectionState = "disconnected"; peers[0].onconnectionstatechange?.();
+    expect(s.onState).toHaveBeenLastCalledWith("reconnecting");
+    await vi.advanceTimersByTimeAsync(4000);
+    expect(track.stop).not.toHaveBeenCalled();
+    peers[0].connectionState = "connected"; peers[0].onconnectionstatechange?.();
+    await vi.advanceTimersByTimeAsync(8000);
+    expect(s.onState).toHaveBeenLastCalledWith("listening");
+    expect(s.onError).not.toHaveBeenCalled(); expect(fetch).toHaveBeenCalledOnce(); s.call.stop();
+  });
+  it("does not extend a disconnect deadline on repeated state events", async () => {
+    const s = setup(); await s.call.start();
+    peers[0].connectionState = "disconnected"; peers[0].onconnectionstatechange?.();
+    await vi.advanceTimersByTimeAsync(6000); peers[0].onconnectionstatechange?.();
+    await vi.advanceTimersByTimeAsync(2000); expect(s.onError).toHaveBeenCalledOnce();
+  });
+  it("manual stop cancels recovery and sends no diagnostic", async () => {
+    const s = setup(); await s.call.start();
+    peers[0].connectionState = "disconnected"; peers[0].onconnectionstatechange?.(); s.call.stop();
+    await vi.advanceTimersByTimeAsync(8000);
+    expect(s.onError).not.toHaveBeenCalled(); expect(fetch).toHaveBeenCalledOnce();
+  });
+  it("reports provider errors separately, preserves the user turn and sends only safe metadata", async () => {
+    const s = setup(); await s.call.start();
+    const event = (value: object) => peers[0].channel.onmessage?.({ data: JSON.stringify(value) });
+    event({ type: "input_audio_buffer.committed", item_id: "u1" });
+    event({ type: "conversation.item.input_audio_transcription.completed", item_id: "u1", transcript: "PRIVATE SPEECH" });
+    event({ type: "error", error: { code: "server_error", message: "PRIVATE SPEECH", param: "PRIVATE ARGUMENT" } });
+    expect(s.onError).toHaveBeenCalledWith("service");
+    expect(s.onExchange).toHaveBeenCalledWith(expect.objectContaining({ user: "PRIVATE SPEECH", state: "interrupted" }), "test-receipt");
+    const [url, request] = vi.mocked(fetch).mock.calls[1];
+    expect(url).toBe("/api/assistant/realtime/diagnostics");
+    expect(JSON.parse(request!.body as string).code).toBe("server_error");
+    expect(request!.body).not.toContain("PRIVATE"); expect(track.stop).toHaveBeenCalledOnce();
+  });
+  it("still closes immediately when the peer has permanently failed", async () => {
+    const s = setup(); await s.call.start(); peers[0].connectionState = "failed"; peers[0].onconnectionstatechange?.();
+    expect(s.onError).toHaveBeenCalledWith("connection"); expect(track.stop).toHaveBeenCalledOnce();
+  });
+  it("continues the voice turn after a tool returns 503, without closing the connection", async () => {
+    const s = setup(); await s.call.start();
+    vi.mocked(fetch).mockResolvedValue(new Response("unavailable", { status: 503 }));
+    const event = (value: object) => peers[0].channel.onmessage?.({ data: JSON.stringify(value) });
+    event({ type: "input_audio_buffer.committed", item_id: "u1" });
+    event({ type: "conversation.item.input_audio_transcription.completed", item_id: "u1", transcript: "Search for a public topic" });
+    event({ type: "response.created", response: { id: "r1", metadata: { input_item_id: "u1" } } });
+    event({ type: "response.done", response: { id: "r1", status: "completed", output: [{ type: "function_call", id: "f1", call_id: "c1", name: "search_web", arguments: "{}" }] } });
+    await vi.advanceTimersByTimeAsync(0);
+    const sent = peers[0].channel.send.mock.calls.map(([raw]) => JSON.parse(raw));
+    expect(sent.filter(e => e.type === "response.create")).toHaveLength(2);
+    expect(JSON.parse(sent.find(e => e.type === "conversation.item.create").item.output).error).toBe("unavailable");
+    expect(s.onError).not.toHaveBeenCalled(); expect(track.stop).not.toHaveBeenCalled(); s.call.stop();
   });
   it("handles output playback rejection", async () => {
     audio.play.mockRejectedValue(new DOMException("", "NotAllowedError")); const s = setup(); await s.call.start();
