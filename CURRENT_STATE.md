@@ -152,7 +152,12 @@ five columns and two indexes verified; assistant_messages RLS remains enabled.
 Vercel production/preview now has the signing secret and enabled staff-only,
 built-ins-only voice plus public web search; custom voices remain disabled.
 Current main was integrated, preserving source-tagged history and factual-honesty
-rules in the unified WebRTC handshake. Deployment acceptance is being completed.
+rules in the unified WebRTC handshake. PR #159 merged as cf96d8c; production
+dpl_BzdAZzdwGRLqyoyVNfze5BPYAhb9 reached READY. The actual founder account loaded
+its history and the avatar dialog with exactly five voices. The fixed-phrase
+preview completed without a displayed error. Live microphone acceptance still
+requires the user's browser microphone permission; no live speech was captured.
+1527 tests / 166 files, TypeScript, ESLint and diff checks passed.
 Earlier blocked-approval entries below are historical and superseded for these
 two migrations only; no clinical migration/automatic verification is authorized.
 
