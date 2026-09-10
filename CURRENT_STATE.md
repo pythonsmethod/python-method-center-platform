@@ -832,3 +832,4 @@ support, varied brief welcomes/goodbyes and complete word endings at speed 0.95.
 Browser now forwards the pilot's own-case/web tools to existing server authorization.
 No role/schema/clinical changes. 107 relevant tests pass; TS/ESLint/diff pass.
 Acoustic validation remains a live listening task; see docs/ankh/anham_voice_delivery.md.
+Production verified READY: PR #169, merge 67f41eba0ae828b05056fb8afc6432f9a9af9cf6, deployment dpl_HT2rb2QtmuS9iHzpUsDJC6ueqVHQ. Live listening remains pending.

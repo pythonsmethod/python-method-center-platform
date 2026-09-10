@@ -22,10 +22,18 @@ or ending; live acoustic listening not performed. Interruptions/network/session
 limits can still cut playback. Specific mispronounced words not yet supplied.
 I. Not implemented: custom voices, new clinical interpretation, automatic mood or
 health promises, forced cheerfulness or repeated praise. No route/navigation UI edits.
-J. Phase: implementation verified; release pending below. Acoustic acceptance open.
+J. Phase: implementation and publication CLOSED. Acoustic acceptance remains open.
 K. GO for publication and live testing; no claim of universal pronunciation accuracy.
 L. Next: publish, verify production deployment, then listen in a new voice session.
 
 Provider references: https://platform.openai.com/docs/api-reference/realtime
 and https://platform.openai.com/docs/api-reference/audio . Speed controls pacing;
 prompt instructions guide delivery but do not guarantee acoustic correctness.
+## Release evidence
+PR #169 merged as 67f41eba0ae828b05056fb8afc6432f9a9af9cf6.
+Website preview dpl_4Mg4ej3dyD2smcMsiXX5YkV6eL4F READY.
+Separate anham-mobile-app check failed before compilation: No Next.js version
+detected / Root Directory configuration. No mobile files changed. Automatic
+approval initially rejected merge; after inspecting that log and supplying the
+successful website build and test evidence, ordinary merge was approved.
+Production deployment dpl_HT2rb2QtmuS9iHzpUsDJC6ueqVHQ READY, matching the production merge SHA.
