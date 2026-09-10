@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { ARCHIVE_RULE, CONVERSATION_ARCHIVE_TOOLS, conversationArchiveScope, executeConversationArchiveTool } from "./conversation-archive";
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
@@ -221,6 +222,8 @@ export async function askClaude(
   maxTokens: number,
   attachments?: ChatAttachment[]
 ): Promise<AssistantResult> {
+  const archiveEnabled = Boolean(conversationArchiveScope());
+  if (archiveEnabled) system += `\n${ARCHIVE_RULE}`;
   const anthropic = getClient();
 
   if (!anthropic) {
@@ -228,16 +231,27 @@ export async function askClaude(
   }
 
   try {
-    const requestMessages =
+    const requestMessages: Anthropic.MessageParam[] =
       attachments && attachments.length > 0
         ? withAttachments(messages, attachments)
         : messages;
-    const response = await anthropic.messages.create({
+    const call = (round: number) => anthropic.messages.create({
       model: ASSISTANT_MODEL,
       max_tokens: maxTokens,
       system: buildSystemParam(system),
-      messages: requestMessages
+      messages: requestMessages,
+      ...(archiveEnabled ? { tools: CONVERSATION_ARCHIVE_TOOLS.map(tool => ({ name: tool.name, description: tool.description, input_schema: tool.parameters as Anthropic.Tool.InputSchema })), tool_choice: { type: round < 4 ? "auto" as const : "none" as const } } : {})
     });
+    let response = await call(0);
+    for (let round = 0; archiveEnabled && response.stop_reason === "tool_use"; round++) {
+      const calls = response.content.filter(block => block.type === "tool_use");
+      if (round >= 4 || calls.length > 3 || !calls.length) throw new Error("archive tool budget");
+      requestMessages.push({ role: "assistant", content: response.content });
+      const results: Anthropic.ToolResultBlockParam[] = [];
+      for (const tool of calls) results.push({ type: "tool_result", tool_use_id: tool.id, content: JSON.stringify(await executeConversationArchiveTool(tool.name, tool.input)) });
+      requestMessages.push({ role: "user", content: results });
+      response = await call(round + 1);
+    }
 
     if (response.stop_reason === "refusal") {
       return providerPolicyRefusal();

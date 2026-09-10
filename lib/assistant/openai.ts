@@ -2,6 +2,8 @@ import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
 import { isExplicitPolicyError, isFilteredChoice, providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
+import { conversationArchiveScope } from "./conversation-archive";
+import { askOpenAiArchive } from "./openai-archive";
 
 // Quality-first flagship. Deployments may pin another available model, but
 // the private expert assistant must not silently fall back to a legacy one.
@@ -35,6 +37,8 @@ export async function askOpenAi(
   const baseUrl =
     process.env.OPENAI_BASE_URL?.trim().replace(/\/$/, "") ||
     "https://api.openai.com";
+
+  if (conversationArchiveScope()) return askOpenAiArchive({ apiKey, baseUrl, model, system, messages, maxTokens, reasoningEffort: options.reasoningEffort });
 
   try {
     const response = await fetch(`${baseUrl}/v1/chat/completions`, {

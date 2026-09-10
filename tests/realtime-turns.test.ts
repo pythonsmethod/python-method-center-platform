@@ -14,6 +14,23 @@ function setup() {
   return { turns, send, saved, incomplete, input, created, done, played };
 }
 describe("realtime turn reconciliation", () => {
+  it.each(["ru", "en"])("keeps the user's context after interruption (%s)", locale => {
+    const s = setup();
+    s.input("u1", locale === "ru" ? "Обсуждаем главу книги Адаптация" : "We are discussing the Adaptation chapter");
+    s.created(); s.done();
+    s.turns.receive({ type: "input_audio_buffer.speech_started" });
+    s.input("u2", locale === "ru" ? "Продолжим эту главу" : "Continue that chapter");
+    expect(s.send.mock.calls.at(-1)![0].response.input).toEqual(
+      ["u1", "u2"].map(id => ({ type: "item_reference", id }))
+    );
+    // Generated but unheard assistant content must not be treated as heard.
+    expect(s.saved.mock.calls[0][0].state).toBe("interrupted");
+  });
+  it.each(["cancelled", "failed", "incomplete"])("retains recognized context after %s output", status => {
+    const s = setup(); s.input(); s.created(); s.done(status);
+    s.input("u2", "Please continue");
+    expect(s.send.mock.calls.at(-1)![0].response.input.map((item: { id: string }) => item.id)).toEqual(["u1", "u2"]);
+  });
   it("publishes recognition and reply deltas before final persistence", () => {
     const preview = vi.fn(), save = vi.fn(); const turns = new RealtimeTurns(vi.fn(), save, vi.fn(), { onTranscript: preview });
     turns.receive({ type: "input_audio_buffer.committed", item_id: "u" });

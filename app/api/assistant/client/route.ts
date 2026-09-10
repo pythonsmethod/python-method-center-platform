@@ -1,5 +1,7 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
+import { conversationContext } from "@/lib/assistant/conversation-context";
+import { withConversationArchive } from "@/lib/assistant/conversation-archive";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
@@ -200,6 +202,11 @@ export async function POST(request: Request) {
     system = await buildGuestSystemPrompt();
   }
 
+  if (audience.profileId && audience.tier !== "guest") {
+    system += await conversationContext({ profileId: audience.profileId, private: false,
+      caseId: audience.caseId ?? null }, messages[messages.length - 1].content);
+  }
+
   // Interface-language hint: the assistant already mirrors the visitor's
   // language, this sets the default for short/ambiguous messages.
   const rawLocale = (body as { locale?: unknown })?.locale;
@@ -217,7 +224,8 @@ export async function POST(request: Request) {
 
   // Attached files go to Claude, which reads photos and PDFs directly;
   // the arbiter path is skipped rather than answering without seeing them.
-  const result = attachments
+  const result = await withConversationArchive(audience.profileId && audience.tier !== "guest"
+    ? { profileId: audience.profileId, private: false, caseId: audience.caseId ?? null } : null, async () => attachments
     ? hasClaudeEnv()
       ? await askClaude(system, messages, 5000, attachments)
       : ({ status: "unavailable" } as const)
@@ -228,7 +236,7 @@ export async function POST(request: Request) {
           messages,
           settings.maxTokens,
           settings.provider
-        );
+        ));
 
   if (result.status === "unavailable") {
     return NextResponse.json(
