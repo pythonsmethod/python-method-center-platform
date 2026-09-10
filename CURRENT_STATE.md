@@ -16,7 +16,10 @@ were removed. After explicit owner confirmation, both outreach migrations were
 applied to production `zdrfttgwnyorifmpqgwe`; server-only grants and zero sends
 were verified. Vercel production now explicitly has the enable flag set to
 `false`. PR #156 integrates current main through `d810dd8`, preserving history,
-Anna memory, tariffs and safety changes. Publication verification is pending.
+Anna memory, tariffs and safety changes. Vercel preview build is READY.
+Automatic approval review rejected merging PR #156 into main because the
+publication confirmation did not explicitly name merge-to-main. Production
+deployment is pending that authorization; no sends occurred.
 Ordinary history retains all original languages and private/client isolation;
 only stored outreach templates are projected into the active locale.
 Full suite after integration: 1,143/1,143 tests in 141 files;

@@ -2,7 +2,8 @@
 
 Date: 2026-09-09. Scope: implementation, local regression, authorized synthetic
 staging acceptance and explicitly authorized disabled production rollout.
-Both production migrations are applied; deployment verification is pending.
+Both production migrations are applied and preview build is READY; production
+merge was separately rejected by automatic approval review.
 
 ## A. Before
 
@@ -170,6 +171,8 @@ non-medical chat feature, not closure of Ankh clinical Phase 2.9 or Phase 3.
 Final release review, integration and production migrations are complete.
 Production rollout is **NOT CLOSED** until deployment verification finishes.
 
+Automatic approval review requires explicit merge-to-main authorization.
+
 ## K. GO / NO-GO
 
 **GO** for the explicitly authorized release with delivery disabled.
@@ -177,7 +180,8 @@ Production rollout is **NOT CLOSED** until deployment verification finishes.
 
 ## L. Exact next action
 
-Merge/deploy PR #156 with outreach disabled and verify the deployed routes,
+Obtain the explicit merge-to-main authorization required by automatic approval
+review, then merge/deploy PR #156 with outreach disabled and verify the deployed routes,
 cron authorization and zero delivery. Both production migration prerequisites
 are satisfied. Real-client activation and its initial scope remain separate
 owner decisions.
@@ -201,6 +205,28 @@ Opt-out acknowledgement now returns saved/messages and request timestamps from
 the current persistence API; a new regression verifies an unsaved acknowledgement
 still reports the already-persisted opt-out honestly. Full regression: 1,143/1,143
 tests in 141 files; TypeScript, ESLint and diff check passed.
+
+Preview deployment `dpl_GT4GMr2My8PxXx3NTmKzNbzwg2yn` for commit `2a0725c`
+is READY; Next.js build completed and the platform's Vercel check succeeded.
+Preview URL:
+https://python-method-center-platform-keyob6vz8-pythonsmethods-projects.vercel.app
+Unauthenticated outreach cron returned application HTTP 401 with
+`{"error":"Unauthorized"}`. The separate preference probe reached Vercel's
+SSO redirect (302), so this is not claimed as an authenticated preference test.
+The unrelated automatic `anham-mobile-app` check failed because its configured
+root has no detected Next.js dependency; this PR changes no mobile files.
+
+The owner-authorized production migrations have history versions
+`20260910003442` and `20260910003456`. Recheck after preview requests:
+automatic_messages=0 and outreach_state_rows=0.
+
+The subsequent `merge_pull_request` call was rejected before execution:
+automatic approval review interpreted publication confirmation as insufficient
+authorization to merge into the default branch and trigger a production deploy.
+No alternate merge or direct deployment was attempted. The PR remains open and
+ready for review; production rollout is not closed. The precise remaining gate
+is permission to merge PR #156 into main and allow its production deployment
+with `ASSISTANT_OUTREACH_ENABLED=false`.
 
 ## Final release preparation — 2026-09-09
 

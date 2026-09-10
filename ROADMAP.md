@@ -7,7 +7,9 @@ for saved Anham welcome/check-ins and authorized synthetic staging acceptance
 are CLOSED (concurrent cron/opt-out and RU/EN cabinet/admin UI). Final diff review
 and integration with current main are complete. Owner explicitly authorized
 the two production migrations and disabled rollout; migrations are applied and
-production enable flag is `false`. Next: publish PR #156 and verify deployment.
+production enable flag is `false`. Preview build is READY. Next: explicit
+authorization to merge PR #156 into main (required by automatic approval review),
+then verify the resulting production deployment.
 Production activation remains separate.
 See `docs/ankh/assistant_outreach.md`.
 
