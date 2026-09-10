@@ -1,6 +1,7 @@
 import "server-only";
 
 import { askAssistantTeam } from "@/lib/assistant/router";
+import { normalizeAnhamResponse, withAnhamResponseStyle } from "@/lib/assistant/response-style";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type {
   MedicalDigestArticle,
@@ -71,8 +72,22 @@ function issueDate(now = new Date()): string {
   return `${value("year")}-${value("month")}-${value("day")}`;
 }
 
-function asText(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
+function asText(value: unknown, locale: "ru" | "en"): string {
+  return typeof value === "string" ? normalizeAnhamResponse(value, locale) : "";
+}
+
+// Normalize only generated narrative fields when reading historical issues.
+// Bibliographic titles, abstracts, URLs and identifiers remain source data.
+function presentArticle(article: MedicalDigestArticle): MedicalDigestArticle {
+  return {
+    ...article,
+    summaryRu: asText(article.summaryRu, "ru"), summaryEn: asText(article.summaryEn, "en"),
+    significanceRu: asText(article.significanceRu, "ru"), significanceEn: asText(article.significanceEn, "en"),
+    limitationsRu: asText(article.limitationsRu, "ru"), limitationsEn: asText(article.limitationsEn, "en"),
+    outcomeRu: asText(article.outcomeRu, "ru"), outcomeEn: asText(article.outcomeEn, "en"),
+    evidenceRu: asText(article.evidenceRu, "ru"), evidenceEn: asText(article.evidenceEn, "en"),
+    compositionRu: asText(article.compositionRu, "ru"), compositionEn: asText(article.compositionEn, "en")
+  };
 }
 
 function jsonObject(text: string): Record<string, unknown> | null {
@@ -137,7 +152,7 @@ async function fetchCategory(
 
 async function summarize(article: DraftArticle): Promise<MedicalDigestArticle> {
   const system = `You are the evidence editor for a private oncology research digest. Use only the supplied bibliographic record and abstract. Never infer patient-specific advice, causation, effectiveness beyond the study, regulatory approval, adoption in clinical practice, chemical composition, molecular formula, extraction method, or facts absent from the abstract. The editorial section is ${article.category}; describe the actual development or implementation stage only when the abstract states it. A case report, remission after a folk remedy, supplement, extract, or complementary intervention is an observation and must never be presented as proof that the intervention caused recovery. Use the term cure only if the source explicitly documents durable complete remission, and still state the evidence design. For compositionRu/compositionEn, list active ingredients, molecules, formula, formulation, extraction or manufacturing method only when explicitly stated; otherwise say that the abstract does not specify it. Return one valid JSON object with exactly these string keys: summaryRu, summaryEn, significanceRu, significanceEn, limitationsRu, limitationsEn, outcomeRu, outcomeEn, evidenceRu, evidenceEn, compositionRu, compositionEn. Each value must be 1-2 concise sentences. Russian fields must be entirely Russian; English fields entirely English. State uncertainty and study limitations explicitly. Do not use Markdown.`;
-  const result = await askAssistantTeam(system, [{
+  const result = await askAssistantTeam(withAnhamResponseStyle(system), [{
     role: "user",
     content: `Title: ${article.title}\nJournal: ${article.journal}\nPublication date: ${article.publishedAt}\nPublication type: ${article.publicationType}\nAbstract:\n${article.abstract.slice(0, 7000)}`
   }], 900, "gpt");
@@ -148,18 +163,18 @@ async function summarize(article: DraftArticle): Promise<MedicalDigestArticle> {
 
   return {
     ...article,
-    summaryRu: asText(parsed?.summaryRu) || fallbackRu,
-    summaryEn: asText(parsed?.summaryEn) || fallbackEn,
-    significanceRu: asText(parsed?.significanceRu) || "Клиническое значение требует оценки по полному тексту исследования.",
-    significanceEn: asText(parsed?.significanceEn) || "Clinical significance should be assessed from the full study text.",
-    limitationsRu: asText(parsed?.limitationsRu) || "Ограничения не извлечены автоматически; требуется ручная проверка.",
-    limitationsEn: asText(parsed?.limitationsEn) || "Limitations were not extracted automatically; manual review is required.",
-    outcomeRu: asText(parsed?.outcomeRu) || "Заявленный результат требует проверки по полному тексту.",
-    outcomeEn: asText(parsed?.outcomeEn) || "The reported outcome requires review of the full text.",
-    evidenceRu: asText(parsed?.evidenceRu) || "Уровень доказательности не определён автоматически.",
-    evidenceEn: asText(parsed?.evidenceEn) || "The evidence level was not determined automatically.",
-    compositionRu: asText(parsed?.compositionRu) || "Состав, формула или способ получения в аннотации не указаны.",
-    compositionEn: asText(parsed?.compositionEn) || "The abstract does not specify the composition, formula, or production method."
+    summaryRu: asText(parsed?.summaryRu, "ru") || fallbackRu,
+    summaryEn: asText(parsed?.summaryEn, "en") || fallbackEn,
+    significanceRu: asText(parsed?.significanceRu, "ru") || "Клиническое значение требует оценки по полному тексту исследования.",
+    significanceEn: asText(parsed?.significanceEn, "en") || "Clinical significance should be assessed from the full study text.",
+    limitationsRu: asText(parsed?.limitationsRu, "ru") || "Ограничения не извлечены автоматически; требуется ручная проверка.",
+    limitationsEn: asText(parsed?.limitationsEn, "en") || "Limitations were not extracted automatically; manual review is required.",
+    outcomeRu: asText(parsed?.outcomeRu, "ru") || "Заявленный результат требует проверки по полному тексту.",
+    outcomeEn: asText(parsed?.outcomeEn, "en") || "The reported outcome requires review of the full text.",
+    evidenceRu: asText(parsed?.evidenceRu, "ru") || "Уровень доказательности не определён автоматически.",
+    evidenceEn: asText(parsed?.evidenceEn, "en") || "The evidence level was not determined automatically.",
+    compositionRu: asText(parsed?.compositionRu, "ru") || "Состав, формула или способ получения в аннотации не указаны.",
+    compositionEn: asText(parsed?.compositionEn, "en") || "The abstract does not specify the composition, formula, or production method."
   };
 }
 
@@ -217,7 +232,7 @@ export async function listMedicalDigestIssues(limit = 14): Promise<MedicalDigest
     issueDate: row.issue_date as string,
     generatedAt: row.generated_at as string,
     sourceCount: row.source_count as number,
-    articles: row.articles as MedicalDigestArticle[]
+    articles: (row.articles as MedicalDigestArticle[]).map(presentArticle)
   }));
 }
 

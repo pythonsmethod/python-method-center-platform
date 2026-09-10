@@ -165,7 +165,6 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const viewer = await headerViewer();
-  const currentPath = await getCurrentPath();
 
   return (
     <html className={playfair.variable} lang={locale}>
@@ -181,7 +180,7 @@ export default async function RootLayout({ children }: RootLayoutProps) {
             <Link className="mobile-header-account" href={viewer === "staff" ? "/admin" : viewer === "client" ? "/cabinet" : "/login"}>
               {viewer === "staff" ? (locale === "ru" ? "Рабочее место" : "Workspace") : viewer === "client" ? (locale === "ru" ? "Кабинет" : "Account") : (locale === "ru" ? "Вход / Регистрация" : "Sign in / Sign up")}
             </Link>
-            <LanguageSwitcher locale={locale} path={currentPath} />
+            <LanguageSwitcher locale={locale} />
           </div>
         </SiteHeader>
         <PublicMobileDock locale={locale} viewer={viewer} />

@@ -83,6 +83,19 @@ export function localizedHref(href: string, locale: Locale): string {
     : `${EN_PREFIX}${normalize(path)}${rest}`;
 }
 
+// Read the browser's current address at click time: shared layouts can retain
+// server props from an earlier page after a client-side navigation.
+export function languageSwitchHref(
+  location: { pathname: string; search: string; hash: string },
+  locale: Locale
+): string {
+  const { path } = readLocaleFromPath(location.pathname);
+  const pathname = hasEnglishTwin(path)
+    ? localizedHref(path, locale)
+    : location.pathname;
+  return `${pathname}${location.search}${location.hash}`;
+}
+
 // Both addresses of one page, for the hreflang pair and the sitemap.
 export function alternatesFor(path: string): { ru: string; en: string } | null {
   if (!hasEnglishTwin(path)) {

@@ -711,6 +711,42 @@ Owner authorized publication of the single-window founder assistant, direct save
 
 Include created_at in both rows of every bulk exchange insert. Record question arrival and answer completion separately; use the same prepared rows for retries. Do not turn empty acknowledgements into saved:true or fabricate sequence IDs. Keep existing two-row insert/readback confirmation and visible storage-failure handling. This is a persistence correction, with no new schema or permission.
 
+## D-057 — One prose style, normalization only at presentation boundaries
+
+Decision (2026-09-09):
+All Anham audiences use the same RU/EN rule for calm, natural writing in short
+paragraphs without Markdown or decorative formatting. Source data, observed
+patterns, hypotheses and Karen decisions remain explicitly distinguishable in
+ordinary words. Style never expands a role's medical permissions.
+
+Normalize complete human-readable output on the server before display/storage.
+Parse machine envelopes first; normalize only designated narrative fields.
+Never run this normalizer over source/OCR, extracted values, machine JSON,
+human messages or approved decisions. Preserve ambiguous clinical symbols and
+URLs rather than deleting characters indiscriminately. Historical AI output
+may be projected for display without a data backfill.
+
+Implementation and limits: `docs/ankh/anham_response_style.md`.
+This local change does not authorize production deployment or close any
+extraction, trust, clinical validation or PHI gate.
+
+Acceptance addendum (2026-09-09): owner-authorized browser acceptance uses a
+loopback synthetic provider and an environment allowlist, without production
+credentials or auth bypasses. It proves the prompt/HTTP/normalizer/rendering
+path, not live-model prose quality or authenticated persistence. Language
+switching reads the current browser address at click time because shared
+layout props can retain a previous route after client navigation. Public
+locale twins preserve query and fragment; cabinet routes keep one address.
+
+Review addendum (2026-09-09): presentation must retain ambiguous measurement
+signs, leading decimal separators and unit-bearing numeric lines. Protected
+scientific notation remains numeric when evaluating surrounding syntax.
+Generated annotations use explicit surface/field locales; an empty normalized
+advice response is an error. Provider labels preserve content-line boundaries.
+Review evidence: `docs/ankh/anham_response_style_review.md`.
+
+---
+
 ---
 
 ## D-058 — Factual honesty is provider-wide; text is not an action receipt

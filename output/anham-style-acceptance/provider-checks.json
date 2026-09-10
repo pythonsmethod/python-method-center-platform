@@ -1,0 +1,17 @@
+{
+  "provider": "loopback fixture, not a live model",
+  "checks": [
+    {
+      "sequence": 1,
+      "locale": "ru",
+      "stylePresent": true,
+      "synthetic": true
+    },
+    {
+      "sequence": 2,
+      "locale": "en",
+      "stylePresent": true,
+      "synthetic": true
+    }
+  ]
+}

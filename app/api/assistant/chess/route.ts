@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { normalizeAnhamResponse, withAnhamResponseStyle } from "@/lib/assistant/response-style";
 import { Chess } from "chess.js";
 import { sanitizeChatMessages } from "@/lib/assistant/claude";
 import { askAssistantTeam } from "@/lib/assistant/router";
@@ -40,7 +41,7 @@ export async function GET() {
   const { data } = await auth.supabase.from("chess_conversations")
     .select("role,content").eq("user_id", auth.user.id)
     .order("created_at", { ascending: false }).limit(40);
-  const messages = (data ?? []).reverse().map((row) => ({ role: row.role, content: row.content }));
+  const messages = (data ?? []).reverse().map((row) => ({ role: row.role, content: row.role === "assistant" ? normalizeAnhamResponse(row.content, locale) : row.content }));
   return NextResponse.json({ messages });
 }
 
@@ -78,7 +79,8 @@ export async function POST(request: Request) {
     } catch { pgn = ""; }
   }
 
-  const english = payload.locale === "en";
+  const responseLocale = payload.locale === "en" || payload.locale === "ru" ? payload.locale : locale;
+  const english = responseLocale === "en";
   const levels = ["beginner", "casual", "intermediate", "advanced", "grandmaster"];
   const level = typeof context.level === "string" && levels.includes(context.level) ? context.level : "beginner";
   const [{ data: pastGames }, { data: activeGame }] = await Promise.all([
@@ -91,18 +93,20 @@ export async function POST(request: Request) {
     `${index + 1}. ${game.status}${game.result ? `, result ${game.result}` : ""}; PGN: ${game.pgn || "no moves"}`
   ).join("\n");
   const system = `You are Anham, a patient personal chess coach and playing partner. The person plays White and Anham plays Black. Their explicitly selected chess level is ${level}. Adapt vocabulary, depth, hints, and teaching pace to that level; for beginners explain rules and notation, while for advanced and grandmaster players use deeper positional and tactical analysis. Teach the person how to think, ask guiding questions, identify recurring mistakes from remembered games, and praise specific improvement. Do not merely give a move without explaining the idea. Name only legal candidate moves in algebraic notation and never invent pieces or moves absent from the authoritative position. Reply in ${english ? "English" : "Russian"} unless the person writes in another language.\n\nCURRENT POSITION (authoritative FEN):\n${position.fen()}\n\nCURRENT GAME HISTORY:\n${pgn || "No validated move history is available; analyze the FEN only."}\n\nPAST GAMES FOR COACHING MEMORY:\n${memory || "This is the first remembered game."}`;
-  const result = await askAssistantTeam(system, messages, 1200, "best");
+  const result = await askAssistantTeam(withAnhamResponseStyle(system), messages, 1200, "best");
 
   if (result.status === "unavailable") {
     return NextResponse.json({ error: locale === "en" ? "Anham is temporarily unavailable." : "Anham временно недоступен." }, { status: 503 });
   }
   if (result.status === "error") return NextResponse.json({ error: assistantFailure(result, locale) }, { status: 502 });
+  const reply = normalizeAnhamResponse(result.reply, responseLocale);
+  if (!reply) return NextResponse.json({ error: apiError("assistantEmptyReply", locale) }, { status: 502 });
   const question = messages[messages.length - 1]?.content?.trim() ?? "";
   if (question) {
     await auth.supabase.from("chess_conversations").insert([
       { game_id: activeGame?.id ?? null, user_id: auth.user.id, role: "user", content: question.slice(0, 8000), position_fen: position.fen() },
-      { game_id: activeGame?.id ?? null, user_id: auth.user.id, role: "assistant", content: result.reply.slice(0, 8000), position_fen: position.fen() }
+      { game_id: activeGame?.id ?? null, user_id: auth.user.id, role: "assistant", content: reply.slice(0, 8000), position_fen: position.fen() }
     ]);
   }
-  return NextResponse.json({ reply: result.reply });
+  return NextResponse.json({ reply });
 }
