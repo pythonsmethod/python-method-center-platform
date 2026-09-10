@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
-const f = vi.hoisted(() => ({ context: vi.fn(), audience: vi.fn(), guard: vi.fn(), ask: vi.fn(), save: vi.fn() }));
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+const f = vi.hoisted(() => ({ actor: vi.fn(), context: vi.fn(), audience: vi.fn(), guard: vi.fn(), ask: vi.fn(), save: vi.fn() }));
+vi.mock("@/lib/assistant/realtime-server", () => ({ resolveVoiceActor: f.actor }));
 vi.mock("@/lib/assistant/tiers", () => ({ resolveAssistantAudience: f.audience }));
 vi.mock("@/lib/assistant/guard", () => ({ guardAssistantRequest: f.guard, guardAnhamDeepRequest: async () => false }));
 vi.mock("@/lib/assistant/router", () => ({ askAnham: f.ask, askAssistantTeam: f.ask, chooseAnhamMode: () => "standard" }));
@@ -10,6 +11,7 @@ vi.mock("@/lib/notifications/notify", () => ({ adminLink: () => "", notifyTeam: 
 vi.mock("@/lib/i18n/locale", () => ({ getLocale: async () => "en" }));
 vi.mock("@/lib/assistant/conversation-context", () => ({ conversationContext: f.context }));
 import { POST } from "@/app/api/assistant/client/route";
+import { availableConversationTools, conversationArchiveScope } from "@/lib/assistant/conversation-archive";
 const request = (extra = {}) => new Request("http://localhost/api/assistant/client", { method: "POST", body: JSON.stringify({ messages: [{ role: "user", content: "Hello" }], locale: "en", ...extra }) });
 beforeEach(() => {
   vi.clearAllMocks();
@@ -19,7 +21,29 @@ beforeEach(() => {
   f.context.mockResolvedValue("Saved conversation: earlier topic");
   f.save.mockResolvedValue({ saved: true, messages: [{ role: "user", content: "Hello", created_at: "2026-09-09T00:00:00Z" }] });
 });
+afterEach(() => vi.unstubAllEnvs());
 describe("client history integration", () => {
+  it("offers client tools only after server-resolved preview identity checks", async () => {
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "pilot@example.test"); vi.stubEnv("ANHAM_WEB_SEARCH_ENABLED", "true");
+    f.audience.mockResolvedValue({ tier: "client", profileId: "client-id", caseId: "case-id", fullPreview: true });
+    f.actor.mockResolvedValue({ scope: "client", profileId: "client-id", caseId: "case-id", email: "pilot@example.test", clientPreview: true });
+    f.ask.mockImplementation(async () => {
+      expect(availableConversationTools().map(t => t.name)).toContain("read_my_case"); expect(availableConversationTools().map(t => t.name)).toContain("search_web");
+      conversationArchiveScope()!.clientTools!.webResults = [{ text: "Public fact", searchedAt: "2026-09-09T00:00:00Z", citations: [{ title: "Public source", url: "https://www.nasa.gov/", start: 0, end: 6 }] }];
+      return { status: "ok", reply: "Answer" };
+    });
+    expect((await POST(request())).status).toBe(200);
+    expect(f.save).toHaveBeenCalledWith(expect.objectContaining({ answer: expect.stringContaining("https://www.nasa.gov/") }));
+    expect(availableConversationTools().map(t => t.name)).not.toContain("read_my_case");
+    f.actor.mockResolvedValue({ scope: "client", profileId: "another", caseId: "case-id", email: "pilot@example.test", clientPreview: true });
+    f.ask.mockClear();
+    expect((await POST(request())).status).toBe(403); expect(f.ask).not.toHaveBeenCalled();
+  });
+  it("ignores a preview grant asserted in the request body", async () => {
+    f.ask.mockImplementation(async () => { expect(availableConversationTools().map(t => t.name)).not.toContain("read_my_case"); return { status: "ok", reply: "Answer" }; });
+    expect((await POST(request({ fullPreview: true, clientTools: { email: "pilot@example.test" } }))).status).toBe(200);
+    expect(f.actor).not.toHaveBeenCalled();
+  });
   it("adds stored context to the model using server-resolved identity and case", async () => {
     await POST(request({ profileId: "attacker", caseId: "other-case" }));
     expect(f.context).toHaveBeenCalledWith({ profileId: "client-id", private: false, caseId: "case-id" }, "Hello");

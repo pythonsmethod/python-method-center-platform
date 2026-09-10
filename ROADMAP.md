@@ -1,5 +1,12 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Complete client tool pilot — 2026-09-09
+
+Publish and validate own-Case source retrieval plus public web search for the
+confirmed selected client in text and voice. This supersedes prior pilot web
+and existing-reading exclusions, not clinical/public rollout gates. Next is
+the selected client's own authenticated acceptance. See docs/ankh/client_complete_tools.md.
+
 ## Full client assistant pilot — 2026-09-09
 
 Enable all existing client assistant features for the confirmed pilot account,

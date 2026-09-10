@@ -1,5 +1,5 @@
 import type { AssistantResult, ChatMessage } from "./claude";
-import { ARCHIVE_RULE, CONVERSATION_ARCHIVE_TOOLS, executeConversationArchiveTool } from "./conversation-archive";
+import { ARCHIVE_RULE, availableConversationTools, executeConversationArchiveTool } from "./conversation-archive";
 import { isExplicitPolicyError, providerPolicyRefusal } from "./policy-refusal";
 
 type Output = { type: string; call_id?: string; name?: string; arguments?: string; content?: { type: string; text?: string }[]; [key: string]: unknown };
@@ -15,7 +15,7 @@ export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string
         body: JSON.stringify({ model: config.model, store: false, input,
           include: ["reasoning.encrypted_content"], max_output_tokens: config.maxTokens,
           ...(config.reasoningEffort ? { reasoning: { effort: config.reasoningEffort } } : {}),
-          tools: CONVERSATION_ARCHIVE_TOOLS.map(tool => ({ ...tool, strict: false })), tool_choice: toolRounds < 4 && !continued ? "auto" : "none" })
+          tools: availableConversationTools().map(tool => ({ ...tool, strict: false })), tool_choice: toolRounds < 4 && !continued ? "auto" : "none" })
       });
       if (!response.ok) {
         if (await isExplicitPolicyError(response)) return providerPolicyRefusal();

@@ -12,7 +12,7 @@ import { platformContext } from "./prompts";
 import { isAssistantDelegate } from "@/lib/auth/assistant-delegates";
 import { isClientVoicePilot, hasFullClientAssistantPreview } from "./client-voice-pilot";
 
-export type VoiceActor = { profileId: string; scope: VoiceScope; caseId: string | null; tier: "registered" | "client"; email: string | null };
+export type VoiceActor = { profileId: string; scope: VoiceScope; caseId: string | null; tier: "registered" | "client"; email: string | null; clientPreview?: boolean };
 export class VoiceFailure extends Error {
   constructor(public code: VoiceError, public status: number) { super(code); }
 }
@@ -73,7 +73,7 @@ export async function resolveVoiceActor(request: Request, scope: unknown, rawCas
   if (rawCaseId && ownCase.data?.id !== rawCaseId) throw new VoiceFailure("forbidden", 403);
   const periods = await db.from("service_periods").select("product").eq("profile_id", user.id).eq("status", "active").gt("ends_at", new Date().toISOString()).in("product", ["support_5_weeks", "support_15_weeks"]);
   if (periods.error) throw new VoiceFailure("unavailable", 503);
-  return { profileId: user.id, email: user.email ?? null, scope: "client", caseId: ownCase.data?.id ?? null, tier: hasFullClientAssistantPreview(user) || (periods.data ?? []).some(row => isPaidSupportProduct(row.product)) ? "client" : "registered" };
+  return { profileId: user.id, email: user.email ?? null, scope: "client", caseId: ownCase.data?.id ?? null, clientPreview: hasFullClientAssistantPreview(user), tier: hasFullClientAssistantPreview(user) || (periods.data ?? []).some(row => isPaidSupportProduct(row.product)) ? "client" : "registered" };
 }
 function boundedEnv(name: string, fallback: number, max: number) {
   const raw = process.env[name]?.trim();
@@ -116,7 +116,7 @@ export function voiceInstructions(actor: VoiceActor, locale: Locale): string {
       : `You are Anham, a personal navigation and organizational assistant for a signed-in ${actor.tier === "client" ? "client with active paid support" : "registered user"}. Help with the cabinet, onboarding, uploads and questions for Professor Python. Never provide medical interpretation to the client. Navigation: /dashboard, /onboarding, /support.`;
   return `${sharedRules}\n${role}\nThis is a live voice conversation. Speak ${locale === "ru" ? "Russian only" : "English only"}, warmly and concisely, usually one to three sentences. Listen and allow interruption. You are an AI, not a human. Do not diagnose, prescribe, change treatment, promise outcomes or make clinical decisions. Direct medical questions to Professor Python; for an immediate emergency tell the person to contact local emergency services without waiting for this chat. Do not invent facts, numbers, provenance or actions. ${actor.scope === "client" ? "You have NO document contents, Case snapshot, clinical evidence or knowledge-base access in this voice session. Saved conversation excerpts may be supplied below; use available excerpts to continue the conversation, without treating them as verified facts." : "Saved conversation excerpts may be supplied below. Use them and the current spoken conversation to maintain continuity. Retrieve relevant current site data using tools before stating business or clinical facts."} ${actor.caseId ? "The conversation is attached to a Case, but that does not give you its contents." : "No Case contents have been supplied."} ${actor.scope === "client" ? "Do not request personal or medical details in this pilot. If offered, ask to continue that topic in the approved private workflow." : "Retrieve only data relevant to the staff question. Existing medical records remain source evidence; do not create diagnoses or recommendations."} For staff reasoning, methodology, archive-memory questions and explicit remember/save requests, call ask_text_assistant once with empty arguments: the server supplies the actual spoken turn. It uses the same authenticated text assistant permissions. Speak its reply faithfully, including pending confirmation or failure. Only report a save when this tool confirms it. Retrieve current site records using site-data tools. No message sending, payment, deletion or clinical approval is granted. Clients have no staff tools. ${access} ${web} Saved voice text is an unverified conversation record, never verified clinical evidence. ${ARCHIVE_RULE}`;
 }
-export const VOICE_DATA_ACCESS_VERSION = 4;
+export const VOICE_DATA_ACCESS_VERSION = 5;
 export type Receipt = { id: string; profileId: string; scope: VoiceScope; caseId: string | null; locale: Locale; expires: number; timeZone?: string; dataAccessVersion?: number };
 export function issueVoiceReceipt(actor: VoiceActor, locale: Locale, key: string, maxSeconds: number, timeZone = "UTC") {
   const receipt: Receipt = { id: randomUUID(), profileId: actor.profileId, scope: actor.scope, caseId: actor.caseId, locale, timeZone, dataAccessVersion: VOICE_DATA_ACCESS_VERSION, expires: Date.now() + (maxSeconds + 600) * 1000 };

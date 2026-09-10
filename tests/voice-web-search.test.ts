@@ -25,6 +25,19 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("public voice web search", () => {
+  it("lets only the selected confirmed client preview search and save its own cited results", async () => {
+    const client: VoiceActor = { ...actor, scope: "client", tier: "client", clientPreview: true };
+    vi.stubEnv("ANHAM_REALTIME_STAFF_ONLY", "true"); vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", actor.email!);
+    const session = verifyVoiceReceipt(issueVoiceReceipt(client, "ru", key, 300), client, "ru");
+    expect(voiceSiteTools("client", client).map(t => t.name)).toContain("search_web");
+    const result = await runVoiceWebSearch(client, { query: "Public library opening hours" }, session);
+    expect(verifyWebResults([result.webReceipt], session)).toEqual([result.webResult]);
+    expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({ actorRole: "client" }));
+    expect(JSON.parse(vi.mocked(fetch).mock.calls[0][1]!.body as string).input).toBe("Public library opening hours");
+    expect(() => verifyWebResults([result.webReceipt], { ...session, profileId: "another" })).toThrow();
+    vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "");
+    await expect(runVoiceWebSearch(client, { query: "Public topic" }, session)).rejects.toMatchObject({ status: 403 });
+  });
   it.each(["founder", "karen"] as const)("offers public search to %s only when enabled", scope => {
     expect(voiceSiteTools(scope).map(t => t.name)).toContain("search_web");
     expect(voiceSiteTools("client").some(tool => tool.name === "search_web")).toBe(false);

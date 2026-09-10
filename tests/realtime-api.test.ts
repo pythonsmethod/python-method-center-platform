@@ -53,6 +53,10 @@ describe("voice authorization and provider handshake", () => {
     mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: actor.email, email_confirmed_at: "2026-09-09" } }, error: null });
     caseRow = { id: caseId };
     expect(await resolveVoiceActor(request({}), "client")).toMatchObject({ profileId: userId, caseId, tier: "client", scope: "client" });
+    vi.stubEnv("ANHAM_WEB_SEARCH_ENABLED", "true");
+    expect((await session(request(sessionBody))).status).toBe(200);
+    const config = JSON.parse((vi.mocked(fetch).mock.calls[0][1]!.body as FormData).get("session") as string);
+    expect(config.tools.map((tool: { name: string }) => tool.name)).toEqual(["search_conversation_history", "read_conversation_message", "read_my_case", "search_web"]);
     await expect(resolveVoiceActor(request({}), "staff")).rejects.toMatchObject({ status: 403 });
     await expect(resolveVoiceActor(request({}), "client", userId)).rejects.toMatchObject({ status: 403 });
     vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "");

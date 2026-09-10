@@ -1,7 +1,11 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
-import { conversationContext } from "@/lib/assistant/conversation-context";
+import { conversationContext, type ConversationScope } from "@/lib/assistant/conversation-context";
 import { withConversationArchive } from "@/lib/assistant/conversation-archive";
+import { CLIENT_TOOLS_RULE } from "@/lib/assistant/client-tool-contract";
+import { resolveVoiceActor } from "@/lib/assistant/realtime-server";
+import { canUseClientTools } from "@/lib/assistant/client-case-tools";
+import { webSourceAppendix } from "@/lib/assistant/web-results";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
@@ -223,9 +227,18 @@ export async function POST(request: Request) {
   }
 
   // Attached files go to Claude, which reads photos and PDFs directly;
+  let clientTools: ConversationScope["clientTools"];
+  if (audience.fullPreview) {
+    try {
+      const actor = await resolveVoiceActor(request, "client", audience.caseId);
+      if (!canUseClientTools(actor) || actor.profileId !== audience.profileId || actor.caseId !== audience.caseId || !actor.email) throw new Error();
+      clientTools = { email: actor.email, locale: responseLocale };
+      system += `\n${CLIENT_TOOLS_RULE}`;
+    } catch { return NextResponse.json({ error: responseLocale === "ru" ? "Нет доступа к тестовым возможностям. Войдите заново." : "Preview access is unavailable. Please sign in again." }, { status: 403 }); }
+  }
   // the arbiter path is skipped rather than answering without seeing them.
   const result = await withConversationArchive(audience.profileId && audience.tier !== "guest"
-    ? { profileId: audience.profileId, private: false, caseId: audience.caseId ?? null } : null, async () => attachments
+    ? { profileId: audience.profileId, private: false, caseId: audience.caseId ?? null, clientTools } : null, async () => attachments
     ? hasClaudeEnv()
       ? await askClaude(system, messages, 5000, attachments)
       : ({ status: "unavailable" } as const)
@@ -258,5 +271,5 @@ export async function POST(request: Request) {
     question: messages[messages.length - 1]?.content ?? "",
     locale: rawLocale === "en" ? "en" : rawLocale === "ru" ? "ru" : locale,
     audience: "client"
-  }));
+  }) + (result.refusal ? "" : webSourceAppendix(clientTools?.webResults ?? [], responseLocale)));
 }
