@@ -1,5 +1,6 @@
 import { formatDateTime } from "@/lib/i18n/format";
 import type { AssistantHistoryMessage } from "@/lib/assistant/history";
+import { VoiceWebResults } from "./VoiceWebResults";
 import type { Locale } from "@/lib/i18n/locale";
 
 type SavedAssistantThreadProps = {
@@ -42,8 +43,11 @@ export function SavedAssistantThread({
                 : locale === "ru" ? "Вы" : "You"
               : locale === "ru" ? "ИИ-помощник" : "AI assistant"}{" "}
             · {formatDateTime(message.created_at, locale)}
+            {message.source === "voice_transcript" ? (locale === "ru" ? " · Голос: непроверенная расшифровка" : " · Voice: unverified transcript") : null}
+            {message.voice_state === "interrupted" ? (locale === "ru" ? " · Прервано: ответ мог прозвучать не полностью" : " · Interrupted: reply may not have been fully spoken") : null}
           </span>
           {message.content}
+              {message.role === "assistant" ? <VoiceWebResults results={message.web_results} locale={locale} /> : null}
         </div>
       ))}
     </div>

@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { readFileSync } from "node:fs";
+import { voiceInstructions } from "@/lib/assistant/realtime-server";
 import {
   buildGuestSystemPrompt,
   buildRegisteredSystemPrompt,
@@ -33,9 +33,11 @@ describe("shared sexual-content prohibition", () => {
   });
 
   it("uses the same protected builders for realtime voice", () => {
-    const route = readFileSync("app/api/assistant/realtime/session/route.ts", "utf8");
-    expect(route).toContain("await buildPaidClientSystemPrompt(audience.context)");
-    expect(route).toContain("await buildRegisteredSystemPrompt(audience.context)");
-    expect(route).toContain("${basePrompt}");
+    for (const scope of ["client", "founder", "karen"] as const) {
+      const prompt = voiceInstructions({ profileId: "synthetic", email: "synthetic@example.test", scope, tier: "registered", caseId: null }, "en");
+      expect(prompt).toContain("Sexual content is prohibited");
+      expect(prompt).toContain("require safety support first");
+      expect(prompt).toContain("## Красные флаги");
+    }
   });
 });

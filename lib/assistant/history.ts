@@ -17,6 +17,9 @@ export type AssistantHistoryMessage = {
   created_at: string;
   locale: Locale | null;
   message_sequence: number;
+  source?: "text" | "voice_transcript";
+  voice_state?: "completed" | "interrupted";
+  web_results?: import("./web-results").WebResult[];
 };
 
 // What the chat window loads when it opens: enough to remember the thread,
@@ -125,7 +128,7 @@ export async function getOwnAssistantHistory(
 
   let query = supabase
     .from("assistant_messages")
-    .select("id, role, content, created_at, locale, message_sequence, outreach_translations")
+    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, source, voice_state, web_results")
     .eq("profile_id", profileId)
     .in("tier", options.private ? ["founder", "karen"] : ["registered", "client"])
     .order("message_sequence", { ascending: false })

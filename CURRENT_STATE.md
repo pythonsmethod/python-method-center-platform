@@ -145,6 +145,149 @@ OPEN, production auto-verification and Phase 3 production remain NO-GO.
 
 ## 1. Current position
 
+### Authorized voice production rollout — 2026-09-09 (latest)
+
+Owner explicitly approved the two production voice-history migrations and enabling
+the site update. Both migrations applied successfully to zdrfttgwnyorifmpqgwe:
+five columns and two indexes verified; assistant_messages RLS remains enabled.
+Vercel production/preview now has the signing secret and enabled staff-only,
+built-ins-only voice plus public web search; custom voices remain disabled.
+Current main was integrated, preserving source-tagged history and factual-honesty
+rules in the unified WebRTC handshake. Deployment acceptance is being completed.
+Earlier blocked-approval entries below are historical and superseded for these
+two migrations only; no clinical migration/automatic verification is authorized.
+
+### Voice/text permission parity — 2026-09-09 (latest)
+
+Owner requested voice to have the same powers as text. Staff voice now delegates
+methodology/reasoning/archive and explicit memory commands to the existing staff
+text POST handler with its own authorization rechecked. The actual turn-bound
+browser transcript is used, not a model-supplied command. Private/Case history is
+loaded; one execution per signed session/turn prevents duplicate memory writes.
+Karen destination confirmations remain in the existing chat controls. Source
+queries and internet tools remain available under their existing flags. Policy
+receipts advance to v4; old sessions must restart. No schema or production change
+in this increment. Production rollout still awaits the exact migration approval
+recorded below. See `docs/ankh/voice_text_permissions.md`.
+
+### Built-in staff voice launch preparation — 2026-09-09 (latest)
+
+The owner deferred personal voice cloning and authorized built-in voices only.
+Five built-ins can now be enforced server-side; a staff-only rollout accepts
+verified founder/Karen accounts and denies clients. Voice history integrates with
+the latest private history, timestamps, pagination and shared safety rules from main.
+All 1336 tests / 150 files pass with one worker; TypeScript and ESLint pass.
+Live fixed-phrase TTS returned HTTP 200 and valid WAV for all five voices.
+Both additive voice-history migrations passed on isolated staging; a rolled-back
+synthetic insert/retry verified two rows without duplicates and RLS stayed enabled.
+Production schema changes were rejected by automatic approval review under the
+dedicated-production-task rule. Production voice is NOT launched. Next action:
+explicit approval for the two exact voice migrations, then scoped configuration,
+deployment and authenticated live acceptance. No personal recordings are needed.
+See `docs/ankh/builtin_voice_launch_2026_09_09.md`; this entry supersedes the
+personal-recording prerequisite below.
+
+### Five selectable voices and personal-voice preparation — 2026-09-09
+
+The avatar call now offers Marin, Cedar, Coral, Sage and Verse, authenticated
+fixed-phrase previews, and account/persona-specific browser preference storage.
+Voice selection ends/saves the old session; the next session uses the selected
+voice. Staff-only founder/Karen custom aliases remain unavailable until server
+voice and matching consent references are configured. They never change identity,
+permissions or clinical authority. A guarded, dry-run-first operator helper can
+create consent-linked voices from the owners' supplied recordings.
+
+1163 tests / 133 files pass; TypeScript, ESLint and diff checks pass. Browser
+verification covers five choices, preview, Cedar in the actual session request,
+RU–EN–RU preference retention and 390px layout. A protected Vercel preview was
+deployed from the validated branch; no real voice creation, provider call or
+schema apply occurred. Personal voices are NOT created: recordings
+and confirmed account eligibility remain missing. See
+`docs/ankh/voice_choices_and_personal_voices.md` (D-061).
+
+### Avatar voice launcher and full-screen call — 2026-09-09
+
+Anham's existing artwork is now the small voice launcher beside dictation and
+attachments. One click opens a full-screen native dialog with the large avatar,
+live state animation, latest transcript and source links. Close/End/Escape stops
+media and restores focus; history persists as before. RU/EN, 390px layout,
+permission failure and retry are browser-verified with synthetic audio only.
+Full suite: 1133/1133 in 132 files; TypeScript, ESLint and diff checks pass.
+No production enablement, schema change or paid call. Local UI increment CLOSED;
+production gates remain unchanged. See docs/ankh/voice_avatar_interface.md (D-060).
+
+### Staff voice internet search — 2026-09-09
+
+Public web search is implemented locally for founder and Karen through a
+server-authenticated Responses web_search tool. The spoken answer and a distinct
+cited excerpt appear in the existing chat. Session-attested excerpts, timestamps
+and clickable citations persist in scoped history, including interrupted turns.
+RU/EN disclosure/search state and history restoration are verified. Policy version
+3 supersedes version 2 for newly started sessions. A second, unapplied migration
+adds assistant_messages.web_results; admission checks it before paid audio starts.
+
+OFF by default (ANHAM_WEB_SEARCH_ENABLED=false). The protected Vercel preview
+does not change migration state, provider flags, data-policy version or
+production PHI boundaries. Search sends only a bounded
+public query; common identifier checks are not a complete free-form PHI detector.
+Full local regression: 1133 tests / 132 files pass; TypeScript, ESLint and diff
+checks pass. Production remains NO-GO pending authorized staging/privacy/audio
+acceptance. See docs/ankh/voice_web_search.md (D-059) for limits and exact next action.
+
+### Realtime Anham voice pilot — 2026-09-09
+
+Local WebRTC voice integration now exists in registered-client and private
+founder/Karen chats. Roles are resolved server-side; microphone/connection/
+listening/speaking/error/end states and transcript labels follow RU/EN locale.
+Recognized speech and streaming reply text appear in the same open chat. The
+existing assistant history stores completed turns and explicitly interrupted
+turns, including recognized user-only utterances, with persona isolation,
+signed session binding, atomic/idempotent writes and visible save failures.
+Staff can load earlier history beyond the first 60 messages. No raw audio is stored.
+
+The owner explicitly expanded the requirement to all site/client business data
+for BOTH founder and Karen. Voice now exposes a reviewed catalog of 46 datasets,
+generic filtered/paginated reads, full field chunks with revision checks, grouped
+counts/decimal sums, and actual localized site/legal/shop/pricing content. It
+covers every current public business table except retired escalation records and
+internal abuse-counter buckets. The catalog/schema regression requires review of
+new tables. Credentials, raw provider/notification/audit payloads, private storage
+links and retired Case/support classification fields are excluded.
+
+Both personas can read both Professor and support correspondence through voice;
+their default inbox and automatically restored conversation remain persona-specific.
+This owner-authorized assistant read policy supersedes D-057's channel restriction;
+existing direct UI access rules remain unchanged. Clients get no site tools.
+Reads recheck current identity/access, signed policy version, kill switch and a
+60-read/session cap; sensitive record releases require a successful minimal audit
+entry. Older session receipts cannot silently acquire the expanded data access.
+No messages are marked read or sent; no file/audio reprocessing is triggered.
+
+The pilot is disabled by default and requires an explicit test-account allowlist.
+No saved history, documents or clinical Case snapshot are automatically sent to
+voice. Requested relevant business/clinical source records may be sent as untrusted
+tool data under the expanded RU/EN disclosure. Real sensitive use still requires
+the approved workflow and PHI gate; no real PHI was used for this implementation.
+Migration `20260909211728_assistant_voice_transcripts.sql` is repository-only;
+no database changes, key creation, paid provider requests or deployment occurred.
+The feature does not close any Ankh clinical/PHI gate.
+
+Implementation and synthetic validation details, required environment settings,
+remaining live acceptance gates and exact next action: `docs/ankh/realtime_voice.md`
+and the latest `docs/ankh/voice_site_data_access.md` (D-058).
+Production voice/PHI release remains NO-GO; isolated synthetic-speech staging
+validation is the next step after separate authorization and configuration.
+
+Final verification: full suite 1,096/1,096 across 131 files; focused voice/site
+regression 118/118. TypeScript, ESLint and diff checks passed. Synthetic browser
+checks cover actual chat + questionnaire tool read + reply persistence in RU/EN,
+RU→EN→RU at the same route and 390px layout without overflow, extending the prior
+live text, interruption and older-history checks.
+No actual microphone/provider or staging DB validation.
+
+### Clinical document foundation
+
+
 Non-medical chat increment (2026-09-09): saved Anham registration welcome and
 72-hour-minimum follow-ups are implemented locally, with atomic service-only
 delivery, sticky opt-outs and RU/EN history projection. Authorized synthetic

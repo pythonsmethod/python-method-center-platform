@@ -8069,3 +8069,67 @@ body.cabinet-menu-open { overflow: hidden; }
   .public-mobile-dock { gap: 4px; }
   .public-mobile-dock a { flex: 1 1 auto; padding-inline: 5px; font-size: clamp(10px, 2.8vw, 12px); }
 }
+
+.assistant-web-result { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid currentColor; overflow-wrap: anywhere; white-space: normal; }
+.assistant-web-result p { white-space: pre-wrap; margin: .5rem 0 0; }
+.assistant-web-result a { text-decoration: underline; text-underline-offset: 3px; }
+
+/* One avatar button in the composer; the native dialog owns the top layer. */
+.assistant-voice-launcher { position: relative; display: inline-flex; flex: 0 0 48px; align-items: center; justify-content: center; width: 48px; height: 48px; padding: 0; overflow: hidden; border: 1px solid #bca365; border-radius: 50%; background: #17150e; cursor: pointer; box-shadow: 0 0 14px #cdaa4830; }
+.assistant-voice-launcher .anham { pointer-events: none; }
+.assistant-voice-launcher:hover { border-color: #f7d991; box-shadow: 0 0 20px #cdaa4860; }
+.assistant-voice-launcher:disabled { opacity: .45; cursor: not-allowed; }
+.assistant-voice-launcher__notice { position: absolute; right: 1px; top: 0; color: white; background: #a84224; border-radius: 50%; width: 18px; height: 18px; font-size: 12px; }
+.assistant-voice-disclosure { font-size: .75rem; line-height: 1.5; color: var(--muted); }
+.assistant-voice-disclosure summary { cursor: pointer; padding: 4px 0; }
+.assistant-voice-disclosure p { margin: 8px 0; }
+.assistant-voice-launcher:focus-visible, .anham-call button:focus-visible, .anham-call__transcript:focus-visible { outline: 3px solid #f5d687; outline-offset: 4px; }
+.anham-call { box-sizing: border-box; position: fixed; inset: 0; width: 100vw; height: 100dvh; max-width: none; max-height: none; margin: 0; padding: 0; border: 0; color: #f9eed5; background: radial-gradient(ellipse at 50% 34%, #443b23 0%, #191a15 42%, #0c1110 85%); overscroll-behavior: contain; }
+.anham-call::backdrop { background: #0c1110e8; }
+.anham-call__layout { box-sizing: border-box; display: flex; flex-direction: column; align-items: center; gap: clamp(12px, 2vh, 24px); min-height: 100%; max-width: 900px; margin: 0 auto; padding: max(24px, env(safe-area-inset-top)) 32px max(24px, env(safe-area-inset-bottom)); }
+.anham-call__header { align-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.anham-call__header small { font-size: .8rem; color: #c9b98f; }
+.anham-call__header h2 { margin: 2px 0 0; font-size: 1.5rem; color: #f5d687; }
+.anham-call__close { border: 1px solid #b9a57260; background: #ffffff08; color: #f9eed5; border-radius: 50%; width: 48px; height: 48px; flex: 0 0 48px; cursor: pointer; font: 30px/1 sans-serif; }
+.anham-call__stage { display: flex; flex-direction: column; align-items: center; margin: auto 0 0; padding-top: 12px; }
+.anham-call__portrait { position: relative; width: clamp(180px, 30vh, 280px); aspect-ratio: 1; border-radius: 50%; box-shadow: 0 0 0 1px #e9cf7b50, 0 0 65px #dfb94324; }
+.anham-call__portrait::before { content: ''; position: absolute; inset: -12px; border: 1px solid #d5b86438; border-radius: 50%; }
+.anham-call__portrait > .anham { width: 100% !important; height: 100% !important; }
+.anham-call__state { margin: 24px 0 12px; min-height: 1.5em; text-align: center; font-size: 1.1rem; }
+.anham-call__waves { height: 24px; display: flex; align-items: center; gap: 5px; }
+.anham-call__waves i { display: block; width: 4px; height: 5px; border-radius: 5px; background: #dfc783; }
+.anham-call [data-state] { color: inherit; }
+.anham-call__layout[data-state="speaking"] .anham-call__portrait::before { animation: anham-call-glow 1.5s ease-in-out infinite; }
+.anham-call__layout[data-state="speaking"] .anham-call__waves i { animation: anham-call-wave .8s ease-in-out infinite alternate; }
+.anham-call__layout[data-state="speaking"] .anham-call__waves i:nth-child(2n) { animation-delay: -.4s; }
+.anham-call__layout[data-state="speaking"] .anham-call__waves i:nth-child(3) { animation-delay: -.2s; }
+.anham-call__layout[data-state="listening"] .anham-call__portrait::before { animation: anham-call-glow 3s ease-in-out infinite; }
+.anham-call__transcript { box-sizing: border-box; width: min(100%, 640px); min-height: 90px; max-height: 24vh; overflow-y: auto; overscroll-behavior: contain; padding: 8px 20px; overflow-wrap: anywhere; font-size: .95rem; line-height: 1.65; scrollbar-width: thin; }
+.anham-call__transcript p { white-space: pre-wrap; margin: 8px 0 16px; }
+.anham-call__transcript small { display: block; font-size: .72rem; color: #c2ad7c; }
+.anham-call__user { color: #d1c8b3; }
+.anham-call__hint { text-align: center; color: #c8c0ae; }
+.anham-call__footer { width: min(100%, 680px); display: flex; flex-direction: column; align-items: center; gap: 12px; margin: auto 0 0; text-align: center; }
+.anham-call__footer p { margin: 0; font-size: .85rem; }
+.anham-call__footer > small { color: #baae94; max-width: 500px; font-size: .7rem; line-height: 1.5; }
+.anham-call__end { display: inline-flex; align-items: center; justify-content: center; gap: 12px; min-height: 52px; border: 1px solid #ba8d5f; border-radius: 999px; padding: 12px 28px; background: #493126; color: #fff1da; cursor: pointer; font: inherit; }
+.anham-call__end:disabled { opacity: .5; cursor: not-allowed; }
+@keyframes anham-call-glow { 50% { transform: scale(1.06); box-shadow: 0 0 35px #dfb94350; border-color: #dfc78390; } }
+@keyframes anham-call-wave { to { height: 23px; } }
+@media (max-width: 480px) { .anham-call__layout { padding-left: 20px; padding-right: 20px; gap: 12px; } .anham-call__portrait { width: clamp(150px, 26vh, 230px); } .anham-call__transcript { padding: 4px; } }
+@media (max-height: 560px) { .anham-call__portrait { width: 110px; } .anham-call__layout { gap: 8px; } .anham-call__state { margin: 12px 0 4px; } }
+@media (prefers-reduced-motion: reduce) { .anham-call *, .assistant-voice-launcher * { animation: none !important; transition: none !important; } }
+
+.anham-call__voice-choice { margin-left: auto; max-width: 45%; padding: 9px 14px; border: 1px solid #b9a57260; border-radius: 24px; background: #ffffff08; color: #efdab0; font: inherit; font-size: .8rem; cursor: pointer; }
+.anham-voices { width: min(100%, 560px); margin: auto 0; color: #efdab0; }
+.anham-voices h3 { margin: 0 0 16px; font-size: 1.2rem; }
+.anham-voices__options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.anham-voices__option { display: flex; gap: 10px; align-items: center; min-height: 54px; padding: 10px 16px; border: 1px solid #b9a57250; border-radius: 14px; cursor: pointer; }
+.anham-voices__option.is-selected { border-color: #efcf80; background: #dfb94320; }
+.anham-voices__option.is-unavailable { opacity: .6; cursor: default; }
+.anham-voices__option input { accent-color: #e4c475; width: 16px; height: 16px; flex: 0 0 auto; }
+.anham-voices__option small { display: block; font-size: .7rem; line-height: 1.4; }
+.anham-voices__preview { padding: 10px 18px; border: 1px solid #b9a57260; border-radius: 24px; background: #263c33; color: #f9eed5; cursor: pointer; font: inherit; font-size: .85rem; margin-top: 16px; }
+.anham-voices p, .anham-voices details { font-size: .78rem; line-height: 1.6; }
+.anham-voices summary { cursor: pointer; }
+@media (max-width: 480px) { .anham-call__header { gap: 8px; } .anham-call__voice-choice { padding: 8px; max-width: 43%; } .anham-voices__option { padding: 8px; } }

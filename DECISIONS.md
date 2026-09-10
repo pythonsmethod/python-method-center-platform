@@ -2,7 +2,7 @@
 
 This file records architectural decisions that must survive chat/thread changes.
 
-Last canonical update: 2026-09-05. New decisions are appended with a new ID; historical decisions are not silently rewritten. If a decision is superseded, record the replacement and reference the prior ID.
+Last canonical update: 2026-09-09. New decisions are appended with a new ID; historical decisions are not silently rewritten. If a decision is superseded, record the replacement and reference the prior ID.
 
 ---
 
@@ -646,6 +646,156 @@ preferred when projection-level duplicate rows are collapsed.
 
 ---
 
+## D-056 — Realtime voice is a scoped conversation channel, not clinical evidence
+
+2026-09-09: reuse `assistant_messages` for completed, fully played voice turns,
+with explicit client/founder/Karen scope, locale, unverified voice source and
+idempotent exchange IDs. Server-verified identity and the existing private role
+allowlists determine the scope; signed receipts bind writes to that session.
+
+Use an authenticated server SDP handshake; no provider credential reaches the
+browser. The initial release is an OFF-by-default non-sensitive test-account
+pilot. Do not transmit saved history, documents, clinical snapshots or knowledge
+memory automatically. No raw audio is retained by the application.
+
+Client-reported transcripts are not provider-attested facts or Karen decisions.
+Browser session controls/prompts are not server-enforced clinical guardrails or
+hard spending limits. Live production/PHI acceptance requires a dedicated review;
+local synthetic tests alone cannot authorize it. See `docs/ankh/realtime_voice.md`.
+
+---
+
+## D-057 — Live readable voice and permission-scoped operational queries
+
+The narrow inbox permission below is superseded by the owner's explicit D-058
+requirement. Transcript/day-boundary/history principles remain in force.
+
+2026-09-09: extend D-056 persistence: show recognized user words immediately and
+assistant transcript deltas in the same chat. Store available interrupted text
+with `voice_state=interrupted`; never label unplayed text as fully spoken. A
+recognized user-only turn is valid history. Failed recognition is not guessed.
+Staff history uses sequence cursors to load older messages beyond the first page.
+
+Offer only named read operations to founder/Karen: exact current client-profile
+counts, incoming messages today, and one incoming message's full text. Resolve
+the existing role on the server on every call. Founder cannot read private
+Professor correspondence, including through the single-message operation; Karen
+defaults to Professor and may explicitly request support. Clients have no tools.
+
+The signed session contains the browser IANA timezone. Day boundaries account
+for DST; returned data states date, channel, source, pagination/truncation and
+query time. Missing data or errors are unknown, never zero. Guest sender counts
+describe a support conversation rather than a verified unique person. Queries
+do not mark messages read, sign audio URLs, send messages or mutate Case state.
+
+Tool bodies/names are untrusted source correspondence, never instructions or
+verified evidence. The start disclosure explains external transmission of
+requested authorized information. No bulk documents/snapshots/history is loaded.
+Server checks receipts, current access, kill switch and shared tool-use limit;
+the browser bounds tool rounds and discards late results after Stop. Local tests
+do not authorize production PHI use or attest model compliance to prompt rules.
+
+---
+
+## D-058 — Both private staff personas can retrieve all catalogued business data
+
+2026-09-09: the owner explicitly requested access to all site/client information
+for both herself and Karen, not only registrations or a restricted inbox. This
+supersedes the assistant-specific founder/Professor restriction in D-057 and is
+an explicit exception to the older default support/medical-substance separation
+for this private assistant read surface. It does not widen guest/client access,
+change direct UI permissions or confer clinical decision/write authority.
+
+Reuse the existing verified founder/Karen identity and service-only data layer.
+One reviewed catalog covers 46 business datasets and lists actual allowed fields,
+keys, dates and evidence cautions. Generic named operations query/count/filter,
+page through records, read complete long fields and compute bounded grouped
+counts/decimal sums. Published page/legal/shop/pricing data comes from the same
+modules the site renders. Optional canonical/trust tables remain unavailable
+when not migrated; a catalog listing never claims they are deployed.
+
+No arbitrary SQL, schema discovery, credentials, private file URLs, raw provider
+payloads, internal abuse-counter buckets or retired classification are exposed.
+No new Case/evidence/role store is created. Source facts, normalized values,
+confidence/provenance, AI drafts and Karen decisions retain their separate fields.
+No auto-verification, diagnosis, recommendation or client response is generated
+as an authoritative clinical act. Reads do not trigger extraction or mutate records.
+
+Every data release requires minimal append-only audit success, recording the
+actor, source, operation and selected record IDs without duplicating body text or
+search values. Existing server receipt/access/kill-switch/session-cap checks apply.
+The expanded disclosure is RU/EN; signed data-access version 2 prevents an older,
+narrower-disclosure session from acquiring broad access without a new start.
+
+The change remains OFF by default and locally validated with synthetic data.
+Real speech, live provider/database acceptance and production PHI authorization
+remain separate gates. See `docs/ankh/voice_site_data_access.md` for the exact
+coverage, tests, limitations and next action.
+
+
+## D-059 — Public internet search during staff voice conversations (2026-09-09)
+
+The owner explicitly requested internet search for voice Anham. Reuse existing
+founder/Karen authorization and the realtime tool endpoint. Delegate only a short
+public-topic query to the Responses web_search tool; do not automatically attach
+site data, conversation history or documents. Reuse the server OpenAI key.
+
+Require actual completed search and inline provider citations. Preserve the
+retrieved excerpt separately from the spoken paraphrase in assistant_messages,
+with clickable source links and retrieval time. Domain-separated HMAC attestation
+binds results to the authenticated session; the browser cannot invent stored
+source payloads. This proves retrieval, not truth or clinical verification.
+The result is untrusted conversation context, never canonical clinical evidence.
+
+Use RU/EN disclosure and data-policy version 3, OFF-default search flag, existing
+pilot restrictions, atomic search-attempt budgets, minimal audit, bounded output
+and cancellation. No search tool for client voice. Common identifier rejection
+is not complete PHI detection; mixed-data privacy validation remains a release
+gate. Existing provider and database production boundaries remain unchanged.
+
+Local implementation is complete; production release is NOT CLOSED. Full report,
+validation evidence, limitations and exact next action: docs/ankh/voice_web_search.md.
+
+
+## D-060 — Anham avatar launches the full-screen voice conversation (2026-09-09)
+
+The owner requested a small Anham image beside microphone and attachment controls,
+opening a large talking Anham above the page. Reuse official artwork and existing
+RealtimeVoice lifecycle; use a native modal dialog in a body portal so nested
+chat panels cannot clip it. Retain scoped transcript/source persistence in the
+original chat. Close/End/Escape must stop media and return focus; opening must not
+start a second session. Browser dictation and live voice remain mutually exclusive.
+
+RU/EN labels, reduced motion, mobile safe areas and explicit save-error recovery
+are required. The existing disclosure moves beneath the composer; server access,
+provider flags, data-policy version and production PHI boundaries do not change.
+Local UI implementation and synthetic verification are complete. Production
+acceptance remains pending. Report: docs/ankh/voice_avatar_interface.md.
+
+
+## D-061 — Five voice choices and consent-linked personal voices (2026-09-09)
+
+Offer five reviewed Realtime choices: Marin, Cedar, Coral, Sage, Verse. Resolve
+voice on the authenticated server from reviewed aliases. Keep persona and access
+independent of vocal timbre. Use an account/persona-derived browser preference
+key and a fixed-phrase, bounded TTS preview that sends no user/Case content.
+Changing voice ends and saves the old session; a new session uses the new voice,
+with previous text retained in chat rather than silently claiming live continuity.
+
+Founder/Karen personal voices require provider eligibility and each owner's
+separate consent and sample recordings. Enable staff-only aliases only after
+matching provider voice/consent references are configured. Raw provider IDs from
+clients are never accepted. Creation is an operator workflow with local dry-run,
+explicit execution/owner-confirmation gates, private atomic checkpoints, exclusive
+per-owner locking and reconciliation of uncertain provider POSTs before retry.
+
+No real personal voices were created in this task; recordings and provider access
+are missing. No account terms were accepted, keys created, paid calls made or
+production enablement performed. A protected Vercel preview was published from
+the validated branch for synthetic/UI testing; personal voice activation
+and production release remain open. Report and exact next action:
+`docs/ankh/voice_choices_and_personal_voices.md`.
+
 ## D-056 — Proactive Anham chat uses fixed templates and atomic delivery
 
 Decision (2026-09-09): registration welcomes and later non-medical check-ins are
@@ -710,6 +860,14 @@ Owner authorized publication of the single-window founder assistant, direct save
 ## 2026-09-09 — Preserve confirmed history and actual timestamps
 
 Include created_at in both rows of every bulk exchange insert. Record question arrival and answer completion separately; use the same prepared rows for retries. Do not turn empty acknowledgements into saved:true or fabricate sequence IDs. Keep existing two-row insert/readback confirmation and visible storage-failure handling. This is a persistence correction, with no new schema or permission.
+
+## D-062 — Built-in staff voices first (2026-09-09)
+
+Owner deferred personal voices. Enforce ANHAM_VOICE_BUILTINS_ONLY and restrict initial rollout to verified founder/Karen accounts. Reuse current private history tiers/timestamps and shared safety instructions. Personal recordings are not required. Production migration approval and live acceptance remain explicit launch gates. See docs/ankh/builtin_voice_launch_2026_09_09.md.
+
+## D-063 — Same text authority for staff voice (2026-09-09)
+
+Voice delegates actual recognized user commands to the existing authenticated staff text handler. Model arguments cannot define a write. Actor/Case are session-bound; private history is server-loaded. One execution per signed session/turn prevents duplicate saves. Founder internal notes and Karen confirmation retain text behavior. Receipt policy v4. No new production schema authorization is inferred from the parity request. See docs/ankh/voice_text_permissions.md.
 
 ## D-057 — One prose style, normalization only at presentation boundaries
 

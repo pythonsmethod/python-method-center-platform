@@ -527,6 +527,7 @@ export default async function StaffCaseDetailPage({
             attachments
             caseId={clientCase.id}
             endpoint="/api/assistant/staff"
+            locale={locale}
             intro="Я вижу данные этого кейса: анкету, статусы, список документов, оплаты и историю. Спросите — сделаю выжимку, черновик ответа клиенту или предложу следующие шаги. Фото и PDF можно приложить скрепкой — до 30 штук за раз, прочитаю все. Решения — за Professor Python."
             placeholder="Например: сделай выжимку кейса…"
             providerChoice={showProviders}

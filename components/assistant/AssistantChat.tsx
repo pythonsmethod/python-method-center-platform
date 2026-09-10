@@ -3,6 +3,10 @@
 import { Fragment, useEffect, useRef, useState } from "react";
 import { AssistantOutreachPreference } from "@/components/assistant/AssistantOutreachPreference";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
+import { RealtimeVoice } from "./RealtimeVoice";
+import { VoiceWebResults } from "./VoiceWebResults";
+import { voiceCopy } from "@/lib/assistant/realtime-contract";
+import { mergeVoiceTranscript, type VoiceChatMessage } from "@/lib/assistant/voice-chat";
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
 import { memoryCollectionFromCommand, type MemoryCollection } from "@/lib/assistant/memory";
@@ -15,7 +19,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
 import { formatDateTime } from "@/lib/i18n/format";
 
-type ChatMessage = {
+type ChatMessage = VoiceChatMessage & {
   role: "user" | "assistant";
   content: string;
   id?: string;
@@ -33,6 +37,7 @@ type AssistantChatProps = {
   // team and for paying clients; never for the public widget.
   attachments?: boolean;
   caseId?: string;
+  voiceScope?: "client" | "staff";
   locale?: Locale;
   // Where to read the previous conversation from. Passed only for people
   // with an account — for everyone else the thread starts empty every time,
@@ -94,6 +99,7 @@ function AssistantChatSession({
   providerChoice = false,
   attachments: allowAttachments = false,
   caseId,
+  voiceScope,
   locale = "ru",
   historyEndpoint,
   initialQuestion = null,
@@ -104,6 +110,7 @@ function AssistantChatSession({
   replyUsedLabel,
   requestContext
 }: AssistantChatProps) {
+  voiceScope ??= endpoint === "/api/assistant/staff" ? "staff" : undefined;
   historyEndpoint ??= endpoint === "/api/assistant/staff"
     ? `/api/assistant/history?scope=private${caseId ? `&caseId=${encodeURIComponent(caseId)}` : ""}`
     : undefined;
@@ -113,6 +120,7 @@ function AssistantChatSession({
   const [messages, setMessages] = useState<ChatMessage[]>([]);
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
+  const [voiceActive, setVoiceActive] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [historyLoading, setHistoryLoading] = useState(Boolean(historyEndpoint));
   const [historyError, setHistoryError] = useState(false);
@@ -226,7 +234,7 @@ function AssistantChatSession({
   }, [historyEndpoint, historyRetry]);
 
   async function loadEarlier() {
-    if (!historyEndpoint || historyLoading) return;
+    if (!historyEndpoint || historyLoading || voiceActive) return;
     const before = messages[0]?.message_sequence;
     if (!before) return;
     setHistoryLoading(true);
@@ -348,7 +356,7 @@ function AssistantChatSession({
   const sentQuestion = useRef<string | null>(null);
 
   useEffect(() => {
-    if (!initialQuestion || pending || historyLoading || historyError || sentQuestion.current === initialQuestion) {
+    if (!initialQuestion || pending || voiceActive || historyLoading || historyError || sentQuestion.current === initialQuestion) {
       return;
     }
 
@@ -358,13 +366,13 @@ function AssistantChatSession({
     // `send` intentionally stays out of the dependencies: this effect owns
     // one initial hand-off, and sentQuestion prevents duplicate paid calls.
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialQuestion, pending, historyLoading, historyError, onInitialQuestionSent]);
+  }, [initialQuestion, pending, voiceActive, historyLoading, historyError, onInitialQuestionSent]);
 
   async function send(text: string, baseMessages: ChatMessage[] = messages) {
     const trimmed = text.trim();
     const attached = files;
 
-    if ((!trimmed && attached.length === 0) || pending || historyLoading || historyError) {
+    if ((!trimmed && attached.length === 0) || pending || voiceActive || historyLoading || historyError) {
       return;
     }
 
@@ -520,7 +528,7 @@ function AssistantChatSession({
       <div className="assistant-chat__messages" ref={scrollRef}>
         <div className="assistant-msg assistant-msg--assistant">{intro}</div>
         {historyLoading ? <p role="status">{locale === "ru" ? "Загружаю переписку…" : "Loading conversation…"}</p> : null}
-        {hasMore ? <button type="button" disabled={historyLoading || pending} onClick={() => void loadEarlier()}>{locale === "ru" ? "Загрузить более ранние сообщения" : "Load earlier messages"}</button> : null}
+        {hasMore ? <button type="button" disabled={historyLoading || pending || voiceActive} onClick={() => void loadEarlier()}>{locale === "ru" ? "Загрузить более ранние сообщения" : "Load earlier messages"}</button> : null}
         {restored > 0 ? (
           <p className="assistant-chat__divider">{c.history}</p>
         ) : null}
@@ -532,7 +540,10 @@ function AssistantChatSession({
             <div className={`assistant-msg assistant-msg--${message.role}`}>
               {message.created_at ? <time className="assistant-log__meta" dateTime={message.created_at}>{formatDateTime(message.created_at, locale)}</time> : null}
               {message.content}
-              {message.role === "assistant" && onUseReply ? (
+              {message.source === "voice_transcript" ? <small className="assistant-log__meta">{locale === "ru" ? "Голос · непроверенная расшифровка" : "Voice · unverified transcript"}</small> : null}
+              {message.voice_state === "interrupted" ? <small className="assistant-log__meta">{locale === "ru" ? "Прервано · текст ответа мог прозвучать не полностью" : "Interrupted · reply text may not have been fully spoken"}</small> : null}
+              {message.role === "assistant" ? <VoiceWebResults results={message.web_results} locale={locale} /> : null}
+              {message.role === "assistant" && !message.voiceLive && onUseReply ? (
                 <button
                   className="assistant-msg__use-reply"
                   onClick={() => {
@@ -620,6 +631,7 @@ function AssistantChatSession({
         }}
       >
         <textarea
+          disabled={voiceActive}
           maxLength={4000}
           onChange={(event) => setInput(event.target.value)}
           onKeyDown={(event) => {
@@ -675,6 +687,7 @@ function AssistantChatSession({
               />
               <button
                 aria-label={c.attach}
+                disabled={voiceActive}
                 className="assistant-chat__mic"
                 onClick={() => fileInputRef.current?.click()}
                 title={c.attachTitle}
@@ -687,6 +700,7 @@ function AssistantChatSession({
           {voice.supported ? (
             <button
               aria-label={voice.listening ? t.micStop : t.micStart}
+              disabled={voiceActive || pending}
               className={`assistant-chat__mic${voice.listening ? " assistant-chat__mic--on" : ""}`}
               onClick={voice.toggle}
               type="button"
@@ -694,15 +708,25 @@ function AssistantChatSession({
               🎤
             </button>
           ) : null}
+          {voiceScope ? <RealtimeVoice key={locale + ":" + voiceScope + ":" + (caseId ?? "own")}
+            locale={locale} scope={voiceScope} caseId={caseId}
+            disabled={pending || historyLoading || historyError || voice.listening || files.length > 0 || Boolean(progress)}
+            onActive={setVoiceActive}
+            onTranscript={(text, sessionId) => {
+              setMessages(current => mergeVoiceTranscript(current, text, sessionId));
+              if (memoryCapture && !text.live && text.assistant) { setMemoryState("offer"); setMemoryMessage(null); }
+            }}
+          /> : null}
           <button
             className="button"
-            disabled={pending || historyLoading || historyError || (!input.trim() && files.length === 0)}
+            disabled={pending || voiceActive || historyLoading || historyError || (!input.trim() && files.length === 0)}
             type="submit"
           >
             {t.send}
           </button>
         </div>
       </form>
+      {voiceScope ? <details className="assistant-voice-disclosure"><summary>{voiceCopy[locale].voiceDetails}</summary><p>{voiceScope === "staff" ? voiceCopy[locale].staffDisclosure : voiceCopy[locale].disclosure}</p></details> : null}
     </div>
   );
 }

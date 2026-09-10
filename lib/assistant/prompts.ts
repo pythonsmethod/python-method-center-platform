@@ -13,7 +13,7 @@ import { CHAT_CAPABILITIES, FACTUAL_HONESTY_RULE } from "@/lib/assistant/factual
 // AI helps make decisions. Karen makes decisions. The client decides
 // whether to follow recommendations.
 
-const platformContext = () => `${FACTUAL_HONESTY_RULE}${CHAT_CAPABILITIES}
+export const platformContext = () => `${FACTUAL_HONESTY_RULE}${CHAT_CAPABILITIES}
 ## О центре
 Python Method Center (pythonmethodcenter.com) — цифровой реабилитационный центр «Реабилитация без границ». Основатель и ведущий эксперт — Professor Python, операционный координатор и поддержка — Анна.
 
