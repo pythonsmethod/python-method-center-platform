@@ -359,3 +359,7 @@ Owner-authorized isolated production publication in progress. Scope: private and
 ## 2026-09-09 — Anna integrated memory and whole-archive retrieval
 
 Owner authorized publication of the single-window founder assistant, direct save commands, and search across the complete knowledge archive. Existing assistant_knowledge remains canonical; internal notes use staff/general and authenticated created_by. Every founder question searches all active staff/both entries in pages of 200, ranks lexical matches, and adds up to 12 source-labeled notes within 24,000 characters. Latest 40 notes remain the default context. Archive failures are explicit in the answer instructions. No schema changes, PHI test data, clinical verification or client publication. Release isolated from production commit d9e001f. See docs/architecture/ANNA_DIALOGUE_MEMORY.md.
+
+## 2026-09-09 — Complete assistant history acceptance
+
+Fix the confirmed bulk-insert timestamp failure, retain strict storage acknowledgement, and publish the isolated change from main. Local regression passes 1092/1092. Close after production reload and RU↔EN checks confirm the dated conversation. No Ankh phase advancement or clinical processing enablement.

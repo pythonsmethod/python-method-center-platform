@@ -22,6 +22,18 @@ describe("assistant durable history", () => {
     await saveAssistantExchange({ ...input, answer: "x".repeat(16000) });
     expect(f.insert.mock.calls[0][0][1].content).toHaveLength(16000);
   });
+  it("does not claim success when an empty response cannot be confirmed by reading back", async () => {
+    f.insert.mockReturnValue({ select: () => Promise.resolve({ data: null, error: null }) });
+    f.query.mockReturnValue({ data: [], error: null });
+    const result = await saveAssistantExchange({ ...input, questionCreatedAt: "2026-09-09T17:20:00.000Z" });
+    expect(result).toEqual({ saved: false });
+    expect(f.insert).toHaveBeenCalledTimes(3);
+  });
+  it("confirms an empty response through the actual stored messages", async () => {
+    f.insert.mockReturnValue({ select: () => Promise.resolve({ data: null, error: null }) });
+    expect(await saveAssistantExchange(input)).toEqual({ saved: true, messages: stored });
+    expect(f.insert).toHaveBeenCalledTimes(1);
+  });
   it("does not store guests", async () => { expect(await saveAssistantExchange({ ...input, tier: "guest" })).toEqual({ saved: false }); expect(f.insert).not.toHaveBeenCalled(); });
   it("reports a missing database instead of an empty history", async () => { f.db.mockReturnValue(null); expect(await saveAssistantExchange(input)).toEqual({ saved: false }); expect((await getOwnAssistantHistory("owner", "ru")).status).toBe("error"); });
   it("retries identical IDs after a transient failure", async () => {
