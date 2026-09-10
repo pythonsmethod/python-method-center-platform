@@ -16,6 +16,11 @@ This checkpoint supersedes earlier no-deploy notes for this scoped release only.
 
 ## North Star
 
+Assistant-only delegation: confirmed owner-approved accounts use /assistant
+without a platform role promotion. Delegate history remains private; suspended,
+closed, anonymous and unlisted accounts are denied. Release verification follows
+in docs/ankh/assistant_delegate_access.md.
+
 Latest voice rollout: owner approved the two production history migrations;
 applied and verified with RLS intact. PR #159 is merged, production is READY,
 staff-only built-in voices and web search enabled. Founder browser checks pass

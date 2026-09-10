@@ -144,6 +144,15 @@ OPEN, production auto-verification and Phase 3 production remain NO-GO.
 
 ## 1. Current position
 
+### Owner-approved assistant delegate — 2026-09-09
+
+Owner confirmed Elena's existing account and explicitly granted assistant access
+equivalent to the founder assistant. A separate server-managed delegate allowlist
+enables /assistant, private text/history and staff voice for that account while
+retaining its client profile role. Admin routes and founder privileges remain
+unchanged. History is scoped to the delegate's own profile. See
+`docs/ankh/assistant_delegate_access.md` for checks and publication status.
+
 ### Authorized voice production rollout — 2026-09-09 (latest)
 
 Owner explicitly approved the two production voice-history migrations and enabling

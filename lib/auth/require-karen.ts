@@ -1,5 +1,6 @@
 import { getStaffUserState, type StaffUserState } from "@/lib/auth/require-staff";
 import { isFounderEmail } from "@/lib/auth/require-founder";
+import { isAssistantDelegate } from "./assistant-delegates";
 
 export type PrivateAssistantRole = "founder" | "karen";
 
@@ -24,6 +25,7 @@ export function resolvePrivateAssistantRole(
   email: string | null | undefined
 ): PrivateAssistantRole | null {
   if (isFounderEmail(email)) return "founder";
+  if (isAssistantDelegate(email)) return "founder";
   if (isKarenAssistantEmail(email)) return "karen";
   return null;
 }

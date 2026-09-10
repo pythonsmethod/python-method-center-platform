@@ -11,7 +11,8 @@ import { staffAssistantView } from "@/lib/assistant/staff-provider";
 import { buildCaseContext } from "@/lib/assistant/case-context";
 import { ATTACHMENT_READING_ACCURACY_RULE, buildStaffSystemPrompt } from "@/lib/assistant/prompts";
 import { canSeeProviderNames } from "@/lib/auth/require-founder";
-import { getStaffUserState } from "@/lib/auth/require-staff";
+import { getPrivateAssistantUserState as getStaffUserState } from "@/lib/auth/require-private-assistant";
+import { isAssistantDelegate } from "@/lib/auth/assistant-delegates";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { isUuid } from "@/lib/utils/uuid";
 import { guardFactualReply } from "@/lib/assistant/factual-honesty";
@@ -95,6 +96,7 @@ export async function POST(request: Request) {
   }
 
   const memory = assistantRole === "founder" ? founderMemoryFromCommand(messages, english) : null;
+  if (memory && isAssistantDelegate(auth.email)) memory.title = `${english ? "Assistant note" : "Заметка помощника"}: ${memory.content.split(/\r?\n/)[0]}`.slice(0, 200);
   if (memory) {
     if (attachments || !memory.content || memory.content.length > 8000) {
       return respondWithReply(english
@@ -127,6 +129,7 @@ export async function POST(request: Request) {
   );
 
   let system = await buildStaffSystemPrompt(assistantRole);
+  if (isAssistantDelegate(auth.email)) system += "\nThis account is an owner-authorized assistant delegate, not Anna or Karen. Use neutral address without calling the person Anna, Karen or founder. The assistant command permissions are the founder assistant's; this does not grant platform administrator authority.";
   const rawLocale = (body as { locale?: unknown })?.locale;
   const responseLocale = rawLocale === "en" || rawLocale === "ru" ? rawLocale : locale;
   system += responseLocale === "en"
