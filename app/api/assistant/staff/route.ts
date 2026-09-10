@@ -1,3 +1,4 @@
+import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
 import { sanitizeAttachments } from "@/lib/assistant/attachments";
 import { askClaude, hasClaudeEnv, sanitizeChatMessages } from "@/lib/assistant/claude";
@@ -118,5 +119,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: result.message }, { status: 502 });
   }
 
+  if (result.refusal) result.reply = providerPolicyRefusal((body as { locale?: unknown })?.locale === "en" ? "en" : "ru").reply;
   return NextResponse.json({ reply: result.reply });
 }

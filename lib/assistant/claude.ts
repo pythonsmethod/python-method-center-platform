@@ -1,4 +1,5 @@
 import Anthropic from "@anthropic-ai/sdk";
+import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import {
   isImageType,
   isTextType,
@@ -80,7 +81,7 @@ export type AssistantErrorCode =
   | "emptyReply";
 
 export type AssistantResult =
-  | { status: "ok"; reply: string }
+  | { status: "ok"; reply: string; refusal?: "provider_policy" }
   | { status: "unavailable" }
   | { status: "error"; message: string; code?: AssistantErrorCode };
 
@@ -236,11 +237,7 @@ export async function askClaude(
     });
 
     if (response.stop_reason === "refusal") {
-      return {
-        status: "ok",
-        reply:
-          "Я не могу помочь с этим вопросом. Пожалуйста, напишите команде через страницу «Поддержка» — живой человек ответит вам."
-      };
+      return providerPolicyRefusal();
     }
 
     let reply = response.content
@@ -272,6 +269,7 @@ export async function askClaude(
             { role: "user", content: CONTINUE_INSTRUCTION }
           ]
         });
+        if (continuation.stop_reason === "refusal") return providerPolicyRefusal();
         const ending = continuation.content
           .filter((block) => block.type === "text")
           .map((block) => block.text)
