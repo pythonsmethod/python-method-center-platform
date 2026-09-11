@@ -50,3 +50,44 @@ Final local checks: 1277/1277 tests in 149/149 files, TypeScript and ESLint
 all passed. Synthetic benchmark: 3 documents / 4 pages, four metrics 100%,
 critical extraction errors / false VERIFIED / security issues 0. Benchmark
 timestamp artifacts are excluded. No extraction/trust logic changed.
+
+## Published acceptance — 2026-09-10
+
+This section closes the release validation the J–L gate left pending; the
+earlier gate wording above is historical.
+
+Publication is confirmed from the repository and the hosting provider, not from
+memory. PR #158 published the prose normalizer and PR #160 this Unicode
+correction. Merge commit `ae210e9` is an ancestor of `origin/main`. Vercel
+production deployment `dpl_44jRTzEbgABPovMjcgK5TrXSvuwP` built exactly that
+commit, reached READY, and is aliased to `pythonmethodcenter.com` and
+`www.pythonmethodcenter.com`. Both signs and the Unicode-space handling have
+since been carried forward unchanged through later production releases.
+
+Owner-authorized acceptance used the already signed-in synthetic test account on
+the published cabinet surface. Verified there: the RU answer, the EN answer,
+RU → EN → RU switching, retained history after a full reload, and `-`, `+`,
+decimal values and units keeping their signs. No-break space, narrow no-break
+space and thin space were each exercised before the number. Only synthetic
+messages were sent. No real client record was opened, no payment was made and no
+account setting was changed.
+
+Runtime errors were queried for `/api/assistant/client` and
+`/api/assistant/history` on the production project; none were found.
+
+### What this acceptance does not establish
+
+The historical raw provider response was not retained, was not recovered and was
+not reconstructed. Nothing here restores it. The defect is reproduced only from
+the controlled synthetic fixture described in section B, so attribution of the
+earlier live omission to this mechanism remains unproven. The separate
+mobile-project Vercel build failure predates this work, concerns a different
+project configuration, and is not caused by or attributed to this correction.
+
+No clinical, PHI or auto-verification gate was opened or closed by this release.
+Phase 2.9 stays open; production auto-verification and Phase 3 production remain
+NO-GO. This remains a general Unicode-whitespace correction, not a rule for one
+target value, and it is not a universal numeric-fidelity claim.
+
+Scoped numeric-sign release: CLOSED. No schema, migration, role, payment or
+authorization change was made at any point in this work.

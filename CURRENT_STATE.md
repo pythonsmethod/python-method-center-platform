@@ -872,3 +872,32 @@ production migration is applied with RLS, no `anon`/`authenticated` grants, and
 server-role-only access. Focused regression: 160/160; full suite: 1649/1649;
 production build, TypeScript, ESLint and diff check pass. See
 docs/ankh/client_confirmed_voice_actions.md.
+
+## 2026-09-10 — Published numeric sign acceptance
+
+The Anham prose normalizer no longer drops mathematical signs before numbers.
+PR #158 published the normalizer and PR #160 the Unicode-whitespace correction.
+Merge commit ae210e9 is an ancestor of origin/main; Vercel production deployment
+dpl_44jRTzEbgABPovMjcgK5TrXSvuwP built that commit, reached READY and served
+pythonmethodcenter.com and www.pythonmethodcenter.com. Later production releases
+carry the same behavior. Authorized acceptance in the existing signed-in
+synthetic test account covered the RU reply, the EN reply, RU → EN → RU, history
+after a full reload, and `-`, `+`, decimals and units, including after no-break,
+narrow no-break and thin spaces. Only synthetic messages were sent; no client
+data, payment or account setting was touched. Production runtime errors were
+queried for `/api/assistant/client` and `/api/assistant/history`; none found.
+Validation: 1277/1277 tests in 149/149 files, TypeScript, ESLint and diff check
+pass; synthetic benchmark 3 documents / 4 pages with all four metrics at 100%
+and zero critical extraction errors, false VERIFIED criticals and security
+issues. Extraction and trust logic were not changed.
+
+The fix is general Unicode-whitespace handling, not a rule for one value. The
+historical raw provider response was not retained and has not been recovered or
+reconstructed; the defect is reproduced only from a controlled synthetic
+fixture, so the link to the original live omission stays unproven. The separate
+mobile-project Vercel build failure predates this work and is not attributed to
+it. No migration, schema, role, payment or authorization change. No clinical,
+PHI or auto-verification gate was closed: Phase 2.9 remains open and production
+auto-verification and Phase 3 production remain NO-GO. Scoped release CLOSED /
+GO. Evidence: docs/ankh/anham_response_style_release.md and
+docs/ankh/anham_unicode_numeric_signs.md.
