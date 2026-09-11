@@ -52,6 +52,14 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  it.each(["dubrovenkoanna@gmail.com", "karen@example.test", "client@example.test", "founder@example.test"])("returns cost visibility using authenticated identity only: %s", async email => {
+    vi.stubEnv("GPT_LIVE_ENABLED", "true"); vi.stubEnv("GPT_LIVE_OPENAI_API_KEY", "synthetic-live-key");
+    vi.stubEnv("GPT_LIVE_PILOT_EMAILS", email);
+    mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email } }, error: null });
+    const response = await voiceList(new Request("https://test.local/api/assistant/realtime/voices?scope=client&showLiveCosts=true&email=dubrovenkoanna%40gmail.com"));
+    expect(response.status).toBe(200);
+    expect((await response.json()).showLiveCosts).toBe(email === "dubrovenkoanna@gmail.com");
+  });
   describe("GPT-Live pilot route", () => {
     beforeEach(() => {
       vi.stubEnv("GPT_LIVE_ENABLED", "true"); vi.stubEnv("GPT_LIVE_OPENAI_API_KEY", "synthetic-live-key");

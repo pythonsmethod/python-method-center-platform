@@ -11,8 +11,8 @@ class Socket extends EventEmitter { readyState = 1; send = vi.fn(); close = vi.f
 let socket: Socket;
 const actor = { profileId: "00000000-0000-4000-8000-000000000001", email: "synthetic@example.test", scope: "founder" as const, caseId: null, tier: "registered" as const };
 const event = (data: object) => socket.emit("message", Buffer.from(JSON.stringify(data)));
-async function begin() {
-  const response = await openLiveSession({ actor, request: new Request("https://test.local/api/assistant/live"), locale: "en", sdp: "v=0", voice: "marin", timeZone: "UTC" });
+async function begin(sessionActor = actor) {
+  const response = await openLiveSession({ actor: sessionActor, request: new Request("https://test.local/api/assistant/live"), locale: "en", sdp: "v=0", voice: "marin", timeZone: "UTC" });
   const text = response.text(); socket.emit("open"); event({ type: "session.started" }); return { text };
 }
 function end() { event({ type: "session.closed", reason: "close_requested", usage: { seconds: 20 } }); }
@@ -26,6 +26,16 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 describe("Live server session", () => {
+  it.each(["dubrovenkoanna@gmail.com", "karen@example.test", "client@example.test", "other-founder@example.test"])("restricts streamed costs to Anna: %s", async email => {
+    vi.stubEnv("GPT_LIVE_PILOT_EMAILS", email);
+    const { text } = await begin({ ...actor, email });
+    end(); const output = await text;
+    const allowed = email === "dubrovenkoanna@gmail.com";
+    expect(output.includes('"usdPerSecond"')).toBe(allowed);
+    expect(output.includes('"estimatedUsd"')).toBe(allowed);
+    expect(output).toContain('"seconds":20');
+    expect(m.audit.mock.calls.some(c => typeof c[0].metadata.estimatedUsd === "number")).toBe(true);
+  });
   it("loads bounded shared history and saves trusted transcript fragments idempotently", async () => {
     const { text } = await begin();
     const fragment = { type: "session.input_transcript.delta", event_id: "evt_1", delta: "Synthetic", start_ms: 0, end_ms: 100 };

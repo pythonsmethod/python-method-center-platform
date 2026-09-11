@@ -5,6 +5,11 @@ import { getStaffUserState, type StaffUserState } from "@/lib/auth/require-staff
 // supplied through FOUNDER_EMAILS.
 export const PRIMARY_FOUNDER_EMAIL = "dubrovenkoanna@gmail.com";
 
+// Use only the server-verified email. Additional founders do not see pilot spend.
+export function canSeeVoicePilotCosts(email: string | null | undefined): boolean {
+  return email?.toLowerCase() === PRIMARY_FOUNDER_EMAIL;
+}
+
 export function founderAllowlist(): string[] {
   return [PRIMARY_FOUNDER_EMAIL, ...(process.env.FOUNDER_EMAILS ?? "").split(",")]
     .map((value) => value.trim().toLowerCase())

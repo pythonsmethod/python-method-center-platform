@@ -7,6 +7,7 @@ import { VoiceWebResults } from "./VoiceWebResults";
 import { VoicePicker, useVoiceChoice } from "./VoicePicker";
 import { voiceSelectionCopy } from "@/lib/assistant/voice-options";
 import { RealtimeBrowser } from "@/lib/assistant/realtime-browser";
+import { LiveUsage } from "./LiveUsage";
 import { LiveBrowser } from "@/lib/assistant/live-browser";
 import { voiceCopy, voiceErrorMessage, type VoiceState } from "@/lib/assistant/realtime-contract";
 import type { VoiceExchange, VoiceTranscript } from "@/lib/assistant/realtime-turns";
@@ -156,8 +157,8 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
         </div></>}
         <footer className="anham-call__footer">
           {choice.live ? <>
-            <small>{locale === "ru" ? "При запуске звук и необходимый контекст передаются OpenAI. Расшифровка сохраняется в вашей истории ANHAM. Пауза завершает платное соединение." : "Starting sends audio and necessary context to OpenAI. Transcripts are saved in your ANHAM history. Pause ends the paid connection."}</small>
-            <p>{locale === "ru" ? "Голосовой пилот" : "Voice pilot"}: {Math.floor(usage.seconds / 60)}:{String(Math.floor(usage.seconds % 60)).padStart(2, "0")} · ${usage.usd.toFixed(3)} {locale === "ru" ? "за голос; фоновые задачи отдельно" : "voice estimate; backend billed separately"}{!usage.finalized ? "*" : ""}</p>
+            <small>{locale === "ru" ? "При запуске звук и необходимый контекст передаются OpenAI. Расшифровка сохраняется в вашей истории ANHAM. Пауза завершает голосовое соединение." : "Starting sends audio and necessary context to OpenAI. Transcripts are saved in your ANHAM history. Pause ends the voice connection."}</small>
+            <LiveUsage locale={locale} showCosts={choice.showLiveCosts} {...usage} />
             {active ? <div>
               <button type="button" onClick={() => { if (controller.current instanceof LiveBrowser) { controller.current.mute(); setMuted(!muted); } }}>{muted ? (locale === "ru" ? "Включить микрофон" : "Unmute microphone") : (locale === "ru" ? "Выключить микрофон" : "Mute microphone")}</button>
               <button type="button" onClick={() => { if (controller.current instanceof LiveBrowser) controller.current.pause(); }}>{locale === "ru" ? "Пауза" : "Pause"}</button>

@@ -1131,3 +1131,13 @@ receipt is the only basis for claiming completion. Do not extend this authority 
 payments, access, source documents, extracted facts, Case state, clinical decisions,
 deletions, other clients or staff/admin tools. See
 docs/ankh/client_confirmed_voice_actions.md.
+
+## 2026-09-11 — Anna-only voice pilot costs
+
+Voice pilot price and billing copy are private to the primary founder Anna.
+The voices endpoint derives visibility from the authenticated email using the
+existing primary-founder identity; query/body claims and additional founder
+accounts cannot grant it. Live SSE omits monetary fields for everyone else;
+server audit retains accounting. RU/EN voice UI keeps duration and privacy
+disclosure for all users. No schema, clinical, memory or audio-flow changes.
+Validation and release status: docs/ankh/live_cost_visibility.md.

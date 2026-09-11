@@ -145,7 +145,7 @@ export class LiveBrowser {
           if (event.type === "backend_result" && event.memoryPending) {
             this.options.onTranscript({ turnId: `memory_${event.taskId}`, user: "", assistant: event.reply, live: false });
           }
-          if (event.type === "usage") { this.seconds = event.seconds; this.usd = event.estimatedUsd; this.options.onUsage(this.previousSeconds + this.seconds, this.previousUsd + this.usd, false); }
+          if (event.type === "usage") { this.seconds = event.seconds; this.usd = typeof event.estimatedUsd === "number" ? event.estimatedUsd : 0; this.options.onUsage(this.previousSeconds + this.seconds, this.previousUsd + this.usd, false); }
           if (event.type === "error") { this.options.onError(event.code); }
           if (event.type === "ended") {
             this.seconds = event.seconds;

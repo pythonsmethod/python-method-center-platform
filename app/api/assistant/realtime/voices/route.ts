@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { canSeeVoicePilotCosts } from "@/lib/auth/require-founder";
 import { liveConfig, isLivePilot } from "@/lib/assistant/live-config";
 import { isBuiltinVoice } from "@/lib/assistant/voice-options";
 import { availableVoices } from "@/lib/assistant/voice-options-server";
@@ -16,6 +17,6 @@ export async function GET(request: Request) {
       selection.voices = selection.voices.filter(v => isBuiltinVoice(v.id));
       selection.defaultVoice = liveConfig(actor).voice;
     }
-    return NextResponse.json({ ...selection, live }, { headers: { "Cache-Control": "no-store" } });
+    return NextResponse.json({ ...selection, live, showLiveCosts: live && canSeeVoicePilotCosts(actor.email) }, { headers: { "Cache-Control": "no-store" } });
   } catch (error) { return voiceFailure(error, locale); }
 }
