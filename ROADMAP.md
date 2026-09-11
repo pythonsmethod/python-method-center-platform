@@ -585,3 +585,22 @@ preview. The isolated confirmation-ledger migration is applied. Publish the webs
 code, then accept with a synthetic supplement schedule and Professor message;
 do not broaden to payment, documents, Case state or clinical decisions. See
 docs/ankh/client_confirmed_voice_actions.md.
+
+## 2026-09-10 — Published numeric sign acceptance
+The mathematical-sign loss before numbers is fixed, published and accepted.
+PR #158 and PR #160 are merged; merge commit ae210e9 is an ancestor of
+origin/main and production deployment dpl_44jRTzEbgABPovMjcgK5TrXSvuwP was READY
+on pythonmethodcenter.com and www.pythonmethodcenter.com. Synthetic test-account
+acceptance covered RU, EN, RU → EN → RU, reload and signs, decimals and units
+after no-break, narrow no-break and thin spaces; no runtime errors were found for
+the client and history assistant routes. This closes the scoped prose and
+numeric-sign release only. The fix stays general Unicode-whitespace handling,
+never a rule for a single value. No raw provider response was recovered, the
+defect is reproduced only synthetically, and the link to the original live
+omission is unproven. The separate mobile-project build failure is unrelated and
+not attributed here. No schema, migration, role, payment or authorization change,
+and no clinical, PHI or auto-verification gate closed: Phase 2.9 stays open and
+Phase 3 production and production auto-verification remain NO-GO. Next work on
+this line is ordinary regression coverage only, not a new sign rule. See
+docs/ankh/anham_response_style_release.md and
+docs/ankh/anham_unicode_numeric_signs.md.
