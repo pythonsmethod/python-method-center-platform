@@ -1,5 +1,40 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-064 — Knowledge gaps are recorded as enumerated codes, never as questions (2026-09-11)
+
+Record the moment Anham's honesty guard replaces an answer, and record nothing
+else about it.
+
+- Signal, not content. A gap event stores `topic`, `audience`,
+  `escalation_target` and `locale` from closed lists, plus a timestamp. The
+  question is read in exactly one place to choose the topic and is then
+  discarded. No question text, no medical value, no profile, case, email or IP.
+  A row cannot be traced to a person even by someone holding the whole table.
+- Guard-only trigger. Only an exact match against the honesty guard's own
+  substituted sentences counts; a model that merely sounds unsure is not a gap.
+  `clarify` is excluded because asking which figure someone means is
+  conversation, not missing knowledge.
+- Append-only audit. Events are service-role INSERT/SELECT only. Because this
+  project's default privileges grant ALL on new public tables, a migration
+  must revoke from service_role before granting, and a test now asserts that
+  order. Read marks are per founder and unique per (event, founder).
+- Answers live in the knowledge base. Each new topic opens one inactive,
+  staff-only draft there; nothing reaches a prompt until a human writes the
+  answer and switches it on.
+- Internal only. No Telegram, email or other external notification; the
+  founder reads the centre in the workspace. The assistant's site-data tools
+  deliberately cannot read this table.
+
+## D-065 — Retired classification is withheld from the Case detail, not deleted (2026-09-11)
+
+Client cases have no processing status, urgency or direction. On the staff Case
+detail: remove the panel and the form, make the old server action a closed
+door that reads and writes nothing, and keep every archived `status_changed`
+row exactly as written while withholding it from the timeline and from the
+assistant snapshot. A withdrawn model is history, not a present fact about a
+person's case. The columns and constants remain for archived data and other
+surfaces; removing them is a separate migration task.
+
 ## 2026-09-11 — Own-profile payment projection for the client assistant
 
 Let the signed-in client's Anham answer payment and support-period questions

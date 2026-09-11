@@ -140,6 +140,49 @@ in either direction.
 - `tests/assistant-gap-access.test.ts` — founder-only endpoint and the
   migration's RLS, grant, uniqueness and additive-only guarantees.
 
+## Production release — 2026-09-11
+
+- Branch `claude/affectionate-goodall-rhsgrs`, PR #179, merged as main
+  `8f23316e65c483381b304ed9663d8b7349d186af` (feature commit
+  `66dda1c6715d0e4c167e2f0f045c6204eabcf3d6`).
+- Vercel production deployment `dpl_AK3TkxyR3fi7yz1tHYMm8WQvBxJs`, project
+  `python-method-center-platform`, build started 2026-09-11T20:08:30Z, READY
+  2026-09-11T20:09:42Z, aliased to pythonmethodcenter.com,
+  www.pythonmethodcenter.com and python-method-center-platform.vercel.app.
+- Production Supabase `zdrfttgwnyorifmpqgwe` (verified as the parent project of
+  the `ankh-staging` branch `atdmzkciqxdgblusbhtr`; staging was not used as
+  evidence). Ledger read first; migration absent. Applied:
+  `20260911194351 assistant_knowledge_gap_notifications` and
+  `20260911195108 assistant_gap_notifications_service_role_least_privilege`.
+  The repo file is `20260909211104_assistant_knowledge_gap_notifications.sql`;
+  MCP-applied migrations receive a fresh ledger version, as with earlier
+  releases. `document_identity_manual_review` was not applied: already present
+  as `20260906183517`, column verified.
+- Post-migration verification in production: both tables exist; RLS enabled,
+  0 policies; `has_table_privilege` — service_role UPDATE=false, DELETE=false,
+  INSERT=true on events; DELETE=true, UPDATE=false on reads; anon and
+  authenticated SELECT=false on both; unread RPC EXECUTE false for anon and
+  authenticated, true for service_role; constraint
+  `assistant_gap_reads_event_founder_key UNIQUE (gap_event_id, founder_profile_id)`
+  present. Row counts after release: 0 events, 0 reads, 0 drafts.
+- Advisors: no new WARN. `rls_enabled_no_policy` (INFO) now lists 12 tables,
+  the 2 new ones alongside 10 pre-existing service-only tables. Pre-existing and
+  untouched: `auth_rls_initplan` WARN (40 policy-bearing tables),
+  `unindexed_foreign_keys` INFO (now also `knowledge_draft_id`), `unused_index`
+  INFO (the three new, still-empty indexes).
+- Unauthenticated smoke through Vercel's fetch (direct egress from the
+  publishing session is blocked by policy): `/` 200 `lang=ru`; `/en` 200
+  `lang=en` with hreflang ru/en/x-default and no Cyrillic in visible markup;
+  `/admin/notifications` served the login page (`x-matched-path: /login`);
+  `/api/admin/notifications/unread` returned 403 `{"error":"Нет доступа."}`
+  with no count.
+- Not performed: signed-in founder, Karen and client checks in production. No
+  credentials were available to this session and none were created. Those
+  exclusions are enforced by `getFounderState()` and covered by
+  `tests/assistant-gap-access.test.ts`; the nav entry uses the same gate.
+- No external notification was sent; no production data was created,
+  modified or backfilled; production auto-verification stays off.
+
 ## Known limitations
 
 - Classification is pattern-based and ordered. A question spanning two subjects

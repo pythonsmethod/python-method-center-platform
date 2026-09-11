@@ -70,6 +70,24 @@ rather than left implicit.
 - No badge, filter, prioritisation or automatic transition was introduced
   anywhere.
 
+## Production release — 2026-09-11
+
+Published with the founder gap centre: PR #179, main
+`8f23316e65c483381b304ed9663d8b7349d186af`, Vercel production
+`dpl_AK3TkxyR3fi7yz1tHYMm8WQvBxJs` READY at 2026-09-11T20:09:42Z on
+pythonmethodcenter.com. This change needs no migration; no `client_cases`
+column, archived lifecycle row or audit record was touched.
+
+Signed-in Case detail checks in production (no status/urgency/direction
+controls, one language at a time, `?view=today` plus hash preserved across
+RU ↔ EN, unchanged conversation/document/payment/analytical-picture
+permissions) were NOT performed: no staff credentials were available to the
+publishing session and none were created. They are covered by
+`tests/case-detail-cleanup.test.tsx`, which renders the real page in RU, EN
+and RU again, and by `tests/language-switch-route.test.ts`; the permission
+gates themselves (`canSeeProviderNames`, `canAccessProfessorMessages`,
+`resolvePrivateAssistantRole`) are unchanged by this work.
+
 ## Files
 
 - `app/(admin)/admin/cases/[caseId]/page.tsx` — rewritten, fully localised
