@@ -32,6 +32,11 @@ const nextConfig = {
   // "X-Powered-By: Next.js" told every visitor which framework and, by
   // implication, which class of advisories to try. It buys nothing.
   poweredByHeader: false,
+  // `ws` uses Node's native Buffer implementation. Bundling it into the
+  // route chunk changed the optional masking helper's module shape in the
+  // Vercel runtime (`mask is not a function`). Keep the package external so
+  // the live-session route loads the tested Node package directly.
+  serverExternalPackages: ["ws"],
   async headers() {
     return [
       {

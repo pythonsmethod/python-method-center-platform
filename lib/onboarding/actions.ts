@@ -222,7 +222,6 @@ export async function submitOnboarding(
       .from("client_cases")
       .insert({
         profile_id: user.id,
-        status: "ready_for_review",
         title: primaryGoal,
         summary: situationDescription
       })
@@ -434,7 +433,6 @@ export async function submitOnboarding(
       profileId: user.id,
       caseId,
       eventType: "case_created",
-      toStatus: "ready_for_review",
       actorId: user.id,
       actorRole: "client",
       metadata: { source: "onboarding_form" }

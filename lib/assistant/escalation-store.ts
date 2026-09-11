@@ -46,11 +46,6 @@ const EVENT_COLUMNS =
 // enough that the page stays a list rather than a log file.
 const LIST_LIMIT = 100;
 
-// How long one topic stays "already reported" before the same gap counts
-// again. Without this a single popular missing answer would write one row
-// per client message and drown every other gap on the page.
-const DEDUPE_WINDOW_MINUTES = 60;
-
 function toEvent(row: GapEventRow, readIds: ReadonlySet<string>): GapEvent {
   return {
     id: row.id,
@@ -62,53 +57,6 @@ function toEvent(row: GapEventRow, readIds: ReadonlySet<string>): GapEvent {
     createdAt: row.created_at,
     read: readIds.has(row.id)
   };
-}
-
-// An inactive placeholder in the existing knowledge base, one per topic, so
-// the founder answers the gap where answers already live instead of in a
-// notification screen that no assistant reads.
-//
-// is_active is false, so it can never reach a prompt before a human has
-// written the real answer and switched it on. The seed text is generic by
-// construction: it is derived from the enumerated topic alone and contains
-// nothing from any conversation.
-async function ensureKnowledgeDraft(
-  supabase: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
-  topic: GapTopic
-): Promise<string | null> {
-  const seed = gapDraftSeed(topic);
-
-  const { data: existing } = await supabase
-    .from("assistant_knowledge")
-    .select("id")
-    .eq("title", seed.title)
-    .eq("is_active", false)
-    .limit(1)
-    .maybeSingle();
-
-  if (existing?.id) {
-    return existing.id as string;
-  }
-
-  const { data: created, error } = await supabase
-    .from("assistant_knowledge")
-    .insert({
-      title: seed.title,
-      content: seed.content,
-      // Staff-only until a human decides otherwise: an unfinished draft that
-      // was switched on by accident must not be able to reach a client.
-      audience: "staff",
-      collection: "general",
-      is_active: false
-    })
-    .select("id")
-    .maybeSingle();
-
-  if (error || !created?.id) {
-    return null;
-  }
-
-  return created.id as string;
 }
 
 /**
@@ -126,35 +74,26 @@ export async function recordKnowledgeGap(
       return { status: "skipped" };
     }
 
-    const since = new Date(
-      Date.now() - DEDUPE_WINDOW_MINUTES * 60_000
-    ).toISOString();
-
-    const { data: recent } = await supabase
-      .from("assistant_gap_events")
-      .select("id")
-      .eq("topic", signal.topic)
-      .eq("audience", signal.audience)
-      .eq("locale", signal.locale)
-      .gte("created_at", since)
-      .limit(1)
-      .maybeSingle();
-
-    if (recent?.id) {
-      return { status: "deduplicated" };
-    }
-
-    const knowledgeDraftId = await ensureKnowledgeDraft(supabase, signal.topic);
-
-    const { error } = await supabase.from("assistant_gap_events").insert({
-      topic: signal.topic,
-      audience: signal.audience,
-      escalation_target: signal.escalationTarget,
-      locale: signal.locale,
-      knowledge_draft_id: knowledgeDraftId
+    const seed = gapDraftSeed(signal.topic);
+    const { data, error } = await supabase.rpc("record_assistant_gap_event", {
+      p_topic: signal.topic,
+      p_audience: signal.audience,
+      p_escalation_target: signal.escalationTarget,
+      p_locale: signal.locale,
+      p_draft_title: seed.title,
+      p_draft_content: seed.content
     });
 
-    return error ? { status: "skipped" } : { status: "recorded" };
+    if (error) {
+      return { status: "skipped" };
+    }
+
+    const row = Array.isArray(data) ? data[0] : data;
+    return row?.record_status === "deduplicated"
+      ? { status: "deduplicated" }
+      : row?.record_status === "recorded"
+        ? { status: "recorded" }
+        : { status: "skipped" };
   } catch {
     return { status: "skipped" };
   }

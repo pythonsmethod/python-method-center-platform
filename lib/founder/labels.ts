@@ -7,32 +7,18 @@ export const auditActionLabels: Record<string, string> = {
   consent_captured: "Записано согласие на обработку данных",
   document_uploaded: "Клиент загрузил документ",
   payment_recorded: "Записана оплата",
-  case_state_updated: "Изменён статус кейса",
   support_request_created: "Создано обращение в поддержку",
-  support_request_status_changed: "Изменён статус обращения"
 };
 
 export const lifecycleLabels: Record<string, string> = {
   case_created: "Кейс создан",
   onboarding_submitted: "Анкета отправлена",
-  status_changed: "Смена статуса кейса",
   payment_recorded: "Оплата зафиксирована",
   service_period_started: "Начался период сопровождения",
   service_period_completed: "Период сопровождения завершён",
   support_requested: "Запрошена поддержка",
   consent_recorded: "Записано согласие",
   admin_note_added: "Добавлена заметка команды"
-};
-
-export const caseStatusLabels: Record<string, string> = {
-  created: "Создан",
-  awaiting_onboarding: "Ждёт анкету",
-  ready_for_review: "Передан на изучение",
-  in_review: "Изучается командой",
-  active_support: "Активное сопровождение",
-  inactive_support: "Сопровождение приостановлено",
-  completed: "Завершён",
-  archived: "В архиве"
 };
 
 export const actorRoleLabels: Record<string, string> = {

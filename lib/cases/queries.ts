@@ -5,9 +5,6 @@ import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 export type ClientCaseShell = {
   id: string;
   case_number: string | null;
-  status: string;
-  urgency: string;
-  direction: string;
   title: string | null;
   summary: string | null;
   created_at: string;
@@ -39,7 +36,7 @@ export async function getClientCaseShell(
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      "id, case_number, status, urgency, direction, title, summary, created_at, updated_at"
+      "id, case_number, title, summary, created_at, updated_at"
     )
     .eq("profile_id", profileId)
     .maybeSingle();

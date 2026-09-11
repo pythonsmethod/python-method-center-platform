@@ -385,6 +385,7 @@ export default async function StaffCaseDetailPage({
             labels={dictionary.cabinet.timeline}
             documents={documents}
             emptyText={copy.documentsEmpty}
+            locale={locale}
             renderAction={(document) => (
               <Link
                 className="button button--secondary button--compact"

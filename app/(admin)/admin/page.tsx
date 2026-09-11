@@ -70,32 +70,6 @@ export default async function AdminPage() {
   // Only the founder sees which model answers; for the team it is simply
   // the assistant.
   const showProviders = canSeeProviderNames(auth.email);
-  const statusLabels = locale === "ru"
-    ? {
-        created: "Создан",
-        awaiting_onboarding: "Ожидает анкету",
-        ready_for_review: "Передан на изучение",
-        in_review: "Изучается командой",
-        active_support: "Активное сопровождение",
-        inactive_support: "Сопровождение приостановлено",
-        completed: "Завершён",
-        archived: "В архиве"
-      }
-    : {
-        created: "Created",
-        awaiting_onboarding: "Awaiting questionnaire",
-        ready_for_review: "Ready for review",
-        in_review: "Under review",
-        active_support: "Active support",
-        inactive_support: "Support paused",
-        completed: "Completed",
-        archived: "Archived"
-      };
-  const urgencyLabels = locale === "ru"
-    ? { normal: "Обычная", elevated: "Повышенная", critical: "Критическая" }
-    : { normal: "Normal", elevated: "Elevated", critical: "Critical" };
-  const label = (labels: Record<string, string>, value: string) =>
-    labels[value] ?? value.replaceAll("_", " ");
   const dateFormatter = new Intl.DateTimeFormat(locale === "ru" ? "ru" : "en", {
     dateStyle: "short",
     timeStyle: "short"
@@ -107,7 +81,7 @@ export default async function AdminPage() {
         messages: "Новых сообщений",
         clients: "Клиентов в работе",
         queue: "Очередь на сегодня",
-        queueHint: "Сначала показаны срочные кейсы и непрочитанные сообщения.",
+        queueHint: "Сначала показаны последние обновлённые кейсы.",
         open: "Открыть клиента",
         waiting: "Обновлено",
         noCases: "Активных кейсов пока нет.",
@@ -117,7 +91,8 @@ export default async function AdminPage() {
         assistantPlaceholder: "Вопрос, текст или файл…",
         assistantUnavailable: "Помощник пока не подключён. Напишите администратору платформы.",
         assistantSuggestions: ["Сделай выжимку кейса", "Подготовь черновик ответа", "Разбери приложенные анализы"],
-        unread: "нов."
+        unread: "нов.",
+        caseFallback: "Материалы кейса"
       }
     : {
         eyebrow: "Karen's workspace",
@@ -125,7 +100,7 @@ export default async function AdminPage() {
         messages: "New messages",
         clients: "Active clients",
         queue: "Today's queue",
-        queueHint: "Urgent cases and unread messages appear first.",
+        queueHint: "The most recently updated cases appear first.",
         open: "Open client",
         waiting: "Updated",
         noCases: "There are no active cases yet.",
@@ -135,16 +110,12 @@ export default async function AdminPage() {
         assistantPlaceholder: "Question, text or file…",
         assistantUnavailable: "The assistant is not connected yet. Contact the platform administrator.",
         assistantSuggestions: ["Summarize the case", "Draft a reply", "Review the attached results"],
-        unread: "new"
+        unread: "new",
+        caseFallback: "Case materials"
       };
   const cases = casesResult.status === "ready"
     ? [...casesResult.cases]
-        .sort((a, b) => {
-          const urgency = (value: string) => value === "critical" ? 2 : value === "elevated" ? 1 : 0;
-          const priorityA = urgency(a.urgency) * 1000 + (unread.byCase[a.id] ?? 0) * 100;
-          const priorityB = urgency(b.urgency) * 1000 + (unread.byCase[b.id] ?? 0) * 100;
-          return priorityB - priorityA || b.updated_at.localeCompare(a.updated_at);
-        })
+        .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
         .slice(0, 8)
     : [];
 
@@ -192,8 +163,8 @@ export default async function AdminPage() {
                     </strong>
                     {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
                   </span>
-                  <span>{clientCase.title ?? label(statusLabels, clientCase.status)}</span>
-                  <small>{label(urgencyLabels, clientCase.urgency)} · {copy.waiting}: {dateFormatter.format(new Date(clientCase.updated_at))}</small>
+                  <span>{clientCase.title ?? copy.caseFallback}</span>
+                  <small>{copy.waiting}: {dateFormatter.format(new Date(clientCase.updated_at))}</small>
                 </span>
                 <span className="karen-client-card__arrow" aria-label={copy.open}>›</span>
               </Link>
@@ -251,7 +222,7 @@ export default async function AdminPage() {
               ) : null}
             </h2>
             <p>
-              Анкеты онбординга, статусы, история и управление каждым кейсом.
+              Анкеты онбординга, документы, история и материалы каждого кейса.
               {unread.total > 0
                 ? " Есть непрочитанные сообщения от клиентов."
                 : ""}
