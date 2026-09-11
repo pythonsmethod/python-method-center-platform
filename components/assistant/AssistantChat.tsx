@@ -714,7 +714,7 @@ function AssistantChatSession({
             onActive={setVoiceActive}
             onTranscript={(text, sessionId) => {
               setMessages(current => mergeVoiceTranscript(current, text, sessionId));
-              if (memoryCapture && !text.live && text.assistant) { setMemoryState("offer"); setMemoryMessage(null); }
+              if (memoryCapture && !text.live && !text.continuous && text.assistant) { setMemoryState("offer"); setMemoryMessage(null); }
             }}
           /> : null}
           <button

@@ -1,4 +1,6 @@
 import { POST as diagnostic } from "@/app/api/assistant/realtime/diagnostics/route";
+import { POST as liveSession } from "@/app/api/assistant/live/route";
+vi.mock("@/lib/assistant/live-session", () => ({ openLiveSession: vi.fn(async () => new Response("data: {}\n\n", { headers: { "Content-Type": "text/event-stream" } })) }));
 import { ANHAM_VOICE_SPEED, voiceDeliveryInstructions } from "@/lib/assistant/voice-delivery";
 vi.mock("@/lib/assistant/client-voice-context", () => ({ clientVoiceInstructions: async () => "Synthetic own-client context" }));
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
@@ -50,6 +52,43 @@ beforeEach(() => {
 afterEach(() => { vi.unstubAllEnvs(); vi.unstubAllGlobals(); });
 
 describe("voice authorization and provider handshake", () => {
+  describe("GPT-Live pilot route", () => {
+    beforeEach(() => {
+      vi.stubEnv("GPT_LIVE_ENABLED", "true"); vi.stubEnv("GPT_LIVE_OPENAI_API_KEY", "synthetic-live-key");
+      vi.stubEnv("GPT_LIVE_PILOT_EMAILS", "client@example.test");
+    });
+    it("uses server identity and admits the explicitly enabled client", async () => {
+      const result = await liveSession(request(sessionBody)); expect(result.status).toBe(200);
+      expect(result.headers.get("content-type")).toBe("text/event-stream");
+      expect(await result.text()).not.toContain("synthetic-live-key");
+    });
+    it("admits the default registered profile status the pilot accounts actually have", async () => {
+      profile!.status = "registered";
+      expect((await liveSession(request(sessionBody))).status).toBe(200);
+    });
+    it("denies unauthenticated, blocked, wrong role and wrong owner", async () => {
+      expect((await liveSession(request({ ...sessionBody, scope: "staff" }))).status).toBe(403);
+      expect((await liveSession(request({ ...sessionBody, caseId }))).status).toBe(403);
+      profile!.status = "suspended"; expect((await liveSession(request(sessionBody))).status).toBe(403);
+      mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
+      expect((await liveSession(request(sessionBody))).status).toBe(401);
+      expect(mocks.rpc).not.toHaveBeenCalled();
+    });
+    it("denies cross-origin and malformed/oversized bodies before spending", async () => {
+      expect((await liveSession(request(sessionBody, "https://evil.test"))).status).toBe(403);
+      for (const patch of [{ consent: false }, { sdp: {} }, { sdp: "v=0" + "x".repeat(30001) }, { voice: "unapproved" }]) expect((await liveSession(request({ ...sessionBody, ...patch }))).status).toBe(400);
+      expect((await liveSession(request({ ...sessionBody, extra: "x".repeat(81000) }))).status).toBe(413);
+      expect(mocks.rpc).not.toHaveBeenCalled();
+    });
+    it.each(["GPT_LIVE_ENABLED", "GPT_LIVE_PILOT_EMAILS", "GPT_LIVE_OPENAI_API_KEY"])("fails closed with no fallback for missing %s", async name => {
+      vi.stubEnv(name, ""); expect((await liveSession(request(sessionBody))).status).toBe(503); expect(fetch).not.toHaveBeenCalled();
+    });
+    it("rejects model substitution and uncertain budget", async () => {
+      vi.stubEnv("GPT_LIVE_MODEL", "gpt-realtime"); expect((await liveSession(request(sessionBody))).status).toBe(503);
+      vi.stubEnv("GPT_LIVE_MODEL", "gpt-live-1"); mocks.rpc.mockResolvedValue({ error: {}, data: null });
+      expect((await liveSession(request(sessionBody))).status).toBe(503);
+    });
+  });
   it("gives the confirmed preview client the full client tier while keeping own-case and staff boundaries", async () => {
     vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "client@example.test");
     mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email: actor.email, email_confirmed_at: "2026-09-09" } }, error: null });

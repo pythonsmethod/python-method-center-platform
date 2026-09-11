@@ -7,9 +7,11 @@ export function useVoiceChoice(locale: Locale, scope: "staff" | "client", caseId
   const [voices, setVoices] = useState<VoiceOption[]>(builtinVoiceOptions);
   const [selected, setSelected] = useState("marin");
   const [loading, setLoading] = useState(true);
+  const [live, setLive] = useState(false);
+  const [unavailable, setUnavailable] = useState(false);
   const storageKey = useRef<string | null>(null);
   useEffect(() => {
-    const abort = new AbortController(); storageKey.current = null; setLoading(true);
+    const abort = new AbortController(); storageKey.current = null; setLoading(true); setUnavailable(false);
     const query = new URLSearchParams({ locale, scope }); if (caseId) query.set("caseId", caseId);
     void (async () => {
       try {
@@ -22,8 +24,9 @@ export function useVoiceChoice(locale: Locale, scope: "staff" | "client", caseId
         let saved: string | null = null;
         try { saved = localStorage.getItem(data.preferenceKey); } catch { /* Private browsers may refuse storage. */ }
         setVoices(data.voices);
+        setLive(data.live === true);
         setSelected(data.voices.some((v: VoiceOption) => v.available && v.id === saved) ? saved! : data.defaultVoice);
-      } catch { if (!abort.signal.aborted) { setVoices(builtinVoiceOptions); setSelected("marin"); } }
+      } catch { if (!abort.signal.aborted) { setVoices(builtinVoiceOptions); setSelected("marin"); setLive(false); setUnavailable(true); } }
       finally { if (!abort.signal.aborted) setLoading(false); }
     })();
     return () => abort.abort();
@@ -33,7 +36,7 @@ export function useVoiceChoice(locale: Locale, scope: "staff" | "client", caseId
     setSelected(id);
     try { if (storageKey.current) localStorage.setItem(storageKey.current, id); } catch { /* Selection still works without persistence. */ }
   }
-  return { voices, selected, choose, loading };
+  return { voices, selected, choose, loading, live, unavailable };
 }
 
 type Props = { locale: Locale; scope: "staff" | "client"; caseId?: string; voices: VoiceOption[]; selected: string; onChange: (id: string) => void; onBusy: (busy: boolean) => void };

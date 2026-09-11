@@ -1,3 +1,4 @@
+import { aiFetch } from "@/lib/security/ai-transport";
 import type { AssistantResult, ChatMessage } from "./claude";
 import { ARCHIVE_RULE, availableConversationTools, executeConversationArchiveTool } from "./conversation-archive";
 import { isExplicitPolicyError, providerPolicyRefusal } from "./policy-refusal";
@@ -10,7 +11,7 @@ export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string
   let toolRounds = 0, continued = false, reply = "";
   try {
     for (;;) {
-      const response = await fetch(`${config.baseUrl}/v1/responses`, {
+      const response = await aiFetch(`${config.baseUrl}/v1/responses`, {
         method: "POST", headers: { Authorization: `Bearer ${config.apiKey}`, "Content-Type": "application/json" }, signal: AbortSignal.timeout(60000),
         body: JSON.stringify({ model: config.model, store: false, input,
           include: ["reasoning.encrypted_content"], max_output_tokens: config.maxTokens,

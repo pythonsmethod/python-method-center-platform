@@ -1,3 +1,4 @@
+import { withAiSafety } from "@/lib/security/ai-policy";
 import Anthropic from "@anthropic-ai/sdk";
 import { ARCHIVE_RULE, availableConversationTools, conversationArchiveScope, executeConversationArchiveTool } from "./conversation-archive";
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
@@ -98,7 +99,7 @@ const CONTINUE_INSTRUCTION =
 const CACHEABLE_SYSTEM_MIN_CHARS = 4000;
 
 function buildSystemParam(system: string) {
-  system = withFactualHonesty(system);
+  system = withAiSafety(withFactualHonesty(system));
   if (system.length < CACHEABLE_SYSTEM_MIN_CHARS) {
     return system;
   }

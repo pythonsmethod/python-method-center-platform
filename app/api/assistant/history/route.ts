@@ -37,7 +37,7 @@ export async function GET(request: Request) {
   try {
     const result = await getOwnAssistantHistory(profileId, locale, HISTORY_PAGE_SIZE, { private: privateHistory, caseId, before });
     if (result.status === "error") return respond({ error: result.message }, 503);
-    return respond({ messages: result.messages, hasMore: result.messages.length === HISTORY_PAGE_SIZE });
+    return respond({ messages: result.messages, hasMore: result.hasMore ?? result.messages.length === HISTORY_PAGE_SIZE });
   } catch {
     return respond({ error: locale === "ru" ? "Не удалось загрузить историю." : "Could not load history." }, 503);
   }

@@ -54,7 +54,7 @@ describe("assistant durable history", () => {
     expect(f.eq).toHaveBeenCalledWith("profile_id", "owner");
   });
   it.each(["ru", "en"] as const)("loads original multilingual text with timestamps in %s", async locale => {
-    expect(await getOwnAssistantHistory("owner", locale)).toEqual({ status: "ready", messages: stored });
+    expect(await getOwnAssistantHistory("owner", locale)).toEqual({ status: "ready", messages: stored, hasMore: false });
     expect(f.eq).toHaveBeenCalledWith("profile_id", "owner");
     expect(f.eq).not.toHaveBeenCalledWith("locale", expect.anything());
     expect(f.in).toHaveBeenCalledWith("tier", ["registered", "client"]);
@@ -63,6 +63,15 @@ describe("assistant durable history", () => {
     await getOwnAssistantHistory("owner", "en", 60, { private: true });
     expect(f.in).toHaveBeenCalledWith("tier", ["founder", "karen"]);
     expect(f.is).toHaveBeenCalledWith("case_id", null);
+  });
+  it("keeps older-page navigation after coalescing sixty Live deltas", async () => {
+    const rows = Array.from({ length: 60 }, (_, i) => ({ ...stored[0], id: `event_${i}`, message_sequence: i + 1,
+      exchange_id: `live:00000000-0000-4000-8000-000000000001:event_${i}`, content: "a",
+      created_at: new Date(Date.parse(stored[0].created_at) + i * 10).toISOString() }));
+    f.query.mockReturnValue({ data: rows.reverse(), error: null });
+    const result = await getOwnAssistantHistory("owner", "en");
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") { expect(result.hasMore).toBe(true); expect(result.messages).toHaveLength(1); expect(result.messages[0].message_sequence).toBe(1); }
   });
   it("scopes older pages to both account and case", async () => {
     await getOwnAssistantHistory("owner", "ru", 60, { private: true, caseId: "case", before: 61 });

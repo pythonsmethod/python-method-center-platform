@@ -3,6 +3,7 @@ import type { AssistantTier } from "@/lib/assistant/tiers";
 import type { Locale } from "@/lib/i18n/locale";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { randomUUID } from "node:crypto";
+import { coalesceLiveHistory } from "./live-transcript";
 
 // Conversations with the AI are kept only for people who have an account —
 // registered visitors and paying clients. A person who described their
@@ -17,6 +18,7 @@ export type AssistantHistoryMessage = {
   created_at: string;
   locale: Locale | null;
   message_sequence: number;
+  exchange_id?: string | null;
   source?: "text" | "voice_transcript";
   voice_state?: "completed" | "interrupted";
   web_results?: import("./web-results").WebResult[];
@@ -110,7 +112,7 @@ export async function saveAssistantExchange({
 }
 
 export type AssistantHistoryResult =
-  | { status: "ready"; messages: AssistantHistoryMessage[] }
+  | { status: "ready"; messages: AssistantHistoryMessage[]; hasMore?: boolean }
   | { status: "error"; message: string };
 
 // The person's own conversation, oldest first — the order it reads in.
@@ -128,7 +130,7 @@ export async function getOwnAssistantHistory(
 
   let query = supabase
     .from("assistant_messages")
-    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, source, voice_state, web_results")
+    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, source, voice_state, web_results, exchange_id")
     .eq("profile_id", profileId)
     .in("tier", options.private ? ["founder", "karen"] : ["registered", "client"])
     .order("message_sequence", { ascending: false })
@@ -154,7 +156,7 @@ export async function getOwnAssistantHistory(
     content: outreach_translations?.[locale] ?? message.content
   })) as AssistantHistoryMessage[];
 
-  return { status: "ready", messages: messages.slice().reverse().map((message) =>
+  return { status: "ready", hasMore: messages.length === limit, messages: coalesceLiveHistory(messages.slice().reverse()).map((message) =>
     message.role === "assistant"
       ? { ...message, content: normalizeAnhamResponse(message.content, locale) }
       : message

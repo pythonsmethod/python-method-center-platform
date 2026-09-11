@@ -1,6 +1,6 @@
 import { validWebResult, type WebResult } from "./web-results";
 export type VoiceExchange = { turnId: string; user: string; assistant: string; state?: "interrupted"; webResults?: WebResult[]; webReceipts?: string[] };
-export type VoiceTranscript = VoiceExchange & { live?: boolean };
+export type VoiceTranscript = VoiceExchange & { live?: boolean; continuous?: boolean };
 export type VoiceToolCall = { id: string; call_id: string; name: string; arguments: string };
 type Output = { id?: string; type?: string; call_id?: string; name?: string; arguments?: string; content?: { type?: string; transcript?: string }[] };
 type Input = { id: string; text?: string; failed?: boolean };
