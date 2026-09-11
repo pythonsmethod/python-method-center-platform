@@ -8,6 +8,9 @@ import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { getDeliveryAttentionCounts } from "@/lib/delivery/queries";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { getStaffSupportUnreadCount } from "@/lib/support/queries";
+import { getFounderState } from "@/lib/auth/require-founder";
+import { getGapUnreadCount } from "@/lib/assistant/escalation-store";
+import { notificationsCopy } from "@/lib/assistant/escalation-copy";
 
 type AdminLayoutProps = {
   children: React.ReactNode;
@@ -68,6 +71,14 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         db?.from("uploaded_documents").select("id", { count: "exact", head: true }).in("document_status", ["needs_reupload", "failed"])
       ])
     : [{ total: 0, byCase: {} }, 0, { admin: 0 }, undefined];
+  // The knowledge-gap centre is the founder's alone: Karen's workspace is
+  // clinical, and a list of what the assistant could not answer is a platform
+  // concern, not a case one. The gate is the same one the route itself uses,
+  // so the link cannot appear for someone who would be refused on arrival.
+  const founder = await getFounderState();
+  const gapUnread = founder.status === "authorized"
+    ? await getGapUnreadCount(founder.userId)
+    : 0;
   const adminNavRoutes = [
     { href: "/admin", label: labels.today, icon: "⌂" },
     { href: "/admin/cases", label: labels.clients, icon: "♙", badge: messageCounts.total },
@@ -84,6 +95,14 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
       : []),
     ...(auth.status === "authorized"
       ? [{ href: "/admin/requests", label: labels.requests, icon: "✉", badge: supportUnread }]
+      : []),
+    ...(founder.status === "authorized"
+      ? [{
+          href: "/admin/notifications",
+          label: notificationsCopy(locale).navLabel,
+          icon: "◎",
+          badge: gapUnread
+        }]
       : [])
   ];
 

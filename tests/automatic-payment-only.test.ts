@@ -8,13 +8,17 @@ describe("automatic payments only", () => {
       "utf8"
     );
     const actions = readFileSync("lib/cases/staff-actions.ts", "utf8");
+    // The page's visible copy moved to lib/cases/detail-copy.ts when the Case
+    // detail was fully localised; the bilingual wording is asserted there.
+    const detailCopy = readFileSync("lib/cases/detail-copy.ts", "utf8");
 
     expect(
       existsSync("app/(admin)/admin/cases/[caseId]/PaymentRecordForm.tsx")
     ).toBe(false);
     expect(casePage).not.toContain("PaymentRecordForm");
-    expect(casePage).toContain("Автоматические оплаты");
-    expect(casePage).toContain("Automatic payments");
+    expect(casePage).toContain("copy.paymentsTitle");
+    expect(detailCopy).toContain("Автоматические оплаты");
+    expect(detailCopy).toContain("Automatic payments");
     expect(actions).toContain("const MANUAL_PAYMENT_ENTRY_ENABLED = false");
   });
 

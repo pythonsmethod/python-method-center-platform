@@ -2,13 +2,8 @@
 
 import { revalidatePath } from "next/cache";
 import { writeAuditLog } from "@/lib/audit/log";
-import {
-  CASE_DIRECTIONS,
-  CASE_STATUSES,
-  CASE_URGENCIES,
-  PAYMENT_PRODUCTS,
-  includesValue
-} from "@/lib/cases/constants";
+import { PAYMENT_PRODUCTS, includesValue } from "@/lib/cases/constants";
+import { getLocale } from "@/lib/i18n/locale";
 import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
@@ -31,101 +26,30 @@ function successState(message: string): StaffActionState {
   return { status: "success", message };
 }
 
+// Retired with the client processing classification.
+//
+// Client cases have no processing status, urgency, prioritisation, badge or
+// filter, so there is nothing here left to set. The function survives only as
+// a closed door: a browser tab opened before the release still holds the old
+// form's action identifier, and a POST from it must not reach the database.
+//
+// It therefore reads nothing and writes nothing — no lookup, no update, no
+// audit row, no lifecycle event. Existing classification transitions already
+// in audit storage stay exactly as they are; they are history, not a control.
+//
+// `docs/architecture/CLIENT_PROCESSING_WITHOUT_CLASSIFICATION.md` is
+// authoritative. Do not restore this action.
 export async function updateCaseState(
   _previousState: StaffActionState,
-  formData: FormData
+  _formData: FormData
 ): Promise<StaffActionState> {
-  const caseId = String(formData.get("caseId") ?? "");
+  const locale = await getLocale();
 
-  if (!isUuid(caseId)) {
-    return errorState("Некорректный идентификатор кейса.");
-  }
-
-  const auth = await getStaffUserState();
-
-  if (auth.status !== "authorized") {
-    return errorState("Нет доступа для изменения кейса.");
-  }
-
-  const nextStatus = String(formData.get("status") ?? "");
-  const nextUrgency = String(formData.get("urgency") ?? "");
-  const nextDirection = String(formData.get("direction") ?? "");
-
-  if (
-    !includesValue(CASE_STATUSES, nextStatus) ||
-    !includesValue(CASE_URGENCIES, nextUrgency) ||
-    !includesValue(CASE_DIRECTIONS, nextDirection)
-  ) {
-    return errorState("Недопустимое значение статуса кейса.");
-  }
-
-  const supabase = createSupabaseServiceClient();
-
-  if (!supabase) {
-    return errorState("Service role key не настроен — обновление недоступно.");
-  }
-
-  const { data: currentCase, error: lookupError } = await supabase
-    .from("client_cases")
-    .select("id, profile_id, status, urgency, direction")
-    .eq("id", caseId)
-    .maybeSingle();
-
-  if (lookupError) {
-    return errorState(lookupError.message);
-  }
-
-  if (!currentCase) {
-    return errorState("Кейс не найден.");
-  }
-
-  const { error: updateError } = await supabase
-    .from("client_cases")
-    .update({
-      status: nextStatus,
-      urgency: nextUrgency,
-      direction: nextDirection
-    })
-    .eq("id", caseId);
-
-  if (updateError) {
-    return errorState(updateError.message);
-  }
-
-  await Promise.all([
-    writeAuditLog({
-      profileId: currentCase.profile_id,
-      caseId,
-      actorId: auth.userId,
-      actorRole: auth.role,
-      action: "case_state_updated",
-      entityTable: "client_cases",
-      entityId: caseId,
-      metadata: {
-        from_status: currentCase.status,
-        to_status: nextStatus,
-        from_urgency: currentCase.urgency,
-        to_urgency: nextUrgency,
-        from_direction: currentCase.direction,
-        to_direction: nextDirection
-      }
-    }),
-    currentCase.status !== nextStatus
-      ? writeLifecycleEvent({
-          profileId: currentCase.profile_id,
-          caseId,
-          eventType: "status_changed",
-          fromStatus: currentCase.status,
-          toStatus: nextStatus,
-          actorId: auth.userId,
-          actorRole: auth.role
-        })
-      : Promise.resolve(null)
-  ]);
-
-  revalidatePath(`/admin/cases/${caseId}`);
-
-  return successState("Кейс обновлён.");
+  return errorState(
+    locale === "en"
+      ? "Case status, urgency and direction were retired and can no longer be changed. Refresh the page to see the current case."
+      : "Статус, срочность и направление кейса больше не используются и не могут быть изменены. Обновите страницу, чтобы увидеть актуальный кейс."
+  );
 }
 
 export async function recordCasePayment(

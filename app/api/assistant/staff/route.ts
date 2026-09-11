@@ -20,6 +20,7 @@ import { isUuid } from "@/lib/utils/uuid";
 import { guardFactualReply } from "@/lib/assistant/factual-honesty";
 import { apiError, apiErrorLocale, assistantFailure } from "@/lib/i18n/api-errors";
 
+import { captureKnowledgeGap } from "@/lib/assistant/escalation-store";
 import { saveAssistantExchange } from "@/lib/assistant/history";
 import { memoryCollectionFromCommand } from "@/lib/assistant/memory";
 
@@ -206,11 +207,22 @@ export async function POST(request: Request) {
   }
   if (result.refusal) result.reply = providerPolicyRefusal((body as { locale?: unknown })?.locale === "en" ? "en" : "ru").reply;
 
+  const question = messages[messages.length - 1]?.content ?? "";
   const reply = guardFactualReply({
     reply: result.reply,
-    question: messages[messages.length - 1]?.content ?? "",
+    question,
     locale: responseLocale,
     audience: assistantRole
   });
+
+  // Same enumerated signal as the client side: the team's own unanswered
+  // subjects are gaps in the centre's knowledge too.
+  await captureKnowledgeGap({
+    reply,
+    question,
+    audience: "staff",
+    locale: responseLocale
+  });
+
   return respondWithReply(reply);
 }
