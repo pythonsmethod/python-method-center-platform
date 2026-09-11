@@ -1,5 +1,58 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
+
+Owner authorised publication. PR #179 merged as main `8f23316` (feature commit
+`66dda1c`); Vercel production deployment `dpl_AK3TkxyR3fi7yz1tHYMm8WQvBxJs`
+READY at 2026-09-11T20:09:42Z on pythonmethodcenter.com and
+www.pythonmethodcenter.com.
+
+Anham's honesty-guard refusals are now recorded in a founder-only internal
+centre as append-only events carrying only enumerated topic/audience/target/
+locale — no question text, no medical data, no client identifier. Each new
+subject opens one inactive, staff-only knowledge draft. No Telegram, email or
+other external notification is sent. The retired client processing
+classification is gone from the staff Case detail: no status/urgency/direction
+panel, no CaseManagementForm, `updateCaseState` reads and writes nothing;
+archived `status_changed` rows stay in storage and are withheld from the
+timeline and from the assistant snapshot. The page is fully RU/EN.
+
+Production Supabase (`zdrfttgwnyorifmpqgwe`, verified as the parent of the
+`ankh-staging` branch): ledger checked read-only first. Applied
+`20260911194351 assistant_knowledge_gap_notifications` and the corrective
+`20260911195108 assistant_gap_notifications_service_role_least_privilege`
+(repo file `20260909211104_assistant_knowledge_gap_notifications.sql`). The
+correction exists because the project's default privileges grant ALL on new
+tables to service_role, which left UPDATE/DELETE in place until revoked; this
+was found by reading applied grants, not the SQL. `document_identity_manual_review`
+was NOT applied: the ledger already holds it as `20260906183517` and
+`uploaded_documents.identity_review_status` exists. No backfill; 0 rows in
+both new tables and 0 drafts after release.
+
+Verified in production: both tables exist, RLS on, 0 policies, anon/authenticated
+have no SELECT, service_role has INSERT+SELECT only on events (UPDATE and DELETE
+false) and INSERT+SELECT+DELETE on reads, unread RPC executable by service_role
+only, `unique (gap_event_id, founder_profile_id)` present. Advisors: no new
+WARN; the two tables join `rls_enabled_no_policy` at INFO with 10 pre-existing
+service-only tables. The pre-existing `auth_rls_initplan` WARN covers 40
+policy-bearing tables and is untouched.
+
+Regression on the merged base: 1742 tests passed, 1 pre-existing skip (183
+files); TypeScript, ESLint (0 warnings), security:check, build, npm audit (0)
+and `git diff --check` pass; benchmark unchanged at 100% with 0 errors.
+
+Unauthenticated production smoke (via Vercel fetch; direct egress from the
+publishing session is blocked): RU `/` 200 `lang=ru`; EN `/en` 200 `lang=en`,
+hreflang ru/en/x-default, no Cyrillic in visible markup; `/admin/notifications`
+redirects to `/login`; `/api/admin/notifications/unread` returns 403 with no
+count. Authenticated smoke (client/Karen exclusion, Case detail RU/EN, route
+preservation, unchanged permissions) was NOT performed in production: no
+credentials were available and none were created. Those properties are covered
+by the unit suite rendering the real page and by the `getFounderState` gate.
+Production auto-verification and external notifications were not enabled.
+Evidence: docs/ankh/founder_gap_notifications.md,
+docs/ankh/case_detail_without_classification.md.
+
 ## Client payment and support-period visibility — 2026-09-11
 
 The signed-in client Anham now reads the person's own payment history and their

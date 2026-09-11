@@ -1,5 +1,17 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
+
+Published as main `8f23316`, production `dpl_AK3TkxyR3fi7yz1tHYMm8WQvBxJs`
+READY. Production migrations `20260911194351` and `20260911195108` applied
+after a read-only ledger check; no data change. Next for this line: a signed-in
+founder RU/EN acceptance of `/admin/notifications` and of the Case detail with
+`?view=today`, plus one real gap recorded end to end. The topic taxonomy stays
+enumerated; do not add a text classifier. Clinical gates unchanged: Phase 3
+production and production auto-verification remain NO-GO. See
+docs/ankh/founder_gap_notifications.md and
+docs/ankh/case_detail_without_classification.md.
+
 ## Client payment and support-period visibility — 2026-09-11 — IMPLEMENTED
 
 Payment and service-period visibility for the signed-in client assistant is
