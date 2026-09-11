@@ -1,3 +1,4 @@
+import { canSeeVoicePilotCosts } from "@/lib/auth/require-founder";
 import { randomUUID } from "node:crypto";
 import { aiFetch, attachLiveSession } from "@/lib/security/ai-transport";
 import { platformContext } from "./prompts";
@@ -14,6 +15,7 @@ import type { Locale } from "@/lib/i18n/locale";
 type Input = { request: Request; actor: VoiceActor; locale: Locale; sdp: string; voice: string; timeZone: string };
 export async function openLiveSession(input: Input) {
   const { request, actor, locale } = input, config = liveConfig(actor);
+  const showCosts = canSeeVoicePilotCosts(actor.email);
   const history = await getOwnAssistantHistory(actor.profileId, locale, 120, { private: actor.scope !== "client", caseId: actor.caseId });
   if (history.status !== "ready") throw new VoiceFailure("unavailable", 503);
   const initial = history.messages.slice(-12).map(m => ({ role: m.role, content: m.content.slice(-600) }));
@@ -71,14 +73,14 @@ export async function openLiveSession(input: Input) {
   const meter = setInterval(() => {
     if (!mediaStartedAt || ended) return;
     const seconds = Math.max(usage, (Date.now() - mediaStartedAt) / 1000);
-    emit({ type: "usage", seconds, estimatedUsd: seconds * LIVE_USD_PER_SECOND });
+    emit({ type: "usage", seconds, ...(showCosts ? { estimatedUsd: seconds * LIVE_USD_PER_SECOND } : {}) });
   }, 1000);
   request.signal.addEventListener("abort", close, { once: true });
   const stream = new ReadableStream<Uint8Array>({
     start(controller) {
       emit = data => { if (!request.signal.aborted) { try { controller.enqueue(new TextEncoder().encode(`data: ${JSON.stringify(data)}\n\n`)); } catch { /* Browser left. */ } } };
       finish = () => { try { controller.close(); } catch { /* Already canceled. */ } };
-      socket.on("open", () => { emit({ type: "connected", sdp: created.transport.sdp, sessionId: id, maxSeconds: config.maxSeconds, usdPerSecond: LIVE_USD_PER_SECOND }); });
+      socket.on("open", () => { emit({ type: "connected", sdp: created.transport.sdp, sessionId: id, maxSeconds: config.maxSeconds, ...(showCosts ? { usdPerSecond: LIVE_USD_PER_SECOND } : {}) }); });
       socket.on("error", () => { emit({ type: "error", code: "connection" }); void cleanup(false); });
       socket.on("close", () => { if (!ended) void cleanup(false); });
       socket.on("message", raw => {
@@ -107,7 +109,7 @@ export async function openLiveSession(input: Input) {
         if (event.type === "session.usage.updated" || event.type === "session.closed") {
           const seconds = (event.usage as { seconds?: unknown } | undefined)?.seconds;
           if (typeof seconds === "number" && Number.isFinite(seconds) && seconds >= usage) usage = seconds;
-          emit({ type: "usage", seconds: usage, estimatedUsd: usage * LIVE_USD_PER_SECOND });
+          emit({ type: "usage", seconds: usage, ...(showCosts ? { estimatedUsd: usage * LIVE_USD_PER_SECOND } : {}) });
           if (event.type === "session.closed") { reason = String(event.reason); void cleanup(typeof seconds === "number" && Number.isFinite(seconds) && seconds >= 0); }
         }
         if (event.type === "error") { emit({ type: "error", code: "service" }); close(); }

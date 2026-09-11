@@ -8,10 +8,11 @@ export function useVoiceChoice(locale: Locale, scope: "staff" | "client", caseId
   const [selected, setSelected] = useState("marin");
   const [loading, setLoading] = useState(true);
   const [live, setLive] = useState(false);
+  const [showLiveCosts, setShowLiveCosts] = useState(false);
   const [unavailable, setUnavailable] = useState(false);
   const storageKey = useRef<string | null>(null);
   useEffect(() => {
-    const abort = new AbortController(); storageKey.current = null; setLoading(true); setUnavailable(false);
+    const abort = new AbortController(); storageKey.current = null; setLoading(true); setUnavailable(false); setShowLiveCosts(false);
     const query = new URLSearchParams({ locale, scope }); if (caseId) query.set("caseId", caseId);
     void (async () => {
       try {
@@ -25,8 +26,9 @@ export function useVoiceChoice(locale: Locale, scope: "staff" | "client", caseId
         try { saved = localStorage.getItem(data.preferenceKey); } catch { /* Private browsers may refuse storage. */ }
         setVoices(data.voices);
         setLive(data.live === true);
+        setShowLiveCosts(data.showLiveCosts === true);
         setSelected(data.voices.some((v: VoiceOption) => v.available && v.id === saved) ? saved! : data.defaultVoice);
-      } catch { if (!abort.signal.aborted) { setVoices(builtinVoiceOptions); setSelected("marin"); setLive(false); setUnavailable(true); } }
+      } catch { if (!abort.signal.aborted) { setVoices(builtinVoiceOptions); setSelected("marin"); setLive(false); setShowLiveCosts(false); setUnavailable(true); } }
       finally { if (!abort.signal.aborted) setLoading(false); }
     })();
     return () => abort.abort();
@@ -36,7 +38,7 @@ export function useVoiceChoice(locale: Locale, scope: "staff" | "client", caseId
     setSelected(id);
     try { if (storageKey.current) localStorage.setItem(storageKey.current, id); } catch { /* Selection still works without persistence. */ }
   }
-  return { voices, selected, choose, loading, live, unavailable };
+  return { voices, selected, choose, loading, live, showLiveCosts, unavailable };
 }
 
 type Props = { locale: Locale; scope: "staff" | "client"; caseId?: string; voices: VoiceOption[]; selected: string; onChange: (id: string) => void; onBusy: (busy: boolean) => void };

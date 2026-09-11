@@ -963,3 +963,13 @@ PHI or auto-verification gate was closed: Phase 2.9 remains open and production
 auto-verification and Phase 3 production remain NO-GO. Scoped release CLOSED /
 GO. Evidence: docs/ankh/anham_response_style_release.md and
 docs/ankh/anham_unicode_numeric_signs.md.
+
+## 2026-09-11 — Anna-only voice pilot costs
+
+Voice pilot price and billing copy are private to the primary founder Anna.
+The voices endpoint derives visibility from the authenticated email using the
+existing primary-founder identity; query/body claims and additional founder
+accounts cannot grant it. Live SSE omits monetary fields for everyone else;
+server audit retains accounting. RU/EN voice UI keeps duration and privacy
+disclosure for all users. No schema, clinical, memory or audio-flow changes.
+Validation and release status: docs/ankh/live_cost_visibility.md.
