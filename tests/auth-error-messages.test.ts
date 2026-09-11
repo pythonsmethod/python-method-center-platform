@@ -16,6 +16,7 @@ describe("translateAuthError", () => {
     ["Email rate limit exceeded", "rate_limited"],
     ["For security purposes, you can only request this after 47 seconds", "rate_limited"],
     ["Password should be at least 6 characters", "weak_password"],
+    ["Password is known to be weak and easy to guess, please choose a different one.", "weak_password"],
     ["Unable to validate email address: invalid format", "invalid_email"],
     ["Signups not allowed for this instance", "signup_disabled"],
     ["Database error saving new user", "server_error"],

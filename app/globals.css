@@ -8157,3 +8157,9 @@ body.cabinet-menu-open { overflow: hidden; }
 .anham-voices p, .anham-voices details { font-size: .78rem; line-height: 1.6; }
 .anham-voices summary { cursor: pointer; }
 @media (max-width: 480px) { .anham-call__header { gap: 8px; } .anham-call__voice-choice { padding: 8px; max-width: 43%; } .anham-voices__option { padding: 8px; } }
+
+/* Optional consent controls stay in document flow and never cover navigation. */
+.product-analytics-consent { margin: 1.5rem auto; padding: 1rem; width: calc(100% - 2rem); max-width: 68rem; border: 1px solid #806a39; border-radius: 12px; }
+.product-analytics-consent p { margin: 0 0 .75rem; }
+.product-analytics-consent button { min-height: 44px; padding: .5rem .8rem; border: 1px solid #bfa057; border-radius: 8px; background: transparent; color: #f3e7c8; cursor: pointer; }
+.product-analytics-consent button:focus-visible { outline: 2px solid #efcc60; outline-offset: 3px; }

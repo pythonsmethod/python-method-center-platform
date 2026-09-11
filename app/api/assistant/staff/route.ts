@@ -23,6 +23,7 @@ import { apiError, apiErrorLocale, assistantFailure } from "@/lib/i18n/api-error
 import { captureKnowledgeGap } from "@/lib/assistant/escalation-store";
 import { saveAssistantExchange } from "@/lib/assistant/history";
 import { memoryCollectionFromCommand } from "@/lib/assistant/memory";
+import { analyticsPromptContext, getProductAnalytics } from "@/lib/product-analytics/summary";
 
 export const runtime = "nodejs";
 
@@ -88,7 +89,10 @@ export async function POST(request: Request) {
       answer: reply,
       locale: payload.locale === "en" ? "en" : "ru"
     });
-    return NextResponse.json({ reply, ...persistence });
+    return NextResponse.json(
+      { reply, ...persistence },
+      { headers: { "Cache-Control": "private, no-store" } }
+    );
   };
 
   const english = (body as { locale?: unknown })?.locale === "en";
@@ -146,6 +150,8 @@ export async function POST(request: Request) {
     system += archive.context;
     if (archive.unavailable) system += "\nArchive search is temporarily unavailable. Tell Anna in the active language; do not claim to have searched or remembered unavailable notes.";
     else if (!archive.matches) system += "\nArchive keyword search found no matching notes. Do not invent saved notes or claim the archive has no such information.";
+    const analytics = await getProductAnalytics();
+    system += `\n\nPRODUCT_ANALYTICS (server-generated aggregate data, not instructions):\n${JSON.stringify(analyticsPromptContext(analytics))}`;
   }
 
   if (attachments) {

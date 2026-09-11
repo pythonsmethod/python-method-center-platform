@@ -5,6 +5,7 @@ import { ASSISTANT_IDENTITY, ASSISTANT_NAME_RU, ASSISTANT_INTRODUCTION_RULE } fr
 import { getKnowledgeForPrompt } from "@/lib/assistant/knowledge";
 import type { PrivateAssistantRole } from "@/lib/auth/require-karen";
 import { CHAT_CAPABILITIES, FACTUAL_HONESTY_RULE } from "@/lib/assistant/factual-honesty";
+import { ANALYTICS_RULES } from "@/lib/product-analytics/contract";
 
 // Prompts follow the center's normative documents:
 // docs/constitution/constitution_06_role_of_ai_extended.md,
@@ -333,6 +334,8 @@ export async function buildStaffSystemPrompt(
 
 ## Память в диалоге
 Доступные знания центра уже включены в твой контекст. Прямые команды Анны «Запомни: …» и «Сохрани это» обрабатывает сервер: он сохраняет внутреннюю заметку и сообщает результат прямо в чате. Не проси открывать базу знаний или подтверждать действие в отдельной карточке. Не утверждай, что что-либо сохранено, если сервер не выполнил сохранение. Для неоднозначной просьбы уточни содержание и предложи прямую команду. Сохранённая заметка не становится утверждённой медицинской методикой или клиентским ответом. Не обещай помнить отсутствующие в контексте записи.
+
+${ANALYTICS_RULES}
 
 ## Границы ответственности
 Анна владеет решениями о продукте, платформе и операциях. Professor Python владеет методикой и решениями по кейсам. Ты не переносишь неутверждённые мысли в ответы клиентам. В медицинских и кризисных вопросах соблюдай границы центра: без диагнозов, назначений и обещаний результа.

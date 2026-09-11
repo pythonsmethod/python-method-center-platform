@@ -1,4 +1,8 @@
 import type { Metadata, Viewport } from "next";
+import { cookies } from "next/headers";
+import { ProductAnalytics } from "@/components/analytics/ProductAnalytics";
+import { analyticsEnabled } from "@/lib/product-analytics/session";
+import { CONSENT_COOKIE, CONSENT_DENIED_COOKIE, CONSENT_VERSION } from "@/lib/product-analytics/contract";
 import { Link } from "@/components/LocaleLink";
 import { Playfair_Display } from "next/font/google";
 import "./globals.css";
@@ -165,6 +169,10 @@ export default async function RootLayout({ children }: RootLayoutProps) {
   const locale = await getLocale();
   const dict = getDictionary(locale);
   const viewer = await headerViewer();
+  const analyticsCookies = await cookies();
+  const analyticsConsent = analyticsCookies.get(CONSENT_DENIED_COOKIE)?.value === "1"
+    ? "no"
+    : analyticsCookies.get(CONSENT_COOKIE)?.value;
 
   return (
     <html className={playfair.variable} lang={locale}>
@@ -185,6 +193,11 @@ export default async function RootLayout({ children }: RootLayoutProps) {
         </SiteHeader>
         <PublicMobileDock locale={locale} viewer={viewer} />
         <main>{children}</main>
+        <ProductAnalytics
+          enabled={analyticsEnabled() && viewer !== "staff"}
+          initialConsent={analyticsConsent === CONSENT_VERSION ? true : analyticsConsent === "no" ? false : null}
+          locale={locale}
+        />
         <footer className="site-footer">
           <span>© Python Method</span>
           {socialLinks.length > 0 ? (

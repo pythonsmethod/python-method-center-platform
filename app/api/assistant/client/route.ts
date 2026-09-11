@@ -1,5 +1,6 @@
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 import { NextResponse } from "next/server";
+import { recordProductEvent } from "@/lib/product-analytics/record";
 import { conversationContext, type ConversationScope } from "@/lib/assistant/conversation-context";
 import { withConversationArchive } from "@/lib/assistant/conversation-archive";
 import { CLIENT_TOOLS_RULE } from "@/lib/assistant/client-tool-contract";
@@ -140,6 +141,9 @@ export async function POST(request: Request) {
       ? await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId, tier: audience.tier, questionCreatedAt,
           question: typeof payload.displayText === "string" && payload.displayText.trim() ? payload.displayText : messages![messages!.length - 1].content,
           answer: reply, locale: payload.locale === "en" ? "en" : "ru" }) : undefined;
+    if (audience.tier !== "guest" && payload.transient !== true) {
+      await recordProductEvent("chat_completed", payload.locale === "en" ? "en" : "ru");
+    }
     return NextResponse.json({ reply, ...persistence });
   }
 

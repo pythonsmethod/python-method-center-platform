@@ -1,0 +1,23 @@
+
+> python-method-center-platform@0.1.0 test
+> vitest run --maxWorkers=2
+
+
+ RUN  v4.1.10 C:/Users/lenovo/.codex/worktrees/07b9/сайт
+
+Dataset: ankh-synthetic-development@1.0.0 (synthetic_development)
+Parser/provider: canonical-parser-v1 / pretrained-ocr-v2.1-2024-08-07
+Documents/pages: 3 / 4
+Critical numeric exact match: 100.00%
+Verified precision: 100.00%
+Needs-review recall: 100.00%
+Provenance availability: 100.00%
+Critical extraction errors: 0
+False VERIFIED critical errors: 0
+Security issues: 0
+Report: C:\Users\lenovo\.codex\worktrees\07b9\сайт\output\ankh-benchmark\synthetic-baseline.json
+
+ Test Files  131 passed (131)
+      Tests  1007 passed (1007)
+   Start at  14:37:11
+   Duration  23.08s (transform 2.59s, setup 0ms, import 9.20s, tests 6.00s, environment 12ms)

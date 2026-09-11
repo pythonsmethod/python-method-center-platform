@@ -113,7 +113,8 @@ const PRIVACY_RU: LegalDocument = {
       heading: "7. Гости сайта, счётчики и cookie",
       paragraphs: [
         "Чтобы помощник на главной странице не был исчерпан одним посетителем, обращения гостей считаются. Для счётчика IP-адрес не сохраняется: он необратимо преобразуется в хеш с секретной солью, и в базе остаётся только этот хеш. Восстановить из него адрес нельзя, и ни с каким профилем он не связывается.",
-        "Мы используем cookie: технические cookie сессии — чтобы вы оставались в системе, и cookie выбранного языка. Рекламных и трекинговых cookie на платформе нет, сторонние аналитические системы не подключены."
+        "Мы используем технические cookie сессии и выбранного языка. Если включена добровольная продуктовая аналитика, она работает только после вашего согласия: случайный код браузера действует 30 дней, а события шагов пути доступны в отчётах до 90 дней. Они не содержат имени, email, текста анкет, чатов или документов. Отключить сбор можно кнопкой «Отключить аналитику» внизу страницы.",
+        "Необязательная интеграция PostHog, если она подключена владельцем платформы, измеряет только клики и движения указателя на публичной главной странице для тепловых карт. Она не записывает сессии и не собирает содержимое личного кабинета. При обращении к PostHog ваш браузер устанавливает сетевое соединение с этим провайдером; IP-адрес виден на сетевом уровне. Интеграция отключает геолокацию и сохранение IP в свойствах событий."
       ]
     },
     {
@@ -242,7 +243,8 @@ const PRIVACY_EN: LegalDocument = {
       heading: "7. Site visitors, counters and cookies",
       paragraphs: [
         "So that one visitor cannot exhaust the assistant on the front page, visitors' messages are counted. The IP address is not stored for that counter: it is irreversibly turned into a hash with a secret salt, and only the hash remains in the database. The address cannot be recovered from it, and it is not linked to any profile.",
-        "We use cookies: technical session cookies, so that you stay signed in, and a cookie for your chosen language. There are no advertising or tracking cookies on the platform, and no third-party analytics are connected."
+        "We use technical session and language cookies. If optional product analytics is enabled, it runs only after your consent: a random browser code lasts 30 days, and journey-step events are available in reports for up to 90 days. They contain no name, email, questionnaire or chat text, or documents. Use ‘Disable analytics’ at the bottom of the page to stop collection.",
+        "The optional PostHog integration, if connected by the platform owner, measures only clicks and pointer movement on the public landing page for heatmaps. It does not record sessions or collect account-page content. Connecting to PostHog exposes your IP address to the provider at the network level. The integration disables geolocation and IP storage in event properties."
       ]
     },
     {

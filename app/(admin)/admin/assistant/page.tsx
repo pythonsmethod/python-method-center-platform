@@ -48,7 +48,7 @@ export default async function PrivateAssistantPage() {
     chatTitle: "Личный помощник Анны",
     intro: "Здравствуйте, Анна. Дайте мне задачу, идею или принцип — помогу довести его до сильного решения или знания для системы.",
     placeholder: "Напишите задачу, идею или правило…",
-    suggestions: ["Помоги принять решение", "Преврати мою мысль в правило", "Подготовь задание для команды"],
+    suggestions: ["Где посетители теряются на пути? Покажи данные за 30 и 7 дней и отдели гипотезы.", "Преврати мою мысль в правило", "Подготовь задание для команды"],
     unavailable: "Личный помощник пока не подключён.",
   } : {
     eyebrow: "Anna's personal AI",
@@ -58,7 +58,7 @@ export default async function PrivateAssistantPage() {
     chatTitle: "Anna's personal assistant",
     intro: "Hello, Anna. Give me a task, idea, or principle — I will help turn it into a strong decision or durable system knowledge.",
     placeholder: "Write a task, idea, or rule…",
-    suggestions: ["Help me make a decision", "Turn my thought into a rule", "Prepare a task for the team"],
+    suggestions: ["Where do visitors drop off? Show 30-day and 7-day data and separate hypotheses.", "Turn my thought into a rule", "Prepare a task for the team"],
     unavailable: "The personal assistant is not connected yet.",
   };
 

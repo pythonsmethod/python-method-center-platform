@@ -1,5 +1,19 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Consent-gated product analytics — 2026-09-11 — RELEASE CANDIDATE
+
+Aggregate founder analytics, a seven-step consenting-browser funnel and optional
+public-home heatmaps are implemented with RU/EN consent controls. The first-party
+collector stores only an opaque journey UUID, enumerated event, locale and time;
+it excludes profiles, Cases, medical data, documents and free text. PostHog and
+all collection remain disabled by default. Migration
+`20260909210803_product_analytics.sql` is applied only to isolated `ankh-staging`;
+production is unchanged. The owner registration is email-confirmed, but its Case,
+onboarding submission and database consent rows do not yet exist. Hosted
+signup-to-chat acceptance, scheduled retention and publication remain open.
+Evidence: `docs/audits/PRODUCT_ANALYTICS_ANHAM_2026-09-09.md` and
+`docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 
 Owner authorised publication. PR #179 merged as main `8f23316` (feature commit

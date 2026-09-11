@@ -1,5 +1,13 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Consent-gated product analytics — next release gate
+
+Publish the disabled-by-default implementation to a hosted preview, complete the
+email-confirmed staging account's onboarding and Case creation, and verify RU/EN
+signup-to-chat plus retention. External PostHog heatmaps require a separate
+owner-approved account, terms and region; no production collection follows from
+this code release. See `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 
 Published as main `8f23316`, production `dpl_AK3TkxyR3fi7yz1tHYMm8WQvBxJs`

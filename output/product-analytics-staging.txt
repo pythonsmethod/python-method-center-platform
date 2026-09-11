@@ -1,0 +1,7 @@
+{"check":"no consent/no data, foreign origin, deduplication, forged completion and extra fields"}
+{"check":"real Auth + founder allowlist; client, Karen, unlisted admin and anonymous denied"}
+{"check":"signed-in views and real chat completion hook; AI transport is a local test double"}
+{"check":"real Supabase gateway ACL and seven-step SQL fixture","sqlFixtureJourneys":1}
+{"check":"founder prompt receives server aggregates; caller data and journey IDs excluded"}
+{"check":"withdrawal deletes the journey and stops recording"}
+{"check":"PASS","registrationEmailDelivery":"not tested","signupAndOnboardingBrowserFlow":"not tested","hostedPreview":"not deployed","heatmaps":"disabled"}
