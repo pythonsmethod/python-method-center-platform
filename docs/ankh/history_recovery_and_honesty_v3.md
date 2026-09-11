@@ -1,5 +1,53 @@
 # History recovery and factual honesty V3 — 2026-09-09
 
+## Follow-up: client payment and support-period visibility — 2026-09-11
+
+Scope: let the signed-in client Anham answer "did my payment go through, and
+until when am I accompanied?" from records, without inventing dates and without
+exposing payment secrets. This extends the honesty contract recorded below; it
+does not reopen or supersede it.
+
+Before: the client source context carried `payments` with availability
+`not_connected`, and support periods were visible only as the active-period tier
+check and the latest own-Case period. The assistant therefore had no recorded
+payment history and no recorded period boundaries to speak from.
+
+Changed: `lib/assistant/tiers.ts` reads own-profile payments and own-profile
+service periods (20 latest each) and projects them as two typed `system_record`
+sources, `payments` and `service_periods`. Each row is rebuilt field by field in
+code, so the exclusion of `processor_reference`, transaction identifiers, the
+`metadata` blob and any card or bank data does not depend on the select string.
+`lib/assistant/prompts.ts` adds `CLIENT_PAYMENT_VISIBILITY_RULE` to both
+signed-in levels: exact status meanings, recorded dates only, a paid status is
+never an opened period, `unavailable` is never `absent`, and the RU/EN support
+wording for a payment without a period and for no payment at all.
+
+Not changed: no schema migration, no new RLS grant, no new store, no clinical
+workflow, diagnosis, recommendation or automatic verification, no retired client
+case classification, and no client-visible mention of providers or of more than
+one model. Provider selection stays in the internal staff/founder interface. The
+route still ignores browser-supplied payment records, source context and action
+receipts; the server-built context remains the only payment truth.
+
+Checks on the candidate: 39/39 focused tests across five files
+(`assistant-context-honesty`, `client-payment-visibility`,
+`assistant-source-context`, `factual-honesty-provider`,
+`factual-honesty-route`); full offline suite 1,697 passed / 1 skipped across 178
+files in 20.29s with zero failures and no hang; TypeScript, ESLint and
+`git diff --check` passed. The existing synthetic Ankh benchmark ran inside the
+full suite (3 documents / 4 pages, zero critical extraction errors, zero false
+VERIFIED, zero security issues); its synthetic numbers demonstrate no clinical
+accuracy, and the generated artifact churn was restored rather than committed.
+
+One finding came from the tests themselves: the first implementation forwarded
+database rows verbatim, so a projection drift would have carried a processor
+reference into a model prompt. The field-by-field rebuild above closes that.
+
+Limitations: these are deterministic context and instruction tests, not proof
+that every generated sentence about a payment is true. Amount conversion from
+minor units is instruction-governed. Publication status, deployment identifiers
+and signed-in RU/EN acceptance are recorded in the publication section below.
+
 ## Published release and acceptance — 2026-09-10 UTC / September 9 local
 
 **PUBLISHED; scoped release CLOSED.** This completion record supersedes the

@@ -1,5 +1,35 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-11 — Own-profile payment projection for the client assistant
+
+Let the signed-in client's Anham answer payment and support-period questions
+from records, under a deliberately narrow contract.
+
+- Own profile only. Both reads are bound to the authenticated `profile_id`;
+  another person's payments and periods are never queried or projected.
+- Limited projection. Payments expose `product`, `status`, `amount_cents`,
+  `currency`, `paid_at`, `created_at`; periods expose `product`, `status`,
+  `starts_at`, `ends_at`. Up to 20 latest records each, and `sample_count` is
+  never presented as a total.
+- No processor reference. `processor_reference`, external transaction and
+  processor identifiers, the payments `metadata` blob and any card or bank data
+  are excluded. Rows are rebuilt field by field in code, so the guarantee does
+  not depend on a query string staying narrow.
+- A payment status is not a service-period activation. Only a recorded
+  `service_periods` row may establish dates, and `starts_at`/`ends_at` are named
+  as recorded — never derived from a tariff, a duration or a payment date.
+- `unavailable` and `absent` both lead to support. A failed read never becomes
+  "no payment exists"; a payment without a period never becomes an invented
+  activation date. Both cases direct the person to /support in RU and EN.
+- No new schema, no new RLS grant, no new store. The change is a request-time
+  projection over existing tables plus prompt policy, and the browser cannot
+  supply payment records, source context or action receipts.
+- Sources stay separated: a system record remains a system record; it is not
+  merged with the person's own words, an AI draft or a human decision, and a
+  recorded status carries no clinical meaning.
+
+Evidence: docs/ankh/history_recovery_and_honesty_v3.md.
+
 ## 2026-09-10 — GPT-Live as a voice layer, shared Anham backend
 
 Use exact gpt-live-1 and official unified WebRTC plus trusted server sideband.
