@@ -10,9 +10,16 @@ unreadable records to /support in RU and EN. Processor references, transaction
 identifiers, payment metadata, card and bank data stay out of the assistant
 context, and other profiles remain unreadable.
 
-Remaining for this item: merge, READY production deployment for the carrying
-commit, and signed-in RU/EN acceptance on /cabinet. No schema, RLS or clinical
-gate change is implied; existing Ankh clinical NO-GO gates are unchanged.
+Published: PR #177 merged as 892f4cd, Vercel production deployment
+dpl_FBK7mNa8FsCmRLHoR7MgKsjJq4Fc READY on pythonmethodcenter.com and
+www.pythonmethodcenter.com.
+
+Remaining for this item: signed-in RU/EN acceptance on /cabinet — a recorded
+payment with a period, a client with no payment, RU → EN → RU, and close and
+reopen the chat. It was not executed in the publishing session, which had no
+client credentials and no egress to the production domain, so it stays open.
+No schema, RLS or clinical gate change is implied; existing Ankh clinical NO-GO
+gates are unchanged.
 
 ## GPT-Live pilot — next acceptance gate
 

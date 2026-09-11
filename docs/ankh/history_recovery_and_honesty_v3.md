@@ -43,10 +43,38 @@ One finding came from the tests themselves: the first implementation forwarded
 database rows verbatim, so a projection drift would have carried a processor
 reference into a model prompt. The field-by-field rebuild above closes that.
 
+Published: PR #177 merged as 892f4cd3a92db15c6d0a5b3bd354baeb5d629204; the
+change itself is commit 10962ce69b27ef9e99908c7991892ed274bbd5c1. Vercel
+production deployment dpl_FBK7mNa8FsCmRLHoR7MgKsjJq4Fc is READY for the merge
+commit, target production, aliased to pythonmethodcenter.com and
+www.pythonmethodcenter.com with aliasError null; production URL
+https://pythonmethodcenter.com. The remote production build completed
+successfully, the preview deployment dpl_Fk95NC1ScmQfukmk9qHb85KTjTdP for
+10962ce was READY before the merge, and the repository CI workflow passed on the
+candidate. One unauthenticated production request to /cabinet served /login in
+Russian with the guest assistant tier: the deployment serves and the cabinet
+gate holds. The separate anham-mobile-app Vercel project failed its build on
+this commit exactly as it failed on every recent branch (#171–#176) and as its
+production runs were canceled; that is the mobile project's pre-existing
+failure and is not mixed into this website result.
+
+**Signed-in RU/EN cabinet acceptance: NOT PERFORMED — the remaining gate.** The
+publishing session had no client account credentials and no network egress to
+the production domain (the environment's policy rejected the CONNECT), so none
+of the four browser scenarios ran: (A) a client with a recorded payment and a
+recorded period — actual payment status, recorded starts_at and ends_at, no
+invented dates, no vendor name, no processor reference; (B) a client with no
+confirmed payment — no claim of seeing a payment, no promised activation,
+/support instead; (C) RU → EN → RU with the route staying on /cabinet and
+history preserved; (D) closing and reopening the chat with new messages retained
+and no storage warning on a successful save. No acceptance result may be
+inferred from the deployment checks above, and none is claimed here.
+
 Limitations: these are deterministic context and instruction tests, not proof
 that every generated sentence about a payment is true. Amount conversion from
-minor units is instruction-governed. Publication status, deployment identifiers
-and signed-in RU/EN acceptance are recorded in the publication section below.
+minor units is instruction-governed. The earlier recorded quality limitations
+(verbosity, categorical RU team wording, stale-tab locale) are unchanged by this
+follow-up. Existing Ankh clinical production NO-GO gates remain.
 
 ## Published release and acceptance — 2026-09-10 UTC / September 9 local
 

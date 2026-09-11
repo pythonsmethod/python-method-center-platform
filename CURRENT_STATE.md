@@ -32,9 +32,27 @@ passed. No schema migration, no new RLS grant, no clinical workflow, diagnosis,
 recommendation or automatic verification change. Generated benchmark artifact
 churn was restored rather than committed.
 
-Publication is complete only after the merge, a READY production deployment for
-the commit carrying this change, and signed-in RU/EN acceptance on
-pythonmethodcenter.com/cabinet. Release record: docs/ankh/history_recovery_and_honesty_v3.md.
+**PUBLISHED to production.** PR #177 merged as
+892f4cd3a92db15c6d0a5b3bd354baeb5d629204 (change commit
+10962ce69b27ef9e99908c7991892ed274bbd5c1). Vercel production deployment
+dpl_FBK7mNa8FsCmRLHoR7MgKsjJq4Fc is READY for that merge commit, target
+production, aliased to pythonmethodcenter.com and www.pythonmethodcenter.com
+with no alias error; the remote production build completed successfully and the
+repository CI workflow (security inventory, TypeScript, ESLint, full tests,
+audit, build, diff check) passed on the merged commit. An unauthenticated
+production request to /cabinet correctly served /login in Russian with the guest
+assistant tier, confirming the deployment serves and the cabinet gate holds.
+
+**Signed-in RU/EN cabinet acceptance is NOT done and is the remaining gate.**
+This session had no client account credentials and no network egress to the
+production domain, so the four browser scenarios (recorded payment plus period,
+no payment, RU → EN → RU on /cabinet, close and reopen the chat) were not
+executed and no acceptance result may be assumed from the checks above. A
+separate Vercel project, anham-mobile-app, failed its build on this commit as it
+did on every recent branch including #171–#176; that failure belongs to the
+mobile project, not to the website deployment.
+
+Release record: docs/ankh/history_recovery_and_honesty_v3.md.
 
 ## GPT-Live pilot implementation — 2026-09-10
 
