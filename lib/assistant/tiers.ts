@@ -16,6 +16,20 @@ export function isPaidSupportProduct(product: unknown): boolean {
   return product === "support_5_weeks" || product === "support_15_weeks";
 }
 
+// What the client's own assistant may read about money, and nothing more.
+//
+// The person asks "did my payment go through, and until when am I
+// accompanied?" — answering that needs the recorded status and the recorded
+// dates. It never needs `processor_reference`, the external transaction id,
+// the metadata blob, or anything resembling card or bank data: those cannot
+// help the answer and must not reach a model prompt at all.
+const CLIENT_PAYMENT_FIELDS = "product, status, amount_cents, currency, paid_at, created_at";
+// Recorded boundaries only. A period that is not stored stays unknown: an end
+// date is never derived from a tariff, a duration or the date of a payment.
+const CLIENT_SERVICE_PERIOD_FIELDS = "product, status, starts_at, ends_at";
+// A bounded window of recent own records, not the person's whole ledger.
+const CLIENT_RECORD_LIMIT = 20;
+
 export type AssistantAudience = {
   fullPreview?: boolean;
   tier: AssistantTier;
@@ -113,7 +127,7 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
       };
     }
 
-    const [caseResult, periodsResult] = await Promise.all([
+    const [caseResult, periodsResult, paymentsResult, ownPeriodsResult] = await Promise.all([
       supabase
         .from("client_cases")
         .select("id, case_number, direction, created_at")
@@ -125,19 +139,51 @@ export async function resolveAssistantAudience(accessToken?: string | null): Pro
         .eq("profile_id", user.id)
         .eq("status", "active")
         .gt("ends_at", new Date().toISOString())
-        .order("ends_at", { ascending: false })
+        .order("ends_at", { ascending: false }),
+      // Own profile only, both times: the assistant of one person must never
+      // be able to read another person's money records.
+      supabase
+        .from("payments")
+        .select(CLIENT_PAYMENT_FIELDS)
+        .eq("profile_id", user.id)
+        .order("created_at", { ascending: false })
+        .limit(CLIENT_RECORD_LIMIT),
+      supabase
+        .from("service_periods")
+        .select(CLIENT_SERVICE_PERIOD_FIELDS)
+        .eq("profile_id", user.id)
+        .order("starts_at", { ascending: false })
+        .limit(CLIENT_RECORD_LIMIT)
     ]);
 
     const retrievedAt = new Date().toISOString();
     const caseRow = caseResult.error ? null : caseResult.data;
     const activePeriods = periodsResult.error ? [] : periodsResult.data ?? [];
+    // Rebuild each row field by field instead of forwarding what the query
+    // returned. The select list above already narrows it, but then the
+    // guarantee would live in a string: one added column, one view that
+    // returns more than it used to, and a processor reference would reach a
+    // model prompt. Named fields cannot drift that way.
+    const payments = (paymentsResult.error ? [] : paymentsResult.data ?? []).map((row) => ({
+      product: row.product, status: row.status, amount_cents: row.amount_cents,
+      currency: row.currency, paid_at: row.paid_at, created_at: row.created_at
+    }));
+    const ownPeriods = (ownPeriodsResult.error ? [] : ownPeriodsResult.data ?? []).map((row) => ({
+      product: row.product, status: row.status, starts_at: row.starts_at, ends_at: row.ends_at
+    }));
     const hasPaidSupport = activePeriods.some((row) => isPaidSupportProduct(row.product));
     const fullPreview = hasFullClientAssistantPreview(user);
     const sources: AssistantSource[] = [
       assistantSource({ id: "account", kind: "system_record", origin: "authenticated session", availability: "available", retrievedAt, freshness: "current_snapshot", scope: "authenticated account only", data: { email: user.email ?? null } }),
       assistantSource({ id: "case", kind: "system_record", origin: "client_cases", availability: caseResult.error ? "unavailable" : caseRow ? "available" : "absent", retrievedAt, recordedAt: caseRow?.created_at ?? null, freshness: "current_snapshot", scope: "own Case metadata; not processing classification", data: caseRow ? { id: caseRow.id, created_at: caseRow.created_at, direction: caseRow.direction } : null }),
       assistantSource({ id: "active_support", kind: "system_record", origin: "service_periods", availability: periodsResult.error ? "unavailable" : activePeriods.length ? "available" : "absent", retrievedAt, freshness: "current_snapshot", scope: "own active service periods; NOT proof of payment", data: activePeriods }),
-      assistantSource({ id: "payments", kind: "system_record", origin: "payments", availability: "not_connected", retrievedAt, scope: "payments not queried in client chat", data: null })
+      // Payment history of this account. A recorded status is a system fact
+      // about the record, never a medical or access conclusion — and a paid
+      // status on its own does not open a support period.
+      assistantSource({ id: "payments", kind: "system_record", origin: "payments", availability: paymentsResult.error ? "unavailable" : payments.length ? "available" : "absent", retrievedAt, freshness: "current_snapshot", scope: `own profile payments only; up to ${CLIENT_RECORD_LIMIT} latest; sample_count is NOT total; product/status/amount_cents/currency/paid_at/created_at only; no processor reference, transaction id, card or bank data; amount_cents is minor currency units; paid status is NOT proof of an active service period`, data: { sample_count: payments.length, rows: payments } }),
+      // Recorded support periods of this account: the only place a start or
+      // end date may come from.
+      assistantSource({ id: "service_periods", kind: "system_record", origin: "service_periods", availability: ownPeriodsResult.error ? "unavailable" : ownPeriods.length ? "available" : "absent", retrievedAt, freshness: "current_snapshot", scope: `own profile service periods only; up to ${CLIENT_RECORD_LIMIT} latest; recorded starts_at/ends_at only, never calculated or extended; NOT proof of payment; absent means no period record was found, not that a payment is missing`, data: { sample_count: ownPeriods.length, rows: ownPeriods } })
     ];
 
     if (fullPreview) sources.push(assistantSource({ id: "assistant_preview", kind: "system_record", origin: "owner-managed client assistant preview", availability: "available", retrievedAt, scope: "assistant capabilities only; NOT proof of payment or active support", data: { full_client_assistant_preview: true } }));

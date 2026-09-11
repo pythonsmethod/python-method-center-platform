@@ -1,5 +1,41 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Client payment and support-period visibility — 2026-09-11
+
+The signed-in client Anham now reads the person's own payment history and their
+own recorded support periods. The client context previously carried `payments`
+as `not_connected`, so the assistant could not answer "did my payment go
+through, and until when am I accompanied?" at all.
+
+What Anham receives: own-profile payments (`product`, `status`, `amount_cents`,
+`currency`, `paid_at`, `created_at`) and own-profile service periods (`product`,
+`status`, `starts_at`, `ends_at`), up to 20 latest records each, rebuilt field by
+field in code rather than forwarded from the query result.
+
+What Anham never receives: `processor_reference`, external transaction or
+processor identifiers, the payments `metadata` blob, card or bank data, and any
+record of another profile. No payment secrets reach a model prompt.
+
+Answer boundaries: recorded `paid`, `pending`, `failed`, `refunded` and
+`partially_refunded` are distinguished; only recorded `starts_at`/`ends_at` may
+be named and an end date is never calculated; a paid status alone never becomes
+an active support period; `unavailable` (read failure) never becomes "you have
+no payment"; both a payment without a period and no payment at all route the
+person to /support in RU and EN. The browser cannot supply payment records,
+source context or action receipts — the server-built context is the only truth.
+
+Checks on the candidate: 39/39 focused tests (five files: assistant-context-honesty,
+client-payment-visibility, assistant-source-context, factual-honesty-provider,
+factual-honesty-route); full suite 1,697 passed / 1 skipped across 178 files in
+20.29s, zero failures and no hang; TypeScript, ESLint and `git diff --check`
+passed. No schema migration, no new RLS grant, no clinical workflow, diagnosis,
+recommendation or automatic verification change. Generated benchmark artifact
+churn was restored rather than committed.
+
+Publication is complete only after the merge, a READY production deployment for
+the commit carrying this change, and signed-in RU/EN acceptance on
+pythonmethodcenter.com/cabinet. Release record: docs/ankh/history_recovery_and_honesty_v3.md.
+
 ## GPT-Live pilot implementation — 2026-09-10
 
 Existing voice UI now has a gated gpt-live-1 WebRTC adapter with trusted server

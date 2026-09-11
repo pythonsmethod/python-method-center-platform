@@ -1,5 +1,19 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Client payment and support-period visibility — 2026-09-11 — IMPLEMENTED
+
+Payment and service-period visibility for the signed-in client assistant is
+implemented: Anham reads its own profile's payment records and recorded support
+periods, names recorded `starts_at`/`ends_at` only, never calculates an end
+date, never treats a paid status as an opened period, and routes absent or
+unreadable records to /support in RU and EN. Processor references, transaction
+identifiers, payment metadata, card and bank data stay out of the assistant
+context, and other profiles remain unreadable.
+
+Remaining for this item: merge, READY production deployment for the carrying
+commit, and signed-in RU/EN acceptance on /cabinet. No schema, RLS or clinical
+gate change is implied; existing Ankh clinical NO-GO gates are unchanged.
+
 ## GPT-Live pilot — next acceptance gate
 
 Review the implemented Live adapter, approve the specific scoped release, configure
