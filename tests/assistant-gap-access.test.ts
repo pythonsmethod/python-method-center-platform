@@ -64,7 +64,7 @@ describe("gap notification migration", () => {
   // The statements only. The file's comments explain which privileges are
   // deliberately withheld, and naming them there must not read as granting
   // them here.
-  const sql = source.replace(/--[^\n]*/g, "");
+  const sql = source.replace(/\r\n/g, "\n").replace(/--[^\n]*/g, "");
 
   it("creates both tables with row level security enabled", () => {
     for (const table of ["assistant_gap_events", "assistant_gap_reads"]) {
@@ -145,5 +145,42 @@ describe("gap notification migration", () => {
     expect(sql).not.toMatch(/drop\s+(table|column|function|index)/i);
     expect(sql).not.toMatch(/^\s*delete\s+from/im);
     expect(sql).not.toMatch(/truncate/i);
+  });
+});
+
+describe("atomic gap recording migration", () => {
+  const source = readFileSync(
+    path.join(
+      process.cwd(),
+      "supabase/migrations/20260911211406_atomic_assistant_gap_recording.sql"
+    ),
+    "utf8"
+  ).replace(/\r\n/g, "\n");
+  const sql = source.replace(/--[^\n]*/g, "");
+
+  it("serializes one topic draft before event deduplication", () => {
+    expect(sql).toContain("pg_catalog.pg_advisory_xact_lock");
+    expect(sql).toContain("'assistant_gap_draft:' || p_topic");
+    expect(sql.indexOf("pg_catalog.pg_advisory_xact_lock")).toBeLessThan(
+      sql.indexOf("from public.assistant_gap_events")
+    );
+  });
+
+  it("creates the inactive staff-only draft and event in the same function", () => {
+    expect(sql).toContain("insert into public.assistant_knowledge");
+    expect(sql).toContain("'staff',\n      'general',\n      false");
+    expect(sql).toContain("insert into public.assistant_gap_events");
+  });
+
+  it("is service-role-only and receives no client text or identifier", () => {
+    expect(sql).toContain(
+      "revoke all on function public.record_assistant_gap_event(text, text, text, text, text, text)\n  from public, anon, authenticated, service_role"
+    );
+    expect(sql).toContain(
+      "grant execute on function public.record_assistant_gap_event(text, text, text, text, text, text)\n  to service_role"
+    );
+    for (const forbidden of ["p_question", "p_profile_id", "p_case_id", "p_email"]) {
+      expect(sql).not.toContain(forbidden);
+    }
   });
 });

@@ -1,7 +1,6 @@
 import { describe, expect, it } from "vitest";
 import {
   auditActionLabels,
-  caseStatusLabels,
   formatMoney,
   lifecycleLabels,
   productLabels
@@ -37,19 +36,16 @@ describe("founder labels", () => {
       "consent_captured",
       "document_uploaded",
       "payment_recorded",
-      "case_state_updated",
-      "support_request_created",
-      "support_request_status_changed"
+      "support_request_created"
     ]) {
       expect(auditActionLabels[action], action).toBeTruthy();
     }
   });
 
-  it("covers every lifecycle event type and case status", () => {
+  it("covers every active lifecycle event type", () => {
     for (const event of [
       "case_created",
       "onboarding_submitted",
-      "status_changed",
       "payment_recorded",
       "service_period_started",
       "service_period_completed",
@@ -60,17 +56,5 @@ describe("founder labels", () => {
       expect(lifecycleLabels[event], event).toBeTruthy();
     }
 
-    for (const status of [
-      "created",
-      "awaiting_onboarding",
-      "ready_for_review",
-      "in_review",
-      "active_support",
-      "inactive_support",
-      "completed",
-      "archived"
-    ]) {
-      expect(caseStatusLabels[status], status).toBeTruthy();
-    }
   });
 });

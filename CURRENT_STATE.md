@@ -1026,3 +1026,14 @@ accounts cannot grant it. Live SSE omits monetary fields for everyone else;
 server audit retains accounting. RU/EN voice UI keeps duration and privacy
 disclosure for all users. No schema, clinical, memory or audio-flow changes.
 Validation and release status: docs/ankh/live_cost_visibility.md.
+
+## 2026-09-11 — Classification retirement and release repairs
+
+The active Case workflow no longer renders, sorts, queries or automatically
+writes the retired status, urgency and direction classification. English Case
+detail now keeps document and review states in English. Founder knowledge gaps
+are recorded through one atomic topic-serialized service-role RPC, and the live route externalizes
+`ws` for the Node runtime. The separate mobile Vercel project's invalid Root
+Directory was cleared. Validation and production evidence are recorded in
+`docs/ankh/retired_classification_atomic_gaps_voice_release.md`. Clinical and
+production auto-verification gates remain unchanged.

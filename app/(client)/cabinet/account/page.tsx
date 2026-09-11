@@ -14,13 +14,10 @@ import {
 import { formatDateTime } from "@/lib/i18n/format";
 import { getOwnPayments } from "@/lib/payments/queries";
 import {
-  caseDirectionLabel,
-  caseStatusLabel,
-  caseUrgencyLabel,
-  lifecycleEventLabel,
   paymentProductLabel,
   paymentStatusLabel
 } from "@/lib/i18n/status-labels";
+import { caseActivityEntries } from "@/lib/cases/activity";
 
 export const dynamic = "force-dynamic";
 
@@ -64,6 +61,10 @@ export default async function AccountPage() {
     caseResult.status === "ready" && caseResult.case
       ? await getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id)
       : null;
+  const history =
+    historyResult?.status === "ready"
+      ? caseActivityEntries(historyResult.events, locale)
+      : [];
 
   return (
     <div className="page-shell">
@@ -100,19 +101,13 @@ export default async function AccountPage() {
             </>
           ) : caseResult.case ? (
             <>
-              <h2>{caseStatusLabel(caseResult.case.status, locale)}</h2>
+              <h2>{t.caseTitle}</h2>
               <ul className="status-list">
                 <li>
                   {t.caseNumber}: <code>{caseResult.case.id}</code>
                 </li>
                 <li>
                   {t.caseGoal}: {caseResult.case.title ?? t.caseGoalEmpty}
-                </li>
-                <li>
-                  {t.caseUrgency}: {caseUrgencyLabel(caseResult.case.urgency, locale)}
-                </li>
-                <li>
-                  {t.caseDirection}: {caseDirectionLabel(caseResult.case.direction, locale)}
                 </li>
                 <li>
                   {t.caseCreated}: {formatDateTime(caseResult.case.created_at, locale)}
@@ -171,17 +166,13 @@ export default async function AccountPage() {
             </p>
           ) : historyResult.status === "error" ? (
             <p className="empty-state">{historyResult.message}</p>
-          ) : historyResult.events.length === 0 ? (
+          ) : history.length === 0 ? (
             <p className="empty-state">{t.historyEmpty}</p>
           ) : (
             <ul className="status-list">
-              {historyResult.events.map((event) => (
+              {history.map((event) => (
                 <li key={event.id}>
-                  {formatDateTime(event.created_at, locale)} —{" "}
-                  {lifecycleEventLabel(event.event_type, locale)}
-                  {event.to_status
-                    ? `: ${caseStatusLabel(event.to_status, locale)}`
-                    : ""}
+                  {formatDateTime(event.createdAt, locale)} — {event.label}
                 </li>
               ))}
             </ul>

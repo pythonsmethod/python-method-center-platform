@@ -37,12 +37,11 @@ const ru = {
       detailsText:
         "Эти данные видит только команда центра. Адрес нужен для доставки формулы Professor Python и заказов из магазина.",
       caseLabel: "Ваш кейс",
-      caseUnavailable: "Статус кейса недоступен",
+      caseTitle: "Материалы кейса",
+      caseUnavailable: "Кейс временно недоступен",
       caseNumber: "Номер кейса",
       caseGoal: "Цель",
       caseGoalEmpty: "Не указана",
-      caseUrgency: "Срочность",
-      caseDirection: "Направление",
       caseCreated: "Создан",
       caseNoneTitle: "Кейса пока нет",
       caseNoneText:
@@ -1208,12 +1207,11 @@ const en: typeof ru = {
       detailsText:
         "Only the center's team sees these details. The address is needed to deliver Professor Python's formula and any shop orders.",
       caseLabel: "Your case",
-      caseUnavailable: "Case status unavailable",
+      caseTitle: "Case materials",
+      caseUnavailable: "Case temporarily unavailable",
       caseNumber: "Case number",
       caseGoal: "Goal",
       caseGoalEmpty: "Not stated",
-      caseUrgency: "Urgency",
-      caseDirection: "Direction",
       caseCreated: "Created",
       caseNoneTitle: "No case yet",
       caseNoneText:

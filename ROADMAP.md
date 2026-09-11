@@ -647,3 +647,11 @@ accounts cannot grant it. Live SSE omits monetary fields for everyone else;
 server audit retains accounting. RU/EN voice UI keeps duration and privacy
 disclosure for all users. No schema, clinical, memory or audio-flow changes.
 Validation and release status: docs/ankh/live_cost_visibility.md.
+
+## 2026-09-11 — Retired classification and operational repairs
+
+Close the remaining active Case classification surfaces, make founder gap
+recording atomic, repair the live WebSocket server bundle and restore the
+mobile project's root build. This operational release does not advance an Ankh
+clinical phase or relax any production trust gate. Evidence:
+`docs/ankh/retired_classification_atomic_gaps_voice_release.md`.

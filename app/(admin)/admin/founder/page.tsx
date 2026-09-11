@@ -91,8 +91,8 @@ export default async function FounderPage() {
           <span>всего оплачено на платформе</span>
         </div>
         <div className="founder-metric">
-          <b>{m.openRequests}</b>
-          <span>открытых обращений</span>
+          <b>{m.supportRequests}</b>
+          <span>обращений всего</span>
         </div>
         <div className="founder-metric">
           <b>{m.messages7d}</b>
@@ -110,7 +110,7 @@ export default async function FounderPage() {
           <h2>Что происходит на платформе</h2>
           <p>
             Последние {overview.timeline.length} событий: оплаты, сообщения,
-            обращения, изменения кейсов и записи аудита — в одной
+            обращения, события кейсов и записи аудита — в одной
             хронологии.
           </p>
 

@@ -4,9 +4,6 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 export type StaffCaseListItem = {
   id: string;
   case_number: string | null;
-  status: string;
-  urgency: string;
-  direction: string;
   title: string | null;
   created_at: string;
   updated_at: string;
@@ -54,7 +51,7 @@ export async function getStaffCases(): Promise<StaffCasesResult> {
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      "id, case_number, status, urgency, direction, title, created_at, updated_at, profiles(email, full_name, phone, country_code)"
+      "id, case_number, title, created_at, updated_at, profiles(email, full_name, phone, country_code)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -100,9 +97,6 @@ export type StaffCaseLifecycleEvent = CaseLifecycleEvent;
 export type StaffCaseDetail = {
   id: string;
   profile_id: string;
-  status: string;
-  urgency: string;
-  direction: string;
   title: string | null;
   summary: string | null;
   created_at: string;
@@ -156,7 +150,7 @@ export async function getStaffCaseDetail(
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      `id, profile_id, status, urgency, direction, title, summary, created_at, updated_at,
+      `id, profile_id, title, summary, created_at, updated_at,
        profiles(email, full_name, phone, delivery_first_name, delivery_last_name, delivery_email, delivery_phone, delivery_country_code, delivery_region, delivery_city, delivery_street, delivery_building, delivery_unit, delivery_postal_code, delivery_instructions),
        onboarding_submissions(id, status, submitted_at, payload),
        uploaded_documents(id, original_filename, document_status, identity_review_status, created_at),

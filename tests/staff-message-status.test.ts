@@ -1,22 +1,18 @@
 import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 
-describe("staff reply case status", () => {
+describe("staff reply without case classification", () => {
   const source = readFileSync("lib/messages/actions.ts", "utf8");
 
-  it("moves only submitted cases into active review", () => {
-    expect(source).toContain('caseRow.status === "ready_for_review"');
-    expect(source).toContain('.eq("status", "ready_for_review")');
-    expect(source).toContain('.update({ status: "in_review" })');
+  it("does not read, change or record a retired case state", () => {
+    expect(source).not.toContain('caseRow.status === "ready_for_review"');
+    expect(source).not.toContain('.update({ status: "in_review" })');
+    expect(source).not.toContain('action: "case_state_updated"');
+    expect(source).not.toContain('eventType: "status_changed"');
+    expect(source).not.toContain('trigger: "first_staff_reply"');
   });
 
-  it("records the automatic transition in both histories", () => {
-    expect(source).toContain('action: "case_state_updated"');
-    expect(source).toContain('eventType: "status_changed"');
-    expect(source).toContain('trigger: "first_staff_reply"');
-  });
-
-  it("refreshes staff and client status screens", () => {
+  it("refreshes the staff and client conversation screens", () => {
     expect(source).toContain('revalidatePath("/admin/cases")');
     expect(source).toContain('revalidatePath("/cabinet")');
   });

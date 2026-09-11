@@ -1176,3 +1176,15 @@ accounts cannot grant it. Live SSE omits monetary fields for everyone else;
 server audit retains accounting. RU/EN voice UI keeps duration and privacy
 disclosure for all users. No schema, clinical, memory or audio-flow changes.
 Validation and release status: docs/ankh/live_cost_visibility.md.
+
+## 2026-09-11 — Atomic assistant gaps and no active Case classification
+
+Active product code must not expose or mutate the retired Case/support
+processing classification. Historical database columns and audit rows remain
+for compatibility and provenance, but active timelines filter them. Assistant
+gap creation is one `SECURITY INVOKER` transaction serialized by topic, while
+event deduplication includes audience and locale. It receives no client question
+or identifier. `ws` stays
+external to Next.js server bundles so live sideband transport uses the Node
+package directly. See
+`docs/ankh/retired_classification_atomic_gaps_voice_release.md`.

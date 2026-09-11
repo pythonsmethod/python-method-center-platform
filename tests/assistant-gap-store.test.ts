@@ -20,7 +20,8 @@ const state = vi.hoisted(() => ({
   deletes: [] as { table: string; filters: Record<string, unknown> }[],
   rpcCalls: [] as { name: string; args: Record<string, unknown> }[],
   clientAvailable: true,
-  throwOnFrom: false
+  throwOnFrom: false,
+  throwOnRpc: false
 }));
 
 function makeQuery(table: string) {
@@ -89,6 +90,7 @@ vi.mock("@/lib/supabase/service", () => ({
         return makeQuery(table);
       },
       rpc: async (name: string, args: Record<string, unknown>) => {
+        if (state.throwOnRpc) throw new Error("database unreachable");
         state.rpcCalls.push({ name, args });
         return state.rpc;
       }
@@ -129,63 +131,50 @@ function reset() {
   state.rpcCalls = [];
   state.clientAvailable = true;
   state.throwOnFrom = false;
+  state.throwOnRpc = false;
 }
 
 describe("founder gap store", () => {
   beforeEach(reset);
 
-  it("writes only the enumerated columns of the event", async () => {
+  it("sends only enumerated metadata and generic draft seed copy to one atomic RPC", async () => {
+    state.rpc = {
+      data: [{ record_status: "recorded", event_id: "event-1", knowledge_draft_id: "draft-1" }],
+      error: null
+    };
     expect(await recordKnowledgeGap({ ...GAP_SIGNAL })).toEqual({ status: "recorded" });
 
-    const event = state.inserts.find((row) => row.table === "assistant_gap_events");
-
-    expect(event).toBeDefined();
-    expect(Object.keys(event!.payload).sort()).toEqual([
-      "audience",
-      "escalation_target",
-      "knowledge_draft_id",
-      "locale",
-      "topic"
+    expect(state.rpcCalls).toHaveLength(1);
+    expect(state.rpcCalls[0].name).toBe("record_assistant_gap_event");
+    expect(Object.keys(state.rpcCalls[0].args).sort()).toEqual([
+      "p_audience",
+      "p_draft_content",
+      "p_draft_title",
+      "p_escalation_target",
+      "p_locale",
+      "p_topic"
     ]);
-    // No client, case, profile or question column exists to be filled.
     for (const forbidden of ["question", "profile_id", "case_id", "content", "text", "email"]) {
-      expect(event!.payload).not.toHaveProperty(forbidden);
+      expect(state.rpcCalls[0].args).not.toHaveProperty(forbidden);
     }
+    expect(state.inserts).toHaveLength(0);
   });
 
-  it("opens the knowledge draft inactive and staff-only", async () => {
-    await recordKnowledgeGap({ ...GAP_SIGNAL });
-
-    const draft = state.inserts.find((row) => row.table === "assistant_knowledge");
-
-    expect(draft).toBeDefined();
-    expect(draft!.payload.is_active).toBe(false);
-    expect(draft!.payload.audience).toBe("staff");
-  });
-
-  it("reuses an existing draft instead of opening a second one", async () => {
-    state.existingDraft = { data: { id: "draft-existing" }, error: null };
-
-    await recordKnowledgeGap({ ...GAP_SIGNAL });
-
-    expect(state.inserts.filter((row) => row.table === "assistant_knowledge")).toHaveLength(0);
-    expect(
-      state.inserts.find((row) => row.table === "assistant_gap_events")!.payload.knowledge_draft_id
-    ).toBe("draft-existing");
-  });
-
-  it("deduplicates a repeated subject inside the window", async () => {
-    state.recentEvent = { data: { id: "already-there" }, error: null };
+  it("maps the RPC deduplication result", async () => {
+    state.rpc = {
+      data: [{ record_status: "deduplicated", event_id: "already-there", knowledge_draft_id: "draft-1" }],
+      error: null
+    };
 
     expect(await recordKnowledgeGap({ ...GAP_SIGNAL })).toEqual({ status: "deduplicated" });
     expect(state.inserts).toHaveLength(0);
   });
 
   it("never throws and never records when the database is unreachable", async () => {
-    state.throwOnFrom = true;
+    state.throwOnRpc = true;
     expect(await recordKnowledgeGap({ ...GAP_SIGNAL })).toEqual({ status: "skipped" });
 
-    state.throwOnFrom = false;
+    state.throwOnRpc = false;
     state.clientAvailable = false;
     expect(await recordKnowledgeGap({ ...GAP_SIGNAL })).toEqual({ status: "skipped" });
     expect(state.inserts).toHaveLength(0);
@@ -193,6 +182,10 @@ describe("founder gap store", () => {
 
   it("captures from a delivered escalation reply and ignores ordinary answers", async () => {
     const question = "Когда вернутся деньги за отменённую оплату?";
+    state.rpc = {
+      data: [{ record_status: "recorded", event_id: "event-1", knowledge_draft_id: "draft-1" }],
+      error: null
+    };
 
     await captureKnowledgeGap({
       reply: unconfirmedReply("ru", "support", "client"),
@@ -200,10 +193,10 @@ describe("founder gap store", () => {
       audience: "client",
       locale: "ru"
     });
-    const recorded = state.inserts.find((row) => row.table === "assistant_gap_events");
+    const recorded = state.rpcCalls.find((row) => row.name === "record_assistant_gap_event");
     expect(recorded).toBeDefined();
-    expect(recorded!.payload.topic).toBe("payment_or_refund");
-    expect(recorded!.payload.escalation_target).toBe("support");
+    expect(recorded!.args.p_topic).toBe("payment_or_refund");
+    expect(recorded!.args.p_escalation_target).toBe("support");
 
     reset();
     await captureKnowledgeGap({
@@ -212,7 +205,7 @@ describe("founder gap store", () => {
       audience: "client",
       locale: "ru"
     });
-    expect(state.inserts).toHaveLength(0);
+    expect(state.rpcCalls).toHaveLength(0);
   });
 
   it("keeps read state per founder and never edits the event", async () => {

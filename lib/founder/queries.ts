@@ -7,7 +7,6 @@ import { hasAssistantEnv } from "@/lib/assistant/router";
 import {
   actorRoleLabels,
   auditActionLabels,
-  caseStatusLabels,
   formatMoney,
   lifecycleLabels,
   notificationKindLabels,
@@ -25,7 +24,7 @@ export type FounderMetrics = {
   paidPayments30d: number;
   revenue30dCents: number;
   revenueTotalCents: number;
-  openRequests: number;
+  supportRequests: number;
   documents: number;
   messages7d: number;
 };
@@ -70,7 +69,7 @@ const emptyMetrics: FounderMetrics = {
   paidPayments30d: 0,
   revenue30dCents: 0,
   revenueTotalCents: 0,
-  openRequests: 0,
+  supportRequests: 0,
   documents: 0,
   messages7d: 0
 };
@@ -197,19 +196,13 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     }
   );
 
-  const [readyForReview, failedDocuments, expiredActivePeriods, unmatchedPayments] = await Promise.all([
-    countRows(supabase, "client_cases", { type: "eq", column: "status", value: "ready_for_review" }),
+  const [failedDocuments, expiredActivePeriods, unmatchedPayments] = await Promise.all([
     countRows(supabase, "uploaded_documents", { type: "eq", column: "document_status", value: "failed" }),
     supabase.from("service_periods").select("id", { count: "exact", head: true }).eq("status", "active").lte("ends_at", new Date().toISOString()),
     supabase.from("notification_events").select("id", { count: "exact", head: true }).eq("kind", "payment").like("dedupe_key", "payment_unmatched:%")
   ]);
 
   systems.push(
-    {
-      name: "Кейсы готовы к разбору",
-      ok: readyForReview === 0,
-      detail: readyForReview === 0 ? "Очередь пуста" : `${readyForReview} кейсов требуют проверки и перевода на следующий этап`
-    },
     {
       name: "Очередь обработки документов",
       ok: failedDocuments === 0,
@@ -236,7 +229,7 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     activeSupport,
     newClients7d,
     documents,
-    openRequests,
+    supportRequests,
     messages7d,
     paymentsAll,
     paymentRows,
@@ -248,10 +241,10 @@ export async function getFounderOverview(): Promise<FounderOverview> {
   ] = await Promise.all([
     countRows(supabase, "profiles", { type: "eq", column: "role", value: "client" }),
     countRows(supabase, "client_cases"),
-    countRows(supabase, "client_cases", {
+    countRows(supabase, "service_periods", {
       type: "eq",
       column: "status",
-      value: "active_support"
+      value: "active"
     }),
     countRows(supabase, "profiles", {
       type: "gte",
@@ -259,11 +252,7 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       value: since7d
     }),
     countRows(supabase, "uploaded_documents"),
-    countRows(supabase, "support_requests", {
-      type: "eq",
-      column: "status",
-      value: "open"
-    }),
+    countRows(supabase, "support_requests"),
     countRows(supabase, "case_messages", {
       type: "gte",
       column: "created_at",
@@ -287,12 +276,12 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       .limit(TIMELINE_PER_SOURCE),
     supabase
       .from("support_requests")
-      .select("id, subject, status, created_at, profile_id, contact_email")
+      .select("id, subject, created_at, profile_id, contact_email")
       .order("created_at", { ascending: false })
       .limit(TIMELINE_PER_SOURCE),
     supabase
       .from("case_lifecycle_events")
-      .select("id, event_type, from_status, to_status, actor_role, created_at, case_id")
+      .select("id, event_type, actor_role, created_at, case_id")
       .order("created_at", { ascending: false })
       .limit(TIMELINE_PER_SOURCE),
     supabase
@@ -397,24 +386,24 @@ export async function getFounderOverview(): Promise<FounderOverview> {
   }
 
   for (const row of lifecycleRows.data ?? []) {
-    const transition =
-      row.from_status || row.to_status
-        ? ` · ${caseStatusLabels[row.from_status ?? ""] ?? "—"} → ${
-            caseStatusLabels[row.to_status ?? ""] ?? "—"
-          }`
-        : "";
+    if (row.event_type === "status_changed") continue;
 
     timeline.push({
       id: `life-${row.id}`,
       at: row.created_at,
       kind: "case",
       title: `📁 ${lifecycleLabels[row.event_type] ?? row.event_type}`,
-      detail: `Инициатор: ${actorRoleLabels[row.actor_role] ?? row.actor_role}${transition}`,
+      detail: `Инициатор: ${actorRoleLabels[row.actor_role] ?? row.actor_role}`,
       href: row.case_id ? `/admin/cases/${row.case_id}` : null
     });
   }
 
   for (const row of auditRows.data ?? []) {
+    if (
+      row.action === "case_state_updated" ||
+      row.action === "support_request_status_changed"
+    ) continue;
+
     timeline.push({
       id: `audit-${row.id}`,
       at: row.created_at,
@@ -464,7 +453,7 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       paidPayments30d: recentPaid.length,
       revenue30dCents,
       revenueTotalCents,
-        openRequests,
+      supportRequests,
       documents,
       messages7d
     },

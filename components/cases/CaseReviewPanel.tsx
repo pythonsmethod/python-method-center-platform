@@ -70,6 +70,10 @@ export function CaseReviewPanel({
         verified: "Дополнительная проверка не требуется.",
         stale: "Клиент загрузил новые документы после подготовки текста. Подготовьте его заново.",
         recognized: "Распознано файлов",
+        reupload: "Нужна повторная загрузка",
+        reuploadHint: "Клиент получил сообщение с названием файла.",
+        allReady: "Все материалы учтены — итог можно собрать без повторного чтения файлов.",
+        processing: "Остальные файлы находятся в очереди или обрабатываются.",
         blocked: "Сначала проверьте все критические свидетельства в целостной картине кейса."
       }
     : {
@@ -93,6 +97,10 @@ export function CaseReviewPanel({
         verified: "No additional verification is required.",
         stale: "The client uploaded new documents after this text was prepared. Prepare it again.",
         recognized: "Files recognized",
+        reupload: "Re-upload required",
+        reuploadHint: "The client received a message with the file name.",
+        allReady: "All materials are included, so the result can be prepared without rereading the files.",
+        processing: "The remaining files are queued or being processed.",
         blocked: "Review every critical evidence item in the whole-case picture before approval."
       };
 
@@ -148,10 +156,10 @@ export function CaseReviewPanel({
         <p className="case-review__origin">
           {t.recognized}: {readyCount} / {documentsCount}.
           {reuploadCount > 0
-            ? ` Нужна повторная загрузка: ${reuploadCount}. Клиент получил сообщение с названием файла.`
+            ? ` ${t.reupload}: ${reuploadCount}. ${t.reuploadHint}`
             : allReady
-              ? " Все материалы учтены — итог можно собрать без повторного чтения файлов."
-              : " Остальные файлы находятся в очереди или обрабатываются."}
+              ? ` ${t.allReady}`
+              : ` ${t.processing}`}
         </p>
       ) : null}
 
