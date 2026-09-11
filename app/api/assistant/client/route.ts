@@ -25,6 +25,7 @@ import {
   guardAnhamDeepRequest,
   guardAssistantRequest
 } from "@/lib/assistant/guard";
+import { captureKnowledgeGap } from "@/lib/assistant/escalation-store";
 import { saveAssistantExchange } from "@/lib/assistant/history";
 import { isExplicitOutreachRefusal, stopAssistantOutreach } from "@/lib/assistant/outreach";
 import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/tiers";
@@ -266,10 +267,22 @@ export async function POST(request: Request) {
   }
   if (result.refusal) result.reply = providerPolicyRefusal(rawLocale === "en" ? "en" : "ru").reply;
 
-  return respondWithReply(guardFactualReply({
+  const question = messages[messages.length - 1]?.content ?? "";
+  const honestReply = guardFactualReply({
     reply: result.reply,
-    question: messages[messages.length - 1]?.content ?? "",
+    question,
     locale: rawLocale === "en" ? "en" : rawLocale === "ru" ? "ru" : locale,
     audience: "client"
-  }) + (result.refusal ? "" : webSourceAppendix(clientTools?.webResults ?? [], responseLocale)));
+  });
+
+  // The founder's gap centre learns only that a subject came up unanswered.
+  // The question itself stays in this request and is not carried anywhere.
+  await captureKnowledgeGap({
+    reply: honestReply,
+    question,
+    audience: "client",
+    locale: responseLocale
+  });
+
+  return respondWithReply(honestReply + (result.refusal ? "" : webSourceAppendix(clientTools?.webResults ?? [], responseLocale)));
 }

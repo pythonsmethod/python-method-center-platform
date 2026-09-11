@@ -1,4 +1,5 @@
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
+import { isClassificationEvent } from "@/lib/cases/activity";
 import { getCaseReview } from "@/lib/cases/review-queries";
 import { assistantSource, renderSourceContext, type AssistantSource } from "@/lib/assistant/source-context";
 
@@ -12,7 +13,10 @@ export async function buildCaseSources(caseId: string): Promise<AssistantSource[
   const detail = result.case;
   const sources: AssistantSource[] = [];
   const add = (source: Omit<Parameters<typeof assistantSource>[0], "retrievedAt">) => sources.push(assistantSource({ ...source, retrievedAt }));
-  add({ id: "case", kind: "system_record", origin: "client_cases", availability: "available", recordedAt: detail.updated_at, freshness: "current_snapshot", scope: "selected Case metadata; not clinical verification", data: { id: detail.id, created_at: detail.created_at, direction: detail.direction } });
+  // No status, urgency or direction: the client processing classification is
+  // retired, and a snapshot carrying it would let the assistant describe a
+  // withdrawn label as the present state of the Case.
+  add({ id: "case", kind: "system_record", origin: "client_cases", availability: "available", recordedAt: detail.updated_at, freshness: "current_snapshot", scope: "selected Case metadata; no processing classification; not clinical verification", data: { id: detail.id, created_at: detail.created_at } });
   add({ id: "profile", kind: "user_report", origin: "profiles", availability: detail.profiles ? "available" : "absent", scope: "profile contact fields, not independent identity verification", data: detail.profiles ? { full_name: detail.profiles.full_name, email: detail.profiles.email, phone: detail.profiles.phone } : null });
   add({ id: "case_summary", kind: "ai_draft", origin: "client_cases.summary", availability: detail.summary ? "available" : "absent", scope: "authorship/review unknown; treated conservatively as unverified summary", data: detail.summary });
   const submission = detail.onboarding_submissions?.[0];
@@ -27,7 +31,10 @@ export async function buildCaseSources(caseId: string): Promise<AssistantSource[
   }
   const payments = detail.payments ?? [];
   add({ id: "payments", kind: "system_record", origin: "payments", availability: payments.length ? "available" : "absent", freshness: "current_snapshot", scope: "selected Case; up to 15 payment records; no action performed by this chat", data: payments.slice(0, 15).map((payment) => ({ id: payment.id, product: payment.product, status: payment.status, amount_cents: payment.amount_cents, currency: payment.currency, paid_at: payment.paid_at, created_at: payment.created_at })) });
-  const events = detail.case_lifecycle_events ?? [];
+  // Archived classification transitions stay in the lifecycle table but are
+  // withheld from the snapshot for the same reason they are withheld from the
+  // page: they describe a retired model, not what is true about the Case now.
+  const events = (detail.case_lifecycle_events ?? []).filter((event) => !isClassificationEvent(event));
   add({ id: "events", kind: "system_record", origin: "case_lifecycle_events", availability: events.length ? "available" : "absent", freshness: "current_snapshot", scope: "up to 25 historical events; not receipts for actions in this request", data: events.slice(0, 25).map((event) => ({ id: event.id, event_type: event.event_type, created_at: event.created_at })) });
   add({ id: "event_notes", kind: "user_report", origin: "case_lifecycle_events.notes", availability: events.some((event) => event.notes) ? "available" : "absent", scope: "staff-entered notes; author/review not independently verified", data: events.slice(0, 25).filter((event) => event.notes).map((event) => ({ id: event.id, notes: event.notes, created_at: event.created_at })) });
   return sources;

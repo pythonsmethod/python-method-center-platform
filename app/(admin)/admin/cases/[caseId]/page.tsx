@@ -6,14 +6,7 @@ import { canSeeProviderNames } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
 import { formatDateTime } from "@/lib/i18n/format";
-import {
-  caseDirectionLabel,
-  caseStatusLabel,
-  caseUrgencyLabel,
-  lifecycleEventLabel,
-  paymentProductLabel,
-  paymentStatusLabel
-} from "@/lib/i18n/status-labels";
+import { paymentProductLabel, paymentStatusLabel } from "@/lib/i18n/status-labels";
 import { isUuid } from "@/lib/utils/uuid";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { getDictionary } from "@/lib/i18n/dictionaries";
@@ -27,7 +20,8 @@ import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
-import { CaseManagementForm } from "./CaseManagementForm";
+import { caseActivityEntries } from "@/lib/cases/activity";
+import { caseDetailCopy, type CaseDetailCopy } from "@/lib/cases/detail-copy";
 import { ReprocessCaseDocumentsForm } from "./ReprocessCaseDocumentsForm";
 import { IdentityReviewForm } from "./IdentityReviewForm";
 import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
@@ -43,40 +37,28 @@ type StaffCasePageProps = {
   }>;
 };
 
-const payloadFieldLabels: Record<string, string> = {
-  full_name: "Полное имя",
-  phone: "Телефон",
-  care_recipient_type: "Для кого запрос",
-  primary_goal: "Основная цель",
-  situation_description: "Описание ситуации",
-  offer_accepted: "Оферта принята",
-  offer_version: "Версия оферты",
-  consent_accepted: "Согласие на обработку данных",
-  submitted_at: "Отправлена"
-};
-
-const careRecipientLabels: Record<string, string> = {
-  self: "Для себя",
-  family_member: "Для члена семьи"
-};
-
 function formatAmount(amountCents: number, currency: string): string {
   return `${(amountCents / 100).toFixed(2)} ${currency}`;
 }
 
-function formatPayloadValue(key: string, value: unknown): string {
+function formatPayloadValue(
+  key: string,
+  value: unknown,
+  copy: CaseDetailCopy,
+  locale: "ru" | "en"
+): string {
   if (typeof value === "boolean") {
-    return value ? "Да" : "Нет";
+    return value ? copy.yes : copy.no;
   }
 
-  const text = String(value ?? "—");
+  const text = String(value ?? copy.dash);
 
   if (key === "care_recipient_type") {
-    return careRecipientLabels[text] ?? text;
+    return copy.careRecipients[text] ?? text;
   }
 
-  if (key === "submitted_at" && text !== "—") {
-    return formatDateTime(text);
+  if (key === "submitted_at" && text !== copy.dash) {
+    return formatDateTime(text, locale);
   }
 
   return text;
@@ -90,30 +72,18 @@ export default async function StaffCaseDetailPage({
   const requestedTodayView = (await searchParams).view === "today";
   const auth = await getRequiredStaffUser(`/admin/cases/${caseId}`);
   const locale = await getLocale();
-  const paymentCopy = locale === "ru"
-    ? {
-        title: "Автоматические оплаты",
-        description:
-          "Здесь появляются только оплаты, автоматически подтверждённые платёжной системой.",
-        empty: "Автоматически подтверждённых оплат пока нет."
-      }
-    : {
-        title: "Automatic payments",
-        description:
-          "Only payments automatically confirmed by the payment processor appear here.",
-        empty: "There are no automatically confirmed payments yet."
-      };
+  const copy = caseDetailCopy(locale);
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Рабочее место команды"
-          title="Кейс"
-          description="Для доступа требуется настроенная аутентификация."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.setupDescription}
         />
 
-        <AuthSetupNotice title="Кейс требует настройки Supabase Auth" />
+        <AuthSetupNotice title={copy.setupTitle} />
       </div>
     );
   }
@@ -126,14 +96,14 @@ export default async function StaffCaseDetailPage({
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Рабочее место команды"
-          title="Кейс"
-          description="Не удалось проверить доступ."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.accessErrorDescription}
         />
 
         <div className="notice notice--warning">
-          <span className="panel__label">Ошибка доступа</span>
-          <h2>Кейс недоступен</h2>
+          <span className="panel__label">{copy.accessErrorTitle}</span>
+          <h2>{copy.accessErrorHeading}</h2>
           <p>{auth.message}</p>
         </div>
       </div>
@@ -147,10 +117,14 @@ export default async function StaffCaseDetailPage({
   // Only the founder sees which model answers; for the team it is simply
   // the assistant.
   const showProviders = canSeeProviderNames(auth.email);
-  // Case status editing and automatic payment history are developer/founder
-  // controls. They stay out of Karen's clinical workspace so his attention
-  // remains on the client, documents and conversation. This intentionally
-  // fails closed when the founder allowlist is not configured.
+  // Automatic payment history is a developer/founder control. It stays out of
+  // Karen's clinical workspace so his attention remains on the client,
+  // documents and conversation. This intentionally fails closed when the
+  // founder allowlist is not configured.
+  //
+  // Case status, urgency and direction are not here and must not return: the
+  // client processing classification is retired, and the case detail shows
+  // what happened rather than what the case was once labelled.
   const showAdminControls = auth.role === "admin" && canSeeProviderNames(auth.email);
   const canReadProfessorConversation = canAccessProfessorMessages(auth.email);
   const focusedTodayView = requestedTodayView && canReadProfessorConversation;
@@ -160,14 +134,14 @@ export default async function StaffCaseDetailPage({
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Рабочее место команды"
-          title="Кейс"
-          description="Не удалось загрузить кейс."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.loadErrorDescription}
         />
 
         <div className="notice notice--warning">
-          <span className="panel__label">Кейс недоступен</span>
-          <h2>Ошибка загрузки</h2>
+          <span className="panel__label">{copy.loadErrorLabel}</span>
+          <h2>{copy.loadErrorHeading}</h2>
           <p>{detailResult.message}</p>
         </div>
       </div>
@@ -180,10 +154,11 @@ export default async function StaffCaseDetailPage({
     notFound();
   }
 
+  const dictionary = getDictionary(locale);
+
   if (focusedTodayView) {
     const caseMessages = await getCaseMessages(clientCase.id);
-    const dictionary = getDictionary(locale);
-    const copy = locale === "ru"
+    const workspaceCopy = locale === "ru"
       ? {
           eyebrow: "Работа с клиентом",
           fallbackName: "Клиент",
@@ -226,19 +201,19 @@ export default async function StaffCaseDetailPage({
         };
     const clientName = clientCase.profiles?.full_name
       ?? clientCase.profiles?.email
-      ?? copy.fallbackName;
+      ?? workspaceCopy.fallbackName;
 
     return (
       <div className="page-shell karen-case-workspace">
         <PageHeader
-          eyebrow={copy.eyebrow}
+          eyebrow={workspaceCopy.eyebrow}
           title={clientName}
           description={clientCase.title ?? ""}
         />
 
         <CaseConversationWorkspace
           caseId={clientCase.id}
-          copy={copy}
+          copy={workspaceCopy}
           dateLocale={dictionary.cabinet.dateLocale}
           labels={dictionary.cabinet.thread}
           loadError={caseMessages.error}
@@ -260,9 +235,9 @@ export default async function StaffCaseDetailPage({
   const payments = [...clientCase.payments].sort((a, b) =>
     b.created_at.localeCompare(a.created_at)
   );
-  const events = [...clientCase.case_lifecycle_events].sort((a, b) =>
-    b.created_at.localeCompare(a.created_at)
-  );
+  // Classification transitions stay in audit storage and are not presented
+  // here as current facts. See lib/cases/activity.ts.
+  const activity = caseActivityEntries(clientCase.case_lifecycle_events, locale);
   const [caseMessages, assistantHistory, review, casePicture] = await Promise.all([
     canReadProfessorConversation
       ? getCaseMessages(clientCase.id)
@@ -275,60 +250,45 @@ export default async function StaffCaseDetailPage({
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Рабочее место команды"
-        title={clientCase.title ?? "Кейс без названия"}
-        description={`Кейс ${clientCase.id}`}
+        eyebrow={copy.eyebrow}
+        title={clientCase.title ?? copy.untitledCase}
+        description={`${copy.caseIdPrefix} ${clientCase.id}`}
       />
 
       <section className="panel-grid">
         <div className="panel">
-          <span className="panel__label">Клиент</span>
-          <h2>{clientCase.profiles?.full_name ?? "Без имени"}</h2>
+          <span className="panel__label">{copy.clientLabel}</span>
+          <h2>{clientCase.profiles?.full_name ?? copy.clientUnnamed}</h2>
           <ul className="status-list">
-            <li>Email: {clientCase.profiles?.email ?? "—"}</li>
-            <li>Телефон: {clientCase.profiles?.phone ?? "—"}</li>
-            <li>Email для доставки: {clientCase.profiles?.delivery_email ?? "—"}</li>
-            <li>Телефон для доставки: {clientCase.profiles?.delivery_phone ?? "—"}</li>
-            <li>Получатель: {[clientCase.profiles?.delivery_first_name, clientCase.profiles?.delivery_last_name].filter(Boolean).join(" ") || "—"}</li>
-            <li>Адрес для доставки: {[clientCase.profiles?.delivery_postal_code, clientCase.profiles?.delivery_country_code, clientCase.profiles?.delivery_region, clientCase.profiles?.delivery_city, clientCase.profiles?.delivery_street, clientCase.profiles?.delivery_building, clientCase.profiles?.delivery_unit].filter(Boolean).join(", ") || "—"}</li>
-            {clientCase.profiles?.delivery_instructions ? <li>Дополнительно: {clientCase.profiles.delivery_instructions}</li> : null}
+            <li>{copy.email}: {clientCase.profiles?.email ?? copy.dash}</li>
+            <li>{copy.phone}: {clientCase.profiles?.phone ?? copy.dash}</li>
+            <li>{copy.deliveryEmail}: {clientCase.profiles?.delivery_email ?? copy.dash}</li>
+            <li>{copy.deliveryPhone}: {clientCase.profiles?.delivery_phone ?? copy.dash}</li>
+            <li>{copy.recipient}: {[clientCase.profiles?.delivery_first_name, clientCase.profiles?.delivery_last_name].filter(Boolean).join(" ") || copy.dash}</li>
+            <li>{copy.deliveryAddress}: {[clientCase.profiles?.delivery_postal_code, clientCase.profiles?.delivery_country_code, clientCase.profiles?.delivery_region, clientCase.profiles?.delivery_city, clientCase.profiles?.delivery_street, clientCase.profiles?.delivery_building, clientCase.profiles?.delivery_unit].filter(Boolean).join(", ") || copy.dash}</li>
+            {clientCase.profiles?.delivery_instructions ? <li>{copy.deliveryExtra}: {clientCase.profiles.delivery_instructions}</li> : null}
           </ul>
         </div>
-        {showAdminControls ? (
-          <div className="panel">
-            <span className="panel__label">Кейс</span>
-            <h2>{caseStatusLabel(clientCase.status)}</h2>
-            <ul className="status-list">
-              <li>Срочность: {caseUrgencyLabel(clientCase.urgency)}</li>
-              <li>Направление: {caseDirectionLabel(clientCase.direction)}</li>
-              <li>Создан: {formatDateTime(clientCase.created_at)}</li>
-              <li>Обновлён: {formatDateTime(clientCase.updated_at)}</li>
-            </ul>
-          </div>
-        ) : null}
         <div className="panel">
-          <span className="panel__label">Описание ситуации</span>
-          <h2>Из анкеты</h2>
-          <p>{clientCase.summary ?? "Описание не заполнено."}</p>
+          <span className="panel__label">{copy.situationLabel}</span>
+          <h2>{copy.situationHeading}</h2>
+          <p>{clientCase.summary ?? copy.situationEmpty}</p>
         </div>
       </section>
 
       {canReadProfessorConversation ? <section
         className="intake-section"
         id="case-conversation"
-        aria-label="Чат с клиентом"
+        aria-label={copy.conversationAria}
       >
         <div className="panel">
-          <span className="panel__label">Чат с клиентом</span>
-          <h2>Переписка по кейсу</h2>
-          <p>
-            Клиент видит эти сообщения в своём кабинете. Можно писать текстом
-            или записывать голосовые.
-          </p>
+          <span className="panel__label">{copy.conversationLabel}</span>
+          <h2>{copy.conversationHeading}</h2>
+          <p>{copy.conversationHint}</p>
           <CaseMessageThread
-            labels={getDictionary("ru").cabinet.thread}
-            voiceLabels={getDictionary("ru").cabinet.voice}
-            dateLocale={getDictionary("ru").cabinet.dateLocale}
+            labels={dictionary.cabinet.thread}
+            voiceLabels={dictionary.cabinet.voice}
+            dateLocale={dictionary.cabinet.dateLocale}
             caseId={clientCase.id}
             expandable
             loadError={caseMessages.error}
@@ -339,33 +299,22 @@ export default async function StaffCaseDetailPage({
       </section> : null}
 
       {showAdminControls ? (
-        <section className="panel-grid" aria-label="Управление кейсом">
+        <section className="panel-grid" aria-label={copy.paymentsAria}>
           <div className="panel">
-            <span className="panel__label">Управление</span>
-            <h2>Обновить кейс</h2>
-            <CaseManagementForm
-              caseId={clientCase.id}
-              direction={clientCase.direction}
-              status={clientCase.status}
-              urgency={clientCase.urgency}
-            />
-          </div>
-
-          <div className="panel">
-            <span className="panel__label">Оплаты</span>
-            <h2>{paymentCopy.title}</h2>
-            <p>{paymentCopy.description}</p>
+            <span className="panel__label">{copy.paymentsLabel}</span>
+            <h2>{copy.paymentsTitle}</h2>
+            <p>{copy.paymentsDescription}</p>
             {payments.length === 0 ? (
-              <p className="empty-state">{paymentCopy.empty}</p>
+              <p className="empty-state">{copy.paymentsEmpty}</p>
             ) : (
               <ul className="status-list">
                 {payments.map((payment) => (
                   <li key={payment.id}>
-                    {paymentProductLabel(payment.product)} —{" "}
+                    {paymentProductLabel(payment.product, locale)} —{" "}
                     {formatAmount(payment.amount_cents, payment.currency)} —{" "}
-                    {paymentStatusLabel(payment.status)}
+                    {paymentStatusLabel(payment.status, locale)}
                     {payment.paid_at
-                      ? ` (${formatDateTime(payment.paid_at)})`
+                      ? ` (${formatDateTime(payment.paid_at, locale)})`
                       : ""}
                     {payment.processor_reference
                       ? ` · ${payment.processor_reference}`
@@ -390,7 +339,7 @@ export default async function StaffCaseDetailPage({
         />
       </section>
 
-      <section className="intake-section" aria-label="Разбор анализов">
+      <section className="intake-section" aria-label={copy.reviewAria}>
         <div className="panel">
           <CaseReviewPanel
             caseId={clientCase.id}
@@ -403,14 +352,11 @@ export default async function StaffCaseDetailPage({
         </div>
       </section>
 
-      <section className="intake-section" aria-label="Документы кейса">
+      <section className="intake-section" aria-label={copy.documentsAria}>
         <div className="panel">
-          <span className="panel__label">Документы</span>
-          <h2>История загрузок</h2>
-          <p>
-            По загрузкам, от свежих к ранним. Повторная загрузка файла с тем
-            же названием помечена как новая версия — это динамика клиента.
-          </p>
+          <span className="panel__label">{copy.documentsLabel}</span>
+          <h2>{copy.documentsHeading}</h2>
+          <p>{copy.documentsHint}</p>
           {showAdminControls || canReadProfessorConversation ? (
             <>
               <IdentityReviewForm
@@ -422,7 +368,7 @@ export default async function StaffCaseDetailPage({
                   )
                   .map((document) => ({
                     id: document.id,
-                    filename: document.original_filename ?? (locale === "ru" ? "Документ" : "Document")
+                    filename: document.original_filename ?? copy.documentFallbackName
                   }))}
                 locale={locale}
               />
@@ -436,9 +382,9 @@ export default async function StaffCaseDetailPage({
             </>
           ) : null}
           <DocumentTimeline
-            labels={getDictionary("ru").cabinet.timeline}
+            labels={dictionary.cabinet.timeline}
             documents={documents}
-            emptyText="Документы ещё не загружены."
+            emptyText={copy.documentsEmpty}
             renderAction={(document) => (
               <Link
                 className="button button--secondary button--compact"
@@ -446,31 +392,26 @@ export default async function StaffCaseDetailPage({
                 rel="noreferrer"
                 target="_blank"
               >
-                Открыть файл
+                {copy.openFile}
               </Link>
             )}
           />
         </div>
       </section>
 
-      <section className="intake-section" aria-label="История кейса">
+      <section className="intake-section" aria-label={copy.activityAria}>
         <div className="panel">
-          <span className="panel__label">История</span>
-          <h2>История кейса</h2>
-          {events.length === 0 ? (
-            <p className="empty-state">Событий пока нет.</p>
+          <span className="panel__label">{copy.activityLabel}</span>
+          <h2>{copy.activityHeading}</h2>
+          <p>{copy.activityHint}</p>
+          {activity.length === 0 ? (
+            <p className="empty-state">{copy.activityEmpty}</p>
           ) : (
             <ul className="status-list">
-              {events.map((event) => (
-                <li key={event.id}>
-                  {formatDateTime(event.created_at)} —{" "}
-                  {lifecycleEventLabel(event.event_type)}
-                  {event.from_status && event.to_status
-                    ? `: ${caseStatusLabel(event.from_status)} → ${caseStatusLabel(event.to_status)}`
-                    : event.to_status
-                      ? `: ${caseStatusLabel(event.to_status)}`
-                      : ""}
-                  {event.notes ? ` · ${event.notes}` : ""}
+              {activity.map((entry) => (
+                <li key={entry.id}>
+                  {formatDateTime(entry.createdAt, locale)} — {entry.label}
+                  {entry.notes ? ` · ${entry.notes}` : ""}
                 </li>
               ))}
             </ul>
@@ -480,18 +421,14 @@ export default async function StaffCaseDetailPage({
 
       <section
         className="intake-section"
-        aria-label={locale === "ru" ? "Переписка клиента с ИИ-помощником" : "Client conversation with the AI assistant"}
+        aria-label={copy.clientAssistantAria}
       >
         <div className="panel">
-          <span className="panel__label">{locale === "ru" ? "Клиент и ИИ-помощник" : "Client and AI assistant"}</span>
-          <h2>{locale === "ru" ? "Переписка клиента с помощником" : "Client conversation with the assistant"}</h2>
-          <p>
-            {locale === "ru"
-              ? "Здесь сохранены вопросы клиента, ответы и автоматические сообщения Анхама. Прочитайте переписку перед ответом."
-              : "The client’s questions, replies and Anham’s automatic messages are saved here. Read the conversation before replying."}
-          </p>
+          <span className="panel__label">{copy.clientAssistantLabel}</span>
+          <h2>{copy.clientAssistantHeading}</h2>
+          <p>{copy.clientAssistantHint}</p>
           <SavedAssistantThread
-            emptyText={locale === "ru" ? "В переписке пока нет сообщений." : "There are no messages in this conversation yet."}
+            emptyText={copy.clientAssistantEmpty}
             locale={locale}
             loadError={
               assistantHistory.status === "error"
@@ -508,61 +445,49 @@ export default async function StaffCaseDetailPage({
         </div>
       </section>
 
-      <section className="intake-section" aria-label="ИИ-Ассистент по кейсу">
+      <section className="intake-section" aria-label={copy.assistantAria}>
         <div className="panel">
-          <span className="panel__label">ИИ-Ассистент Professor Python</span>
+          <span className="panel__label">{copy.assistantLabel}</span>
           <h2 className="staff-assistant__title">
             <AnhamAvatar className="staff-assistant__face" size={44} state="client" />
-            Помощник по этому кейсу
+            {copy.assistantHeading}
           </h2>
-          <p>
-            Ассистент видит снимок кейса из базы: анкету, список документов,
-            оплаты и историю. Содержимое загруженных файлов ему недоступно —
-            но его можно приложить прямо в чат скрепкой: до 30 фото или PDF за
-            раз. Снимки сжимаются автоматически, а большой набор ассистент
-            читает по частям и собирает общий разбор. Приложенное нигде не
-            сохраняется.
-          </p>
+          <p>{copy.assistantHint}</p>
           <AssistantChat
             attachments
             caseId={clientCase.id}
             endpoint="/api/assistant/staff"
             locale={locale}
-            intro="Я вижу данные этого кейса: анкету, статусы, список документов, оплаты и историю. Спросите — сделаю выжимку, черновик ответа клиенту или предложу следующие шаги. Фото и PDF можно приложить скрепкой — до 30 штук за раз, прочитаю все. Решения — за Professor Python."
-            placeholder="Например: сделай выжимку кейса…"
+            intro={copy.assistantIntro}
+            placeholder={copy.assistantPlaceholder}
             providerChoice={showProviders}
-            suggestions={[
-              "Разбери приложенные анализы по методу",
-              "Сделай выжимку кейса",
-              "Чего не хватает в этом кейсе?",
-              "Составь черновик ответа клиенту"
-            ]}
+            suggestions={copy.assistantSuggestions}
           />
         </div>
       </section>
 
-      <section className="panel-grid" aria-label="Анкеты онбординга">
+      <section className="panel-grid" aria-label={copy.submissionsAria}>
         {submissions.length === 0 ? (
           <div className="panel">
-            <span className="panel__label">Анкета</span>
-            <h2>Анкета не отправлена</h2>
-            <p>Клиент ещё не заполнил анкету онбординга.</p>
+            <span className="panel__label">{copy.submissionLabel}</span>
+            <h2>{copy.submissionMissingHeading}</h2>
+            <p>{copy.submissionMissingText}</p>
           </div>
         ) : (
           submissions.map((submission) => (
             <div className="panel" key={submission.id}>
               <span className="panel__label">
-                Анкета от{" "}
+                {copy.submissionFrom}{" "}
                 {submission.submitted_at
-                  ? formatDateTime(submission.submitted_at)
-                  : "—"}
+                  ? formatDateTime(submission.submitted_at, locale)
+                  : copy.dash}
               </span>
-              <h2>Ответы клиента</h2>
+              <h2>{copy.submissionHeading}</h2>
               <ul className="status-list">
                 {Object.entries(submission.payload).map(([key, value]) => (
                   <li key={key}>
-                    <strong>{payloadFieldLabels[key] ?? key}:</strong>{" "}
-                    {formatPayloadValue(key, value)}
+                    <strong>{copy.payloadFields[key] ?? key}:</strong>{" "}
+                    {formatPayloadValue(key, value, copy, locale)}
                   </li>
                 ))}
               </ul>
@@ -573,7 +498,7 @@ export default async function StaffCaseDetailPage({
 
       <div className="panel-actions">
         <Link className="button button--secondary" href="/admin/cases">
-          ← Ко всем кейсам
+          {copy.backToCases}
         </Link>
       </div>
     </div>
