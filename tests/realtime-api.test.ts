@@ -62,10 +62,14 @@ describe("voice authorization and provider handshake", () => {
       expect(result.headers.get("content-type")).toBe("text/event-stream");
       expect(await result.text()).not.toContain("synthetic-live-key");
     });
+    it("admits the default registered profile status the pilot accounts actually have", async () => {
+      profile!.status = "registered";
+      expect((await liveSession(request(sessionBody))).status).toBe(200);
+    });
     it("denies unauthenticated, blocked, wrong role and wrong owner", async () => {
       expect((await liveSession(request({ ...sessionBody, scope: "staff" }))).status).toBe(403);
       expect((await liveSession(request({ ...sessionBody, caseId }))).status).toBe(403);
-      profile!.status = "blocked"; expect((await liveSession(request(sessionBody))).status).toBe(403);
+      profile!.status = "suspended"; expect((await liveSession(request(sessionBody))).status).toBe(403);
       mocks.getUser.mockResolvedValue({ data: { user: null }, error: null });
       expect((await liveSession(request(sessionBody))).status).toBe(401);
       expect(mocks.rpc).not.toHaveBeenCalled();

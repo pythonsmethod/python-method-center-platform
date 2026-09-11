@@ -56,7 +56,10 @@ export async function resolveVoiceActor(request: Request, scope: unknown, rawCas
   if (error || !user || user.is_anonymous) throw new VoiceFailure("unauthorized", 401);
   const { data: profile, error: profileError } = await auth.from("profiles").select("role, status").eq("id", user.id).maybeSingle();
   if (profileError) throw new VoiceFailure("unavailable", 503);
-  if (!profile || profile.status !== "active") throw new VoiceFailure("forbidden", 403);
+  // "registered" is the default profile status, including for the owner and the
+  // pilot accounts. Denying everything except "active" would revoke existing
+  // voice access, so keep the established suspended/closed deny list.
+  if (!profile || profile.status === "suspended" || profile.status === "closed") throw new VoiceFailure("forbidden", 403);
   const db = createSupabaseServiceClient();
   if (!db) throw new VoiceFailure("unavailable", 503);
   if (scope === "staff") {
