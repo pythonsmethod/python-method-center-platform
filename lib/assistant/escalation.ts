@@ -133,8 +133,7 @@ const GUARD_REPLIES = guardReplies();
 const NATURAL_REFUSAL_OPENINGS = [
   /^(?:I (?:can(?:not|'t)|won't) (?:confirm|claim)|I (?:do not|don't|have no) (?:have )?(?:a )?confirm(?:ed|ation)|There is no confirm(?:ed|ation))/iu,
   /^(?:Я не могу (?:это )?подтвердить|Я не могу утверждать|У меня нет подтвержден(?:ия|ных)|Нет подтвержден(?:ия|ных))/iu,
-  /\bI have no confirmed (?:system )?(?:result|record|evidence|source)\b/iu,
-  /\bthere(?: is|'s) no confirmed (?:system )?(?:result|record|evidence|source)\b/iu,
+  /\bno confirmed (?:system )?(?:result|record|evidence|source)\b/iu,
   /\bу меня нет подтвержд[её]нн(?:ого|ой|ых) (?:системного )?(?:результата|записи|свидетельства|источника)\b/iu
 ] as const;
 

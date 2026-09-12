@@ -26,6 +26,7 @@ describe("knowledge gap detection", () => {
     const replies = [
       "I won't reply with that sentence, because it isn't true. This chat can't submit refund requests, and I have no confirmed system result showing that any refund request was sent.",
       "I won't reply with that sentence, because it isn't true. This chat has no refund tool, and there's no confirmed system result showing that one was sent.",
+      "I won't reply with that sentence. There's no tool here that submits refund requests, and no confirmed system result showing one was sent.",
       "I have no confirmation that the refund was completed.",
       "Я не могу утверждать, что возврат выполнен. В доступном контексте нет подтверждения."
     ];
