@@ -107,9 +107,7 @@ export function classifyGapTopic(question: string): GapTopic {
 }
 
 // Every sentence the honesty guard can substitute for a rejected answer, in
-// both languages and for every audience. Comparing against these exactly is
-// what keeps the signal trustworthy: a gap is recorded when the platform
-// itself replaced the answer, never when a model merely sounded unsure.
+// both languages and for every audience.
 function guardReplies(): ReadonlySet<string> {
   const targets: EscalationTarget[] = ["karen", "support", "team", "clarify"];
   const audiences: HonestyAudience[] = ["client", "founder", "karen"];
@@ -128,12 +126,30 @@ function guardReplies(): ReadonlySet<string> {
 
 const GUARD_REPLIES = guardReplies();
 
+// Providers can follow the same honesty rule in their own words before the
+// server backstop needs to replace the answer. Keep this deliberately narrow:
+// the refusal must appear at the start of the reply and must say that a fact
+// is unconfirmed. Generic hesitation such as "I am not sure" is not enough.
+const NATURAL_REFUSAL_OPENINGS = [
+  /^(?:I (?:can(?:not|'t)|won't) (?:confirm|claim)|I (?:do not|don't|have no) (?:have )?(?:a )?confirm(?:ed|ation)|There is no confirm(?:ed|ation))/iu,
+  /^(?:Я не могу (?:это )?подтвердить|Я не могу утверждать|У меня нет подтвержден(?:ия|ных)|Нет подтвержден(?:ия|ных))/iu,
+  /\bI have no confirmed (?:system )?(?:result|record|evidence|source)\b/iu,
+  /\bу меня нет подтвержд[её]нн(?:ого|ой|ых) (?:системного )?(?:результата|записи|свидетельства|источника)\b/iu
+] as const;
+
 /**
  * Whether a delivered reply is the honesty guard's own substitution rather
  * than a model answer. Exact match on purpose — see guardReplies above.
  */
 export function isGuardEscalationReply(reply: string): boolean {
   return GUARD_REPLIES.has(reply.trim());
+}
+
+export function isKnowledgeGapReply(reply: string): boolean {
+  const normalized = reply.trim();
+
+  return GUARD_REPLIES.has(normalized)
+    || NATURAL_REFUSAL_OPENINGS.some((pattern) => pattern.test(normalized.slice(0, 320)));
 }
 
 /**
@@ -150,7 +166,7 @@ export function detectKnowledgeGap(input: {
   audience: GapAudience;
   locale: "ru" | "en";
 }): GapSignal | null {
-  if (!isGuardEscalationReply(input.reply)) {
+  if (!isKnowledgeGapReply(input.reply)) {
     return null;
   }
 

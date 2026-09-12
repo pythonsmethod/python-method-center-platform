@@ -3,7 +3,8 @@ import {
   GAP_TOPICS,
   classifyGapTopic,
   detectKnowledgeGap,
-  isGuardEscalationReply
+  isGuardEscalationReply,
+  isKnowledgeGapReply
 } from "@/lib/assistant/escalation";
 import { unconfirmedReply } from "@/lib/assistant/factual-honesty";
 import { gapDraftSeed } from "@/lib/assistant/escalation-copy";
@@ -13,11 +14,26 @@ import { gapDraftSeed } from "@/lib/assistant/escalation-copy";
 // is ever read.
 
 describe("knowledge gap detection", () => {
-  it("fires only on the honesty guard's own substituted reply", () => {
+  it("fires on the honesty guard's own substituted reply", () => {
     for (const target of ["karen", "support", "team"] as const) {
       for (const locale of ["ru", "en"] as const) {
         expect(isGuardEscalationReply(unconfirmedReply(locale, target, "client"))).toBe(true);
       }
+    }
+  });
+
+  it("fires on a provider's natural factual refusal", () => {
+    const replies = [
+      "I won't reply with that sentence, because it isn't true. This chat can't submit refund requests, and I have no confirmed system result showing that any refund request was sent.",
+      "I have no confirmation that the refund was completed.",
+      "Я не могу утверждать, что возврат выполнен. В доступном контексте нет подтверждения."
+    ];
+
+    for (const reply of replies) {
+      expect(isKnowledgeGapReply(reply)).toBe(true);
+      expect(
+        detectKnowledgeGap({ reply, question: "Когда вернут оплату?", audience: "staff", locale: "ru" })
+      ).toMatchObject({ topic: "payment_or_refund", audience: "staff", escalationTarget: "support" });
     }
   });
 
@@ -30,6 +46,7 @@ describe("knowledge gap detection", () => {
 
     for (const reply of answers) {
       expect(isGuardEscalationReply(reply)).toBe(false);
+      expect(isKnowledgeGapReply(reply)).toBe(false);
       expect(
         detectKnowledgeGap({ reply, question: "Сколько стоит сопровождение?", audience: "client", locale: "ru" })
       ).toBeNull();

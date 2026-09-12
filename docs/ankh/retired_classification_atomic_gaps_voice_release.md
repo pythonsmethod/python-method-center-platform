@@ -25,6 +25,9 @@ The separate `anham-mobile-app` Vercel project pointed at the absent
 - Case review and document timeline state copy follows the active RU/EN locale.
 - `record_assistant_gap_event(...)` serializes one topic draft, then
   deduplicates events by topic, audience and locale and writes atomically.
+- Gap detection accepts both the server guard's canonical refusal and a narrow
+  provider-authored refusal at the start of the answer. Generic uncertainty
+  still does not create an event.
 - Next.js keeps `ws` external to server bundles so the Node runtime loads its
   Buffer masking implementation directly.
 - The Vercel Root Directory for `anham-mobile-app` is now empty, matching the
