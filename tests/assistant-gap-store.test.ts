@@ -208,6 +208,28 @@ describe("founder gap store", () => {
     expect(state.rpcCalls).toHaveLength(0);
   });
 
+  it("captures a provider-authored factual refusal", async () => {
+    state.rpc = {
+      data: [{ record_status: "recorded", event_id: "event-1", knowledge_draft_id: "draft-1" }],
+      error: null
+    };
+
+    await captureKnowledgeGap({
+      reply: "I won't reply with that sentence, because it isn't true. This chat can't submit refund requests, and I have no confirmed system result showing that any refund request was sent.",
+      question: "When will the refund be completed?",
+      audience: "staff",
+      locale: "en"
+    });
+
+    expect(state.rpcCalls).toHaveLength(1);
+    expect(state.rpcCalls[0].args).toMatchObject({
+      p_topic: "payment_or_refund",
+      p_audience: "staff",
+      p_escalation_target: "support",
+      p_locale: "en"
+    });
+  });
+
   it("keeps read state per founder and never edits the event", async () => {
     expect(await markGapRead("event-1", "founder-a")).toBe(true);
     expect(state.upserts).toEqual([
