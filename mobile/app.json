@@ -1,0 +1,24 @@
+{
+  "expo": {
+    "name": "Python Method Center",
+    "slug": "python-method-center",
+    "scheme": "pythonmethodcenter",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "automatic",
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.pythonsmethod.center"
+    },
+    "android": {
+      "package": "com.pythonsmethod.center"
+    },
+    "web": {
+      "bundler": "metro"
+    }
+  }
+}
