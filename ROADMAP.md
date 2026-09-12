@@ -655,3 +655,14 @@ recording atomic, repair the live WebSocket server bundle and restore the
 mobile project's root build. This operational release does not advance an Ankh
 clinical phase or relax any production trust gate. Evidence:
 `docs/ankh/retired_classification_atomic_gaps_voice_release.md`.
+
+## 2026-09-12 — Operational repair acceptance CLOSED
+
+PRs #182–#185 are merged and the final main deployment is READY. Signed-in
+RU/EN Case acceptance and the non-PHI refusal → event → inactive draft →
+founder unread notification path pass in production. The mobile preview builds
+from the corrected root. No clinical phase advances: Phase 2.9 stays open and
+Phase 3 production and automatic production verification remain NO-GO. The
+next action on this line is routine monitoring of `/api/assistant/live` and
+gap-event quality; any change to mixed clinical/payment routing requires its
+own product decision and fixtures.

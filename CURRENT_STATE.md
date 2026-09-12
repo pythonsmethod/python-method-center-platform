@@ -1037,3 +1037,15 @@ are recorded through one atomic topic-serialized service-role RPC, and the live 
 Directory was cleared. Validation and production evidence are recorded in
 `docs/ankh/retired_classification_atomic_gaps_voice_release.md`. Clinical and
 production auto-verification gates remain unchanged.
+
+## 2026-09-12 — Classification/gap release accepted in production
+
+The scoped operational release is published and accepted. RU/EN Case list and
+detail checks pass, the mobile Root Directory repair builds, and the old live
+`ws` masking error has no occurrence after the release deployment. A signed-in
+non-PHI staff refusal created one enumerated founder event and one inactive
+staff/general knowledge draft; the founder workspace showed it unread. Natural
+provider refusals now use a narrow confirmed-record matcher in addition to the
+canonical guard sentence. Full regression: 1760 passed, one opt-in provider
+test skipped. Clinical phases and production auto-verification remain NO-GO.
+Evidence: `docs/ankh/retired_classification_atomic_gaps_voice_release.md`.
