@@ -1188,3 +1188,14 @@ or identifier. `ws` stays
 external to Next.js server bundles so live sideband transport uses the Node
 package directly. See
 `docs/ankh/retired_classification_atomic_gaps_voice_release.md`.
+
+## 2026-09-12 — Natural factual refusals are first-class gap signals
+
+The server guard's exact fallback is not the only valid refusal: a provider can
+follow the same honesty policy in its own words. Record a gap when the answer
+starts with a narrow RU/EN factual-refusal form or contains the narrow marker
+that no confirmed system result/record/evidence/source exists. Do not record
+generic uncertainty such as "I am not sure". Persist only the existing closed
+enumerations; never persist the reply, question, Case or profile. Production
+acceptance and exact observed fixtures are recorded in
+`docs/ankh/retired_classification_atomic_gaps_voice_release.md`.
