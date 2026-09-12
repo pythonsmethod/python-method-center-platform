@@ -215,7 +215,7 @@ describe("founder gap store", () => {
     };
 
     await captureKnowledgeGap({
-      reply: "I won't reply with that sentence, because it isn't true. This chat has no refund tool, and there's no confirmed system result showing that one was sent.",
+      reply: "I won't reply with that sentence. There's no tool here that submits refund requests, and no confirmed system result showing one was sent.",
       question: "When will the refund be completed?",
       audience: "staff",
       locale: "en"
