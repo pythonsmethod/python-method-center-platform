@@ -25,6 +25,7 @@ describe("knowledge gap detection", () => {
   it("fires on a provider's natural factual refusal", () => {
     const replies = [
       "I won't reply with that sentence, because it isn't true. This chat can't submit refund requests, and I have no confirmed system result showing that any refund request was sent.",
+      "I won't reply with that sentence, because it isn't true. This chat has no refund tool, and there's no confirmed system result showing that one was sent.",
       "I have no confirmation that the refund was completed.",
       "Я не могу утверждать, что возврат выполнен. В доступном контексте нет подтверждения."
     ];
