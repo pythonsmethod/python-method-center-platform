@@ -139,3 +139,23 @@ evidence and the existing real-staging authenticated harness remain the acceptan
 evidence for the private flow. A physical phone session was not remotely controlled.
 Production collection, production migration and PostHog activation remain
 **NO-GO**. The disabled-by-default code release is **GO**.
+
+### Production code release — 2026-09-13
+
+PR #190 merged as main `1ac83f19e01fa3cfd0e44a3b5c066afdab43ff73` after
+the required `verify`, website preview and mobile preview checks passed. Vercel
+production deployment `dpl_5sbQNHQ3dHZutp6WN8yBWysERvMZ` reached READY and was
+assigned to `pythonmethodcenter.com` and `www.pythonmethodcenter.com`. The main
+workflow repeated install, security check, TypeScript, ESLint, 1,802-test suite,
+npm audit, production build and diff check successfully.
+
+The production browser smoke test rendered the Russian home route and English
+`/en` route with localized navigation, content and accessibility labels. No
+PostHog or analytics asset was loaded, consistent with disabled production
+collection. Vercel runtime-error aggregation returned no errors in the release
+window. Production Supabase was not migrated and no production analytics event,
+medical data or client record was created.
+
+Disabled-by-default production code publication is **CLOSED**. Production data
+collection, the production analytics migration and PostHog activation remain
+separate **NO-GO** gates.
