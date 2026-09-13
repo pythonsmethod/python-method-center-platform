@@ -87,6 +87,13 @@ const chatCopy = {
 
 type Provider = "best" | "claude" | "gpt" | "both";
 
+async function fetchAssistantHistory(endpoint: string): Promise<{ messages: ChatMessage[]; hasMore?: boolean }> {
+  const response = await fetch(endpoint, { cache: "no-store" });
+  if (!response.ok) throw new Error("HISTORY_UNAVAILABLE");
+  const data = await response.json() as { messages?: ChatMessage[]; hasMore?: boolean };
+  return { messages: Array.isArray(data.messages) ? data.messages : [], hasMore: data.hasMore };
+}
+
 export function AssistantChat(props: AssistantChatProps) {
   return <AssistantChatSession key={`${props.endpoint}:${props.caseId ?? "personal"}`} {...props} />;
 }
@@ -121,6 +128,8 @@ function AssistantChatSession({
   const [input, setInput] = useState("");
   const [pending, setPending] = useState(false);
   const [voiceActive, setVoiceActive] = useState(false);
+  const [voiceBackgroundTasks, setVoiceBackgroundTasks] = useState<string[]>([]);
+  const [voiceBackgroundFailed, setVoiceBackgroundFailed] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [historyLoading, setHistoryLoading] = useState(Boolean(historyEndpoint));
   const [historyError, setHistoryError] = useState(false);
@@ -205,14 +214,8 @@ function AssistantChatSession({
       setHistoryLoading(true);
       setHistoryError(false);
       try {
-        const response = await fetch(historyEndpoint, { cache: "no-store" });
-
-        if (!response.ok) {
-          throw new Error("HISTORY_UNAVAILABLE");
-        }
-
-        const data = (await response.json()) as { messages?: ChatMessage[]; hasMore?: boolean };
-        const saved = Array.isArray(data.messages) ? data.messages : [];
+        const data = await fetchAssistantHistory(historyEndpoint);
+        const saved = data.messages;
 
         if (cancelled) {
           return;
@@ -232,6 +235,40 @@ function AssistantChatSession({
       cancelled = true;
     };
   }, [historyEndpoint, historyRetry]);
+
+  // A delegated Live request can finish after the paid media connection is
+  // closed. Poll the existing authenticated history and merge only the
+  // expected idempotent background answers into this same conversation.
+  useEffect(() => {
+    if (!historyEndpoint || voiceBackgroundTasks.length === 0) return;
+    let cancelled = false;
+    const startedAt = Date.now();
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const poll = async () => {
+      try {
+        const data = await fetchAssistantHistory(historyEndpoint);
+        const expected = new Set(voiceBackgroundTasks);
+        const completed = (data.messages ?? []).filter(message => message.exchange_id && expected.has(message.exchange_id));
+        if (cancelled) return;
+        if (completed.length) {
+          const completedIds = new Set(completed.map(message => message.exchange_id));
+          setMessages(current => [...current, ...completed.filter(message => !current.some(existing => existing.id === message.id || existing.exchange_id === message.exchange_id))]);
+          setVoiceBackgroundTasks(current => current.filter(id => !completedIds.has(id)));
+          setVoiceBackgroundFailed(false);
+          return;
+        }
+      } catch { /* A later poll may succeed; do not disturb ordinary chat. */ }
+      if (cancelled) return;
+      if (Date.now() - startedAt >= 305_000) {
+        setVoiceBackgroundTasks([]);
+        setVoiceBackgroundFailed(true);
+        return;
+      }
+      timer = setTimeout(poll, 2500);
+    };
+    timer = setTimeout(poll, 800);
+    return () => { cancelled = true; if (timer) clearTimeout(timer); };
+  }, [historyEndpoint, voiceBackgroundTasks]);
 
   async function loadEarlier() {
     if (!historyEndpoint || historyLoading || voiceActive) return;
@@ -565,6 +602,12 @@ function AssistantChatSession({
             {progress}
           </div>
         ) : null}
+        {voiceBackgroundTasks.length > 0 ? (
+          <div className="assistant-msg assistant-msg--assistant assistant-msg--pending" role="status">
+            {locale === "ru" ? "Голосовая команда выполняется в фоне. Можно продолжать пользоваться чатом — ответ появится здесь автоматически." : "The voice request is continuing in the background. You can keep using the chat; the answer will appear here automatically."}
+          </div>
+        ) : null}
+        {voiceBackgroundFailed ? <p role="alert" className="form-message form-message--error">{locale === "ru" ? "Фоновый ответ не появился вовремя. Отправьте команду ещё раз текстом." : "The background answer did not arrive in time. Please send the request again as text."}</p> : null}
         {pending ? (
           <div className="assistant-msg assistant-msg--assistant assistant-msg--pending">
             {progress ?? t.sending}
@@ -715,6 +758,12 @@ function AssistantChatSession({
             onTranscript={(text, sessionId) => {
               setMessages(current => mergeVoiceTranscript(current, text, sessionId));
               if (memoryCapture && !text.live && !text.continuous && text.assistant) { setMemoryState("offer"); setMemoryMessage(null); }
+            }}
+            onBackgroundTask={(exchangeId, taskActive) => {
+              setVoiceBackgroundFailed(false);
+              setVoiceBackgroundTasks(current => taskActive
+                ? (current.includes(exchangeId) ? current : [...current, exchangeId])
+                : current.filter(id => id !== exchangeId));
             }}
           /> : null}
           <button

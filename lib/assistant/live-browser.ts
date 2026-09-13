@@ -5,7 +5,8 @@ import type { LiveFragment } from "./live-transcript";
 import { LiveDisplay } from "./live-transcript";
 type Options = { locale: Locale; scope: "client" | "staff"; caseId?: string; voice: string;
   onState: (s: VoiceState) => void; onError: (s: VoiceError) => void; onTranscript: (t: VoiceTranscript) => void;
-  onSaving: (s: "saving" | "saved" | "saveError") => void; onUsage: (seconds: number, usd: number, finalized: boolean) => void };
+  onSaving: (s: "saving" | "saved" | "saveError") => void; onUsage: (seconds: number, usd: number, finalized: boolean) => void;
+  onBackgroundTask: (exchangeId: string, active: boolean) => void };
 
 export class LiveBrowser {
   private peer?: RTCPeerConnection;
@@ -58,7 +59,10 @@ export class LiveBrowser {
     this.microphone?.getTracks().forEach(t => t.stop());
     if (this.channel?.readyState === "open") {
       this.channel.send(JSON.stringify({ type: "session.close" }));
-      this.closeTimer = setTimeout(() => this.dispose(), 6500);
+      // During delegation, release the paid media connection immediately.
+      // The server has its own sideband hangup and keeps the detached task.
+      if (this.thinking) this.dispose();
+      else this.closeTimer = setTimeout(() => this.dispose(), 6500);
     } else this.dispose();
     this.options.onState(this.finalState);
   }
@@ -141,7 +145,13 @@ export class LiveBrowser {
           }
           if (event.type === "saved") this.options.onSaving("saved");
           if (event.type === "save_error") { this.options.onSaving("saveError"); this.fail("unavailable"); return; }
-          if (event.type === "thinking") { this.thinking = event.active; this.state(); }
+          if (event.type === "thinking") {
+            this.thinking = event.active;
+            if (typeof event.exchangeId === "string" && event.exchangeId.startsWith("live-background:") && (event.active === true || !this.stopped)) {
+              this.options.onBackgroundTask(event.exchangeId, event.active === true);
+            }
+            this.state();
+          }
           if (event.type === "backend_result" && event.memoryPending) {
             this.options.onTranscript({ turnId: `memory_${event.taskId}`, user: "", assistant: event.reply, live: false });
           }

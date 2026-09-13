@@ -6,13 +6,13 @@ import { ASSISTANT_INTRODUCTION_RULE } from "./identity";
 import { liveConfig, LIVE_USD_PER_SECOND } from "./live-config";
 import { liveFragment, liveMessages, type LiveFragment } from "./live-transcript";
 import { runLiveBackend } from "./live-backend";
-import { getOwnAssistantHistory } from "./history";
+import { getOwnAssistantHistory, saveLiveBackgroundAnswer } from "./history";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { writeAuditLog } from "@/lib/audit/log";
 import { VoiceFailure, voicePersona, type VoiceActor } from "./realtime-server";
 import type { Locale } from "@/lib/i18n/locale";
 
-type Input = { request: Request; actor: VoiceActor; locale: Locale; sdp: string; voice: string; timeZone: string };
+type Input = { request: Request; actor: VoiceActor; locale: Locale; sdp: string; voice: string; timeZone: string; defer?: (task: Promise<unknown>) => void };
 export async function openLiveSession(input: Input) {
   const { request, actor, locale } = input, config = liveConfig(actor);
   const showCosts = canSeeVoicePilotCosts(actor.email);
@@ -44,6 +44,11 @@ export async function openLiveSession(input: Input) {
   if (typeof providerId !== "string" || !/^[a-zA-Z0-9_-]{1,160}$/.test(providerId) || typeof created.transport?.sdp !== "string" || !created.transport.sdp.startsWith("v=0")) throw new VoiceFailure("connection", 502);
   const socket = attachLiveSession(providerId, config.apiKey);
   let ended = false, closing = false, usage = 15, version = 0, tasks = 0, firstOutput = false;
+  let responseClosed = false, backgroundTasks = 0;
+  let releaseBackground!: () => void;
+  const backgroundLifetime = new Promise<void>(resolve => { releaseBackground = resolve; });
+  const settleBackground = () => { if (responseClosed && backgroundTasks === 0) releaseBackground(); };
+  input.defer?.(backgroundLifetime);
   let reason = "connection_lost";
   let mediaStartedAt = 0;
   const fragments: LiveFragment[] = [], seen = new Set<string>(), delegated = new Set<string>();
@@ -63,9 +68,10 @@ export async function openLiveSession(input: Input) {
     await saved.catch(() => {});
     await log("ended", { seconds: usage, estimatedUsd: usage * LIVE_USD_PER_SECOND, finalized, elapsedMs: Date.now() - startedAt }).catch(() => emit({ type: "save_error" }));
     emit({ type: "ended", seconds: usage, finalized, reason }); finish();
+    responseClosed = true; settleBackground();
   };
   const close = () => {
-    if (closing || ended) return; closing = true; version++;
+    if (closing || ended) return; closing = true;
     send({ type: "session.close" });
     closeTimer = setTimeout(() => { void cleanup(false); }, 5000);
   };
@@ -119,21 +125,42 @@ export async function openLiveSession(input: Input) {
           delegated.add(d.id);
           const taskVersion = ++version, taskStart = Date.now();
           if (++tasks > 12) { close(); return; }
-          emit({ type: "thinking", active: true });
+          const exchangeId = `live-background:${id}:${d.id}`;
+          emit({ type: "thinking", active: true, exchangeId });
+          backgroundTasks++;
           // Let late transcript packets arrive; do not interpret silence as turn completion.
           void (async () => {
             await new Promise(resolve => setTimeout(resolve, 250));
             const messages = [...initial, ...liveMessages(fragments)];
             while (messages.at(-1)?.role === "assistant") messages.pop();
             if (!messages.length) throw new Error("missing_transcript");
-            const result = await runLiveBackend(request, actor, locale, id, d.id!, messages, input.timeZone);
-            await log("delegation", { durationMs: Date.now() - taskStart, stale: taskVersion !== version });
-            if (ended || closing || taskVersion !== version) return;
+            const detachedRequest = new Request(request.url, { method: "POST", headers: new Headers(request.headers) });
+            const result = await runLiveBackend(detachedRequest, actor, locale, id, d.id!, messages, input.timeZone);
+            const stale = taskVersion !== version;
+            const destination = stale ? "discarded" : ended || closing ? "chat" : "live";
+            await log("delegation", { durationMs: Date.now() - taskStart, stale, destination });
+            if (stale) return;
+            if (ended || closing) {
+              const stored = await saveLiveBackgroundAnswer({ profileId: actor.profileId, caseId: actor.caseId,
+                tier: actor.scope === "client" ? actor.tier : actor.scope, locale, conversationScope: actor.scope,
+                exchangeId, answer: result.reply });
+              if (!stored) throw new Error("storage");
+              return;
+            }
             send({ type: "session.commentary.append", event_id: `result_${taskVersion}`, delegation_id: d.id, content: result.reply.slice(0, 12000) });
             emit({ type: "backend_result", ...result, taskId: d.id });
-          })().catch(() => {
-            if (!ended && !closing && taskVersion === version) send({ type: "session.commentary.append", delegation_id: d.id, content: locale === "ru" ? "Фоновая задача не подтвердила результат. Не утверждай, что действие выполнено или память сохранена." : "The backend did not confirm a result. Do not claim an action or memory save succeeded." });
-          }).finally(() => { if (taskVersion === version) emit({ type: "thinking", active: false }); });
+          })().catch(async () => {
+            if (taskVersion !== version) return;
+            const failure = locale === "ru" ? "Не удалось завершить фоновую команду. Попробуйте отправить её в текстовом чате ещё раз." : "The background request could not be completed. Please send it again in the text chat.";
+            if (ended || closing) {
+              await saveLiveBackgroundAnswer({ profileId: actor.profileId, caseId: actor.caseId,
+                tier: actor.scope === "client" ? actor.tier : actor.scope, locale, conversationScope: actor.scope,
+                exchangeId, answer: failure });
+            } else send({ type: "session.commentary.append", delegation_id: d.id, content: failure });
+          }).finally(() => {
+            backgroundTasks--; settleBackground();
+            if (taskVersion === version) emit({ type: "thinking", active: false, exchangeId });
+          });
         }
       });
     },
