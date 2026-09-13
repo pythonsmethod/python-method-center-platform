@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Consent-gated product analytics — 2026-09-13 — RELEASE CANDIDATE
+## Consent-gated product analytics — 2026-09-13 — PUBLISHED
 
 Aggregate founder analytics, a seven-step consenting-browser funnel and optional
 public-home heatmaps are implemented with RU/EN consent controls. The first-party
@@ -20,14 +20,15 @@ events remain. Ninety-day cleanup is scheduled through the already deployed dail
 `assistant-outreach` cron, avoiding a fourth Hobby-plan cron while retaining the
 same authorization boundary.
 
-PR #190 is conflict-free and all GitHub/Vercel checks pass. Its protected preview
-`python-method-center-platform-l1w9bajmn-pythonsmethods-projects.vercel.app` is
-READY. Browser acceptance passed for Russian, English, both language directions
-on registration, and absence of loaded PostHog resources. Exact-head verification:
-196 test files passed and 1 skipped; 1,802 tests passed and 1 skipped; TypeScript,
-ESLint, security inventory and production build pass. Production publication is
-the remaining release action; production analytics collection and PostHog remain
-NO-GO without a separate owner-approved enablement.
+PR #190 merged as main `1ac83f1`; Vercel production deployment
+`dpl_5sbQNHQ3dHZutp6WN8yBWysERvMZ` is READY on `pythonmethodcenter.com` and
+`www.pythonmethodcenter.com`. Browser acceptance passed for Russian, English,
+both language directions on registration, and absence of loaded PostHog resources.
+Vercel reported no runtime errors in the release window. Exact-head and main CI
+verification: 196 test files passed and 1 skipped; 1,802 tests passed and 1
+skipped; TypeScript, ESLint, security inventory, npm audit, `git diff --check`
+and production build pass. Production analytics collection, the production
+migration and PostHog remain NO-GO without a separate owner-approved enablement.
 Evidence: `docs/audits/PRODUCT_ANALYTICS_ANHAM_2026-09-09.md` and
 `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
 
