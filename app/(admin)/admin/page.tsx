@@ -14,6 +14,8 @@ import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { getStaffCases } from "@/lib/cases/staff-queries";
 import { countryFlag } from "@/lib/profile/identity";
+import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
+import { createProfileAvatarUrlMap } from "@/lib/profile/avatar";
 
 export default async function AdminPage() {
   const auth = await getRequiredStaffUser("/admin");
@@ -118,6 +120,9 @@ export default async function AdminPage() {
         .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
         .slice(0, 8)
     : [];
+  const avatarUrls = await createProfileAvatarUrlMap(
+    cases.map((clientCase) => clientCase.profiles?.avatar_path)
+  );
 
   return (
     <div className="page-shell page-shell--wide">
@@ -151,9 +156,11 @@ export default async function AdminPage() {
             const unreadCount = unread.byCase[clientCase.id] ?? 0;
             return (
               <Link className="karen-client-card" href={`/admin/cases/${clientCase.id}?view=today`} key={clientCase.id}>
-                <span className="karen-client-card__avatar" aria-hidden="true">
-                  {(clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "?").trim().charAt(0).toUpperCase()}
-                </span>
+                <ClientAvatar
+                  className="karen-client-card__avatar"
+                  name={clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? "?"}
+                  url={clientCase.profiles?.avatar_path ? avatarUrls[clientCase.profiles.avatar_path] : null}
+                />
                 <span className="karen-client-card__content">
                   <span className="karen-client-card__topline">
                     <strong>

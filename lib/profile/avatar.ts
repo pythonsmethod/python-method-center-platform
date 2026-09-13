@@ -45,3 +45,22 @@ export async function createProfileAvatarUrl(path: string | null | undefined): P
 
   return error ? null : data.signedUrl;
 }
+
+export async function createProfileAvatarUrlMap(
+  paths: Array<string | null | undefined>
+): Promise<Record<string, string>> {
+  const uniquePaths = [...new Set(paths.filter((path): path is string => Boolean(path)))];
+  if (uniquePaths.length === 0) return {};
+
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return {};
+
+  const { data, error } = await supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .createSignedUrls(uniquePaths, AVATAR_URL_TTL_SECONDS);
+  if (error || !data) return {};
+
+  return Object.fromEntries(
+    data.flatMap((entry) => entry.signedUrl ? [[entry.path, entry.signedUrl]] : [])
+  );
+}
