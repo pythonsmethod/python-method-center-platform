@@ -33,6 +33,8 @@ export type PictureReviewNote = {
 };
 
 export type ExtractedClinicalEvidence = {
+  reviewSnapshot?: import("./review-snapshot").StoredReviewSnapshot | null;
+  reviewToken?: string;
   id: string;
   documentId: string;
   section: string;

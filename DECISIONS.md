@@ -1,5 +1,7 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+2026-09-13: bind human row reviews to immutable-at-save extraction snapshots, not reused array indices. Reuse admin_notes; preserve old reviews without treating missing snapshots as current confirmation. Extraction timestamp/content hash does not prove original-file hash or source adjudication. Concurrent reprocessing may leave a historical note but must not carry its decision to the new extraction. Training admission remains false. See docs/ankh/review_snapshot_integration_2026_09_13.md.
+
 ## D-064 — Knowledge gaps are recorded as enumerated codes, never as questions (2026-09-11)
 
 Record the moment Anham's honesty guard replaces an answer, and record nothing
