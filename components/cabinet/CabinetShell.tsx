@@ -95,7 +95,10 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
     {menuOpen ? <button aria-label={ru ? "Закрыть меню" : "Close menu"} className="web-cab__backdrop" onClick={() => setMenuOpen(false)} type="button" /> : null}
     <div className="web-cab__workspace">
       <header className="web-cab__topbar">
-        <button aria-expanded={menuOpen} aria-label={ru ? "Открыть меню кабинета" : "Open cabinet menu"} className="web-cab__menu" onClick={() => setMenuOpen(true)} type="button"><span /><span /><span /></button>
+        <button aria-expanded={menuOpen} aria-label={ru ? "Открыть меню кабинета" : "Open cabinet menu"} className="web-cab__menu" onClick={() => setMenuOpen(true)} type="button">
+          <span aria-hidden="true" className="web-cab__menu-icon"><i /><i /><i /></span>
+          <span className="web-cab__menu-label">{ru ? "Меню" : "Menu"}</span>
+        </button>
         <Link aria-label={ru ? "Перейти на главную страницу сайта" : "Go to the main website"} className="web-cab__mobile-brand" href="/"><IconAnkh /><span>Python Method Center</span></Link>
         <div className="web-cab__welcome"><strong>{ru ? `Добрый день, ${greetingName}` : `Good day, ${greetingName}`}</strong><span>{ru ? "Ваш личный кабинет" : "Your personal cabinet"}</span></div>
         <div className="web-cab__top-actions">
