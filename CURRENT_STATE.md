@@ -1,16 +1,33 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Consent-gated product analytics — 2026-09-11 — RELEASE CANDIDATE
+## Consent-gated product analytics — 2026-09-13 — RELEASE CANDIDATE
 
 Aggregate founder analytics, a seven-step consenting-browser funnel and optional
 public-home heatmaps are implemented with RU/EN consent controls. The first-party
 collector stores only an opaque journey UUID, enumerated event, locale and time;
 it excludes profiles, Cases, medical data, documents and free text. PostHog and
 all collection remain disabled by default. Migration
-`20260909210803_product_analytics.sql` is applied only to isolated `ankh-staging`;
-production is unchanged. The owner registration is email-confirmed, but its Case,
-onboarding submission and database consent rows do not yet exist. Hosted
-signup-to-chat acceptance, scheduled retention and publication remain open.
+`20260909210803_product_analytics.sql` remains isolated to `ankh-staging`;
+production is unchanged.
+
+The owner's staging account is email-confirmed and now has an active client
+profile, submitted onboarding, structured US delivery address, recorded offer and
+data-processing consents, and one explicitly non-clinical test Case. Analytics
+consent was not granted, and the account has zero product events. A separate
+synthetic journey wrote all seven ordered events through the real staging RPC,
+returned a complete funnel, and was deleted by exact journey ID; zero fixture
+events remain. Ninety-day cleanup is scheduled through the already deployed daily
+`assistant-outreach` cron, avoiding a fourth Hobby-plan cron while retaining the
+same authorization boundary.
+
+PR #190 is conflict-free and all GitHub/Vercel checks pass. Its protected preview
+`python-method-center-platform-l1w9bajmn-pythonsmethods-projects.vercel.app` is
+READY. Browser acceptance passed for Russian, English, both language directions
+on registration, and absence of loaded PostHog resources. Exact-head verification:
+196 test files passed and 1 skipped; 1,802 tests passed and 1 skipped; TypeScript,
+ESLint, security inventory and production build pass. Production publication is
+the remaining release action; production analytics collection and PostHog remain
+NO-GO without a separate owner-approved enablement.
 Evidence: `docs/audits/PRODUCT_ANALYTICS_ANHAM_2026-09-09.md` and
 `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
 

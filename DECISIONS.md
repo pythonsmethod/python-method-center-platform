@@ -1211,3 +1211,15 @@ public home page after consent, with replay and private routes disabled. Provide
 activation, production collection and retention scheduling are separate release
 gates. Staging evidence is recorded in
 `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+
+## 2026-09-13 — Analytics retention shares the existing authorized daily cron
+
+The Vercel project is on the Hobby plan and already has three scheduled jobs.
+Product-event retention therefore runs after authorization inside the existing
+daily `assistant-outreach` cron instead of adding a fourth schedule or a second
+public cron boundary. When analytics is disabled it is a no-op. When enabled, it
+deletes only first-party `product_events` older than 90 days. It never touches
+assistant conversation history, profiles, Cases, documents, clinical evidence or
+shared rate-limit counters. A cleanup failure is logged without blocking outreach.
+Production collection and the production analytics migration remain separate,
+owner-approved gates.

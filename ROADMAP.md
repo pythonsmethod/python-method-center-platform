@@ -1,12 +1,15 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
-## Consent-gated product analytics — next release gate
+## Consent-gated product analytics — 2026-09-13 — GO FOR CODE RELEASE
 
-Publish the disabled-by-default implementation to a hosted preview, complete the
-email-confirmed staging account's onboarding and Case creation, and verify RU/EN
-signup-to-chat plus retention. External PostHog heatmaps require a separate
-owner-approved account, terms and region; no production collection follows from
-this code release. See `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+Staging account completion, seven-step synthetic funnel acceptance, exact cleanup,
+ninety-day scheduled retention and hosted RU/EN preview acceptance are complete.
+PR #190 is mergeable and all checks pass. Next action: merge the disabled-by-default
+code release, wait for production READY, and smoke-test Russian and English public
+routes. Do not apply `20260909210803_product_analytics.sql` to production or enable
+collection as part of this release. External PostHog heatmaps still require a
+separate owner-approved account, terms, region and activation task. See
+`docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
 
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 

@@ -93,3 +93,49 @@ Exact next action: obtain approval to restore the existing Supabase dashboard se
 The owner approved the Supabase GitHub sign-in. The dashboard session recovered and visibly opened `python-method-center-platform (ankh-staging)`. The existing secret key was copied without creating a new key. The local launcher first failed because its sandboxed process could not reach Supabase (`EACCES` on port 443); an escalated retry was rejected by the automatic approval review because the Codex account had reached 100% usage. The staging setup page consequently returned `ERR_CONNECTION_RESET`. No questionnaire submission, new key, OAuth key, production mutation, or analytics consent occurred. The account remains email-confirmed with a registered profile, no case, and zero onboarding submissions.
 
 The Codex account currently reports one available free rate-limit reset. Consuming it is an account-level action and requires explicit owner authorization. Until the reset is authorized or the usage window resets, the approved browser questionnaire remains prepared but cannot be submitted through the local app.
+
+### Registration, retention and hosted preview closure — 2026-09-13
+
+After the owner restored the execution limits and reconfirmed the already prepared
+questionnaire, staging registration was completed without changing production.
+The email-confirmed account now has an active client profile, submitted onboarding,
+the owner-provided structured US delivery address, accepted offer and data-processing
+consent records, and one Case explicitly labelled as a website workflow test with
+no medical data. The report deliberately omits the address, phone and password.
+The account has no analytics consent and zero product events.
+
+A separate fixed synthetic journey was inserted through the real staging
+`record_product_event` RPC. The summary returned one journey at every ordered step
+from `landing_view` through `chat_completed`, conversion 1. The exact journey was
+then deleted and a post-cleanup query returned zero remaining product events. This
+proves the safe event contract and funnel calculation for the fixture; it does not
+claim traffic volume, causality or universal browser behavior.
+
+Retention is now invoked from the existing authenticated daily
+`/api/cron/assistant-outreach` route. Disabled analytics is a no-op; enabled
+analytics removes only `product_events` older than 90 days. No fourth Vercel cron
+is required on the project's Hobby plan, and assistant conversation history is
+unchanged.
+
+PR #190 preview deployment `dpl_5uYyhUCrnDnerLynDf53ozwhk4Jr` is READY at
+`python-method-center-platform-l1w9bajmn-pythonsmethods-projects.vercel.app`.
+Browser acceptance confirmed complete Russian and English public pages, RU→EN and
+EN→RU switching on the registration route, the sign-up form in both languages,
+and no loaded PostHog/analytics asset. PostHog remains unconnected and disabled.
+
+Exact-head verification after integration with current main: 196 test files passed
+and 1 skipped; 1,802 tests passed and 1 skipped. The synthetic Ankh benchmark kept
+100% critical numeric exact match, verified precision, needs-review recall and
+provenance availability, with zero critical extraction errors, zero false VERIFIED
+critical errors and zero security issues. TypeScript, ESLint, security inventory,
+`git diff --check` and the Next.js production build pass. Two inherited tests were
+made platform-stable: one normalizes CRLF before inspecting SQL, and two server
+render checks use a 15-second full-suite timeout.
+
+Staging registration/data/funnel/retention and hosted public RU/EN acceptance are
+**CLOSED**. Signed-in credentials were not submitted to the hosted preview because
+its Supabase environment could not be independently shown to be staging; database
+evidence and the existing real-staging authenticated harness remain the acceptance
+evidence for the private flow. A physical phone session was not remotely controlled.
+Production collection, production migration and PostHog activation remain
+**NO-GO**. The disabled-by-default code release is **GO**.
