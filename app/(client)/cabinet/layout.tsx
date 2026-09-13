@@ -12,19 +12,20 @@ import { getTokenLedger } from "@/lib/tokens/queries";
 import { redirect } from "next/navigation";
 import { getClientDeliveryUnreadCount } from "@/lib/delivery/queries";
 import { getClientSupportUnreadCount } from "@/lib/support/queries";
+import { createProfileAvatarUrl } from "@/lib/profile/avatar";
 
 // The name a person gave us, not the front half of their email address.
 // Falls back quietly: a greeting is never worth an error page.
-async function greetingFor(userId: string, email: string | null,
+async function identityFor(userId: string, email: string | null,
   fallback: string
-): Promise<string> {
+): Promise<{ greetingName: string; avatarPath: string | null }> {
   try {
     const supabase = createSupabaseServiceClient();
 
     if (supabase) {
       const { data } = await supabase
         .from("profiles")
-        .select("full_name")
+        .select("full_name, avatar_path")
         .eq("id", userId)
         .maybeSingle();
 
@@ -33,14 +34,19 @@ async function greetingFor(userId: string, email: string | null,
       if (full) {
         // As the person wrote it. Guessing which half is the first name is
         // a guess we would get wrong for half our clients.
-        return full;
+        return { greetingName: full, avatarPath: data?.avatar_path ?? null };
       }
+
+      return {
+        greetingName: email ? email.split("@")[0] : fallback,
+        avatarPath: data?.avatar_path ?? null
+      };
     }
   } catch {
     // Fall through to the email.
   }
 
-  return email ? email.split("@")[0] : fallback;
+  return { greetingName: email ? email.split("@")[0] : fallback, avatarPath: null };
 }
 
 // The shell is shared by every cabinet page, so the person keeps the same
@@ -80,24 +86,26 @@ export default async function CabinetLayout({
   const caseId =
     caseResult.status === "ready" && caseResult.case ? caseResult.case.id : null;
 
-  const [unread, supportUnread, tokens, greetingName, supplementsDue, deliveryUnread, documentsAttentionResult, questionnaireFilled] = await Promise.all([
+  const [unread, supportUnread, tokens, identity, supplementsDue, deliveryUnread, documentsAttentionResult, questionnaireFilled] = await Promise.all([
     caseId ? getUnreadForClient(caseId) : Promise.resolve(0),
     getClientSupportUnreadCount(auth.userId),
     getTokenLedger(auth.userId),
-    greetingFor(auth.userId, auth.email, dict.friend),
+    identityFor(auth.userId, auth.email, dict.friend),
     getSupplementsDueCount(),
     getClientDeliveryUnreadCount(auth.userId),
     roleClient?.from("uploaded_documents").select("id", { count: "exact", head: true })
       .eq("profile_id", auth.userId).in("document_status", ["needs_reupload", "failed", "identity_mismatch"]),
     hasQuestionnaire()
   ]);
+  const avatarUrl = await createProfileAvatarUrl(identity.avatarPath);
 
   return (
     <CabinetShell
       email={auth.email}
+      avatarUrl={avatarUrl}
       labels={dict}
       locale={locale}
-      greetingName={greetingName}
+      greetingName={identity.greetingName}
       supplementsDue={supplementsDue}
       tokens={tokens.balance}
       unread={unread}

@@ -90,6 +90,11 @@ const ru = {
       }
     },
     profileForm: {
+      avatarTitle: "Фотография профиля",
+      avatarHint: "JPEG, PNG или WebP, не больше 5 МБ.",
+      avatarChoose: "Выбрать из галереи",
+      avatarCamera: "Сделать фото",
+      avatarUploading: "Загружаю фотографию…",
       name: "Имя и фамилия",
       namePlaceholder: "Как к вам обращаться",
       phone: "Телефон",
@@ -1261,6 +1266,11 @@ const en: typeof ru = {
       }
     },
     profileForm: {
+      avatarTitle: "Profile photo",
+      avatarHint: "JPEG, PNG, or WebP, up to 5 MB.",
+      avatarChoose: "Choose from gallery",
+      avatarCamera: "Take a photo",
+      avatarUploading: "Uploading photo…",
       name: "First and last name",
       namePlaceholder: "What should we call you",
       phone: "Phone",

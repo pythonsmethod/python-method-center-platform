@@ -18,6 +18,7 @@ import { initialStaffActionState } from "@/lib/cases/staff-types";
 import type { CaseMessage } from "@/lib/messages/queries";
 import { mergeRefreshedMessages } from "@/lib/messages/merge";
 import { VoiceRecorder } from "@/components/messages/VoiceRecorder";
+import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
 
 const POLL_INTERVAL_MS = 3000;
 const SIGNED_AUDIO_URL_REFRESH_MS = 45 * 60 * 1000;
@@ -38,6 +39,8 @@ type CaseMessageThreadProps = {
   // that label is reworded.
   dateLocale: string;
   externalDraft?: { id: number; text: string } | null;
+  clientAvatarUrl?: string | null;
+  clientName?: string;
 };
 
 function senderLabel(role: string, viewer: "client" | "staff",
@@ -104,6 +107,8 @@ export function CaseMessageThread({
   labels: t,
   voiceLabels,
   dateLocale,
+  clientAvatarUrl = null,
+  clientName,
   externalDraft = null
 }: CaseMessageThreadProps) {
   const [expanded, setExpanded] = useState(false);
@@ -269,21 +274,30 @@ export function CaseMessageThread({
                   <span>{formatDay(message.created_at, t, dateLocale)}</span>
                 </div>
               ) : null}
-              <div className={`case-msg${own ? " case-msg--own" : ""}`}>
-                {!own ? (
-                  <span className="case-msg__sender">
-                    {senderLabel(message.sender_role, viewer, t)}
+              <div className={`case-msg-row${own ? " case-msg-row--own" : ""}`}>
+                {message.sender_role === "client" ? (
+                  <ClientAvatar
+                    className="case-msg__avatar"
+                    name={clientName ?? t.client}
+                    url={clientAvatarUrl}
+                  />
+                ) : null}
+                <div className={`case-msg${own ? " case-msg--own" : ""}`}>
+                  {!own ? (
+                    <span className="case-msg__sender">
+                      {senderLabel(message.sender_role, viewer, t)}
+                    </span>
+                  ) : null}
+                  {message.body ? <p>{message.body}</p> : null}
+                  {message.audioUrl ? (
+                    <audio controls preload="metadata" src={message.audioUrl} />
+                  ) : message.audio_path && !message.audioUrl ? (
+                    <p className="case-msg__missing">{t.audioMissing}</p>
+                  ) : null}
+                  <span className="case-msg__time">
+                    {formatTime(message.created_at, dateLocale)}
                   </span>
-                ) : null}
-                {message.body ? <p>{message.body}</p> : null}
-                {message.audioUrl ? (
-                  <audio controls preload="metadata" src={message.audioUrl} />
-                ) : message.audio_path && !message.audioUrl ? (
-                  <p className="case-msg__missing">{t.audioMissing}</p>
-                ) : null}
-                <span className="case-msg__time">
-                  {formatTime(message.created_at, dateLocale)}
-                </span>
+                </div>
               </div>
             </Fragment>
           );

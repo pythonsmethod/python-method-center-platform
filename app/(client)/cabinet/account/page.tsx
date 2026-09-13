@@ -18,6 +18,8 @@ import {
   paymentStatusLabel
 } from "@/lib/i18n/status-labels";
 import { caseActivityEntries } from "@/lib/cases/activity";
+import { AvatarUploadForm } from "@/components/cabinet/AvatarUploadForm";
+import { createProfileAvatarUrl } from "@/lib/profile/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -48,7 +50,7 @@ export default async function AccountPage() {
   const { data: profileRow } = supabase
     ? await supabase
         .from("profiles")
-        .select("full_name, phone")
+        .select("full_name, phone, avatar_path")
         .eq("id", auth.userId)
         .maybeSingle()
     : { data: null };
@@ -57,6 +59,7 @@ export default async function AccountPage() {
     getClientCaseShell(auth.userId),
     getOwnPayments(auth.userId)
   ]);
+  const avatarUrl = await createProfileAvatarUrl(profileRow?.avatar_path ?? null);
   const historyResult =
     caseResult.status === "ready" && caseResult.case
       ? await getOwnCaseLifecycleEvents(auth.userId, caseResult.case.id)
@@ -81,6 +84,17 @@ export default async function AccountPage() {
           <p>
 {t.detailsText}
           </p>
+          <AvatarUploadForm
+            avatarUrl={avatarUrl}
+            labels={{
+              camera: dict.profileForm.avatarCamera,
+              choose: dict.profileForm.avatarChoose,
+              hint: dict.profileForm.avatarHint,
+              title: dict.profileForm.avatarTitle,
+              uploading: dict.profileForm.avatarUploading
+            }}
+            name={profileRow?.full_name ?? auth.email ?? dict.friend}
+          />
           <ProfileDetailsForm
             labels={dict.profileForm}
             email={auth.email}

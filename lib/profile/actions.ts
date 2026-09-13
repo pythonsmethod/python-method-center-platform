@@ -1,11 +1,18 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import type { ProfileDetailsActionState } from "@/lib/profile/action-state";
+import type { ProfileAvatarActionState, ProfileDetailsActionState } from "@/lib/profile/action-state";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { getLocale } from "@/lib/i18n/locale";
 import { isFullName } from "@/lib/profile/identity";
+import sharp from "sharp";
+import {
+  avatarPathBelongsTo,
+  detectSupportedAvatar,
+  MAX_PROFILE_AVATAR_BYTES,
+  PROFILE_AVATAR_BUCKET
+} from "@/lib/profile/avatar";
 
 
 
@@ -80,4 +87,85 @@ export async function updateProfileDetails(
   revalidatePath("/cabinet");
 
   return { status: "success", message: "Данные сохранены." };
+}
+
+export async function uploadProfileAvatar(
+  _previousState: ProfileAvatarActionState,
+  formData: FormData
+): Promise<ProfileAvatarActionState> {
+  const locale = await getLocale();
+  const error = (ru: string, en: string): ProfileAvatarActionState => ({
+    status: "error",
+    message: locale === "ru" ? ru : en
+  });
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) return error("Сервис временно недоступен.", "The service is temporarily unavailable.");
+
+  const { data: { user } } = await supabase.auth.getUser();
+  if (!user) return error("Сессия истекла — войдите заново.", "Your session expired. Please sign in again.");
+
+  const file = formData.get("avatar");
+  if (!(file instanceof File) || file.size === 0) {
+    return error("Выберите фотографию.", "Choose a photo.");
+  }
+  if (file.size > MAX_PROFILE_AVATAR_BYTES) {
+    return error("Фотография должна быть не больше 5 МБ.", "The photo must be 5 MB or smaller.");
+  }
+
+  const bytes = new Uint8Array(await file.arrayBuffer());
+  const detected = detectSupportedAvatar(bytes);
+  if (!detected) {
+    return error("Поддерживаются только фотографии JPEG, PNG и WebP.", "Only JPEG, PNG, and WebP photos are supported.");
+  }
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("avatar_path")
+    .eq("id", user.id)
+    .maybeSingle();
+  let normalizedPhoto: Buffer;
+  try {
+    // Re-encoding validates the complete image, removes EXIF/location metadata,
+    // and prevents a large original from being served as an avatar.
+    normalizedPhoto = await sharp(bytes, { limitInputPixels: 40_000_000 })
+      .rotate()
+      .resize(512, 512, { fit: "cover", position: "attention" })
+      .jpeg({ quality: 82, mozjpeg: true })
+      .toBuffer();
+  } catch {
+    return error("Файл повреждён или не является фотографией.", "The file is damaged or is not a photo.");
+  }
+
+  const path = `${user.id}/${crypto.randomUUID()}.jpg`;
+  const { error: uploadError } = await supabase.storage
+    .from(PROFILE_AVATAR_BUCKET)
+    .upload(path, normalizedPhoto, { contentType: "image/jpeg", upsert: false });
+
+  if (uploadError) {
+    return error("Не удалось загрузить фотографию. Попробуйте ещё раз.", "The photo could not be uploaded. Please try again.");
+  }
+
+  const { error: updateError } = await supabase
+    .from("profiles")
+    .update({ avatar_path: path })
+    .eq("id", user.id);
+
+  if (updateError) {
+    await supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([path]);
+    return error("Не удалось сохранить фотографию. Попробуйте ещё раз.", "The photo could not be saved. Please try again.");
+  }
+
+  const previousPath = typeof profile?.avatar_path === "string" ? profile.avatar_path : null;
+  if (previousPath && previousPath !== path && avatarPathBelongsTo(user.id, previousPath)) {
+    await supabase.storage.from(PROFILE_AVATAR_BUCKET).remove([previousPath]);
+  }
+
+  revalidatePath("/cabinet", "layout");
+  revalidatePath("/cabinet/account");
+
+  return {
+    status: "success",
+    message: locale === "ru" ? "Фотография обновлена." : "Photo updated."
+  };
 }

@@ -25,6 +25,7 @@ import { caseDetailCopy, type CaseDetailCopy } from "@/lib/cases/detail-copy";
 import { ReprocessCaseDocumentsForm } from "./ReprocessCaseDocumentsForm";
 import { IdentityReviewForm } from "./IdentityReviewForm";
 import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
+import { createProfileAvatarUrl } from "@/lib/profile/avatar";
 import { CaseAnalyticalPicturePanel } from "@/components/cases/CaseAnalyticalPicturePanel";
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 
@@ -155,6 +156,7 @@ export default async function StaffCaseDetailPage({
   }
 
   const dictionary = getDictionary(locale);
+  const clientAvatarUrl = await createProfileAvatarUrl(clientCase.profiles?.avatar_path ?? null);
 
   if (focusedTodayView) {
     const caseMessages = await getCaseMessages(clientCase.id);
@@ -213,6 +215,8 @@ export default async function StaffCaseDetailPage({
 
         <CaseConversationWorkspace
           caseId={clientCase.id}
+          clientAvatarUrl={clientAvatarUrl}
+          clientName={clientName}
           copy={workspaceCopy}
           dateLocale={dictionary.cabinet.dateLocale}
           labels={dictionary.cabinet.thread}
@@ -290,6 +294,8 @@ export default async function StaffCaseDetailPage({
             voiceLabels={dictionary.cabinet.voice}
             dateLocale={dictionary.cabinet.dateLocale}
             caseId={clientCase.id}
+            clientAvatarUrl={clientAvatarUrl}
+            clientName={clientCase.profiles?.full_name ?? clientCase.profiles?.email ?? copy.clientUnnamed}
             expandable
             loadError={caseMessages.error}
             messages={caseMessages.messages}

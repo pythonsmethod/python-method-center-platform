@@ -33,6 +33,8 @@ type Props = {
   messages: CaseMessage[];
   providerChoice: boolean;
   voiceLabels: Dictionary["cabinet"]["voice"];
+  clientAvatarUrl?: string | null;
+  clientName: string;
 };
 
 export function CaseConversationWorkspace({
@@ -44,7 +46,9 @@ export function CaseConversationWorkspace({
   locale,
   messages,
   providerChoice,
-  voiceLabels
+  voiceLabels,
+  clientAvatarUrl,
+  clientName
 }: Props) {
   const [draft, setDraft] = useState<{ id: number; text: string } | null>(null);
 
@@ -79,6 +83,8 @@ export function CaseConversationWorkspace({
         {draft ? <p className="case-conversation-workspace__notice">{copy.reviewBeforeSending}</p> : null}
         <CaseMessageThread
           caseId={caseId}
+          clientAvatarUrl={clientAvatarUrl}
+          clientName={clientName}
           dateLocale={dateLocale}
           expandable
           externalDraft={draft}
