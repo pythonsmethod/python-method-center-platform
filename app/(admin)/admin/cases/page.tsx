@@ -13,6 +13,8 @@ import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { formatDateTime } from "@/lib/i18n/format";
 import { getLocale, type Locale } from "@/lib/i18n/locale";
 import { countryFlag } from "@/lib/profile/identity";
+import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
+import { createProfileAvatarUrlMap } from "@/lib/profile/avatar";
 
 function shortId(value: string): string {
   return value.slice(0, 8);
@@ -21,11 +23,13 @@ function shortId(value: string): string {
 function CaseTable({
   cases,
   locale,
-  unreadByCase
+  unreadByCase,
+  avatarUrls
 }: {
   cases: StaffCaseListItem[];
   locale: Locale;
   unreadByCase: Record<string, number>;
+  avatarUrls: Record<string, string>;
 }) {
   const copy = locale === "ru"
     ? { empty: "Кейсов пока нет.", case: "Кейс", chat: "Чат", client: "Клиент", contacts: "Контакты", goal: "Цель", created: "Создан", open: "Открыть", unnamed: "Без имени" }
@@ -65,9 +69,14 @@ function CaseTable({
                 )}
               </td>
               <td>
-                {clientCase.profiles?.full_name ?? copy.unnamed}
-                {clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
-                {clientCase.profiles?.country_code ? ` · ${countryFlag(clientCase.profiles.country_code)}` : ""}
+                <span className="staff-case-client">
+                  <ClientAvatar name={clientCase.profiles?.full_name ?? copy.unnamed} url={clientCase.profiles?.avatar_path ? avatarUrls[clientCase.profiles.avatar_path] : null} />
+                  <span>
+                    {clientCase.profiles?.full_name ?? copy.unnamed}
+                    {clientCase.case_number ? ` · ${clientCase.case_number}` : ""}
+                    {clientCase.profiles?.country_code ? ` · ${countryFlag(clientCase.profiles.country_code)}` : ""}
+                  </span>
+                </span>
               </td>
               <td>
                 {clientCase.profiles?.email ?? "—"}
@@ -95,11 +104,13 @@ function CaseTable({
 function CaseCards({
   cases,
   locale,
-  unreadByCase
+  unreadByCase,
+  avatarUrls
 }: {
   cases: StaffCaseListItem[];
   locale: Locale;
   unreadByCase: Record<string, number>;
+  avatarUrls: Record<string, string>;
 }) {
   const copy = locale === "ru"
     ? {
@@ -130,9 +141,7 @@ function CaseCards({
 
         return (
           <Link className="staff-client-card" href={`/admin/cases/${clientCase.id}`} key={clientCase.id}>
-            <span className="staff-client-card__avatar" aria-hidden="true">
-              {name.trim().charAt(0).toUpperCase() || "?"}
-            </span>
+            <ClientAvatar className="staff-client-card__avatar" name={name} url={clientCase.profiles?.avatar_path ? avatarUrls[clientCase.profiles.avatar_path] : null} />
             <span className="staff-client-card__body">
               <span className="staff-client-card__name-row">
                 <strong>
@@ -230,6 +239,9 @@ export default async function StaffCasesPage({ searchParams }: PageProps) {
 
   const found =
     casesResult.status === "ready" ? searchCases(casesResult.cases, query) : [];
+  const avatarUrls = await createProfileAvatarUrlMap(
+    found.map((clientCase) => clientCase.profiles?.avatar_path)
+  );
 
   return (
     <div className="page-shell">
@@ -287,8 +299,8 @@ export default async function StaffCasesPage({ searchParams }: PageProps) {
                   : copy.notFound(query)}
               </p>
             ) : null}
-            <CaseTable cases={found} locale={locale} unreadByCase={unread.byCase} />
-            <CaseCards cases={found} locale={locale} unreadByCase={unread.byCase} />
+            <CaseTable avatarUrls={avatarUrls} cases={found} locale={locale} unreadByCase={unread.byCase} />
+            <CaseCards avatarUrls={avatarUrls} cases={found} locale={locale} unreadByCase={unread.byCase} />
           </>
         ) : (
           <div className="notice notice--warning">

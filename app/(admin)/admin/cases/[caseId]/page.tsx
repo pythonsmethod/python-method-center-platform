@@ -26,6 +26,7 @@ import { ReprocessCaseDocumentsForm } from "./ReprocessCaseDocumentsForm";
 import { IdentityReviewForm } from "./IdentityReviewForm";
 import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { createProfileAvatarUrl } from "@/lib/profile/avatar";
+import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
 import { CaseAnalyticalPicturePanel } from "@/components/cases/CaseAnalyticalPicturePanel";
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 
@@ -262,7 +263,10 @@ export default async function StaffCaseDetailPage({
       <section className="panel-grid">
         <div className="panel">
           <span className="panel__label">{copy.clientLabel}</span>
-          <h2>{clientCase.profiles?.full_name ?? copy.clientUnnamed}</h2>
+          <div className="staff-case-profile-heading">
+            <ClientAvatar name={clientCase.profiles?.full_name ?? copy.clientUnnamed} url={clientAvatarUrl} />
+            <h2>{clientCase.profiles?.full_name ?? copy.clientUnnamed}</h2>
+          </div>
           <ul className="status-list">
             <li>{copy.email}: {clientCase.profiles?.email ?? copy.dash}</li>
             <li>{copy.phone}: {clientCase.profiles?.phone ?? copy.dash}</li>

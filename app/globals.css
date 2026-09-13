@@ -7595,6 +7595,10 @@ body.cabinet-menu-open { overflow: hidden; }
 .web-cab__token svg { height:20px; width:20px; }
 .web-cab__account { color:var(--wc-text); gap:8px; }
 .client-avatar { align-items:center; background:#0b0d0b center/cover no-repeat; border:1px solid var(--wc-gold, var(--accent)); border-radius:50%; color:var(--wc-bright, var(--accent-strong)); display:inline-flex; flex:0 0 auto; font-weight:700; justify-content:center; overflow:hidden; }
+.staff-case-client,.staff-case-profile-heading { align-items:center; display:flex; gap:10px; }
+.staff-case-client>.client-avatar { height:34px; width:34px; }
+.staff-case-profile-heading>.client-avatar { height:52px; width:52px; }
+.staff-case-profile-heading h2 { margin:0; }
 .web-cab__account>.client-avatar { height:40px; width:40px; }
 .web-cab__account strong { font-size:.75rem; }
 .web-cab__account small { max-width:150px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
