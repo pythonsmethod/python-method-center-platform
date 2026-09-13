@@ -1,5 +1,7 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+2026-09-13: manual evidence-review snapshot integration implemented locally on main 54ca208 in codex/controlled-review-snapshots. Existing admin_notes save original row/version plus correction atomically; stale forms and unsafe index-only readback fail closed. Verified Auth Karen identity required. Focused 51/51; full 1783 passed / 1 skipped; TS/lint/security pass. Windows avatar assertion normalizes line endings without changing its ACL checks. Scoped release authorized, preparing isolated PR/preview; production remains gated on authenticated RU/EN acceptance. No migration/PHI/model call. See docs/ankh/review_snapshot_integration_2026_09_13.md. End-to-end learning loop NOT CLOSED.
+
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 
 Owner authorised publication. PR #179 merged as main `8f23316` (feature commit

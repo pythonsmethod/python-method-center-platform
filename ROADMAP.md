@@ -1,5 +1,7 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+2026-09-13 manual-review capture: local save/readback integration complete; live release and learning loop open. Next: isolated authenticated staff-note/RU/EN stale-form acceptance and clean release validation, then controlled publication. Source-image adjudication, minimized fixture export and quality-gate connection remain separate; no automatic learning/trust activation. See docs/ankh/review_snapshot_integration_2026_09_13.md.
+
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 
 Published as main `8f23316`, production `dpl_AK3TkxyR3fi7yz1tHYMm8WQvBxJs`

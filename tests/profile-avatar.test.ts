@@ -23,7 +23,7 @@ describe("profile avatars", () => {
   });
 
   it("keeps the bucket private and scopes writes by owner folder", () => {
-    const migration = readFileSync("supabase/migrations/20260913070000_client_profile_avatars.sql", "utf8");
+    const migration = readFileSync("supabase/migrations/20260913070000_client_profile_avatars.sql", "utf8").replace(/\r\n/g, "\n");
     expect(migration).toContain("'profile-avatars',\n  'profile-avatars',\n  false");
     expect(migration).toContain("(storage.foldername(name))[1] = (select auth.uid()::text)");
     expect(migration).toContain("owner_id = (select auth.uid()::text)");
