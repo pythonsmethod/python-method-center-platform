@@ -21,6 +21,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { sanitizeNextPath } from "@/lib/auth/safe-next-path";
 import { resolveStaffLandingPath } from "@/lib/auth/staff-landing";
+import { recordProductEvent } from "@/lib/product-analytics/record";
 
 function errorState(message: string, code?: AuthErrorCode): AuthActionState {
   return { status: "error", message, code };
@@ -223,6 +224,8 @@ export async function signUpWithPassword(
       rawCode: cookieStore.get(REFERRAL_COOKIE)?.value
     });
   }
+
+  if (data.user) await recordProductEvent("registration_completed", locale);
 
   // Confirmation switched off in Supabase: the session is already open, so
   // nothing stands between the person and the cabinet.

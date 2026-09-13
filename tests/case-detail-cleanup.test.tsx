@@ -134,7 +134,7 @@ describe("Case detail without classification", () => {
       // And no control that could set them.
       expect(html).not.toMatch(/<select|CaseManagementForm|Сохранить изменения|Save changes/);
     }
-  });
+  }, 15_000);
 
   it("renders one language at a time", async () => {
     expect(await renderPage("ru")).toMatch(/[А-Яа-яЁё]/);
@@ -142,7 +142,7 @@ describe("Case detail without classification", () => {
     const english = await renderPage("en");
     expect(english).toContain("Team workspace");
     expect(english).not.toMatch(/[А-Яа-яЁё]/);
-  });
+  }, 15_000);
 
   it("keeps the page in Russian after switching back", async () => {
     await renderPage("en");

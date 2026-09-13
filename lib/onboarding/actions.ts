@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { recordProductEvent } from "@/lib/product-analytics/record";
 import type {
   CareRecipientType,
   OnboardingActionState
@@ -463,5 +464,6 @@ export async function submitOnboarding(
   // picture of the person is the next thing the centre needs, and it is
   // asked for while they are still filling things in rather than left for
   // them to discover in a menu.
+  await recordProductEvent("onboarding_completed", uiLocale);
   redirect("/cabinet/health?onboarding=submitted");
 }

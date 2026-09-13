@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { deliverAssistantOutreach, isAssistantOutreachEnabled } from "@/lib/assistant/outreach";
+import { purgeExpiredProductEvents } from "@/lib/product-analytics/retention";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -10,6 +11,9 @@ export async function GET(request: Request) {
   if (!secret || request.headers.get("authorization") !== `Bearer ${secret}`) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
+  // Reuse this existing daily authenticated job: the Vercel Hobby project
+  // cannot add another schedule. Collection-disabled environments no-op.
+  await purgeExpiredProductEvents();
   if (!isAssistantOutreachEnabled()) {
     return NextResponse.json({ enabled: false, sent: 0 });
   }

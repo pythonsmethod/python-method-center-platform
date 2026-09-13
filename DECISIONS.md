@@ -1199,3 +1199,27 @@ generic uncertainty such as "I am not sure". Persist only the existing closed
 enumerations; never persist the reply, question, Case or profile. Production
 acceptance and exact observed fixtures are recorded in
 `docs/ankh/retired_classification_atomic_gaps_voice_release.md`.
+
+## 2026-09-11 — Product analytics stays aggregate, consent-gated and separate from clinical data
+
+Founder analytics uses the existing founder authorization and server-generated
+aggregates. The first-party store accepts only enumerated journey events and never
+stores a profile, Case, medical payload, document, URL or free text. Missing and
+unavailable measurements remain unknown; operational row counts are not presented
+as a cohort. Optional PostHog heatmaps are limited to pointer coordinates on the
+public home page after consent, with replay and private routes disabled. Provider
+activation, production collection and retention scheduling are separate release
+gates. Staging evidence is recorded in
+`docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+
+## 2026-09-13 — Analytics retention shares the existing authorized daily cron
+
+The Vercel project is on the Hobby plan and already has three scheduled jobs.
+Product-event retention therefore runs after authorization inside the existing
+daily `assistant-outreach` cron instead of adding a fourth schedule or a second
+public cron boundary. When analytics is disabled it is a no-op. When enabled, it
+deletes only first-party `product_events` older than 90 days. It never touches
+assistant conversation history, profiles, Cases, documents, clinical evidence or
+shared rate-limit counters. A cleanup failure is logged without blocking outreach.
+Production collection and the production analytics migration remain separate,
+owner-approved gates.

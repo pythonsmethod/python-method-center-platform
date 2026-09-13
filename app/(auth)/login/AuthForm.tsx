@@ -1,6 +1,8 @@
 "use client";
 
 import { useActionState, useEffect, useRef, useState } from "react";
+import { useLocale } from "@/components/LocaleLink";
+import { trackProductEvent } from "@/lib/product-analytics/browser";
 import {
   resendConfirmationEmail,
   signInWithPassword,
@@ -74,6 +76,13 @@ export function AuthForm({
   initialMode = "login"
 }: AuthFormProps) {
   const [mode, setMode] = useState<AuthMode>(initialMode);
+  const locale = useLocale();
+  useEffect(() => {
+    const track = () => { if (mode === "signup") trackProductEvent("registration_started", locale); };
+    track();
+    window.addEventListener("pm-analytics-consent-changed", track);
+    return () => window.removeEventListener("pm-analytics-consent-changed", track);
+  }, [mode, locale]);
   // Every field is held here, not left to the browser. React empties an
   // uncontrolled form once its action returns, so a single mistake used to
   // wipe the phone number and both passwords — and since the address

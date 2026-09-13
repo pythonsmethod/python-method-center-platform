@@ -32,7 +32,8 @@ const MESSAGES_RU: Record<AuthErrorCode, string> = {
     "Такой email уже зарегистрирован. Перейдите на вкладку «Войти», а если пароль не вспоминается — задайте новый через «Забыли пароль?».",
   rate_limited:
     "Слишком много попыток подряд. Подождите минуту и попробуйте ещё раз.",
-  weak_password: "Пароль должен быть не короче 6 символов.",
+  weak_password:
+    "Этот пароль слишком простой или встречался в утечках. Придумайте другой: длинную фразу или сочетание несвязанных слов, цифр и знаков.",
   invalid_email: "Проверьте, правильно ли написан email.",
   signup_disabled:
     "Регистрация сейчас закрыта. Напишите команде — вас заведут вручную.",
@@ -53,7 +54,7 @@ const MESSAGES_EN: Record<AuthErrorCode, string> = {
   email_not_confirmed: "Your account exists, but the email is not confirmed yet. Open the link in the email or resend it below.",
   already_registered: "This email is already registered. Switch to Sign in, or use ‘Forgot password?’ to set a new password.",
   rate_limited: "Too many attempts. Wait a minute and try again.",
-  weak_password: "The password must be at least 6 characters.",
+  weak_password: "This password is too easy to guess or has appeared in data breaches. Choose a different long phrase or a mix of unrelated words, numbers, and symbols.",
   invalid_email: "Check that the email address is written correctly.",
   signup_disabled: "Registration is currently closed. Contact the team and we will help you.",
   email_send_failed: "The account was not created because the confirmation email could not be sent. Contact the team and we will help you.",
@@ -67,7 +68,7 @@ const PATTERNS: Array<[RegExp, AuthErrorCode]> = [
   [/email not confirmed|email_not_confirmed|not confirmed/i, "email_not_confirmed"],
   [/already registered|already been registered|user_already_exists|email_exists/i, "already_registered"],
   [/rate limit|too many requests|only request this after|over_email_send_rate/i, "rate_limited"],
-  [/password should be|weak_password|password is too short/i, "weak_password"],
+  [/password should be|weak_password|password is too short|known to be weak|easy to guess|pwned password/i, "weak_password"],
   [/unable to validate email|invalid email|email_address_invalid/i, "invalid_email"],
   [/signups not allowed|signup_disabled|signups are disabled/i, "signup_disabled"],
   // The mail sender is misconfigured or refusing. Supabase reports this as
