@@ -15,3 +15,13 @@ export const initialProfileDetailsActionState: ProfileDetailsActionState = {
   status: "idle",
   message: ""
 };
+
+export type ProfileAvatarActionState = {
+  status: "idle" | "success" | "error";
+  message: string;
+};
+
+export const initialProfileAvatarActionState: ProfileAvatarActionState = {
+  status: "idle",
+  message: ""
+};

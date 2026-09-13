@@ -6,6 +6,7 @@ import { useEffect, useState, type ReactNode } from "react";
 import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { logoutAction } from "@/lib/auth/actions";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
+import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
 import {
   IconAnkh, IconDjed, IconEyeOfHorus, IconLotus, IconPapyrus,
   IconScales, IconScarab, IconWater, IconWingedSun
@@ -18,7 +19,7 @@ type CabinetShellProps = {
   // half of the picture the analyses do not carry, so an empty one is worth
   // a mark in the sidebar rather than a page nobody finds.
   questionnaireDue?: number;
-  locale: "ru" | "en"; preview?: boolean; labels: Dictionary["cabinet"];
+  locale: "ru" | "en"; preview?: boolean; labels: Dictionary["cabinet"]; avatarUrl?: string | null;
 };
 
 type NavItem = {
@@ -27,7 +28,7 @@ type NavItem = {
 };
 
 export function CabinetShell({ children, email, greetingName, unread, tokens,
-  supportUnread = 0, deliveryUnread = 0, documentsAttention = 0, questionnaireDue = 0, supplementsDue, locale, preview = false, labels: t }: CabinetShellProps) {
+  supportUnread = 0, deliveryUnread = 0, documentsAttention = 0, questionnaireDue = 0, supplementsDue, locale, preview = false, labels: t, avatarUrl = null }: CabinetShellProps) {
   const pathname = usePathname();
   const [menuOpen, setMenuOpen] = useState(false);
   const ru = locale === "ru";
@@ -95,13 +96,16 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
     {menuOpen ? <button aria-label={ru ? "Закрыть меню" : "Close menu"} className="web-cab__backdrop" onClick={() => setMenuOpen(false)} type="button" /> : null}
     <div className="web-cab__workspace">
       <header className="web-cab__topbar">
-        <button aria-expanded={menuOpen} aria-label={ru ? "Открыть меню кабинета" : "Open cabinet menu"} className="web-cab__menu" onClick={() => setMenuOpen(true)} type="button"><span /><span /><span /></button>
+        <button aria-expanded={menuOpen} aria-label={ru ? "Открыть меню кабинета" : "Open cabinet menu"} className="web-cab__menu" onClick={() => setMenuOpen(true)} type="button">
+          <span aria-hidden="true" className="web-cab__menu-icon"><i /><i /><i /></span>
+          <span className="web-cab__menu-label">{ru ? "Меню" : "Menu"}</span>
+        </button>
         <Link aria-label={ru ? "Перейти на главную страницу сайта" : "Go to the main website"} className="web-cab__mobile-brand" href="/"><IconAnkh /><span>Python Method Center</span></Link>
         <div className="web-cab__welcome"><strong>{ru ? `Добрый день, ${greetingName}` : `Good day, ${greetingName}`}</strong><span>{ru ? "Ваш личный кабинет" : "Your personal cabinet"}</span></div>
         <div className="web-cab__top-actions">
           <LanguageSwitcher locale={locale} />
           <Link aria-label={ru ? `Токены: ${tokens}` : `Tokens: ${tokens}`} className="web-cab__token" href={`${root}/tokens`}><IconScarab /><span>{tokens}</span></Link>
-          <Link className="web-cab__account" href={`${root}/account`}><span>{greetingName.slice(0, 1).toUpperCase()}</span><span><strong>{greetingName}</strong><small>{email ?? t.clientFallback}</small></span></Link>
+          <Link aria-label={ru ? "Открыть профиль" : "Open profile"} className="web-cab__account" href={`${root}/account`}><ClientAvatar name={greetingName} url={avatarUrl} /><span><strong>{greetingName}</strong><small>{email ?? t.clientFallback}</small></span></Link>
         </div>
       </header>
       <main className="web-cab__content">{children}</main>

@@ -11,6 +11,7 @@ export type StaffCaseListItem = {
     email: string | null;
     full_name: string | null;
     phone: string | null;
+    avatar_path?: string | null;
     delivery_first_name?: string | null;
     delivery_last_name?: string | null;
     delivery_email?: string | null;
@@ -51,7 +52,7 @@ export async function getStaffCases(): Promise<StaffCasesResult> {
   const { data, error } = await supabase
     .from("client_cases")
     .select(
-      "id, case_number, title, created_at, updated_at, profiles(email, full_name, phone, country_code)"
+      "id, case_number, title, created_at, updated_at, profiles(email, full_name, phone, avatar_path, country_code)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
@@ -105,6 +106,7 @@ export type StaffCaseDetail = {
     email: string | null;
     full_name: string | null;
     phone: string | null;
+    avatar_path?: string | null;
     delivery_first_name?: string | null;
     delivery_last_name?: string | null;
     delivery_email?: string | null;
@@ -151,7 +153,7 @@ export async function getStaffCaseDetail(
     .from("client_cases")
     .select(
       `id, profile_id, title, summary, created_at, updated_at,
-       profiles(email, full_name, phone, delivery_first_name, delivery_last_name, delivery_email, delivery_phone, delivery_country_code, delivery_region, delivery_city, delivery_street, delivery_building, delivery_unit, delivery_postal_code, delivery_instructions),
+       profiles(email, full_name, phone, avatar_path, delivery_first_name, delivery_last_name, delivery_email, delivery_phone, delivery_country_code, delivery_region, delivery_city, delivery_street, delivery_building, delivery_unit, delivery_postal_code, delivery_instructions),
        onboarding_submissions(id, status, submitted_at, payload),
        uploaded_documents(id, original_filename, document_status, identity_review_status, created_at),
        payments(id, product, status, amount_cents, currency, processor_reference, paid_at, created_at),

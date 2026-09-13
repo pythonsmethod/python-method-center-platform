@@ -5,6 +5,8 @@ import { getClientCaseShell } from "@/lib/cases/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { getCaseMessages } from "@/lib/messages/queries";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createProfileAvatarUrl } from "@/lib/profile/avatar";
 
 export const dynamic = "force-dynamic";
 
@@ -23,9 +25,16 @@ export default async function ProfessorDialogPage() {
     return <section className="web-dialog"><header><span>{locale === "ru" ? "Первый шаг" : "First step"}</span><h1>Karen — Professor Python</h1><p>{locale === "ru" ? "Сначала заполните анкету — она создаст ваш случай и откроет личный диалог." : "Complete the questionnaire first to create your case and open your personal conversation."}</p><Link className="button" href="/onboarding">{locale === "ru" ? "Заполнить анкету" : "Complete questionnaire"}</Link></header></section>;
   }
 
-  const messages = await getCaseMessages(clientCase.id);
+  const supabase = await createSupabaseServerClient();
+  const { data: profile } = supabase
+    ? await supabase.from("profiles").select("full_name, avatar_path").eq("id", auth.userId).maybeSingle()
+    : { data: null };
+  const [messages, avatarUrl] = await Promise.all([
+    getCaseMessages(clientCase.id),
+    createProfileAvatarUrl(profile?.avatar_path ?? null)
+  ]);
   return <section className="web-dialog">
     <header><span>{locale === "ru" ? "Защищённый диалог" : "Protected conversation"}</span><h1>Karen — Professor Python</h1><p>{locale === "ru" ? "Личная переписка по вашему случаю, материалам и следующим шагам." : "A private conversation about your case, materials, and next steps."}</p></header>
-    <CaseMessageThread caseId={clientCase.id} dateLocale={dict.dateLocale} labels={dict.thread} loadError={messages.error} messages={messages.messages} viewer="client" voiceLabels={dict.voice} />
+    <CaseMessageThread caseId={clientCase.id} clientAvatarUrl={avatarUrl} clientName={profile?.full_name ?? auth.email ?? dict.friend} dateLocale={dict.dateLocale} labels={dict.thread} loadError={messages.error} messages={messages.messages} viewer="client" voiceLabels={dict.voice} />
   </section>;
 }
