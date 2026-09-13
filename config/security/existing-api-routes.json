@@ -1,5 +1,8 @@
 [
   "app/api/admin/notifications/unread/route.ts",
+  "app/api/analytics/consent/route.ts",
+  "app/api/analytics/events/route.ts",
+  "app/api/analytics/summary/route.ts",
   "app/api/assistant/chess/route.ts",
   "app/api/assistant/client/route.ts",
   "app/api/assistant/history/route.ts",

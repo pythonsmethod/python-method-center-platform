@@ -9,6 +9,7 @@ const mocks = vi.hoisted(() => ({ insert: vi.fn(), auth: vi.fn(), role: vi.fn(),
 vi.mock("@/lib/auth/require-staff", () => ({ getStaffUserState: mocks.auth }));
 vi.mock("@/lib/auth/require-karen", () => ({ resolvePrivateAssistantRole: mocks.role }));
 vi.mock("@/lib/auth/require-founder", () => ({ canSeeProviderNames: () => false }));
+vi.mock("@/lib/product-analytics/summary", () => ({ getProductAnalytics: async () => ({ status: "authorized" }), analyticsPromptContext: (value: unknown) => value }));
 vi.mock("@/lib/supabase/service", () => ({ createSupabaseServiceClient: () => ({ from: (table: string) => ({ insert: table === "assistant_knowledge" ? mocks.insert : async () => ({ error: null }) }) }) }));
 vi.mock("@/lib/assistant/prompts", () => ({ buildStaffSystemPrompt: async () => "", ATTACHMENT_READING_ACCURACY_RULE: "" }));
 vi.mock("@/lib/assistant/case-context", () => ({ buildCaseContext: async () => "" }));

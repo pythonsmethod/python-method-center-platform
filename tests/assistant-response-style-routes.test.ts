@@ -20,6 +20,7 @@ vi.mock("@/lib/assistant/tiers", () => ({ resolveAssistantAudience: mocks.audien
 vi.mock("@/lib/auth/require-staff", () => ({ getStaffUserState: async () => ({ status: "authorized", email: "staff@example.test" }) }));
 vi.mock("@/lib/auth/require-karen", () => ({ resolvePrivateAssistantRole: mocks.role }));
 vi.mock("@/lib/auth/require-founder", () => ({ canSeeProviderNames: () => false }));
+vi.mock("@/lib/product-analytics/summary", () => ({ getProductAnalytics: async () => ({ status: "authorized" }), analyticsPromptContext: (value: unknown) => value }));
 vi.mock("@/lib/assistant/case-context", () => ({ buildCaseContext: async () => "Synthetic case only" }));
 vi.mock("@/lib/i18n/api-errors", () => ({ apiErrorLocale: async () => "en", apiError: () => "**Service unavailable**", assistantFailure: () => "Service unavailable" }));
 

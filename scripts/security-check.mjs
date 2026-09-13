@@ -6,6 +6,7 @@ import ts from "typescript";
 // Reviewed network boundaries, not a list of providers whose APIs may be called anywhere.
 const fetchSites = {
   "lib/security/ai-transport.ts": 1,
+  "lib/product-analytics/browser.ts": 1,
   "components/assistant/AssistantOutreachPreference.tsx": 2,
   "components/assistant/AssistantChat.tsx": 4,
   "components/assistant/RealtimeVoice.tsx": 1,
@@ -16,6 +17,7 @@ const fetchSites = {
   "components/cabinet/SupplementAiImport.tsx": 1,
   "components/messages/CaseMessageThread.tsx": 1,
   "components/messages/VoiceRecorder.tsx": 1,
+  "components/analytics/ProductAnalytics.tsx": 1,
   "lib/assistant/realtime-browser.ts": 3,
   "lib/assistant/live-browser.ts": 1,
   "lib/notifications/guest-support-email.ts": 1,
@@ -30,6 +32,7 @@ const fetchSites = {
 const dynamicImports = {
   "lib/assistant/conversation-archive.ts": ["./client-case-tools", "./realtime-server", "./voice-web-search"],
   "lib/assistant/voice-text-bridge.ts": ["@/lib/supabase/service"],
+  "lib/product-analytics/heatmaps.ts": ["posthog-js"],
 };
 function inspect(name, source) {
   const errors = [];

@@ -6,6 +6,7 @@ vi.mock("@/lib/i18n/locale", () => ({ getLocale: f.locale }));
 vi.mock("@/lib/auth/require-staff", () => ({ getStaffUserState: f.staff }));
 vi.mock("@/lib/auth/require-karen", () => ({ getKarenAssistantUserState: f.staff, resolvePrivateAssistantRole: f.role }));
 vi.mock("@/lib/auth/require-founder", () => ({ canSeeProviderNames: () => false }));
+vi.mock("@/lib/product-analytics/summary", () => ({ getProductAnalytics: async () => ({ status: "authorized" }), analyticsPromptContext: (value: unknown) => value }));
 vi.mock("@/lib/assistant/prompts", () => ({ buildStaffSystemPrompt: async () => "", ATTACHMENT_READING_ACCURACY_RULE: "" }));
 vi.mock("@/lib/assistant/case-context", () => ({ buildCaseContext: async () => "" }));
 vi.mock("@/lib/assistant/router", () => ({ askKarenAssistant: f.ask, askAssistantTeam: f.ask }));

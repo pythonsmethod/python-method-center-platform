@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 const m = vi.hoisted(() => ({ staff: vi.fn(), summary: vi.fn(), ask: vi.fn() }));
-vi.mock("@/lib/auth/require-staff", () => ({ getStaffUserState: m.staff }));
+vi.mock("@/lib/auth/require-private-assistant", () => ({ getPrivateAssistantUserState: m.staff }));
 vi.mock("@/lib/product-analytics/summary", () => ({ getProductAnalytics: m.summary, analyticsPromptContext: (value: unknown) => value }));
 vi.mock("@/lib/assistant/prompts", () => ({ buildStaffSystemPrompt: async () => "BASE", ATTACHMENT_READING_ACCURACY_RULE: "FILES" }));
 vi.mock("@/lib/assistant/router", () => ({ askKarenAssistant: m.ask, askAssistantTeam: m.ask, isAssistantProvider: () => false }));
@@ -22,7 +22,7 @@ describe("analytics reaches only the founder assistant through server context", 
     expect((await POST(request())).status).toBe(200);
     const system = m.ask.mock.calls[0][0] as string;
     expect(system).toContain("PRODUCT_ANALYTICS"); expect(system).toContain('"measured":4');
-    expect(system).not.toContain("99999"); expect(system).toContain("Respond in English");
+    expect(system).not.toContain("99999"); expect(system).toContain("Active interface language: English");
   });
   it("never reads or injects product analytics for Karen", async () => {
     m.staff.mockResolvedValue({ status: "authorized", role: "admin", email: "karen@example.com" });
