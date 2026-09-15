@@ -181,7 +181,7 @@ export async function getOwnAssistantHistory(
 
   let query = supabase
     .from("assistant_messages")
-    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, source, voice_state, web_results, exchange_id")
+    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, scheduled_translations, source, voice_state, web_results, exchange_id")
     .eq("profile_id", profileId)
     .in("tier", options.private ? ["founder", "karen"] : ["registered", "client"])
     .order("message_sequence", { ascending: false })
@@ -202,9 +202,9 @@ export async function getOwnAssistantHistory(
     };
   }
 
-  const messages = (data ?? []).map(({ outreach_translations, ...message }) => ({
+  const messages = (data ?? []).map(({ outreach_translations, scheduled_translations, ...message }) => ({
     ...message,
-    content: outreach_translations?.[locale] ?? message.content
+    content: scheduled_translations?.[locale] ?? outreach_translations?.[locale] ?? message.content
   })) as AssistantHistoryMessage[];
 
   return { status: "ready", hasMore: messages.length === limit, messages: coalesceLiveHistory(messages.slice().reverse()).map((message) =>

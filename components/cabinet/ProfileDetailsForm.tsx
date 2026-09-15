@@ -11,6 +11,7 @@ type ProfileDetailsFormProps = {
   email: string | null;
   fullName: string | null;
   phone: string | null;
+  timeZone: string | null;
 };
 
 // The person's own contact card: name, phone, where the formula ships.
@@ -20,7 +21,8 @@ export function ProfileDetailsForm({
   labels,
   email,
   fullName,
-  phone
+  phone,
+  timeZone
 }: ProfileDetailsFormProps) {
   const [state, formAction, pending] = useActionState(
     updateProfileDetails,
@@ -33,7 +35,7 @@ export function ProfileDetailsForm({
   // page silent, and the address blank again on the next visit. Keying on
   // the saved values remounts the fields exactly when the server has
   // something new to show, and never while someone is typing.
-  const savedKey = `${fullName ?? ""}|${phone ?? ""}`;
+  const savedKey = `${fullName ?? ""}|${phone ?? ""}|${timeZone ?? ""}`;
 
   return (
     <form action={formAction} className="onboarding-form" key={savedKey}>
@@ -48,6 +50,10 @@ export function ProfileDetailsForm({
           type="text"
         />
       </label>
+
+      <input name="time_zone" type="hidden" ref={(node) => {
+        if (node) node.value = Intl.DateTimeFormat().resolvedOptions().timeZone || timeZone || "America/Los_Angeles";
+      }} />
 
       <label className="field">
         <span>{labels.phone}</span>

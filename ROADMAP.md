@@ -743,3 +743,7 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 - [x] Notify the registered account owner about new Professor Python messages.
 - [x] Keep email neutral, bilingual, deduplicated and free of Case/medical text.
 - [ ] Complete full release verification and production acceptance.
+
+# 2026-09-18 — Anham birthday greetings
+
+Implementation, regression, security/build checks, preview validation and production migration are complete. Remaining release gates: application merge, production deployment and non-mutating RU/EN acceptance. No Anham clinical phase gate changes.

@@ -50,7 +50,7 @@ export default async function AccountPage() {
   const { data: profileRow } = supabase
     ? await supabase
         .from("profiles")
-        .select("full_name, phone, avatar_path")
+        .select("full_name, phone, avatar_path, time_zone")
         .eq("id", auth.userId)
         .maybeSingle()
     : { data: null };
@@ -100,6 +100,7 @@ export default async function AccountPage() {
             email={auth.email}
             fullName={profileRow?.full_name ?? null}
             phone={profileRow?.phone ?? null}
+            timeZone={(profileRow?.time_zone as string | null) ?? null}
           />
           <div className="panel-actions">
             <LogoutButton label={dict.logout} />

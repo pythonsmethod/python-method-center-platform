@@ -1299,3 +1299,7 @@ must not create a second archive. Each bubble displays the time derived from its
 stored `created_at`, grouped by viewer-local Today/Yesterday/full-date separators.
 The original ISO timestamp remains the semantic source for accessibility and
 audit. This presentation rule is shared by client and staff views.
+
+# 2026-09-14 — Birthday messages reuse canonical questionnaire evidence
+
+Anham birthday greetings read the latest append-only `health_questionnaire_versions.birth_date`; they do not copy birth date into `profiles`. A profile stores only its IANA time zone. Delivery is a fixed bilingual, service-only scheduled message in existing assistant history, honors the existing automatic-message opt-out and is unique per profile/local year. This is not a clinical fact transformation or ordinary outreach activation.

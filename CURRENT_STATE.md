@@ -1,5 +1,9 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Anham birthday greetings — 2026-09-18 — PRODUCTION MIGRATED / DEPLOY PENDING
+
+The production database now has the additive birthday-delivery schema and service-role-only `SECURITY INVOKER` function. The application branch reuses the canonical latest health-questionnaire birth date and existing authenticated daily assistant cron to save one deterministic RU/EN birthday message per eligible client and local year. Existing outreach opt-out is honored; no AI/provider or clinical inference is involved. Application merge, deployment and acceptance remain pending. Evidence: `docs/ankh/anham_birthday_greetings.md`.
+
 ## Staff message email notifications — 2026-09-17 — RELEASE CANDIDATE
 
 New client-authored Support messages notify Anna at the canonical founder
@@ -60,7 +64,6 @@ The shared Karen/staff and client chess interface now includes bilingual `Экс
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE
 
 A bilingual self/other-adult/minor onboarding choice now stores the Case patient separately from the authenticated account owner, including both relationship directions, representation reason, authority, patient-data consent and responsibility acknowledgments. Karen-assistant context resolves medical content to the patient while account access remains with the owner. Production schema and Case #483 were corrected with append-only audit; the legacy owner must still reconfirm the new explicit checkboxes. Focused tests 3/3 pass; full release verification remains CI-gated because the isolated local dependency install did not complete.
-
 ## Consent-gated product analytics — 2026-09-13 — PUBLISHED
 
 Aggregate founder analytics, a seven-step consenting-browser funnel and optional
