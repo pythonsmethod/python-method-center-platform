@@ -33,6 +33,7 @@ export function OnboardingForm({
   // Choosing that path swaps the age confirmation for the participant's own
   // details, so the person filling the form is never the person described.
   const [recipient, setRecipient] = useState("self");
+  const isAnotherPerson = recipient !== "self";
   const isGuardian = recipient === "minor";
   const regionNames = new Intl.DisplayNames([locale], { type: "region" });
   const countries = COUNTRY_CODES
@@ -80,38 +81,54 @@ export function OnboardingForm({
         delivery_country_code: profileDefaults.countryCode
       }} />
 
-      <label className="field">
-        <span>{labels.recipient}</span>
-        <select
-          name="careRecipientType"
-          onChange={(event) => setRecipient(event.target.value)}
-          required
-          value={recipient}
-        >
-          <option value="self">{labels.recipientSelf}</option>
-          <option value="family_member">{labels.recipientFamily}</option>
-          <option value="minor">{labels.recipientMinor}</option>
-        </select>
-      </label>
+      <fieldset className="onboarding-guardian">
+        <legend>{labels.recipient}</legend>
+        {(["self", "family_member", "minor"] as const).map((value) => (
+          <label className="checkbox-field" key={value}>
+            <input checked={recipient === value} name="careRecipientType" onChange={() => setRecipient(value)} type="radio" value={value} />
+            <span>{value === "self" ? labels.recipientSelf : value === "family_member" ? labels.recipientFamily : labels.recipientMinor}</span>
+          </label>
+        ))}
+      </fieldset>
 
-      {isGuardian ? (
+      {isAnotherPerson ? (
         <fieldset className="onboarding-guardian">
-          <legend>{labels.guardianLabel}</legend>
-          <p className="onboarding-guardian__note">{labels.guardianNote}</p>
+          <legend>{labels.patientLabel}</legend>
+          <p className="onboarding-guardian__note">{isGuardian ? labels.guardianNote : labels.patientNote}</p>
 
           <label className="field">
-            <span>{labels.minorName}</span>
-            <input name="minorFullName" required type="text" />
+            <span>{labels.patientName}</span>
+            <input maxLength={160} name="patientFullName" required type="text" />
           </label>
 
           <label className="field">
-            <span>{labels.minorBirthDate}</span>
-            <input name="minorBirthDate" required type="date" />
+            <span>{labels.patientBirthDate}</span>
+            <input name="patientBirthDate" required type="date" />
+          </label>
+          <label className="field">
+            <span>{labels.patientRelationship}</span>
+            <input maxLength={80} name="patientRelationship" placeholder={labels.patientRelationshipPlaceholder} required type="text" />
+          </label>
+          <label className="field">
+            <span>{labels.accountOwnerRole}</span>
+            <input maxLength={80} name="accountOwnerRole" placeholder={labels.accountOwnerRolePlaceholder} required type="text" />
+          </label>
+          <label className="field">
+            <span>{labels.representationReason}</span>
+            <textarea maxLength={600} name="representationReason" placeholder={labels.representationReasonPlaceholder} required rows={3} />
           </label>
 
           <label className="checkbox-field">
-            <input name="guardianConfirmed" required type="checkbox" />
-            <span>{labels.guardianConfirm}</span>
+            <input name="representativeConfirmed" required type="checkbox" />
+            <span>{isGuardian ? labels.guardianConfirm : labels.representativeConfirm}</span>
+          </label>
+          <label className="checkbox-field">
+            <input name="patientDataConsent" required type="checkbox" />
+            <span>{labels.patientDataConsent}</span>
+          </label>
+          <label className="checkbox-field">
+            <input name="responsibilityAcknowledged" required type="checkbox" />
+            <span>{labels.responsibilityAcknowledged}</span>
           </label>
         </fieldset>
       ) : (

@@ -105,10 +105,16 @@ export async function submitOnboarding(
   const t = getDictionary(uiLocale).onboarding;
   const offerLocale = getOfferDocumentLocale(uiLocale);
   const isGuardianPath = careRecipientType === "minor";
+  const isRepresentedPatient = careRecipientType !== "self";
   const ageConfirmed = formData.get("ageConfirmed") === "on";
-  const guardianConfirmed = formData.get("guardianConfirmed") === "on";
-  const minorFullName = readRequiredText(formData, "minorFullName");
-  const minorBirthDate = readRequiredText(formData, "minorBirthDate");
+  const representativeConfirmed = formData.get("representativeConfirmed") === "on";
+  const patientDataConsent = formData.get("patientDataConsent") === "on";
+  const responsibilityAcknowledged = formData.get("responsibilityAcknowledged") === "on";
+  const patientFullName = readRequiredText(formData, "patientFullName");
+  const patientBirthDate = readRequiredText(formData, "patientBirthDate");
+  const patientRelationship = readRequiredText(formData, "patientRelationship");
+  const accountOwnerRole = readRequiredText(formData, "accountOwnerRole");
+  const representationReason = readRequiredText(formData, "representationReason");
   const offerAccepted = formData.get("offerAccepted") === "on";
   const consentAccepted = formData.get("consentAccepted") === "on";
   const deliveryProfile = readDeliveryProfile(formData);
@@ -136,25 +142,27 @@ export async function submitOnboarding(
   }
 
   // Age, before anything is written down.
-  if (isGuardianPath) {
-    if (!minorFullName || !isFullName(minorFullName) || !minorBirthDate) {
+  if (isRepresentedPatient) {
+    if (!patientFullName || !isFullName(patientFullName) || !patientBirthDate || !patientRelationship || !accountOwnerRole || !representationReason) {
       return errorState(t.errorMinorFields);
     }
 
-    const age = yearsSince(minorBirthDate);
+    const age = yearsSince(patientBirthDate);
 
     if (age === null || age < 0) {
       return errorState(t.errorMinorFields);
     }
 
-    if (age >= MIN_PARTICIPANT_AGE) {
+    if (isGuardianPath && age >= MIN_PARTICIPANT_AGE) {
       // Not a refusal: this person can simply register in their own name.
       return errorState(t.errorMinorTooOld);
     }
 
-    if (!guardianConfirmed) {
+    if (!isGuardianPath && age < MIN_PARTICIPANT_AGE) return errorState(t.errorAge);
+    if (!representativeConfirmed) {
       return errorState(t.errorGuardian);
     }
+    if (!patientDataConsent || !responsibilityAcknowledged) return errorState(t.errorRepresentative);
   } else if (!ageConfirmed) {
     return errorState(t.errorAge);
   }
@@ -241,6 +249,20 @@ export async function submitOnboarding(
     return errorState(t.errorCase);
   }
 
+  const service = createSupabaseServiceClient();
+  if (!service) return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  const recipientQuery = isRepresentedPatient
+    ? service.from("care_recipients").upsert({
+        case_id: caseId, profile_id: user.id, recipient_type: isGuardianPath ? "minor" : "adult",
+        full_name: patientFullName, birth_date: patientBirthDate,
+        relationship_to_client: patientRelationship, client_role_for_recipient: accountOwnerRole,
+        reason_for_representation: representationReason, representative_confirmed: true,
+        data_processing_consent: true, responsibility_acknowledged: true, is_current: true
+      }, { onConflict: "case_id" })
+    : service.from("care_recipients").update({ is_current: false }).eq("case_id", caseId).eq("profile_id", user.id);
+  const { error: recipientError } = await recipientQuery;
+  if (recipientError) return errorState(recipientError.message);
+
   const submittedAt = new Date().toISOString();
   const payload = {
     full_name: fullName,
@@ -250,11 +272,16 @@ export async function submitOnboarding(
     care_recipient_type: careRecipientType,
     primary_goal: primaryGoal,
     situation_description: situationDescription,
-    age_confirmed: isGuardianPath ? false : ageConfirmed,
-    guardian_confirmed: isGuardianPath ? guardianConfirmed : false,
-    minor_full_name: isGuardianPath ? minorFullName : null,
-    minor_birth_date: isGuardianPath ? minorBirthDate : null,
-    minor_age_years: isGuardianPath ? yearsSince(minorBirthDate) : null,
+    age_confirmed: isRepresentedPatient ? false : ageConfirmed,
+    representative_confirmed: isRepresentedPatient ? representativeConfirmed : false,
+    patient_full_name: isRepresentedPatient ? patientFullName : null,
+    patient_birth_date: isRepresentedPatient ? patientBirthDate : null,
+    patient_age_years: isRepresentedPatient ? yearsSince(patientBirthDate) : null,
+    patient_relationship: isRepresentedPatient ? patientRelationship : null,
+    account_owner_role: isRepresentedPatient ? accountOwnerRole : null,
+    representation_reason: isRepresentedPatient ? representationReason : null,
+    patient_data_consent: isRepresentedPatient ? patientDataConsent : false,
+    responsibility_acknowledged: isRepresentedPatient ? responsibilityAcknowledged : false,
     offer_accepted: true,
     offer_version: OFFER_VERSION,
     offer_document_locale: offerLocale,
@@ -314,18 +341,21 @@ export async function submitOnboarding(
 
   // A guardian accepting on a minor's behalf is a distinct consent, and the
   // record has to name whose behalf it was given on.
-  if (isGuardianPath && !consentError) {
+  if (isRepresentedPatient && !consentError) {
     await supabase.from("consent_records").insert({
       profile_id: user.id,
       case_id: caseId,
       consent_type: "offer_acceptance",
       status: "accepted",
       version: OFFER_VERSION,
-      source: "onboarding_guardian",
+      source: isGuardianPath ? "onboarding_guardian" : "onboarding_representative",
       metadata: {
-        guardian_for: minorFullName,
-        minor_birth_date: minorBirthDate,
-        minor_age_years: yearsSince(minorBirthDate),
+        care_recipient: patientFullName,
+        patient_birth_date: patientBirthDate,
+        patient_age_years: yearsSince(patientBirthDate),
+        relationship_to_client: patientRelationship,
+        client_role_for_recipient: accountOwnerRole,
+        reason_for_representation: representationReason,
         offer_document_locale: offerLocale,
         offer_binding_locale: OFFER_BINDING_LOCALE,
         ui_locale: uiLocale
