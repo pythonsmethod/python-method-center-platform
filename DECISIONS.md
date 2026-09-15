@@ -1227,3 +1227,26 @@ assistant conversation history, profiles, Cases, documents, clinical evidence or
 shared rate-limit counters. A cleanup failure is logged without blocking outreach.
 Production collection and the production analytics migration remain separate,
 owner-approved gates.
+
+## 2026-09-11 — End paid voice while the same ANHAM finishes in text
+
+When the current Live delegation is already authorized and started, browser
+hangup releases WebRTC immediately but does not cancel the backend operation.
+Use Next.js request-lifetime continuation and the canonical `assistant_messages`
+scope; persist one server-identified assistant result only when voice has ended,
+and let the authenticated text chat retrieve it. Keep newer delegations able to
+supersede stale ones. This does not create a second persona, voice memory, public
+job endpoint or new permissions. The bounded 300-second function window is
+explicit; a future durable workflow requires its own authorization design.
+Evidence: docs/ankh/voice_background_continuation.md.
+
+## 2026-09-13 — Platform costs are private to Anna and unknown bills stay unknown
+
+Expose `/admin/costs` only to the primary developer identity, using the existing
+server-verified Anna gate for both navigation and page access. Aggregate monetary
+cost only from provider usage already stored in trusted server audit; currently
+that is GPT-Live. List other cost centres and available activity counts, but use
+NULL/“billing data unavailable” until their first-party billing feeds are wired.
+Never convert revenue, quotas or operation counts into invented expenses. No new
+browser API or cost database is needed for this first read-only view. Evidence:
+docs/architecture/ANNA_PLATFORM_COSTS.md.

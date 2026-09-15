@@ -1085,3 +1085,25 @@ provider refusals now use a narrow confirmed-record matcher in addition to the
 canonical guard sentence. Full regression: 1760 passed, one opt-in provider
 test skipped. Clinical phases and production auto-verification remain NO-GO.
 Evidence: `docs/ankh/retired_classification_atomic_gaps_voice_release.md`.
+
+## 2026-09-11 — Voice command continues in text after hangup
+
+During a current GPT-Live delegation, the user can end paid voice immediately;
+the detached, authenticated ANHAM backend request continues within the existing
+300-second Vercel function window. Its result is saved idempotently into the same
+`assistant_messages` profile/Case/scope and the open text chat polls the existing
+protected history endpoint for that exact exchange. No new route, schema, role,
+memory store or business-logic copy. RU/EN UI explains the handoff. Runtime crash,
+redeploy and work past the function deadline remain non-durable. Evidence and
+acceptance: docs/ankh/voice_background_continuation.md.
+
+## 2026-09-13 — Anna-only platform cost table
+
+The primary developer account has a separate `/admin/costs` tab. Both navigation
+and page access use the server-verified Anna identity; Karen, clients and extra
+founders cannot see monetary data. The table inventories current external cost
+centres. GPT-Live 30-day usage and session estimates come from existing final
+audit events. Web search and Document AI show activity counts; all vendor bills
+without a connected usage feed remain explicitly unknown and are excluded from
+the verified minimum. No schema, client API, credential or clinical change.
+Details: docs/architecture/ANNA_PLATFORM_COSTS.md.

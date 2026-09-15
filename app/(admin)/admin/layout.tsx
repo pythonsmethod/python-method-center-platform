@@ -8,7 +8,7 @@ import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { getDeliveryAttentionCounts } from "@/lib/delivery/queries";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { getStaffSupportUnreadCount } from "@/lib/support/queries";
-import { getFounderState } from "@/lib/auth/require-founder";
+import { canSeeVoicePilotCosts, getFounderState } from "@/lib/auth/require-founder";
 import { getGapUnreadCount } from "@/lib/assistant/escalation-store";
 import { notificationsCopy } from "@/lib/assistant/escalation-copy";
 
@@ -40,6 +40,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         requests: "Обращения",
         delivery: "Доставки",
         founder: "Обзор",
+        costs: "Расходы",
         home: "На главную сайта",
         logout: "Выйти"
       }
@@ -55,6 +56,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         requests: "Requests",
         delivery: "Deliveries",
         founder: "Overview",
+        costs: "Costs",
         home: "Website home",
         logout: "Sign out"
       };
@@ -103,7 +105,10 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
           icon: "◎",
           badge: gapUnread
         }]
-      : [])
+      : []),
+    ...(auth.status === "authorized" && canSeeVoicePilotCosts(auth.email)
+      ? [{ href: "/admin/costs", label: labels.costs, icon: "$" }]
+      : []),
   ];
 
   return (

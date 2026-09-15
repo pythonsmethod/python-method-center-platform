@@ -682,3 +682,21 @@ Phase 3 production and automatic production verification remain NO-GO. The
 next action on this line is routine monitoring of `/api/assistant/live` and
 gap-event quality; any change to mixed clinical/payment routing requires its
 own product decision and fixtures.
+
+## 2026-09-11 — Voice-to-text background handoff
+
+Release the bounded continuation path: ending voice during a current delegation
+must close WebRTC immediately, continue the authenticated backend call, save one
+idempotent answer in the same conversation and refresh it into text chat. No new
+memory store or route. After publication, Anna accepts the Russian payments-count
+scenario and one English scenario. Work beyond the 300-second function lifetime
+requires a separately reviewed durable workflow. See
+docs/ankh/voice_background_continuation.md.
+
+## 2026-09-13 — Platform cost observability
+
+Publish the Anna-only `/admin/costs` inventory and GPT-Live 30-day audit total.
+Keep unconnected vendor invoices visibly unknown. Next accounting phase: add
+first-party usage/billing feeds for text AI, web search, Google Cloud, Vercel,
+Supabase and Stripe fees before claiming a complete platform total. See
+docs/architecture/ANNA_PLATFORM_COSTS.md.
