@@ -1,8 +1,8 @@
 import { EventEmitter } from "node:events";
 import { beforeEach, afterEach, describe, expect, it, vi } from "vitest";
-const m = vi.hoisted(() => ({ fetch: vi.fn(), attach: vi.fn(), history: vi.fn(), db: vi.fn(), upsert: vi.fn(), backend: vi.fn(), audit: vi.fn() }));
+const m = vi.hoisted(() => ({ fetch: vi.fn(), attach: vi.fn(), history: vi.fn(), saveBackground: vi.fn(), db: vi.fn(), upsert: vi.fn(), backend: vi.fn(), audit: vi.fn() }));
 vi.mock("@/lib/security/ai-transport", () => ({ aiFetch: m.fetch, attachLiveSession: m.attach }));
-vi.mock("@/lib/assistant/history", () => ({ getOwnAssistantHistory: m.history }));
+vi.mock("@/lib/assistant/history", () => ({ getOwnAssistantHistory: m.history, saveLiveBackgroundAnswer: m.saveBackground }));
 vi.mock("@/lib/supabase/service", () => ({ createSupabaseServiceClient: m.db }));
 vi.mock("@/lib/assistant/live-backend", () => ({ runLiveBackend: m.backend }));
 vi.mock("@/lib/audit/log", () => ({ writeAuditLog: m.audit }));
@@ -11,8 +11,8 @@ class Socket extends EventEmitter { readyState = 1; send = vi.fn(); close = vi.f
 let socket: Socket;
 const actor = { profileId: "00000000-0000-4000-8000-000000000001", email: "synthetic@example.test", scope: "founder" as const, caseId: null, tier: "registered" as const };
 const event = (data: object) => socket.emit("message", Buffer.from(JSON.stringify(data)));
-async function begin(sessionActor = actor) {
-  const response = await openLiveSession({ actor: sessionActor, request: new Request("https://test.local/api/assistant/live"), locale: "en", sdp: "v=0", voice: "marin", timeZone: "UTC" });
+async function begin(sessionActor = actor, defer?: (task: Promise<unknown>) => void) {
+  const response = await openLiveSession({ actor: sessionActor, request: new Request("https://test.local/api/assistant/live"), locale: "en", sdp: "v=0", voice: "marin", timeZone: "UTC", defer });
   const text = response.text(); socket.emit("open"); event({ type: "session.started" }); return { text };
 }
 function end() { event({ type: "session.closed", reason: "close_requested", usage: { seconds: 20 } }); }
@@ -22,6 +22,7 @@ beforeEach(() => {
   m.fetch.mockResolvedValue(new Response(JSON.stringify({ session: { id: "live_test" }, transport: { sdp: "v=0" } })));
   m.history.mockResolvedValue({ status: "ready", messages: [{ role: "user", content: "Earlier context" }, { role: "assistant", content: "Earlier answer" }] });
   m.audit.mockResolvedValue({ status: "inserted" }); m.upsert.mockResolvedValue({ error: null });
+  m.saveBackground.mockResolvedValue(true);
   m.db.mockReturnValue({ from: vi.fn(() => ({ upsert: m.upsert })) });
 });
 afterEach(() => vi.unstubAllEnvs());
@@ -66,6 +67,26 @@ describe("Live server session", () => {
     expect(m.backend).toHaveBeenCalledTimes(2); expect(m.upsert).toHaveBeenCalledTimes(2);
     expect(output).toContain("Current result"); expect(output).not.toContain("Stale result");
     expect(JSON.parse(socket.send.mock.calls[0][0])).toMatchObject({ type: "session.commentary.append", delegation_id: "task_2" });
+  });
+  it("continues a delegated request after hangup and saves its answer in the same text history", async () => {
+    let resolveBackend!: (value: object) => void;
+    const deferred: Promise<unknown>[] = [];
+    m.backend.mockImplementation(() => new Promise(resolve => { resolveBackend = resolve; }));
+    const { text } = await begin(actor, task => deferred.push(task));
+    event({ type: "session.input_transcript.delta", event_id: "evt_bg", delta: "How many payments do we have?", start_ms: 0, end_ms: 100 });
+    event({ type: "session.delegation.created", delegation: { id: "task_bg", target: "client" } });
+    await vi.waitFor(() => expect(m.backend).toHaveBeenCalledTimes(1));
+    end();
+    await text;
+    resolveBackend({ reply: "There are 12 payments.", memoryPending: false });
+    await deferred[0];
+    expect(m.saveBackground).toHaveBeenCalledWith(expect.objectContaining({
+      profileId: actor.profileId,
+      conversationScope: "founder",
+      exchangeId: expect.stringMatching(/^live-background:.*:task_bg$/),
+      answer: "There are 12 payments.",
+    }));
+    expect(socket.send).not.toHaveBeenCalledWith(expect.stringContaining("There are 12 payments."));
   });
   it("does not start a paid session when history or audit is unavailable", async () => {
     m.history.mockResolvedValue({ status: "error" });

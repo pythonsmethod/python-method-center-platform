@@ -141,6 +141,8 @@ const ALLOWED: Record<string, string> = {
   "lib/legal/policy-content.ts":
     "legal disclosure: the privacy policy must name who receives client data",
   "lib/founder/queries.ts": "the founder cabinet — her own view",
+  "lib/founder/costs.ts": "the primary developer's private cost ledger",
+  "app/(admin)/admin/costs/page.tsx": "the primary developer's private cost page",
   "lib/assistant/claude.ts":
     "the provider adapter — the SDK class and its error types live here by design",
   "lib/assistant/router.ts":

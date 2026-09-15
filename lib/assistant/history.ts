@@ -24,6 +24,57 @@ export type AssistantHistoryMessage = {
   web_results?: import("./web-results").WebResult[];
 };
 
+type SaveBackgroundAnswerInput = {
+  profileId: string;
+  caseId: string | null;
+  tier: AssistantTier | "founder" | "karen";
+  locale: Locale;
+  conversationScope: "client" | "founder" | "karen";
+  exchangeId: string;
+  answer: string;
+};
+
+// A delegated voice request may outlive the paid media connection. Store its
+// answer in the same conversation as text so ending the call never discards
+// completed backend work. The exchange id makes retries idempotent.
+export async function saveLiveBackgroundAnswer({
+  profileId,
+  caseId,
+  tier,
+  locale,
+  conversationScope,
+  exchangeId,
+  answer,
+}: SaveBackgroundAnswerInput): Promise<boolean> {
+  const supabase = createSupabaseServiceClient();
+  const content = normalizeAnhamResponse(answer, locale).trim();
+  if (!supabase || tier === "guest" || !content || !/^live-background:[a-zA-Z0-9_-]{1,160}:[a-zA-Z0-9_-]{1,160}$/.test(exchangeId)) return false;
+
+  for (let attempt = 0; attempt < 3; attempt += 1) {
+    try {
+      const result = await supabase.from("assistant_messages").upsert({
+        id: randomUUID(),
+        profile_id: profileId,
+        case_id: caseId,
+        role: "assistant",
+        content,
+        tier,
+        locale,
+        conversation_scope: conversationScope,
+        source: "text",
+        voice_state: null,
+        exchange_id: exchangeId,
+      }, { onConflict: "profile_id,exchange_id,role", ignoreDuplicates: true });
+      if (!result.error) return true;
+
+      const existing = await supabase.from("assistant_messages")
+        .select("id").eq("profile_id", profileId).eq("exchange_id", exchangeId).eq("role", "assistant").maybeSingle();
+      if (!existing.error && existing.data?.id) return true;
+    } catch { /* Retry without logging conversation content. */ }
+  }
+  return false;
+}
+
 // What the chat window loads when it opens: enough to remember the thread,
 // short enough to stay instant.
 export const HISTORY_PAGE_SIZE = 60;

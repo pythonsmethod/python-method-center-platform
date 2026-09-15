@@ -3,6 +3,7 @@ import { liveConfig } from "@/lib/assistant/live-config";
 import { openLiveSession } from "@/lib/assistant/live-session";
 import { validatedTimeZone } from "@/lib/assistant/voice-site-tools";
 import { isBuiltinVoice } from "@/lib/assistant/voice-options";
+import { after } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 300;
 export async function POST(request: Request) {
@@ -14,6 +15,6 @@ export async function POST(request: Request) {
     const voice = body.voice ?? config.voice;
     if (!isBuiltinVoice(voice)) throw new VoiceFailure("invalid", 400);
     await reserveVoiceSession(actor, config.dailyLimit);
-    return await openLiveSession({ request, actor, locale, sdp: body.sdp, voice, timeZone: validatedTimeZone(body.timeZone) });
+    return await openLiveSession({ request, actor, locale, sdp: body.sdp, voice, timeZone: validatedTimeZone(body.timeZone), defer: task => after(task) });
   } catch (error) { return voiceFailure(error, locale); }
 }

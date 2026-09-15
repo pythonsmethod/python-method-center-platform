@@ -13,8 +13,8 @@ import { voiceCopy, voiceErrorMessage, type VoiceState } from "@/lib/assistant/r
 import type { VoiceExchange, VoiceTranscript } from "@/lib/assistant/realtime-turns";
 import type { Locale } from "@/lib/i18n/locale";
 
-type Props = { locale: Locale; scope: "client" | "staff"; caseId?: string; disabled?: boolean; onActive: (active: boolean) => void; onExchange?: (pair: VoiceExchange) => void; onTranscript?: (text: VoiceTranscript, sessionId: string) => void };
-export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExchange, onTranscript }: Props) {
+type Props = { locale: Locale; scope: "client" | "staff"; caseId?: string; disabled?: boolean; onActive: (active: boolean) => void; onExchange?: (pair: VoiceExchange) => void; onTranscript?: (text: VoiceTranscript, sessionId: string) => void; onBackgroundTask?: (exchangeId: string, active: boolean) => void };
+export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExchange, onTranscript, onBackgroundTask }: Props) {
   const copy = voiceCopy[locale];
   const descriptionId = useId();
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -30,13 +30,13 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
   const controller = useRef<RealtimeBrowser | LiveBrowser | null>(null);
   const [muted, setMuted] = useState(false);
   const [usage, setUsage] = useState({ seconds: 0, usd: 0, finalized: false });
-  const callbacks = useRef({ onActive, onExchange, onTranscript });
+  const callbacks = useRef({ onActive, onExchange, onTranscript, onBackgroundTask });
   const pending = useRef<{ pair: VoiceExchange; receipt: string }[]>([]);
   const writing = useRef(false);
   const mounted = useRef(true);
   const running = useRef(false);
   const epoch = useRef(0);
-  useEffect(() => { callbacks.current = { onActive, onExchange, onTranscript }; }, [onActive, onExchange, onTranscript]);
+  useEffect(() => { callbacks.current = { onActive, onExchange, onTranscript, onBackgroundTask }; }, [onActive, onExchange, onTranscript, onBackgroundTask]);
   const active = !["idle", "ended", "error", "paused"].includes(state);
   useEffect(() => {
     if (!open) return;
@@ -106,6 +106,7 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
         onTranscript: text => { if (mounted.current) { if (isCurrent()) setLatest(text); callbacks.current.onTranscript?.(text, sessionId); } },
         onSaving: next => { if (isCurrent()) setSaving(next); },
         onUsage: (seconds, usd, finalized) => { if (isCurrent()) setUsage({ seconds, usd, finalized }); },
+        onBackgroundTask: (exchangeId, taskActive) => callbacks.current.onBackgroundTask?.(exchangeId, taskActive),
       });
       void controller.current.start(); return;
     }
@@ -167,7 +168,8 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
           {error ? <p role="alert" className="form-message form-message--error">{error}</p> : null}
           {notice ? <p role="status">{copy[notice]}</p> : null}
           {saving !== "idle" ? <p role="status">{copy[saving]} {saving === "saveError" && !choice.live ? <button type="button" onClick={() => void flush()}>{copy.retrySave}</button> : null}</p> : null}
-          {active ? <button type="button" className="anham-call__end" onClick={close}><span aria-hidden="true">■</span> {copy.stop}</button>
+          {state === "thinking" ? <small role="status">{copy.backgroundHint}</small> : null}
+          {active ? <button type="button" className="anham-call__end" onClick={close}><span aria-hidden="true">■</span> {state === "thinking" ? copy.continueInChat : copy.stop}</button>
             : <button type="button" className="anham-call__end" disabled={disabled || saving === "saving" || saving === "saveError" || previewBusy || choice.loading} onClick={start}>{state === "error" ? copy.retry : copy.start}</button>}
           <small>{copy.transcript}</small>
         </footer>
