@@ -26,6 +26,19 @@ export type StaffCaseListItem = {
     delivery_instructions?: string | null;
     country_code?: string | null;
   } | null;
+  care_recipients: Array<{
+    id: string;
+    recipient_type: "adult" | "minor";
+    full_name: string;
+    birth_date: string | null;
+    relationship_to_client: string;
+    client_role_for_recipient: string;
+    reason_for_representation: string;
+    representative_confirmed: boolean;
+    data_processing_consent: boolean;
+    responsibility_acknowledged: boolean;
+    is_current: boolean;
+  }>;
 };
 
 export type StaffCasesResult =
@@ -154,6 +167,7 @@ export async function getStaffCaseDetail(
     .select(
       `id, profile_id, title, summary, created_at, updated_at,
        profiles(email, full_name, phone, avatar_path, delivery_first_name, delivery_last_name, delivery_email, delivery_phone, delivery_country_code, delivery_region, delivery_city, delivery_street, delivery_building, delivery_unit, delivery_postal_code, delivery_instructions),
+       care_recipients(id, recipient_type, full_name, birth_date, relationship_to_client, client_role_for_recipient, reason_for_representation, representative_confirmed, data_processing_consent, responsibility_acknowledged, is_current),
        onboarding_submissions(id, status, submitted_at, payload),
        uploaded_documents(id, original_filename, document_status, identity_review_status, created_at),
        payments(id, product, status, amount_cents, currency, processor_reference, paid_at, created_at),

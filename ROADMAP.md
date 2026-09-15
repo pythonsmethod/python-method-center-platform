@@ -1,5 +1,9 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Represented-patient identity — 2026-09-14
+
+Implemented in an isolated release branch; the additive production table and Case #483 correction are applied. Next: CI verification, deployment, then RU↔EN browser acceptance of self, represented-adult and guardian paths. This does not enable automatic identity verification or trust promotion.
+
 ## Consent-gated product analytics — 2026-09-13 — PUBLISHED
 
 Staging account completion, seven-step synthetic funnel acceptance, exact cleanup,

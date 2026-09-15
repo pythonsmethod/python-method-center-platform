@@ -68,7 +68,7 @@ describe("catalog matches the repository's real business schema", () => {
 describe("broad staff read tools", () => {
   it.each(["founder", "karen"] as const)("allows %s to discover all business sources and read Professor correspondence", async scope => {
     const catalog = await run("site_data_catalog", {}, scope);
-    expect(catalog).toMatchObject({ datasets: expect.arrayContaining([expect.objectContaining({ id: "questionnaires" }), expect.objectContaining({ id: "canonical_facts" }), expect.objectContaining({ id: "payments" })]) });
+    expect(catalog).toMatchObject({ datasets: expect.arrayContaining([expect.objectContaining({ id: "questionnaires" }), expect.objectContaining({ id: "care_recipients" }), expect.objectContaining({ id: "canonical_facts" }), expect.objectContaining({ id: "payments" })]) });
     await expect(run("query_site_records", { dataset: "professor_messages" }, scope)).resolves.toMatchObject({ source: "case_messages", totalMatches: 0 });
     expect(mocks.audit).toHaveBeenCalledWith(expect.objectContaining({ actorId: id, action: "assistant.site_data.read" }));
   });

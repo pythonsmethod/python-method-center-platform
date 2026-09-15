@@ -2,6 +2,7 @@ import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
 import { isClassificationEvent } from "@/lib/cases/activity";
 import { getCaseReview } from "@/lib/cases/review-queries";
 import { assistantSource, renderSourceContext, type AssistantSource } from "@/lib/assistant/source-context";
+import { resolveCaseSubject } from "@/lib/cases/case-subject";
 
 /** Snapshot projection only: no new store, source reading or trust promotion. */
 export async function buildCaseSources(caseId: string): Promise<AssistantSource[]> {
@@ -11,6 +12,7 @@ export async function buildCaseSources(caseId: string): Promise<AssistantSource[
     return [assistantSource({ id: "case", kind: "system_record", origin: "client_cases", availability: result.status === "ready" && !result.case ? "absent" : "unavailable", retrievedAt, scope: "selected Case only", data: null })];
   }
   const detail = result.case;
+  const subject = resolveCaseSubject(detail);
   const sources: AssistantSource[] = [];
   const add = (source: Omit<Parameters<typeof assistantSource>[0], "retrievedAt">) => sources.push(assistantSource({ ...source, retrievedAt }));
   // No status, urgency or direction: the client processing classification is
@@ -18,6 +20,7 @@ export async function buildCaseSources(caseId: string): Promise<AssistantSource[
   // withdrawn label as the present state of the Case.
   add({ id: "case", kind: "system_record", origin: "client_cases", availability: "available", recordedAt: detail.updated_at, freshness: "current_snapshot", scope: "selected Case metadata; no processing classification; not clinical verification", data: { id: detail.id, created_at: detail.created_at } });
   add({ id: "profile", kind: "user_report", origin: "profiles", availability: detail.profiles ? "available" : "absent", scope: "profile contact fields, not independent identity verification", data: detail.profiles ? { full_name: detail.profiles.full_name, email: detail.profiles.email, phone: detail.profiles.phone } : null });
+  add({ id: "case_patient", kind: "user_report", origin: subject.kind === "care_recipient" ? "care_recipients" : "profiles", availability: subject.fullName ? "available" : "absent", scope: "medical subject of the selected Case; keep distinct from account ownership and authorization", data: { patient_name: subject.fullName, patient_is_account_owner: subject.kind === "account_owner", patient_relationship_to_owner: subject.relationshipToClient, account_owner_role: subject.clientRoleForRecipient, representation_reason: subject.representationReason } });
   add({ id: "case_summary", kind: "ai_draft", origin: "client_cases.summary", availability: detail.summary ? "available" : "absent", scope: "authorship/review unknown; treated conservatively as unverified summary", data: detail.summary });
   const submission = detail.onboarding_submissions?.[0];
   add({ id: "questionnaire", kind: "user_report", origin: "onboarding_submissions", availability: submission ? "available" : "absent", recordedAt: submission?.submitted_at ?? null, scope: "client's own report; payload excerpt up to 4000 characters", data: submission ? { status: submission.status, payload_excerpt: JSON.stringify(submission.payload).slice(0, 4000) } : null });

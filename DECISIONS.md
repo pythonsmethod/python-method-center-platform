@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-065 — Account owner and Case patient are separate identities (2026-09-14)
+
+The authenticated adult remains the account owner, consent actor, payer and communication principal. A Case for another adult or minor stores a separate Care Recipient with both relationship directions, the reason for representation and explicit confirmations. Medical documents and analytical context resolve to the active Care Recipient; authorization and audit resolve to the account owner. Existing source documents and historical onboarding submissions are not rewritten.
+
 ## D-064 — Knowledge gaps are recorded as enumerated codes, never as questions (2026-09-11)
 
 Record the moment Anham's honesty guard replaces an answer, and record nothing
