@@ -1250,3 +1250,6 @@ NULL/“billing data unavailable” until their first-party billing feeds are wi
 Never convert revenue, quotas or operation counts into invented expenses. No new
 browser API or cost database is needed for this first read-only view. Evidence:
 docs/architecture/ANNA_PLATFORM_COSTS.md.
+## 2026-09-16 — Live Google identity smoke is Preview-only and document-free
+
+The first live cloud check verifies only short-lived Vercel OIDC to Google STS/IAM credential exchange. It is admin-authenticated, unavailable outside Preview, requires the PHI gate to remain false, accepts no file, returns no credential material and cannot establish clinical extraction accuracy.

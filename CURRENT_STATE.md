@@ -1,5 +1,7 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+2026-09-16 Anham Preview WIF live-smoke: added a Preview-only, admin-authenticated server endpoint that verifies the Vercel OIDC to Google STS/IAM short-lived credential exchange without accepting or sending documents or PHI. The endpoint fails closed outside Preview and when PHI authorization is not explicitly false, returns no token material, and is registered in the security inventory. Focused tests pass 6/6; TypeScript, ESLint, security inventory and diff check pass. Live cloud execution remains pending deployment and authenticated invocation.
+
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE
 
 A bilingual self/other-adult/minor onboarding choice now stores the Case patient separately from the authenticated account owner, including both relationship directions, representation reason, authority, patient-data consent and responsibility acknowledgments. Karen-assistant context resolves medical content to the patient while account access remains with the owner. Production schema and Case #483 were corrected with append-only audit; the legacy owner must still reconfirm the new explicit checkboxes. Focused tests 3/3 pass; full release verification remains CI-gated because the isolated local dependency install did not complete.

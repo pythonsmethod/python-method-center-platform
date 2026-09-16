@@ -700,3 +700,4 @@ Keep unconnected vendor invoices visibly unknown. Next accounting phase: add
 first-party usage/billing feeds for text AI, web search, Google Cloud, Vercel,
 Supabase and Stripe fees before claiming a complete platform total. See
 docs/architecture/ANNA_PLATFORM_COSTS.md.
+2026-09-16: Preview-only Google WIF live-smoke endpoint implemented and locally verified. Next: deploy the isolated branch, invoke it as an authenticated staging admin, record success/failure without token material, then keep OCR and PHI gates disabled pending a separate synthetic Document AI request.
