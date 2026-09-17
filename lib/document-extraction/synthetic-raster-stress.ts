@@ -2,6 +2,9 @@ import { createHash } from "node:crypto";
 import fixtures from "./synthetic-raster-fixtures.json";
 import { GoogleDocumentAIProvider } from "./google-document-ai";
 import type { NormalizedDocumentExtraction } from "./types";
+import { SYNTHETIC_PROCESSOR, SYNTHETIC_PROCESSOR_MANIFEST } from "./synthetic-processor-manifest";
+import { buildCanonicalFactsFromGoogleResponse } from "@/lib/canonical-facts/pipeline";
+import { runConnectedAnkhHarness } from "@/lib/ankh-harness/connected-pipeline";
 
 export const STRESS_GOLD = [
   ["ALPHA", "12,34", "mg/L", "10,00-20,00"],
@@ -38,20 +41,43 @@ export function scoreRaster(result: NormalizedDocumentExtraction, fixture: { wid
 }
 
 export async function runRasterStress(accessToken: () => Promise<string>) {
-  const provider = new GoogleDocumentAIProvider({ projectId: "pythons-ankh-analysis", location: "us", processorId: "2ca773b0daa15488", accessToken });
-  // Processing-only identities may lack processors.get. Unknown metadata must
-  // stay unknown; do not expand IAM just to run a fixed-fixture OCR check.
-  const status = await provider.get_processor_status().catch(() => null);
+  const provider = new GoogleDocumentAIProvider({ ...SYNTHETIC_PROCESSOR, accessToken });
   const receipts = [];
   for (const fixture of fixtures) {
     const bytes = Buffer.from(fixture.base64, "base64");
     const started = Date.now();
     const raw = await provider.process_document({ bytes, mimeType: "image/png" });
     const result = provider.normalize_response(raw);
+    // Deliberately do not feed authored Gold cells into the real parser.
+    // This tests the OCR-to-canonical boundary separately from OCR scoring.
+    const canonical = buildCanonicalFactsFromGoogleResponse(raw, {
+      caseId: "synthetic-diagnostic", sourceDocumentId: fixture.name,
+      extractionProvider: "google_document_ai", extractionVersion: SYNTHETIC_PROCESSOR.processorVersionId,
+    });
+    const connected = runConnectedAnkhHarness({
+      environment: "IN_MEMORY_TEST", externalCallsAllowed: false, persistenceAllowed: false,
+      caseAlias: "synthetic-diagnostic", expectedContext: ["independent_source_review"],
+      documents: [{ caseAlias: "synthetic-diagnostic", sourceDocumentId: fixture.name,
+        currentVersion: "frozen-v1", candidateVersion: "frozen-v1",
+        caseIdentityHash: null, documentIdentityHash: null,
+        providerVersion: SYNTHETIC_PROCESSOR.processorVersionId, parserVersion: "clinical-closure-v1",
+        normalized: result }],
+    });
+    const chain = {
+      nativeTables: result.pages.reduce((sum, page) => sum + page.tables.length, 0),
+      canonicalCandidates: canonical.facts.length,
+      expectedRows: STRESS_GOLD.length,
+      legacyVerifiedCandidatesBlocked: canonical.counters.facts_verified,
+      effectiveVerified: 0,
+      status: canonical.facts.length === 0 ? "BLOCKED_NO_CANONICAL_ROWS" : "SOURCE_AUDIT_REQUIRED",
+      persistence: "NOT_RUN", wholeCaseReview: "NOT_RUN", independentAudit: "NOT_RUN",
+      connectedInMemory: { counters: connected.counters, documentTypes: connected.documents.map(d => d.documentType),
+        externalCallsPerformed: connected.externalCallsPerformed, persistenceWritesPerformed: connected.persistenceWritesPerformed },
+    };
     receipts.push({ name: fixture.name, sha256: createHash("sha256").update(bytes).digest("hex"),
       elapsedMs: Date.now() - started, pages: result.pages.length,
-      quality: result.pages.map(p => p.qualityScore ?? null), ...scoreRaster(result, fixture) });
+      quality: result.pages.map(p => p.qualityScore ?? null), chain, ...scoreRaster(result, fixture) });
   }
-  return { fixtureSet: "anham-raster-stress-v1", processorVersion: status?.defaultProcessorVersion ?? null,
-    versionPinned: false, receipts, phiSent: false, clinicalValidation: false, cost: null };
+  return { fixtureSet: "anham-raster-stress-v1", processorVersion: SYNTHETIC_PROCESSOR.processorVersionId,
+    manifest: SYNTHETIC_PROCESSOR_MANIFEST, versionPinned: true, receipts, phiSent: false, clinicalValidation: false, cost: null };
 }

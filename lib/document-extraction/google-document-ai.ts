@@ -11,6 +11,7 @@ type GoogleDocumentAIProviderOptions = {
   projectId: string;
   location: string;
   processorId: string;
+  processorVersionId?: string;
   accessToken: () => Promise<string>;
   fetchImpl?: typeof fetch;
 };
@@ -61,6 +62,7 @@ export class GoogleDocumentAIProvider implements DocumentExtractionProvider {
   private readonly projectId: string;
   private readonly location: string;
   private readonly processorId: string;
+  private readonly processorVersionId?: string;
   private readonly accessToken: () => Promise<string>;
   private readonly fetchImpl: typeof fetch;
 
@@ -68,6 +70,12 @@ export class GoogleDocumentAIProvider implements DocumentExtractionProvider {
     this.projectId = options.projectId;
     this.location = options.location;
     this.processorId = options.processorId;
+    if (options.processorVersionId !== undefined &&
+      (!/^[a-z0-9][a-z0-9.-]*$/i.test(options.processorVersionId) ||
+        /^(latest|stable|default|rc)$/i.test(options.processorVersionId))) {
+      throw new Error("An explicit processor version ID is required");
+    }
+    this.processorVersionId = options.processorVersionId;
     this.accessToken = options.accessToken;
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
@@ -78,6 +86,10 @@ export class GoogleDocumentAIProvider implements DocumentExtractionProvider {
 
   private get apiBase(): string {
     return `https://${this.location}-documentai.googleapis.com/v1/${this.processorName}`;
+  }
+
+  private get processingBase(): string {
+    return this.processorVersionId ? `${this.apiBase}/processorVersions/${this.processorVersionId}` : this.apiBase;
   }
 
   private async request(url: string, init?: RequestInit): Promise<unknown> {
@@ -113,14 +125,14 @@ export class GoogleDocumentAIProvider implements DocumentExtractionProvider {
           },
           processOptions: { ocrConfig: { enableImageQualityScores: true } }
         };
-    return this.request(`${this.apiBase}:process`, {
+    return this.request(`${this.processingBase}:process`, {
       method: "POST",
       body: JSON.stringify(body)
     });
   }
 
   async batch_process_documents(request: BatchDocumentExtractionRequest): Promise<unknown> {
-    return this.request(`${this.apiBase}:batchProcess`, {
+    return this.request(`${this.processingBase}:batchProcess`, {
       method: "POST",
       body: JSON.stringify({
         inputDocuments: {

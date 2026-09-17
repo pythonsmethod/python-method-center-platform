@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { GoogleDocumentAIProvider } from "./google-document-ai";
+import { SYNTHETIC_PROCESSOR } from "./synthetic-processor-manifest";
 
 // Fixed, authored non-medical fixture. No uploaded or caller-supplied bytes.
 export const SYNTHETIC_LINES = [
@@ -36,7 +37,7 @@ export async function runSyntheticGoogleSmoke(accessToken: () => Promise<string>
   const bytes = syntheticPdf();
   // Existing Google processor, deliberately pinned for this bounded staging test.
   const provider = new GoogleDocumentAIProvider({
-    projectId: "pythons-ankh-analysis", location: "us", processorId: "2ca773b0daa15488",
+    ...SYNTHETIC_PROCESSOR,
     accessToken, fetchImpl,
   });
   const raw = await provider.process_document({ bytes, mimeType: "application/pdf" });
@@ -50,5 +51,6 @@ export async function runSyntheticGoogleSmoke(accessToken: () => Promise<string>
     sourceSha256: createHash("sha256").update(bytes).digest("hex"),
     checks, pages: result.pages.length, tokenCount: tokens.length, anchoredTokens,
     syntheticDocumentSent: true, phiSent: false, clinicalValidation: false,
+    processorVersion: SYNTHETIC_PROCESSOR.processorVersionId, versionPinned: true,
   };
 }
