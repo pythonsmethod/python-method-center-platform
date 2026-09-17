@@ -1267,3 +1267,10 @@ non-client `support_request_messages`. Both counts may be displayed in navigatio
 and on the cabinet home, but opening one channel must not mark the other channel
 read. This is an interface separation only and does not create a parallel message
 store or expand Anham's authority.
+# 2026-09-17 — Support history uses stored timestamps and viewer-local display
+
+Support correspondence remains append-only in `support_request_messages`; the UI
+must not create a second archive. Each bubble displays the time derived from its
+stored `created_at`, grouped by viewer-local Today/Yesterday/full-date separators.
+The original ISO timestamp remains the semantic source for accessibility and
+audit. This presentation rule is shared by client and staff views.

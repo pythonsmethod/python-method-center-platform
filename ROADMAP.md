@@ -718,3 +718,8 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 - [x] Add independent Professor and Support unread badges to navigation and home.
 - [x] Preserve the existing message stores and read boundaries.
 - [x] Complete release verification, merge and production acceptance.
+# Support conversation chronology — 2026-09-17
+
+- [x] Keep every support reply in the existing append-only message store.
+- [x] Show Today/Yesterday/date separators and each message's local time.
+- [ ] Complete release verification and production acceptance.
