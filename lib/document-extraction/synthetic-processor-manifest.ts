@@ -7,9 +7,9 @@ export const SYNTHETIC_PROCESSOR = Object.freeze({
   processorVersionId: "pretrained-ocr-v2.1-2024-08-07",
 });
 export const SYNTHETIC_PROCESSOR_MANIFEST = Object.freeze({
-  id: "anham-google-synthetic-v2",
+  id: "anham-google-synthetic-v3",
   ...SYNTHETIC_PROCESSOR,
-  parser: "google-native-table-parser-v1",
+  parser: "native-plus-spatial-lab-review-v1",
   preprocessing: "frozen-raster-stress-v1",
   scoring: "source-cell-exact-v1",
   trust: "diagnostic-review-only-v1",

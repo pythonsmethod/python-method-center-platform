@@ -6,7 +6,7 @@ export type Rect = { left: number; top: number; right: number; bottom: number };
 export type SpatialCell = { text: string; tokens: SpatialToken[]; coordinates: BoundingPolygon; ocrConfidence: number | null };
 export type SpatialRow = { cells: Array<SpatialCell | null>; page: number; layoutConfidence: number; verificationStatus: "VERIFIED" | "NEEDS_REVIEW"; issues: string[] };
 export type SpatialTable = { headers: string[]; rows: SpatialRow[]; page: number; layoutConfidence: number };
-export type SpatialOptions = { structuredTablesSufficient: boolean; headerRoles?: string[] };
+export type SpatialOptions = { structuredTablesSufficient: boolean; headerRoles?: string[]; mergeWrappedValues?: boolean };
 export type SpatialResult = { tables: SpatialTable[]; counters: { table_objects_missing_but_fallback_used: number; spatial_rows_reconstructed: number; spatial_rows_needing_review: number; layout_reconstruction_failures: number } };
 
 export function tokenRect(token: SpatialToken): Rect | null {
@@ -84,7 +84,7 @@ export function reconstructSpatialTables(tokens: SpatialToken[], options: Spatia
         if (bounds.some((boundary) => r.left < boundary && r.right > boundary)) crosses = true;
       }
       const previous = active.rows[active.rows.length - 1];
-      if (!groups[0].length && previous && top - lastBottom < 0.025) {
+      if (options.mergeWrappedValues !== false && !groups[0].length && previous && top - lastBottom < 0.025) {
         // A possible wrapped value is retained, but association requires review.
         groups.forEach((part, i) => { if (part.length) previous.cells[i] = cell([...(previous.cells[i]?.tokens ?? []), ...part]); });
         previous.layoutConfidence = 0.7; previous.verificationStatus = "NEEDS_REVIEW"; previous.issues.push("WRAPPED_ASSOCIATION");

@@ -5,6 +5,7 @@ import type { NormalizedDocumentExtraction } from "./types";
 import { SYNTHETIC_PROCESSOR, SYNTHETIC_PROCESSOR_MANIFEST } from "./synthetic-processor-manifest";
 import { buildCanonicalFactsFromGoogleResponse } from "@/lib/canonical-facts/pipeline";
 import { runConnectedAnkhHarness } from "@/lib/ankh-harness/connected-pipeline";
+import { buildReviewOnlyLabFacts } from "@/lib/canonical-facts/spatial-lab-adapter";
 
 export const STRESS_GOLD = [
   ["ALPHA", "12,34", "mg/L", "10,00-20,00"],
@@ -63,13 +64,23 @@ export async function runRasterStress(accessToken: () => Promise<string>) {
         providerVersion: SYNTHETIC_PROCESSOR.processorVersionId, parserVersion: "clinical-closure-v1",
         normalized: result }],
     });
+    const spatial = buildReviewOnlyLabFacts(result, { caseId: "synthetic-diagnostic", sourceDocumentId: fixture.name,
+      extractionProvider: "google_document_ai", extractionVersion: SYNTHETIC_PROCESSOR.processorVersionId });
+    const rowMatches = STRESS_GOLD.map(expected => {
+      const matches = spatial.facts.filter(f => f.originalTestName === expected[0]);
+      const fact = matches.length === 1 ? matches[0] : null;
+      return { label: expected[0], matched: Boolean(fact && [fact.originalTestName, fact.valueOriginal, fact.unitOriginal, fact.referenceOriginal]
+        .every((value, i) => value?.replace(/\s/g, "") === expected[i])) };
+    });
     const chain = {
+      spatial, rowMatches, exactStructuredRows: rowMatches.filter(r => r.matched).length,
       nativeTables: result.pages.reduce((sum, page) => sum + page.tables.length, 0),
-      canonicalCandidates: canonical.facts.length,
+      nativeCanonicalCandidates: canonical.facts.length,
+      canonicalCandidates: spatial.facts.length,
       expectedRows: STRESS_GOLD.length,
       legacyVerifiedCandidatesBlocked: canonical.counters.facts_verified,
       effectiveVerified: 0,
-      status: canonical.facts.length === 0 ? "BLOCKED_NO_CANONICAL_ROWS" : "SOURCE_AUDIT_REQUIRED",
+      status: spatial.facts.length === 0 ? "BLOCKED_NO_CANONICAL_ROWS" : "SOURCE_AUDIT_REQUIRED",
       persistence: "NOT_RUN", wholeCaseReview: "NOT_RUN", independentAudit: "NOT_RUN",
       connectedInMemory: { counters: connected.counters, documentTypes: connected.documents.map(d => d.documentType),
         externalCallsPerformed: connected.externalCallsPerformed, persistenceWritesPerformed: connected.persistenceWritesPerformed },
