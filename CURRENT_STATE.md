@@ -1,8 +1,8 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Chess expert level — 2026-09-16 — RELEASE CANDIDATE
+## Chess expert level — 2026-09-16 — PRODUCTION DEPLOYED
 
-The shared Karen/staff and client chess interface now includes bilingual `Эксперт / Expert` between Advanced and Grandmaster. Expert uses the built-in three-ply search; Advanced remains at two-ply, while Grandmaster remains powered by maximum-strength Stockfish with the three-ply search only as its failure fallback. The API, coaching context and account preference schema accept the new value. No PHI, clinical workflow or production trust gate changed.
+The shared Karen/staff and client chess interface now includes bilingual `Эксперт / Expert` between Advanced and Grandmaster. Expert uses the built-in three-ply search; Advanced remains at two-ply, while Grandmaster remains powered by maximum-strength Stockfish with the three-ply search only as its failure fallback. The API, coaching context and account preference schema accept the new value. PR #194 passed the complete application security/regression workflow and all three Vercel preview checks, was merged as `ebe154c8`, and the primary production deployment completed successfully. The additive production constraint migration was applied through the authenticated Supabase SQL Editor and verified from `pg_constraint` with `expert` present. No PHI, clinical workflow or production trust gate changed.
 
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE
 
