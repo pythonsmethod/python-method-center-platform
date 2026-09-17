@@ -1,5 +1,14 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-070 — Staff email follows communication ownership (2026-09-17)
+
+Client-authored Support messages notify Anna, while client-authored Professor
+Python messages notify only server-configured Karen-role addresses. Founder
+precedence explicitly excludes Anna from the Professor recipient set even if a
+legacy allowlist still contains her address. Recipient roles are resolved from
+server configuration; browser input cannot choose or add recipients. Emails
+state only that a message exists and link to the authenticated workspace.
+
 ## D-068 — Master uses bounded Stockfish between Expert and Grandmaster (2026-09-17)
 
 The shared Karen/client chess component exposes `master` as `Мастер / Master` between `expert` and `grandmaster`. Master uses Stockfish skill level 8 with a 2.5-second move search. Grandmaster remains skill level 20 with a 6-second search, and Expert remains on the built-in three-ply minimax path. Both engine levels keep the deterministic built-in search as a worker-failure fallback. This makes the strength difference functional rather than label-only without adding a second engine or changing saved games.

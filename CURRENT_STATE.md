@@ -1,5 +1,15 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Staff message email notifications — 2026-09-17 — RELEASE CANDIDATE
+
+New client-authored Support messages notify Anna at the canonical founder
+address; new client-authored Professor Python messages notify only configured
+Karen-role addresses, including messages created through the confirmed voice
+action. Staff email is neutral and contains no client name, message text, Case
+details or medical information. Delivery uses the existing external-notification
+ledger and immutable source-message dedupe keys. Production mail-provider setup
+remains the shared release dependency for client and staff email delivery.
+
 ## Chess master level — 2026-09-17 — PRODUCTION DEPLOYED
 
 The shared Karen/staff and client chess interface now includes bilingual `Мастер / Master` between Expert and Grandmaster. Master uses the existing Stockfish worker at bounded skill level 8 with a 2.5-second search, while Grandmaster remains at maximum skill 20 with a 6-second search; Expert remains on the built-in three-ply search. The API, coaching context and account preference schema accept the new value. Existing games and preferences remain valid. PR #202 was merged as `8cef1408f1108b47b7fa4affb63f5ea74e3ae27a`; the production database constraint was migrated and verified before the successful Vercel deployment. Production HTTP checks returned `200` for the public site, the expected `307` login redirect for `/cabinet/chess`, and the expected `401` for the unauthenticated chess state API. No PHI, clinical workflow or production trust gate changed.

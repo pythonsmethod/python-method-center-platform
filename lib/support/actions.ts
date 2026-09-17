@@ -6,6 +6,7 @@ import type { SupportRequestActionState } from "@/lib/support/types";
 import { writeAuditLog } from "@/lib/audit/log";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { sendClientMessageEmail } from "@/lib/notifications/client-message-email";
+import { sendStaffMessageEmail } from "@/lib/notifications/staff-message-email";
 import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
@@ -90,6 +91,7 @@ export async function createSupportRequest(
       ],
       link: adminLink("/admin/requests")
     }),
+    sendStaffMessageEmail({ audience: "anna_support", eventId: request.id, link: adminLink("/admin/requests") }),
     writeAuditLog({
       profileId: user.id,
       caseId: clientCase?.id ?? null,
@@ -187,6 +189,7 @@ export async function sendClientSupportMessage(
       ],
       link: adminLink(`/admin/requests#request-${request.id}`)
     }),
+    sendStaffMessageEmail({ audience: "anna_support", eventId: message.id, link: adminLink(`/admin/requests#request-${request.id}`) }),
     writeAuditLog({
       profileId: user.id,
       caseId: request.case_id,

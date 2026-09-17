@@ -8,6 +8,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 import { sendClientMessageEmail } from "@/lib/notifications/client-message-email";
+import { adminLink } from "@/lib/notifications/notify";
+import { sendStaffMessageEmail } from "@/lib/notifications/staff-message-email";
 
 function errorState(message: string): StaffActionState {
   return { status: "error", message };
@@ -49,7 +51,7 @@ export async function sendClientCaseMessage(
     return errorState("Сначала заполните анкету — она создаст ваш кейс.");
   }
 
-  const { error } = await supabase
+  const { data: message, error } = await supabase
     .from("case_messages")
     .insert({
       case_id: caseRow.id,
@@ -57,11 +59,19 @@ export async function sendClientCaseMessage(
       sender_id: user.id,
       sender_role: "client",
       body
-    });
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return errorState(`Не удалось отправить: ${error.message}`);
   }
+
+  await sendStaffMessageEmail({
+    audience: "karen_professor",
+    eventId: message.id,
+    link: adminLink(`/admin/cases/${caseRow.id}`)
+  });
 
   revalidatePath("/cabinet");
 
