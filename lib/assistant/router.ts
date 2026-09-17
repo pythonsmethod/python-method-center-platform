@@ -103,7 +103,7 @@ async function pickStrongerReply(
   messages: ChatMessage[],
   claudeReply: string,
   gptReply: string
-): Promise<"claude" | "gpt"> {
+): Promise<"claude" | "gpt" | Extract<AssistantResult, { status: "ok" }>> {
   const question = messages[messages.length - 1]?.content.slice(0, 1500) ?? "";
 
   const judgeSystem =
@@ -118,7 +118,9 @@ async function pickStrongerReply(
     ? await askClaude(judgeSystem, judgeMessages, 8)
     : await askOpenAi(judgeSystem, judgeMessages, 8);
 
-  if (verdict.status === "ok" && verdict.reply.trim().toUpperCase().startsWith("B")) {
+  if (verdict.status === "ok" && verdict.refusal) return verdict;
+
+  if (verdict.status === "ok" && verdict.reply.trim().toUpperCase() === "B") {
     return "gpt";
   }
 
@@ -179,6 +181,7 @@ export async function askAssistantTeam(
       claudeResult.reply,
       gptResult.reply
     );
+    if (typeof winner !== "string") return winner;
     const reply = winner === "claude" ? claudeResult.reply : gptResult.reply;
 
     if (options.attribution) {

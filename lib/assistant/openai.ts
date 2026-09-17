@@ -1,6 +1,6 @@
 import { aiFetch } from "@/lib/security/ai-transport";
-import type { AssistantResult, ChatMessage } from "@/lib/assistant/claude";
-import { isExplicitPolicyError, isFilteredChoice, providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
+import { assistantResponseFailure, parseOpenAiReply, type AssistantResult, type ChatMessage } from "@/lib/assistant/response-contract";
+import { isExplicitPolicyError, providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
 import { conversationArchiveScope } from "./conversation-archive";
@@ -81,25 +81,12 @@ export async function askOpenAi(
       };
     }
 
-    const data = (await response.json()) as {
-      choices?: {
-        finish_reason?: string | null;
-        message?: { content?: string | null; refusal?: string | null };
-      }[];
-    };
+    const part = parseOpenAiReply(await response.json().catch(() => null));
+    if (part.status === "refusal") return providerPolicyRefusal();
+    if (part.status === "invalid") return assistantResponseFailure("INVALID_RESPONSE");
+    let reply = part.reply;
 
-    if (isFilteredChoice(data.choices?.[0])) return providerPolicyRefusal();
-    let reply = data.choices?.[0]?.message?.content?.trim();
-
-    if (!reply) {
-      return {
-        status: "error",
-        code: "emptyReply",
-        message: "Пустой ответ ассистента."
-      };
-    }
-
-    if (data.choices?.[0]?.finish_reason === "length") {
+    if (part.status === "incomplete") {
       try {
         const continuationResponse = await aiFetch(`${baseUrl}/v1/chat/completions`, {
           method: "POST",
@@ -128,19 +115,13 @@ export async function askOpenAi(
         if (!continuationResponse.ok && await isExplicitPolicyError(continuationResponse)) {
           return providerPolicyRefusal();
         }
-        if (continuationResponse.ok) {
-          const continuationData = (await continuationResponse.json()) as {
-            choices?: { finish_reason?: string | null; message?: { content?: string | null; refusal?: string | null } }[];
-          };
-          if (isFilteredChoice(continuationData.choices?.[0])) return providerPolicyRefusal();
-          const ending = continuationData.choices?.[0]?.message?.content?.trim();
-
-          if (ending) {
-            reply = `${reply}\n${ending}`;
-          }
-        }
+        if (!continuationResponse.ok) return assistantResponseFailure("INCOMPLETE_RESPONSE");
+        const ending = parseOpenAiReply(await continuationResponse.json().catch(() => null));
+        if (ending.status === "refusal") return providerPolicyRefusal();
+        if (ending.status !== "complete") return assistantResponseFailure("INCOMPLETE_RESPONSE");
+        reply = `${reply}\n${ending.reply}`;
       } catch {
-        // Preserve the useful first part if only the continuation call fails.
+        return assistantResponseFailure("INCOMPLETE_RESPONSE");
       }
     }
 

@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-16 — Release complete API responses without regressing current main
+
+Port the bounded response-contract increment onto current main instead of publishing the older dirty workspace. Apply completion checks to both stateless chat and the authenticated Responses archive path; retain archive tools, authorization and safety/honesty. Never publish a failed or twice-truncated continuation as success. Provider-policy refusal remains terminal, including the arbiter. Reuse the existing RU/EN error mapper and compatibility type exports; do not replace newer routes or broaden access. No model migration, schema change or clinical activation.
+
 ## D-066 — Expert bridges Advanced and Stockfish Grandmaster (2026-09-16)
 
 The shared Karen/client chess component exposes `expert` as `Эксперт / Expert` between `advanced` and `grandmaster`. Expert uses the existing deterministic three-ply minimax path, making it stronger than the two-ply Advanced level without invoking Stockfish. Grandmaster remains the only level backed by maximum-strength Stockfish. Existing games and saved preferences are unchanged.

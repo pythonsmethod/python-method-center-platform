@@ -1,5 +1,9 @@
 # AI Core — журнал миграции по фазам
 
+## 2026-09-16 — Isolated API response contract release candidate
+
+The current main already uses OpenAI/Anthropic server APIs, including authenticated archive tools. The release preserves those flows and adds strict completion validation, one bounded continuation, terminal arbiter refusal and shared bilingual errors. Local full regression: 1,885 pass / 1 existing skip; preview acceptance remains pending. This is a bounded hardening increment, not closure of AI Core phases 1–5. Details: docs/ankh/assistant_api_release_2026_09_16.md.
+
 Спецификация: [`AI_CORE_PROVIDER_INDEPENDENCE_V1.md`](./AI_CORE_PROVIDER_INDEPENDENCE_V1.md).
 
 Её правило (§24): каждая фаза начинается с осмотра кода и заканчивается

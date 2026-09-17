@@ -1,5 +1,9 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Anham API response contract — 2026-09-16
+
+Draft PR #196 passed exact-implementation CI/build; its isolated staging preview is READY. Next: explicit authorization for temporary protected-preview access, then synthetic signed-in RU/EN dialogue with route-preserving language changes. Production promotion requires acceptance and explicit approval. Broader AI Core provider independence and clinical production gates remain open. See docs/ankh/assistant_api_release_2026_09_16.md.
+
 ## Chess expert level — 2026-09-16
 
 Deployed to production through PR #194: bilingual shared UI, three-ply intermediate opponent, API/coaching support and additive account-preference migration. The production constraint was applied and verified. Next: observe Karen and client play, verify RU↔EN selection during routine authenticated use, and tune only from play evidence.

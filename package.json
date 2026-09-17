@@ -13,7 +13,7 @@
     "lint": "eslint . --max-warnings=0",
     "benchmark:ankh": "vitest run tests/gold-benchmark-report.test.ts",
     "eval:honesty": "vitest run --config vitest.honesty-eval.config.ts",
-    "security:check": "node scripts/security-check.mjs --self-test && node scripts/security-check.mjs"
+    "security:check": "node scripts/security-check.mjs --self-test && node scripts/security-check.mjs && vitest run tests/assistant-api-contract.test.ts tests/router-behaviour.test.ts tests/conversation-archive.test.ts tests/assistant-client-history-route.test.ts tests/assistant-history-routes.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.3",
