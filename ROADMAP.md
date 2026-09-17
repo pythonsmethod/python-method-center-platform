@@ -1,5 +1,12 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Staff email notifications — 2026-09-17
+
+- [x] Notify Anna about new registered-client Support messages.
+- [x] Notify Karen about new typed and confirmed-voice Professor messages.
+- [x] Exclude message content, client identity, Case data and medical data.
+- [ ] Complete Resend owner setup, deploy and verify synthetic delivery.
+
 ## Chess master level — 2026-09-17
 
 - [x] Add bilingual `Мастер / Master` between Expert and Grandmaster in the shared Karen/client interface.

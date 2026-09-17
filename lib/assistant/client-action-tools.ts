@@ -1,6 +1,7 @@
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { writeAuditLog } from "@/lib/audit/log";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
+import { sendStaffMessageEmail } from "@/lib/notifications/staff-message-email";
 import { normalizeMetricName } from "@/lib/metrics/chart";
 import { isFullName } from "@/lib/profile/identity";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -163,7 +164,10 @@ async function perform(actor: VoiceActor, action: ActionName, payload: Record<st
   if (action === "send_professor_message") {
     const row = await db.from("case_messages").insert({ case_id: actor.caseId, profile_id: actor.profileId, sender_id: actor.profileId, sender_role: "client", body: payload.body }).select("id").single();
     if (row.error || !row.data) throw new Error("write");
-    await notifyTeam({ kind: "client_message", dedupeKey: `assistant_client_action:${row.data.id}`, title: "💬 Новое сообщение Professor Python", lines: ["Клиент отправил сообщение через голосового Анхама."], link: adminLink(`/admin/cases/${actor.caseId}`) });
+    await Promise.all([
+      notifyTeam({ kind: "client_message", dedupeKey: `assistant_client_action:${row.data.id}`, title: "💬 Новое сообщение Professor Python", lines: ["Клиент отправил сообщение через голосового Анхама."], link: adminLink(`/admin/cases/${actor.caseId}`) }),
+      sendStaffMessageEmail({ audience: "karen_professor", eventId: row.data.id, link: adminLink(`/admin/cases/${actor.caseId}`) })
+    ]);
     return { entityId: row.data.id };
   }
   if (action === "save_supplement_schedule") {
