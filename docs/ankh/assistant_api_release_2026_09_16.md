@@ -44,4 +44,15 @@ Structural completion does not prove clinical correctness, grounding or universa
 
 ## J–L. Gate and next action
 
-Local isolated implementation: CLOSED. Deployed/authenticated acceptance: NOT CLOSED pending preview build and synthetic RU/EN dialogue. GO for preview/review; NO-GO for production promotion until acceptance and explicit release approval. Next: publish the isolated candidate, verify exact-head CI/build, and test the signed-in synthetic conversation and locale switching on staging.
+Local isolated implementation and preview build: CLOSED. Authenticated browser acceptance: NOT CLOSED. GO for review; NO-GO for production promotion until acceptance and explicit release approval. Next: obtain authorization to open the protected preview using Vercel's temporary access link, then verify the synthetic signed-in dialogue and locale switching without changing any allowlist.
+
+## Deployed candidate evidence — 2026-09-16 local
+
+- Draft [PR #196](https://github.com/pythonsmethod/python-method-center-platform/pull/196), implementation commit `91d343e61e00cf4b28987c613f71264382ba2860`. No merge or production promotion.
+- [Exact-commit CI](https://github.com/pythonsmethod/python-method-center-platform/actions/runs/35189953372) passed: clean npm ci, security inventory + 143 tests, TypeScript, ESLint, 1,885 tests passed / 1 existing skip, zero dependency vulnerabilities, production-mode build with 60/60 generated pages, and diff check.
+- Preview: [anham-clinical-staging](https://anham-clinical-staging-ccsqh96ve-pythonsmethods-projects.vercel.app), deployment `dpl_CsxBJwg6XACAnYCdLmaCUxR3Dteq`, target preview, READY; Next.js remote build completed successfully.
+- Read-only staging inspection confirms the separate Supabase project `thylrayzjczsxlyqhtfc` is ACTIVE_HEALTHY and retains a synthetic client profile and synthetic staff profile. No profile, Auth user, schema or permission was changed.
+- Vercel lists OpenAI, Anthropic, Supabase and allowlist variables for both preview/production targets of the **staging project**. Values are sensitive and cannot be downloaded through env run. The resulting absent local values are not evidence of missing deployment secrets. Live database binding and provider usability still require runtime acceptance.
+- Browser navigation reached the Vercel login boundary. Automated security review rejected use of a temporary access link without owner confirmation. The attempt was not retried or routed through a bypass; deployment protection remains enabled. No signed-in exchange, live model request or browser RU/EN acceptance is claimed. An explicit access question was sent to the owner.
+
+The Vercel release skill guided isolated preview deployment. OpenAI Docs guided completion semantics; the credential skill reused recorded authorization without creating a key. The verification skill's first-broken-boundary rule leaves end-to-end acceptance open at the protected-preview access boundary.

@@ -2,7 +2,7 @@
 
 ## Anham API response contract — 2026-09-16 — ISOLATED CANDIDATE
 
-Anham already answers through server APIs. A scoped release from canonical main rejects incomplete/malformed final output in Chat Completions, Anthropic and authenticated Responses archive flows, preserves arbiter policy refusal, and localizes failures through the existing RU/EN boundary without storing partial replies. Archive tools, safety/honesty, ownership, provider selection and newer main behavior are retained. Full isolated regression: 1,885 passed / 1 existing skip; security 143/143 plus inventory; TypeScript, ESLint, diff and dependency audit pass. Preview/authenticated acceptance remains open; no production or PHI change. Evidence: docs/ankh/assistant_api_release_2026_09_16.md.
+Anham already answers through server APIs. Draft PR #196 isolates completion checks across chat and authenticated archive flows, terminal arbiter refusal, and shared RU/EN failures without saving partial replies. Current-main archive tools, safety/honesty, ownership and provider selection are retained. Implementation commit 91d343e passed exact-head CI: 1,885 tests / 1 existing skip, security 143/143 plus inventory, TypeScript, ESLint, audit zero, diff and 60-page build. Staging preview dpl_CsxBJwg6XACAnYCdLmaCUxR3Dteq is READY. Authenticated browser acceptance is blocked on explicit permission to open the protected preview through a temporary Vercel access link; protection and allowlists are unchanged. No merge, production or PHI change. Evidence: docs/ankh/assistant_api_release_2026_09_16.md.
 
 ## Chess expert level — 2026-09-16 — PRODUCTION DEPLOYED
 

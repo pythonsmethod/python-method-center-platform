@@ -2,7 +2,7 @@
 
 ## Anham API response contract — 2026-09-16
 
-Isolated current-main candidate is locally verified. Next: exact-head CI/build and synthetic signed-in RU/EN staging dialogue with route-preserving language changes. Production promotion requires acceptance and explicit approval. Broader AI Core provider independence and clinical production gates remain open. See docs/ankh/assistant_api_release_2026_09_16.md.
+Draft PR #196 passed exact-implementation CI/build; its isolated staging preview is READY. Next: explicit authorization for temporary protected-preview access, then synthetic signed-in RU/EN dialogue with route-preserving language changes. Production promotion requires acceptance and explicit approval. Broader AI Core provider independence and clinical production gates remain open. See docs/ankh/assistant_api_release_2026_09_16.md.
 
 ## Chess expert level — 2026-09-16
 
