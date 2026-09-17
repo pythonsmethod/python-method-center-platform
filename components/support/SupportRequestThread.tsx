@@ -30,11 +30,37 @@ type Props = {
   labels: Labels;
 };
 
-function dayLabel(value: string, locale: "ru" | "en"): string {
-  return new Date(value).toLocaleDateString(locale, {
+function calendarDayKey(value: string | Date): string {
+  const date = typeof value === "string" ? new Date(value) : value;
+  return `${date.getFullYear()}-${date.getMonth()}-${date.getDate()}`;
+}
+
+function dayLabel(value: string, locale: "ru" | "en", now = new Date()): string {
+  const messageDate = new Date(value);
+  if (calendarDayKey(messageDate) === calendarDayKey(now)) {
+    return locale === "ru" ? "Сегодня" : "Today";
+  }
+
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  if (calendarDayKey(messageDate) === calendarDayKey(yesterday)) {
+    return locale === "ru" ? "Вчера" : "Yesterday";
+  }
+
+  return messageDate.toLocaleDateString(locale, {
     day: "numeric",
     month: "long",
     year: "numeric"
+  });
+}
+
+function fullDateTime(value: string, locale: "ru" | "en"): string {
+  return new Date(value).toLocaleString(locale, {
+    day: "numeric",
+    month: "long",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit"
   });
 }
 
@@ -92,12 +118,18 @@ export function SupportRequestThread({
                     : labels.team}
                 </span>
                 <p>{message.body}</p>
-                <span className="case-msg__time">
+                <time
+                  aria-label={fullDateTime(message.created_at, locale)}
+                  className="case-msg__time"
+                  dateTime={message.created_at}
+                  suppressHydrationWarning
+                  title={fullDateTime(message.created_at, locale)}
+                >
                   {new Date(message.created_at).toLocaleTimeString(locale, {
                     hour: "2-digit",
                     minute: "2-digit"
                   })}
-                </span>
+                </time>
               </div>
             </Fragment>
           );

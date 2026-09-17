@@ -1,5 +1,15 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Support conversation history timestamps — 2026-09-17 — RELEASE CANDIDATE
+
+The existing append-only Support message history now renders like a familiar
+messenger: local `Today` / `Yesterday` / full-date separators and the local time
+on every message bubble, with the immutable database timestamp retained in a
+semantic `time` element and exposed as a full localized date-time. The same
+component serves Anna and the client, so both sides see the same chronology.
+No message-store, authorization or clinical boundary changed. Release verification
+and publication remain pending.
+
 ## Client communication channels and unread badges — 2026-09-17 — PUBLISHED
 
 The client cabinet now exposes three distinct communication destinations: Anham,
