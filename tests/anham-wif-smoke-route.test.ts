@@ -39,7 +39,9 @@ describe("Anham WIF smoke route", () => {
   it("returns only a bounded success receipt", async () => {
     state.auth.mockResolvedValue({ status: "authorized", role: "admin", userId: "a", email: null });
     state.token.mockResolvedValue("short-lived-secret");
-    const response = await GET();
+    const response = await GET(new Request("https://preview.example/api/admin/anham/wif-smoke", {
+      headers: { "x-vercel-oidc-token": "header.payload.signature" },
+    }));
     expect(response.status).toBe(200);
     expect(await response.json()).toEqual({ ok: true, credential: "short_lived", documentSent: false, phiSent: false });
   });

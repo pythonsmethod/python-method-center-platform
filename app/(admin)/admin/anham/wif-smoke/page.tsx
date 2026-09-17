@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { headers } from "next/headers";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { createGoogleWorkloadIdentityAccessToken } from "@/lib/document-extraction/google-workload-identity";
 import { getLocale } from "@/lib/i18n/locale";
@@ -23,7 +24,11 @@ export default async function AnhamWifSmokePage() {
   let ok = false;
   let failureCode = "none";
   try {
-    const token = await createGoogleWorkloadIdentityAccessToken()();
+    const requestHeaders = await headers();
+    const token = await createGoogleWorkloadIdentityAccessToken({
+      ...process.env,
+      VERCEL_OIDC_TOKEN: requestHeaders.get("x-vercel-oidc-token") ?? process.env.VERCEL_OIDC_TOKEN,
+    })();
     ok = token.length > 0;
   } catch (error) {
     ok = false;
