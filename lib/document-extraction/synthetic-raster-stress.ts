@@ -39,7 +39,9 @@ export function scoreRaster(result: NormalizedDocumentExtraction, fixture: { wid
 
 export async function runRasterStress(accessToken: () => Promise<string>) {
   const provider = new GoogleDocumentAIProvider({ projectId: "pythons-ankh-analysis", location: "us", processorId: "2ca773b0daa15488", accessToken });
-  const status = await provider.get_processor_status();
+  // Processing-only identities may lack processors.get. Unknown metadata must
+  // stay unknown; do not expand IAM just to run a fixed-fixture OCR check.
+  const status = await provider.get_processor_status().catch(() => null);
   const receipts = [];
   for (const fixture of fixtures) {
     const bytes = Buffer.from(fixture.base64, "base64");
@@ -50,6 +52,6 @@ export async function runRasterStress(accessToken: () => Promise<string>) {
       elapsedMs: Date.now() - started, pages: result.pages.length,
       quality: result.pages.map(p => p.qualityScore ?? null), ...scoreRaster(result, fixture) });
   }
-  return { fixtureSet: "anham-raster-stress-v1", processorVersion: status.defaultProcessorVersion ?? null,
+  return { fixtureSet: "anham-raster-stress-v1", processorVersion: status?.defaultProcessorVersion ?? null,
     versionPinned: false, receipts, phiSent: false, clinicalValidation: false, cost: null };
 }
