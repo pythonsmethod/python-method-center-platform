@@ -1,5 +1,7 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+2026-09-17 next gates after spatial bridge (live 12/18 rows, 0 VERIFIED): source-derived deskew/inverse geometry and unit-whitespace normalization; unfamiliar laboratory fixtures and partial native-table coverage; persistent per-cell provenance; reconcile one deployed Case pipeline; durable idempotent budgeted jobs; blind human Gold/provider audit; Karen whole-Case acceptance; PHI/operational release review. Rotated fixture still fails, so robust-layout and full-chain phases remain NOT CLOSED. Details: docs/ankh/spatial_lab_bridge_2026_09_17.md.
+
 2026-09-17: fixed-fixture Google version pin CLOSED live. Downstream boundary test exposed 0 canonical rows despite 72/72 exact OCR fields (no native tables). Before held-out whole-chain validation, connect generic spatial laboratory reconstruction to review-only canonical facts, reconcile required local/runtime components without copying unrelated root changes, and test new semantic laboratory fixtures. Independent audit/persistence/Karen live validation remain open; production NO-GO. See docs/ankh/google_pinned_chain_2026_09_17.md.
 
 2026-09-17: synthetic raster/table smoke CLOSED (72/72 fields, 18/18 rows across three variants). Next: resolve/pin an authorized processor version and freeze unfamiliar layouts with independently checked truth before whole-chain extraction/audit/review benchmarking. No clinical/production GO. Evidence: docs/ankh/google_raster_stress_live_2026_09_17.md.

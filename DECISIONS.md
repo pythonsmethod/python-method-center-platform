@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-17 — Spatial laboratory fallback stays opt-in and review-only
+
+Reuse generic spatial reconstruction and canonical facts. Preserve per-cell original tokens/polygons/spans as in-memory evidence; never supply scorer Gold to extraction or claim independent P4 from geometry. Missing cells stay missing and orphan value lines are not borrowed. No auto-verification or production activation. Native preference is page-level for now and requires region-level completeness review. The observed rotation failure and unresolved unit spacing block robust-layout closure, rather than being hidden by a target-specific fix. See docs/ankh/spatial_lab_bridge_2026_09_17.md.
+
 ## 2026-09-17 — Pin diagnostics and measure downstream coverage separately
 
 Use explicit pretrained-ocr-v2.1-2024-08-07 in fixed-fixture Preview requests; never change the shared cloud default to achieve test reproducibility. Keep known-cell OCR scoring independent of the actual parser and report zero canonical rows as a blocked boundary, not successful extraction. Do not feed authored Gold into candidates, infer clinical meaning for artificial labels, or promote legacy parser VERIFIED candidates. The live test is repeatability/boundary diagnosis, not held-out clinical validation. See docs/ankh/google_pinned_chain_2026_09_17.md.
