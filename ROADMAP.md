@@ -717,4 +717,4 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 - [x] Separate Anham, Professor Python and Support in the client cabinet.
 - [x] Add independent Professor and Support unread badges to navigation and home.
 - [x] Preserve the existing message stores and read boundaries.
-- [ ] Complete release verification, merge and production acceptance.
+- [x] Complete release verification, merge and production acceptance.
