@@ -60,7 +60,7 @@ const ru = {
     chat: {
       eyebrow: "Чат с поддержкой",
       title: "Анна и поддержка центра",
-      description: "Вопросы про оплату, доступ и сайт — и вся ваша переписка с помощником.",
+      description: "Отдельная личная переписка с Анной и службой поддержки центра.",
       setupNotice: "Раздел требует настройки Supabase Auth",
       caseNoticeTitle: "Про ваш кейс — на главной",
       caseNoticeText: "Переписка с Professor Python открывается со страницы кабинета.",
@@ -1249,7 +1249,7 @@ const en: typeof ru = {
     chat: {
       eyebrow: "Support chat",
       title: "Anna and center support",
-      description: "Questions about payment, access and the site — and your whole conversation with the assistant.",
+      description: "A separate private conversation with Anna and the center's support team.",
       setupNotice: "This section needs Supabase Auth configured",
       caseNoticeTitle: "About your case — on the home page",
       caseNoticeText:

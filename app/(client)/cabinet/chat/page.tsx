@@ -3,8 +3,6 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { PageHeader } from "@/components/PageHeader";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
-import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
-import { getOwnAssistantHistory } from "@/lib/assistant/history";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { formatDateTime } from "@/lib/i18n/format";
 import { getOwnSupportRequests } from "@/lib/support/queries";
@@ -13,9 +11,8 @@ import { SupportRequestThread } from "@/components/support/SupportRequestThread"
 
 export const dynamic = "force-dynamic";
 
-// Everything that is not the conversation with Professor Python: questions
-// about payment and access, and whatever the person already asked the AI.
-// His own thread is the home page of the cabinet.
+// A separate human-support channel. Anham and Professor Python each have
+// their own cabinet destination so authorship is never ambiguous.
 export default async function CabinetChatPage() {
   const locale = await getLocale();
   const strings = getDictionary(locale);
@@ -32,10 +29,7 @@ export default async function CabinetChatPage() {
     );
   }
 
-  const [supportResult, assistantResult] = await Promise.all([
-    getOwnSupportRequests(auth.userId),
-    getOwnAssistantHistory(auth.userId, locale)
-  ]);
+  const supportResult = await getOwnSupportRequests(auth.userId);
 
   return (
     <>
@@ -52,29 +46,6 @@ export default async function CabinetChatPage() {
           <Link href="/cabinet">{t.caseNoticeCta}</Link>
         </span>
       </div>
-
-      <section className="documents-section" aria-label={t.assistantAria}>
-        <div className="panel">
-          <span className="panel__label">{t.assistantLabel}</span>
-          <h2>{t.assistantTitle}</h2>
-          <p>
-            {t.assistantText}
-          </p>
-          <SavedAssistantThread
-            emptyText={t.assistantEmpty}
-            loadError={
-              assistantResult.status === "error"
-                ? assistantResult.message
-                : null
-            }
-            messages={
-              assistantResult.status === "ready" ? assistantResult.messages : []
-            }
-            locale={locale}
-            viewer="client"
-          />
-        </div>
-      </section>
 
       <section className="documents-section" aria-label={t.requestsAria}>
         <div className="documents-layout">
