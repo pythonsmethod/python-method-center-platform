@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-066 — Expert bridges Advanced and Stockfish Grandmaster (2026-09-16)
+
+The shared Karen/client chess component exposes `expert` as `Эксперт / Expert` between `advanced` and `grandmaster`. Expert uses the existing deterministic three-ply minimax path, making it stronger than the two-ply Advanced level without invoking Stockfish. Grandmaster remains the only level backed by maximum-strength Stockfish. Existing games and saved preferences are unchanged.
+
 ## D-065 — Account owner and Case patient are separate identities (2026-09-14)
 
 The authenticated adult remains the account owner, consent actor, payer and communication principal. A Case for another adult or minor stores a separate Care Recipient with both relationship directions, the reason for representation and explicit confirmations. Medical documents and analytical context resolve to the active Care Recipient; authorization and audit resolve to the account owner. Existing source documents and historical onboarding submissions are not rewritten.

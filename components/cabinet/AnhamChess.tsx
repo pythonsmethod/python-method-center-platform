@@ -10,11 +10,11 @@ type AnhamChessProps = {
   storageScope?: string;
 };
 
-type ChessLevel = "beginner" | "casual" | "intermediate" | "advanced" | "grandmaster";
+type ChessLevel = "beginner" | "casual" | "intermediate" | "advanced" | "expert" | "grandmaster";
 type EngineMove = { from: Square; to: Square; promotion?: "q" | "r" | "b" | "n" };
 
-const chessLevels: ChessLevel[] = ["beginner", "casual", "intermediate", "advanced", "grandmaster"];
-const levelDepth: Record<ChessLevel, number> = { beginner: -1, casual: 0, intermediate: 1, advanced: 2, grandmaster: 3 };
+const chessLevels: ChessLevel[] = ["beginner", "casual", "intermediate", "advanced", "expert", "grandmaster"];
+const levelDepth: Record<ChessLevel, number> = { beginner: -1, casual: 0, intermediate: 1, advanced: 2, expert: 3, grandmaster: 3 };
 
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const pieces: Record<string, string> = {
@@ -247,8 +247,8 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       <div aria-labelledby="chess-level-label" role="radiogroup">
         {chessLevels.map((item) => {
           const labels = ru
-            ? { beginner: "Новичок", casual: "Любитель", intermediate: "Средний", advanced: "Продвинутый", grandmaster: "Гроссмейстер" }
-            : { beginner: "Beginner", casual: "Casual", intermediate: "Intermediate", advanced: "Advanced", grandmaster: "Grandmaster" };
+            ? { beginner: "Новичок", casual: "Любитель", intermediate: "Средний", advanced: "Продвинутый", expert: "Эксперт", grandmaster: "Гроссмейстер" }
+            : { beginner: "Beginner", casual: "Casual", intermediate: "Intermediate", advanced: "Advanced", expert: "Expert", grandmaster: "Grandmaster" };
           return <button aria-checked={level === item} className={level === item ? "is-active" : undefined} key={item} onClick={() => changeLevel(item)} role="radio" type="button">{labels[item]}</button>;
         })}
       </div>

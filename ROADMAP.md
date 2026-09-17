@@ -1,5 +1,9 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Chess expert level — 2026-09-16
+
+Implemented as an isolated release: bilingual shared UI, three-ply intermediate opponent, API/coaching support and additive account-preference migration. Next: deploy, apply the migration, verify RU↔EN selection for one staff and one client account, and tune only from observed play evidence.
+
 ## Represented-patient identity — 2026-09-14
 
 Implemented in an isolated release branch; the additive production table and Case #483 correction are applied. Next: CI verification, deployment, then RU↔EN browser acceptance of self, represented-adult and guardian paths. This does not enable automatic identity verification or trust promotion.
