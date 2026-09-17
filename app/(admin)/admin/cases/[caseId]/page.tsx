@@ -249,7 +249,7 @@ export default async function StaffCaseDetailPage({
     canReadProfessorConversation
       ? getCaseMessages(clientCase.id)
       : Promise.resolve({ messages: [], error: null }),
-    getCaseSupportThread(clientCase.id),
+    getCaseSupportThread(clientCase.id, locale),
     getAssistantHistoryForCase(clientCase.profile_id, locale),
     getCaseReview(clientCase.id, documents, locale),
     getCaseAnalyticalPicture(clientCase.id)

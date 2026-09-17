@@ -8,7 +8,7 @@ const copy = readFileSync("lib/cases/detail-copy.ts", "utf8");
 
 describe("case-scoped support conversation", () => {
   it("is present for authorized staff independently of Professor access", () => {
-    expect(page).toContain("getCaseSupportThread(clientCase.id)");
+    expect(page).toContain("getCaseSupportThread(clientCase.id, locale)");
     expect(page).toContain("supportConversationHeading");
     expect(page).toContain("caseId={clientCase.id}");
     expect(page.indexOf("supportConversationHeading")).toBeGreaterThan(page.indexOf("canReadProfessorConversation ? <section"));
