@@ -7,6 +7,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
+import { sendClientMessageEmail } from "@/lib/notifications/client-message-email";
 
 function errorState(message: string): StaffActionState {
   return { status: "error", message };
@@ -105,17 +106,19 @@ export async function sendStaffCaseMessage(
     return errorState("Кейс не найден.");
   }
 
-  const { error } = await supabase.from("case_messages").insert({
+  const { data: message, error } = await supabase.from("case_messages").insert({
     case_id: caseRow.id,
     profile_id: caseRow.profile_id,
     sender_id: auth.userId,
     sender_role: auth.role,
     body
-  });
+  }).select("id").single();
 
   if (error) {
     return errorState(`Не удалось отправить: ${error.message}`);
   }
+
+  await sendClientMessageEmail({ profileId: caseRow.profile_id, messageId: message.id, channel: "professor" });
 
   revalidatePath(`/admin/cases/${caseId}`);
   revalidatePath("/admin/cases");

@@ -4,6 +4,18 @@
 
 The shared Karen/staff and client chess interface now includes bilingual `Мастер / Master` between Expert and Grandmaster. Master uses the existing Stockfish worker at bounded skill level 8 with a 2.5-second search, while Grandmaster remains at maximum skill 20 with a 6-second search; Expert remains on the built-in three-ply search. The API, coaching context and account preference schema accept the new value. Existing games and preferences remain valid. PR #202 was merged as `8cef1408f1108b47b7fa4affb63f5ea74e3ae27a`; the production database constraint was migrated and verified before the successful Vercel deployment. Production HTTP checks returned `200` for the public site, the expected `307` login redirect for `/cabinet/chess`, and the expected `401` for the unauthenticated chess state API. No PHI, clinical workflow or production trust gate changed.
 
+## Client message email notifications — 2026-09-17 — RELEASE CANDIDATE
+
+When authorized staff sends a Support message, or Professor Python sends a
+Case message, the registered account owner now receives a neutral RU/EN email
+with a link to the matching protected conversation. The recipient address and
+locale are resolved server-side from the owner profile. Email contains no
+message body, patient name, Case details or medical data. Each delivery is
+recorded in the existing external-notification ledger and deduplicated by the
+immutable message ID; email failure never rolls back the saved site message.
+No schema change, client role change or clinical-processing change was made.
+Full release verification and production publication remain pending.
+
 ## Support conversation history timestamps — 2026-09-17 — RELEASE CANDIDATE
 
 The existing append-only Support message history now renders like a familiar

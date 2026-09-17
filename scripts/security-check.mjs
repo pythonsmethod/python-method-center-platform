@@ -21,6 +21,7 @@ const fetchSites = {
   "lib/assistant/realtime-browser.ts": 3,
   "lib/assistant/live-browser.ts": 1,
   "lib/notifications/guest-support-email.ts": 1,
+  "lib/notifications/client-message-email.ts": 1,
   "lib/notifications/test-action.ts": 1,
   "lib/notifications/telegram.ts": 1,
   "lib/medical-digest/digest.ts": 1,

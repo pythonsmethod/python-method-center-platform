@@ -730,3 +730,9 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 - [x] Keep every support reply in the existing append-only message store.
 - [x] Show Today/Yesterday/date separators and each message's local time.
 - [ ] Complete release verification and production acceptance.
+# Client email notifications — 2026-09-17
+
+- [x] Notify the registered account owner about new Support messages.
+- [x] Notify the registered account owner about new Professor Python messages.
+- [x] Keep email neutral, bilingual, deduplicated and free of Case/medical text.
+- [ ] Complete full release verification and production acceptance.

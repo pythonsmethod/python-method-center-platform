@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import type { SupportRequestActionState } from "@/lib/support/types";
 import { writeAuditLog } from "@/lib/audit/log";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
+import { sendClientMessageEmail } from "@/lib/notifications/client-message-email";
 import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
@@ -264,7 +265,8 @@ export async function sendStaffSupportMessage(
       action: "support_message_created",
       entityTable: "support_request_messages",
       entityId: message.id
-    })
+    }),
+    sendClientMessageEmail({ profileId: request.profile_id, messageId: message.id, channel: "support" })
   ]);
 
   revalidatePath("/admin/requests");
@@ -334,6 +336,8 @@ export async function sendStaffCaseSupportMessage(
     entityId: message.id
   });
   if (audit.status !== "inserted") return errorState(locale === "en" ? "The message was saved, but audit confirmation failed." : "Сообщение сохранено, но аудит не подтверждён.");
+
+  await sendClientMessageEmail({ profileId: caseRow.profile_id, messageId: message.id, channel: "support" });
 
   revalidatePath(`/admin/cases/${caseId}`);
   revalidatePath("/admin/requests");

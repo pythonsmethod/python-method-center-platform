@@ -4,6 +4,18 @@
 
 The shared Karen/client chess component exposes `master` as `Мастер / Master` between `expert` and `grandmaster`. Master uses Stockfish skill level 8 with a 2.5-second move search. Grandmaster remains skill level 20 with a 6-second search, and Expert remains on the built-in three-ply minimax path. Both engine levels keep the deterministic built-in search as a worker-failure fallback. This makes the strength difference functional rather than label-only without adding a second engine or changing saved games.
 
+## D-069 — Email alerts reveal only the existence of a client message (2026-09-17)
+
+Send transactional email for new staff-authored Support and Professor Python
+messages to the registered account owner's profile email. Resolve the recipient
+and locale only on the server. Email identifies the channel and links to the
+authenticated cabinet, but never includes free-text message content, patient
+identity, Case metadata or medical information. Use the existing
+`notification_events` ledger plus a channel/message-ID dedupe key. Delivery is
+best-effort after the site message is stored, so a mail-provider failure cannot
+erase or block the canonical conversation. Automated Anham turns, marketing,
+SMS and reminder scheduling are outside this increment.
+
 ## D-067 — Case support messages reuse the canonical support conversation model (2026-09-17)
 
 Anna/Support receives a dedicated Case-bound conversation, but it does not reuse `case_messages` and does not gain access to Professor Python's clinical channel. Reuse `support_requests` plus append-only `support_request_messages`, mark one request per Case with `is_case_thread`, and enforce uniqueness with a partial index. The client reads and answers through the existing Conversations page. Staff identity and Case ownership are resolved server-side, and each sent message is audited. This channel is for technical and organizational communication only; medical interpretation remains with Professor Python.
