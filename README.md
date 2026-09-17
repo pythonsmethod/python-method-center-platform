@@ -125,7 +125,9 @@ Copy `.env.example` to `.env.local`. Key groups:
   `_REGISTERED` / `_CLIENT`, `ASSISTANT_DAILY_TOTAL_GUEST`,
   `ANHAM_DEEP_DAILY_LIMIT` (default `10`),
   `ASSISTANT_USAGE_SALT`
-- Notifications: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`
+- Notifications: `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID`, `RESEND_API_KEY`,
+  `SUPPORT_FROM_EMAIL`. Client message email uses the verified support sender;
+  the recipient is resolved server-side from the account profile.
 - `NEXT_PUBLIC_SITE_URL` — absolute origin for links in notifications and
   auth redirects
 - `NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION` — optional token from the Google
