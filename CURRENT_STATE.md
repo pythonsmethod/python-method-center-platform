@@ -1,5 +1,9 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Chess master level — 2026-09-17 — RELEASE CANDIDATE
+
+The shared Karen/staff and client chess interface now includes bilingual `Мастер / Master` between Expert and Grandmaster. Master uses the existing Stockfish worker at bounded skill level 8 with a 2.5-second search, while Grandmaster remains at maximum skill 20 with a 6-second search; Expert remains on the built-in three-ply search. The API, coaching context and account preference schema accept the new value. Existing games and preferences remain valid. No PHI, clinical workflow or production trust gate changed.
+
 ## Support conversation history timestamps — 2026-09-17 — RELEASE CANDIDATE
 
 The existing append-only Support message history now renders like a familiar

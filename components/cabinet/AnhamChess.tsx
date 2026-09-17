@@ -10,11 +10,15 @@ type AnhamChessProps = {
   storageScope?: string;
 };
 
-type ChessLevel = "beginner" | "casual" | "intermediate" | "advanced" | "expert" | "grandmaster";
+type ChessLevel = "beginner" | "casual" | "intermediate" | "advanced" | "expert" | "master" | "grandmaster";
 type EngineMove = { from: Square; to: Square; promotion?: "q" | "r" | "b" | "n" };
 
-const chessLevels: ChessLevel[] = ["beginner", "casual", "intermediate", "advanced", "expert", "grandmaster"];
-const levelDepth: Record<ChessLevel, number> = { beginner: -1, casual: 0, intermediate: 1, advanced: 2, expert: 3, grandmaster: 3 };
+const chessLevels: ChessLevel[] = ["beginner", "casual", "intermediate", "advanced", "expert", "master", "grandmaster"];
+const levelDepth: Record<ChessLevel, number> = { beginner: -1, casual: 0, intermediate: 1, advanced: 2, expert: 3, master: 3, grandmaster: 3 };
+const stockfishConfig = {
+  master: { skillLevel: 8, moveTimeMs: 2_500 },
+  grandmaster: { skillLevel: 20, moveTimeMs: 6_000 }
+} as const;
 
 const files = ["a", "b", "c", "d", "e", "f", "g", "h"] as const;
 const pieces: Record<string, string> = {
@@ -63,7 +67,7 @@ function chooseAnhamMove(game: Chess, level: ChessLevel): Move | null {
   return choices[Math.floor(Math.random() * choices.length)] ?? null;
 }
 
-function chooseStockfishMove(fen: string): Promise<EngineMove | null> {
+function chooseStockfishMove(fen: string, config: { skillLevel: number; moveTimeMs: number }): Promise<EngineMove | null> {
   return new Promise((resolve) => {
     const worker = new Worker("/stockfish/stockfish.js");
     let settled = false;
@@ -80,12 +84,12 @@ function chooseStockfishMove(fen: string): Promise<EngineMove | null> {
     worker.onmessage = (event: MessageEvent<string>) => {
       const line = String(event.data);
       if (line === "uciok") {
-        worker.postMessage("setoption name Skill Level value 20");
+        worker.postMessage(`setoption name Skill Level value ${config.skillLevel}`);
         worker.postMessage("setoption name Hash value 16");
         worker.postMessage("isready");
       } else if (line === "readyok") {
         worker.postMessage(`position fen ${fen}`);
-        worker.postMessage("go movetime 6000");
+        worker.postMessage(`go movetime ${config.moveTimeMs}`);
       } else if (line.startsWith("bestmove ")) {
         const uci = line.split(" ")[1] ?? "";
         if (!/^[a-h][1-8][a-h][1-8][qrbn]?$/.test(uci)) return finish(null);
@@ -191,9 +195,10 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
     setThinking(true);
     const searchId = ++searchIdRef.current;
     window.setTimeout(async () => {
-      const move = level === "grandmaster"
-        ? (await chooseStockfishMove(gameRef.current.fen()))
-          ?? chooseAnhamMove(gameRef.current, "grandmaster")
+      const engineLevel = level === "master" || level === "grandmaster" ? level : null;
+      const move = engineLevel
+        ? (await chooseStockfishMove(gameRef.current.fen(), stockfishConfig[engineLevel]))
+          ?? chooseAnhamMove(gameRef.current, engineLevel)
         : chooseAnhamMove(gameRef.current, level);
       if (searchId !== searchIdRef.current) return;
       if (move) gameRef.current.move(move);
@@ -247,8 +252,8 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
       <div aria-labelledby="chess-level-label" role="radiogroup">
         {chessLevels.map((item) => {
           const labels = ru
-            ? { beginner: "Новичок", casual: "Любитель", intermediate: "Средний", advanced: "Продвинутый", expert: "Эксперт", grandmaster: "Гроссмейстер" }
-            : { beginner: "Beginner", casual: "Casual", intermediate: "Intermediate", advanced: "Advanced", expert: "Expert", grandmaster: "Grandmaster" };
+            ? { beginner: "Новичок", casual: "Любитель", intermediate: "Средний", advanced: "Продвинутый", expert: "Эксперт", master: "Мастер", grandmaster: "Гроссмейстер" }
+            : { beginner: "Beginner", casual: "Casual", intermediate: "Intermediate", advanced: "Advanced", expert: "Expert", master: "Master", grandmaster: "Grandmaster" };
           return <button aria-checked={level === item} className={level === item ? "is-active" : undefined} key={item} onClick={() => changeLevel(item)} role="radio" type="button">{labels[item]}</button>;
         })}
       </div>
@@ -278,7 +283,7 @@ export function AnhamChess({ locale, preview = false, storageScope = "client" }:
         <div className="chess-room__tip"><b>✣</b><p><strong>{ru ? "Подсказка Anham" : "Anham’s tip"}</strong>{ru ? "Нажмите на фигуру, затем на подсвеченное поле. Пешка на последней линии автоматически станет ферзём." : "Tap a piece, then a highlighted square. A pawn reaching the last rank is promoted to a queen."}</p></div>
         <div className="chess-room__actions"><button onClick={takeBack} type="button">↶ {ru ? "Вернуть ход" : "Take back"}</button><button onClick={newGame} type="button">＋ {ru ? "Новая партия" : "New game"}</button></div>
         <p className="chess-room__saved">✓ {ru ? "Партия и уровень сохраняются в вашем аккаунте" : "Game and level are saved to your account"}</p>
-        <p className="chess-room__engine">{ru ? "Уровень «Гроссмейстер» работает на движке" : "Grandmaster level is powered by"} <a href="/stockfish/NOTICE.txt" target="_blank">Stockfish</a></p>
+        <p className="chess-room__engine">{ru ? "Уровни «Мастер» и «Гроссмейстер» работают на движке" : "Master and Grandmaster levels are powered by"} <a href="/stockfish/NOTICE.txt" target="_blank">Stockfish</a></p>
       </aside>
     </div>
     <section className="chess-room__discussion" aria-labelledby="chess-discussion-title">

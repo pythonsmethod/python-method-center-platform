@@ -4,7 +4,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { apiError, apiErrorLocale } from "@/lib/i18n/api-errors";
 
 export const runtime = "nodejs";
-const levels = ["beginner", "casual", "intermediate", "advanced", "expert", "grandmaster"] as const;
+const levels = ["beginner", "casual", "intermediate", "advanced", "expert", "master", "grandmaster"] as const;
 
 async function authenticated() {
   const supabase = await createSupabaseServerClient();

@@ -1,5 +1,12 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Chess master level — 2026-09-17
+
+- [x] Add bilingual `Мастер / Master` between Expert and Grandmaster in the shared Karen/client interface.
+- [x] Give Master a bounded Stockfish configuration distinct from maximum-strength Grandmaster.
+- [x] Extend API validation, coaching context, persistence schema and focused tests.
+- [ ] Pass full CI, apply and verify the production migration, merge, deploy and verify production status.
+
 ## Case support conversation — 2026-09-17
 
 - [x] Add a distinct Anna/Support ↔ Client window to every authorized staff Case view.
