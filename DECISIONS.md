@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-17 — Fixed-fixture Google OCR diagnostic
+
+The isolated admin Preview may submit only a server-authored non-PHI PDF through the existing Google adapter, with the PHI gate false. A same-origin Server Action checks the exact staging hostname and database; no caller-supplied source is accepted. This fixture-only action leaves general operational OCR flags disabled. Separate OCR line equality from transport success and from clinical validation. Live evidence: docs/ankh/google_synthetic_ocr_live_2026_09_17.md.
+
 ## D-066 — Anham staging uses bounded Vercel-to-Google federation (2026-09-17)
 
 The isolated `anham-clinical-staging` Preview authenticates to Google through Vercel OIDC and Google Workload Identity Federation, never a stored service-account key. The Google provider accepts only audience `https://vercel.com/pythonsmethods-projects`; its CEL condition and service-account principal remain restricted to the exact Anham staging project and Preview environment. The live smoke may exchange credentials only and must not accept or send a document or PHI. This proves the short-lived credential path, not Document AI extraction quality, production readiness, or authorization to process client documents.

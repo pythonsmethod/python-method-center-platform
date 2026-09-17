@@ -1,5 +1,7 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+2026-09-17 Google Document AI live synthetic processing PASSED: Preview commit 3f8ded7 processed one fixed non-PHI PDF using WIF. All 6 authored OCR lines matched; all 29 tokens had text-anchor and bounding-poly fields. No production or client processing was enabled. Full regression: 1826 passed, 1 skipped. This proves a clean digital PDF processing path, not clinical table accuracy. Evidence and limits: docs/ankh/google_synthetic_ocr_live_2026_09_17.md.
+
 2026-09-17 Anham Preview WIF live-smoke: the Preview-only, admin-authenticated Vercel OIDC to Google STS/IAM exchange passed in the isolated `anham-clinical-staging` deployment. Google trusts only the Vercel team audience plus the exact `owner:pythonsmethods-projects:project:anham-clinical-staging:environment:preview` subject. The receipt reported `credential=short_lived`, `failureStage=none`, `documentSent=false`, and `phiSent=false`; no persistent Google key was used. Production, OCR and PHI processing remain disabled. Focused tests pass 6/6; TypeScript, ESLint, security inventory and diff check pass. The local full build passed the security gate and route compilation but could not fetch Google Fonts because the sandbox denied network access; the corresponding Vercel Preview build is Ready.
 
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE

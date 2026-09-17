@@ -1,5 +1,7 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+2026-09-17: the next synthetic Google Document AI processing step passed live (6/6 exact lines, 29/29 token anchor fields). Next: harder synthetic raster/table fixtures and processor-version pinning before a clinical quality claim. See docs/ankh/google_synthetic_ocr_live_2026_09_17.md. Production and client PHI activation remain separate.
+
 ## Anham Preview Google WIF — 2026-09-17 — LIVE SMOKE PASSED
 
 The isolated Vercel Preview now exchanges its runtime OIDC token for a short-lived Google credential with an audience and subject restricted to the Anham staging project and Preview environment. The bounded live receipt confirmed that no document or PHI was sent and no persistent Google key was used. Next: add a synthetic, non-PHI Document AI request behind the existing disabled operational-OCR gate; do not enable client-document or production processing.
