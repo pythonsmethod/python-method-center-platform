@@ -1,5 +1,13 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Case support conversation — 2026-09-17
+
+- [x] Add a distinct Anna/Support ↔ Client window to every authorized staff Case view.
+- [x] Reuse the existing client support inbox and append-only message store.
+- [x] Keep support messages separate from Anham and Professor Python channels.
+- [x] Add RU/EN staff copy, server-side authorization/ownership resolution, audit, and duplicate-thread prevention.
+- [ ] Apply the reviewed migration, pass full CI, merge, publish, and verify production.
+
 ## Chess expert level — 2026-09-16
 
 Deployed to production through PR #194: bilingual shared UI, three-ply intermediate opponent, API/coaching support and additive account-preference migration. The production constraint was applied and verified. Next: observe Karen and client play, verify RU↔EN selection during routine authenticated use, and tune only from play evidence.

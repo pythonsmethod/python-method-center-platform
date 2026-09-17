@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-067 — Case support messages reuse the canonical support conversation model (2026-09-17)
+
+Anna/Support receives a dedicated Case-bound conversation, but it does not reuse `case_messages` and does not gain access to Professor Python's clinical channel. Reuse `support_requests` plus append-only `support_request_messages`, mark one request per Case with `is_case_thread`, and enforce uniqueness with a partial index. The client reads and answers through the existing Conversations page. Staff identity and Case ownership are resolved server-side, and each sent message is audited. This channel is for technical and organizational communication only; medical interpretation remains with Professor Python.
+
 ## D-066 — Expert bridges Advanced and Stockfish Grandmaster (2026-09-16)
 
 The shared Karen/client chess component exposes `expert` as `Эксперт / Expert` between `advanced` and `grandmaster`. Expert uses the existing deterministic three-ply minimax path, making it stronger than the two-ply Advanced level without invoking Stockfish. Grandmaster remains the only level backed by maximum-strength Stockfish. Existing games and saved preferences are unchanged.
