@@ -26,6 +26,7 @@ const fetchSites = {
   "lib/medical-digest/digest.ts": 1,
   "lib/document-extraction/google-document-ai.ts": 3, // OCR adapter, including fetch type references.
   "lib/document-extraction/google-workload-identity.ts": 2, // Reviewed Google STS and IAM short-lived credential exchange.
+  "lib/document-extraction/synthetic-google-smoke.ts": 2, // Fixed non-PHI fixture only; fetch injection delegates to reviewed Google OCR adapter. No direct fetch call.
   "app/(admin)/admin/cases/[caseId]/IdentityReviewForm.tsx": 1,
   "app/(admin)/admin/cases/[caseId]/ReprocessCaseDocumentsForm.tsx": 1,
   "app/(client)/cabinet/DocumentUploadPanel.tsx": 1,

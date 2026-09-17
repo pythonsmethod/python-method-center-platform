@@ -3,6 +3,7 @@ import { headers } from "next/headers";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { createGoogleWorkloadIdentityAccessToken } from "@/lib/document-extraction/google-workload-identity";
 import { getLocale } from "@/lib/i18n/locale";
+import { SyntheticTest } from "./SyntheticTest";
 
 export const dynamic = "force-dynamic";
 
@@ -74,6 +75,7 @@ export default async function AnhamWifSmokePage() {
           <div><dt>phiSent</dt><dd>false</dd></div>
         </dl>
       </section>
+      <SyntheticTest ru={locale === "ru"} />
     </main>
   );
 }
