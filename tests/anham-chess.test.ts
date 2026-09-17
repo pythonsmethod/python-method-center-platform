@@ -12,6 +12,7 @@ const chessAssistant = readFileSync("app/api/assistant/chess/route.ts", "utf8");
 const chessState = readFileSync("app/api/chess/state/route.ts", "utf8");
 const chessMemoryMigration = readFileSync("supabase/migrations/20260825080000_chess_coach_memory.sql", "utf8");
 const chessLevelMigration = readFileSync("supabase/migrations/20260825124500_chess_skill_level.sql", "utf8");
+const chessExpertLevelMigration = readFileSync("supabase/migrations/20260916190000_add_expert_chess_level.sql", "utf8");
 const packageJson = readFileSync("package.json", "utf8");
 const stockfishPrepare = readFileSync("scripts/prepare-stockfish.mjs", "utf8");
 
@@ -97,17 +98,21 @@ describe("Anham chess", () => {
   });
 
   it("lets each player choose and remember a coaching level", () => {
-    expect(chess).toContain('"beginner", "casual", "intermediate", "advanced", "grandmaster"');
+    expect(chess).toContain('"beginner", "casual", "intermediate", "advanced", "expert", "grandmaster"');
     expect(chess).toContain("Новичок");
+    expect(chess).toContain("Эксперт");
     expect(chess).toContain("Гроссмейстер");
     expect(chess).toContain("Beginner");
+    expect(chess).toContain("Expert");
     expect(chess).toContain("Grandmaster");
+    expect(chess).toContain("expert: 3");
     expect(chess).toContain('method: "PATCH"');
     expect(chess).toContain("chooseAnhamMove(gameRef.current, level)");
     expect(chessState).toContain('from("chess_preferences")');
     expect(chessAssistant).toContain("explicitly selected chess level");
     expect(chessLevelMigration).toContain("enable row level security");
     expect(chessLevelMigration).toContain("(select auth.uid()) = user_id");
+    expect(chessExpertLevelMigration).toContain("'expert'");
   });
 
   it("uses a real maximum-strength engine for grandmaster games", () => {

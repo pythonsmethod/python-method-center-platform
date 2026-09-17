@@ -1,5 +1,9 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Chess expert level — 2026-09-16 — RELEASE CANDIDATE
+
+The shared Karen/staff and client chess interface now includes bilingual `Эксперт / Expert` between Advanced and Grandmaster. Expert uses the built-in three-ply search; Advanced remains at two-ply, while Grandmaster remains powered by maximum-strength Stockfish with the three-ply search only as its failure fallback. The API, coaching context and account preference schema accept the new value. No PHI, clinical workflow or production trust gate changed.
+
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE
 
 A bilingual self/other-adult/minor onboarding choice now stores the Case patient separately from the authenticated account owner, including both relationship directions, representation reason, authority, patient-data consent and responsibility acknowledgments. Karen-assistant context resolves medical content to the patient while account access remains with the owner. Production schema and Case #483 were corrected with append-only audit; the legacy owner must still reconfirm the new explicit checkboxes. Focused tests 3/3 pass; full release verification remains CI-gated because the isolated local dependency install did not complete.
