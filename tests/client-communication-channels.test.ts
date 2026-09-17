@@ -12,6 +12,7 @@ describe("client communication channels", () => {
     expect(shell).toContain('href: `${root}/anham`');
     expect(shell).toContain('href: `${root}/dialog`');
     expect(shell).toContain('href: `${root}/chat`');
+    expect(shell).toContain('label: ru ? "Анхам" : "Anham"');
     expect(shell).toContain('label: ru ? "Служба поддержки" : "Support"');
     expect(anham).toContain("Conversation with Anham");
     expect(support).not.toContain("SavedAssistantThread");
