@@ -21,11 +21,22 @@ export default async function AnhamWifSmokePage() {
   }
 
   let ok = false;
+  let failureCode = "none";
   try {
     const token = await createGoogleWorkloadIdentityAccessToken()();
     ok = token.length > 0;
-  } catch {
+  } catch (error) {
     ok = false;
+    const message = error instanceof Error ? error.message : "unknown";
+    failureCode = [
+      "Google identity configuration missing",
+      "Google identity configuration invalid",
+      "Google identity token is invalid",
+      "sts_exchange_failed",
+      "service_account_exchange_failed",
+      "Google identity exchange returned no token",
+      "Google identity exchange returned no access token",
+    ].includes(message) ? message : "unknown";
   }
 
   const copy = locale === "ru"
@@ -53,6 +64,7 @@ export default async function AnhamWifSmokePage() {
         <p>{copy.safe}</p>
         <dl>
           <div><dt>credential</dt><dd>{ok ? "short_lived" : "not_issued"}</dd></div>
+          <div><dt>failureStage</dt><dd>{failureCode}</dd></div>
           <div><dt>documentSent</dt><dd>false</dd></div>
           <div><dt>phiSent</dt><dd>false</dd></div>
         </dl>

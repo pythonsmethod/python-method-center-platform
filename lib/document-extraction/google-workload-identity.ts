@@ -18,9 +18,9 @@ function required(env: GoogleWorkloadIdentityEnvironment, key: keyof GoogleWorkl
   return value;
 }
 
-async function jsonResponse(response: Response): Promise<JsonRecord> {
+async function jsonResponse(response: Response, failureCode: string): Promise<JsonRecord> {
   const payload = asRecord(await response.json().catch(() => null));
-  if (!response.ok) throw new Error("Google identity exchange failed");
+  if (!response.ok) throw new Error(failureCode);
   return payload;
 }
 
@@ -48,7 +48,7 @@ export function createGoogleWorkloadIdentityAccessToken(
     });
     const exchange = await jsonResponse(await fetchImpl("https://sts.googleapis.com/v1/token", {
       method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: body.toString(),
-    }));
+    }), "sts_exchange_failed");
     const federatedToken = typeof exchange.access_token === "string" ? exchange.access_token.trim() : "";
     if (!federatedToken || federatedToken.length > 16_384) throw new Error("Google identity exchange returned no token");
 
@@ -56,7 +56,7 @@ export function createGoogleWorkloadIdentityAccessToken(
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${federatedToken}` },
       body: JSON.stringify({ scope: ["https://www.googleapis.com/auth/cloud-platform"], lifetime: "3600s" }),
-    }));
+    }), "service_account_exchange_failed");
     const accessToken = typeof access.accessToken === "string" ? access.accessToken.trim() : "";
     if (!accessToken || accessToken.length > 16_384) throw new Error("Google identity exchange returned no access token");
     return accessToken;
