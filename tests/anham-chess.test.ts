@@ -13,6 +13,7 @@ const chessState = readFileSync("app/api/chess/state/route.ts", "utf8");
 const chessMemoryMigration = readFileSync("supabase/migrations/20260825080000_chess_coach_memory.sql", "utf8");
 const chessLevelMigration = readFileSync("supabase/migrations/20260825124500_chess_skill_level.sql", "utf8");
 const chessExpertLevelMigration = readFileSync("supabase/migrations/20260916190000_add_expert_chess_level.sql", "utf8");
+const chessMasterLevelMigration = readFileSync("supabase/migrations/20260917140000_add_master_chess_level.sql", "utf8");
 const packageJson = readFileSync("package.json", "utf8");
 const stockfishPrepare = readFileSync("scripts/prepare-stockfish.mjs", "utf8");
 
@@ -98,12 +99,14 @@ describe("Anham chess", () => {
   });
 
   it("lets each player choose and remember a coaching level", () => {
-    expect(chess).toContain('"beginner", "casual", "intermediate", "advanced", "expert", "grandmaster"');
+    expect(chess).toContain('"beginner", "casual", "intermediate", "advanced", "expert", "master", "grandmaster"');
     expect(chess).toContain("Новичок");
     expect(chess).toContain("Эксперт");
+    expect(chess).toContain("Мастер");
     expect(chess).toContain("Гроссмейстер");
     expect(chess).toContain("Beginner");
     expect(chess).toContain("Expert");
+    expect(chess).toContain("Master");
     expect(chess).toContain("Grandmaster");
     expect(chess).toContain("expert: 3");
     expect(chess).toContain('method: "PATCH"');
@@ -113,18 +116,20 @@ describe("Anham chess", () => {
     expect(chessLevelMigration).toContain("enable row level security");
     expect(chessLevelMigration).toContain("(select auth.uid()) = user_id");
     expect(chessExpertLevelMigration).toContain("'expert'");
+    expect(chessMasterLevelMigration).toContain("'master'");
   });
 
-  it("uses a real maximum-strength engine for grandmaster games", () => {
+  it("uses a reduced-strength engine for Master and maximum strength for Grandmaster", () => {
     expect(packageJson).toContain('"stockfish.js": "10.0.2"');
     expect(packageJson).toContain('"postinstall": "node scripts/prepare-stockfish.mjs"');
     expect(stockfishPrepare).toContain('"public", "stockfish"');
     expect(chess).toContain('new Worker("/stockfish/stockfish.js")');
-    expect(chess).toContain('setoption name Skill Level value 20');
-    expect(chess).toContain('go movetime 6000');
-    expect(chess).toContain('level === "grandmaster"');
-    expect(chess).toContain('?? chooseAnhamMove(gameRef.current, "grandmaster")');
+    expect(chess).toContain("master: { skillLevel: 8, moveTimeMs: 2_500 }");
+    expect(chess).toContain("grandmaster: { skillLevel: 20, moveTimeMs: 6_000 }");
+    expect(chess).toContain('level === "master" || level === "grandmaster"');
+    expect(chess).toContain("stockfishConfig[engineLevel]");
+    expect(chess).toContain("?? chooseAnhamMove(gameRef.current, engineLevel)");
     expect(chess).toContain("searchIdRef.current");
-    expect(chess).toContain("Grandmaster level is powered by");
+    expect(chess).toContain("Master and Grandmaster levels are powered by");
   });
 });
