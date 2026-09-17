@@ -1,5 +1,7 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+2026-09-17 pinned OCR diagnostic: Preview b5f7902 now explicitly requests pretrained-ocr-v2.1-2024-08-07. Live repeat retained 72/72 exact source fields, but Google emitted 0 native tables and the existing native-table lab parser produced 0/18 canonical rows. In-memory clinical harness returned UNKNOWN/0 facts for these non-medical fixtures. Whole-chain validation remains NOT CLOSED: independent audit, persistence and Karen runtime acceptance NOT_RUN. No PHI/production/schema change. Next: generic spatial laboratory mapping with new semantically valid frozen fixtures. Evidence: docs/ankh/google_pinned_chain_2026_09_17.md.
+
 2026-09-17 Google live raster stress PASSED: clean, 3-degree rotated and blurred synthetic tables each matched 24/24 fields and 6/6 source rows (72/72 total fields). Preview commit 63a24d8; no PHI, schema or production change. Full regression 1830 passed, 1 skipped. Processor version unknown/unpinned; this is not clinical or whole-chain validation. Evidence: docs/ankh/google_raster_stress_live_2026_09_17.md.
 
 2026-09-17 Google Document AI live synthetic processing PASSED: Preview commit 3f8ded7 processed one fixed non-PHI PDF using WIF. All 6 authored OCR lines matched; all 29 tokens had text-anchor and bounding-poly fields. No production or client processing was enabled. Full regression: 1826 passed, 1 skipped. This proves a clean digital PDF processing path, not clinical table accuracy. Evidence and limits: docs/ankh/google_synthetic_ocr_live_2026_09_17.md.

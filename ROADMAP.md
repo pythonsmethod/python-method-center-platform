@@ -1,5 +1,7 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+2026-09-17: fixed-fixture Google version pin CLOSED live. Downstream boundary test exposed 0 canonical rows despite 72/72 exact OCR fields (no native tables). Before held-out whole-chain validation, connect generic spatial laboratory reconstruction to review-only canonical facts, reconcile required local/runtime components without copying unrelated root changes, and test new semantic laboratory fixtures. Independent audit/persistence/Karen live validation remain open; production NO-GO. See docs/ankh/google_pinned_chain_2026_09_17.md.
+
 2026-09-17: synthetic raster/table smoke CLOSED (72/72 fields, 18/18 rows across three variants). Next: resolve/pin an authorized processor version and freeze unfamiliar layouts with independently checked truth before whole-chain extraction/audit/review benchmarking. No clinical/production GO. Evidence: docs/ankh/google_raster_stress_live_2026_09_17.md.
 
 2026-09-17: the next synthetic Google Document AI processing step passed live (6/6 exact lines, 29/29 token anchor fields). Next: harder synthetic raster/table fixtures and processor-version pinning before a clinical quality claim. See docs/ankh/google_synthetic_ocr_live_2026_09_17.md. Production and client PHI activation remain separate.

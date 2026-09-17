@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-17 — Pin diagnostics and measure downstream coverage separately
+
+Use explicit pretrained-ocr-v2.1-2024-08-07 in fixed-fixture Preview requests; never change the shared cloud default to achieve test reproducibility. Keep known-cell OCR scoring independent of the actual parser and report zero canonical rows as a blocked boundary, not successful extraction. Do not feed authored Gold into candidates, infer clinical meaning for artificial labels, or promote legacy parser VERIFIED candidates. The live test is repeatability/boundary diagnosis, not held-out clinical validation. See docs/ankh/google_pinned_chain_2026_09_17.md.
+
 ## 2026-09-17 — Synthetic raster scoring preserves source cells
 
 The fixed-fixture Preview diagnostic may send three authored non-PHI PNGs through the existing Google adapter. Score exact strings in pre-authored row/column rectangles, preserving commas, signs and comparators. Do not expand IAM for optional processor metadata; unavailable version stays null and unpinned. Provider quality scores are not clinical correctness probabilities. This does not enable PHI, production or automatic verification. Evidence: docs/ankh/google_raster_stress_live_2026_09_17.md.
