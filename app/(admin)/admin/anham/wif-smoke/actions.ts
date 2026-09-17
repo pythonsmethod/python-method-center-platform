@@ -4,8 +4,9 @@ import { headers } from "next/headers";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { createGoogleWorkloadIdentityAccessToken } from "@/lib/document-extraction/google-workload-identity";
 import { runSyntheticGoogleSmoke } from "@/lib/document-extraction/synthetic-google-smoke";
+import { runRasterStress } from "@/lib/document-extraction/synthetic-raster-stress";
 
-export async function runOcrSmoke(): Promise<string> {
+async function runSmoke(raster: boolean): Promise<string> {
   const auth = await getStaffUserState();
   if (auth.status !== "authorized" || auth.role !== "admin" ||
       process.env.VERCEL_ENV !== "preview" ||
@@ -16,7 +17,8 @@ export async function runOcrSmoke(): Promise<string> {
   const origin = h.get("origin");
   if (!origin || origin !== `https://${process.env.VERCEL_URL}`) return "denied";
   try {
-    const receipt = await runSyntheticGoogleSmoke(createGoogleWorkloadIdentityAccessToken({
+    const runner = raster ? runRasterStress : runSyntheticGoogleSmoke;
+    const receipt = await runner(createGoogleWorkloadIdentityAccessToken({
       ...process.env, VERCEL_OIDC_TOKEN: h.get("x-vercel-oidc-token") ?? undefined,
     }));
     return JSON.stringify(receipt, null, 2);
@@ -27,3 +29,6 @@ export async function runOcrSmoke(): Promise<string> {
     return status ? `document_ai_http_${status}` : "synthetic_test_failed";
   }
 }
+
+export async function runOcrSmoke(): Promise<string> { return runSmoke(false); }
+export async function runRasterSmoke(): Promise<string> { return runSmoke(true); }

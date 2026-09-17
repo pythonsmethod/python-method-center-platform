@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="1000">
+<rect width="1600" height="1000" fill="white"/>
+<g font-family="Arial" font-size="32" fill="black">
+<text x="60" y="65">ANHAM SYNTHETIC TABLE - NO PATIENT DATA</text>
+<text x="60" y="120">Invented measurements for OCR testing only</text>
+<text x="60" y="205">ITEM</text><text x="460" y="205">VALUE</text><text x="800" y="205">UNIT</text><text x="1140" y="205">REFERENCE</text>
+<text x="60" y="295">ALPHA</text><text x="460" y="295">12,34</text><text x="800" y="295">mg/L</text><text x="1140" y="295">10,00-20,00</text>
+<text x="60" y="385">BETA</text><text x="460" y="385">&lt;0.05</text><text x="800" y="385">g/L</text><text x="1140" y="385">0.01-0.09</text>
+<text x="60" y="475">GAMMA</text><text x="460" y="475">&gt;1234</text><text x="800" y="475">count</text><text x="1140" y="475">1000-2000</text>
+<text x="60" y="565">DELTA</text><text x="460" y="565">-0,07</text><text x="800" y="565">mmol/L</text><text x="1140" y="565">-0,10-0,00</text>
+<text x="60" y="655">EPSILON</text><text x="460" y="655">0.001</text><text x="800" y="655">mg/L</text><text x="1140" y="655">0.000-0.009</text>
+<text x="60" y="745">ZETA</text><text x="460" y="745">100.0</text><text x="800" y="745">%</text><text x="1140" y="745">95.0-100.0</text>
+</g>
+<path d="M40 150H1550V790H40Z M40 240H1550 M40 330H1550 M40 420H1550 M40 510H1550 M40 600H1550 M40 690H1550 M430 150V790 M770 150V790 M1110 150V790" fill="none" stroke="#777" stroke-width="2"/>
+</svg>
