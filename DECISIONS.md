@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-066 — Anham staging uses bounded Vercel-to-Google federation (2026-09-17)
+
+The isolated `anham-clinical-staging` Preview authenticates to Google through Vercel OIDC and Google Workload Identity Federation, never a stored service-account key. The Google provider accepts only audience `https://vercel.com/pythonsmethods-projects`; its CEL condition and service-account principal remain restricted to the exact Anham staging project and Preview environment. The live smoke may exchange credentials only and must not accept or send a document or PHI. This proves the short-lived credential path, not Document AI extraction quality, production readiness, or authorization to process client documents.
+
 ## D-065 — Account owner and Case patient are separate identities (2026-09-14)
 
 The authenticated adult remains the account owner, consent actor, payer and communication principal. A Case for another adult or minor stores a separate Care Recipient with both relationship directions, the reason for representation and explicit confirmations. Medical documents and analytical context resolve to the active Care Recipient; authorization and audit resolve to the account owner. Existing source documents and historical onboarding submissions are not rewritten.

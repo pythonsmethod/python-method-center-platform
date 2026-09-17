@@ -1,5 +1,9 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## Anham Preview Google WIF — 2026-09-17 — LIVE SMOKE PASSED
+
+The isolated Vercel Preview now exchanges its runtime OIDC token for a short-lived Google credential with an audience and subject restricted to the Anham staging project and Preview environment. The bounded live receipt confirmed that no document or PHI was sent and no persistent Google key was used. Next: add a synthetic, non-PHI Document AI request behind the existing disabled operational-OCR gate; do not enable client-document or production processing.
+
 ## Represented-patient identity — 2026-09-14
 
 Implemented in an isolated release branch; the additive production table and Case #483 correction are applied. Next: CI verification, deployment, then RU↔EN browser acceptance of self, represented-adult and guardian paths. This does not enable automatic identity verification or trust promotion.

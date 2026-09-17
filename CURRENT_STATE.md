@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-2026-09-16 Anham Preview WIF live-smoke: added a Preview-only, admin-authenticated server endpoint that verifies the Vercel OIDC to Google STS/IAM short-lived credential exchange without accepting or sending documents or PHI. The endpoint fails closed outside Preview and when PHI authorization is not explicitly false, returns no token material, and is registered in the security inventory. Focused tests pass 6/6; TypeScript, ESLint, security inventory and diff check pass. Live cloud execution remains pending deployment and authenticated invocation.
+2026-09-17 Anham Preview WIF live-smoke: the Preview-only, admin-authenticated Vercel OIDC to Google STS/IAM exchange passed in the isolated `anham-clinical-staging` deployment. Google trusts only the Vercel team audience plus the exact `owner:pythonsmethods-projects:project:anham-clinical-staging:environment:preview` subject. The receipt reported `credential=short_lived`, `failureStage=none`, `documentSent=false`, and `phiSent=false`; no persistent Google key was used. Production, OCR and PHI processing remain disabled. Focused tests pass 6/6; TypeScript, ESLint, security inventory and diff check pass. The local full build passed the security gate and route compilation but could not fetch Google Fonts because the sandbox denied network access; the corresponding Vercel Preview build is Ready.
 
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE
 
