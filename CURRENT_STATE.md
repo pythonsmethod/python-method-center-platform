@@ -1,14 +1,17 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Client communication channels and unread badges — 2026-09-17 — RELEASE CANDIDATE
+## Client communication channels and unread badges — 2026-09-17 — PUBLISHED
 
 The client cabinet now exposes three distinct communication destinations: Anham,
 Professor Python and Support. Anham history moved out of the Support page into its
 own cabinet route. Professor and Support retain independent unread counts in the
 sidebar and now show those same counts on the cabinet home cards. Opening Support
 marks only staff support messages read; opening the Professor conversation keeps
-the existing Case-message read boundary. RU/EN copy is complete. Release checks,
-merge and production verification remain pending.
+the existing Case-message read boundary. RU/EN copy is complete. PR #198 passed
+the full CI and all Vercel previews, merged as `2b09afbe`, and the primary
+production deployment completed successfully. Authenticated production acceptance
+confirmed all three destinations in the cabinet navigation and all three home cards.
+No test message was sent and no client row was changed during acceptance.
 
 ## Case support conversation — 2026-09-17 — RELEASE CANDIDATE
 
