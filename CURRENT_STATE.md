@@ -1,5 +1,9 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Case support conversation — 2026-09-17 — RELEASE CANDIDATE
+
+Every authorized staff member, including Anna, now has a distinct Support ↔ Client thread inside each Case. The first staff message creates one Case-bound support request; subsequent messages reuse it, appear in the client's existing Conversations page, and remain separate from Anham history and the Professor Python case channel. The server resolves the Case owner rather than trusting form identity, enforces staff authentication, records an audit event, and limits the channel to technical/organizational scope in RU/EN copy. One partial unique index prevents duplicate Case support threads. Focused tests pass 11/11. Production migration, full CI, merge and deployment verification remain pending.
+
 ## Chess expert level — 2026-09-16 — PRODUCTION DEPLOYED
 
 The shared Karen/staff and client chess interface now includes bilingual `Эксперт / Expert` between Advanced and Grandmaster. Expert uses the built-in three-ply search; Advanced remains at two-ply, while Grandmaster remains powered by maximum-strength Stockfish with the three-ply search only as its failure fallback. The API, coaching context and account preference schema accept the new value. PR #194 passed the complete application security/regression workflow and all three Vercel preview checks, was merged as `ebe154c8`, and the primary production deployment completed successfully. The additive production constraint migration was applied through the authenticated Supabase SQL Editor and verified from `pg_constraint` with `expert` present. No PHI, clinical workflow or production trust gate changed.

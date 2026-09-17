@@ -47,6 +47,11 @@ export function caseDetailCopy(locale: Locale) {
           "Клиент видит эти сообщения в своём кабинете. Можно писать текстом или записывать голосовые.",
         conversationAria: "Чат с клиентом",
 
+        supportConversationLabel: "Служба поддержки",
+        supportConversationHeading: "Личная переписка с клиентом",
+        supportConversationHint: "Здесь Анна и служба поддержки могут написать клиенту по техническим и организационным вопросам. Клиент увидит сообщение в разделе «Переписки» своего кабинета. Медицинские ответы остаются в отдельном чате с Professor Python.",
+        supportConversationAria: "Переписка службы поддержки с клиентом",
+
         paymentsLabel: "Оплаты",
         paymentsTitle: "Автоматические оплаты",
         paymentsDescription:
@@ -156,6 +161,11 @@ export function caseDetailCopy(locale: Locale) {
         conversationHint:
           "The client sees these messages in their cabinet. You can write text or record a voice message.",
         conversationAria: "Client chat",
+
+        supportConversationLabel: "Support",
+        supportConversationHeading: "Private client conversation",
+        supportConversationHint: "Anna and the support team can write to the client here about technical and organizational matters. The client sees the message in the Conversations section of their cabinet. Medical replies remain in the separate Professor Python chat.",
+        supportConversationAria: "Support conversation with the client",
 
         paymentsLabel: "Payments",
         paymentsTitle: "Automatic payments",

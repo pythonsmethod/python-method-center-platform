@@ -271,3 +271,72 @@ export async function sendStaffSupportMessage(
   revalidatePath("/cabinet/chat");
   return { status: "success", message: "Ответ сохранён и отправлен клиенту в кабинет." };
 }
+
+export async function sendStaffCaseSupportMessage(
+  _previousState: StaffActionState,
+  formData: FormData
+): Promise<StaffActionState> {
+  const caseId = String(formData.get("caseId") ?? "");
+  const body = String(formData.get("body") ?? "").trim();
+  const locale = String(formData.get("locale") ?? "ru") === "en" ? "en" : "ru";
+  if (!isUuid(caseId) || !body || body.length > 8000) {
+    return errorState(locale === "en" ? "Enter a message of up to 8,000 characters." : "Введите сообщение до 8000 символов.");
+  }
+
+  const auth = await getStaffUserState();
+  if (auth.status !== "authorized") return errorState(locale === "en" ? "Access denied." : "Нет доступа.");
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return errorState(locale === "en" ? "The service is temporarily unavailable." : "Сервис временно недоступен.");
+
+  const { data: caseRow } = await supabase.from("client_cases").select("id, profile_id")
+    .eq("id", caseId).maybeSingle();
+  if (!caseRow) return errorState(locale === "en" ? "Case not found." : "Кейс не найден.");
+
+  let { data: request } = await supabase.from("support_requests").select("id")
+    .eq("case_id", caseRow.id).eq("is_case_thread", true).maybeSingle();
+  if (!request) {
+    const { data: profile } = await supabase.from("profiles").select("locale")
+      .eq("id", caseRow.profile_id).maybeSingle();
+    const clientLocale = profile?.locale === "en" ? "en" : "ru";
+    const created = await supabase.from("support_requests").insert({
+      profile_id: caseRow.profile_id,
+      case_id: caseRow.id,
+      category: "technical",
+      subject: clientLocale === "en" ? "Support" : "Служба поддержки",
+      assigned_role: "admin",
+      is_case_thread: true
+    }).select("id").single();
+    request = created.data;
+    if (!request && created.error?.code === "23505") {
+      const retry = await supabase.from("support_requests").select("id")
+        .eq("case_id", caseRow.id).eq("is_case_thread", true).maybeSingle();
+      request = retry.data;
+    }
+    if (!request) return errorState(locale === "en" ? "The support conversation could not be created." : "Не удалось создать переписку поддержки.");
+  }
+
+  const { data: message, error } = await supabase.from("support_request_messages").insert({
+    support_request_id: request.id,
+    profile_id: caseRow.profile_id,
+    sender_id: auth.userId,
+    sender_role: auth.role,
+    body
+  }).select("id").single();
+  if (error || !message) return errorState(locale === "en" ? "The message could not be sent." : "Не удалось отправить сообщение.");
+
+  const audit = await writeAuditLog({
+    profileId: caseRow.profile_id,
+    caseId: caseRow.id,
+    actorId: auth.userId,
+    actorRole: auth.role,
+    action: "support_message_created",
+    entityTable: "support_request_messages",
+    entityId: message.id
+  });
+  if (audit.status !== "inserted") return errorState(locale === "en" ? "The message was saved, but audit confirmation failed." : "Сообщение сохранено, но аудит не подтверждён.");
+
+  revalidatePath(`/admin/cases/${caseId}`);
+  revalidatePath("/admin/requests");
+  revalidatePath("/cabinet/chat");
+  return { status: "success", message: locale === "en" ? "Message sent to the client." : "Сообщение отправлено клиенту." };
+}

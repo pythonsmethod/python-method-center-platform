@@ -4,6 +4,7 @@ import { Fragment, useActionState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import {
   sendClientSupportMessage,
+  sendStaffCaseSupportMessage,
   sendStaffSupportMessage
 } from "@/lib/support/actions";
 import { initialStaffActionState } from "@/lib/cases/staff-types";
@@ -21,7 +22,8 @@ type Labels = {
 };
 
 type Props = {
-  requestId: string;
+  requestId?: string | null;
+  caseId?: string;
   messages: SupportRequestMessage[];
   viewer: "client" | "staff";
   locale: "ru" | "en";
@@ -38,6 +40,7 @@ function dayLabel(value: string, locale: "ru" | "en"): string {
 
 export function SupportRequestThread({
   requestId,
+  caseId,
   messages,
   viewer,
   locale,
@@ -47,7 +50,9 @@ export function SupportRequestThread({
   const formRef = useRef<HTMLFormElement | null>(null);
   const action = viewer === "client"
     ? sendClientSupportMessage
-    : sendStaffSupportMessage;
+    : caseId
+      ? sendStaffCaseSupportMessage
+      : sendStaffSupportMessage;
   const [state, formAction, pending] = useActionState(
     action,
     initialStaffActionState
@@ -100,7 +105,8 @@ export function SupportRequestThread({
       </div>
 
       <form action={formAction} className="case-thread__form" ref={formRef}>
-        <input name="requestId" type="hidden" value={requestId} />
+        {requestId ? <input name="requestId" type="hidden" value={requestId} /> : null}
+        {caseId ? <input name="caseId" type="hidden" value={caseId} /> : null}
         <input name="locale" type="hidden" value={locale} />
         <label className="field">
           <span>{labels.reply}</span>

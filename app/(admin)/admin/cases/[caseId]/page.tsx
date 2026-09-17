@@ -20,6 +20,8 @@ import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
 import { getAssistantHistoryForCase } from "@/lib/assistant/history";
 import { getCaseMessages } from "@/lib/messages/queries";
+import { getCaseSupportThread } from "@/lib/support/queries";
+import { SupportRequestThread } from "@/components/support/SupportRequestThread";
 import { caseActivityEntries } from "@/lib/cases/activity";
 import { caseDetailCopy, type CaseDetailCopy } from "@/lib/cases/detail-copy";
 import { ReprocessCaseDocumentsForm } from "./ReprocessCaseDocumentsForm";
@@ -243,10 +245,11 @@ export default async function StaffCaseDetailPage({
   // Classification transitions stay in audit storage and are not presented
   // here as current facts. See lib/cases/activity.ts.
   const activity = caseActivityEntries(clientCase.case_lifecycle_events, locale);
-  const [caseMessages, assistantHistory, review, casePicture] = await Promise.all([
+  const [caseMessages, supportThread, assistantHistory, review, casePicture] = await Promise.all([
     canReadProfessorConversation
       ? getCaseMessages(clientCase.id)
       : Promise.resolve({ messages: [], error: null }),
+    getCaseSupportThread(clientCase.id, locale),
     getAssistantHistoryForCase(clientCase.profile_id, locale),
     getCaseReview(clientCase.id, documents, locale),
     getCaseAnalyticalPicture(clientCase.id)
@@ -307,6 +310,26 @@ export default async function StaffCaseDetailPage({
           />
         </div>
       </section> : null}
+
+      <section className="intake-section" aria-label={copy.supportConversationAria}>
+        <div className="panel">
+          <span className="panel__label">{copy.supportConversationLabel}</span>
+          <h2>{copy.supportConversationHeading}</h2>
+          <p>{copy.supportConversationHint}</p>
+          {supportThread.error ? (
+            <p className="form-message form-message--error" role="alert">{supportThread.error}</p>
+          ) : (
+            <SupportRequestThread
+              caseId={clientCase.id}
+              labels={dictionary.cabinet.chat.supportThread}
+              locale={locale}
+              messages={supportThread.messages}
+              requestId={supportThread.requestId}
+              viewer="staff"
+            />
+          )}
+        </div>
+      </section>
 
       {showAdminControls ? (
         <section className="panel-grid" aria-label={copy.paymentsAria}>

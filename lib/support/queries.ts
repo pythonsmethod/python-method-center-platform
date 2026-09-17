@@ -175,6 +175,34 @@ export async function getClientSupportUnreadCount(profileId: string): Promise<nu
   return count ?? 0;
 }
 
+export type CaseSupportThreadResult = {
+  requestId: string | null;
+  messages: SupportRequestMessage[];
+  error: string | null;
+};
+
+export async function getCaseSupportThread(caseId: string, locale: "ru" | "en"): Promise<CaseSupportThreadResult> {
+  const supabase = createSupabaseServiceClient();
+  const unavailable = locale === "en"
+    ? "The support conversation is temporarily unavailable."
+    : "Переписка поддержки временно недоступна.";
+  if (!supabase) return { requestId: null, messages: [], error: unavailable };
+
+  const { data: request, error } = await supabase.from("support_requests").select("id")
+    .eq("case_id", caseId).eq("is_case_thread", true).maybeSingle();
+  if (error) return { requestId: null, messages: [], error: unavailable };
+  if (!request) return { requestId: null, messages: [], error: null };
+
+  const { data: messages, error: messagesError } = await supabase
+    .from("support_request_messages").select("id, sender_role, body, created_at")
+    .eq("support_request_id", request.id).order("created_at", { ascending: true }).limit(1000);
+  if (messagesError) return { requestId: request.id, messages: [], error: unavailable };
+
+  await supabase.from("support_request_messages").update({ read_at: new Date().toISOString() })
+    .eq("support_request_id", request.id).eq("sender_role", "client").is("read_at", null);
+  return { requestId: request.id, messages: (messages ?? []) as SupportRequestMessage[], error: null };
+}
+
 export async function getStaffSupportUnreadCount(): Promise<number> {
   const supabase = createSupabaseServiceClient();
   if (!supabase) return 0;
