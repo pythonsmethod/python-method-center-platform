@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-const f = vi.hoisted(() => ({ actor: vi.fn(), context: vi.fn(), audience: vi.fn(), guard: vi.fn(), ask: vi.fn(), save: vi.fn() }));
+const f = vi.hoisted(() => ({ actor: vi.fn(), context: vi.fn(), audience: vi.fn(), guard: vi.fn(), ask: vi.fn(), save: vi.fn(), locale: vi.fn() }));
 vi.mock("@/lib/assistant/realtime-server", () => ({ resolveVoiceActor: f.actor }));
 vi.mock("@/lib/assistant/tiers", () => ({ resolveAssistantAudience: f.audience }));
 vi.mock("@/lib/assistant/guard", () => ({ guardAssistantRequest: f.guard, guardAnhamDeepRequest: async () => false }));
@@ -8,13 +8,14 @@ vi.mock("@/lib/assistant/history", () => ({ saveAssistantExchange: f.save }));
 vi.mock("@/lib/assistant/prompts", () => ({ buildGuestSystemPrompt: async () => "", buildPaidClientSystemPrompt: async () => "", buildRegisteredSystemPrompt: async () => "", ATTACHMENT_READING_ACCURACY_RULE: "" }));
 vi.mock("@/lib/assistant/red-flags", () => ({ extractRedFlag: (reply: string) => ({ cleanedReply: reply, category: null }), resolveRedFlag: () => null, recordRedFlagEvent: vi.fn() }));
 vi.mock("@/lib/notifications/notify", () => ({ adminLink: () => "", notifyTeam: vi.fn() }));
-vi.mock("@/lib/i18n/locale", () => ({ getLocale: async () => "en" }));
+vi.mock("@/lib/i18n/locale", () => ({ getLocale: f.locale }));
 vi.mock("@/lib/assistant/conversation-context", () => ({ conversationContext: f.context }));
 import { POST } from "@/app/api/assistant/client/route";
 import { availableConversationTools, conversationArchiveScope } from "@/lib/assistant/conversation-archive";
 const request = (extra = {}) => new Request("http://localhost/api/assistant/client", { method: "POST", body: JSON.stringify({ messages: [{ role: "user", content: "Hello" }], locale: "en", ...extra }) });
 beforeEach(() => {
   vi.clearAllMocks();
+  f.locale.mockResolvedValue("en");
   f.audience.mockResolvedValue({ tier: "client", profileId: "client-id", caseId: "case-id" });
   f.guard.mockResolvedValue({ allowed: true });
   f.ask.mockResolvedValue({ status: "ok", reply: "Answer" });
@@ -23,6 +24,19 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllEnvs());
 describe("client history integration", () => {
+  it.each(["INCOMPLETE_RESPONSE", "INVALID_RESPONSE"])("never saves %s and localizes errors RU/EN/RU", async code => {
+    f.ask.mockResolvedValue({ status: "error", code, message: "Private provider details" });
+    for (const locale of ["ru", "en", "ru"]) {
+      f.locale.mockResolvedValue(locale);
+      const response = await POST(request({ locale }));
+      expect(response.status).toBe(502);
+      const body = await response.json();
+      expect(body.reply).toBeUndefined();
+      expect(body.error).not.toContain("Private provider");
+      expect(/[а-яё]/i.test(body.error)).toBe(locale === "ru");
+    }
+    expect(f.save).not.toHaveBeenCalled();
+  });
   it("offers client tools only after server-resolved preview identity checks", async () => {
     vi.stubEnv("ANHAM_CLIENT_VOICE_TEST_EMAILS", "pilot@example.test"); vi.stubEnv("ANHAM_WEB_SEARCH_ENABLED", "true");
     f.audience.mockResolvedValue({ tier: "client", profileId: "client-id", caseId: "case-id", fullPreview: true });

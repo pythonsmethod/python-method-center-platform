@@ -1,4 +1,4 @@
-import type { AssistantErrorCode } from "@/lib/assistant/claude";
+import type { AssistantErrorCode } from "@/lib/assistant/response-contract";
 import { getLocale, type Locale } from "@/lib/i18n/locale";
 
 // What an endpoint says when it refuses.
@@ -16,6 +16,7 @@ const API_ERRORS = {
   ru: {
     accessDenied: "Нет доступа.",
     assistantEmptyReply: "Ассистент не смог ответить. Попробуйте ещё раз.",
+    assistantIncompleteReply: "Помощник не смог закончить ответ. Попробуйте ещё раз или задайте более короткий вопрос.",
     assistantOverloaded: "Ассистент перегружен. Попробуйте через минуту.",
     assistantTemporarilyDown:
       "Ассистент временно недоступен. Попробуйте позже.",
@@ -50,6 +51,7 @@ const API_ERRORS = {
   en: {
     accessDenied: "You do not have access to this.",
     assistantEmptyReply: "The assistant could not answer. Please try again.",
+    assistantIncompleteReply: "The assistant could not finish the answer. Please try again or ask a shorter question.",
     assistantOverloaded: "The assistant is overloaded. Try again in a minute.",
     assistantTemporarilyDown:
       "The assistant is temporarily unavailable. Please try later.",
@@ -96,8 +98,10 @@ export async function apiErrorLocale(): Promise<Locale> {
 
 // The providers report why they failed with a code; the sentence that goes
 // back to the reader is chosen here, in their language. Falls back to the
-// provider's own text if a new code ever arrives without a translation.
+// generic localized failure if a new code arrives without a translation.
 const ASSISTANT_FAILURES: Record<AssistantErrorCode, ApiErrorKey> = {
+  INVALID_RESPONSE: "assistantEmptyReply",
+  INCOMPLETE_RESPONSE: "assistantIncompleteReply",
   emptyReply: "assistantEmptyReply",
   overloaded: "assistantOverloaded",
   temporarilyDown: "assistantTemporarilyDown",
@@ -110,5 +114,5 @@ export function assistantFailure(
 ): string {
   const key = result.code ? ASSISTANT_FAILURES[result.code] : undefined;
 
-  return key ? apiError(key, locale) : result.message;
+  return apiError(key ?? "assistantEmptyReply", locale);
 }

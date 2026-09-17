@@ -1,5 +1,9 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Anham API response contract — 2026-09-16 — ISOLATED CANDIDATE
+
+Anham already answers through server APIs. A scoped release from canonical main rejects incomplete/malformed final output in Chat Completions, Anthropic and authenticated Responses archive flows, preserves arbiter policy refusal, and localizes failures through the existing RU/EN boundary without storing partial replies. Archive tools, safety/honesty, ownership, provider selection and newer main behavior are retained. Full isolated regression: 1,885 passed / 1 existing skip; security 143/143 plus inventory; TypeScript, ESLint, diff and dependency audit pass. Preview/authenticated acceptance remains open; no production or PHI change. Evidence: docs/ankh/assistant_api_release_2026_09_16.md.
+
 ## Chess expert level — 2026-09-16 — PRODUCTION DEPLOYED
 
 The shared Karen/staff and client chess interface now includes bilingual `Эксперт / Expert` between Advanced and Grandmaster. Expert uses the built-in three-ply search; Advanced remains at two-ply, while Grandmaster remains powered by maximum-strength Stockfish with the three-ply search only as its failure fallback. The API, coaching context and account preference schema accept the new value. PR #194 passed the complete application security/regression workflow and all three Vercel preview checks, was merged as `ebe154c8`, and the primary production deployment completed successfully. The additive production constraint migration was applied through the authenticated Supabase SQL Editor and verified from `pg_constraint` with `expert` present. No PHI, clinical workflow or production trust gate changed.
