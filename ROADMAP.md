@@ -2,7 +2,7 @@
 
 ## Chess expert level — 2026-09-16
 
-Implemented as an isolated release: bilingual shared UI, three-ply intermediate opponent, API/coaching support and additive account-preference migration. Next: deploy, apply the migration, verify RU↔EN selection for one staff and one client account, and tune only from observed play evidence.
+Deployed to production through PR #194: bilingual shared UI, three-ply intermediate opponent, API/coaching support and additive account-preference migration. The production constraint was applied and verified. Next: observe Karen and client play, verify RU↔EN selection during routine authenticated use, and tune only from play evidence.
 
 ## Represented-patient identity — 2026-09-14
 
