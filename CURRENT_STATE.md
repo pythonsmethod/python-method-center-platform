@@ -1,5 +1,15 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Client communication channels and unread badges — 2026-09-17 — RELEASE CANDIDATE
+
+The client cabinet now exposes three distinct communication destinations: Anham,
+Professor Python and Support. Anham history moved out of the Support page into its
+own cabinet route. Professor and Support retain independent unread counts in the
+sidebar and now show those same counts on the cabinet home cards. Opening Support
+marks only staff support messages read; opening the Professor conversation keeps
+the existing Case-message read boundary. RU/EN copy is complete. Release checks,
+merge and production verification remain pending.
+
 ## Case support conversation — 2026-09-17 — RELEASE CANDIDATE
 
 Every authorized staff member, including Anna, now has a distinct Support ↔ Client thread inside each Case. The first staff message creates one Case-bound support request; subsequent messages reuse it, appear in the client's existing Conversations page, and remain separate from Anham history and the Professor Python case channel. The server resolves the Case owner rather than trusting form identity, enforces staff authentication, records an audit event, and limits the channel to technical/organizational scope in RU/EN copy. One partial unique index prevents duplicate Case support threads. Focused tests pass 11/11. Production migration, full CI, merge and deployment verification remain pending.

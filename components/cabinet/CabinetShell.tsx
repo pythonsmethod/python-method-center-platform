@@ -56,8 +56,9 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
       { href: `${root}/supplements`, label: t.sections.supplements.title, hint: t.sections.supplements.hint, icon: IconLotus, badge: supplementsDue }
     ] },
     { title: ru ? "Общение" : "Communication", items: [
+      { href: `${root}/anham`, label: "Anham", hint: ru ? "Ваш ИИ-помощник" : "Your AI assistant", icon: IconAnkh },
       { href: `${root}/dialog`, label: "Professor Python", hint: ru ? "Личное сопровождение" : "Personal guidance", icon: IconEyeOfHorus, badge: unread },
-      { href: `${root}/chat`, label: t.sections.chat.title, hint: t.sections.chat.hint, icon: IconAnkh, badge: supportUnread }
+      { href: `${root}/chat`, label: ru ? "Служба поддержки" : "Support", hint: ru ? "Переписка с Анной" : "Conversation with Anna", icon: IconWater, badge: supportUnread }
     ] },
     { title: ru ? "Возможности" : "Benefits", items: [
       { href: `${root}/chess`, label: ru ? "Шахматы с Anham" : "Chess with Anham", hint: ru ? "Сыграть онлайн-партию" : "Play an online game", icon: IconEyeOfHorus },

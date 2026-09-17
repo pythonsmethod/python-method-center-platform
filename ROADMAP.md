@@ -712,3 +712,9 @@ Keep unconnected vendor invoices visibly unknown. Next accounting phase: add
 first-party usage/billing feeds for text AI, web search, Google Cloud, Vercel,
 Supabase and Stripe fees before claiming a complete platform total. See
 docs/architecture/ANNA_PLATFORM_COSTS.md.
+# Client communication channels — 2026-09-17
+
+- [x] Separate Anham, Professor Python and Support in the client cabinet.
+- [x] Add independent Professor and Support unread badges to navigation and home.
+- [x] Preserve the existing message stores and read boundaries.
+- [ ] Complete release verification, merge and production acceptance.

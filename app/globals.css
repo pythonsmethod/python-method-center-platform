@@ -7607,7 +7607,7 @@ body.cabinet-menu-open { overflow: hidden; }
 .web-home__heading>span,.web-dialog>header>span { color:var(--wc-gold); font-size:.68rem; font-weight:750; letter-spacing:.11em; text-transform:uppercase; }
 .web-home__heading h1,.web-dialog>header h1 { font-family:var(--font-serif); font-size:clamp(2.1rem,4vw,3.5rem); font-weight:500; margin:7px 0 8px; }
 .web-home__heading p,.web-dialog>header p { color:var(--wc-muted); margin:0; max-width:720px; }
-.web-home__priority { display:grid; gap:18px; grid-template-columns:minmax(0,1.08fr) minmax(0,.92fr); margin-top:30px; }
+.web-home__priority { display:grid; gap:18px; grid-template-columns:repeat(3,minmax(0,1fr)); margin-top:30px; }
 .contact-card,.case-shortcut,.web-app-promo,.web-dialog .case-thread { background:linear-gradient(145deg,rgba(18,20,17,.98),rgba(9,10,9,.98)); border:1px solid var(--wc-line); border-radius:18px; }
 .contact-card { display:flex; flex-direction:column; min-height:390px; padding:26px; }
 .contact-card__head { align-items:center; display:grid; gap:13px; grid-template-columns:auto 1fr auto; }

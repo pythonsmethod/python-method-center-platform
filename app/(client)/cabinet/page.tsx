@@ -1,13 +1,14 @@
 import Link from "next/link";
 import { CabinetAnhamCard } from "@/components/cabinet/CabinetAnhamCard";
 import { isClientVoicePilot } from "@/lib/assistant/client-voice-pilot";
-import { IconAnkh, IconDjed, IconEyeOfHorus } from "@/components/icons/EgyptianIcons";
+import { IconAnkh, IconDjed, IconEyeOfHorus, IconWater } from "@/components/icons/EgyptianIcons";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import { getClientCaseShell } from "@/lib/cases/queries";
 import { hasQuestionnaire } from "@/lib/health/queries";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale, type Locale } from "@/lib/i18n/locale";
-import { getCaseMessages } from "@/lib/messages/queries";
+import { getCaseMessages, getUnreadForClient } from "@/lib/messages/queries";
+import { getClientSupportUnreadCount } from "@/lib/support/queries";
 
 export const dynamic = "force-dynamic";
 
@@ -25,7 +26,10 @@ const copy = {
     appCta: "Узнать о приложении", protected: "Защищённый диалог", askAnham: "Спросить Анхама",
     hqTitle: "Картина здоровья не заполнена",
     hqText: "Анализы не описывают человека. Расскажите своими словами, что вас беспокоит и что важно знать о вас — это читают вместе с вашими документами.",
-    hqCta: "Заполнить картину здоровья"
+    hqCta: "Заполнить картину здоровья",
+    support: "Служба поддержки", supportPersonal: "Личная переписка с Анной",
+    supportPreview: "Вопросы по аккаунту, оплате, доступу и работе сайта.",
+    supportOpen: "Открыть поддержку", unread: "Непрочитанных сообщений"
   },
   en: {
     eyebrow: "Contact the center", title: "We are here when you need us",
@@ -40,7 +44,10 @@ const copy = {
     appCta: "Learn about the app", protected: "Protected conversation", askAnham: "Ask Anham",
     hqTitle: "Your health picture is empty",
     hqText: "Test results do not describe a person. Tell us in your own words what troubles you and what matters about you — it is read alongside your documents.",
-    hqCta: "Fill in the health picture"
+    hqCta: "Fill in the health picture",
+    support: "Support", supportPersonal: "Private conversation with Anna",
+    supportPreview: "Questions about your account, payments, access, and the website.",
+    supportOpen: "Open support", unread: "Unread messages"
   }
 } as const satisfies Record<Locale, object>;
 
@@ -53,14 +60,24 @@ export default async function CabinetPage() {
   let hasCase = false;
   let questionnaireFilled = true;
   let latestMessage: string | null = null;
+  let professorUnread = 0;
+  let supportUnread = 0;
 
   if (auth.status !== "missing-env") {
     questionnaireFilled = await hasQuestionnaire();
-    const caseResult = await getClientCaseShell(auth.userId);
+    const [caseResult, unreadSupport] = await Promise.all([
+      getClientCaseShell(auth.userId),
+      getClientSupportUnreadCount(auth.userId)
+    ]);
+    supportUnread = unreadSupport;
     const clientCase = caseResult.status === "ready" ? caseResult.case : null;
     hasCase = Boolean(clientCase);
     if (clientCase) {
-      const messages = await getCaseMessages(clientCase.id);
+      const [messages, unreadProfessor] = await Promise.all([
+        getCaseMessages(clientCase.id),
+        getUnreadForClient(clientCase.id)
+      ]);
+      professorUnread = unreadProfessor;
       latestMessage = [...messages.messages].reverse().find((message) => message.sender_role !== "client" && message.body)?.body ?? null;
     }
   }
@@ -76,7 +93,9 @@ export default async function CabinetPage() {
         <div className="contact-card__head">
           <span className="contact-card__avatar"><IconEyeOfHorus /></span>
           <div><h2 id="karen-title">{c.karen}</h2><p>{c.personal}</p></div>
-          <span className="contact-card__lock" title={c.protected}>⌾</span>
+          {professorUnread > 0
+            ? <b aria-label={`${c.unread}: ${professorUnread}`} className="unread-badge unread-badge--inline">{professorUnread}</b>
+            : <span className="contact-card__lock" title={c.protected}>⌾</span>}
         </div>
         <blockquote>{latestMessage ?? c.preview}</blockquote>
         <span className="contact-card__status"><i />{latestMessage ? c.protected : c.newMessage}</span>
@@ -84,6 +103,19 @@ export default async function CabinetPage() {
       </section>
 
       <CabinetAnhamCard button={c.askAnham} label={t.inviteLabel} title={t.inviteTitle} text={t.inviteText} questions={t.inviteQuestions} boundary={t.inviteBoundary} />
+
+      <section className="contact-card contact-card--support" aria-labelledby="support-title">
+        <div className="contact-card__head">
+          <span className="contact-card__avatar"><IconWater /></span>
+          <div><h2 id="support-title">{c.support}</h2><p>{c.supportPersonal}</p></div>
+          {supportUnread > 0
+            ? <b aria-label={`${c.unread}: ${supportUnread}`} className="unread-badge unread-badge--inline">{supportUnread}</b>
+            : null}
+        </div>
+        <p className="contact-card__anham-text">{c.supportPreview}</p>
+        <span className="contact-card__status"><i />{supportUnread > 0 ? `${c.unread}: ${supportUnread}` : c.protected}</span>
+        <Link className="contact-card__primary" href="/cabinet/chat">{c.supportOpen}<span>→</span></Link>
+      </section>
     </div>
 
     {/* Shown only while it is empty, and gone the moment it is filled: a

@@ -1258,3 +1258,12 @@ NULL/“billing data unavailable” until their first-party billing feeds are wi
 Never convert revenue, quotas or operation counts into invented expenses. No new
 browser API or cost database is needed for this first read-only view. Evidence:
 docs/architecture/ANNA_PLATFORM_COSTS.md.
+# 2026-09-17 — Client communication channels are separate destinations
+
+Anham, Professor Python and human Support are separate cabinet destinations and
+must never be presented as one combined thread. Professor unread state continues
+to come only from non-client `case_messages`; Support unread state comes only from
+non-client `support_request_messages`. Both counts may be displayed in navigation
+and on the cabinet home, but opening one channel must not mark the other channel
+read. This is an interface separation only and does not create a parallel message
+store or expand Anham's authority.
