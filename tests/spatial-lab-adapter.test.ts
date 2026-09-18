@@ -3,14 +3,15 @@ import { buildReviewOnlyLabFacts } from "@/lib/canonical-facts/spatial-lab-adapt
 import type { NormalizedDocumentExtraction } from "@/lib/document-extraction/types";
 
 const context = { caseId: "synthetic", sourceDocumentId: "lab", extractionProvider: "fixture", extractionVersion: "v1" };
-function source(rows: (string | null)[][], headers = ["Test", "Result", "Unit", "Reference"]) {
+function source(rows: (string | null)[][], headers = ["Test", "Result", "Unit", "Reference"], slope = 0) {
   let text = "";
   const tokens = [headers, ...rows].flatMap((row, r) => row.flatMap((word, c) => {
     if (word === null) return [];
     const start = text.length; text += word + "\n";
     const x = .06 + c * .23, y = .2 + r * .06;
+    const skew = (px: number, py: number) => ({ x: px, y: py + slope * (px - .5) });
     return [{ id: `t-${r}-${c}`, text: word, textAnchor: { start, end: start + word.length }, confidence: .99,
-      boundingPoly: { normalizedVertices: [{ x, y }, { x: x + .12, y }, { x: x + .12, y: y + .025 }, { x, y: y + .025 }] } }];
+      boundingPoly: { normalizedVertices: [skew(x, y), skew(x + .12, y), skew(x + .12, y + .025), skew(x, y + .025)] } }];
   }));
   return { text, raw: {}, pages: [{ pageNumber: 1, tokens, blocks: [], lines: [], paragraphs: [], tables: [], detectedLanguages: [], qualityDefects: [] }] } satisfies NormalizedDocumentExtraction;
 }
@@ -51,6 +52,35 @@ describe("laboratory spatial bridge", () => {
   it("uses coordinates rather than provider array order", () => {
     const doc = source(rows); doc.pages[0].tokens.reverse();
     expect(buildReviewOnlyLabFacts(doc, context).facts.map(f => f.originalTestName)).toEqual(["Ferritin", "CRP", "Glucose"]);
+  });
+  it("reconstructs a uniformly tilted table from source-derived token geometry", () => {
+    const doc = source(rows, ["Test", "Result", "Unit", "Reference"], .08);
+    const before = JSON.stringify(doc);
+    const result = buildReviewOnlyLabFacts(doc, context);
+    expect(result.facts.map(f => [f.originalTestName, f.valueOriginal])).toEqual([
+      ["Ferritin", "12,7"], ["CRP", "<0.8"], ["Glucose", "5.1"],
+    ]);
+    expect(result.pageTransforms).toHaveLength(1);
+    expect(result.pageTransforms[0].transform).toMatchObject({
+      kind: "NORMALIZED_Y_SHEAR", algorithmVersion: "anham-spatial-deskew-v1",
+      coordinateSystem: "NORMALIZED_PAGE", sourceDerived: true, reversible: true,
+    });
+    expect(result.pageTransforms[0].transform.slope).toBeCloseTo(.08, 8);
+    expect(result.pageTransforms[0].sourceGeometryHashSha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.pageTransforms[0].derivativeGeometryHashSha256).toMatch(/^[a-f0-9]{64}$/);
+    expect(result.pageTransforms[0].sourceGeometryHashSha256).not.toBe(result.pageTransforms[0].derivativeGeometryHashSha256);
+    const value = result.sourceCells[0].cells.value;
+    expect(value?.coordinates).not.toEqual(value?.associationCoordinates);
+    expect(value?.tokens[0].coordinates).toEqual(doc.pages[0].tokens[5].boundingPoly);
+    expect(value?.coordinateTransform?.slope).toBeCloseTo(.08, 8);
+    expect(result.facts.every(f => f.verificationIssues.includes("SOURCE_DERIVED_DESKEW_APPLIED"))).toBe(true);
+    expect(result.facts.every(f => f.verificationStatus === "NEEDS_REVIEW")).toBe(true);
+    expect(JSON.stringify(doc)).toBe(before);
+  });
+  it("rejects an implausibly large tilt instead of forcing row associations", () => {
+    const result = buildReviewOnlyLabFacts(source(rows, ["Test", "Result", "Unit", "Reference"], .3), context);
+    expect(result.facts).toHaveLength(0);
+    expect(result.pageIssues).toEqual([{ page: 1, reason: "DESKEW_ANGLE_OUT_OF_RANGE" }]);
   });
   it("does not mutate original OCR", () => {
     const doc = source(rows); const before = JSON.stringify(doc); buildReviewOnlyLabFacts(doc, context);

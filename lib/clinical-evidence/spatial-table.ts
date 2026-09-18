@@ -8,6 +8,21 @@ export type SpatialRow = { cells: Array<SpatialCell | null>; page: number; layou
 export type SpatialTable = { headers: string[]; rows: SpatialRow[]; page: number; layoutConfidence: number };
 export type SpatialOptions = { structuredTablesSufficient: boolean; headerRoles?: string[]; mergeWrappedValues?: boolean };
 export type SpatialResult = { tables: SpatialTable[]; counters: { table_objects_missing_but_fallback_used: number; spatial_rows_reconstructed: number; spatial_rows_needing_review: number; layout_reconstruction_failures: number } };
+export type SpatialDeskewTransform = {
+  kind: "NORMALIZED_Y_SHEAR";
+  algorithmVersion: "anham-spatial-deskew-v1";
+  coordinateSystem: "NORMALIZED_PAGE";
+  pivotX: number;
+  slope: number;
+  sampleCount: number;
+  medianAbsoluteDeviation: number;
+  sourceDerived: true;
+  reversible: true;
+};
+export type SpatialDeskewResult =
+  | { status: "NOT_NEEDED"; tokens: SpatialToken[]; transform: null; reason: "ANGLE_BELOW_THRESHOLD" | "INSUFFICIENT_ORIENTATION_SAMPLES" }
+  | { status: "APPLIED"; tokens: SpatialToken[]; transform: SpatialDeskewTransform; reason: null }
+  | { status: "REJECTED"; tokens: SpatialToken[]; transform: null; reason: "UNSTABLE_ORIENTATION" | "ANGLE_OUT_OF_RANGE" | "TRANSFORM_OUT_OF_PAGE" };
 
 export function tokenRect(token: SpatialToken): Rect | null {
   const points = token.coordinates.normalizedVertices;
@@ -24,6 +39,70 @@ export function aggregateCoordinates(tokens: SpatialToken[]): BoundingPolygon {
   const left = Math.min(...rects.map((r) => r.left)), right = Math.max(...rects.map((r) => r.right));
   const top = Math.min(...rects.map((r) => r.top)), bottom = Math.max(...rects.map((r) => r.bottom));
   return { normalizedVertices: [{ x: left, y: top }, { x: right, y: top }, { x: right, y: bottom }, { x: left, y: bottom }] };
+}
+
+const median = (values: number[]) => {
+  const sorted = [...values].sort((a, b) => a - b);
+  const middle = Math.floor(sorted.length / 2);
+  return sorted.length % 2 ? sorted[middle] : (sorted[middle - 1] + sorted[middle]) / 2;
+};
+
+function tokenBaselineSlope(token: SpatialToken): number | null {
+  const points = token.coordinates.normalizedVertices;
+  if (!points || points.length < 4) return null;
+  const edges = points.map((point, index) => {
+    const next = points[(index + 1) % points.length];
+    const x1 = point.x, y1 = point.y, x2 = next.x, y2 = next.y;
+    if (![x1, y1, x2, y2].every(Number.isFinite)) return null;
+    const dx = x2! - x1!, dy = y2! - y1!;
+    if (Math.abs(dx) < 0.01 || Math.abs(dx) < Math.abs(dy)) return null;
+    return { width: Math.abs(dx), slope: dy / dx };
+  }).filter((edge): edge is { width: number; slope: number } => edge !== null);
+  if (!edges.length) return null;
+  return edges.sort((a, b) => b.width - a.width)[0].slope;
+}
+
+/**
+ * Builds a reversible, source-derived coordinate derivative for row association.
+ * OCR text, token identity, anchors and source polygons remain unchanged.
+ */
+export function createDeskewedSpatialTokens(tokens: SpatialToken[]): SpatialDeskewResult {
+  const samples = tokens.map(tokenBaselineSlope).filter((value): value is number => value !== null);
+  if (samples.length < 4) {
+    return { status: "NOT_NEEDED", tokens, transform: null, reason: "INSUFFICIENT_ORIENTATION_SAMPLES" };
+  }
+  const slope = median(samples);
+  const medianAbsoluteDeviation = median(samples.map((value) => Math.abs(value - slope)));
+  if (medianAbsoluteDeviation > Math.max(0.02, Math.abs(slope) * 0.35)) {
+    return { status: "REJECTED", tokens, transform: null, reason: "UNSTABLE_ORIENTATION" };
+  }
+  if (Math.abs(slope) < 0.0025) {
+    return { status: "NOT_NEEDED", tokens, transform: null, reason: "ANGLE_BELOW_THRESHOLD" };
+  }
+  if (Math.abs(slope) > 0.25) {
+    return { status: "REJECTED", tokens, transform: null, reason: "ANGLE_OUT_OF_RANGE" };
+  }
+  const pivotX = 0.5;
+  const transformed = tokens.map((token) => ({
+    ...token,
+    coordinates: {
+      normalizedVertices: token.coordinates.normalizedVertices?.map((point) => {
+        const x = point.x ?? 0, y = point.y ?? 0;
+        return { x, y: y - slope * (x - pivotX) };
+      }),
+    },
+  }));
+  if (transformed.some((token) => !tokenRect(token))) {
+    return { status: "REJECTED", tokens, transform: null, reason: "TRANSFORM_OUT_OF_PAGE" };
+  }
+  return {
+    status: "APPLIED",
+    tokens: transformed,
+    transform: { kind: "NORMALIZED_Y_SHEAR", algorithmVersion: "anham-spatial-deskew-v1",
+      coordinateSystem: "NORMALIZED_PAGE", pivotX, slope, sampleCount: samples.length,
+      medianAbsoluteDeviation, sourceDerived: true, reversible: true },
+    reason: null,
+  };
 }
 
 const roleKey = (value: string) => value.trim().toLowerCase().replace(/:$/, "");
