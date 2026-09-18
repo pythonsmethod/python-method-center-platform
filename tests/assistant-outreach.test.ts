@@ -19,7 +19,7 @@ import { localizedHref } from "@/lib/i18n/routing";
 beforeEach(() => {
   vi.resetAllMocks();
   mocks.locale = "ru";
-  mocks.rpc.mockResolvedValue({ data: 1, error: null });
+  mocks.rpc.mockImplementation(async (name: string) => ({ data: name === "deliver_assistant_birthday_greetings" ? 0 : 1, error: null }));
   mocks.upsert.mockResolvedValue({ error: null });
   mocks.from.mockReturnValue({ upsert: mocks.upsert });
   mocks.service.mockReturnValue({ rpc: mocks.rpc, from: mocks.from });
@@ -45,11 +45,12 @@ describe("outreach cron and registration", () => {
   });
   it.each(["", "false", "TRUE"])("does no work unless explicitly enabled: %s", async (flag) => {
     vi.stubEnv("ASSISTANT_OUTREACH_ENABLED", flag);
-    expect(await (await cron(cronRequest("Bearer test-secret"))).json()).toEqual({ enabled: false, sent: 0 });
-    expect(mocks.service).not.toHaveBeenCalled();
+    expect(await (await cron(cronRequest("Bearer test-secret"))).json()).toEqual({ enabled: false, sent: 0, birthdayGreetings: 0 });
+    expect(mocks.rpc).toHaveBeenCalledWith("deliver_assistant_birthday_greetings", expect.objectContaining({ p_limit: 500 }));
   });
   it("calls the atomic batch RPC and returns only aggregate counts", async () => {
-    expect(await (await cron(cronRequest("Bearer test-secret"))).json()).toEqual({ enabled: true, sent: 1, batchLimit: 100 });
+    expect(await (await cron(cronRequest("Bearer test-secret"))).json()).toEqual({ enabled: true, sent: 1, birthdayGreetings: 0, batchLimit: 100 });
+    expect(mocks.rpc).toHaveBeenCalledWith("deliver_assistant_birthday_greetings", expect.objectContaining({ p_limit: 500 }));
     expect(mocks.rpc).toHaveBeenCalledWith("deliver_assistant_outreach", { p_profile_id: null, p_welcome_only: false, p_limit: 100 });
   });
   it("limits cron delivery to the configured synthetic profiles and deduplicates IDs", async () => {

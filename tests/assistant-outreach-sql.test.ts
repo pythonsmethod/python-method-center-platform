@@ -4,6 +4,7 @@ import { afterAll, beforeAll, beforeEach, describe, expect, it } from "vitest";
 import { isExplicitOutreachRefusal } from "@/lib/assistant/outreach";
 
 const migration = readFileSync("supabase/migrations/20260909210136_assistant_outreach.sql", "utf8");
+const birthdayMigration = readFileSync("supabase/migrations/20260915001735_anham_birthday_greetings.sql", "utf8");
 const core = readFileSync("supabase/migrations/20260621220000_create_core_schema.sql", "utf8");
 const id = "00000000-0000-4000-8000-000000000001";
 const other = "00000000-0000-4000-8000-000000000002";
@@ -31,10 +32,13 @@ beforeAll(async () => {
   `);
   await db.exec(readFileSync("supabase/migrations/20260801120000_assistant_messages.sql", "utf8"));
   await db.exec(readFileSync("supabase/migrations/20260816005441_localize_assistant_history.sql", "utf8"));
+  await db.exec(readFileSync("supabase/migrations/20260901220000_health_questionnaire.sql", "utf8"));
   await db.exec(migration);
   await db.exec(readFileSync("supabase/migrations/20260909221034_assistant_outreach_skip_busy_preferences.sql", "utf8"));
+  await db.exec(birthdayMigration);
   await db.exec(`grant usage on schema public, auth to service_role, authenticated, anon;
     grant select, insert, update on public.profiles, public.assistant_messages to service_role;
+    grant select, insert on public.health_questionnaire_versions to service_role;
     grant usage, select on all sequences in schema public to service_role;
     grant select on public.assistant_messages to authenticated;`);
 }, 30_000);
@@ -158,5 +162,51 @@ describe("assistant outreach PostgreSQL integration", () => {
     await deliver();
     await db.exec(`reset role; set role authenticated; set request.jwt.claim.sub = '${id}'`);
     expect(await query("select profile_id from public.assistant_messages")).toEqual([{ profile_id: id }]);
+  });
+});
+
+describe("birthday greeting PostgreSQL integration", () => {
+  const birthday = async (instant: string, limit = 500) => query(
+    "select public.deliver_assistant_birthday_greetings($1, $2) as sent",
+    [instant, limit]
+  );
+
+  beforeEach(async () => {
+    await db.exec("reset role");
+    await query("insert into public.health_questionnaire_versions(profile_id, birth_date, created_at) values ($1, '1990-09-14', '2026-01-01'), ($2, '1985-09-14', '2026-01-01')", [id, other]);
+    await query("update public.profiles set full_name = case when id = $1 then 'Анна Иванова' else 'Maria Smith' end, time_zone = case when id = $1 then 'Asia/Almaty' else 'America/Los_Angeles' end", [id]);
+    await db.exec("set role service_role");
+  });
+
+  it("delivers on each person's local date, localizes, and retries safely", async () => {
+    expect(await birthday("2026-09-14T20:00:00Z")).toEqual([{ sent: 1 }]);
+    expect(await birthday("2026-09-14T20:00:00Z")).toEqual([{ sent: 0 }]);
+    expect(await birthday("2026-09-13T19:30:00Z")).toEqual([{ sent: 1 }]);
+    const rows = await query("select content, locale, scheduled_event_key, scheduled_translations from public.assistant_messages order by locale");
+    expect(rows).toHaveLength(2);
+    expect(rows[0].content).toContain("Happy birthday, Maria");
+    expect(rows[1].content).toContain("С днём рождения, Анна");
+    expect(rows.every((row) => String(row.scheduled_event_key).endsWith(":2026"))).toBe(true);
+  });
+
+  it("uses only the latest immutable questionnaire version", async () => {
+    await db.exec("reset role");
+    await query("insert into public.health_questionnaire_versions(profile_id, birth_date, created_at) values ($1, '1990-10-01', '2026-02-01')", [id]);
+    await db.exec("set role service_role");
+    expect(await birthday("2026-09-13T19:30:00Z")).toEqual([{ sent: 0 }]);
+  });
+
+  it("honors outreach opt-out and account eligibility", async () => {
+    await query("insert into public.assistant_outreach_state(profile_id, opted_out) values ($1, true)", [id]);
+    await db.exec("reset role; update public.profiles set status = 'suspended' where id = '00000000-0000-4000-8000-000000000002'; set role service_role");
+    expect(await birthday("2026-09-14T20:00:00Z")).toEqual([{ sent: 0 }]);
+  });
+
+  it("fails closed for invalid limits and denies browser roles", async () => {
+    await expect(birthday("2026-09-14T20:00:00Z", 1001)).rejects.toThrow("Invalid batch size");
+    for (const role of ["anon", "authenticated"]) {
+      await db.exec(`reset role; set role ${role}`);
+      await expect(birthday("2026-09-14T20:00:00Z")).rejects.toThrow("permission denied");
+    }
   });
 });
