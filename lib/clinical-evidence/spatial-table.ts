@@ -12,6 +12,7 @@ export type SpatialDeskewTransform = {
   kind: "NORMALIZED_Y_SHEAR";
   algorithmVersion: "anham-spatial-deskew-v1";
   coordinateSystem: "NORMALIZED_PAGE";
+  estimationMethod: "TOKEN_EDGE_MEDIAN" | "SEMANTIC_HEADER_MEDIAN";
   pivotX: number;
   slope: number;
   sampleCount: number;
@@ -23,6 +24,7 @@ export type SpatialDeskewResult =
   | { status: "NOT_NEEDED"; tokens: SpatialToken[]; transform: null; reason: "ANGLE_BELOW_THRESHOLD" | "INSUFFICIENT_ORIENTATION_SAMPLES" }
   | { status: "APPLIED"; tokens: SpatialToken[]; transform: SpatialDeskewTransform; reason: null }
   | { status: "REJECTED"; tokens: SpatialToken[]; transform: null; reason: "UNSTABLE_ORIENTATION" | "ANGLE_OUT_OF_RANGE" | "TRANSFORM_OUT_OF_PAGE" };
+export type SpatialDeskewOptions = { orientationAnchors?: string[] };
 
 export function tokenRect(token: SpatialToken): Rect | null {
   const points = token.coordinates.normalizedVertices;
@@ -62,13 +64,51 @@ function tokenBaselineSlope(token: SpatialToken): number | null {
   return edges.sort((a, b) => b.width - a.width)[0].slope;
 }
 
+function semanticAnchorSlopes(tokens: SpatialToken[], roles: string[]): number[] {
+  const roleSet = new Set(roles.map(roleKey));
+  const anchors = tokens.filter((token) => roleSet.has(roleKey(token.text)) && tokenRect(token));
+  if (new Set(anchors.map((token) => roleKey(token.text))).size < 3) return [];
+  const samples: number[] = [];
+  for (let leftIndex = 0; leftIndex < anchors.length; leftIndex++) {
+    const left = tokenRect(anchors[leftIndex])!;
+    for (let rightIndex = leftIndex + 1; rightIndex < anchors.length; rightIndex++) {
+      const right = tokenRect(anchors[rightIndex])!;
+      const dx = (right.left + right.right - left.left - left.right) / 2;
+      const dy = (right.top + right.bottom - left.top - left.bottom) / 2;
+      if (Math.abs(dx) >= 0.08 && Math.abs(dy) <= 0.12) samples.push(dy / dx);
+    }
+  }
+  return samples;
+}
+
 /**
  * Builds a reversible, source-derived coordinate derivative for row association.
  * OCR text, token identity, anchors and source polygons remain unchanged.
  */
-export function createDeskewedSpatialTokens(tokens: SpatialToken[]): SpatialDeskewResult {
-  const samples = tokens.map(tokenBaselineSlope).filter((value): value is number => value !== null);
-  if (samples.length < 4) {
+export function createDeskewedSpatialTokens(tokens: SpatialToken[], options: SpatialDeskewOptions = {}): SpatialDeskewResult {
+  let samples = tokens.map(tokenBaselineSlope).filter((value): value is number => value !== null);
+  let estimationMethod: SpatialDeskewTransform["estimationMethod"] = "TOKEN_EDGE_MEDIAN";
+  if (samples.length >= 4) {
+    const edgeSlope = median(samples);
+    const edgeDeviation = median(samples.map((value) => Math.abs(value - edgeSlope)));
+    if (edgeDeviation > Math.max(0.02, Math.abs(edgeSlope) * 0.35)) {
+      return { status: "REJECTED", tokens, transform: null, reason: "UNSTABLE_ORIENTATION" };
+    }
+    if (Math.abs(edgeSlope) < 0.0025 && options.orientationAnchors?.length) {
+      const semanticSamples = semanticAnchorSlopes(tokens, options.orientationAnchors);
+      if (semanticSamples.length >= 3) {
+        samples = semanticSamples;
+        estimationMethod = "SEMANTIC_HEADER_MEDIAN";
+      }
+    }
+  } else if (options.orientationAnchors?.length) {
+    const semanticSamples = semanticAnchorSlopes(tokens, options.orientationAnchors);
+    if (semanticSamples.length >= 3) {
+      samples = semanticSamples;
+      estimationMethod = "SEMANTIC_HEADER_MEDIAN";
+    }
+  }
+  if (samples.length < 3) {
     return { status: "NOT_NEEDED", tokens, transform: null, reason: "INSUFFICIENT_ORIENTATION_SAMPLES" };
   }
   const slope = median(samples);
@@ -99,7 +139,7 @@ export function createDeskewedSpatialTokens(tokens: SpatialToken[]): SpatialDesk
     status: "APPLIED",
     tokens: transformed,
     transform: { kind: "NORMALIZED_Y_SHEAR", algorithmVersion: "anham-spatial-deskew-v1",
-      coordinateSystem: "NORMALIZED_PAGE", pivotX, slope, sampleCount: samples.length,
+      coordinateSystem: "NORMALIZED_PAGE", estimationMethod, pivotX, slope, sampleCount: samples.length,
       medianAbsoluteDeviation, sourceDerived: true, reversible: true },
     reason: null,
   };

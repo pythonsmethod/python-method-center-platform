@@ -40,7 +40,9 @@ export function extractSpatialLabCandidates(document: NormalizedDocumentExtracti
     if (invalid) { pageIssues.push({ page: page.pageNumber, reason: "INVALID_OR_MISSING_TOKEN_GEOMETRY" }); continue; }
     // Derivative header routing only; source text is recovered from original tokens.
     const mapped = tokens.map(t => ({ ...t, text: role(t.text) ?? t.text }));
-    const deskew = createDeskewedSpatialTokens(mapped);
+    const deskew = createDeskewedSpatialTokens(mapped, {
+      orientationAnchors: ["test", "value", "unit", "reference", "flag"],
+    });
     if (deskew.status === "REJECTED") {
       pageIssues.push({ page: page.pageNumber, reason: `DESKEW_${deskew.reason}` });
       continue;

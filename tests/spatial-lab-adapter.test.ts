@@ -63,7 +63,8 @@ describe("laboratory spatial bridge", () => {
     expect(result.pageTransforms).toHaveLength(1);
     expect(result.pageTransforms[0].transform).toMatchObject({
       kind: "NORMALIZED_Y_SHEAR", algorithmVersion: "anham-spatial-deskew-v1",
-      coordinateSystem: "NORMALIZED_PAGE", sourceDerived: true, reversible: true,
+      coordinateSystem: "NORMALIZED_PAGE", estimationMethod: "TOKEN_EDGE_MEDIAN",
+      sourceDerived: true, reversible: true,
     });
     expect(result.pageTransforms[0].transform.slope).toBeCloseTo(.08, 8);
     expect(result.pageTransforms[0].sourceGeometryHashSha256).toMatch(/^[a-f0-9]{64}$/);
@@ -76,6 +77,24 @@ describe("laboratory spatial bridge", () => {
     expect(result.facts.every(f => f.verificationIssues.includes("SOURCE_DERIVED_DESKEW_APPLIED"))).toBe(true);
     expect(result.facts.every(f => f.verificationStatus === "NEEDS_REVIEW")).toBe(true);
     expect(JSON.stringify(doc)).toBe(before);
+  });
+  it("uses aligned semantic headers when a provider emits axis-aligned token boxes", () => {
+    const doc = source(rows, ["Test", "Result", "Unit", "Reference"], .08);
+    for (const token of doc.pages[0].tokens) {
+      const points = token.boundingPoly.normalizedVertices;
+      const left = Math.min(...points.map(point => point.x));
+      const right = Math.max(...points.map(point => point.x));
+      const top = Math.min(...points.map(point => point.y));
+      const bottom = Math.max(...points.map(point => point.y));
+      token.boundingPoly.normalizedVertices = [
+        { x: left, y: top }, { x: right, y: top }, { x: right, y: bottom }, { x: left, y: bottom },
+      ];
+    }
+    const result = buildReviewOnlyLabFacts(doc, context);
+    expect(result.facts.map(fact => fact.originalTestName)).toEqual(["Ferritin", "CRP", "Glucose"]);
+    expect(result.pageTransforms[0].transform.estimationMethod).toBe("SEMANTIC_HEADER_MEDIAN");
+    expect(result.pageTransforms[0].transform.slope).toBeCloseTo(.08, 2);
+    expect(result.facts.every(fact => fact.verificationStatus === "NEEDS_REVIEW")).toBe(true);
   });
   it("rejects an implausibly large tilt instead of forcing row associations", () => {
     const result = buildReviewOnlyLabFacts(source(rows, ["Test", "Result", "Unit", "Reference"], .3), context);

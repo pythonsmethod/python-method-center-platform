@@ -10,9 +10,11 @@ rows total and 0 VERIFIED. Google OCR itself read 72/72 source cells exactly.
 ## B. What changed
 
 Before row grouping, Anham now estimates a robust page slope from the longest
-near-horizontal edge of each OCR token polygon. A median plus median absolute
-deviation check accepts only a consistent source-derived orientation. A bounded
-normalized Y-shear then creates a separate in-memory association geometry.
+near-horizontal edge of each OCR token polygon. If a provider emits axis-aligned
+word boxes, a fallback estimates the same slope from at least three distinct
+semantic table-header roles. A median plus median absolute deviation check accepts
+only a consistent source-derived orientation. A bounded normalized Y-shear then
+creates a separate in-memory association geometry.
 
 The algorithm never receives the fixture angle, expected cells or Gold. It does
 not change OCR text, token identity, text anchors, source polygons or source bytes.
@@ -45,8 +47,8 @@ memory/output.
 
 ## E. Tests and exact results
 
-- focused spatial/raster tests: 19/19 passed;
-- full regression: 205 files passed, 1 skipped; 1,854 tests passed, 1 skipped;
+- focused spatial/raster tests: 20/20 passed;
+- full regression: 205 files passed, 1 skipped; 1,855 tests passed, 1 skipped;
 - TypeScript: passed;
 - full ESLint: passed with zero warnings;
 - security self-test: 6/6; route/security inventory: passed;
@@ -55,9 +57,10 @@ memory/output.
 - Vercel Preview for `dec973e`: Ready.
 
 The new regression reconstructs all three rows from a uniformly tilted synthetic
-table, proves source and association geometry differ, verifies both geometry
-hashes, confirms exact original token polygons remain available, confirms no
-source mutation, and rejects an excessive slope instead of forcing associations.
+table both with rotated polygons and with provider-style axis-aligned boxes,
+proves source and association geometry differ, verifies both geometry hashes,
+confirms exact original token polygons remain available, confirms no source
+mutation, and rejects an excessive slope instead of forcing associations.
 
 ## F. Benchmark and live result
 
