@@ -1273,3 +1273,17 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 ## 2026-09-16 — Live Google identity smoke is Preview-only and document-free
 
 The first live cloud check verifies only short-lived Vercel OIDC to Google STS/IAM credential exchange. It is admin-authenticated, unavailable outside Preview, requires the PHI gate to remain false, accepts no file, returns no credential material and cannot establish clinical extraction accuracy.
+
+## 2026-09-18 — Deskew is a reversible association derivative, never source truth
+
+Estimate page tilt only from provider token polygons. Apply a bounded normalized
+Y-shear to an in-memory coordinate derivative used for row association; never use
+the authored fixture angle, expected values, clinical plausibility or Gold. Preserve
+the provider text, token IDs, text anchors and original polygons unchanged.
+
+Record the transform algorithm/version, coordinate system, pivot, slope, sample
+count, dispersion, and SHA-256 fingerprints of source and derivative geometry.
+Reject unstable, excessive or out-of-page transforms. A deskewed association is
+still review-only and cannot create P4 provenance or VERIFIED evidence. No image
+pixels, source bytes, production path, database schema or PHI gate change in this
+increment. Evidence: docs/ankh/source_derived_deskew_2026_09_18.md.
