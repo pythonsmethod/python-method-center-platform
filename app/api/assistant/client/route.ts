@@ -33,6 +33,12 @@ import { resolveAssistantAudience, type AssistantTier } from "@/lib/assistant/ti
 import { clientIp } from "@/lib/utils/client-ip";
 import { guardFactualReply } from "@/lib/assistant/factual-honesty";
 import {
+  anhamReactionRule,
+  extractReactionMarker,
+  resolveAnhamReaction,
+  type AnhamReaction
+} from "@/lib/assistant/reactions";
+import {
   apiError,
   apiErrorLocale,
   assistantFailure
@@ -128,11 +134,14 @@ export async function POST(request: Request) {
       : "Automatic messages are off. You can still write to me whenever you like.";
     const persistence = await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId,
       tier: audience.tier, question: latest.content, answer: reply, locale, questionCreatedAt });
-    return NextResponse.json({ reply, ...persistence });
+    return NextResponse.json({ reply, reaction: null, ...persistence });
   }
   const settings = TIER_SETTINGS[audience.tier];
 
-  async function respondWithReply(rawReply: string) {
+  // `reaction` is Anham's optional reaction to the person's message, already
+  // resolved through the allowlist and the safety gate. Guard replies, quota
+  // messages and refusals pass none: those are not moments for a gesture.
+  async function respondWithReply(rawReply: string, reaction: AnhamReaction | null = null) {
     const requestedLocale = (body as { locale?: unknown })?.locale;
     const reply = normalizeAnhamResponse(rawReply, requestedLocale === "ru" || requestedLocale === "en" ? requestedLocale : locale);
     if (!reply) return NextResponse.json({ error: apiError("assistantEmptyReply", locale) }, { status: 502 });
@@ -140,11 +149,11 @@ export async function POST(request: Request) {
     const persistence = audience.profileId && audience.tier !== "guest" && payload.transient !== true
       ? await saveAssistantExchange({ profileId: audience.profileId, caseId: audience.caseId, tier: audience.tier, questionCreatedAt,
           question: typeof payload.displayText === "string" && payload.displayText.trim() ? payload.displayText : messages![messages!.length - 1].content,
-          answer: reply, locale: payload.locale === "en" ? "en" : "ru" }) : undefined;
+          answer: reply, locale: payload.locale === "en" ? "en" : "ru", reaction }) : undefined;
     if (audience.tier !== "guest" && payload.transient !== true) {
       await recordProductEvent("chat_completed", payload.locale === "en" ? "en" : "ru");
     }
-    return NextResponse.json({ reply, ...persistence });
+    return NextResponse.json({ reply, reaction, ...persistence });
   }
 
 
@@ -231,6 +240,10 @@ export async function POST(request: Request) {
     system += `\n\n${ATTACHMENT_READING_ACCURACY_RULE}`;
   }
 
+  // Message reactions: the model may propose one allowlisted key through a
+  // structured marker. The server decides below whether it is ever shown.
+  system += anhamReactionRule(audience.tier);
+
   // Attached files go to Claude, which reads photos and PDFs directly;
   let clientTools: ConversationScope["clientTools"];
   if (audience.fullPreview) {
@@ -271,6 +284,12 @@ export async function POST(request: Request) {
   }
   if (result.refusal) result.reply = providerPolicyRefusal(rawLocale === "en" ? "en" : "ru").reply;
 
+  // The reaction proposal leaves the prose here, before any other reader of
+  // the reply sees it. Whether it is shown is decided after the honesty
+  // guard, against the reply the person will actually receive.
+  const extracted = extractReactionMarker(result.reply);
+  result.reply = extracted.reply;
+
   const question = messages[messages.length - 1]?.content ?? "";
   const honestReply = guardFactualReply({
     reply: result.reply,
@@ -288,5 +307,16 @@ export async function POST(request: Request) {
     locale: responseLocale
   });
 
-  return respondWithReply(honestReply + (result.refusal ? "" : webSourceAppendix(clientTools?.webResults ?? [], responseLocale)));
+  // Safety always outranks the gesture: a message about pain, an emergency,
+  // medication, self-harm, grief or a diagnosis gets no reaction, whatever
+  // the model proposed, and so does any reply that had to refuse or escalate.
+  const reaction = resolveAnhamReaction({
+    proposed: extracted.reaction,
+    question,
+    reply: honestReply,
+    tier: audience.tier,
+    refusal: Boolean(result.refusal)
+  });
+
+  return respondWithReply(honestReply + (result.refusal ? "" : webSourceAppendix(clientTools?.webResults ?? [], responseLocale)), reaction);
 }
