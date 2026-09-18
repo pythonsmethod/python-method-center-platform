@@ -746,4 +746,9 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 
 # 2026-09-18 — Anham birthday greetings
 
-Implementation, regression, security/build checks, preview validation and production migration are complete. Remaining release gates: application merge, production deployment and non-mutating RU/EN acceptance. No Anham clinical phase gate changes.
+- [x] Complete implementation, regression, security/build checks and preview validation.
+- [x] Apply and verify the production migration and least-privilege function grants.
+- [x] Merge PR #203 and complete primary/clinical production deployments.
+- [x] Verify the public site, cabinet login gate and unauthenticated cron denial without sending a real greeting.
+
+Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next action: observe the next scheduled run and client history; do not manually invoke the production birthday RPC. No Anham clinical phase gate changes.

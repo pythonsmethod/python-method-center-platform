@@ -1,8 +1,8 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Anham birthday greetings — 2026-09-18 — PRODUCTION MIGRATED / DEPLOY PENDING
+## Anham birthday greetings — 2026-09-18 — PUBLISHED
 
-The production database now has the additive birthday-delivery schema and service-role-only `SECURITY INVOKER` function. The application branch reuses the canonical latest health-questionnaire birth date and existing authenticated daily assistant cron to save one deterministic RU/EN birthday message per eligible client and local year. Existing outreach opt-out is honored; no AI/provider or clinical inference is involved. Application merge, deployment and acceptance remain pending. Evidence: `docs/ankh/anham_birthday_greetings.md`.
+The production database has the additive birthday-delivery schema and service-role-only `SECURITY INVOKER` function. PR #203 merged as `5ba27eb38405d68a14e76a5d0dca00139941b90f`; the primary and clinical Vercel production deployments completed successfully. The public site returned `200`, the protected cabinet returned the expected `307` login redirect and the cron route returned the expected `401` without `CRON_SECRET`. The release reuses the latest immutable health-questionnaire birth date, stores one deterministic RU/EN assistant-history message per eligible client/local year and honors the existing outreach opt-out. No birthday RPC was manually invoked against production clients. Evidence: `docs/ankh/anham_birthday_greetings.md`.
 
 ## Staff message email notifications — 2026-09-17 — RELEASE CANDIDATE
 
