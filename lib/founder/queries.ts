@@ -1,4 +1,4 @@
-import { getPaymentPlans } from "@/lib/payments/config";
+import { getPaymentPlans, getSupportDurationOptions } from "@/lib/payments/config";
 import {
   getGuestDailyTotalLimit,
   getPublicAssistantMode
@@ -147,15 +147,19 @@ export async function getFounderOverview(): Promise<FounderOverview> {
       name: "Кнопки оплаты на сайте",
       ok: Boolean(
         getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
-          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
-          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
+          getSupportDurationOptions().every(option => option.paymentLinkUrl)
       ),
-      detail:
-        getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
-          ? "Все три ссылки на тарифы активны"
-          : "Заданы не все ссылки на тарифы (разбор, 5 недель, 100 дней)"
+      detail: (() => {
+        const options = getSupportDurationOptions();
+        const prepaid = options.filter(option => option.paymentLinkUrl).length;
+        const renewing = options.filter(option => option.autoRenewPaymentLinkUrl).length;
+        const review = Boolean(
+          getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl
+        );
+        return review && prepaid === options.length
+          ? `Разбор подключён; ссылки сопровождения: ${prepaid}/${options.length}; автопродление: ${renewing}/${options.length}`
+          : `Не все ссылки подключены: разбор ${review ? "есть" : "нет"}, сопровождение ${prepaid}/${options.length}, автопродление ${renewing}/${options.length}`;
+      })()
     }
   ];
 
