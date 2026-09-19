@@ -1,3 +1,4 @@
+import { aiFetch } from "@/lib/security/ai-transport";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { PRIMARY_FOUNDER_EMAIL } from "@/lib/auth/require-founder";
@@ -12,7 +13,6 @@ async function owner(){
   const auth=await createSupabaseServerClient(); if(!auth)throw new HubError("auth_not_configured",503);
   const {data:{user},error}=await auth.auth.getUser();
   if(error||!user)throw new HubError("sign_in_required",401);
-  // The server-verified Auth identity is authoritative, never a client profile email.
   if(!user.email_confirmed_at||user.email?.toLowerCase()!==PRIMARY_FOUNDER_EMAIL.toLowerCase())throw new HubError("owner_only",403);
   const url=process.env.NEXT_PUBLIC_SUPABASE_URL||process.env.SUPABASE_URL||"";
   if(!canUseEnvironment(url,process.env.NEXORA_RUNTIME_ENABLED))throw new HubError("staging_only",503);
@@ -37,7 +37,7 @@ function text(v:unknown,max:number,required=true){if(typeof v!=="string"||v.leng
 async function quota(db:NonNullable<ReturnType<typeof createSupabaseServiceClient>>,id:string,action:string){const r=await db.rpc("hcs_hub_reserve_quota",{p_profile:id,p_action:action});if(r.error)throw new HubError("quota_not_configured",503);if(r.data!==true)throw new HubError("hourly_limit",429);}
 async function provider(path:string,body:unknown,multipart=false){
   const key=process.env.OPENAI_API_KEY;if(!key)throw new HubError("openai_key_missing",503);
-  const r=await fetch("https://api.openai.com/v1/"+path,{method:"POST",headers:{Authorization:`Bearer ${key}`,...(multipart?{}:{"Content-Type":"application/json"})},body:multipart?body as FormData:JSON.stringify(body),signal:AbortSignal.timeout(48000)});
+  const r=await aiFetch("https://api.openai.com/v1/"+path,{method:"POST",headers:{Authorization:`Bearer ${key}`,...(multipart?{}:{"Content-Type":"application/json"})},body:multipart?body as FormData:JSON.stringify(body),signal:AbortSignal.timeout(48000)});
   if(!r.ok){await r.body?.cancel();throw new HubError("model_unavailable",502);}return r.json();
 }
 export async function GET(req:Request,{params}:{params:Promise<{action:string}>}){
@@ -60,7 +60,7 @@ export async function POST(req:Request,{params}:{params:Promise<{action:string}>
   try{sameOrigin(req);session=await owner();const {id,db}=session;const {action}=await params;
     if(action==="transcribe"){
       const bytes=await limitedBytes(req,6*1024*1024);
-      const form=await new Response(bytes,{headers:{"Content-Type":req.headers.get("content-type")||""}}).formData();
+      const form=await new Response(bytes.buffer as ArrayBuffer,{headers:{"Content-Type":req.headers.get("content-type")||""}}).formData();
       const file=form.get("file");if(!(file instanceof File)||file.size<100||file.size>5*1024*1024||!/^audio\/(webm|mp4|ogg|mpeg|wav|x-wav)(;|$)/i.test(file.type)||form.get("consent")!=="true")throw new HubError("invalid_audio",400);
       await quota(db,id,"transcribe");
       const upload=new FormData();const ext=file.type.includes("mp4")?"mp4":file.type.includes("ogg")?"ogg":file.type.includes("wav")?"wav":file.type.includes("mpeg")?"mp3":"webm";

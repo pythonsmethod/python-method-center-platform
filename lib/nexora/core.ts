@@ -14,7 +14,7 @@ export function destination(value: unknown): string {
   if (typeof value !== "string" || value.length > 1000) throw new Error("invalid_url");
   const s = value.trim();
   if (!s) return "";
-  if (/[\\\u0000-\u0020]/.test(s) || /%0[ad]|%5c/i.test(s)) throw new Error("invalid_url");
+  if (s.includes("\\") || [...s].some(c => c.charCodeAt(0) <= 32) || /%0[ad]|%5c/i.test(s)) throw new Error("invalid_url");
   if (s.startsWith("/") && !s.startsWith("//") && !s.startsWith("/%")) return s;
   const u = new URL(s);
   if (u.protocol !== "https:" || u.username || u.password || u.hostname === "localhost" || /^(127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.)/.test(u.hostname) || u.hostname.includes(":")) throw new Error("invalid_url");
