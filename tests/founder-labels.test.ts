@@ -24,6 +24,7 @@ describe("formatMoney", () => {
 
 describe("founder labels", () => {
   it("covers every payment product used by the platform", () => {
+    expect(productLabels.personal_support).toBeTruthy();
     expect(productLabels.support_5_weeks).toBeTruthy();
     expect(productLabels.support_15_weeks).toBeTruthy();
   });
