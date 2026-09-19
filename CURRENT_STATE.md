@@ -1192,3 +1192,27 @@ audit events. Web search and Document AI show activity counts; all vendor bills
 without a connected usage feed remain explicitly unknown and are excluded from
 the verified minimum. No schema, client API, credential or clinical change.
 Details: docs/architecture/ANNA_PLATFORM_COSTS.md.
+
+## 2026-09-19 — PMC monthly pricing migration is built but not yet live
+
+Draft PR #215 contains the approved migration from new sales of fixed 5-week /
+100-day plans to a two-service model: 299 USD one-time condition assessment and
+Personal Support at 1,300 USD per paid 30-day period with a 1–12 month initial
+duration. Optional Stripe automatic renewal begins only after the prepaid term.
+The formula for the paid support period is a complimentary gift and delivery is
+included; public RU/EN copy does not expose capsule quantity. Legacy fixed-plan
+payments and periods remain readable.
+
+The branch includes RU/EN web and mobile-web UI, oferta-v9, refund/payment copy,
+Anham pricing knowledge, variable service periods, subscription webhook
+handling, a client Stripe Customer Portal entry point, fulfillment linkage,
+founder diagnostics and a database migration for `personal_support` and
+`billing_subscriptions`. Native mobile pricing was intentionally not changed.
+
+**Release status: NOT LIVE / HOLD.** Production remains unchanged until the
+database migration is applied, required Stripe links and metadata are supplied,
+subscription/customer-portal settings and webhook events are configured, the
+full regression/build gate passes, and payment flows are accepted in test mode.
+Vercel preview creation is currently blocked by the account build-rate limit,
+not by an identified application build failure. See
+`docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
