@@ -805,8 +805,6 @@ const ru = {
     planLabels: {
       preliminary_assessment: "Оценка состояния — 299 USD",
       personal_support: "Личное сопровождение — $1,300 / 30 дней",
-      support_5_weeks: "Архив: сопровождение — 5 недель",
-      support_15_weeks: "Архив: сопровождение — 100 дней",
       undecided: "Ещё не решил(а) — нужен совет"
     },
     methodLabels: {
@@ -1996,8 +1994,6 @@ const en: typeof ru = {
     planLabels: {
       preliminary_assessment: "Condition assessment — 299 USD",
       personal_support: "Personal Support — $1,300 / 30 days",
-      support_5_weeks: "Archive: Support — 5 weeks",
-      support_15_weeks: "Archive: Support — 100 days",
       undecided: "Not decided yet — I need advice"
     },
     methodLabels: {
