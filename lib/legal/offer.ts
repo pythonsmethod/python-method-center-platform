@@ -32,7 +32,13 @@ import type { Locale } from "@/lib/i18n/locale";
 // accepted that edition.
 // v7 (2026-09-06): owner adds $180 delivery to the 100-day plan, total $3,855.
 // v8 (2026-09-09): full review at $299 until 1 December 2026, then $500; fees included.
-export const OFFER_VERSION = "oferta-v8";
+// v9 (2026-09-19): replaces fixed 5-week / 100-day new sales with Personal
+// Support at 1,300 USD per paid 30-day period. The client chooses 1-12
+// prepaid months and may separately enable automatic 30-day renewal after
+// that prepaid term. Professor Python's formula for the paid support period
+// is complimentary and its delivery is included. The standalone condition
+// assessment is 299 USD as the permanent current price.
+export const OFFER_VERSION = "oferta-v9";
 
 // The superseded edition, kept reachable because clients accepted it and
 // clause 12 says their terms do not change.
