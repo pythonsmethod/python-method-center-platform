@@ -601,13 +601,14 @@ async function handlePaidSubscriptionInvoice(
   }
 
   const amountCents = invoice.amount_paid ?? 0;
+  const baseAmountCents = invoice.subtotal ?? 0;
   const currency = (invoice.currency ?? "usd").toUpperCase();
   const paidAt = new Date();
   const reference = invoicePaymentReference(invoice);
 
   if (
     !isValidPersonalSupportCharge({
-      amountCents,
+      amountCents: baseAmountCents,
       currency: invoice.currency,
       months: 1
     })
@@ -618,8 +619,9 @@ async function handlePaidSubscriptionInvoice(
       title: "ОШИБКА: сумма автопродления Personal Support не совпадает",
       lines: [
         `Invoice: ${invoice.id}`,
-        `Получено: ${amountCents} ${currency}`,
-        `Ожидалось: ${expectedPersonalSupportAmountCents()} USD`,
+        `Базовая сумма: ${baseAmountCents} ${currency}`,
+        `Фактически оплачено: ${amountCents} ${currency}`,
+        `Ожидалась базовая сумма: ${expectedPersonalSupportAmountCents()} USD`,
         "Новый период не открыт."
       ],
       link: adminLink("/admin/cases")

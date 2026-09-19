@@ -125,8 +125,10 @@ Native mobile app pricing is intentionally out of scope: purchasing remains on t
 The webhook now fails closed on a Personal Support contract mismatch: the
 Checkout Session must contain `product=personal_support`, an integer
 `months=1..12`, USD currency and a base amount of `130000 * months` cents. A
-recurring invoice must be exactly 130000 USD cents before it can open another
-30-day period. Test coverage locks both rules.
+recurring invoice must have an exact 130000 USD-cent base subtotal before it can
+open another 30-day period. Tax and an explicitly configured discount may alter
+the amount actually collected without changing the paid service duration. Test
+coverage locks the base-price and duration rules.
 
 Webhook processing errors now return HTTP 500 and release the event-ledger
 claim so Stripe can redeliver. A repeated delivery resumes an existing payment
