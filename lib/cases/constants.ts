@@ -26,6 +26,7 @@ export type CaseDirection = (typeof CASE_DIRECTIONS)[number];
 
 export const PAYMENT_PRODUCTS = [
   "preliminary_assessment",
+  "personal_support",
   "support_5_weeks",
   "support_15_weeks"
 ] as const;
