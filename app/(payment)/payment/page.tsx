@@ -53,7 +53,15 @@ export default async function PaymentPage() {
 
   const plans = getPaymentPlans(locale).map((plan) => ({
     ...plan,
-    paymentLinkUrl: withClientReference(plan.paymentLinkUrl, profileId)
+    paymentLinkUrl: withClientReference(plan.paymentLinkUrl, profileId),
+    supportOptions: plan.supportOptions?.map((option) => ({
+      ...option,
+      paymentLinkUrl: withClientReference(option.paymentLinkUrl, profileId),
+      autoRenewPaymentLinkUrl: withClientReference(
+        option.autoRenewPaymentLinkUrl,
+        profileId
+      )
+    }))
   }));
 
   return (
@@ -79,7 +87,15 @@ export default async function PaymentPage() {
           offerHint: t.offerHint,
           refundLink: t.refundLink,
           signInToPay: t.signInToPay,
-          signInWhy: t.signInWhy
+          signInWhy: t.signInWhy,
+          durationLabel: t.durationLabel,
+          durationOption: t.durationOption,
+          selectedTotal: t.selectedTotal,
+          giftIncluded: t.giftIncluded,
+          autoRenewLabel: t.autoRenewLabel,
+          autoRenewText: t.autoRenewText,
+          autoRenewUnavailable: t.autoRenewUnavailable,
+          taxNote: t.taxNote
         }}
         plans={plans}
         signInHref="/login?mode=signup&next=/payment"
