@@ -1318,3 +1318,26 @@ audit. This presentation rule is shared by client and staff views.
 # 2026-09-14 — Birthday messages reuse canonical questionnaire evidence
 
 Anham birthday greetings read the latest append-only `health_questionnaire_versions.birth_date`; they do not copy birth date into `profiles`. A profile stores only its IANA time zone. Delivery is a fixed bilingual, service-only scheduled message in existing assistant history, honors the existing automatic-message opt-out and is unique per profile/local year. This is not a clinical fact transformation or ordinary outreach activation.
+
+## 2026-09-19 — PMC has two current paid services; fixed support plans are legacy
+
+Owner-approved public pricing is now two current services only. The one-time
+condition assessment, test-results review and preliminary consultation on a
+personal rehabilitation protocol is 299 USD. Personal Support is one product at
+1,300 USD per paid 30-day period; the client selects an initial prepaid duration
+of 1–12 months. This duration is a parameter of one product, not twelve products.
+
+Automatic renewal is optional. When enabled, it starts only after the prepaid
+term and renews for one additional 30-day period per successful recurring
+payment. A failed renewal opens no new period. Professor Python's formula for
+the paid support period is complimentary, has no separate sale price, and its
+delivery is included. Public copy and Anham do not state capsule quantities.
+
+Historical `support_5_weeks` and `support_15_weeks` records remain readable
+and keep their original service periods and offer history, but they are removed
+from every new-sale selector. The formula is also removed as a future standalone
+shop sale. Native mobile-app purchasing remains out of scope; sales stay on the
+responsive web platform. Implementation is in draft PR #215 and is not a live
+production decision until its migration, Stripe configuration and release gate
+are completed. Release contract:
+`docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
