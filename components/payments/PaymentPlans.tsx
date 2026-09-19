@@ -3,8 +3,9 @@
 import { Link } from "@/components/LocaleLink";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import type { PaymentPlan } from "@/lib/payments/config";
-import { PERSONAL_SUPPORT_PRODUCT } from "@/lib/payments/config";
 import { recordPaymentOfferAcceptance } from "@/lib/payments/actions";
+
+const PERSONAL_SUPPORT_PRODUCT = "personal_support" as const;
 
 type PaymentPlanLabels = {
   planLabel: string;
