@@ -10,6 +10,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const KNOWN_PRODUCTS = new Set([
   "preliminary_assessment",
+  "personal_support",
   "support_5_weeks",
   "support_15_weeks"
 ]);
