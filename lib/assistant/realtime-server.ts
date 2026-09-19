@@ -74,7 +74,7 @@ export async function resolveVoiceActor(request: Request, scope: unknown, rawCas
   const ownCase = await db.from("client_cases").select("id").eq("profile_id", user.id).maybeSingle();
   if (ownCase.error) throw new VoiceFailure("unavailable", 503);
   if (rawCaseId && ownCase.data?.id !== rawCaseId) throw new VoiceFailure("forbidden", 403);
-  const periods = await db.from("service_periods").select("product").eq("profile_id", user.id).eq("status", "active").gt("ends_at", new Date().toISOString()).in("product", ["support_5_weeks", "support_15_weeks"]);
+  const periods = await db.from("service_periods").select("product").eq("profile_id", user.id).eq("status", "active").gt("ends_at", new Date().toISOString()).in("product", ["personal_support", "support_5_weeks", "support_15_weeks"]);
   if (periods.error) throw new VoiceFailure("unavailable", 503);
   return { profileId: user.id, email: user.email ?? null, scope: "client", caseId: ownCase.data?.id ?? null, clientPreview: hasFullClientAssistantPreview(user), tier: hasFullClientAssistantPreview(user) || (periods.data ?? []).some(row => isPaidSupportProduct(row.product)) ? "client" : "registered" };
 }
