@@ -330,10 +330,10 @@ const REFUND_RU: LegalDocument = {
     {
       heading: "4. Из чего складывается сумма",
       paragraphs: [
-        "Полный разбор анализов с рекомендациями Карена (Professor Python) по восстановлению и реабилитации — 299 USD вместо 500 USD до 1 декабря 2026 года (до 00:00 по времени Лос-Анджелеса). С 1 декабря 2026 года стоимость составляет 500 USD. Это итоговая стоимость без дополнительных сборов, временная цена, не акция.",
-        "Сопровождение 5 недель: 1 200 USD программа + 5% сервисный сбор + 180 USD доставка индивидуальной формулы (200 капсул). Итого 1 440 USD.",
-        "Сопровождение 100 дней: 3 500 USD программа + 5% сервисный сбор + 180 USD доставка. Итого 3 855 USD. Индивидуальная формула на весь срок (600 капсул) входит в стоимость.",
-        "Сервисный сбор 5% — это комиссия платёжной системы, он указан отдельно, а не спрятан в цене."
+        "Оценка состояния, разбор анализов и предварительная консультация по личному протоколу реабилитации — 299 USD, разовая оплата.",
+        "Личное сопровождение — 1 300 USD за каждый оплаченный 30-дневный период. При первой оплате вы выбираете от 1 до 12 месяцев, и сумма равна 1 300 USD, умноженным на выбранное количество месяцев.",
+        "Формула Professor Python на оплаченный период предоставляется в подарок и отдельно не продаётся. Её доставка включена в стоимость сопровождения; отдельного сервисного сбора или платы за доставку нет.",
+        "Если по законодательству вашей страны или региона к покупке применяется налог, платёжный провайдер рассчитывает его отдельно при оформлении оплаты."
       ]
     },
     {
@@ -359,10 +359,10 @@ const REFUND_RU: LegalDocument = {
       ]
     },
     {
-      heading: "7. Смена тарифа",
+      heading: "7. Продление сопровождения",
       paragraphs: [
-        "Перейти с 5 недель на 100 дней можно: вы доплачиваете разницу, а пройденное время засчитывается. Обратный переход с возвратом разницы не предусмотрен — работа по расширенной программе к этому моменту уже ведётся.",
-        "Напишите нам, и мы посчитаем доплату лично для вашего случая."
+        "Первоначальный оплаченный срок выбирается до оплаты. Уже начавшийся оплаченный период не сокращается с возвратом части стоимости.",
+        "Если вы включили автоматическое продление, после окончания первоначально оплаченного срока следующее продление происходит на 30 дней по действующей стоимости. Автопродление можно отключить до следующего списания."
       ]
     },
     {
@@ -407,10 +407,10 @@ const REFUND_EN: LegalDocument = {
     {
       heading: "4. What the amount is made of",
       paragraphs: [
-        "A full review of test results with recovery and rehabilitation recommendations from Karen (Professor Python) costs 299 USD instead of 500 USD until 1 December 2026 (before 00:00 Los Angeles time). From 1 December 2026, the price is 500 USD. This is the final price with no additional fees, a temporary price, not a promotion.",
-        "Five-week support programme: 1,200 USD for the programme + a 5% service fee + 180 USD for delivery of the individual formula (200 capsules). Total 1,440 USD.",
-        "100-day support programme: 3,500 USD for the programme + a 5% service fee + 180 USD delivery. Total 3,855 USD. The individual formula for the whole term (600 capsules) is included.",
-        "The 5% service fee is the payment system's commission; it is shown separately rather than hidden inside the price."
+        "Condition assessment, test-results review and a preliminary consultation on a personal rehabilitation protocol costs 299 USD as a one-time payment.",
+        "Personal Support costs 1,300 USD for each paid 30-day period. On the first payment you choose from 1 to 12 months, and the amount equals 1,300 USD multiplied by the number of months selected.",
+        "Professor Python's formula for the paid period is complimentary and is not sold separately. Delivery is included in the Personal Support price; there is no separate service or delivery charge.",
+        "If a tax applies to the purchase under the laws of your country or region, the payment provider calculates it separately at checkout."
       ]
     },
     {
