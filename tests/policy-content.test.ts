@@ -100,12 +100,13 @@ describe("privacy policy disclosures", () => {
 });
 
 describe("refund terms", () => {
-  it("states the totals the payment page charges", () => {
-    // 1,200 + 5% + 180 = 1,440 and 3,500 + 5% = 3,855, as in oferta-v3.
-    expect(allText(REFUND_CONTENT.ru)).toContain("1 440");
-    expect(allText(REFUND_CONTENT.ru)).toContain("3 855");
-    expect(allText(REFUND_CONTENT.en)).toContain("1,440");
-    expect(allText(REFUND_CONTENT.en)).toContain("3,855");
+  it("states the current amounts the payment page charges", () => {
+    expect(allText(REFUND_CONTENT.ru)).toContain("299 USD");
+    expect(allText(REFUND_CONTENT.ru)).toContain("1 300 USD");
+    expect(allText(REFUND_CONTENT.en)).toContain("299 USD");
+    expect(allText(REFUND_CONTENT.en)).toContain("1,300 USD");
+    expect(allText(REFUND_CONTENT.ru)).not.toContain("1 440");
+    expect(allText(REFUND_CONTENT.en)).not.toContain("3,855");
   });
 
   it("defers to the offer rather than replacing it", () => {
