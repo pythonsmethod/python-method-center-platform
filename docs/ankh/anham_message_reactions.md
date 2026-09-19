@@ -96,7 +96,21 @@ Focused suites pass (allowlist, extraction, safety classifier with RU/EN
 fixtures per forbidden category, policy order, route integration including
 the safety-overrides-reaction regression, badge rendering in RU/EN, saved
 thread after reload, CSS placement, PGlite migration idempotence and
-constraint). TypeScript and ESLint pass on the changed files.
+constraint). Full regression: 1,944 tests pass with one existing intentional
+skip. TypeScript, ESLint, `git diff --check` and the production build pass,
+with only the pre-existing Autoprefixer `end` warning.
+
+Release (2026-09-19): the migration was applied to the production Supabase
+project as `anham_message_reactions` before the code deploy; the column,
+constraint and zero pre-existing reacted rows were verified read-only. PR
+#209 passed the `verify` workflow and the three Vercel preview deployments and
+merged as `aba191b1`. The primary and clinical production deployments reached
+READY; the mobile-app project canceled its build as it does on every `main`
+merge. Production checks: `/` returned `200`, `/cabinet/anham` redirected to
+login, `/api/assistant/history` returned `401` without a session; Vercel
+recorded no runtime errors and no 5xx in the release window. The release
+environment's network policy blocked a direct chat request, so no live
+reaction was exercised against production during the release itself.
 
 ## G. Security and PHI
 

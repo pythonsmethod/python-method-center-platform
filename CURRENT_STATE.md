@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Anham message reactions v1 — 2026-09-18 — RELEASE CANDIDATE
+## Anham message reactions v1 — 2026-09-19 — PUBLISHED
 
 Anham may now attach one small, allowlisted emoji reaction to the person's own
 message in the client chat, then answer in words as before. The model proposes
@@ -10,11 +10,20 @@ lets a RU/EN safety classifier veto any reaction on pain, worsening, breathing,
 bleeding, consciousness, seizures, emergency, medication/dosage, self-harm,
 crisis, fear for life, death, diagnosis or serious medical news. A reply that
 had to refuse or escalate also gets none. Registered and paid clients keep the
-reaction on their own `assistant_messages` row through an additive nullable
-column, so it survives reload; guests are never stored. Staff, Karen and
-Professor Python conversations are unchanged. Focused tests, TypeScript and
-ESLint pass. Production migration and publication remain pending. Evidence:
-`docs/ankh/anham_message_reactions.md`.
+reaction on their own `assistant_messages` row, so it survives reload; guests
+are never stored. Staff, Karen and Professor Python conversations are unchanged.
+
+Production migration `20260919 anham_message_reactions` was applied to the
+production Supabase project before the code deploy and verified: nullable
+`reaction` column, `assistant_messages_reaction_allowlist` constraint present,
+zero pre-existing reacted rows. PR #209 passed CI and all three Vercel
+previews and merged as `aba191b1d48320218357e1a77dc3b590401241f3`; the primary
+and clinical production deployments are READY on `pythonmethodcenter.com`. The
+public site returned `200`, the protected cabinet redirected to login and the
+history API returned `401` without a session; no runtime errors or 5xx were
+recorded after the deploy. A real chat exchange could not be sent from the
+release environment because of its network policy, so the first live reaction
+will be observed in ordinary use. Evidence: `docs/ankh/anham_message_reactions.md`.
 
 ## Anham birthday greetings — 2026-09-18 — PUBLISHED
 
