@@ -728,7 +728,7 @@ const ru = {
         }
       ],
       supportLabel: "Полное сопровождение",
-      supportNote: "5 недель или 100 дней",
+      supportNote: "$1,300 / 30 дней · срок выбираете вы",
       support: [
         { title: "Тариф", text: "Выберите формат сопровождения и оплатите." },
         { title: "Документы", text: "Загрузите медицинские документы по кейсу." },
@@ -799,9 +799,10 @@ const ru = {
     note:
       "Оплата вне сайта проверяется человеком, поэтому доступ открывается не мгновенно — обычно в тот же рабочий день.",
     planLabels: {
-      preliminary_assessment: "Разбор анализов — 500 USD",
-      support_5_weeks: "Сопровождение — 5 недель",
-      support_15_weeks: "Сопровождение — 100 дней",
+      preliminary_assessment: "Оценка состояния — 299 USD",
+      personal_support: "Личное сопровождение — $1,300 / 30 дней",
+      support_5_weeks: "Архив: сопровождение — 5 недель",
+      support_15_weeks: "Архив: сопровождение — 100 дней",
       undecided: "Ещё не решил(а) — нужен совет"
     },
     methodLabels: {
@@ -957,7 +958,7 @@ const ru = {
     offerLink: "Читать договор",
     ctaTitle: "Начать с ним работать",
     ctaText: "Заполните анкету, загрузите документы и закажите разбор — он посмотрит вашу ситуацию и скажет, где вы находитесь сейчас и что с этим делать.",
-    ctaReview: "Разбор анализов — 500 USD",
+    ctaReview: "Оценка состояния — 299 USD",
     ctaPlans: "Тарифы сопровождения"
   },
   review: {
@@ -981,7 +982,7 @@ const ru = {
       { q: "Сколько ждать?", a: "До трёх рабочих дней после того, как вы загрузили анализы." },
       { q: "Можно ли задать вопросы?", a: "Да. В течение трёх рабочих дней после разбора открыт чат с Professor Python — вопросы идут напрямую ему." },
       { q: "Придётся ли потом покупать сопровождение?", a: "Нет. Это остаётся на ваше усмотрение — разбор ни к чему не обязывает." },
-      { q: "Чем разбор отличается от сопровождения?", a: "Разбор — разовая обратная связь и рекомендации по вашим анализам. Сопровождение — это программа восстановления на 5 недель или 100 дней, её корректировки и постоянная связь с Professor Python по ходу." },
+      { q: "Чем оценка отличается от сопровождения?", a: "Оценка состояния — разовая работа с вашими материалами и предварительная консультация. Личное сопровождение — продолжающаяся работа с вашим кейсом по оплачиваемым 30-дневным периодам." },
       { q: "Какие анализы подойдут?", a: "Любые анализы и чек-апы, сданные за последние 30 дней." }
     ],
     pageCtaTitle: "Как заказать разбор",
@@ -1914,7 +1915,7 @@ const en: typeof ru = {
         }
       ],
       supportLabel: "Full support program",
-      supportNote: "5 weeks or 100 days",
+      supportNote: "$1,300 / 30 days · you choose the duration",
       support: [
         { title: "Plan", text: "Choose your support format and pay." },
         { title: "Documents", text: "Upload the medical documents for your case." },
@@ -1985,9 +1986,10 @@ const en: typeof ru = {
     note:
       "A payment made outside the site is checked by a person, so access does not open instantly — usually the same working day.",
     planLabels: {
-      preliminary_assessment: "Analyses review — 500 USD",
-      support_5_weeks: "Support programme — 5 weeks",
-      support_15_weeks: "Support programme — 100 days",
+      preliminary_assessment: "Condition assessment — 299 USD",
+      personal_support: "Personal Support — $1,300 / 30 days",
+      support_5_weeks: "Archive: Support — 5 weeks",
+      support_15_weeks: "Archive: Support — 100 days",
       undecided: "Not decided yet — I need advice"
     },
     methodLabels: {
@@ -2106,7 +2108,7 @@ const en: typeof ru = {
     offerLink: "Read the contract",
     ctaTitle: "Start working with him",
     ctaText: "Fill in the questionnaire, upload your documents and order the review — he will look at your situation and tell you where you stand today and what to do about it.",
-    ctaReview: "Analyses review — 500 USD",
+    ctaReview: "Condition assessment — 299 USD",
     ctaPlans: "Support plans"
   },
   review: {
@@ -2126,7 +2128,7 @@ const en: typeof ru = {
       { q: "How long does it take?", a: "Up to three working days after you upload your test results." },
       { q: "Can I ask questions?", a: "Yes. For three working days after the review, a chat with Professor Python is open — your questions go directly to him." },
       { q: "Will I have to buy a support programme afterwards?", a: "No. That remains your decision — the review does not oblige you to anything." },
-      { q: "How is the review different from a support programme?", a: "The review is one-time feedback and recommendations on your test results. A support programme is a recovery programme over 5 weeks or 100 days, its adjustments, and ongoing contact with Professor Python along the way." },
+      { q: "How is the assessment different from Personal Support?", a: "The condition assessment is a one-time review of your materials and preliminary consultation. Personal Support is ongoing work with your case in paid 30-day periods." },
       { q: "Which test results are suitable?", a: "Any tests and check-ups taken within the last 30 days." }
     ],
     pageCtaTitle: "How to order the review",
