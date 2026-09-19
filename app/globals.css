@@ -8189,3 +8189,49 @@ body.cabinet-menu-open { overflow: hidden; }
 .product-analytics-consent p { margin: 0 0 .75rem; }
 .product-analytics-consent button { min-height: 44px; padding: .5rem .8rem; border: 1px solid #bfa057; border-radius: 8px; background: transparent; color: #f3e7c8; cursor: pointer; }
 .product-analytics-consent button:focus-visible { outline: 2px solid #efcc60; outline-offset: 3px; }
+
+
+/* Personal Support pricing: one product, client-selected paid duration. */
+.payment-plans .personal-support-plan { display: grid; align-content: start; gap: 12px; }
+.personal-support-plan__controls { display: grid; gap: 14px; margin-top: 4px; }
+.personal-support-plan__field { display: grid; gap: 7px; color: var(--text); font-weight: 700; }
+.personal-support-plan__field select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 48px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 10px 12px;
+  background: var(--surface-muted);
+  color: var(--text);
+  font: inherit;
+}
+.personal-support-plan__summary {
+  display: grid;
+  gap: 5px;
+  border: 1px solid rgba(212, 175, 55, 0.32);
+  border-radius: 12px;
+  padding: 14px;
+  background: rgba(212, 175, 55, 0.06);
+}
+.personal-support-plan__summary strong { color: var(--accent-strong); font-size: 1.05rem; }
+.personal-support-plan__summary span,
+.personal-support-plan__renew small,
+.personal-support-plan__tax,
+.personal-support-plan__notice { color: var(--muted); font-size: 0.84rem; line-height: 1.55; }
+.personal-support-plan__renew {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  cursor: pointer;
+}
+.personal-support-plan__renew input { width: 20px; height: 20px; margin-top: 2px; accent-color: var(--accent); }
+.personal-support-plan__renew span { display: grid; gap: 4px; }
+.personal-support-plan__renew strong { color: var(--text); }
+.personal-support-plan__notice { margin: 0; color: var(--warning); }
+.personal-support-plan__tax { margin: 0; }
+@media (max-width: 560px) {
+  .personal-support-plan__field select { min-height: 50px; font-size: 16px; }
+  .personal-support-plan__renew { gap: 12px; }
+}
