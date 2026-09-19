@@ -66,10 +66,9 @@ export default async function PaymentPage() {
 
   return (
     <div className="page-shell payment-page">
-      {/* Three formats, one list. The review used to have a panel of its
-          own above the cards, from the days it was the free offer; as a
-          plan it is a card like the other two, and a panel repeating the
-          card's text word for word was the same paragraph twice. */}
+      {/* Two current services: one-time condition assessment and one
+          configurable Personal Support product. Legacy 5-week / 100-day
+          products stay in historical records only and never render here. */}
       <PageHeader
         eyebrow={t.eyebrow}
         title={t.title}
