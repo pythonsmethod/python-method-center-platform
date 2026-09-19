@@ -15,9 +15,9 @@ export async function findActiveDeliveryVolunteer(db: ServiceClient, countryCode
 // correction cannot create duplicate delivery work.
 export async function ensureDeliveryTaskForPayment(
   db: ServiceClient,
-  input: { paymentId: string; profileId: string; caseId: string | null; product?: string }
+  input: { paymentId: string; profileId: string; caseId: string | null; product?: string; months?: number }
 ) {
-  if (input.product && !["support_5_weeks", "support_15_weeks"].includes(input.product)) return { status: "not-applicable" as const };
+  if (input.product && !["personal_support", "support_5_weeks", "support_15_weeks"].includes(input.product)) return { status: "not-applicable" as const };
   const { data: profile } = await db.from("profiles")
     .select(DELIVERY_PROFILE_COLUMNS).eq("id", input.profileId).maybeSingle();
   const delivery = profile as unknown as DeliveryProfile | null;
@@ -34,7 +34,7 @@ export async function ensureDeliveryTaskForPayment(
     recipient_phone: delivery.delivery_phone,
     delivery_address: formatDeliveryAddress(delivery),
     delivery_instructions: delivery.delivery_instructions,
-    quantity: 1
+    quantity: Math.max(1, input.months ?? 1)
   }, { onConflict: "payment_id", ignoreDuplicates: true }).select("id").maybeSingle();
   return error ? { status: "error" as const, message: error.message } : {
     status: assignment ? "ready" as const : "assignment-required" as const,
