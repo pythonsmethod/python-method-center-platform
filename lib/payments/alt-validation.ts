@@ -102,7 +102,8 @@ export const altPaymentMethodLabels: Record<AltPaymentMethodId, string> = {
 };
 
 export const altPaymentPlanLabels: Record<AltPaymentPlanId, string> = {
-  preliminary_assessment: "Оценка состояния — 299 USD",\n  personal_support: "Личное сопровождение — $1,300 / 30 дней",
+  preliminary_assessment: "Оценка состояния — 299 USD",
+  personal_support: "Личное сопровождение — $1,300 / 30 дней",
   support_5_weeks: "Архив: сопровождение — 5 недель",
   support_15_weeks: "Архив: сопровождение — 100 дней",
   undecided: "Ещё не решил(а) — нужен совет"
