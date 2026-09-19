@@ -35,12 +35,16 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
-Optional (payment buttons on `/payment` stay hidden until these are set):
+Payment configuration:
 
 ```text
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W
+NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299
+STRIPE_PAYMENT_LINK_SUPPORT_1M ... STRIPE_PAYMENT_LINK_SUPPORT_12M
+STRIPE_PAYMENT_LINK_SUPPORT_1M_AUTORENEW ... STRIPE_PAYMENT_LINK_SUPPORT_12M_AUTORENEW
 ```
+
+The exact metadata, 30-day renewal and trial requirements are documented in
+`docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`. Personal Support buttons remain unavailable for any duration whose corresponding link is not configured.
 
 Recommended after the production domain is selected:
 
