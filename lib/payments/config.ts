@@ -1,34 +1,36 @@
-import { getReviewCopy, reviewPriceUsd, REVIEW_TEMPORARY_USD } from "@/lib/config/review";
+import { getReviewCopy, REVIEW_PRICE_USD } from "@/lib/config/review";
 import type { Locale } from "@/lib/i18n/locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 
-// Pricing set by the founder (23.07.2026): 5 weeks $1,200 (+5% service fee
-// + $180 formula delivery — Karen sends his formula as a gift with the
-// plan); 100 days $3,500 (+5% service fee + $180 delivery). Stripe Payment Links must be
-// created with the resulting totals: $1,440 and $3,855.
+// Legacy totals remain exported because historical Stripe events, tests and
+// archived records still contain the former products. They are no longer sold.
 export const PLAN_5W_TOTAL_USD = 1440;
 export const PLAN_100D_TOTAL_USD = 3855;
 
-// Standard and historical review total. Current checkout price is calculated
-// by reviewPriceUsd(now), including the temporary 299 USD period.
-export const REVIEW_PRICE_USD = 500;
-export const REVIEW_TOTAL_USD = 500;
+export const PERSONAL_SUPPORT_PRODUCT = "personal_support" as const;
+export const PERSONAL_SUPPORT_MONTHLY_USD = 1300;
+export const PERSONAL_SUPPORT_PERIOD_DAYS = 30;
+export const PERSONAL_SUPPORT_MAX_MONTHS = 12;
 
-// The database id of the review predates its price: it was created for the
-// free preliminary assessment and is kept so that earlier records stay
-// readable. Never show the id; show the plan's title.
+export const REVIEW_TOTAL_USD = REVIEW_PRICE_USD;
+export { REVIEW_PRICE_USD };
 export const REVIEW_PRODUCT = "preliminary_assessment" as const;
 
-// Legacy database/payment id. Never show this value as "15 weeks" to users:
-// the canonical public name and actual duration are both 100 days.
-export const SUPPORT_100_DAY_PRODUCT = "support_15_weeks" as const;
+export type SupportDurationOption = {
+  months: number;
+  durationDays: number;
+  amountUsd: number;
+  paymentLinkUrl: string | null;
+  autoRenewPaymentLinkUrl: string | null;
+};
 
 export type PaymentPlan = {
-  product: typeof REVIEW_PRODUCT | "support_5_weeks" | typeof SUPPORT_100_DAY_PRODUCT;
+  product: typeof REVIEW_PRODUCT | typeof PERSONAL_SUPPORT_PRODUCT;
   title: string;
   description: string;
   priceLine: string;
   paymentLinkUrl: string | null;
+  supportOptions?: SupportDurationOption[];
 };
 
 function readPaymentLink(value: string | undefined): string | null {
@@ -39,6 +41,25 @@ function readPaymentLink(value: string | undefined): string | null {
   }
 
   return url;
+}
+
+function supportLink(months: number, autoRenew: boolean): string | null {
+  const suffix = autoRenew ? "_AUTORENEW" : "";
+  const key = `STRIPE_PAYMENT_LINK_SUPPORT_${months}M${suffix}`;
+  return readPaymentLink(process.env[key]);
+}
+
+export function getSupportDurationOptions(): SupportDurationOption[] {
+  return Array.from({ length: PERSONAL_SUPPORT_MAX_MONTHS }, (_, index) => {
+    const months = index + 1;
+    return {
+      months,
+      durationDays: months * PERSONAL_SUPPORT_PERIOD_DAYS,
+      amountUsd: months * PERSONAL_SUPPORT_MONTHLY_USD,
+      paymentLinkUrl: supportLink(months, false),
+      autoRenewPaymentLinkUrl: supportLink(months, true)
+    };
+  });
 }
 
 export function getPaymentPlans(locale: Locale = "ru", now = new Date()): PaymentPlan[] {
@@ -52,28 +73,17 @@ export function getPaymentPlans(locale: Locale = "ru", now = new Date()): Paymen
       description: review.description,
       priceLine: review.price,
       paymentLinkUrl: readPaymentLink(
-        reviewPriceUsd(now) === REVIEW_TEMPORARY_USD
-          ? process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299
-          : (process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_500 || process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW)
+        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299 ||
+          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW
       )
     },
     {
-      product: "support_5_weeks",
-      title: t.plan5Title,
-      description: t.plan5Desc,
-      priceLine: t.plan5Price,
-      paymentLinkUrl: readPaymentLink(
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W
-      )
-    },
-    {
-      product: SUPPORT_100_DAY_PRODUCT,
-      title: t.plan100Title,
-      description: t.plan100Desc,
-      priceLine: t.plan100Price,
-      paymentLinkUrl: readPaymentLink(
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W
-      )
+      product: PERSONAL_SUPPORT_PRODUCT,
+      title: t.personalSupportTitle,
+      description: t.personalSupportDesc,
+      priceLine: t.personalSupportPrice,
+      paymentLinkUrl: null,
+      supportOptions: getSupportDurationOptions()
     }
   ];
 }
