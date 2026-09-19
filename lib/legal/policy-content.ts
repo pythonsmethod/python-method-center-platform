@@ -359,14 +359,14 @@ const REFUND_RU: LegalDocument = {
       ]
     },
     {
-      heading: "7. Продление сопровождения",
+      heading: "8. Продление сопровождения",
       paragraphs: [
         "Первоначальный оплаченный срок выбирается до оплаты. Уже начавшийся оплаченный период не сокращается с возвратом части стоимости.",
         "Если вы включили автоматическое продление, после окончания первоначально оплаченного срока следующее продление происходит на 30 дней по действующей стоимости. Автопродление можно отключить до следующего списания."
       ]
     },
     {
-      heading: "8. Куда писать",
+      heading: "9. Куда писать",
       paragraphs: [
         "По любому вопросу об оплате: pythonsusa@gmail.com или страница «Поддержка» в кабинете. Мы отвечаем на email в течение 24 часов в рабочие дни.",
         "Если что-то в условиях непонятно — спросите до оплаты. Мы отвечаем на такие вопросы лично и не считаем их лишними."
@@ -436,14 +436,14 @@ const REFUND_EN: LegalDocument = {
       ]
     },
     {
-      heading: "7. Changing your plan",
+      heading: "8. Extending Personal Support",
       paragraphs: [
-        "You can move from the five-week programme to the 100-day one: you pay the difference and the time already spent counts towards it. Moving back, with the difference returned, is not provided for — by that point the work on the longer programme is already under way.",
-        "Write to us and we will calculate the difference for your particular case."
+        "The initial prepaid duration is selected before payment. A paid period that has already begun is not shortened in exchange for a partial refund.",
+        "If you enabled automatic renewal, after the initial prepaid term ends the next renewal is for 30 days at the then-current price. Automatic renewal can be turned off before the next charge."
       ]
     },
     {
-      heading: "8. Where to write",
+      heading: "9. Where to write",
       paragraphs: [
         "For any question about payment: pythonsusa@gmail.com, or the Support page in your cabinet. We answer email within 24 hours on working days.",
         "If anything in the terms is unclear, ask before you pay. We answer such questions personally and never consider them a nuisance."
