@@ -418,9 +418,9 @@ const ru = {
       howTextSuffix:
         " токенов. Не за регистрацию — именно за начатое сопровождение: в этой программе нет места пустым аккаунтам.",
       useLabel: "Что с ними делать",
-      useTitle: "1 токен = 1 капсула формулы",
+      useTitle: "Токены превращаются в скидку",
       useTextPrefix:
-        "Токен привязан к капсуле формулы, а не к доллару: дорожает капсула — дорожают и ваши токены. Токены копятся и превращаются в скидку на любую оплату на платформе. Обменять можно от ",
+        "Токены копятся и могут быть использованы как скидка на оплату на платформе. Обменять можно от ",
       useTextSuffix:
         " токенов: платформа выдаст код, который вводится на странице оплаты. Срок жизни кода — 60 дней, использовать его можно один раз.",
       balanceAria: "Ваши токены",
@@ -1604,11 +1604,11 @@ const en: typeof ru = {
       howTextPrefix:
         "You invite someone with your link. Every time they pay — for a support programme or for capsules — you get back ",
       howTextSuffix:
-        "% of it in tokens. Every time, not only the first. Not for registering, but for the payment itself: there is no room for empty accounts in this one. The capsules included free with a support programme need no separate counting — their cost is already inside the price the share is taken from.",
+        "% of it in tokens. Every time, not only the first. Not for registering, but for the payment itself.",
       useLabel: "What to do with them",
-      useTitle: "1 token = 1 capsule of the formula",
+      useTitle: "Tokens turn into a discount",
       useTextPrefix:
-        "A token is tied to a capsule of the formula rather than to a dollar: when the capsule costs more, so do your tokens. Tokens accumulate and turn into a discount on any payment on the platform. You can exchange them from ",
+        "Tokens accumulate and can be used as a discount on a platform payment. You can exchange them from ",
       useTextSuffix:
         " tokens: the platform issues a code that you enter on the payment page. The code lasts 60 days and can be used once.",
       balanceAria: "Your tokens",
