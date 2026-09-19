@@ -75,3 +75,42 @@ The coordinator verifies the task receipt and returned evidence. Until then, the
 ## Future implementation report
 
 Follow the root `AGENTS.md` reporting requirements. Include changed files, commands actually run, exact test results, unresolved blockers and intentionally untouched areas. Clearly distinguish observed evidence from assumptions. Give the owner-facing summary in Russian; preserve required Russian/English completeness for product-facing changes.
+
+## Budget-aware model selection / Выбор модели и экономия лимитов
+
+Owner instruction, 2026-09-19: before delegating work, ChatGPT selects the appropriate Astra, Luna or Sol model and reasoning effort to conserve the owner's limits. This is a task-routing policy, not an installed runtime switch or a guaranteed credit cap.
+
+Перед каждым поручением выбираем минимально достаточную модель и уровень усилий. Экономим на лишних запусках, контексте и переделках, а не на обязательных проверках, безопасности или достоверности. Рекомендуемые настройки и фактически применённые настройки записываем отдельно.
+
+### Routing policy
+
+These are initial project heuristics, not guaranteed capability or savings claims. Reassess using observed task results and available usage evidence. Check current model availability and supported effort values for the actual launch surface.
+
+| Task scope | Initial requested model | Requested effort |
+| --- | --- | --- |
+| Exact copy/documentation edits, known mechanical changes, bounded read-only checks | Luna (`gpt-5.6-luna`) | Low / Light |
+| Small, isolated implementation following an existing pattern, with clear tests | Luna (`gpt-5.6-luna`) | Medium |
+| Feature integration, nontrivial debugging or interacting components | Sol (`gpt-5.6-sol`) | Medium; High only when justified |
+| Difficult cross-system design or unresolved multi-step failure | Astra (`gpt-6-astra`) | Medium; High only when justified and supported |
+
+Assess ambiguity, coupling, reversibility, verification difficulty and consequences of error, not just file count. Authentication, authorization, billing, migrations and clinical-data boundaries need a stronger review plan; they are not automatically Luna tasks just because the diff is small. No model choice authorizes real client-data access, deployment or clinical decisions.
+
+Do not climb every model/effort rung by default. Start directly with a suitable stronger model when repeated cheap attempts would be wasteful. After an implementation pass, allow at most one targeted repair-and-retest cycle within the authorized run unless the task specifies otherwise. If the same blocker remains, stop with diagnostics; the coordinator reassesses instead of automatically relaunching or increasing effort. Missing permissions or infrastructure are not solved by a stronger model.
+
+### Runtime selection gate
+
+Before an engineering dispatch, record requested model, effort, Standard speed, rationale, scope, checks and stop condition. Use actual supported runtime controls to apply the selection. A sentence in the task, `AGENTS.md` or this document is NOT a model switch. Do not infer execution settings from the agent's own claim.
+
+Verify the effective settings from available launcher configuration, task metadata or UI evidence. Mark unobservable values UNKNOWN. If the transport cannot select or verify an acceptable configuration, mark MODEL_SELECTION_UNVERIFIED and do not silently launch a potentially expensive default. Report the missing control; do not replace the connection with a paid API runner without separate authorization.
+
+As of this update, the native GitHub handshake returned a missing-environment blocker in PR #211. Per-task model/effort control through that route has NOT been verified. This update does not retry the handshake or start Codex. Any future retry must reference the then-current branch head, not blindly reuse the initial submitted commit.
+
+### Spend boundaries and measurement
+
+- Request Standard speed. Fast, Extra High, Max, Ultra, parallel agents and additional independent runs are off by policy unless explicitly justified and separately authorized. A policy is not proof that a platform switch is off.
+- Prefer direct available tools for trivial deterministic work; do not start Codex solely to reread information already available. Keep task context relevant while preserving mandatory repository instructions and required tests.
+- Separate drafting, implementation and release permissions. Do not add unrelated improvements, enable automatic reviews, buy credits, change billing or use an API key as a quota workaround.
+- Record run ID, requested/effective settings, changed commit, verification outcome and usage only when the platform exposes it. Unknown credits or remaining allowances stay unknown. Do not infer a fixed credit charge from elapsed time or message count.
+- Treat any task budget written in a prompt as a target, not a hard cap. Claim enforcement only when the runtime provides and confirms it. Compare cost per verified result, including failed attempts; do not promise a savings percentage or assume a different model resets shared limits.
+
+Official references checked 2026-09-19: https://developers.openai.com/codex/models ; https://developers.openai.com/codex/pricing/ ; https://learn.chatgpt.com/docs/agent-configuration/speed ; https://learn.chatgpt.com/docs/config-file/config-basic ; https://developers.openai.com/codex/integrations/github
