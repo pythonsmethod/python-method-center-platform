@@ -8,7 +8,17 @@ export const dynamic = "force-dynamic";
 
 export const metadata = {
   title: "NEXORA — Anna Dubrovenko",
-  description: "NEXORA is Anna Dubrovenko's living AI ecosystem: one evolving core, many specialized systems."
+  description: "NEXORA is Anna Dubrovenko's living AI ecosystem: one evolving core, many specialized systems.",
+  openGraph: {
+    title: "NEXORA — Anna Dubrovenko",
+    description: "One evolving intelligence core. Many systems that turn intelligence into new human possibilities.",
+    type: "website"
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "NEXORA — Anna Dubrovenko",
+    description: "One evolving intelligence core. Many systems that turn intelligence into new human possibilities."
+  }
 };
 
 type Branch = {
