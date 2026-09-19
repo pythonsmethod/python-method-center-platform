@@ -1071,18 +1071,23 @@ const ru = {
     offerHint:
       "Чтобы перейти к оплате, отметьте оба пункта выше.",
     refundLink: "Подробные условия оплаты и возврата",
-    feeNote: "К тарифам сопровождения добавляется сервисный сбор 5%; в цену разбора анализов он уже включён.",
-    planReviewTitle: "Разбор анализов",
+    feeNote: "Стоимость личного сопровождения включает формулу Professor Python на оплаченный период и её доставку. Налоги, если они юридически применимы к покупке, рассчитываются отдельно при оформлении оплаты.",
+    planReviewTitle: "Оценка состояния",
     planReviewDesc:
-      "Личный разбор ваших анализов от Professor Python без сопровождения: обратная связь по состоянию организма и рекомендации файлом в личный кабинет — до трёх рабочих дней, затем три рабочих дня открытого чата с ним. Один раз, ни к чему не обязывает.",
-    planReviewPrice: "$500 — сервисный сбор включён",
-    plan5Title: "Сопровождение — 5 недель",
-    plan5Desc:
-      "Разбор ситуации, план и сопровождение командой на 5 недель. В подарок Professor Python отправляет свою формулу — 200 капсул; вы оплачиваете только доставку ($180).",
-    plan5Price: "$1 200 + 5% сбор + $180 доставка формулы = $1 440",
-    plan100Title: "Сопровождение — 100 дней",
-    plan100Desc: "Расширенное сопровождение кейса командой Python Method на 100 дней. В подарок Professor Python отправляет свою формулу — 600 капсул; стоимость доставки — $180.",
-    plan100Price: "$3 500 + 5% сбор + $180 доставка формулы = $3 855"
+      "Оценка текущего состояния, разбор актуальных анализов и предварительная консультация по личному протоколу реабилитации от Professor Python. Разовая услуга, без обязательства покупать сопровождение.",
+    planReviewPrice: "299 USD — разовая оплата",
+    personalSupportTitle: "Личное сопровождение",
+    personalSupportDesc:
+      "Личная работа с вашим кейсом по оплачиваемым 30-дневным периодам. Вы сами выбираете продолжительность. Формула Professor Python на оплаченный период предоставляется в подарок, доставка включена в стоимость.",
+    personalSupportPrice: "$1,300 / 30 дней",
+    durationLabel: "На какой срок вы хотите сопровождение?",
+    durationOption: "{months} мес. · {days} дней · {amount}",
+    selectedTotal: "К оплате сегодня:",
+    giftIncluded: "Формула Professor Python на выбранный оплаченный период — в подарок. Доставка включена.",
+    autoRenewLabel: "Включить автоматическое продление",
+    autoRenewText: "После окончания уже оплаченного срока сопровождение будет продлеваться на следующие 30 дней по действующей цене. Автопродление можно отключить до следующего списания.",
+    autoRenewUnavailable: "Ссылка Stripe для автопродления этого срока ещё не подключена.",
+    taxNote: "Применимые налоги, если они требуются законодательством вашей страны или региона, рассчитываются отдельно в Stripe Checkout."
   },
   paymentSuccess: {
     eyebrow: "Оплата получена",
@@ -1092,7 +1097,7 @@ const ru = {
     steps: [
       "Оплата привязывается к вашему кейсу автоматически в течение нескольких минут (по аккаунту или email, указанному при оплате). Если через 10 минут её не видно в кабинете — напишите нам.",
       "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
-      "Professor Python лично отправит вам свою формулу в подарок (200 капсул на тарифе «5 недель», 600 капсул на тарифе «100 дней»). На обоих тарифах доставка ($180) включена в итоговую сумму оплаты. Трек-номер придёт в чат.",
+      "Вместе с личным сопровождением Professor Python предоставляет свою формулу на оплаченный период в подарок. Доставка уже включена в стоимость сопровождения; трек-номер придёт в чат.",
       "Professor Python и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
     ],
     cabinetCta: "Перейти в кабинет",
@@ -2205,18 +2210,23 @@ const en: typeof ru = {
     offerHint:
       "To proceed to payment, please tick both boxes above.",
     refundLink: "Full payment and refund terms",
-    feeNote: "A 5% service fee is added to the support plans; the analyses review price already includes it.",
-    planReviewTitle: "Analyses review",
+    feeNote: "The Personal Support price includes Professor Python's formula for the paid period and delivery. Taxes, where legally applicable to the purchase, are calculated separately at checkout.",
+    planReviewTitle: "Condition assessment",
     planReviewDesc:
-      "A personal review of your test results by Professor Python without the support programme: feedback on the state of your body and recommendations as a file in your cabinet — within three working days, then three working days of open chat with him. Once, and without obligation.",
-    planReviewPrice: "$500 — service fee included",
-    plan5Title: "Support — 5 weeks",
-    plan5Desc:
-      "Case review, plan and team support for 5 weeks. As a gift, Professor Python sends his formula — 200 capsules; you only pay for delivery ($180).",
-    plan5Price: "$1,200 + 5% fee + $180 formula delivery = $1,440",
-    plan100Title: "Support — 100 days",
-    plan100Desc: "Extended case support by the Python Method team for 100 days. As a gift, Professor Python sends his formula — 600 capsules; delivery costs $180.",
-    plan100Price: "$3,500 + 5% fee + $180 formula delivery = $3,855"
+      "An assessment of your current condition, review of current test results and a preliminary consultation on your personal rehabilitation protocol by Professor Python. A one-time service with no obligation to purchase support.",
+    planReviewPrice: "299 USD — one-time payment",
+    personalSupportTitle: "Personal Support",
+    personalSupportDesc:
+      "Personal work with your case in paid 30-day periods. You choose the duration. Professor Python's formula for the paid period is provided as a complimentary gift, with delivery included.",
+    personalSupportPrice: "$1,300 / 30 days",
+    durationLabel: "How long would you like support?",
+    durationOption: "{months} mo · {days} days · {amount}",
+    selectedTotal: "Due today:",
+    giftIncluded: "Professor Python's formula for the selected paid period is complimentary. Delivery is included.",
+    autoRenewLabel: "Enable automatic renewal",
+    autoRenewText: "After the prepaid period ends, support renews for the next 30 days at the then-current price. You can turn off renewal before the next charge.",
+    autoRenewUnavailable: "The Stripe auto-renew link for this duration has not been connected yet.",
+    taxNote: "Applicable taxes, if required by the laws of your country or region, are calculated separately in Stripe Checkout."
   },
   paymentSuccess: {
     eyebrow: "Payment received",
@@ -2226,7 +2236,7 @@ const en: typeof ru = {
     steps: [
       "The payment is linked to your case automatically within a few minutes (by your account or the email used at checkout). If you don't see it in your account after 10 minutes — write to us.",
       "The team will confirm the activation of your support program — you will get a message in your account chat.",
-      "Professor Python will personally send you his formula as a gift (200 capsules on the “5 weeks” plan, 600 capsules on the “100 days” plan). On both plans, delivery ($180) is included in the total payment. The tracking number will arrive in the chat.",
+      "With Personal Support, Professor Python provides his formula for the paid period as a complimentary gift. Delivery is already included in the support price; the tracking number will arrive in the chat.",
       "Professor Python and the team will study your case and begin the support program. All communication happens in your account."
     ],
     cabinetCta: "Go to my account",
