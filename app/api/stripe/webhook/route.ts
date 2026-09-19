@@ -434,18 +434,36 @@ async function handlePaidSession(
         ? session.customer
         : session.customer?.id ?? null;
 
-    await supabase.from("billing_subscriptions").upsert(
-      {
-        profile_id: profileId,
-        case_id: caseRow?.id ?? null,
-        stripe_subscription_id: stripeSubscriptionId,
-        stripe_customer_id: stripeCustomerId,
-        status: "trialing",
-        initial_months: purchasedMonths,
-        renewal_days: 30
-      },
-      { onConflict: "stripe_subscription_id" }
-    );
+    const { error: subscriptionError } = await supabase
+      .from("billing_subscriptions")
+      .upsert(
+        {
+          profile_id: profileId,
+          case_id: caseRow?.id ?? null,
+          stripe_subscription_id: stripeSubscriptionId,
+          stripe_customer_id: stripeCustomerId,
+          status: "trialing",
+          initial_months: purchasedMonths,
+          renewal_days: 30
+        },
+        { onConflict: "stripe_subscription_id" }
+      );
+
+    if (subscriptionError) {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `subscription-link-failed:${eventId}`,
+        title: "ОШИБКА: автопродление оплачено, но подписка не привязана",
+        lines: [
+          `Subscription: ${stripeSubscriptionId}`,
+          `Ошибка базы: ${subscriptionError.message}`,
+          "Первоначальный оплаченный срок сохранён, но до исправления будущие автоплатежи не смогут автоматически продлевать кейс."
+        ],
+        link: caseRow?.id
+          ? adminLink(`/admin/cases/${caseRow.id}`)
+          : adminLink("/admin/cases")
+      });
+    }
   }
 
   // 7) Referral reward: if this client was invited by someone, the referrer
