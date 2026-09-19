@@ -17,7 +17,6 @@ import type { EgyptianIconName } from "@/components/icons/EgyptianIcons";
 export type ShopStatus = "available" | "preparing" | "idea";
 
 export const SHOP_ITEM_IDS = [
-  "formula",
   "oil",
   "cream",
   "lotion",
@@ -53,7 +52,6 @@ export const SHOP_SECTIONS: ShopSectionSpine[] = [
     id: "formulas",
     icon: "ankh",
     items: [
-      { id: "formula", art: "jar", latin: "PYTHON'S ELIXIR", status: "preparing" },
       { id: "oil", art: "dropper", latin: "ELIXIR OIL", status: "idea" }
     ]
   },
@@ -94,9 +92,9 @@ type CatalogText = {
 const RU: CatalogText = {
   sections: {
     formulas: {
-      label: "Формулы",
-      title: "Формулы центра",
-      text: "То, что Professor Python составляет сам. Сейчас формула отправляется вместе с тарифами сопровождения — здесь появится возможность заказать её отдельно."
+      label: "Линия Professor Python",
+      title: "Продукты линии",
+      text: "Основная формула Professor Python отдельно не продаётся: в личном сопровождении она предоставляется на оплаченный период в подарок. В этом разделе могут появляться другие продукты линии."
     },
     care: {
       label: "Уход за телом",
@@ -115,10 +113,6 @@ const RU: CatalogText = {
     }
   },
   items: {
-    formula: {
-      title: "Формула Professor Python",
-      text: "Авторская формула центра в капсулах. Та самая, что входит в сопровождение."
-    },
     oil: {
       title: "Масло-концентрат",
       text: "Концентрат в каплях — для тех, кому удобнее не в капсулах."
@@ -153,9 +147,9 @@ const RU: CatalogText = {
 const EN: CatalogText = {
   sections: {
     formulas: {
-      label: "Formulas",
-      title: "The centre's formulas",
-      text: "What Professor Python composes himself. For now the formula is sent together with the support plans — here it will become possible to order it on its own."
+      label: "Professor Python line",
+      title: "Products from the line",
+      text: "Professor Python's main formula is not sold separately: with Personal Support it is provided as a complimentary gift for the paid period. Other products from the line may appear here."
     },
     care: {
       label: "Body care",
@@ -174,10 +168,6 @@ const EN: CatalogText = {
     }
   },
   items: {
-    formula: {
-      title: "Professor Python's formula",
-      text: "The centre's own formula in capsules. The same one included in the support programme."
-    },
     oil: {
       title: "Concentrated oil",
       text: "The concentrate in drops — for those who would rather not take capsules."
