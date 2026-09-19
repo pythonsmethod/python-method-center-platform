@@ -17,7 +17,6 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { SiteNav, type NavViewer } from "@/components/SiteNav";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { AppRouteMode } from "@/components/AppRouteMode";
-import { PublicMobileDock } from "@/components/PublicMobileDock";
 
 // Who is looking at the header. Not merely whether anyone is signed in:
 // a member of the team leaving the workspace used to land on the
@@ -185,13 +184,9 @@ export default async function RootLayout({ children }: RootLayoutProps) {
           </Link>
           <div className="site-header__right">
             <SiteNav labels={dict.nav} viewer={viewer} />
-            <Link className="mobile-header-account" href={viewer === "staff" ? "/admin" : viewer === "client" ? "/cabinet" : "/login"}>
-              {viewer === "staff" ? (locale === "ru" ? "Рабочее место" : "Workspace") : viewer === "client" ? (locale === "ru" ? "Кабинет" : "Account") : (locale === "ru" ? "Вход / Регистрация" : "Sign in / Sign up")}
-            </Link>
             <LanguageSwitcher locale={locale} />
           </div>
         </SiteHeader>
-        <PublicMobileDock locale={locale} viewer={viewer} />
         <main>{children}</main>
         <ProductAnalytics
           enabled={analyticsEnabled() && viewer !== "staff"}

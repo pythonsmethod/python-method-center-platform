@@ -1,5 +1,24 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Mobile site aligned with the desktop site — 2026-09-19 — RELEASE CANDIDATE
+
+Phones and touch-first devices now get the same site as a wide screen instead
+of a reduced variant. The public header keeps its full row of sections, the
+guest sign-in and sign-up doors and the language switch at every width (the
+separate bottom dock and the header account chip are removed). The homepage
+journey is the same six numbered cards with their explanations on every
+screen; the phone-only ring of step titles without text is removed, and the
+retained app promotion block stays on narrow screens. The team workspace on a
+phone keeps the site header with the language switch, the footer, the top
+navigation row including the founder overview link, and one bilingual home
+page with the session panel, today's queue, the assistant and the knowledge
+base. Client cards in the staff list now carry the contacts and creation date
+the table shows. The client cabinet keeps sign-out in the narrow sidebar and
+the token balance in the phone top bar. No schema, data, payment or PHI
+change. Validation: typecheck, ESLint and the full test suite pass; production
+build passes; phone and tablet screenshots of the public pages reviewed
+locally in RU and EN with no horizontal overflow.
+
 ## Anham birthday greetings — 2026-09-18 — PUBLISHED
 
 The production database has the additive birthday-delivery schema and service-role-only `SECURITY INVOKER` function. PR #203 merged as `5ba27eb38405d68a14e76a5d0dca00139941b90f`; the primary and clinical Vercel production deployments completed successfully. The public site returned `200`, the protected cabinet returned the expected `307` login redirect and the cron route returned the expected `401` without `CRON_SECRET`. The release reuses the latest immutable health-questionnaire birth date, stores one deterministic RU/EN assistant-history message per eligible client/local year and honors the existing outreach opt-out. No birthday RPC was manually invoked against production clients. Evidence: `docs/ankh/anham_birthday_greetings.md`.
