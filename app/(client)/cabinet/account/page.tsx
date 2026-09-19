@@ -55,9 +55,19 @@ export default async function AccountPage() {
         .maybeSingle()
     : { data: null };
 
-  const [caseResult, paymentsResult] = await Promise.all([
+  const [caseResult, paymentsResult, subscriptionResult] = await Promise.all([
     getClientCaseShell(auth.userId),
-    getOwnPayments(auth.userId)
+    getOwnPayments(auth.userId),
+    supabase
+      ? supabase
+          .from("billing_subscriptions")
+          .select("id, status")
+          .eq("profile_id", auth.userId)
+          .in("status", ["trialing", "active", "past_due", "paused", "unpaid", "incomplete"])
+          .order("created_at", { ascending: false })
+          .limit(1)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null })
   ]);
   const avatarUrl = await createProfileAvatarUrl(profileRow?.avatar_path ?? null);
   const historyResult =
@@ -170,6 +180,19 @@ export default async function AccountPage() {
               ))}
             </ul>
           )}
+
+          {subscriptionResult.data ? (
+            <div className="account-subscription">
+              <span className="panel__label">{t.subscriptionLabel}</span>
+              <h3>{t.subscriptionTitle}</h3>
+              <p>{t.subscriptionText}</p>
+              <form action="/api/stripe/portal" method="post">
+                <button className="button button--secondary" type="submit">
+                  {t.subscriptionManage}
+                </button>
+              </form>
+            </div>
+          ) : null}
         </div>
 
         <div className="panel">
