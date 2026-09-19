@@ -3,19 +3,33 @@ import { isPlanProduct, openServicePeriod } from "@/lib/payments/service-period"
 
 type Row = Record<string, unknown>;
 
-function fakeSupabase(options: { activeEndsAt?: string; insertError?: string } = {}) {
+function fakeSupabase(options: {
+  activeEndsAt?: string;
+  existingPaymentEndsAt?: string;
+  insertError?: string;
+} = {}) {
   const inserted: Row[] = [];
   const client = {
     from(table: string) {
       if (table !== "service_periods") throw new Error(`unexpected table: ${table}`);
+      let paymentLookup = false;
       const query = {
         select: () => query,
-        eq: () => query,
+        eq: (column: string) => {
+          if (column === "payment_id") paymentLookup = true;
+          return query;
+        },
         gt: () => query,
         order: () => query,
         limit: () => query,
         maybeSingle: async () => ({
-          data: options.activeEndsAt ? { ends_at: options.activeEndsAt } : null
+          data: paymentLookup
+            ? options.existingPaymentEndsAt
+              ? { ends_at: options.existingPaymentEndsAt }
+              : null
+            : options.activeEndsAt
+              ? { ends_at: options.activeEndsAt }
+              : null
         }),
         insert: async (row: Row) => {
           inserted.push(row);
@@ -99,6 +113,25 @@ describe("Personal Support service periods", () => {
     });
 
     expect(result).toEqual({ status: "failed", message: "permission denied" });
+  });
+
+  it("does not grant the same payment twice on webhook retry", async () => {
+    const { client, inserted } = fakeSupabase({
+      existingPaymentEndsAt: "2026-10-19T12:00:00.000Z"
+    });
+
+    const result = await openServicePeriod(client, {
+      ...BASE,
+      product: "personal_support",
+      paidAt: new Date("2026-09-19T12:00:00.000Z"),
+      months: 1
+    });
+
+    expect(result).toEqual({
+      status: "already-applied",
+      endsAt: "2026-10-19T12:00:00.000Z"
+    });
+    expect(inserted).toHaveLength(0);
   });
 });
 

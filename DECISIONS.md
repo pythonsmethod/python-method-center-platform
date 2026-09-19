@@ -1341,3 +1341,17 @@ responsive web platform. Implementation is in draft PR #215 and is not a live
 production decision until its migration, Stripe configuration and release gate
 are completed. Release contract:
 `docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
+
+## 2026-09-19 — Personal Support webhooks retry safely and fail closed on billing mismatch
+
+A valid Personal Support checkout requires exact Stripe metadata
+`product=personal_support`, `months=1..12`, USD and a base amount of 1,300 USD
+times the selected term. A recurring invoice extends access only when it is the
+expected 1,300 USD renewal. Contract mismatches create an operational alert and
+grant no access.
+
+An internal processing failure must return HTTP 500 and allow Stripe
+redelivery. Retried events resume the existing payment, while a unique
+`service_periods.payment_id` boundary makes access issuance idempotent. This
+replaces the previous behavior that acknowledged a partially processed event
+and permanently prevented recovery.

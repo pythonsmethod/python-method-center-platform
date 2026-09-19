@@ -1216,3 +1216,12 @@ full regression/build gate passes, and payment flows are accepted in test mode.
 Vercel preview creation is currently blocked by the account build-rate limit,
 not by an identified application build failure. See
 `docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
+
+Follow-up hardening on the same draft branch makes webhook retry recoverable,
+prevents duplicate service periods for the same payment, and rejects Personal
+Support checkout/renewal amounts that do not match the selected term. Focused
+tests pass. The staging migration and Stripe Test Mode acceptance remain
+blocked by missing Supabase CLI/browser MFA authorization and an unauthenticated
+Stripe Dashboard; Vercel Preview also has none of the 24 required support-link
+variables. Production was not changed. Exact evidence and remaining gates are
+recorded in `docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.

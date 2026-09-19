@@ -6,8 +6,11 @@ import { describeFailedPayment, stripeDashboardUrl } from "@/lib/payments/failur
 import { openServicePeriod } from "@/lib/payments/service-period";
 import {
   emailExactMatchPattern,
+  expectedPersonalSupportAmountCents,
   getStripe,
+  isValidPersonalSupportCharge,
   normalizePayerEmail,
+  personalSupportMonthsFromMetadata,
   resolveStripeProduct,
   supportMonthsFromMetadata
 } from "@/lib/payments/stripe";
@@ -147,9 +150,10 @@ export async function POST(request: Request) {
       link: adminLink("/admin")
     });
 
-    // The event stays in stripe_events: we alerted a human instead of
-    // letting Stripe retry into the same failure.
-    return NextResponse.json({ received: true, alerted: true });
+    // Release the idempotency claim so Stripe can retry. Downstream writes are
+    // independently idempotent by processor_reference/payment_id.
+    await supabase.from("stripe_events").delete().eq("id", event.id);
+    return NextResponse.json({ error: "processing-failed" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });
@@ -280,6 +284,34 @@ async function handlePaidSession(
       ? supportMonthsFromMetadata(session.metadata, amountCents, session.currency)
       : 1;
 
+  if (product === "personal_support") {
+    const metadataMonths = personalSupportMonthsFromMetadata(session.metadata);
+    const baseAmountCents = session.amount_subtotal ?? session.amount_total;
+    if (
+      metadataMonths === null ||
+      !isValidPersonalSupportCharge({
+        amountCents: baseAmountCents,
+        currency: session.currency,
+        months: metadataMonths
+      })
+    ) {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `personal-support-contract-mismatch:${eventId}`,
+        title: "ОШИБКА: Stripe Personal Support не совпадает с договором",
+        lines: [
+          `Событие: ${eventId}`,
+          `Metadata product: ${session.metadata?.product ?? "не задано"}`,
+          `Metadata months: ${session.metadata?.months ?? "не задано"}`,
+          `Базовая сумма: ${baseAmountCents ?? 0} ${(session.currency ?? "не задано").toUpperCase()}`,
+          "Доступ не выдан: проверьте тестовую Payment Link и metadata."
+        ],
+        link: adminLink("/admin")
+      });
+      return;
+    }
+  }
+
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
   if (!profileId || !product) {
@@ -323,7 +355,7 @@ async function handlePaidSession(
   // 3) Payment record. The unique index on processor_reference makes a
   // concurrent duplicate insert fail closed.
   const paidAt = new Date();
-  const { data: payment, error: paymentError } = await supabase
+  const { data: insertedPayment, error: paymentError } = await supabase
     .from("payments")
     .insert({
       profile_id: profileId,
@@ -344,34 +376,44 @@ async function handlePaidSession(
     })
     .select("id")
     .single();
+  let payment = insertedPayment;
 
   if (paymentError) {
     if (paymentError.code === "23505") {
-      // Reference already recorded by an earlier webhook delivery.
-      return;
+      const { data: existingPayment, error: existingPaymentError } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("processor_reference", reference)
+        .maybeSingle();
+      if (existingPaymentError || !existingPayment?.id) {
+        throw new Error("duplicate payment could not be resumed");
+      }
+      payment = existingPayment;
+    } else {
+      // Money left the client's card and the platform could not record it.
+      // Silence here is the worst outcome: the client sees an empty cabinet
+      // and no one knows. Tell the team the exact reason, then fail so
+      // Stripe retries the delivery.
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `payment-insert-failed:${eventId}`,
+        title: "ОШИБКА: ОПЛАТА ПОЛУЧЕНА, НО НЕ ЗАПИСАНА",
+        lines: [
+          `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
+          customerEmail ? `Плательщик: ${customerEmail}` : null,
+          `Тариф: ${paymentProductLabel(product)}`,
+          `Ошибка базы: ${paymentError.message}`,
+          `Референс: ${reference}`,
+          "Клиент оплатил, но запись не создана — нужна техническая проверка."
+        ],
+        link: adminLink("/admin/cases")
+      });
+
+      throw new Error(`payment insert failed: ${paymentError.message}`);
     }
-
-    // Money left the client's card and the platform could not record it.
-    // Silence here is the worst outcome: the client sees an empty cabinet
-    // and no one knows. Tell the team the exact reason, then fail so
-    // Stripe retries the delivery.
-    await notifyTeam({
-      kind: "processing_error",
-      dedupeKey: `payment-insert-failed:${eventId}`,
-      title: "ОШИБКА: ОПЛАТА ПОЛУЧЕНА, НО НЕ ЗАПИСАНА",
-      lines: [
-        `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
-        customerEmail ? `Плательщик: ${customerEmail}` : null,
-        `Тариф: ${paymentProductLabel(product)}`,
-        `Ошибка базы: ${paymentError.message}`,
-        `Референс: ${reference}`,
-        "Клиент оплатил, но запись не создана — нужна техническая проверка."
-      ],
-      link: adminLink("/admin/cases")
-    });
-
-    throw new Error(`payment insert failed: ${paymentError.message}`);
   }
+
+  if (!payment) throw new Error("payment record missing after insert");
 
   // 4) Service period activation, tied to the payment. Shared with the
   // manual path on the case page, so a renewal follows the same rule
@@ -398,6 +440,7 @@ async function handlePaidSession(
         ],
         link: adminLink(`/admin/cases/${caseRow.id}`)
       });
+      throw new Error(`service period failed: ${period.message}`);
     }
   }
 
@@ -463,6 +506,7 @@ async function handlePaidSession(
           ? adminLink(`/admin/cases/${caseRow.id}`)
           : adminLink("/admin/cases")
       });
+      throw new Error(`subscription link failed: ${subscriptionError.message}`);
     }
   }
 
@@ -561,7 +605,29 @@ async function handlePaidSubscriptionInvoice(
   const paidAt = new Date();
   const reference = invoicePaymentReference(invoice);
 
-  const { data: payment, error: paymentError } = await supabase
+  if (
+    !isValidPersonalSupportCharge({
+      amountCents,
+      currency: invoice.currency,
+      months: 1
+    })
+  ) {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `subscription-invoice-contract-mismatch:${event.id}`,
+      title: "ОШИБКА: сумма автопродления Personal Support не совпадает",
+      lines: [
+        `Invoice: ${invoice.id}`,
+        `Получено: ${amountCents} ${currency}`,
+        `Ожидалось: ${expectedPersonalSupportAmountCents()} USD`,
+        "Новый период не открыт."
+      ],
+      link: adminLink("/admin/cases")
+    });
+    return;
+  }
+
+  const { data: insertedPayment, error: paymentError } = await supabase
     .from("payments")
     .insert({
       profile_id: subscription.profile_id,
@@ -583,11 +649,25 @@ async function handlePaidSubscriptionInvoice(
     })
     .select("id")
     .single();
+  let payment = insertedPayment;
 
   if (paymentError) {
-    if (paymentError.code === "23505") return;
-    throw new Error(`subscription payment insert failed: ${paymentError.message}`);
+    if (paymentError.code === "23505") {
+      const { data: existingPayment, error: existingPaymentError } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("processor_reference", reference)
+        .maybeSingle();
+      if (existingPaymentError || !existingPayment?.id) {
+        throw new Error("duplicate subscription payment could not be resumed");
+      }
+      payment = existingPayment;
+    } else {
+      throw new Error(`subscription payment insert failed: ${paymentError.message}`);
+    }
   }
+
+  if (!payment) throw new Error("subscription payment missing after insert");
 
   if (subscription.case_id) {
     const period = await openServicePeriod(supabase, {
@@ -607,6 +687,7 @@ async function handlePaidSubscriptionInvoice(
         lines: [`Оплата: ${payment.id}`, `Ошибка: ${period.message}`],
         link: adminLink(`/admin/cases/${subscription.case_id}`)
       });
+      throw new Error(`subscription service period failed: ${period.message}`);
     }
   }
 

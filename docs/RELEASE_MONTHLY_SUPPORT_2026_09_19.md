@@ -119,3 +119,31 @@ Do not publish this pricing release until all of the following pass:
 - TypeScript, lint, build and test suite pass.
 
 Native mobile app pricing is intentionally out of scope: purchasing remains on the web platform.
+
+## Verification follow-up — 2026-09-19
+
+The webhook now fails closed on a Personal Support contract mismatch: the
+Checkout Session must contain `product=personal_support`, an integer
+`months=1..12`, USD currency and a base amount of `130000 * months` cents. A
+recurring invoice must be exactly 130000 USD cents before it can open another
+30-day period. Test coverage locks both rules.
+
+Webhook processing errors now return HTTP 500 and release the event-ledger
+claim so Stripe can redeliver. A repeated delivery resumes an existing payment
+by `processor_reference`; a unique `service_periods.payment_id` index plus an
+existing-period lookup prevents the retry from granting access twice.
+
+External staging gate remains open:
+
+- no `STRIPE_PAYMENT_LINK_SUPPORT_1M..12M` variables exist in the Vercel
+  Preview environment;
+- no matching `_AUTORENEW` variables exist there;
+- Vercel marks the existing Stripe/Supabase Preview values as sensitive and
+  they are shared with Production scope, so Test Mode and the staging project
+  cannot be verified from the CLI output;
+- Supabase CLI has no access token and the browser session stops at Supabase
+  MFA, so migration application is not claimed;
+- Stripe Dashboard is not authenticated, so test Payment Links, webhook event
+  selection and Customer Portal configuration are not claimed.
+
+No production configuration or database was changed during this follow-up.

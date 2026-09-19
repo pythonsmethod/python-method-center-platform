@@ -14,6 +14,7 @@ type ServiceClient = NonNullable<ReturnType<typeof createSupabaseServiceClient>>
 export type ServicePeriodOutcome =
   | { status: "opened"; endsAt: string }
   | { status: "extended"; endsAt: string }
+  | { status: "already-applied"; endsAt: string }
   | { status: "not-applicable" }
   | { status: "failed"; message: string };
 
@@ -36,6 +37,16 @@ export async function openServicePeriod(
 
   if (!isPlanProduct(product)) {
     return { status: "not-applicable" };
+  }
+
+  const { data: existing } = await supabase
+    .from("service_periods")
+    .select("ends_at")
+    .eq("payment_id", paymentId)
+    .maybeSingle();
+
+  if (existing?.ends_at) {
+    return { status: "already-applied", endsAt: existing.ends_at as string };
   }
 
   const { data: current } = await supabase

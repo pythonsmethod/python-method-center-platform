@@ -87,6 +87,35 @@ export function supportMonthsFromMetadata(
   return personalSupportMonthsFromAmount(amountCents, currency) ?? 1;
 }
 
+export function personalSupportMonthsFromMetadata(
+  metadata: Record<string, string> | null | undefined
+): number | null {
+  if (metadata?.product !== PERSONAL_SUPPORT_PRODUCT) return null;
+
+  const raw = metadata.months;
+  if (!raw || !/^\d+$/.test(raw)) return null;
+
+  const months = Number(raw);
+  return months >= 1 && months <= PERSONAL_SUPPORT_MAX_MONTHS
+    ? months
+    : null;
+}
+
+export function expectedPersonalSupportAmountCents(months = 1): number {
+  return PERSONAL_SUPPORT_MONTHLY_USD * 100 * months;
+}
+
+export function isValidPersonalSupportCharge(input: {
+  amountCents: number | null | undefined;
+  currency: string | null | undefined;
+  months: number;
+}): boolean {
+  return (
+    input.currency?.toLowerCase() === "usd" &&
+    input.amountCents === expectedPersonalSupportAmountCents(input.months)
+  );
+}
+
 export function productFromAmount(
   amountCents: number | null | undefined,
   currency: string | null | undefined

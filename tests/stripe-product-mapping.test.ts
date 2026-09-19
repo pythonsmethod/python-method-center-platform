@@ -1,7 +1,10 @@
 import { describe, expect, it } from "vitest";
 import {
   PLAN_DURATION_DAYS,
+  expectedPersonalSupportAmountCents,
+  isValidPersonalSupportCharge,
   personalSupportMonthsFromAmount,
+  personalSupportMonthsFromMetadata,
   productFromAmount,
   productFromMetadata,
   resolveStripeProduct,
@@ -36,6 +39,41 @@ describe("current payment mapping", () => {
         "usd"
       )
     ).toBe(6);
+  });
+
+  it("requires exact Personal Support metadata and USD base amount", () => {
+    expect(
+      personalSupportMonthsFromMetadata({
+        product: "personal_support",
+        months: "12"
+      })
+    ).toBe(12);
+    expect(personalSupportMonthsFromMetadata({ product: "personal_support" })).toBeNull();
+    expect(personalSupportMonthsFromMetadata({ product: "personal_support", months: "0" })).toBeNull();
+    expect(personalSupportMonthsFromMetadata({ product: "personal_support", months: "13" })).toBeNull();
+    expect(personalSupportMonthsFromMetadata({ product: "other", months: "1" })).toBeNull();
+    expect(expectedPersonalSupportAmountCents(6)).toBe(780_000);
+    expect(
+      isValidPersonalSupportCharge({
+        amountCents: 780_000,
+        currency: "USD",
+        months: 6
+      })
+    ).toBe(true);
+    expect(
+      isValidPersonalSupportCharge({
+        amountCents: 650_000,
+        currency: "usd",
+        months: 6
+      })
+    ).toBe(false);
+    expect(
+      isValidPersonalSupportCharge({
+        amountCents: 130_000,
+        currency: "eur",
+        months: 1
+      })
+    ).toBe(false);
   });
 
   it("rejects unknown, malformed and non-USD totals", () => {

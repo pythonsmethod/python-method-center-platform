@@ -29,6 +29,13 @@ create index if not exists billing_subscriptions_profile_idx
 create index if not exists billing_subscriptions_case_idx
   on public.billing_subscriptions (case_id, created_at desc);
 
+-- A retried Stripe event must resume safely without granting the same paid
+-- period twice. Existing historical rows are unaffected because NULL values
+-- remain allowed by a partial unique index.
+create unique index if not exists service_periods_payment_id_key
+  on public.service_periods (payment_id)
+  where payment_id is not null;
+
 alter table public.billing_subscriptions enable row level security;
 
 drop policy if exists "billing_subscriptions_select_own"
