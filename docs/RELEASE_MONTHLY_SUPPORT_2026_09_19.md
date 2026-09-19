@@ -106,6 +106,7 @@ Do not publish this pricing release until all of the following pass:
 - all intended prepaid links configured with correct metadata;
 - all intended auto-renew links configured with correct metadata, 30-day recurring price and correct trial duration;
 - webhook subscription events enabled;
+- Stripe Customer Portal enabled for the production account, with customers allowed to cancel automatic renewal and update payment methods;
 - RU and EN payment page verified;
 - desktop + mobile-web duration selection verified;
 - one-time test payment verified;
