@@ -1,5 +1,21 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Anham message reactions v1 — 2026-09-18 — RELEASE CANDIDATE
+
+Anham may now attach one small, allowlisted emoji reaction to the person's own
+message in the client chat, then answer in words as before. The model proposes
+a key through one structured `[[reaction:key]]` marker; the server strips the
+marker, applies the eight-key allowlist, restricts guests to a calm subset and
+lets a RU/EN safety classifier veto any reaction on pain, worsening, breathing,
+bleeding, consciousness, seizures, emergency, medication/dosage, self-harm,
+crisis, fear for life, death, diagnosis or serious medical news. A reply that
+had to refuse or escalate also gets none. Registered and paid clients keep the
+reaction on their own `assistant_messages` row through an additive nullable
+column, so it survives reload; guests are never stored. Staff, Karen and
+Professor Python conversations are unchanged. Focused tests, TypeScript and
+ESLint pass. Production migration and publication remain pending. Evidence:
+`docs/ankh/anham_message_reactions.md`.
+
 ## Anham birthday greetings — 2026-09-18 — PUBLISHED
 
 The production database has the additive birthday-delivery schema and service-role-only `SECURITY INVOKER` function. PR #203 merged as `5ba27eb38405d68a14e76a5d0dca00139941b90f`; the primary and clinical Vercel production deployments completed successfully. The public site returned `200`, the protected cabinet returned the expected `307` login redirect and the cron route returned the expected `401` without `CRON_SECRET`. The release reuses the latest immutable health-questionnaire birth date, stores one deterministic RU/EN assistant-history message per eligible client/local year and honors the existing outreach opt-out. No birthday RPC was manually invoked against production clients. Evidence: `docs/ankh/anham_birthday_greetings.md`.

@@ -2667,6 +2667,32 @@ code {
   border: 1px solid rgba(212, 175, 55, 0.4);
   color: var(--text);
   justify-self: end;
+  position: relative;
+}
+
+/* Anham's reaction to the person's message: one small badge tucked under the
+   corner of their bubble, like a messenger reaction. Absolutely positioned so
+   it never widens the bubble or shifts the thread; the reacted bubble only
+   leaves a little room below so the badge does not sit on the next message.
+   Works unchanged on a phone. */
+.assistant-msg--reacted {
+  margin-bottom: 10px;
+}
+
+.assistant-msg__reaction {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  bottom: -11px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  display: inline-block;
+  font-size: 13px;
+  font-style: normal;
+  left: 10px;
+  line-height: 1;
+  padding: 3px 7px;
+  position: absolute;
+  white-space: nowrap;
 }
 
 .assistant-msg--pending {

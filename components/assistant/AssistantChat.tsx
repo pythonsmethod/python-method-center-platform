@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import { AnhamReactionBadge } from "@/components/assistant/AnhamReactionBadge";
 import { AssistantOutreachPreference } from "@/components/assistant/AssistantOutreachPreference";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
 import { RealtimeVoice } from "./RealtimeVoice";
@@ -10,6 +11,7 @@ import { mergeVoiceTranscript, type VoiceChatMessage } from "@/lib/assistant/voi
 import { ACCEPT_ATTRIBUTE, MAX_ATTACHMENTS_TOTAL } from "@/lib/assistant/attachments";
 import { contextWindow } from "@/lib/assistant/context-window";
 import { memoryCollectionFromCommand, type MemoryCollection } from "@/lib/assistant/memory";
+import { normalizeReaction, type AnhamReaction } from "@/lib/assistant/reactions";
 import {
   prepareFiles,
   splitIntoBatches,
@@ -25,7 +27,12 @@ type ChatMessage = VoiceChatMessage & {
   id?: string;
   created_at?: string;
   message_sequence?: number;
+  // Anham's reaction to the person's message, shown as a small badge on it.
+  reaction?: AnhamReaction | null;
 };
+
+// What one call to the assistant gives back to the window.
+type AssistantAnswer = { reply: string; reaction: AnhamReaction | null };
 
 type AssistantChatProps = {
   endpoint: string;
@@ -288,11 +295,21 @@ function AssistantChatSession({
     finally { setHistoryLoading(false); }
   }
 
-  function appendReply(current: ChatMessage[], reply: string) {
+  // The reaction belongs to the person's message, so it is attached to the
+  // last user message rather than shown as a message of its own. Saved rows
+  // carry it from the database; an unsaved (guest) exchange takes it from
+  // the response.
+  function appendReply(current: ChatMessage[], reply: string, reaction: AnhamReaction | null = null) {
     const saved = savedExchange.current;
-    setMessages(saved?.length === 2
-      ? [...current.slice(0, -1), ...saved]
-      : [...current, { role: "assistant", content: reply, created_at: new Date().toISOString() }]);
+    if (saved?.length === 2) {
+      setMessages([...current.slice(0, -1), { ...saved[0], reaction: saved[0].reaction ?? reaction }, saved[1]]);
+      return;
+    }
+    const last = current[current.length - 1];
+    const reacted = reaction && last?.role === "user"
+      ? [...current.slice(0, -1), { ...last, reaction }]
+      : current;
+    setMessages([...reacted, { role: "assistant", content: reply, created_at: new Date().toISOString() }]);
   }
 
   function downloadConversation() {
@@ -347,7 +364,7 @@ function AssistantChatSession({
     // What to keep in the saved conversation: the text the person actually
     // typed, or nothing at all for the technical file-reading requests.
     save?: { displayText?: string; transient?: boolean; memoryConfirmation?: boolean }
-  ): Promise<string> {
+  ): Promise<AssistantAnswer> {
     const response = await fetch(endpoint, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -373,7 +390,7 @@ function AssistantChatSession({
     });
 
     const data = (await response.json().catch(() => null)) as
-      | { reply?: string; error?: string; saved?: boolean; messages?: ChatMessage[] }
+      | { reply?: string; reaction?: unknown; error?: string; saved?: boolean; messages?: ChatMessage[] }
       | null;
 
     if (!response.ok || !data?.reply) {
@@ -384,7 +401,9 @@ function AssistantChatSession({
       savedExchange.current = data.saved ? data.messages ?? null : null;
       if (data.saved === false) setSaveFailed(true);
     }
-    return data.reply;
+    // The allowlist is applied in the browser as well: only a known key can
+    // become a badge, whatever the response carried.
+    return { reply: data.reply, reaction: save?.transient ? null : normalizeReaction(data.reaction) };
   }
 
   // Sent once per question handed in, and never while something else is in
@@ -427,8 +446,8 @@ function AssistantChatSession({
       setMemoryMessage(null);
       setPending(true);
       try {
-        const reply = await ask(next, null, { memoryConfirmation: true });
-        appendReply(next, reply);
+        const answer = await ask(next, null, { memoryConfirmation: true });
+        appendReply(next, answer.reply, answer.reaction);
       } catch (failure) {
         setError(failure instanceof Error ? failure.message : t.errorNetwork);
       } finally { setPending(false); }
@@ -456,8 +475,8 @@ function AssistantChatSession({
 
     try {
       if (attached.length === 0) {
-        const reply = await ask(nextMessages, null);
-        appendReply(nextMessages, reply);
+        const answer = await ask(nextMessages, null);
+        appendReply(nextMessages, answer.reply, answer.reaction);
         if (memoryCapture) setMemoryState("offer");
         return;
       }
@@ -465,12 +484,12 @@ function AssistantChatSession({
       const batches = splitIntoBatches(attached);
 
       if (batches.length === 1) {
-        const reply = await ask(
+        const answer = await ask(
           [...baseMessages, { role: "user", content: question }],
           batches[0],
           { displayText: visible }
         );
-        appendReply(nextMessages, reply);
+        appendReply(nextMessages, answer.reply, answer.reaction);
         if (memoryCapture) setMemoryState("offer");
         return;
       }
@@ -485,7 +504,7 @@ function AssistantChatSession({
           c.reading(read + 1, read + batch.length, attached.length)
         );
 
-        const partReply = await ask(
+        const { reply: partReply } = await ask(
           [
             {
               role: "user",
@@ -505,7 +524,7 @@ function AssistantChatSession({
 
       setProgress(c.combining);
 
-      const reply = await ask(
+      const answer = await ask(
         [
             ...baseMessages,
           {
@@ -519,7 +538,7 @@ function AssistantChatSession({
         { displayText: visible }
       );
 
-      appendReply(nextMessages, reply);
+      appendReply(nextMessages, answer.reply, answer.reaction);
       if (memoryCapture) setMemoryState("offer");
     } catch (sendError) {
       setError(
@@ -574,9 +593,10 @@ function AssistantChatSession({
             {restored > 0 && index === restored ? (
               <p className="assistant-chat__divider">{c.today}</p>
             ) : null}
-            <div className={`assistant-msg assistant-msg--${message.role}`}>
+            <div className={`assistant-msg assistant-msg--${message.role}${message.role === "user" && message.reaction ? " assistant-msg--reacted" : ""}`}>
               {message.created_at ? <time className="assistant-log__meta" dateTime={message.created_at}>{formatDateTime(message.created_at, locale)}</time> : null}
               {message.content}
+              {message.role === "user" ? <AnhamReactionBadge locale={locale} reaction={message.reaction} /> : null}
               {message.source === "voice_transcript" ? <small className="assistant-log__meta">{locale === "ru" ? "Голос · непроверенная расшифровка" : "Voice · unverified transcript"}</small> : null}
               {message.voice_state === "interrupted" ? <small className="assistant-log__meta">{locale === "ru" ? "Прервано · текст ответа мог прозвучать не полностью" : "Interrupted · reply text may not have been fully spoken"}</small> : null}
               {message.role === "assistant" ? <VoiceWebResults results={message.web_results} locale={locale} /> : null}

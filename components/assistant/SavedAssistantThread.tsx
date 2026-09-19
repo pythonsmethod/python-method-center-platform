@@ -1,5 +1,6 @@
 import { formatDateTime } from "@/lib/i18n/format";
 import type { AssistantHistoryMessage } from "@/lib/assistant/history";
+import { AnhamReactionBadge } from "./AnhamReactionBadge";
 import { VoiceWebResults } from "./VoiceWebResults";
 import type { Locale } from "@/lib/i18n/locale";
 
@@ -33,7 +34,7 @@ export function SavedAssistantThread({
     <div className="assistant-log">
       {messages.map((message) => (
         <div
-          className={`assistant-msg assistant-msg--${message.role}`}
+          className={`assistant-msg assistant-msg--${message.role}${message.role === "user" && message.reaction ? " assistant-msg--reacted" : ""}`}
           key={message.id}
         >
           <span className="assistant-log__meta">
@@ -48,6 +49,7 @@ export function SavedAssistantThread({
           </span>
           {message.content}
               {message.role === "assistant" ? <VoiceWebResults results={message.web_results} locale={locale} /> : null}
+          {message.role === "user" ? <AnhamReactionBadge locale={locale} reaction={message.reaction} /> : null}
         </div>
       ))}
     </div>
