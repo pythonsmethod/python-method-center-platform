@@ -33,21 +33,26 @@ function catalog() {
 }
 
 describe("automatic Stripe catalog", () => {
-  it("reuses four localized products and six prices for all terms, with exact USD amounts", async () => {
+  it("reuses four localized products and automatic prices for all terms, with exact USD amounts and periods", async () => {
     const { client, stripe, products, prices } = catalog();
     for (const locale of ["ru", "en"] as const) {
       for (let term = 1; term <= 12; term++) {
         for (const kind of ["assessment", "prepaid", "renewal"] as const) await ensureCheckoutPrice(stripe, kind, locale);
+        await ensureCheckoutPrice(stripe, "prepaid-renewal", locale, term);
       }
     }
     expect(products.size).toBe(4);
-    expect(prices.size).toBe(6);
+    expect(prices.size).toBe(30);
     expect(client.products.create).toHaveBeenCalledTimes(4);
-    expect(client.prices.create).toHaveBeenCalledTimes(6);
-    expect([...prices.values()].map(p => p.unit_amount).sort()).toEqual([130000, 130000, 130000, 130000, 29900, 29900]);
+    expect(client.prices.create).toHaveBeenCalledTimes(30);
+    expect([...prices.values()].filter(p => p.metadata?.checkout_version).length).toBe(30);
     for (const price of prices.values()) {
       expect(price.currency).toBe("usd");
-      if (price.recurring) expect(price.recurring).toMatchObject({ interval: "day", interval_count: 30, usage_type: "licensed" });
+      if (price.recurring) {
+        expect(price.recurring.interval).toBe("day");
+        expect(price.recurring.usage_type).toBe("licensed");
+        expect(price.unit_amount).toBe((price.recurring.interval_count ?? 0) / 30 * 130000);
+      }
     }
     const names = [...products.values()].map(p => p.name);
     expect(names.some(n => n.includes("Личное сопровождение"))).toBe(true);

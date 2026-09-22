@@ -26,8 +26,9 @@ customer ownership, metadata and return URLs are computed on the server. Two
 separate offer/immediate-start consents must be persisted before Stripe writes;
 the renewal choice and duration are included in those records.
 
-A stable catalog namespace creates/reuses four localized Stripe products and
-six reusable prices. There are no manually maintained term/language links:
+A stable catalog namespace creates/reuses four localized Stripe products, six
+base prices and 24 localized initial-term recurring prices. There are no
+manually maintained term/language links:
 
 | Purchase | Due now, before applicable tax | Later charges |
 | --- | --- | --- |
@@ -35,15 +36,14 @@ six reusable prices. There are no manually maintained term/language links:
 | Support, prepaid only | 1,300 USD × N | None |
 | Support, renewal selected | 1,300 USD × N | 1,300 USD every 30 days, starting after N×30 days |
 
-Renewal uses subscription-mode Checkout with the prepaid one-time line plus a
-30-day recurring line deferred by `trial_period_days=N*30`. Stripe's API calls
-this deferral a trial; the initial paid service itself is not free. Verify the
-visible Stripe summary and first invoice in test mode before enabling sales.
-
-Actual hosted-page inspection found "30 дней бесплатно" / "360 days free" and
-"Pay and start trial" beside the correct upfront amount and our explicit paid
-summary. This wording can mislead a prepaid customer. Resolve the presentation
-before release; the successful API amount check does not close this UX gate.
+The revised renewal flow does not use a trial. Subscription-mode Checkout uses
+one recurring initial-term price whose amount is `1,300 × N` USD and whose
+first billing period is exactly `N × 30` days. After confirmed payment, the
+signed webhook idempotently attaches a Subscription Schedule: the paid initial
+phase is preserved, then the next phase changes to 1,300 USD every 30 days.
+The schedule releases after 120 renewal periods while retaining the final
+30-day price, so long-lived subscriptions continue. Schedule creation must
+succeed before application processing acknowledges the Checkout webhook.
 
 Checkout locale, merchant product name/description, custom purchase summary,
 return routes and Customer preferred invoice/email languages follow the site's
@@ -232,8 +232,9 @@ Other payment cases, actual renewal charging, final Portal cancellation,
 entitlement and delivery writes, tax settings and full invoice/email appearance
 remain unverified. Test Clock advance is not exposed by the connected Stripe
 API search; an authenticated supported testing surface is still needed for it.
-The hosted trial wording is also an explicit release blocker. Do not enable
-live sales on the basis of catalog setup or unit tests.
+The trial-based code blocker is removed locally and locked by focused tests,
+but the revised hosted Checkout, schedule transition and Portal cancellation
+still require Sandbox acceptance before live sales are enabled.
 
 Before launch, verify assessment, 1/6/12-term prepaid payments, 1/6/12-term
 renewal payments, cancelled/failed Checkout, failed renewal, webhook retry and

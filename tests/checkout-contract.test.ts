@@ -16,8 +16,7 @@ describe.each(["ru", "en"] as const)("Checkout contract in %s", locale => {
       expect(session.locale).toBe(locale);
       expect(session.client_reference_id).toBe("account-owner");
       expect(session.customer).toBe("cus_owner");
-      expect(session.line_items?.[0]).toEqual({ price: "price_1300_once", quantity: months });
-      expect((session.line_items?.[0].quantity ?? 0) * 130000).toBe(months * 130000);
+      expect(session.line_items?.[0]).toEqual({ price: "price_1300_once", quantity: autoRenew ? 1 : months });
       expect(session.metadata).toMatchObject({ product: "personal_support", months: String(months), auto_renew: String(autoRenew), ui_locale: locale, profile_id: "account-owner" });
       expect(session.automatic_tax).toEqual({ enabled: false });
       expect(session.adaptive_pricing).toEqual({ enabled: false });
@@ -31,8 +30,9 @@ describe.each(["ru", "en"] as const)("Checkout contract in %s", locale => {
       expect(copy).toContain(locale === "ru" ? "доставка включена" : "delivery is included");
       if (autoRenew) {
         expect(session.mode).toBe("subscription");
-        expect(session.line_items?.[1]).toEqual({ price: "price_1300_30d", quantity: 1 });
-        expect(session.subscription_data?.trial_period_days).toBe(months * 30);
+        expect(session.line_items).toHaveLength(1);
+        expect(session.subscription_data).not.toHaveProperty("trial_period_days");
+        expect(session.subscription_data).not.toHaveProperty("trial_settings");
         expect(session.subscription_data?.metadata).toEqual(session.metadata);
         expect(session.payment_method_collection).toBe("always");
         expect(copy).toContain(locale === "ru" ? "1,300 USD каждые 30 дней" : "USD 1,300 every 30 days");

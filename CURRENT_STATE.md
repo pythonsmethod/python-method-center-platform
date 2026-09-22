@@ -1,5 +1,17 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Personal Support billing launch — 2026-09-22 — RELEASE HOLD
+
+PR #216 now has a local follow-up that removes Stripe trial semantics from the
+prepaid renewal flow. Checkout charges the selected paid `N×30`-day initial
+term as its real first subscription period; the signed webhook then attaches an
+idempotent schedule that changes only the following phase to 1,300 USD every
+30 days. Focused tests pass 112/112, full regression 2,045/2,045 with one
+existing skip, and TypeScript, ESLint, security checks and production build
+pass. Sandbox hosted-page/schedule/Portal acceptance, isolated Preview runtime,
+Live Stripe permissions, Live catalog/webhook events and production publication
+remain open. Commercial launch is still NO-GO.
+
 ## Anham message reactions v1 — 2026-09-19 — PUBLISHED
 
 Anham may now attach one small, allowlisted emoji reaction to the person's own

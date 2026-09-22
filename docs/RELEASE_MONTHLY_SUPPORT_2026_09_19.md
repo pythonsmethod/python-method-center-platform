@@ -29,15 +29,17 @@ The site creates an authenticated Checkout Session on demand. The previous
 24-link configuration is superseded. No 50 manually maintained RU/EN links
 are required. See `docs/STRIPE_CHECKOUT_AUTOMATION_2026_09_22.md`.
 
-- Four localized Stripe products (two services × RU/EN) and six reusable prices
-  are created automatically using deterministic product IDs, price lookup keys
-  and Stripe idempotency keys. Historical products are never edited.
+- Four localized Stripe products (two services × RU/EN), six base prices and
+  24 localized initial-term renewal prices are created automatically using
+  deterministic product IDs, lookup keys and idempotency keys. Historical
+  products are never edited.
 - Assessment: one-time price 299 USD, quantity 1, payment mode.
 - Support: one-time price 1,300 USD, quantity N (1..12), payment mode unless
   the client explicitly selects renewal.
-- Renewal: add a recurring price of 1,300 USD, `interval=day`,
-  `interval_count=30`, quantity 1. Subscription trial is N×30 days; the one-time
-  line is due immediately and only the recurring line is deferred.
+- Renewal: Checkout charges one recurring initial-term price of `1,300 × N` USD
+  for `N × 30` days. It uses no trial. After confirmed payment, an idempotent
+  Subscription Schedule preserves that paid phase and switches the next phase
+  to the reusable 1,300 USD / 30-day price.
 - Checkout and subscription metadata include `product=personal_support`,
   `months=N`, `auto_renew`, `ui_locale`, the authenticated `profile_id`, offer
   version and checkout attempt ID. The webhook contract is unchanged.

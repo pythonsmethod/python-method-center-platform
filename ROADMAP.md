@@ -806,3 +806,16 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
 
 Evidence: `docs/validation/stripe-production-readiness-2026-09-22.json`.
 Production schema is prepared; commercial publication remains HOLD.
+# Payment launch checkpoint — 2026-09-22
+
+- [x] Replace misleading trial-based prepaid deferral with a paid initial
+  subscription period and scheduled 30-day renewal phase.
+- [x] Prove 1–12 amount/duration contracts and webhook schedule idempotency in
+  automated tests; run full regression, type, lint, security and build gates.
+- [ ] Verify revised Checkout, first schedule transition, failed renewal,
+  webhook redelivery, Portal cancellation and entitlement/delivery effects in
+  isolated Stripe Sandbox + staging Preview.
+- [ ] Obtain official Live Stripe `product_write` capability, configure Live
+  catalog/Portal/webhook events and verified Vercel production environment.
+- [ ] Merge PR #215 then #216, publish, retire old offers for new sales and run
+  RU/EN production smoke. Until all unchecked items pass: NO-GO.

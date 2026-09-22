@@ -60,8 +60,10 @@ describe("authenticated checkout action", () => {
     expect(stripe.customers.create).toHaveBeenCalledWith(expect.objectContaining({ preferred_locales: ["en"], metadata: { profile_id: owner } }), expect.anything());
     expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(expect.objectContaining({
       client_reference_id: owner, customer: "cus_owner", locale: "en", mode: "subscription",
-      subscription_data: expect.objectContaining({ trial_period_days: 360 })
+      line_items: [{ price: "price_prepaid-renewal", quantity: 1 }],
+      subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() })
     }), expect.objectContaining({ idempotencyKey: expect.any(String) }));
+    expect(mocks.price).toHaveBeenCalledWith(stripe, "prepaid-renewal", "en", 12);
   });
   it("uses stable Stripe idempotency keys on a network retry", async () => {
     await createPaymentCheckout(input);

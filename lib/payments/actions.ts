@@ -55,7 +55,9 @@ export async function createPaymentCheckout(raw: unknown): Promise<CheckoutResul
       if (error) return { error: "consent" };
     }
 
-    const prepaid = await ensureCheckoutPrice(stripe, input.product === "personal_support" ? "prepaid" : "assessment", input.locale);
+    const prepaid = await ensureCheckoutPrice(stripe,
+      input.product === "personal_support" ? (input.autoRenew ? "prepaid-renewal" : "prepaid") : "assessment",
+      input.locale, input.months);
     const renewal = input.autoRenew ? await ensureCheckoutPrice(stripe, "renewal", input.locale) : undefined;
     if (input.autoRenew) await ensurePortalConfiguration(stripe, settings.origin, input.locale);
     const key = `pmc-checkout-${createHash("sha256").update(JSON.stringify([user.id, input])).digest("hex")}`;

@@ -76,17 +76,13 @@ export function buildCheckoutSession(input: CheckoutInput, profileId: string, cu
     adaptive_pricing: { enabled: false },
     automatic_tax: { enabled: settings.automaticTax },
     metadata,
-    line_items: [
-      { price: prices.prepaid, quantity: support ? input.months : 1 },
-      ...(input.autoRenew ? [{ price: prices.renewal!, quantity: 1 }] : [])
-    ],
+    line_items: [{ price: prices.prepaid, quantity: input.autoRenew ? 1 : support ? input.months : 1 }],
     ...(input.autoRenew ? {
       payment_method_collection: "always" as const,
       subscription_data: {
-        // Stripe calls this a trial, but the initial one-time line is paid
-        // immediately. Only the recurring line is deferred, for exactly N*30 days.
-        trial_period_days: days,
-        trial_settings: { end_behavior: { missing_payment_method: "cancel" as const } },
+        // The first recurring price is the actual paid N×30-day term. After
+        // payment the webhook attaches a schedule that changes the next phase
+        // to the 30-day renewal price. No paid time is represented as a trial.
         metadata
       }
     } : { payment_intent_data: { metadata } }),

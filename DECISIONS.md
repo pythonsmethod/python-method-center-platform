@@ -1401,3 +1401,14 @@ genuine owner-only blockers. They do not close the remaining paid-access,
 renewal/cancellation or misleading trial-wording acceptance gates. Keep the
 commercial launch status accurate until those gates pass and the live site is
 verified.
+# 2026-09-22 — Paid initial subscription phase replaces trial deferral
+
+For optional Personal Support renewal, represent the selected prepaid term as
+the subscription's actual first recurring billing period: `1,300 × N` USD for
+`N × 30` days. After confirmed Checkout payment, attach an idempotent Stripe
+Subscription Schedule that retains that paid phase and switches the next phase
+to 1,300 USD every 30 days. Do not label paid access as a trial or rely on trial
+copy customization. Webhook processing fails and retries if schedule creation
+cannot be confirmed. Customer Portal remains the self-service surface for card
+updates and end-of-period cancellation. Sandbox acceptance remains mandatory
+before live enablement.

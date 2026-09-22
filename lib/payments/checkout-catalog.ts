@@ -5,15 +5,18 @@ import { localizedHref } from "@/lib/i18n/routing";
 import { getPaymentPlans, REVIEW_TOTAL_USD, PERSONAL_SUPPORT_MONTHLY_USD } from "@/lib/payments/config";
 import { CHECKOUT_VERSION, type CheckoutProduct } from "@/lib/payments/checkout-contract";
 
-type PriceKind = "assessment" | "prepaid" | "renewal";
+type PriceKind = "assessment" | "prepaid" | "renewal" | "prepaid-renewal";
 
-// Four localized products and six reusable prices cover all 50 combinations.
+// Four localized products cover all combinations. One recurring initial price
+// per 1..12 term makes Stripe show paid time as paid rather than as a trial.
 // Product/lookup identifiers are stable; retries never edit the old catalog.
-export async function ensureCheckoutPrice(stripe: Stripe, kind: PriceKind, locale: Locale) {
+export async function ensureCheckoutPrice(stripe: Stripe, kind: PriceKind, locale: Locale, months = 1) {
+  if (!Number.isInteger(months) || months < 1 || months > 12) throw new Error("checkout months mismatch");
   const product: CheckoutProduct = kind === "assessment" ? "preliminary_assessment" : "personal_support";
   const productId = `${CHECKOUT_VERSION}-${product}-${locale}`;
-  const lookupKey = `${CHECKOUT_VERSION}-${kind}-${locale}`;
-  const amount = (kind === "assessment" ? REVIEW_TOTAL_USD : PERSONAL_SUPPORT_MONTHLY_USD) * 100;
+  const initialRenewal = kind === "prepaid-renewal";
+  const lookupKey = `${CHECKOUT_VERSION}-${kind}-${initialRenewal ? `${months}m-` : ""}${locale}`;
+  const amount = (kind === "assessment" ? REVIEW_TOTAL_USD : PERSONAL_SUPPORT_MONTHLY_USD * (initialRenewal ? months : 1)) * 100;
   const plan = getPaymentPlans(locale).find(item => item.product === product)!;
   const metadata = { checkout_version: CHECKOUT_VERSION, product, ui_locale: locale };
   const { data } = await stripe.prices.list({ lookup_keys: [lookupKey], limit: 1 });
@@ -30,12 +33,16 @@ export async function ensureCheckoutPrice(stripe: Stripe, kind: PriceKind, local
   const price = data[0] ?? await stripe.prices.create({
     currency: "usd", unit_amount: amount, product: productId, lookup_key: lookupKey,
     tax_behavior: "exclusive", metadata,
-    ...(kind === "renewal" ? { recurring: { interval: "day" as const, interval_count: 30 } } : {})
+    ...(kind === "renewal" || initialRenewal
+      ? { recurring: { interval: "day" as const, interval_count: 30 * (initialRenewal ? months : 1) } }
+      : {})
   }, { idempotencyKey: lookupKey });
   const recurring = price.recurring;
   if (!price.active || price.currency !== "usd" || price.unit_amount !== amount || price.product !== productId ||
       price.tax_behavior !== "exclusive" || price.billing_scheme !== "per_unit" ||
-      (kind === "renewal" ? !recurring || recurring.interval !== "day" || recurring.interval_count !== 30 || recurring.usage_type !== "licensed" : recurring !== null)) {
+      (kind === "renewal" || initialRenewal
+        ? !recurring || recurring.interval !== "day" || recurring.interval_count !== 30 * (initialRenewal ? months : 1) || recurring.usage_type !== "licensed"
+        : recurring !== null)) {
     throw new Error("checkout price mismatch");
   }
   return price.id;

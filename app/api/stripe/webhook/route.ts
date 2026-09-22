@@ -18,6 +18,8 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
+import { ensureCheckoutPrice } from "@/lib/payments/checkout-catalog";
+import { ensureThirtyDayRenewalSchedule } from "@/lib/payments/renewal-schedule";
 
 export const runtime = "nodejs";
 
@@ -91,7 +93,7 @@ export async function POST(request: Request) {
 
         // Delayed payment methods complete later via async_payment_succeeded.
         if (session.payment_status === "paid") {
-          await handlePaidSession(supabase, session, event);
+          await handlePaidSession(supabase, stripe, session, event);
         }
         break;
       }
@@ -235,6 +237,7 @@ async function handleFailedPayment(
 
 async function handlePaidSession(
   supabase: ServiceClient,
+  stripe: Stripe,
   session: Stripe.Checkout.Session,
   event: Stripe.Event
 ) {
@@ -477,6 +480,12 @@ async function handlePaidSession(
         ? session.customer
         : session.customer?.id ?? null;
 
+    const locale = session.metadata?.ui_locale === "en" ? "en" : "ru";
+    const renewalPriceId = await ensureCheckoutPrice(stripe, "renewal", locale);
+    await ensureThirtyDayRenewalSchedule(stripe, stripeSubscriptionId, renewalPriceId);
+    const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    const periodEnd = (stripeSubscription.items.data[0] as Stripe.SubscriptionItem & { current_period_end?: number })?.current_period_end;
+
     const { error: subscriptionError } = await supabase
       .from("billing_subscriptions")
       .upsert(
@@ -485,9 +494,10 @@ async function handlePaidSession(
           case_id: caseRow?.id ?? null,
           stripe_subscription_id: stripeSubscriptionId,
           stripe_customer_id: stripeCustomerId,
-          status: "trialing",
+          status: "active",
           initial_months: purchasedMonths,
-          renewal_days: 30
+          renewal_days: 30,
+          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null
         },
         { onConflict: "stripe_subscription_id" }
       );
