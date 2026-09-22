@@ -1,0 +1,84 @@
+{
+  "checkedOn": "2026-09-22",
+  "ownerAuthorizedProductionLaunch": true,
+  "releaseStatus": "HOLD",
+  "published": false,
+  "productionDatabase": {
+    "projectId": "zdrfttgwnyorifmpqgwe",
+    "migration": "supabase/migrations/20260919123000_personal_support_billing.sql",
+    "applied": true,
+    "personalSupportEnum": true,
+    "billingSubscriptionsTable": true,
+    "billingSubscriptionsRls": true,
+    "authenticatedReadPolicy": "profile_id = auth.uid()",
+    "authenticatedSelectGranted": true,
+    "serviceRoleWriteGranted": true,
+    "updatedAtTrigger": true,
+    "uniqueServicePeriodPaymentIndex": true,
+    "billingSubscriptionRowsAfterMigration": 0,
+    "servicePeriodRowsBeforeMigration": 5,
+    "servicePeriodRowsAfterMigration": 5,
+    "securityAdvisorsForBillingTable": 0
+  },
+  "stripeLive": {
+    "stripeContext": "acct_1SUwZYE6esfE5qRj",
+    "livemode": true,
+    "checkoutNamespace": "pmc-20260922-v1",
+    "namespaceObjectsPresent": false,
+    "newObjectsCreated": 0,
+    "writeAttempt": {
+      "operation": "PostProducts",
+      "result": "insufficient_permissions",
+      "requiredPermission": "product_write"
+    },
+    "existingWebhook": {
+      "id": "we_1U0AkJE6esfE5qRjmhhRNxmF",
+      "url": "https://pythonmethodcenter.com/api/stripe/webhook",
+      "status": "enabled",
+      "apiVersion": "2025-10-29.clover",
+      "enabledEvents": [
+        "checkout.session.completed",
+        "checkout.session.async_payment_succeeded",
+        "checkout.session.async_payment_failed",
+        "payment_intent.payment_failed",
+        "charge.refunded"
+      ],
+      "missingRecurringEvents": [
+        "invoice.paid",
+        "invoice.payment_failed",
+        "customer.subscription.updated",
+        "customer.subscription.deleted"
+      ],
+      "modified": false
+    }
+  },
+  "vercel": {
+    "projectId": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
+    "readyPreview": {
+      "commit": "ae9e6d3a6f76ca9e120a20c6689840f2c28b30ae",
+      "deploymentId": "dpl_54Cs6inSm9tKMpy6Uh64nnmQQTfd",
+      "status": "READY"
+    },
+    "productionEnvironmentModified": false,
+    "browserAuthenticated": false,
+    "environmentWriteAvailableInConnector": false,
+    "preparedProductionEnvironment": {
+      "STRIPE_CHECKOUT_ENABLED": "true only after acceptance",
+      "STRIPE_CHECKOUT_MODE": "live",
+      "STRIPE_CHECKOUT_RETURN_ORIGIN": "https://pythonmethodcenter.com",
+      "STRIPE_CHECKOUT_AUTOMATIC_TAX": "false"
+    },
+    "existingSecretsToVerifySecurely": [
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET"
+    ]
+  },
+  "remaining": [
+    "Owner must update permissions for the Live Stripe account through official reconsent; do not retry the rejected write through another credential or interface.",
+    "Vercel browser authentication is required for environment configuration because the connector exposes no environment write operation.",
+    "Isolated Preview secrets, signed webhook, paid access, gift delivery, renewal, failure and cancellation acceptance remain incomplete.",
+    "Resolve the observed free-trial wording before enabling prepaid auto-renew sales.",
+    "Provision Live catalog and localized Portal, add required recurring webhook events, configure production runtime, merge and verify the public deployment.",
+    "Deactivate retired sale links only as part of the verified launch; preserve history and existing subscriptions."
+  ]
+}

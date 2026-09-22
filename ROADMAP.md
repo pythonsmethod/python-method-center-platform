@@ -783,11 +783,26 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
 - [x] Inspect actual RU Portal invoice/card and cancellation preview end date.
 - [ ] Execute final cancellation and actual renewal collection; previewing the
       cancellation confirmation does not close these acceptance cases.
-- [ ] Investigate the latest Vercel Preview build failure and verify return
-      flow with authorized Preview access (current browser reaches Vercel login).
+- [x] Verify a READY Vercel Preview for the latest revision (`ae9e6d3`);
+      protected success page returns HTTP 200 through authorized connector access.
+- [ ] Finish browser sign-in and verify the complete authenticated return flow.
 - [ ] Connect isolated Preview secrets and signed Stripe webhook.
 - [ ] Resolve Stripe's "free trial" labeling of the prepaid renewal deferral.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
       RU/EN customer pages; local tests alone do not close these gates.
 - [ ] Publish only after the existing release gate; deactivate retired sales
       links at launch while preserving subscription/history objects.
+
+### 2026-09-22 — Authorized production preparation
+
+- [x] Apply and verify the additive production billing migration; preserve all
+      existing service-period rows and owner-only billing reads.
+- [x] Inventory the Live catalog and webhook; prepare exact environment values
+      and record missing recurring events.
+- [ ] Obtain official Live Stripe permission expansion after `PostProducts`
+      was rejected; do not use another credential or interface to bypass it.
+- [ ] Authenticate Vercel for environment configuration, then finish the open
+      acceptance/UX gates and publish the approved model.
+
+Evidence: `docs/validation/stripe-production-readiness-2026-09-22.json`.
+Production schema is prepared; commercial publication remains HOLD.

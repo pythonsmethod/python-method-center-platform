@@ -4,8 +4,11 @@ Status: implementation in draft PR #216 on top of draft PR #215; Sandbox catalog
 Portal configuration and isolated staging migration completed on 2026-09-22.
 Hosted test Checkout pages were inspected in RU/EN. The owner completed the
 RU one-period renewal test payment; Stripe confirmed its paid invoice.
-Commercial release remains HOLD. Existing public offers remain live until the
-pricing release passes its staging gate.
+The owner subsequently authorized production launch. The additive production
+billing migration is now applied and verified; latest Preview `ae9e6d3` is READY.
+Commercial release remains HOLD because Live Stripe writes were denied,
+Vercel environment access needs sign-in, and acceptance/UX gates remain open.
+Existing public offers remain live until the pricing release passes its gate.
 
 ## A. Existing implementation
 
@@ -181,6 +184,24 @@ Human-handoff follow-up on 2026-09-22 supersedes the earlier unpaid status:
   Its new Vercel Preview failed with `type_error`; the build-log tool was not
   available. The failure's specific cause remains unverified.
 
+Production-preparation follow-up on 2026-09-22:
+
+- Latest Preview `dpl_54Cs6inSm9tKMpy6Uh64nnmQQTfd` at `ae9e6d3` is READY;
+  the previous build failure is not the current release blocker.
+- After explicit owner launch authorization, the existing billing migration
+  was applied to production `zdrfttgwnyorifmpqgwe`. Enum, table, RLS owner-read
+  policy, authenticated SELECT, service-role writes, trigger and unique index
+  all passed SQL checks. Historical service-period count remained five.
+- The post-migration security advisor has no finding for the billing table.
+  It lists existing informational notices for unrelated server-only tables.
+- Live catalog inventory contains none of the new namespace. The first
+  authorized product-create attempt failed with missing `PostProducts`
+  permission. No Live object was created, and no alternate write route was used.
+- The existing Live endpoint lacks `invoice.paid`, `invoice.payment_failed`,
+  `customer.subscription.updated` and `customer.subscription.deleted`.
+  Prepared activation values and exact evidence are recorded in
+  `validation/stripe-production-readiness-2026-09-22.json`.
+
 ## F. Benchmark
 
 The existing synthetic benchmark ran as part of the full suite: 3 documents /
@@ -237,8 +258,10 @@ invoices use Customer preferred languages.
 
 ## I. Intentionally outside this change
 
-No production deployment/merge, no manual legacy-price deletion, no migration of
-existing customer subscriptions, no clinical workflow changes and no native
+No production deployment/merge has occurred. The owner has now authorized the
+rollout, and the additive production billing migration has been applied.
+No manual legacy-price deletion, no migration of existing customer
+subscriptions, no clinical workflow changes and no native
 mobile purchasing changes. Archived legacy source repositories are not used.
 Old public Payment Links should be deactivated at launch after verifying that
 existing subscriptions/history remain intact; this is not done ahead of launch.
@@ -248,9 +271,10 @@ existing subscriptions/history remain intact; this is not done ahead of launch.
 Code preparation can be reviewed independently of the external account setup.
 Commercial launch remains **NO-GO** until isolated Stripe/Supabase acceptance
 passes. The first human-completed Sandbox payment, its invoice and subscription
-schedule are now verified. Next finish isolated Preview credentials and signed
-webhook configuration, investigate the Preview build, resolve the trial wording, and
-complete the remaining acceptance cases and release gate in
+schedule are now verified. The latest Preview is READY and the production
+schema is prepared. Next resolve the Live Stripe permission denial and Vercel
+sign-in, finish isolated Preview credentials and signed webhook configuration,
+resolve the trial wording, and complete the remaining acceptance cases and release gate in
 `RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
 
 ## Primary references

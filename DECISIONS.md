@@ -1384,3 +1384,20 @@ despite the correct initial paid line. Treat that observed wording as an open
 release blocker, not as approval of a free service period. Automatic browser
 review blocked final Sandbox payment submission; the next submission must be
 performed by the user through handoff, without an alternate automated route.
+
+### 2026-09-22 — Owner authorized production rollout; respect access boundaries
+
+The request to launch on the existing live site authorizes the billing rollout,
+including its additive production schema, necessary production configuration,
+merge and publication. Do not ask for the same launch authorization again.
+Apply backward-compatible schema preparation independently of enabling sales;
+the production billing migration is now applied and verified.
+
+An explicit Live Stripe permission rejection must be resolved through official
+account reconsent, not a different credential or interface. Vercel environment
+configuration requires the authenticated browser because that operation is
+absent from the connected plugin. Secure sign-in and permission expansion are
+genuine owner-only blockers. They do not close the remaining paid-access,
+renewal/cancellation or misleading trial-wording acceptance gates. Keep the
+commercial launch status accurate until those gates pass and the live site is
+verified.

@@ -1271,3 +1271,25 @@ Code revision f7f6970 passes GitHub CI and local build, but its Vercel Preview
 build failed; detailed build logs were unavailable through the connector.
 Commercial launch remains HOLD. The validation JSON/report contain exact IDs
 and remaining gates; production was not changed.
+
+### 2026-09-22 — Production launch requested; billing schema prepared
+
+The owner explicitly requested launch on the existing live site. Under that
+authorization, the additive billing migration was applied to production
+`zdrfttgwnyorifmpqgwe` and verified: enum, table, owner-read RLS policy,
+authenticated SELECT, service-role writes, updated-at trigger and unique
+service-period payment index are present. All five historical service-period
+rows remain; no billing subscriptions were created. Security advisors report
+no finding for the new billing table.
+
+Latest PR #216 Preview `dpl_54Cs6inSm9tKMpy6Uh64nnmQQTfd` at `ae9e6d3` is READY,
+superseding the earlier Preview build failure. Live Stripe has none of the new
+catalog namespace. Its authorized `PostProducts` request was rejected for
+insufficient permissions; official Live account reconsent is required. The
+existing live webhook lacks the four recurring billing events. Vercel's
+connector exposes no environment-write operation, and the browser needs sign-in.
+
+No Live Stripe settings, production environment variables, main branch or
+public offers were changed. The trial-wording and payment acceptance gates
+remain open. The site has NOT launched the new model. Exact readiness evidence:
+`docs/validation/stripe-production-readiness-2026-09-22.json`.
