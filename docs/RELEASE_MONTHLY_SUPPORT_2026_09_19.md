@@ -23,41 +23,33 @@ New public commercial model:
 
 Legacy `support_5_weeks` and `support_15_weeks` remain readable for historical payments and periods, but are not offered for new purchase.
 
-## Stripe link contract
+## Stripe Checkout contract — updated 2026-09-22
 
-The site expects a pair of links for each initial duration N = 1..12:
+The site creates an authenticated Checkout Session on demand. The previous
+24-link configuration is superseded. No 50 manually maintained RU/EN links
+are required. See `docs/STRIPE_CHECKOUT_AUTOMATION_2026_09_22.md`.
 
-- `STRIPE_PAYMENT_LINK_SUPPORT_NM` — prepaid term only, no automatic renewal.
-- `STRIPE_PAYMENT_LINK_SUPPORT_NM_AUTORENEW` — same prepaid term paid now + automatic renewal after that term.
+- Four localized Stripe products (two services × RU/EN) and six reusable prices
+  are created automatically using deterministic product IDs, price lookup keys
+  and Stripe idempotency keys. Historical products are never edited.
+- Assessment: one-time price 299 USD, quantity 1, payment mode.
+- Support: one-time price 1,300 USD, quantity N (1..12), payment mode unless
+  the client explicitly selects renewal.
+- Renewal: add a recurring price of 1,300 USD, `interval=day`,
+  `interval_count=30`, quantity 1. Subscription trial is N×30 days; the one-time
+  line is due immediately and only the recurring line is deferred.
+- Checkout and subscription metadata include `product=personal_support`,
+  `months=N`, `auto_renew`, `ui_locale`, the authenticated `profile_id`, offer
+  version and checkout attempt ID. The webhook contract is unchanged.
+- Checkout `locale`, product name/description, purchase summary, return URLs,
+  Customer `preferred_locales` and Customer Portal follow RU/EN selection.
+- No separate formula or delivery charge. Shipping continues through the
+  existing cabinet address/fulfillment workflow; no address is invented.
+- Adaptive Pricing is disabled and prices use USD. Automatic Tax is opt-in
+  after business tax configuration; no tax registration/classification is inferred.
 
-Every Personal Support Payment Link MUST include Payment Link metadata:
-
-- `product=personal_support`
-- `months=N`
-
-Stripe copies Payment Link metadata to the Checkout Session. The webhook uses this metadata as the authoritative duration so taxes, Adaptive Pricing, currency conversion, discounts or future fee changes cannot corrupt duration inference.
-
-### Prepaid-only link for N months
-
-- Mode: one-time payment.
-- One-time amount: `1300 × N USD`.
-- Metadata: `product=personal_support`, `months=N`.
-- No separate formula item.
-- No separate delivery item.
-- Automatic Tax: enable only when the Center has determined that Stripe should collect applicable tax for that jurisdiction.
-
-### Auto-renew link for N months
-
-Use subscription-mode Checkout / Payment Link:
-
-- One-time line item due immediately: `1300 × N USD` for the prepaid initial term.
-- Recurring price: `1300 USD every 30 days` (use a 30-day recurring interval, not a calendar-month interval).
-- Subscription trial: `30 × N days`, so the recurring price is not charged during the already-paid term.
-- Metadata on Payment Link: `product=personal_support`, `months=N`.
-- No separate formula or delivery line item.
-- Automatic Tax: same rule as above.
-
-The initial Checkout Session opens the full prepaid support period. Later `invoice.paid` events open exactly one additional 30-day period.
+The initial paid Checkout Session opens the full prepaid support period.
+Later `invoice.paid` events open exactly one additional 30-day period.
 
 ## Webhook events required
 
@@ -88,23 +80,25 @@ It:
 
 ## Environment variables
 
-Assessment:
-- `NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299`
+Server-only configuration:
 
-For N = 1..12:
-- `STRIPE_PAYMENT_LINK_SUPPORT_NM`
-- `STRIPE_PAYMENT_LINK_SUPPORT_NM_AUTORENEW`
+- `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_CHECKOUT_ENABLED=true` only after the release gate
+- `STRIPE_CHECKOUT_MODE=test` in isolated staging; `live` only in production
+- `STRIPE_CHECKOUT_RETURN_ORIGIN` for the exact target environment
+- `STRIPE_CHECKOUT_AUTOMATIC_TAX=false` unless Stripe Tax is configured
 
-Support links are server-side environment values and are passed to the authenticated payment page. Do not expose Stripe secret keys in client configuration.
+Do not expose Stripe keys to the client. Preview deployments reject live keys.
+Missing billing migration or consent persistence blocks support checkout.
 
 ## Release gate
 
 Do not publish this pricing release until all of the following pass:
 
 - database migration applied in the target environment;
-- 299 USD assessment link verified;
-- all intended prepaid links configured with correct metadata;
-- all intended auto-renew links configured with correct metadata, 30-day recurring price and correct trial duration;
+- automatic RU/EN catalog and 299 USD assessment Checkout verified;
+- prepaid Checkout verified for all 1–12 terms and correct metadata;
+- auto-renew Checkout verified with exact 30-day price and N×30-day deferral;
 - webhook subscription events enabled;
 - Stripe Customer Portal enabled for the production account, with customers allowed to cancel automatic renewal and update payment methods;
 - RU and EN payment page verified;
@@ -120,7 +114,11 @@ Do not publish this pricing release until all of the following pass:
 
 Native mobile app pricing is intentionally out of scope: purchasing remains on the web platform.
 
-## Verification follow-up — 2026-09-19
+## Historical verification follow-up — 2026-09-19
+
+The link-specific blockers below describe the original implementation; the
+2026-09-22 automation supersedes them. Stripe, migration and staging payment
+verification remain release gates.
 
 The webhook now fails closed on a Personal Support contract mismatch: the
 Checkout Session must contain `product=personal_support`, an integer

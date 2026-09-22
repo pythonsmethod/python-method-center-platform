@@ -1054,7 +1054,7 @@ const ru = {
     offerLabel: "Условия",
     offerTitle: "Оферта",
     offerText:
-      "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Указывайте при оплате тот же email, что и в аккаунте платформы, — по нему команда привяжет платёж к вашему кейсу.",
+      "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Платёж автоматически привязывается к аккаунту, из которого вы переходите к оплате.",
     // Регистрация раньше оплаты. Публичную платёжную ссылку мог открыть
     // кто угодно — и тогда деньги приходили без аккаунта, к которому их
     // привязать. Цены при этом видны всем: смысл не в том, чтобы прятать
@@ -1088,8 +1088,15 @@ const ru = {
     selectedTotal: "К оплате сегодня:",
     giftIncluded: "Формула Professor Python на выбранный оплаченный период — в подарок. Доставка включена.",
     autoRenewLabel: "Включить автоматическое продление",
-    autoRenewText: "После окончания уже оплаченного срока сопровождение будет продлеваться на следующие 30 дней по действующей цене. Автопродление можно отключить до следующего списания.",
-    autoRenewUnavailable: "Ссылка Stripe для автопродления этого срока ещё не подключена.",
+    autoRenewText: "После окончания уже оплаченного срока — $1,300 каждые 30 дней. Автопродление можно отключить до следующего списания.",
+    checkoutPending: "Открываем оплату…",
+    checkoutErrors: {
+      invalid: "Проверьте выбранный срок и подтвердите оба согласия.",
+      signin: "Войдите в аккаунт, чтобы продолжить оплату.",
+      unavailable: "Не удалось открыть оплату. Попробуйте ещё раз или напишите команде через кабинет.",
+      consent: "Не удалось сохранить согласие с условиями. Попробуйте ещё раз.",
+      "subscription-exists": "У вас уже подключено автопродление. Управлять им можно в настройках аккаунта."
+    },
     taxNote: "Применимые налоги, если они требуются законодательством вашей страны или региона, рассчитываются отдельно в Stripe Checkout."
   },
   paymentSuccess: {
@@ -2200,7 +2207,7 @@ const en: typeof ru = {
     offerLabel: "Terms",
     offerTitle: "Public offer",
     offerText:
-      "By paying for a plan you confirm acceptance of the public offer. Use the same email as in your platform account — the team links the payment to your case by it.",
+      "By paying for a plan you confirm acceptance of the public offer. Your payment is automatically linked to the account you use to open checkout.",
     signInToPay: "Register and pay",
     signInWhy:
       "Payment opens once you have an account. That way it attaches to your cabinet straight away, access switches on by itself, and you never have to prove anything to anyone. Registering takes a minute.",
@@ -2230,8 +2237,15 @@ const en: typeof ru = {
     selectedTotal: "Due today:",
     giftIncluded: "Professor Python's formula for the selected paid period is complimentary. Delivery is included.",
     autoRenewLabel: "Enable automatic renewal",
-    autoRenewText: "After the prepaid period ends, support renews for the next 30 days at the then-current price. You can turn off renewal before the next charge.",
-    autoRenewUnavailable: "The Stripe auto-renew link for this duration has not been connected yet.",
+    autoRenewText: "After the prepaid period ends: $1,300 every 30 days. You can turn off renewal before the next charge.",
+    checkoutPending: "Opening checkout…",
+    checkoutErrors: {
+      invalid: "Check your selected term and confirm both consent boxes.",
+      signin: "Sign in to continue to payment.",
+      unavailable: "We could not open checkout. Try again or contact the team through your account.",
+      consent: "We could not save your acceptance of the terms. Please try again.",
+      "subscription-exists": "Automatic renewal is already connected. Manage it in your account settings."
+    },
     taxNote: "Applicable taxes, if required by the laws of your country or region, are calculated separately in Stripe Checkout."
   },
   paymentSuccess: {

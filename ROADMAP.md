@@ -766,3 +766,15 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
   Portal against staging without real charges.
 - [ ] Run the full clean dependency/build/regression gate and publish a new PR
   preview. Production and merge remain HOLD.
+
+## 2026-09-22 — Stripe Checkout automation follow-up to PR #215
+
+- [x] Replace the 24-link requirement with dynamic authenticated RU/EN Checkout.
+- [x] Automate localized catalog/Portal configuration and validate 1–12 terms.
+- [x] Preserve signed-webhook entitlement contract and record renewal consent.
+- [ ] Finish authenticated Stripe access and configure isolated test environment.
+- [ ] Apply/verify PR #215 billing migration in the isolated target database.
+- [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
+      RU/EN customer pages; local tests alone do not close these gates.
+- [ ] Publish only after the existing release gate; deactivate retired sales
+      links at launch while preserving subscription/history objects.

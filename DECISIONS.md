@@ -1355,3 +1355,18 @@ redelivery. Retried events resume the existing payment, while a unique
 `service_periods.payment_id` boundary makes access issuance idempotent. This
 replaces the previous behavior that acknowledged a partially processed event
 and permanently prevented recovery.
+
+## 2026-09-22 — Generate Checkout instead of maintaining term/language links
+
+Owner requested automation after discussing RU/EN and the potential 50-link
+matrix. Use server-created Stripe Checkout from the approved 299 USD assessment
+and 1,300 USD per 30-day support model. One prepaid price × N covers 1–12 terms;
+optional renewal adds a 30-day recurring price deferred N×30 days. Localized
+Stripe catalog records preserve merchant copy in the selected language.
+
+Both offer/immediate-start consents and the explicit renewal selection must be
+persisted before redirecting to payment. Amount, customer/account reference,
+metadata and return origin are server-controlled. No new legacy sales. Keep
+checkout disabled by default and refuse live keys in preview. Customer Portal
+permits card updates and cancellation at period end, without plan changes.
+Historical subscriptions/records are not migrated by this code change.

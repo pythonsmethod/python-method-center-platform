@@ -1225,3 +1225,15 @@ blocked by missing Supabase CLI/browser MFA authorization and an unauthenticated
 Stripe Dashboard; Vercel Preview also has none of the 24 required support-link
 variables. Production was not changed. Exact evidence and remaining gates are
 recorded in `docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
+
+## 2026-09-22 — Automatic RU/EN Stripe Checkout prepared
+
+The follow-up to draft PR #215 replaces static assessment/support Payment Links
+with authenticated server-created Checkout. Four localized products and six
+prices cover the assessment and all 1–12-term/renewal/language selections.
+Consent persistence, exact USD pricing, customer ownership, 30-day renewal,
+localized invoices/Portal and preview/live configuration guards are implemented.
+See `docs/STRIPE_CHECKOUT_AUTOMATION_2026_09_22.md` for scope and limitations.
+This supersedes the earlier 24-link environment requirement, not the staging
+release gate. Stripe account setup, test payments and the PR #215 database
+migration are still unverified; the new commercial model is NOT published.

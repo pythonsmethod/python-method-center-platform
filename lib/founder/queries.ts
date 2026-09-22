@@ -1,4 +1,4 @@
-import { getPaymentPlans, getSupportDurationOptions } from "@/lib/payments/config";
+import { getCheckoutSettings } from "@/lib/payments/checkout-settings";
 import {
   getGuestDailyTotalLimit,
   getPublicAssistantMode
@@ -145,21 +145,10 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     },
     {
       name: "Кнопки оплаты на сайте",
-      ok: Boolean(
-        getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
-          getSupportDurationOptions().every(option => option.paymentLinkUrl)
-      ),
-      detail: (() => {
-        const options = getSupportDurationOptions();
-        const prepaid = options.filter(option => option.paymentLinkUrl).length;
-        const renewing = options.filter(option => option.autoRenewPaymentLinkUrl).length;
-        const review = Boolean(
-          getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl
-        );
-        return review && prepaid === options.length
-          ? `Разбор подключён; ссылки сопровождения: ${prepaid}/${options.length}; автопродление: ${renewing}/${options.length}`
-          : `Не все ссылки подключены: разбор ${review ? "есть" : "нет"}, сопровождение ${prepaid}/${options.length}, автопродление ${renewing}/${options.length}`;
-      })()
+      ok: Boolean(getCheckoutSettings()),
+      detail: getCheckoutSettings()
+        ? "Серверный Checkout настроен: RU/EN, 1–12 периодов, выбор автопродления. Фактическую оплату подтверждает webhook."
+        : "Checkout выключен или не настроен: проверьте режим Stripe, секреты и адрес возврата"
     }
   ];
 
