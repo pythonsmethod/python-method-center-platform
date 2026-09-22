@@ -1253,3 +1253,21 @@ Stripe also labels the prepaid renewal deferral as a free trial; resolve this
 customer-facing wording before launch. Preview secrets/webhook and end-to-end
 entitlement, renewal and cancellation acceptance remain open. New sales remain
 disabled and the new model is NOT published. Work is in draft PR #216.
+
+### 2026-09-22 — First real Sandbox Checkout payment verified
+
+The owner completed the RU one-period renewal payment. Stripe now confirms
+Checkout `complete` / `paid`, invoice `in_1UIYoJE5bkDqmDrJYwSTaxNb` paid for
+1,300 USD, and subscription `sub_1UIYoLE5bkDqmDrJ7ZGjpMGV`. First renewal is
+22 October 2026 at 18:33:55 UTC, exactly 30 days after the frozen Test Clock
+start. Actual collection at renewal remains untested.
+
+The RU Portal displays the paid invoice and test card; cancellation preview
+preserves access until 22 October. Cancellation was not submitted. The owner
+landed on Vercel login after Checkout because the success page is on protected
+Preview. Authorized connector access returns HTTP 200 for that page. This is
+not proof of application entitlement; Preview secrets and webhook are pending.
+Code revision f7f6970 passes GitHub CI and local build, but its Vercel Preview
+build failed; detailed build logs were unavailable through the connector.
+Commercial launch remains HOLD. The validation JSON/report contain exact IDs
+and remaining gates; production was not changed.

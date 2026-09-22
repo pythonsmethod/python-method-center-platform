@@ -2,7 +2,8 @@
 
 Status: implementation in draft PR #216 on top of draft PR #215; Sandbox catalog,
 Portal configuration and isolated staging migration completed on 2026-09-22.
-Hosted test Checkout pages were inspected in RU/EN; no payment was completed.
+Hosted test Checkout pages were inspected in RU/EN. The owner completed the
+RU one-period renewal test payment; Stripe confirmed its paid invoice.
 Commercial release remains HOLD. Existing public offers remain live until the
 pricing release passes its staging gate.
 
@@ -155,6 +156,31 @@ Follow-up after account authorization:
   remain open until the user submits the prepared test form.
 - [Prepared Sandbox form](validation/stripe-sandbox-ru-1790102314400.jpg).
 
+Human-handoff follow-up on 2026-09-22 supersedes the earlier unpaid status:
+
+- Session `cs_test_b1LlW7Q0LATV7WdGldnfmojXhfdWjRYbvKa3YpsdGmIs75rS7mVFJgmy0a`
+  is now `complete` / `paid`, in Sandbox only.
+- Invoice `in_1UIYoJE5bkDqmDrJYwSTaxNb` is `paid`, amount paid 130,000 USD cents,
+  amount remaining zero, billing reason `subscription_create`.
+- Subscription `sub_1UIYoLE5bkDqmDrJ7ZGjpMGV` is `trialing`; its initial deferral
+  runs from 2026-09-22 18:33:55 UTC to 2026-10-22 18:33:55 UTC, exactly 30 days
+  on the synthetic Test Clock. Its recurring price is 1,300 USD every 30 days.
+- The invoice's one-time line period follows Checkout wall-clock time, while
+  the subscription follows frozen clock time. The exact periods are retained
+  in the validation JSON; this does not verify application entitlement dates.
+- Actual RU Customer Portal shows the paid invoice, saved test card and next
+  renewal date. Its cancellation preview says access remains until 22 October.
+  Final cancellation and actual recurring collection have not been executed.
+- The browser returned from successful payment to Vercel sign-in because the
+  success URL belongs to an authentication-protected Preview. An authorized
+  Vercel connector fetch returns HTTP 200 for `/payment/success`. The Vercel
+  login is separate from payment status. No protection was disabled, and the
+  static success-page response does not verify account entitlement.
+- Parent code revision `f7f6970` passed local production build and GitHub Actions
+  run `35768947357` (security, types, lint, tests, audit, build and diff check).
+  Its new Vercel Preview failed with `type_error`; the build-log tool was not
+  available. The failure's specific cause remains unverified.
+
 ## F. Benchmark
 
 The existing synthetic benchmark ran as part of the full suite: 3 documents /
@@ -180,9 +206,11 @@ not expose an environment-variable write operation, and no authenticated CLI or
 test server secret is available in this workspace. The ready PR Preview alone
 does not prove isolation. No webhook was attached to an unverified environment.
 
-Actual payment completion is blocked at the browser's human-handoff gate.
-Renewal charging, cancellation through a live Portal session, entitlement and
-delivery writes, tax settings and invoice/email appearance remain unverified.
+The RU one-period payment completed after the owner performed the handoff.
+Other payment cases, actual renewal charging, final Portal cancellation,
+entitlement and delivery writes, tax settings and full invoice/email appearance
+remain unverified. Test Clock advance is not exposed by the connected Stripe
+API search; an authenticated supported testing surface is still needed for it.
 The hosted trial wording is also an explicit release blocker. Do not enable
 live sales on the basis of catalog setup or unit tests.
 
@@ -219,9 +247,9 @@ existing subscriptions/history remain intact; this is not done ahead of launch.
 
 Code preparation can be reviewed independently of the external account setup.
 Commercial launch remains **NO-GO** until isolated Stripe/Supabase acceptance
-passes. The immediate next action is the human completion of the prepared
-Sandbox payment. Then inspect its subscription/invoice, finish isolated Preview
-credentials and signed webhook configuration, resolve the trial wording, and
+passes. The first human-completed Sandbox payment, its invoice and subscription
+schedule are now verified. Next finish isolated Preview credentials and signed
+webhook configuration, investigate the Preview build, resolve the trial wording, and
 complete the remaining acceptance cases and release gate in
 `RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
 

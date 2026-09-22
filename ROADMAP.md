@@ -778,8 +778,13 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
       (`thylrayzjczsxlyqhtfc`); production unchanged.
 - [x] Create actual Sandbox Checkout Sessions for assessment and boundary terms;
       inspect correct RU/EN copy, upfront totals and deferred renewal pricing.
-- [ ] Complete prepared test payment through user handoff: automatic browser
-      review rejected final submission even in Sandbox.
+- [x] Owner completed the prepared RU one-period Sandbox payment; verify paid
+      invoice, subscription and exact 30-day deferral from Test Clock start.
+- [x] Inspect actual RU Portal invoice/card and cancellation preview end date.
+- [ ] Execute final cancellation and actual renewal collection; previewing the
+      cancellation confirmation does not close these acceptance cases.
+- [ ] Investigate the latest Vercel Preview build failure and verify return
+      flow with authorized Preview access (current browser reaches Vercel login).
 - [ ] Connect isolated Preview secrets and signed Stripe webhook.
 - [ ] Resolve Stripe's "free trial" labeling of the prepaid renewal deferral.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and

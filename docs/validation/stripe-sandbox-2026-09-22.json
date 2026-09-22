@@ -1,5 +1,5 @@
 {
-  "checkedAt": "2026-09-22T18:39:14.236Z",
+  "checkedAt": "2026-09-22T18:57:20.001Z",
   "releaseStatus": "HOLD",
   "stripe": {
     "stripe_context": "acct_1SUwZgE5bkDqmDrJ",
@@ -136,13 +136,15 @@
       {
         "testCase": "renew_ru_1",
         "id": "cs_test_b1LlW7Q0LATV7WdGldnfmojXhfdWjRYbvKa3YpsdGmIs75rS7mVFJgmy0a",
-        "status": "open",
-        "payment_status": "unpaid",
+        "status": "complete",
+        "payment_status": "paid",
         "amount_total": 130000,
         "currency": "usd",
         "locale": "ru",
         "mode": "subscription",
-        "prepaidDays": 30
+        "prepaidDays": 30,
+        "subscription": "sub_1UIYoLE5bkDqmDrJ7ZGjpMGV",
+        "invoice": "in_1UIYoJE5bkDqmDrJYwSTaxNb"
       },
       {
         "testCase": "renew_en_12",
@@ -182,14 +184,61 @@
   "boundary": {
     "productionModified": false,
     "checkoutPublished": false,
-    "completedPayments": 0,
+    "completedPayments": 1,
     "webhookConfigured": false,
     "previewSecretsConfigured": false,
     "proof": "docs/validation/stripe-sandbox-ru-1790102314400.jpg"
   },
   "blockers": [
-    "Cloud Browser automatic approval review rejected final sandbox payment submission; user handoff required. No alternate submission attempted.",
     "Stripe hosted Checkout labels the deferral as a free trial. Resolve customer-facing wording before launch.",
-    "Isolated preview credentials and signed webhook not configured; full entitlement/renewal/cancellation acceptance remains open."
-  ]
+    "Isolated preview credentials and signed webhook not configured; full entitlement/renewal/cancellation acceptance remains open.",
+    "Only the RU one-period renewal Checkout payment is complete; other payment cases, actual renewal and final cancellation remain unverified."
+  ],
+  "completedPaymentVerification": {
+    "amountPaidCents": 130000,
+    "currency": "usd",
+    "invoiceStatus": "paid",
+    "invoiceId": "in_1UIYoJE5bkDqmDrJYwSTaxNb",
+    "subscriptionId": "sub_1UIYoLE5bkDqmDrJ7ZGjpMGV",
+    "subscriptionStatus": "trialing",
+    "trialStart": 1790102035,
+    "firstRenewalAt": 1792694035,
+    "firstRenewalAtUtc": "2026-10-22T18:33:55.000Z",
+    "deferralDays": 30,
+    "renewalUnitAmount": 130000,
+    "renewalInterval": {
+      "interval": "day",
+      "interval_count": 30,
+      "meter": null,
+      "trial_period_days": null,
+      "usage_type": "licensed"
+    },
+    "testClockBasis": "Subscription timestamps follow frozen Test Clock time. Invoice one-time line period uses Checkout wall-clock time; full paid-access alignment remains to be tested in isolated application.",
+    "invoiceLinePeriods": [
+      {
+        "amount": 130000,
+        "start": 1790103179,
+        "end": 1792695179
+      },
+      {
+        "amount": 0,
+        "start": 1790102035,
+        "end": 1792694035
+      }
+    ],
+    "portalVerified": {
+      "locale": "ru",
+      "paidInvoiceVisible": true,
+      "renewalDateVisible": "2026-10-22",
+      "cardUpdateAvailable": true,
+      "cancellationPreviewEndsOn": "2026-10-22",
+      "cancellationSubmitted": false
+    },
+    "successRedirect": {
+      "browserResult": "Vercel login (protected Preview)",
+      "authorizedVercelFetchStatus": 200,
+      "matchedPath": "/payment/success",
+      "doesNotProveEntitlement": true
+    }
+  }
 }
