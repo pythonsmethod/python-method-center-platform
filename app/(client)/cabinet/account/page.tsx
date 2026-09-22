@@ -91,7 +91,9 @@ export default async function AccountPage() {
               choose: dict.profileForm.avatarChoose,
               hint: dict.profileForm.avatarHint,
               title: dict.profileForm.avatarTitle,
-              uploading: dict.profileForm.avatarUploading
+              uploading: dict.profileForm.avatarUploading,
+              tooLarge: dict.profileForm.avatarTooLarge,
+              unsupported: dict.profileForm.avatarUnsupported
             }}
             name={profileRow?.full_name ?? auth.email ?? dict.friend}
           />

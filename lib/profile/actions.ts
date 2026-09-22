@@ -111,6 +111,7 @@ export async function uploadProfileAvatar(
     status: "error",
     message: locale === "ru" ? ru : en
   });
+  try {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) return error("Сервис временно недоступен.", "The service is temporarily unavailable.");
@@ -181,4 +182,10 @@ export async function uploadProfileAvatar(
     status: "success",
     message: locale === "ru" ? "Фотография обновлена." : "Photo updated."
   };
+  } catch {
+    return error(
+      "Не удалось обработать фотографию. Попробуйте ещё раз.",
+      "The photo could not be processed. Please try again."
+    );
+  }
 }
