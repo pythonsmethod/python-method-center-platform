@@ -36,7 +36,7 @@ describe("avatar browser preparation", () => {
     vi.stubGlobal("document", { createElement: vi.fn(() => canvas) });
 
     const result = await prepareAvatarUpload(
-      new NodeFile([new Uint8Array(128)], "iphone.heic", { type: "image/heic" }) as File
+      new NodeFile([new Uint8Array(128)], "iphone.heic", { type: "image/heic" }) as unknown as File
     );
 
     expect(result.status).toBe("ready");
