@@ -772,8 +772,16 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
 - [x] Replace the 24-link requirement with dynamic authenticated RU/EN Checkout.
 - [x] Automate localized catalog/Portal configuration and validate 1–12 terms.
 - [x] Preserve signed-webhook entitlement contract and record renewal consent.
-- [ ] Finish authenticated Stripe access and configure isolated test environment.
-- [ ] Apply/verify PR #215 billing migration in the isolated target database.
+- [x] Finish Stripe Sandbox authorization; create/verify four localized products,
+      six prices and two Portal configurations.
+- [x] Apply/verify PR #215 billing migration on isolated `anham-staging`
+      (`thylrayzjczsxlyqhtfc`); production unchanged.
+- [x] Create actual Sandbox Checkout Sessions for assessment and boundary terms;
+      inspect correct RU/EN copy, upfront totals and deferred renewal pricing.
+- [ ] Complete prepared test payment through user handoff: automatic browser
+      review rejected final submission even in Sandbox.
+- [ ] Connect isolated Preview secrets and signed Stripe webhook.
+- [ ] Resolve Stripe's "free trial" labeling of the prepaid renewal deferral.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
       RU/EN customer pages; local tests alone do not close these gates.
 - [ ] Publish only after the existing release gate; deactivate retired sales

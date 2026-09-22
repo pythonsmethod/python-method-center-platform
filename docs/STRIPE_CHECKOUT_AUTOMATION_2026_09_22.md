@@ -1,7 +1,9 @@
 # Automatic Stripe Checkout — 2026-09-22
 
-Status: implementation prepared on top of draft PR #215; NOT deployed and NOT
-verified against a Stripe account. Existing public offers remain live until the
+Status: implementation in draft PR #216 on top of draft PR #215; Sandbox catalog,
+Portal configuration and isolated staging migration completed on 2026-09-22.
+Hosted test Checkout pages were inspected in RU/EN; no payment was completed.
+Commercial release remains HOLD. Existing public offers remain live until the
 pricing release passes its staging gate.
 
 ## A. Existing implementation
@@ -33,6 +35,11 @@ Renewal uses subscription-mode Checkout with the prepaid one-time line plus a
 30-day recurring line deferred by `trial_period_days=N*30`. Stripe's API calls
 this deferral a trial; the initial paid service itself is not free. Verify the
 visible Stripe summary and first invoice in test mode before enabling sales.
+
+Actual hosted-page inspection found "30 дней бесплатно" / "360 days free" and
+"Pay and start trial" beside the correct upfront amount and our explicit paid
+summary. This wording can mislead a prepaid customer. Resolve the presentation
+before release; the successful API amount check does not close this UX gate.
 
 Checkout locale, merchant product name/description, custom purchase summary,
 return routes and Customer preferred invoice/email languages follow the site's
@@ -93,6 +100,20 @@ The key must permit product/price read+write, customer read+write, Checkout
 creation and Billing Portal configuration/session creation. No key is in the
 client bundle. No static Payment Link variables are consumed by this code.
 
+Sandbox setup now exists in `Pythons & Co sandbox` (`acct_1SUwZgE5bkDqmDrJ`).
+Four localized products, six prices and two active Portal configurations were
+created and read back. Recurrence is `day` with `interval_count=30`, not a calendar
+month. Stable namespace `pmc-20260922-v1` matches the application's catalog.
+The exact object IDs and checks are in
+[`validation/stripe-sandbox-2026-09-22.json`](validation/stripe-sandbox-2026-09-22.json).
+
+The existing billing migration was applied through Supabase to the isolated
+`anham-staging` project `thylrayzjczsxlyqhtfc`. Verified: `personal_support` enum,
+`billing_subscriptions` RLS, owner-only authenticated SELECT, service-role write
+privilege and unique `service_periods.payment_id` index. The security advisor
+reported no finding referencing the new billing table. Production DB was not
+changed. This does not assert that Preview is connected to this staging DB.
+
 ## E. Verification
 
 Local checks on 2026-09-22:
@@ -114,6 +135,26 @@ Portal rejection, preview/live separation and RU/EN rendered payment controls.
 These are local tests with synthetic fixtures; they are not real Stripe test
 payments, a deployed browser run or verification of Supabase production state.
 
+Follow-up after account authorization:
+
+- Checkout contract, catalog, webhook, action and UI: 105 tests passed in 5 files.
+- Typecheck and lint passed after using Stripe-managed payment method selection
+  and a stable `integration_identifier` (`pmc-checkout-slibjrkn`).
+- Four real Sandbox Checkout Sessions generated from `buildCheckoutSession`:
+  RU assessment = 299 USD; EN 12 prepaid periods = 15,600 USD; RU 1 period with
+  renewal = 1,300 USD now; EN 12 periods with renewal = 15,600 USD now.
+- Subscription deferrals accepted by Stripe for 30 and 360 days. Hosted RU/EN
+  pages show the correct localized merchant copy, sums, future 1,300 USD / 30-day
+  price and return routes. Final invoice/renewal timestamps are still unverified.
+- A synthetic Test Clock and two synthetic Customers were created. The prepared
+  RU payment uses Stripe's public test card and fictional contact/address data.
+- Automatic Cloud Browser approval review rejected `submit_payment` because
+  final financial submission requires a human handoff, including Sandbox.
+  Session remains `open` / `unpaid`, with no subscription or invoice. No retry
+  through a different interface was attempted. All completed-payment checks
+  remain open until the user submits the prepared test form.
+- [Prepared Sandbox form](validation/stripe-sandbox-ru-1790102314400.jpg).
+
 ## F. Benchmark
 
 The existing synthetic benchmark ran as part of the full suite: 3 documents /
@@ -132,11 +173,18 @@ the existing signed webhook remains authoritative.
 
 ## H. Remaining limits and release gate
 
-No authenticated Stripe session or test secret was available during this change.
-Therefore catalog creation in the actual account, real test-mode payments,
-Customer Portal behavior, tax settings and invoice email appearance are not
-claimed verified. Database migration, webhook registration and isolated staging
-also remain unverified. Do not enable live sales on the basis of unit tests.
+Stripe Sandbox access, catalog creation, Portal settings and the staging schema
+are verified as recorded above. Runtime secrets and a matching signed webhook
+have not been configured for an isolated Preview. The connected Vercel tools do
+not expose an environment-variable write operation, and no authenticated CLI or
+test server secret is available in this workspace. The ready PR Preview alone
+does not prove isolation. No webhook was attached to an unverified environment.
+
+Actual payment completion is blocked at the browser's human-handoff gate.
+Renewal charging, cancellation through a live Portal session, entitlement and
+delivery writes, tax settings and invoice/email appearance remain unverified.
+The hosted trial wording is also an explicit release blocker. Do not enable
+live sales on the basis of catalog setup or unit tests.
 
 Before launch, verify assessment, 1/6/12-term prepaid payments, 1/6/12-term
 renewal payments, cancelled/failed Checkout, failed renewal, webhook retry and
@@ -171,9 +219,10 @@ existing subscriptions/history remain intact; this is not done ahead of launch.
 
 Code preparation can be reviewed independently of the external account setup.
 Commercial launch remains **NO-GO** until isolated Stripe/Supabase acceptance
-passes. The next external action is to finish authenticated Stripe access, then
-exercise the prepared checkout flow in test mode, apply/verify the existing
-billing migration in staging, and complete the release gate in
+passes. The immediate next action is the human completion of the prepared
+Sandbox payment. Then inspect its subscription/invoice, finish isolated Preview
+credentials and signed webhook configuration, resolve the trial wording, and
+complete the remaining acceptance cases and release gate in
 `RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
 
 ## Primary references

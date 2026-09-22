@@ -1237,3 +1237,19 @@ See `docs/STRIPE_CHECKOUT_AUTOMATION_2026_09_22.md` for scope and limitations.
 This supersedes the earlier 24-link environment requirement, not the staging
 release gate. Stripe account setup, test payments and the PR #215 database
 migration are still unverified; the new commercial model is NOT published.
+
+### 2026-09-22 — Sandbox setup and isolated billing migration completed
+
+The later authorization enabled `Pythons & Co sandbox` (`acct_1SUwZgE5bkDqmDrJ`).
+Four RU/EN products, six prices and two Customer Portal configurations are now
+created and verified. PR #215's billing migration was applied and checked on
+`anham-staging` (`thylrayzjczsxlyqhtfc`) only. Exact objects and checks are recorded
+in `docs/validation/stripe-sandbox-2026-09-22.json`.
+
+Four actual Sandbox Checkout Sessions have correct 299 / 1,300 / 15,600 USD
+totals; RU/EN hosted pages were inspected. No test payment has completed:
+automatic browser review requires a human to submit the prepared payment.
+Stripe also labels the prepaid renewal deferral as a free trial; resolve this
+customer-facing wording before launch. Preview secrets/webhook and end-to-end
+entitlement, renewal and cancellation acceptance remain open. New sales remain
+disabled and the new model is NOT published. Work is in draft PR #216.

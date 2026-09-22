@@ -1370,3 +1370,17 @@ metadata and return origin are server-controlled. No new legacy sales. Keep
 checkout disabled by default and refuse live keys in preview. Customer Portal
 permits card updates and cancellation at period end, without plan changes.
 Historical subscriptions/records are not migrated by this code change.
+
+### 2026-09-22 — Sandbox proof does not constitute commercial acceptance
+
+Use `Pythons & Co sandbox` and isolated `anham-staging` for this billing rollout.
+Localized catalog and Portal settings are provisioned; the existing additive
+billing migration is applied only to staging. Retain the default-disabled
+Checkout flag until the runtime is isolated and signed webhooks, paid access,
+renewal and cancellation have passed actual payment tests.
+
+Hosted Checkout currently presents the deferred recurring line as a free trial
+despite the correct initial paid line. Treat that observed wording as an open
+release blocker, not as approval of a free service period. Automatic browser
+review blocked final Sandbox payment submission; the next submission must be
+performed by the user through handoff, without an alternate automated route.

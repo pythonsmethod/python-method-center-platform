@@ -21,6 +21,8 @@ describe.each(["ru", "en"] as const)("Checkout contract in %s", locale => {
       expect(session.metadata).toMatchObject({ product: "personal_support", months: String(months), auto_renew: String(autoRenew), ui_locale: locale, profile_id: "account-owner" });
       expect(session.automatic_tax).toEqual({ enabled: false });
       expect(session.adaptive_pricing).toEqual({ enabled: false });
+      expect(session.integration_identifier).toBe("pmc-checkout-slibjrkn");
+      expect(session).not.toHaveProperty("payment_method_types");
       expect(session).not.toHaveProperty("allow_promotion_codes");
       expect(session).not.toHaveProperty("shipping_options");
       const submit = session.custom_text?.submit;

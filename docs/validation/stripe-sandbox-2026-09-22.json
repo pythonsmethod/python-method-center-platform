@@ -1,0 +1,195 @@
+{
+  "checkedAt": "2026-09-22T18:39:14.236Z",
+  "releaseStatus": "HOLD",
+  "stripe": {
+    "stripe_context": "acct_1SUwZgE5bkDqmDrJ",
+    "livemode": false,
+    "products": [
+      {
+        "id": "pmc-20260922-v1-preliminary_assessment-ru",
+        "name": "Оценка состояния, разбор анализов и предварительная консультация",
+        "active": true,
+        "livemode": false
+      },
+      {
+        "id": "pmc-20260922-v1-preliminary_assessment-en",
+        "name": "Condition assessment, test-results review and preliminary consultation",
+        "active": true,
+        "livemode": false
+      },
+      {
+        "id": "pmc-20260922-v1-personal_support-ru",
+        "name": "Личное сопровождение",
+        "active": true,
+        "livemode": false
+      },
+      {
+        "id": "pmc-20260922-v1-personal_support-en",
+        "name": "Personal Support",
+        "active": true,
+        "livemode": false
+      }
+    ],
+    "prices": [
+      {
+        "id": "price_1UIYLtE5bkDqmDrJ2Axln8Lt",
+        "lookup_key": "pmc-20260922-v1-assessment-ru",
+        "unit_amount": 29900,
+        "currency": "usd",
+        "recurring": null,
+        "livemode": false
+      },
+      {
+        "id": "price_1UIYLxE5bkDqmDrJr0CnsdHX",
+        "lookup_key": "pmc-20260922-v1-prepaid-ru",
+        "unit_amount": 130000,
+        "currency": "usd",
+        "recurring": null,
+        "livemode": false
+      },
+      {
+        "id": "price_1UIYM2E5bkDqmDrJyxVuIZt6",
+        "lookup_key": "pmc-20260922-v1-renewal-ru",
+        "unit_amount": 130000,
+        "currency": "usd",
+        "recurring": {
+          "interval": "day",
+          "interval_count": 30,
+          "meter": null,
+          "trial_period_days": null,
+          "usage_type": "licensed"
+        },
+        "livemode": false
+      },
+      {
+        "id": "price_1UIYM7E5bkDqmDrJ2JS4Rrjt",
+        "lookup_key": "pmc-20260922-v1-assessment-en",
+        "unit_amount": 29900,
+        "currency": "usd",
+        "recurring": null,
+        "livemode": false
+      },
+      {
+        "id": "price_1UIYMBE5bkDqmDrJ4PHjUxWf",
+        "lookup_key": "pmc-20260922-v1-prepaid-en",
+        "unit_amount": 130000,
+        "currency": "usd",
+        "recurring": null,
+        "livemode": false
+      },
+      {
+        "id": "price_1UIYMGE5bkDqmDrJByKtPAyB",
+        "lookup_key": "pmc-20260922-v1-renewal-en",
+        "unit_amount": 130000,
+        "currency": "usd",
+        "recurring": {
+          "interval": "day",
+          "interval_count": 30,
+          "meter": null,
+          "trial_period_days": null,
+          "usage_type": "licensed"
+        },
+        "livemode": false
+      }
+    ],
+    "portalConfigurations": [
+      {
+        "id": "bpc_1UIYUOE5bkDqmDrJQfMRQlFo",
+        "locale": "ru",
+        "active": true,
+        "livemode": false,
+        "cancelMode": "at_period_end",
+        "prorationBehavior": "none"
+      },
+      {
+        "id": "bpc_1UIYUUE5bkDqmDrJbRxJL1VW",
+        "locale": "en",
+        "active": true,
+        "livemode": false,
+        "cancelMode": "at_period_end",
+        "prorationBehavior": "none"
+      }
+    ],
+    "checkoutSessions": [
+      {
+        "testCase": "assessment_ru",
+        "id": "cs_test_a1TRyAEE5ghSjShbGPzNXUdnWXSdtkx1wM6xadm0vLQhyRjojf8Qnl6rX7",
+        "status": "open",
+        "payment_status": "unpaid",
+        "amount_total": 29900,
+        "currency": "usd",
+        "locale": "ru",
+        "mode": "payment",
+        "prepaidDays": null
+      },
+      {
+        "testCase": "prepaid_en_12",
+        "id": "cs_test_a1BJLME690FQ6BrGSp9woCHHDAG7Wx7j07JRlSJnxIdTU6OGmlejvD0TUv",
+        "status": "open",
+        "payment_status": "unpaid",
+        "amount_total": 1560000,
+        "currency": "usd",
+        "locale": "en",
+        "mode": "payment",
+        "prepaidDays": null
+      },
+      {
+        "testCase": "renew_ru_1",
+        "id": "cs_test_b1LlW7Q0LATV7WdGldnfmojXhfdWjRYbvKa3YpsdGmIs75rS7mVFJgmy0a",
+        "status": "open",
+        "payment_status": "unpaid",
+        "amount_total": 130000,
+        "currency": "usd",
+        "locale": "ru",
+        "mode": "subscription",
+        "prepaidDays": 30
+      },
+      {
+        "testCase": "renew_en_12",
+        "id": "cs_test_b1wNQ4Nijp4VrRpMlw5hEi5incpaoKVTodqtb8QnUZlq8vVR4YwdnS9TY6",
+        "status": "open",
+        "payment_status": "unpaid",
+        "amount_total": 1560000,
+        "currency": "usd",
+        "locale": "en",
+        "mode": "subscription",
+        "prepaidDays": 360
+      }
+    ],
+    "testClock": "clock_1UIYVxE5bkDqmDrJ1BSt0ild",
+    "testCustomers": [
+      {
+        "locale": "ru",
+        "id": "cus_VJArKSND4bc0yx"
+      },
+      {
+        "locale": "en",
+        "id": "cus_VJArbHaiKwzqQZ"
+      }
+    ]
+  },
+  "stagingDatabase": {
+    "project_id": "thylrayzjczsxlyqhtfc",
+    "project_name": "anham-staging",
+    "migration": "supabase/migrations/20260919123000_personal_support_billing.sql",
+    "applied": true,
+    "personalSupportEnum": true,
+    "billingSubscriptionsRls": true,
+    "ownReadPolicy": true,
+    "uniquePaymentPeriodIndex": true,
+    "securityAdvisorsForBillingTable": 0
+  },
+  "boundary": {
+    "productionModified": false,
+    "checkoutPublished": false,
+    "completedPayments": 0,
+    "webhookConfigured": false,
+    "previewSecretsConfigured": false,
+    "proof": "docs/validation/stripe-sandbox-ru-1790102314400.jpg"
+  },
+  "blockers": [
+    "Cloud Browser automatic approval review rejected final sandbox payment submission; user handoff required. No alternate submission attempted.",
+    "Stripe hosted Checkout labels the deferral as a free trial. Resolve customer-facing wording before launch.",
+    "Isolated preview credentials and signed webhook not configured; full entitlement/renewal/cancellation acceptance remains open."
+  ]
+}

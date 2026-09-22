@@ -10,6 +10,7 @@ import {
 import type { CheckoutSettings } from "@/lib/payments/checkout-settings";
 
 export const CHECKOUT_VERSION = "pmc-20260922-v1";
+export const STRIPE_INTEGRATION_IDENTIFIER = "pmc-checkout-slibjrkn";
 export type CheckoutProduct = typeof REVIEW_PRODUCT | typeof PERSONAL_SUPPORT_PRODUCT;
 export type CheckoutInput = {
   product: CheckoutProduct;
@@ -66,12 +67,12 @@ export function buildCheckoutSession(input: CheckoutInput, profileId: string, cu
   if (input.autoRenew && !prices.renewal) throw new Error("renewal price is required");
   return {
     mode: input.autoRenew ? "subscription" : "payment",
+    integration_identifier: STRIPE_INTEGRATION_IDENTIFIER,
     locale: input.locale,
     client_reference_id: profileId,
     customer: customerId,
     customer_update: { address: "auto", name: "auto" },
     billing_address_collection: "required",
-    payment_method_types: ["card"],
     adaptive_pricing: { enabled: false },
     automatic_tax: { enabled: settings.automaticTax },
     metadata,
