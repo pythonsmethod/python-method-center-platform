@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
-## Mobile site aligned with the desktop site — 2026-09-19 — RELEASE CANDIDATE
+## Mobile site aligned with the desktop site — 2026-09-22 — PUBLISHED
 
 Phones and touch-first devices now get the same site as a wide screen instead
 of a reduced variant. The public header keeps its full row of sections, the
@@ -18,6 +18,14 @@ the token balance in the phone top bar. No schema, data, payment or PHI
 change. Validation: typecheck, ESLint and the full test suite pass; production
 build passes; phone and tablet screenshots of the public pages reviewed
 locally in RU and EN with no horizontal overflow.
+PR #219 merged as `08195bb3feaf09e037d9586e7c996d2e5ce5c0b1`; the Vercel
+production deployment of `python-method-center-platform` reached READY and is
+aliased to pythonmethodcenter.com. The production homepage serves the full
+header with sign-in, sign-up and the language switch, the six journey cards
+with text and no bottom dock; `/cabinet` sends a guest to `/login`; Vercel
+reported no runtime errors in the first hour. The `main` branch protection now
+requires the `Vercel` status, the name Vercel reports since only one project is
+linked to the repository.
 ## Anham message reactions v1 — 2026-09-19 — PUBLISHED
 
 Anham may now attach one small, allowlisted emoji reaction to the person's own
