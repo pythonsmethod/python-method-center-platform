@@ -118,6 +118,7 @@ function CaseCards({
         open: "Открыть клиента",
         unread: "новых",
         updated: "Обновлён",
+        created: "Создан",
         empty: "Клиентов пока нет."
       }
     : {
@@ -125,6 +126,7 @@ function CaseCards({
         open: "Open client",
         unread: "new",
         updated: "Updated",
+        created: "Created",
         empty: "There are no clients yet."
       };
   const formatter = new Intl.DateTimeFormat(locale, { dateStyle: "short" });
@@ -151,7 +153,17 @@ function CaseCards({
                 {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
               </span>
               {clientCase.title ? <span className="staff-client-card__goal">{clientCase.title}</span> : null}
-              <small>{copy.updated}: {formatter.format(new Date(clientCase.updated_at))}</small>
+              {/* The same contacts the table shows on a wide screen: a
+                  payment arrives from an address, and the card has to
+                  answer "do we know this person?" without opening it. */}
+              {clientCase.profiles?.email || clientCase.profiles?.phone ? (
+                <span className="staff-client-card__meta">
+                  {[clientCase.profiles?.email, clientCase.profiles?.phone].filter(Boolean).join(" · ")}
+                </span>
+              ) : null}
+              <small>
+                {copy.created}: {formatter.format(new Date(clientCase.created_at))} · {copy.updated}: {formatter.format(new Date(clientCase.updated_at))}
+              </small>
             </span>
             <span className="staff-client-card__open">
               <span>{copy.open}</span>
