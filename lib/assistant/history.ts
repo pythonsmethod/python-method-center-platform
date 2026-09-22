@@ -2,6 +2,7 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { AssistantTier } from "@/lib/assistant/tiers";
 import type { Locale } from "@/lib/i18n/locale";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
+import { normalizeReaction, type AnhamReaction } from "@/lib/assistant/reactions";
 import { randomUUID } from "node:crypto";
 import { coalesceLiveHistory } from "./live-transcript";
 
@@ -22,6 +23,8 @@ export type AssistantHistoryMessage = {
   source?: "text" | "voice_transcript";
   voice_state?: "completed" | "interrupted";
   web_results?: import("./web-results").WebResult[];
+  // Anham's reaction to this message. Only ever set on a user row.
+  reaction?: AnhamReaction | null;
 };
 
 type SaveBackgroundAnswerInput = {
@@ -88,6 +91,9 @@ type SaveInput = {
   answer: string;
   locale: Locale;
   questionCreatedAt?: string;
+  // Anham's reaction to the question, already resolved through the safety
+  // gate. Stored on the person's message so it survives a reload.
+  reaction?: AnhamReaction | null;
 };
 
 // Keep the answer available on storage failure, but explicitly report it.
@@ -98,7 +104,8 @@ export async function saveAssistantExchange({
   question,
   answer,
   locale,
-  questionCreatedAt
+  questionCreatedAt,
+  reaction
 }: SaveInput): Promise<{ saved: boolean; messages?: AssistantHistoryMessage[] }> {
   if (tier === "guest") {
     return { saved: false };
@@ -129,7 +136,11 @@ export async function saveAssistantExchange({
         role: "user",
         content: userText || "—",
         tier,
-        locale
+        locale,
+        // The allowlist is applied once more at the storage boundary: the
+        // column constraint would reject anything else, and a rejected insert
+        // must never cost the person their saved conversation.
+        reaction: normalizeReaction(reaction)
       },
       {
         id: randomUUID(),
@@ -139,20 +150,21 @@ export async function saveAssistantExchange({
         role: "assistant",
         content: assistantText,
         tier,
-        locale
+        locale,
+        reaction: null
       }
     ];
   for (let attempt = 0; attempt < 3; attempt += 1) {
     try {
       const { data, error } = await supabase.from("assistant_messages").insert(rows)
-        .select("id, role, content, created_at, locale, message_sequence");
+        .select("id, role, content, created_at, locale, message_sequence, reaction");
       if (!error && data?.length === 2) {
         return { saved: true, messages: (data as AssistantHistoryMessage[]).sort((a, b) => a.message_sequence - b.message_sequence) };
       }
       // A lost acknowledgement can mean the insert committed. Read the same
       // IDs before retrying; never create a second copy of the exchange.
       const existing = await supabase.from("assistant_messages")
-        .select("id, role, content, created_at, locale, message_sequence")
+        .select("id, role, content, created_at, locale, message_sequence, reaction")
         .eq("profile_id", profileId).in("id", rows.map(row => row.id));
       if (!existing.error && existing.data?.length === 2) {
         return { saved: true, messages: (existing.data as AssistantHistoryMessage[]).sort((a, b) => a.message_sequence - b.message_sequence) };
@@ -181,7 +193,7 @@ export async function getOwnAssistantHistory(
 
   let query = supabase
     .from("assistant_messages")
-    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, scheduled_translations, source, voice_state, web_results, exchange_id")
+    .select("id, role, content, created_at, locale, message_sequence, outreach_translations, scheduled_translations, source, voice_state, web_results, exchange_id, reaction")
     .eq("profile_id", profileId)
     .in("tier", options.private ? ["founder", "karen"] : ["registered", "client"])
     .order("message_sequence", { ascending: false })

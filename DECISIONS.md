@@ -1,5 +1,20 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-071 — Anham reactions are server-validated keys, never model emoji (2026-09-18)
+
+A reaction to a person's message is a separate structured value, not text in
+the reply. The model may propose one through a single `[[reaction:key]]`
+marker in the same protocol family as `[[action:id]]`; the server removes the
+marker, accepts only the closed allowlist (`heart`, `clap`, `celebrate`,
+`thumbs_up`, `eyes`, `smile`, `thanks`, `strength`) and maps keys to emoji
+itself. Safety outranks the gesture without exception: a server-side RU/EN
+classifier on the person's message, plus a check on the delivered reply for
+emergency, refusal or honesty-guard text, forces `null`. At most one reaction
+per message; when unsure, none. Guests get a restrained subset and no storage.
+The reaction is stored on the `user` row as a nullable, constrained column,
+because it describes that message, and only the client route produces it:
+Professor Python, Karen and founder conversations never carry reactions.
+
 ## D-070 — Staff email follows communication ownership (2026-09-17)
 
 Client-authored Support messages notify Anna, while client-authored Professor
