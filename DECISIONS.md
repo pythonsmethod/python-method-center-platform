@@ -1,5 +1,17 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## D-072 — Normalize profile photos before the Server Action (2026-09-22)
+
+Client profile photos are decoded in the selecting browser and converted to a
+bounded metadata-free JPEG before upload. This intentionally uses iPhone
+Safari's native HEIC/HEIF support instead of adding a second native/WASM image
+decoder to the application bundle. The server remains authoritative: it checks
+the prepared byte size and signature, applies EXIF-aware Sharp normalization,
+uploads to a fresh private owner-scoped Storage path, persists that path, and
+only then removes the prior object. Browser decode, size, processing, Storage or
+profile-update failures must return localized form state and must never clear the
+existing avatar or escape to the account-page error boundary.
+
 ## D-071 — Anham reactions are server-validated keys, never model emoji (2026-09-18)
 
 A reaction to a person's message is a separate structured value, not text in

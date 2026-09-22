@@ -29,6 +29,12 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  experimental: {
+    // Avatar images are reduced in the browser to <=2 MiB before submission.
+    // Keep modest multipart headroom so valid uploads reach the action while
+    // preserving Next's request-size protection.
+    serverActions: { bodySizeLimit: "3mb" }
+  },
   // "X-Powered-By: Next.js" told every visitor which framework and, by
   // implication, which class of advisories to try. It buys nothing.
   poweredByHeader: false,

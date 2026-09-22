@@ -1,5 +1,19 @@
 # CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
 
+## Client avatar upload hardening — 2026-09-22 — PR CANDIDATE
+
+Issue #217 root cause was the default 1 MiB Next.js Server Action request limit:
+iPhone photos larger than that failed before the avatar action and its localized
+validation could run, so React displayed the global error boundary. The account
+picker now decodes and resizes JPEG, PNG, WebP and native Safari HEIC/HEIF into a
+metadata-free JPEG no larger than 2 MiB before submission, with a 25 MiB source
+guard. The Server Action has 3 MiB multipart headroom, still validates and
+re-encodes the image with Sharp, and catches unexpected processing/storage errors.
+Failed selections remain on the usable RU/EN account page; existing profile data
+and avatar paths are not changed. Storage stays private with the existing owner
+RLS and new-object replacement flow. No migration, production change, PHI flow,
+payment logic or clinical-processing gate changed.
+
 ## Anham message reactions v1 — 2026-09-19 — PUBLISHED
 
 Anham may now attach one small, allowlisted emoji reaction to the person's own

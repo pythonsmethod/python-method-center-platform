@@ -1,9 +1,10 @@
 "use client";
 
-import { useActionState } from "react";
+import { startTransition, useActionState, useState } from "react";
 import { uploadProfileAvatar } from "@/lib/profile/actions";
 import { initialProfileAvatarActionState } from "@/lib/profile/action-state";
 import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
+import { prepareAvatarUpload } from "@/lib/profile/prepare-avatar";
 
 type AvatarLabels = {
   camera: string;
@@ -11,6 +12,8 @@ type AvatarLabels = {
   hint: string;
   title: string;
   uploading: string;
+  tooLarge: string;
+  unsupported: string;
 };
 
 export function AvatarUploadForm({ avatarUrl, labels, name }: {
@@ -22,9 +25,26 @@ export function AvatarUploadForm({ avatarUrl, labels, name }: {
     uploadProfileAvatar,
     initialProfileAvatarActionState
   );
+  const [clientError, setClientError] = useState("");
+  const [preparing, setPreparing] = useState(false);
 
-  const submitSelectedFile = (event: React.ChangeEvent<HTMLInputElement>) => {
-    if (event.currentTarget.files?.length) event.currentTarget.form?.requestSubmit();
+  const submitSelectedFile = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.currentTarget.files?.[0];
+    event.currentTarget.value = "";
+    if (!file) return;
+
+    setClientError("");
+    setPreparing(true);
+    const prepared = await prepareAvatarUpload(file);
+    setPreparing(false);
+    if (prepared.status !== "ready") {
+      setClientError(prepared.status === "too-large" ? labels.tooLarge : labels.unsupported);
+      return;
+    }
+
+    const formData = new FormData();
+    formData.set("avatar", prepared.file);
+    startTransition(() => action(formData));
   };
 
   const picker = (camera: boolean) => (
@@ -32,9 +52,9 @@ export function AvatarUploadForm({ avatarUrl, labels, name }: {
       <label className={`button${camera ? " button--secondary" : ""}`}>
         {camera ? labels.camera : labels.choose}
         <input
-          accept="image/jpeg,image/png,image/webp"
+          accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif"
           capture={camera ? "user" : undefined}
-          disabled={pending}
+          disabled={pending || preparing}
           name="avatar"
           onChange={submitSelectedFile}
           type="file"
@@ -53,7 +73,12 @@ export function AvatarUploadForm({ avatarUrl, labels, name }: {
           {picker(false)}
           {picker(true)}
         </div>
-        {pending ? <p aria-live="polite">{labels.uploading}</p> : null}
+        {pending || preparing ? <p aria-live="polite">{labels.uploading}</p> : null}
+        {clientError ? (
+          <p aria-live="polite" className="form-message form-message--error" role="status">
+            {clientError}
+          </p>
+        ) : null}
         {state.message ? (
           <p aria-live="polite" className={`form-message form-message--${state.status}`} role="status">
             {state.message}

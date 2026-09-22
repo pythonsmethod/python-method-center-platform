@@ -2,9 +2,13 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import {
   avatarPathBelongsTo,
-  detectSupportedAvatar,
-  MAX_PROFILE_AVATAR_BYTES
+  detectSupportedAvatar
 } from "@/lib/profile/avatar";
+import {
+  MAX_PROFILE_AVATAR_BYTES,
+  MAX_PROFILE_AVATAR_SOURCE_BYTES,
+  PROFILE_AVATAR_MAX_DIMENSION
+} from "@/lib/profile/avatar-constraints";
 
 describe("profile avatars", () => {
   it("detects supported image content instead of trusting the filename", () => {
@@ -19,7 +23,30 @@ describe("profile avatars", () => {
     expect(avatarPathBelongsTo(owner, `${owner}/photo.jpg`)).toBe(true);
     expect(avatarPathBelongsTo(owner, "22222222-2222-2222-2222-222222222222/photo.jpg")).toBe(false);
     expect(avatarPathBelongsTo(owner, `${owner}/../other/photo.jpg`)).toBe(false);
-    expect(MAX_PROFILE_AVATAR_BYTES).toBe(5 * 1024 * 1024);
+    expect(MAX_PROFILE_AVATAR_BYTES).toBe(2 * 1024 * 1024);
+    expect(MAX_PROFILE_AVATAR_SOURCE_BYTES).toBe(25 * 1024 * 1024);
+    expect(PROFILE_AVATAR_MAX_DIMENSION).toBe(1024);
+  });
+
+  it("keeps enough Server Action headroom for the normalized multipart upload", () => {
+    const config = readFileSync("next.config.mjs", "utf8");
+    const form = readFileSync("components/cabinet/AvatarUploadForm.tsx", "utf8");
+    const preparation = readFileSync("lib/profile/prepare-avatar.ts", "utf8");
+
+    expect(config).toContain('bodySizeLimit: "3mb"');
+    expect(form).toContain("prepareAvatarUpload(file)");
+    expect(form).toContain("image/heic,image/heif,.heic,.heif");
+    expect(preparation).toContain('canvas.toBlob(resolve, "image/jpeg", quality)');
+    expect(preparation).toContain("PROFILE_AVATAR_MAX_DIMENSION");
+  });
+
+  it("keeps upload failures inside the account form instead of the global boundary", () => {
+    const action = readFileSync("lib/profile/actions.ts", "utf8");
+    const form = readFileSync("components/cabinet/AvatarUploadForm.tsx", "utf8");
+
+    expect(action).toContain('"The photo could not be processed. Please try again."');
+    expect(form).toContain('className="form-message form-message--error"');
+    expect(form).toContain("event.currentTarget.value = \"\"");
   });
 
   it("keeps the bucket private and scopes writes by owner folder", () => {

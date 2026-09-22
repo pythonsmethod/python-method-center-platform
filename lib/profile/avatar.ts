@@ -1,7 +1,7 @@
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 
 export const PROFILE_AVATAR_BUCKET = "profile-avatars";
-export const MAX_PROFILE_AVATAR_BYTES = 5 * 1024 * 1024;
+export { MAX_PROFILE_AVATAR_BYTES } from "@/lib/profile/avatar-constraints";
 const AVATAR_URL_TTL_SECONDS = 60 * 60;
 
 export type SupportedAvatar = {

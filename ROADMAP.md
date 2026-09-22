@@ -1,5 +1,15 @@
 # ROADMAP.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-22 — Issue #217 client avatar upload
+
+Local fix and regression coverage are complete: iPhone Safari performs native
+HEIC/HEIF decoding plus bounded JPEG preparation before the Server Action, valid
+uploads fit within explicit request/server limits, and unsupported, corrupt or
+oversized files render localized form errors without reaching the global error
+boundary. Next action: review and merge the isolated PR, then verify one RU and
+one EN upload on real iPhone Safari in the normal non-production preview. No
+production deployment or database migration is part of this task.
+
 ## Staff email notifications — 2026-09-17
 
 - [x] Notify Anna about new registered-client Support messages.
