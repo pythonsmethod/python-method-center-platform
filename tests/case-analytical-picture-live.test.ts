@@ -108,38 +108,37 @@ describe("live Case Analytical Picture", () => {
     )).toHaveLength(1);
   });
 
-  it("normalizes formatting-only disagreements, separates generic notes and removes exact duplicates", () => {
+  it("preserves disputed readings and generic notes, removing only repeated identical source rows", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
       { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Nottingham grade: Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
       { file: "synthetic.pdf", section: "Note", label: "Text", first: "First independent note", second: "Second independent note", reason: "разные значения", note: "" },
     ] }, new Set(["doc-a"]));
     const prepared = prepareEvidenceForKaren([...projected, projected[0]]);
-    expect(prepared).toHaveLength(3);
-    expect(prepared[0]).toMatchObject({ alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY", priority: "CRITICAL" });
-    expect(prepared.slice(1)).toEqual(expect.arrayContaining([
-      expect.objectContaining({ value: "First independent note", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" }),
-      expect.objectContaining({ value: "Second independent note", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" }),
-    ]));
+    expect(prepared).toHaveLength(2);
+    expect(prepared[0]).toMatchObject({ id: projected[0].id, value: "* Nottingham grade: Grade 3 of 3.", alternateValue: "Grade 3 of 3", disputeReason: "разные значения", trustState: "NEEDS_REVIEW", priority: "CRITICAL" });
+    expect(prepared[1]).toMatchObject({ id: projected[1].id, value: "First independent note", alternateValue: "Second independent note", disputeReason: "разные значения", trustState: "NEEDS_REVIEW" });
   });
 
-  it("collapses complementary dual-read rows into one non-blocking source-only item", () => {
+  it("does not infer corroboration across sections when one reading omits a unit", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
       { file: "synthetic.pdf", section: "Hemogram", label: "PLT", first: "243", second: "", reason: "разные значения", note: "" },
       { file: "synthetic.pdf", section: "CBC", label: "PLT", first: "", second: "243 [10^9/L]", reason: "разные значения", note: "" },
     ] }, new Set(["doc-a"]));
     const prepared = prepareEvidenceForKaren(projected);
-    expect(prepared).toHaveLength(1);
-    expect(prepared[0]).toMatchObject({ label: "PLT", value: "243 [10^9/L]", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" });
+    expect(prepared).toHaveLength(2);
+    expect(prepared).toEqual(expect.arrayContaining(projected));
+    expect(buildCaseAnalyticalPicture(base({ extractedEvidence: prepared })).reviewSummary).toMatchObject({ required: 2, completed: 0 });
   });
 
-  it("preserves a reviewed representative when complementary rows are collapsed", () => {
+  it("preserves the reviewed row and the separate pending row", () => {
     const item = (id: string, section: string, value: string | null, alternateValue: string | null, reviewDecision: "PENDING" | "CORRECTED") => ({ id, documentId: "doc-a", section, label: "PLT", value, alternateValue, category: "UNKNOWN" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: "разные значения", provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision, correction: reviewDecision === "CORRECTED" ? "PLT 243 [10^9/L]" : null });
     const prepared = prepareEvidenceForKaren([
       item("pending", "CBC", "243", null, "PENDING"),
       item("reviewed", "Hemogram", null, "243 [10^9/L]", "CORRECTED"),
     ]);
-    expect(prepared).toHaveLength(1);
-    expect(prepared[0]).toMatchObject({ id: "reviewed", reviewDecision: "CORRECTED", correction: "PLT 243 [10^9/L]", trustState: "SOURCE_ONLY" });
+    expect(prepared).toHaveLength(2);
+    expect(prepared[0]).toMatchObject({ id: "pending", reviewDecision: "PENDING", correction: null, trustState: "NEEDS_REVIEW" });
+    expect(prepared[1]).toMatchObject({ id: "reviewed", reviewDecision: "CORRECTED", correction: "PLT 243 [10^9/L]", trustState: "NEEDS_REVIEW" });
   });
 
   it("keeps a genuine dual-read disagreement in the exception queue", () => {

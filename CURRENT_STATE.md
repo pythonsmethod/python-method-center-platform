@@ -1,5 +1,21 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## NX-03.2 — Document data integrity — 2026-09-23 — LOCAL IMPLEMENTATION
+
+The owner's current eleven-step audit explicitly excludes the old Case 2.9.
+Do not reopen its files, data or replay it based on historical next steps below.
+The first scoped repair retains disputed units, both readings, source IDs and
+review decisions in Karen's presentation; formatting no longer clears review.
+Ambiguous numeric dates remain null with their printed text preserved, including
+the report date. No language-based date guess, clinical trust promotion, schema
+change or production data write. These corrections are independent of draft #222.
+
+Local evidence: 38 new synthetic checks; final related regression 102/102,
+synthetic benchmark 1/1, typecheck and lint PASS. Full historical tests and the
+automatic PR workflow were not run because they include excluded real fixtures.
+Remote branch preparation is not production deployment or hosted acceptance.
+Details and exact next action: [data integrity report](docs/ankh/document_data_integrity_2026_09_23.md).
+
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
 Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.

@@ -1,5 +1,16 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Current owner scope — eleven-step chain / data integrity — 2026-09-23
+
+The old Case 2.9 is explicitly excluded. Earlier roadmap proposals to continue
+it are historical and must not drive this task.
+
+- [x] NX-03.2: Preserve units, alternate readings and review reasons; reject ambiguous date normalization. Local related regression 102/102 and synthetic benchmark 1/1; typecheck/lint passed.
+- [ ] Review the narrow branch and accept the two synthetic scenarios in a legitimately authenticated, isolated Karen environment; production publication is not done.
+- [ ] Next separate increment: make original-file persistence → queue handoff reliable.
+
+Evidence: [document data integrity](docs/ankh/document_data_integrity_2026_09_23.md).
+
 ## NEXORA capability ownership and migration — 2026-09-23
 
 Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future

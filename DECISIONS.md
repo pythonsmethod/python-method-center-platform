@@ -1,5 +1,20 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## NEXORA-2026-09-23-03 — Preserve uncertainty in the current document path
+
+Owner instruction: begin the eleven-step chain with preservation of reliable
+data; the old Case 2.9 is excluded from this task. Historical next steps do not
+authorize accessing it. NX-03.2 fixes the two newly reproduced mechanisms.
+
+Presentation must preserve source rows, units, comparators, review reasons and
+human decisions. Text similarity is not a verification operation. Date parsing
+must retain the printed source and return no normalized date when more than one
+calendar interpretation is valid. Language and punctuation alone do not prove
+day/month order. Use the existing source/evidence/header stores without a new
+Case model, trust upgrade or production rewrite.
+
+Evidence and limits: [NX-03.2](docs/ankh/document_data_integrity_2026_09_23.md).
+
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
 Status: owner-approved product direction; implementation migration pending.
