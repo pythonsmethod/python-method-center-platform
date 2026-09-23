@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useEffect, useRef, useState } from "react";
+import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AnhamReactionBadge } from "@/components/assistant/AnhamReactionBadge";
 import { AssistantOutreachPreference } from "@/components/assistant/AssistantOutreachPreference";
 import { useVoiceInput } from "@/components/assistant/useVoiceInput";
@@ -69,6 +70,7 @@ type AssistantChatProps = {
 // everything together.
 const chatCopy = {
   ru: {
+    thinking: "Анхам готовит ответ…",
     tooMany: (count: number) => `За раз можно приложить не больше ${count} файлов.`,
     preparing: (count: number) => count > 1 ? `Готовлю ${count} файлов…` : "Готовлю файл…",
     inspectFiles: "Посмотри приложенные файлы.",
@@ -80,6 +82,7 @@ const chatCopy = {
     extract: `Это одна партия фотографий, сканов или PDF анализов. Выполни только точную расшифровку, без медицинского разбора. Для каждого файла отдельно выпиши все видимые строки: название показателя, результат, знак < или >, единицу, референс, дату и примечание. После первого чтения второй раз сверь каждую цифру и единицу с изображением. Не исправляй и не угадывай. Помечай [НЕЧИТАЕМО: файл, конкретная строка/поле] только если это место видно, но символ действительно нельзя различить. Отсутствующие на странице исследования не считай непрочитанными. Не повторяй замечания.`
   },
   en: {
+    thinking: "Anham is preparing a reply…",
     tooMany: (count: number) => `You can attach no more than ${count} files at once.`,
     preparing: (count: number) => count > 1 ? `Preparing ${count} files…` : "Preparing file…",
     inspectFiles: "Please review the attached files.",
@@ -623,14 +626,16 @@ function AssistantChatSession({
           </div>
         ) : null}
         {voiceBackgroundTasks.length > 0 ? (
-          <div className="assistant-msg assistant-msg--assistant assistant-msg--pending" role="status">
-            {locale === "ru" ? "Голосовая команда выполняется в фоне. Можно продолжать пользоваться чатом — ответ появится здесь автоматически." : "The voice request is continuing in the background. You can keep using the chat; the answer will appear here automatically."}
+          <div className="assistant-msg assistant-msg--assistant assistant-msg--pending assistant-msg--thinking" role="status">
+            <AnhamAvatar size={88} activity="thinking" />
+            <span>{locale === "ru" ? "Голосовая команда выполняется в фоне. Можно продолжать пользоваться чатом — ответ появится здесь автоматически." : "The voice request is continuing in the background. You can keep using the chat; the answer will appear here automatically."}</span>
           </div>
         ) : null}
         {voiceBackgroundFailed ? <p role="alert" className="form-message form-message--error">{locale === "ru" ? "Фоновый ответ не появился вовремя. Отправьте команду ещё раз текстом." : "The background answer did not arrive in time. Please send the request again as text."}</p> : null}
         {pending ? (
-          <div className="assistant-msg assistant-msg--assistant assistant-msg--pending">
-            {progress ?? t.sending}
+          <div className="assistant-msg assistant-msg--assistant assistant-msg--pending assistant-msg--thinking" role="status">
+            <AnhamAvatar size={88} activity="thinking" />
+            <span>{progress ?? c.thinking}</span>
           </div>
         ) : null}
         {error ? <p aria-live="assertive" className="form-message form-message--error" role="alert">{error}</p> : null}
@@ -773,6 +778,7 @@ function AssistantChatSession({
           ) : null}
           {voiceScope ? <RealtimeVoice key={locale + ":" + voiceScope + ":" + (caseId ?? "own")}
             locale={locale} scope={voiceScope} caseId={caseId}
+            thinking={pending || voiceBackgroundTasks.length > 0}
             disabled={pending || historyLoading || historyError || voice.listening || files.length > 0 || Boolean(progress)}
             onActive={setVoiceActive}
             onTranscript={(text, sessionId) => {
