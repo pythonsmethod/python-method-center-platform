@@ -17,7 +17,7 @@ const messages = [{ role: "user" as const, content: "Synthetic data only" }];
 describe("policy at the provider boundary", () => {
   it("applies to Claude attachment/OCR calls and their continuation without changing JSON", async () => {
     create.mockResolvedValueOnce({ stop_reason: "max_tokens", content: [{ type: "text", text: '{"value":' }] })
-      .mockResolvedValueOnce({ content: [{ type: "text", text: 'null}' }] });
+      .mockResolvedValueOnce({ stop_reason: "end_turn", content: [{ type: "text", text: 'null}' }] });
     const result = await askClaude("Return only JSON", messages, 100, []);
     expect(result).toEqual({ status: "ok", reply: '{"value":\nnull}' });
     for (const [request] of create.mock.calls) {
@@ -30,7 +30,7 @@ describe("policy at the provider boundary", () => {
   it("applies to OpenAI and its continuation", async () => {
     const fetchMock = vi.fn()
       .mockResolvedValueOnce(Response.json({ choices: [{ finish_reason: "length", message: { content: "Data" } }] }))
-      .mockResolvedValueOnce(Response.json({ choices: [{ message: { content: "unavailable" } }] }));
+      .mockResolvedValueOnce(Response.json({ choices: [{ finish_reason: "stop", message: { content: "unavailable" } }] }));
     vi.stubGlobal("fetch", fetchMock);
     expect(await askOpenAi("Synthetic prompt", messages, 100)).toEqual({ status: "ok", reply: "Data\nunavailable" });
     expect(fetchMock).toHaveBeenCalledTimes(2);

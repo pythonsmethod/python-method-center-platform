@@ -6,9 +6,9 @@ Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and f
 external consumers. Retire ANKH as a standalone system name. Technical aliases
 remain until the compatible migration is verified.
 
-- [x] NX-00: Record the decision, NEXORA master and subordinate ANHAM/PMC profile in the architecture work branch.
-- [ ] NX-01: Map each current component to shared capability, PMC domain adapter or user interface, with callers and data ownership.
-- [ ] NX-02: Introduce the document-analysis contract and thin PMC adapter without copying the engine or source history.
+- [x] NX-00: Record the decision, NEXORA master and subordinate ANHAM/PMC profile; PR #207 merged as c273d8e.
+- [x] NX-01: Map current components, callers, data ownership and compatible legacy identifiers in NEXORA_COMPONENT_MAP.md.
+- [x] NX-02: Implement the first internal document.read v1 contract and thin PMC adapter, using existing queue/evidence; synthetic checks pass. Runtime release remains gated by hosted acceptance.
 - [ ] NX-03: Continue Phase 2.9 and isolated persistence/source/authorization acceptance.
 - [ ] NX-04: Accept ANHAM's complete document → Karen → saved client response flow through the shared boundary.
 - [ ] NX-05: Accept a versioned external NEXORA API with organization isolation, access control, limits, usage accounting and documentation.
@@ -17,6 +17,8 @@ remain until the compatible migration is verified.
 Keep existing PMC payment/access work and clinical gates distinct. A new name does
 not require a new repository, database or deployed service at this step.
 Master: [NEXORA](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
+Implementation, staging prerequisite repair and exact release evidence:
+[2026-09-23 report](docs/nexora/RELEASE_2026_09_23.md).
 
 
 ## Staff email notifications — 2026-09-17
@@ -41,6 +43,10 @@ Master: [NEXORA](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
 - [x] Add RU/EN staff copy, server-side authorization/ownership resolution, audit, and duplicate-thread prevention.
 - [ ] Apply the reviewed migration, pass full CI, merge, publish, and verify production.
 
+## Anham API response contract — 2026-09-16
+
+Draft PR #196 passed exact-implementation CI/build; its isolated staging preview is READY. Next: explicit authorization for temporary protected-preview access, then synthetic signed-in RU/EN dialogue with route-preserving language changes. Production promotion requires acceptance and explicit approval. Broader AI Core provider independence and clinical production gates remain open. See docs/ankh/assistant_api_release_2026_09_16.md.
+
 ## Chess expert level — 2026-09-16
 
 Deployed to production through PR #194: bilingual shared UI, three-ply intermediate opponent, API/coaching support and additive account-preference migration. The production constraint was applied and verified. Next: observe Karen and client play, verify RU↔EN selection during routine authenticated use, and tune only from play evidence.
@@ -60,6 +66,8 @@ is closed. Any production collection is a separate future task: do not apply
 explicit owner approval. External PostHog heatmaps additionally require an
 owner-approved account, terms, region and activation task. See
 `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+
+2026-09-13 manual-review capture: local save/readback integration complete; live release and learning loop open. Next: isolated authenticated staff-note/RU/EN stale-form acceptance and clean release validation, then controlled publication. Source-image adjudication, minimized fixture export and quality-gate connection remain separate; no automatic learning/trust activation. See docs/ankh/review_snapshot_integration_2026_09_13.md.
 
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 

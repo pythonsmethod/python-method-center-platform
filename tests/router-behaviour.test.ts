@@ -138,6 +138,19 @@ describe("a named provider", () => {
 });
 
 describe("best — both answer, an arbiter picks", () => {
+  it("preserves the arbiter's explicit policy refusal", async () => {
+    const refusal = { status: "ok" as const, reply: "Safety refusal", refusal: "provider_policy" as const };
+    askClaude.mockResolvedValueOnce(ok("Draft A")).mockResolvedValueOnce(refusal);
+    askOpenAi.mockResolvedValue(ok("Draft B"));
+    await expect(ask("best", true)).resolves.toEqual(refusal);
+    expect(askClaude).toHaveBeenCalledTimes(2);
+    expect(askOpenAi).toHaveBeenCalledTimes(1);
+  });
+  it("requires an exact B verdict instead of accepting a sentence", async () => {
+    askClaude.mockResolvedValueOnce(ok("Draft A")).mockResolvedValueOnce(ok("Both have gaps"));
+    askOpenAi.mockResolvedValue(ok("Draft B"));
+    await expect(ask("best")).resolves.toEqual(ok("Draft A"));
+  });
   it("asks both and returns the arbiter's winner", async () => {
     askClaude
       .mockResolvedValueOnce(ok("ответ Claude"))

@@ -2,6 +2,8 @@ import { withAiSafety } from "@/lib/security/ai-policy";
 import Anthropic from "@anthropic-ai/sdk";
 import { ARCHIVE_RULE, availableConversationTools, conversationArchiveScope, executeConversationArchiveTool } from "./conversation-archive";
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
+import { assistantResponseFailure, parseClaudeReply, type AssistantResult, type ChatMessage } from "@/lib/assistant/response-contract";
+export type { AssistantErrorCode, AssistantResult, ChatMessage } from "@/lib/assistant/response-contract";
 
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
 import {
@@ -15,11 +17,6 @@ export const ASSISTANT_MODEL = "claude-opus-4-8";
 
 export const MAX_HISTORY_MESSAGES = 24;
 export const MAX_MESSAGE_CHARS = 4000;
-
-export type ChatMessage = {
-  role: "user" | "assistant";
-  content: string;
-};
 
 let client: Anthropic | null = null;
 
@@ -73,21 +70,6 @@ export function sanitizeChatMessages(value: unknown): ChatMessage[] | null {
 
   return messages;
 }
-
-// Why the assistant could not answer. The message stays for the places
-// that only log it; the code is what lets a route say the same thing in the
-// reader's own language instead of passing the Russian text straight to an
-// English chat window.
-export type AssistantErrorCode =
-  | "overloaded"
-  | "temporarilyDown"
-  | "unreachable"
-  | "emptyReply";
-
-export type AssistantResult =
-  | { status: "ok"; reply: string; refusal?: "provider_policy" }
-  | { status: "unavailable" }
-  | { status: "error"; message: string; code?: AssistantErrorCode };
 
 const CONTINUE_INSTRUCTION =
   "Продолжи ответ ровно с того места, где он оборвался. Не повторяй уже написанное, сохрани язык и закончи мысль кратко и естественно.";
@@ -244,7 +226,7 @@ export async function askClaude(
         ...(archiveEnabled ? { tools: availableConversationTools().map(tool => ({ name: tool.name, description: tool.description, input_schema: tool.parameters as Anthropic.Tool.InputSchema })), tool_choice: { type: round < 4 ? "auto" as const : "none" as const } } : {})
     });
     let response = await call(0);
-    for (let round = 0; archiveEnabled && response.stop_reason === "tool_use"; round++) {
+    for (let round = 0; archiveEnabled && response?.stop_reason === "tool_use"; round++) {
       const calls = response.content.filter(block => block.type === "tool_use");
       if (round >= 4 || calls.length > 3 || !calls.length) throw new Error("archive tool budget");
       requestMessages.push({ role: "assistant", content: response.content });
@@ -254,28 +236,15 @@ export async function askClaude(
       response = await call(round + 1);
     }
 
-    if (response.stop_reason === "refusal") {
-      return providerPolicyRefusal();
-    }
-
-    let reply = response.content
-      .filter((block) => block.type === "text")
-      .map((block) => block.text)
-      .join("\n")
-      .trim();
-
-    if (!reply) {
-      return {
-        status: "error",
-        code: "emptyReply",
-        message: "Пустой ответ ассистента."
-      };
-    }
+    const part = parseClaudeReply(response);
+    if (part.status === "refusal") return providerPolicyRefusal();
+    if (part.status === "invalid") return assistantResponseFailure("INVALID_RESPONSE");
+    let reply = part.reply;
 
     // A token ceiling is not a completed answer. Ask once for the missing
     // ending and return one seamless message instead of exposing a sentence
     // cut in half. One continuation keeps latency and cost bounded.
-    if (response.stop_reason === "max_tokens") {
+    if (part.status === "incomplete") {
       try {
         const continuation = await anthropic.messages.create({
           model: ASSISTANT_MODEL,
@@ -287,18 +256,12 @@ export async function askClaude(
             { role: "user", content: CONTINUE_INSTRUCTION }
           ]
         });
-        if (continuation.stop_reason === "refusal") return providerPolicyRefusal();
-        const ending = continuation.content
-          .filter((block) => block.type === "text")
-          .map((block) => block.text)
-          .join("\n")
-          .trim();
-
-        if (ending) {
-          reply = `${reply}\n${ending}`;
-        }
+        const ending = parseClaudeReply(continuation);
+        if (ending.status === "refusal") return providerPolicyRefusal();
+        if (ending.status !== "complete") return assistantResponseFailure("INCOMPLETE_RESPONSE");
+        reply = `${reply}\n${ending.reply}`;
       } catch {
-        // Preserve the useful first part if only the continuation call fails.
+        return assistantResponseFailure("INCOMPLETE_RESPONSE");
       }
     }
 

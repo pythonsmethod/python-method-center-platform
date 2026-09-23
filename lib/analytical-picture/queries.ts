@@ -7,6 +7,7 @@ import {
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import type { TrendAssessment } from "@/lib/analysis/trend-gate";
 import { prepareEvidenceForKaren } from "./evidence-presentation";
+import { makeReviewSnapshot, reviewMatchesSnapshot, reviewSnapshotToken, type StoredReviewSnapshot } from "./review-snapshot";
 
 export type PictureQueryResult =
   | { status: "ready"; picture: ReturnType<typeof buildCaseAnalyticalPicture> }
@@ -28,7 +29,7 @@ function isUnselectedStandaloneTemplateDispute(row: DisputedValue): boolean {
   );
 }
 
-export function projectStoredExtractionEvidence(input: { id: string; documentId: string; agreed: TranscribedValue[]; disputed: DisputedValue[] }, allowedDocumentIds: Set<string>, structuredKeys = new Set<string>()): ExtractedClinicalEvidence[] {
+export function projectStoredExtractionEvidence(input: { id: string; documentId: string; extractedAt?: string; agreed: TranscribedValue[]; disputed: DisputedValue[] }, allowedDocumentIds: Set<string>, structuredKeys = new Set<string>()): ExtractedClinicalEvidence[] {
   if (!allowedDocumentIds.has(input.documentId)) throw new Error("Stored extraction belongs to another Case");
   const classify = (section: string, label: string): ExtractedClinicalEvidence["category"] => {
     const text = `${section} ${label}`.toLowerCase().replace(/[_/]+/g, " ").replace(/\s+/g, " ").trim();
@@ -45,10 +46,17 @@ export function projectStoredExtractionEvidence(input: { id: string; documentId:
     }
     return signals.size === 1 ? [...signals][0] : "UNKNOWN";
   };
-  return [
+  const projected: ExtractedClinicalEvidence[] = [
     ...input.agreed.flatMap((row, index) => structuredKeys.has(`${input.documentId}|${row.label}|${row.value}`) || looksLikeUnselectedStandaloneTemplateChoice(row) ? [] : [{ id: `${input.id}-agreed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.value, alternateValue: null, category: classify(row.section, row.label), trustState: "SOURCE_ONLY" as const, disputeReason: null, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
     ...input.disputed.flatMap((row, index) => isUnselectedStandaloneTemplateDispute(row) ? [] : [{ id: `${input.id}-disputed-${index}`, documentId: input.documentId, section: row.section, label: row.label, value: row.first, alternateValue: row.second, category: classify(row.section, row.label), trustState: "NEEDS_REVIEW" as const, disputeReason: row.reason, provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null }]),
   ];
+  return projected.map(item => {
+    const match = /-(agreed|disputed)-(\d+)$/.exec(item.id)!;
+    const kind = match[1] as "agreed" | "disputed";
+    const index = Number(match[2]);
+    const snapshot = makeReviewSnapshot({ extractionId: input.id, documentId: input.documentId, extractedAt: input.extractedAt ?? "", rowKind: kind, rowIndex: index, row: input[kind][index] });
+    return { ...item, reviewSnapshot: snapshot };
+  });
 }
 
 export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQueryResult> {
@@ -74,7 +82,7 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
   }));
   const documentIds = new Set(documents.map((item) => item.id));
   const extractionResult = documents.length ? await supabase.from("document_extractions")
-    .select("id, document_id, agreed_values, disputed_values")
+    .select("id, document_id, extracted_at, agreed_values, disputed_values")
     .eq("case_id", caseId)
     .in("document_id", [...documentIds]) : { data: [], error: null };
   if (extractionResult.error) {
@@ -94,7 +102,7 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
   for (const extraction of extractionResult.data ?? []) {
     const documentId = String(extraction.document_id);
     if (!documentIds.has(documentId)) continue;
-    extractedEvidence.push(...projectStoredExtractionEvidence({ id: String(extraction.id), documentId, agreed: (extraction.agreed_values ?? []) as TranscribedValue[], disputed: (extraction.disputed_values ?? []) as DisputedValue[] }, documentIds, structuredKeys));
+    extractedEvidence.push(...projectStoredExtractionEvidence({ id: String(extraction.id), documentId, extractedAt: String(extraction.extracted_at ?? ""), agreed: (extraction.agreed_values ?? []) as TranscribedValue[], disputed: (extraction.disputed_values ?? []) as DisputedValue[] }, documentIds, structuredKeys));
   }
   const run = runResult.data as { id?: string; created_at?: string; trends?: Record<string, TrendAssessment>; blocked?: PictureInputRun["blocked"]; requests?: string[]; excluded?: PictureInputRun["excluded"] } | null;
   const noteRows = notesResult.data ?? [];
@@ -102,20 +110,20 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
     id: String(row.id), body: String(row.body), authorId: row.author_id ? String(row.author_id) : null,
     createdAt: String(row.created_at), state: (row.metadata as { state?: string } | null)?.state === "confirmed" ? "confirmed" : "draft",
   }));
-  const latestReviews = new Map<string, { decision: ExtractedClinicalEvidence["reviewDecision"]; correction: string | null }>();
+  const latestReviews = new Map<string, { decision: ExtractedClinicalEvidence["reviewDecision"]; correction: string | null; snapshot?: StoredReviewSnapshot; snapshot_token?: string; evidence_id?: string; document_id?: string }>();
   for (const row of noteRows) {
-    const metadata = row.metadata as { kind?: string; evidence_id?: string; decision?: string; correction?: string } | null;
+    const metadata = row.metadata as { kind?: string; evidence_id?: string; document_id?: string; snapshot?: StoredReviewSnapshot; snapshot_token?: string; decision?: string; correction?: string } | null;
     if (metadata?.kind !== "case_picture_evidence_review" || !metadata.evidence_id || latestReviews.has(metadata.evidence_id)) continue;
     const decision = metadata.decision;
     if (decision !== "CONFIRMED" && decision !== "CORRECTED" && decision !== "REJECTED") continue;
-    latestReviews.set(metadata.evidence_id, { decision, correction: metadata.correction?.trim() || null });
+    latestReviews.set(metadata.evidence_id, { ...metadata, decision, correction: metadata.correction?.trim() || null });
   }
-  const reviewedEvidence = extractedEvidence.map((item) => ({
-    ...item,
-    reviewDecision: latestReviews.get(item.id)?.decision ?? "PENDING",
-    correction: latestReviews.get(item.id)?.correction ?? null,
-  }));
-  const preparedEvidence = prepareEvidenceForKaren(reviewedEvidence);
+  const preparedEvidence = prepareEvidenceForKaren(extractedEvidence).map(item => {
+    const review = latestReviews.get(item.id);
+    const applies = review && reviewMatchesSnapshot(review, item.reviewSnapshot, item.id);
+    return { ...item, reviewToken: item.reviewSnapshot ? reviewSnapshotToken(item.reviewSnapshot, item.id) : "",
+      reviewDecision: applies ? review.decision : "PENDING" as const, correction: applies ? review.correction : null };
+  });
 
   const newestDocumentAt = documents.reduce((latest, item) => item.createdAt > latest ? item.createdAt : latest, "");
   const analysisCurrent = Boolean(run?.id && run.created_at && run.created_at >= newestDocumentAt);

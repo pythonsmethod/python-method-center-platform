@@ -18,6 +18,7 @@ function EvidenceReviewControls({ caseId, locale, item, labels }: {
     <input name="case_id" type="hidden" value={caseId} />
     <input name="document_id" type="hidden" value={item.documentId} />
     <input name="evidence_id" type="hidden" value={item.id} />
+    <input name="review_token" type="hidden" value={item.reviewToken ?? ""} />
     <input name="locale" type="hidden" value={locale} />
     {item.reviewDecision === "PENDING" ? <>
       <textarea aria-label={labels.correction} maxLength={2000} name="correction" placeholder={labels.correction} rows={2} />
