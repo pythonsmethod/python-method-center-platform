@@ -1,4 +1,26 @@
-# CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
+# CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
+
+## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
+
+Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.
+Document analysis is a NEXORA capability. ANHAM is the AI system within PMC
+and consumes the core through application authorization and domain adapters.
+External technology commercialization belongs to NEXORA / NEXORA API.
+ANKH is retired as a standalone system/product name.
+
+Canonical direction: [NEXORA MASTER ARCHITECTURE](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
+ANHAM is scoped by [its PMC application profile](docs/architecture/ANHAM_PMC_APPLICATION_ARCHITECTURE.md).
+
+This increment changes architecture and working documentation. It does not
+establish a separate deployed core, connect a new runtime, enable public API sales,
+migrate schemas, or change providers or clinical trust. Existing implementation
+remains in PMC. Phase 2.9 remains IN PROGRESS; production auto-verification and
+Phase 3 production remain NO-GO. Historical ANKH names below identify their
+original evidence and compatible technical paths, not another active system.
+
+Next: NX-01 ownership/dependency inventory, then NX-02 capability contract and PMC
+adapter, alongside existing PMC acceptance and the unchanged quality gates.
+
 
 ## Mobile site aligned with the desktop site — 2026-09-22 — PUBLISHED
 
