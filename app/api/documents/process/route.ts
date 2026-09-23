@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   processNextCaseDocument,
-  processNextDocument
+  processNextDocument,
+  processNextProfileDocument
 } from "@/lib/documents/processing";
 import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 import { getStaffUserState } from "@/lib/auth/require-staff";
@@ -102,22 +103,9 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: result.status });
   }
 
-  const service = createSupabaseServiceClient();
-  if (!service) return NextResponse.json({ error: "Unavailable" }, { status: 503 });
-
-  const { data: own } = await service
-    .from("document_processing_jobs")
-    .select("id")
-    .eq("profile_id", user.id)
-    .in("status", ["queued", "processing"])
-    .limit(1);
-
-  // Nothing of theirs is waiting: nothing to do, and no reason to let the
-  // request reach the queue at all.
-  if (!own || own.length === 0) {
-    return NextResponse.json({ status: "idle" });
-  }
-
-  const result = await processNextDocument();
+  // The ownership predicate is part of the claim, not a preflight followed
+  // by a global claim that could consume another client's older job.
+  if (!createSupabaseServiceClient()) return NextResponse.json({ error: "Unavailable" }, { status: 503 });
+  const result = await processNextProfileDocument(user.id);
   return NextResponse.json({ status: result.status });
 }

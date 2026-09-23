@@ -22,7 +22,7 @@ Do not relabel historical benchmark evidence as new NEXORA runtime validation.
 - Work only in `pythonsmethod/python-method-center-platform`.
 - Never clone, connect to, fetch from, inspect, modify, or reuse code from the archived legacy repository `pythonsmethod/python-method-center`.
 - Do not add the legacy repository as a Git remote or source dependency.
-- The retired client processing classification remains retired. Client cases and support requests have no processing status, urgency, prioritization, automatic transition, badge or filter. `docs/architecture/CLIENT_PROCESSING_WITHOUT_CLASSIFICATION.md` is authoritative.
+- The retired client processing classification remains retired. Client cases and support requests have no processing status, urgency, prioritization, automatic transition, badge or filter. `docs/ankh/case_detail_without_classification.md` is authoritative.
 - Every user-facing change must be complete in Russian and English. Visible copy, accessibility labels, validation, metadata, navigation and states must follow the active locale. Language switching must preserve the route and be verified in both directions.
 
 These repository-wide rules remain authoritative for NEXORA capability work inside PMC. The rest of this file preserves the document-analysis operating memory.

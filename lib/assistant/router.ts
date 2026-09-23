@@ -1,5 +1,6 @@
 import {
   askClaude,
+  ASSISTANT_MODEL,
   hasClaudeEnv,
   type AssistantResult,
   type ChatMessage
@@ -7,6 +8,20 @@ import {
 import { askOpenAi, hasOpenAiEnv } from "@/lib/assistant/openai";
 import type { ChatAttachment } from "@/lib/assistant/attachments";
 import { ANHAM_RESPONSE_STYLE } from "@/lib/assistant/response-style";
+import { withConversationArchive } from "@/lib/assistant/conversation-archive";
+
+export function documentReadingProvider() {
+  return { id: "anthropic", model: ASSISTANT_MODEL } as const;
+}
+
+/** One permitted reader; document input never inherits chat tools or history. */
+export function readIsolatedDocument(
+  system: string, instruction: string, maxTokens: number, attachment: ChatAttachment
+): Promise<AssistantResult> {
+  return withConversationArchive(null, () => askAssistantWithAttachments(
+    system, [{ role: "user", content: instruction }], maxTokens, [attachment]
+  ));
+}
 
 // Both models share the same system prompt (rules + Karen's knowledge base),
 // so they answer as one team.
@@ -103,7 +118,7 @@ async function pickStrongerReply(
   messages: ChatMessage[],
   claudeReply: string,
   gptReply: string
-): Promise<"claude" | "gpt"> {
+): Promise<"claude" | "gpt" | Extract<AssistantResult, { status: "ok" }>> {
   const question = messages[messages.length - 1]?.content.slice(0, 1500) ?? "";
 
   const judgeSystem =
@@ -118,7 +133,9 @@ async function pickStrongerReply(
     ? await askClaude(judgeSystem, judgeMessages, 8)
     : await askOpenAi(judgeSystem, judgeMessages, 8);
 
-  if (verdict.status === "ok" && verdict.reply.trim().toUpperCase().startsWith("B")) {
+  if (verdict.status === "ok" && verdict.refusal) return verdict;
+
+  if (verdict.status === "ok" && verdict.reply.trim().toUpperCase() === "B") {
     return "gpt";
   }
 
@@ -179,6 +196,7 @@ export async function askAssistantTeam(
       claudeResult.reply,
       gptResult.reply
     );
+    if (typeof winner !== "string") return winner;
     const reply = winner === "claude" ? claudeResult.reply : gptResult.reply;
 
     if (options.attribution) {

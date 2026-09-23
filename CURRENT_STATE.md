@@ -1,5 +1,40 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## NEXORA document capability — 2026-09-23 — INTEGRATED RELEASE CANDIDATE
+
+Architecture PR #207 is merged as `c273d8e8ccd76ab4e096e92b39f9dbad3e943e6b`.
+NX-01 is mapped in [component ownership](docs/architecture/NEXORA_COMPONENT_MAP.md).
+NX-02's first internal `document.read` v1 boundary and PMC adapter are implemented
+in the integration branch, retaining the existing provider, queue and evidence
+stores. Client-triggered processing now claims only that authenticated owner's
+job; active source/Case/owner are checked before download. Scope/version/byte
+checks, isolated document reads, source/policy receipts, represented-patient
+identity and checked persistence are covered by synthetic behavior tests.
+
+The candidate integrates the existing response-completion contract (#196),
+source-version review snapshots (#189) and Case subject normalizer (#213),
+preserving commit ancestry. #214 is not applied twice. The test screen's visible
+name is NEXORA; historical engine IDs, harness paths and benchmark evidence stay
+compatible. No new core database, public API, model or clinical trust policy.
+
+Local full suite: 2,083 passed / 1 existing skip, 216 passed files / 1 skip;
+TypeScript, ESLint, security inventory, 143 security tests and production build
+passed; dependency audit 0 vulnerabilities. Final candidate CI is recorded in
+[the release report](docs/nexora/RELEASE_2026_09_23.md).
+
+The isolated `anham-staging` database was missing four existing document-pipeline
+migrations. Their prerequisites were applied there with explicit service-only
+claim permissions; readback shows no missing columns, RLS on, no public/client
+claim execution and no cron activation. **No production database migration.**
+
+NX-03 real-document diversity/independent source review, NX-04 signed-in hosted
+RU/EN Karen → saved client response acceptance, and NX-05 external commercial API
+remain OPEN. A passing build does not close them. Runtime production promotion
+is held behind the existing acceptance gates; the architecture merge is separate.
+Next: exact-candidate isolated acceptance with legitimate synthetic role sessions,
+then bounded runtime release. No impersonation, password reset or protection
+disablement is authorized by a desire to make tests pass.
+
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
 Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.
@@ -18,8 +53,8 @@ remains in PMC. Phase 2.9 remains IN PROGRESS; production auto-verification and
 Phase 3 production remain NO-GO. Historical ANKH names below identify their
 original evidence and compatible technical paths, not another active system.
 
-Next: NX-01 ownership/dependency inventory, then NX-02 capability contract and PMC
-adapter, alongside existing PMC acceptance and the unchanged quality gates.
+This is the architecture-only checkpoint; the later implementation checkpoint
+above supersedes its next-step status. Clinical quality gates remain unchanged.
 
 
 ## Mobile site aligned with the desktop site — 2026-09-22 — PUBLISHED
@@ -130,6 +165,10 @@ No test message was sent and no client row was changed during acceptance.
 
 Every authorized staff member, including Anna, now has a distinct Support ↔ Client thread inside each Case. The first staff message creates one Case-bound support request; subsequent messages reuse it, appear in the client's existing Conversations page, and remain separate from Anham history and the Professor Python case channel. The server resolves the Case owner rather than trusting form identity, enforces staff authentication, records an audit event, and limits the channel to technical/organizational scope in RU/EN copy. One partial unique index prevents duplicate Case support threads. Focused tests pass 11/11. Production migration, full CI, merge and deployment verification remain pending.
 
+## Anham API response contract — 2026-09-16 — ISOLATED CANDIDATE
+
+Anham already answers through server APIs. Draft PR #196 isolates completion checks across chat and authenticated archive flows, terminal arbiter refusal, and shared RU/EN failures without saving partial replies. Current-main archive tools, safety/honesty, ownership and provider selection are retained. Implementation commit 91d343e passed exact-head CI: 1,885 tests / 1 existing skip, security 143/143 plus inventory, TypeScript, ESLint, audit zero, diff and 60-page build. Staging preview dpl_CsxBJwg6XACAnYCdLmaCUxR3Dteq is READY. Authenticated browser acceptance is blocked on explicit permission to open the protected preview through a temporary Vercel access link; protection and allowlists are unchanged. No merge, production or PHI change. Evidence: docs/ankh/assistant_api_release_2026_09_16.md.
+
 ## Chess expert level — 2026-09-16 — PRODUCTION DEPLOYED
 
 The shared Karen/staff and client chess interface now includes bilingual `Эксперт / Expert` between Advanced and Grandmaster. Expert uses the built-in three-ply search; Advanced remains at two-ply, while Grandmaster remains powered by maximum-strength Stockfish with the three-ply search only as its failure fallback. The API, coaching context and account preference schema accept the new value. PR #194 passed the complete application security/regression workflow and all three Vercel preview checks, was merged as `ebe154c8`, and the primary production deployment completed successfully. The additive production constraint migration was applied through the authenticated Supabase SQL Editor and verified from `pg_constraint` with `expert` present. No PHI, clinical workflow or production trust gate changed.
@@ -168,6 +207,8 @@ and production build pass. Production analytics collection, the production
 migration and PostHog remain NO-GO without a separate owner-approved enablement.
 Evidence: `docs/audits/PRODUCT_ANALYTICS_ANHAM_2026-09-09.md` and
 `docs/audits/PRODUCT_ANALYTICS_STAGING_2026-09-09.md`.
+
+2026-09-13: manual evidence-review snapshot integration implemented locally on main 54ca208 in codex/controlled-review-snapshots. Existing admin_notes save original row/version plus correction atomically; stale forms and unsafe index-only readback fail closed. Verified Auth Karen identity required. Focused 51/51; full 1783 passed / 1 skipped; TS/lint/security pass. Windows avatar assertion normalizes line endings without changing its ACL checks. Scoped release authorized, preparing isolated PR/preview; production remains gated on authenticated RU/EN acceptance. No migration/PHI/model call. See docs/ankh/review_snapshot_integration_2026_09_13.md. End-to-end learning loop NOT CLOSED.
 
 ## Founder knowledge-gap centre and Case detail cleanup — 2026-09-11 — PUBLISHED
 

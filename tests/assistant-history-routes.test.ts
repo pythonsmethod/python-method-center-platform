@@ -64,6 +64,19 @@ describe("history HTTP boundary", () => {
   });
 });
 describe("staff exchange persistence integration", () => {
+  it.each(["INCOMPLETE_RESPONSE", "INVALID_RESPONSE"])("never saves %s and localizes errors EN/RU/EN", async code => {
+    f.ask.mockResolvedValue({ status: "error", code, message: "Private provider details" });
+    for (const locale of ["en", "ru", "en"]) {
+      f.locale.mockResolvedValue(locale);
+      const response = await post({ locale });
+      expect(response.status).toBe(502);
+      const body = await response.json();
+      expect(body.reply).toBeUndefined();
+      expect(body.error).not.toContain("Private provider");
+      expect(/[а-яё]/i.test(body.error)).toBe(locale === "ru");
+    }
+    expect(f.save).not.toHaveBeenCalled();
+  });
   it("loads private context for the authenticated staff user and selected Case", async () => {
     const caseId = "00000000-0000-4000-8000-000000000002";
     await post({ caseId, profileId: "other-owner" });

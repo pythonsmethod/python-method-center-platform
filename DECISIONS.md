@@ -1,4 +1,24 @@
-# DECISIONS.md — ANKH ANALYSIS SYSTEM
+# DECISIONS.md — NEXORA CORE / PMC APPLICATION
+
+## NEXORA-2026-09-23-02 — First internal capability boundary
+
+Implement `document.read` v1 as a provider-injected, PMC-independent server
+contract. The existing PMC worker supplies server-derived scope/source policy,
+uses the existing router/provider and persists successful-attempt receipts in
+existing document metadata. It retains medical parsing, review, Case and human
+publication as PMC responsibilities. No public API or separate engine is created.
+
+Fix the client queue boundary in the claim itself. Validate active source ownership
+before download; reject incomplete/refused readings; check durable completion;
+use the represented patient's identity without the account owner's questionnaire.
+Merge the existing #196/#189/#213 histories in one candidate rather than rewriting
+their implementations or replaying the subset from #214.
+
+Default capability mode is `nexora`, with explicit server-only `legacy` rollback.
+Legacy technical names preserve compatibility; active product/UI naming says
+NEXORA. Clinical Phase 2.9, hosted role acceptance and external commercial release
+keep their separate gates. Isolated staging schema repair reuses existing
+migrations and must not be interpreted as production migration authorization.
 
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
@@ -67,6 +87,10 @@ SMS and reminder scheduling are outside this increment.
 
 Anna/Support receives a dedicated Case-bound conversation, but it does not reuse `case_messages` and does not gain access to Professor Python's clinical channel. Reuse `support_requests` plus append-only `support_request_messages`, mark one request per Case with `is_case_thread`, and enforce uniqueness with a partial index. The client reads and answers through the existing Conversations page. Staff identity and Case ownership are resolved server-side, and each sent message is audited. This channel is for technical and organizational communication only; medical interpretation remains with Professor Python.
 
+## 2026-09-16 — Release complete API responses without regressing current main
+
+Port the bounded response-contract increment onto current main instead of publishing the older dirty workspace. Apply completion checks to both stateless chat and the authenticated Responses archive path; retain archive tools, authorization and safety/honesty. Never publish a failed or twice-truncated continuation as success. Provider-policy refusal remains terminal, including the arbiter. Reuse the existing RU/EN error mapper and compatibility type exports; do not replace newer routes or broaden access. No model migration, schema change or clinical activation.
+
 ## D-066 — Expert bridges Advanced and Stockfish Grandmaster (2026-09-16)
 
 The shared Karen/client chess component exposes `expert` as `Эксперт / Expert` between `advanced` and `grandmaster`. Expert uses the existing deterministic three-ply minimax path, making it stronger than the two-ply Advanced level without invoking Stockfish. Grandmaster remains the only level backed by maximum-strength Stockfish. Existing games and saved preferences are unchanged.
@@ -74,6 +98,8 @@ The shared Karen/client chess component exposes `expert` as `Эксперт / Ex
 ## D-065 — Account owner and Case patient are separate identities (2026-09-14)
 
 The authenticated adult remains the account owner, consent actor, payer and communication principal. A Case for another adult or minor stores a separate Care Recipient with both relationship directions, the reason for representation and explicit confirmations. Medical documents and analytical context resolve to the active Care Recipient; authorization and audit resolve to the account owner. Existing source documents and historical onboarding submissions are not rewritten.
+
+2026-09-13: bind human row reviews to immutable-at-save extraction snapshots, not reused array indices. Reuse admin_notes; preserve old reviews without treating missing snapshots as current confirmation. Extraction timestamp/content hash does not prove original-file hash or source adjudication. Concurrent reprocessing may leave a historical note but must not carry its decision to the new extraction. Training admission remains false. See docs/ankh/review_snapshot_integration_2026_09_13.md.
 
 ## D-064 — Knowledge gaps are recorded as enumerated codes, never as questions (2026-09-11)
 

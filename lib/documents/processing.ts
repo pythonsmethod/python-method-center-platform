@@ -18,6 +18,8 @@ import { detectVisualFillEvidence } from "@/lib/documents/visual-fill";
 import { loadCaseDocuments, readMimeType } from "@/lib/cases/case-documents";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { shouldBlockIdentityMismatch } from "@/lib/documents/identity-review";
+import { createPmcDocumentReader, documentCapabilityMetadata } from "@/lib/documents/nexora-reader";
+import { resolveCaseSubject } from "@/lib/cases/case-subject";
 
 const MAX_ATTEMPTS = 3;
 const RETRY_MINUTES = [1, 5, 20];
@@ -28,6 +30,7 @@ type ProcessingJob = {
   case_id: string;
   profile_id: string;
   attempts: number;
+  locked_at: string;
 };
 
 export type ProcessDocumentResult =
@@ -255,14 +258,28 @@ export async function processNextDocument(): Promise<ProcessDocumentResult> {
 export async function processNextCaseDocument(
   caseId: string
 ): Promise<ProcessDocumentResult> {
+  return processNextScopedDocument({ caseId });
+}
+
+/** Client requests may only claim the authenticated account's work. */
+export async function processNextProfileDocument(profileId: string): Promise<ProcessDocumentResult> {
+  return processNextScopedDocument({ profileId });
+}
+
+async function processNextScopedDocument(
+  scope: { caseId: string } | { profileId: string }
+): Promise<ProcessDocumentResult> {
+  const scopeId = "caseId" in scope ? scope.caseId : scope.profileId;
+  if (!scopeId.trim()) return { status: "idle" };
   const supabase = createSupabaseServiceClient();
   if (!supabase) return { status: "idle" };
 
   const now = new Date().toISOString();
-  const { data: candidate, error: candidateError } = await supabase
+  let selection = supabase
     .from("document_processing_jobs")
-    .select("id, document_id, case_id, profile_id, attempts")
-    .eq("case_id", caseId)
+    .select("id, document_id, case_id, profile_id, attempts");
+  selection = "caseId" in scope ? selection.eq("case_id", scope.caseId) : selection.eq("profile_id", scope.profileId);
+  const { data: candidate, error: candidateError } = await selection
     .eq("status", "queued")
     .lte("available_at", now)
     .order("created_at", { ascending: true })
@@ -282,8 +299,10 @@ export async function processNextCaseDocument(
       updated_at: now
     })
     .eq("id", candidate.id)
+    .eq("case_id", candidate.case_id)
+    .eq("profile_id", candidate.profile_id)
     .eq("status", "queued")
-    .select("id, document_id, case_id, profile_id, attempts")
+    .select("id, document_id, case_id, profile_id, attempts, locked_at")
     .maybeSingle();
 
   if (claimError || !claimed) return { status: "idle" };
@@ -295,17 +314,37 @@ async function processClaimedDocument(
   supabase: NonNullable<ReturnType<typeof createSupabaseServiceClient>>,
   job: ProcessingJob
 ): Promise<ProcessDocumentResult> {
-  await supabase.from("uploaded_documents")
-    .update({ document_status: "processing" }).eq("id", job.document_id);
-
   const { data: document, error: documentError } = await supabase
     .from("uploaded_documents")
-    .select("id, storage_path, original_filename, metadata, created_at, identity_review_status")
+    .select("id, case_id, profile_id, storage_path, original_filename, metadata, created_at, identity_review_status")
     .eq("id", job.document_id)
+    .eq("case_id", job.case_id)
+    .eq("profile_id", job.profile_id)
+    .is("archived_at", null)
     .maybeSingle();
-  if (documentError || !document) {
-    return finishFailure(job, "service", documentError?.message ?? "Document row not found");
+  if (documentError) {
+    // Ownership is not established yet: only touch the claimed job.
+    const retrying = job.attempts < MAX_ATTEMPTS;
+    await supabase.from("document_processing_jobs").update({
+      status: retrying ? "queued" : "failed", available_at: retryAt(job.attempts),
+      locked_at: null, last_error: "SOURCE_LOOKUP_FAILED", updated_at: new Date().toISOString()
+    }).eq("id", job.id).eq("case_id", job.case_id).eq("profile_id", job.profile_id);
+    return { status: retrying ? "retrying" : "failed", documentId: job.document_id };
   }
+  if (!document || document.case_id !== job.case_id || document.profile_id !== job.profile_id) {
+    // A stale/corrupt job must not load, update or notify another subject.
+    await supabase.from("document_processing_jobs").update({
+      status: "failed", locked_at: null, last_error: "SOURCE_SCOPE_MISMATCH_OR_ARCHIVED", updated_at: new Date().toISOString()
+    }).eq("id", job.id);
+    return { status: "failed", documentId: job.document_id };
+  }
+  const { data: clientCase, error: caseError } = await supabase.from("client_cases")
+    .select("id, profile_id, care_recipients(full_name, birth_date, is_current)")
+    .eq("id", job.case_id).eq("profile_id", job.profile_id).maybeSingle();
+  if (caseError || !clientCase) return finishFailure(job, "service", "Case scope unavailable");
+
+  await supabase.from("uploaded_documents")
+    .update({ document_status: "processing" }).eq("id", job.document_id);
 
   const loaded = await loadCaseDocuments([{
     id: String(document.id),
@@ -318,6 +357,20 @@ async function processClaimedDocument(
     return finishFailure(job, "unreadable", loaded?.skipped[0]?.reason ?? "Storage unavailable");
   }
 
+  const readMode = process.env.NEXORA_DOCUMENT_READ_MODE ?? "nexora";
+  if (readMode !== "nexora" && readMode !== "legacy") return finishFailure(job, "service", "Invalid document capability mode");
+  const reader = createPmcDocumentReader({
+    jobId: job.id, attempt: job.attempts, lockedAt: job.locked_at,
+    profileId: job.profile_id, caseId: job.case_id, documentId: job.document_id,
+    sourceVersion: loaded.fingerprint, attachment: loaded.attachments[0]
+  });
+  const read = async (stage: "header" | "transcription-first" | "transcription-second", system: string, instruction: string, maxTokens: number) => {
+    if (readMode === "nexora") return reader.read(stage, system, instruction, maxTokens);
+    const result = await askAssistantWithAttachments(system, [{ role: "user", content: instruction }], maxTokens, loaded.attachments);
+    return result.status === "ok" && result.refusal
+      ? { status: "error" as const, message: "Document reader refused the request" } : result;
+  };
+
   // --- metadata_pre_extraction ---
   // A cheap pass over the header only. It answers two questions before the
   // document is read in full: whose it is, and whether the case already
@@ -325,11 +378,11 @@ async function processClaimedDocument(
   await supabase.from("document_processing_jobs")
     .update({ status: "pre_extracting", updated_at: new Date().toISOString() }).eq("id", job.id);
 
-  const headerRead = await askAssistantWithAttachments(
+  const headerRead = await read(
+    "header",
     METADATA_SYSTEM_PROMPT,
-    [{ role: "user", content: "Прочитай только шапку этого документа по заданному формату." }],
-    600,
-    loaded.attachments
+    "Прочитай только шапку этого документа по заданному формату.",
+    600
   );
   if (headerRead.status !== "ok") {
     return finishFailure(
@@ -343,13 +396,14 @@ async function processClaimedDocument(
   // --- identity_resolver ---
   // Name from the profile, date of birth from the questionnaire. Neither is
   // guessed from the document itself.
-  const [{ data: profile }, questionnaire] = await Promise.all([
-    supabase.from("profiles").select("full_name").eq("id", job.profile_id).maybeSingle(),
-    getLatestQuestionnaireFor(supabase, job.profile_id)
-  ]);
+  const { data: profile, error: profileError } = await supabase.from("profiles")
+    .select("full_name").eq("id", job.profile_id).maybeSingle();
+  if (profileError) return finishFailure(job, "service", "Subject identity unavailable");
+  const subject = resolveCaseSubject({ profiles: profile, care_recipients: clientCase.care_recipients });
+  const questionnaire = subject.kind === "care_recipient" ? null : await getLatestQuestionnaireFor(supabase, job.profile_id);
   const identity = resolveIdentity(header, {
-    fullName: profile?.full_name ? String(profile.full_name) : null,
-    birthDate: questionnaire?.birth_date ?? null
+    fullName: subject.fullName,
+    birthDate: subject.kind === "care_recipient" ? subject.birthDate : questionnaire?.birth_date ?? null
   });
 
   await supabase.from("uploaded_documents").update({
@@ -370,11 +424,11 @@ async function processClaimedDocument(
   // Run the two independent readings sequentially. Parallel vision requests
   // hit provider rate limits on real multi-file cases and wasted both reads;
   // independence means separate calls, not simultaneous calls.
-  const first = await askAssistantWithAttachments(
+  const first = await read(
+    "transcription-first",
     TRANSCRIPTION_SYSTEM_PROMPT,
-    [{ role: "user", content: prompt }],
-    8000,
-    loaded.attachments
+    prompt,
+    8000
   );
   if (first.status !== "ok") {
     return finishFailure(
@@ -384,11 +438,11 @@ async function processClaimedDocument(
     );
   }
 
-  const second = await askAssistantWithAttachments(
+  const second = await read(
+    "transcription-second",
     TRANSCRIPTION_SYSTEM_PROMPT,
-    [{ role: "user", content: `${prompt} Это независимая повторная вычитка: заново проверь рукопись, границы листа и однотонные области, не полагаясь на возможное первое чтение.` }],
-    8000,
-    loaded.attachments
+    `${prompt} Это независимая повторная вычитка: заново проверь рукопись, границы листа и однотонные области, не полагаясь на возможное первое чтение.`,
+    8000
   );
   if (second.status !== "ok") {
     return finishFailure(
@@ -440,6 +494,14 @@ async function processClaimedDocument(
     return finishFailure(job, "service", extractionError.message);
   }
 
+  const capabilityMetadata = documentCapabilityMetadata(document.metadata, reader.receipts);
+  if (readMode === "legacy") capabilityMetadata.nexora_document_read = { version: "1", receipts: [] };
+  const { data: receiptRow, error: receiptError } = await supabase.from("uploaded_documents")
+    .update({ metadata: capabilityMetadata }).eq("id", job.document_id)
+    .eq("case_id", job.case_id).eq("profile_id", job.profile_id).is("archived_at", null)
+    .select("id").maybeSingle();
+  if (receiptError || !receiptRow) return finishFailure(job, "service", "Document reading receipt was not stored");
+
   // --- duplicate_version_detection ---
   const { data: siblings } = await supabase
     .from("uploaded_documents")
@@ -468,20 +530,25 @@ async function processClaimedDocument(
   }).eq("id", job.document_id);
 
   const markReady = async () => {
-    await supabase.from("document_processing_jobs").update({
+    const { data: source, error: sourceError } = await supabase.from("uploaded_documents")
+      .update({ document_status: "ready" }).eq("id", job.document_id)
+      .eq("case_id", job.case_id).eq("profile_id", job.profile_id).is("archived_at", null)
+      .select("id").maybeSingle();
+    if (sourceError || !source) return false;
+    const { data: completed, error: completedError } = await supabase.from("document_processing_jobs").update({
       status: "ready",
       locked_at: null,
       last_error: null,
       updated_at: new Date().toISOString()
-    }).eq("id", job.id);
-    await supabase.from("uploaded_documents")
-      .update({ document_status: "ready" }).eq("id", job.document_id);
+    }).eq("id", job.id).eq("case_id", job.case_id).eq("profile_id", job.profile_id)
+      .eq("locked_at", job.locked_at).select("id").maybeSingle();
+    return !completedError && Boolean(completed);
   };
 
   if (relation.kind === "duplicate") {
     // Nothing new to analyse, and analysing it would put every value on the
     // timeline twice. The person is told, and the earlier copy stands.
-    await markReady();
+    if (!await markReady()) return finishFailure(job, "service", "Document completion was not stored");
     const { locale, filename } = await readLocaleAndFilename(supabase, job.document_id);
     await tellClient(supabase, job, buildDuplicateMessage(locale, filename));
     return { status: "ready", documentId: job.document_id };
@@ -491,7 +558,7 @@ async function processClaimedDocument(
     // The source and both readings remain auditable, but a form containing
     // only identity/header data and untouched fields contributes no evidence
     // and creates no Karen review queue.
-    await markReady();
+    if (!await markReady()) return finishFailure(job, "service", "Document completion was not stored");
     return { status: "ready", documentId: job.document_id };
   }
 
@@ -538,7 +605,7 @@ async function processClaimedDocument(
     }],
     prior,
     questionnaire,
-    extractionModelVersion: ASSISTANT_MODEL
+    extractionModelVersion: readMode === "nexora" ? reader.modelVersion : ASSISTANT_MODEL
   });
 
   // The five fields are a constraint in the table as well; this is the
@@ -564,7 +631,9 @@ async function processClaimedDocument(
   }
 
   // Reprocessing replaces this document's values rather than adding to them.
-  await supabase.from("lab_values").delete().eq("document_id", job.document_id);
+  const { error: replacementError } = await supabase.from("lab_values").delete()
+    .eq("document_id", job.document_id).eq("case_id", job.case_id).eq("profile_id", job.profile_id);
+  if (replacementError) return finishFailure(job, "service", "Previous document values could not be replaced");
   if (run.labValues.length > 0) {
     const { error: valuesError } = await supabase.from("lab_values").insert(
       run.labValues.map(({ document_id, ...record }) => ({
@@ -580,6 +649,6 @@ async function processClaimedDocument(
     }
   }
 
-  await markReady();
+  if (!await markReady()) return finishFailure(job, "service", "Document completion was not stored");
   return { status: "ready", documentId: job.document_id };
 }
