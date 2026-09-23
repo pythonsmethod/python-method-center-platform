@@ -39,6 +39,8 @@ export type AnhamState = "guest" | "registered" | "client";
 type AnhamAvatarProps = {
   size?: number;
   state?: AnhamState;
+  // Conversation activity is independent of the person's access tier.
+  activity?: "idle" | "thinking";
   className?: string;
   // Decorative next to a visible label, announced when standing alone.
   title?: string;
@@ -47,56 +49,78 @@ type AnhamAvatarProps = {
 export function AnhamAvatar({
   size = 72,
   state = "guest",
+  activity = "idle",
   className,
   title
 }: AnhamAvatarProps) {
   return (
     <span
-      className={`anham anham--${state}${className ? ` ${className}` : ""}`}
+      className={`anham anham--${state}${activity === "thinking" ? " anham--thinking" : ""}${className ? ` ${className}` : ""}`}
+      data-activity={activity}
       style={{ width: size, height: size }}
     >
-      <Image
-        alt={title ?? ""}
-        className="anham__art"
-        height={size}
-        // He is the first thing on the page in the hero, and the last thing
-        // that should pop in late.
-        priority={size >= 180}
-        src={ANHAM_SRC}
-        width={size}
-      />
+      <span className="anham__figure">
+        <Image
+          alt={title ?? ""}
+          className="anham__art"
+          height={size}
+          // He is the first thing on the page in the hero, and the last thing
+          // that should pop in late.
+          priority={size >= 180}
+          src={ANHAM_SRC}
+          width={size}
+        />
 
-      {/* Lids. Two over the left eye on purpose: blink and wink both drive
-          a transform, and one element cannot carry two animations. They are
-          the same colour, so the overlap is invisible. */}
-      <svg
-        aria-hidden="true"
-        className="anham__lids"
-        viewBox="0 0 100 100"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <ellipse
-          className="anham__lid anham__lid--blink"
-          cx={EYE_LEFT_X}
-          cy={EYE_Y}
-          rx={EYE_RX}
-          ry={EYE_RY}
-        />
-        <ellipse
-          className="anham__lid anham__lid--blink"
-          cx={EYE_RIGHT_X}
-          cy={EYE_Y}
-          rx={EYE_RX}
-          ry={EYE_RY}
-        />
-        <ellipse
-          className="anham__lid anham__lid--wink"
-          cx={EYE_LEFT_X}
-          cy={EYE_Y}
-          rx={EYE_RX}
-          ry={EYE_RY}
-        />
-      </svg>
+        {/* Lids. Two over the left eye on purpose: blink and wink both drive
+            a transform, and one element cannot carry two animations. They are
+            the same colour, so the overlap is invisible. */}
+        <svg
+          aria-hidden="true"
+          className="anham__lids"
+          viewBox="0 0 100 100"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <ellipse
+            className="anham__lid anham__lid--blink"
+            cx={EYE_LEFT_X}
+            cy={EYE_Y}
+            rx={EYE_RX}
+            ry={EYE_RY}
+          />
+          <ellipse
+            className="anham__lid anham__lid--blink"
+            cx={EYE_RIGHT_X}
+            cy={EYE_Y}
+            rx={EYE_RX}
+            ry={EYE_RY}
+          />
+          <ellipse
+            className="anham__lid anham__lid--wink"
+            cx={EYE_LEFT_X}
+            cy={EYE_Y}
+            rx={EYE_RX}
+            ry={EYE_RY}
+          />
+        </svg>
+
+        {/* A visual metaphor for preparing a reply, not a claim that a search
+            or document check has happened. No timers or extra API calls. */}
+        {activity === "thinking" ? (
+          <span aria-hidden="true" className="anham__tablet">
+            <span className="anham__tablet-screen">
+              <span className="anham__tablet-pages"><i /><i /><i /><i /><i /></span>
+              <span className="anham__tablet-scan" />
+              <svg className="anham__tablet-search" viewBox="0 0 24 24" fill="none">
+                <circle cx="10" cy="10" r="5.5" />
+                <path d="m14 14 5 5" />
+              </svg>
+              <span className="anham__tablet-touch" />
+            </span>
+            <span className="anham__tablet-hand anham__tablet-hand--left" />
+            <span className="anham__tablet-hand anham__tablet-hand--right" />
+          </span>
+        ) : null}
+      </span>
 
       {/* A ring turns around him once a person has an account. */}
       {state !== "guest" ? (

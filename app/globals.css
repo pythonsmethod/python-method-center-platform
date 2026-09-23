@@ -2532,6 +2532,17 @@ code {
   font-style: italic;
 }
 
+.assistant-msg--thinking {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.assistant-msg--thinking > span:last-child {
+  min-width: 0;
+}
+
 /* Upload history: one block per round, a golden thread down the left —
    the case as it unfolded in time. */
 .doc-rounds {
@@ -5961,6 +5972,13 @@ code {
   position: relative;
 }
 
+.anham__figure {
+  display: block;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
 /* He breathes rather than bounces: presence without demanding attention.
    The glow lives here rather than in the artwork, so it can deepen by
    tier without a second file. */
@@ -6045,6 +6063,162 @@ code {
   }
 }
 
+/* Preparing a reply: a gentle lean, lowered eyes and a tablet he browses.
+   One wrapper keeps the artwork, measured lids and tablet aligned. */
+.anham--thinking .anham__figure {
+  animation: anham-read 5.6s ease-in-out infinite;
+  transform-origin: 50% 75%;
+}
+
+.anham--thinking .anham__art,
+.anham--thinking .anham__lids {
+  animation: none;
+}
+
+.anham--thinking .anham__lid--blink {
+  animation: anham-reading-eyes 5.6s ease-in-out infinite;
+  transform: scaleY(0.3);
+}
+
+.anham--thinking .anham__lid--wink {
+  animation: none;
+  transform: scaleY(0);
+}
+
+.anham__tablet {
+  background: linear-gradient(145deg, #fff0bd, #b5842d 48%, #f4d582 75%, #8d6a22);
+  border: 1px solid #f3d78f;
+  border-radius: 12% / 20%;
+  box-shadow: 0 3px 8px #08050180, inset 0 0 0 1px #fff0bd80;
+  height: 29%;
+  left: 21%;
+  pointer-events: none;
+  position: absolute;
+  top: 56%;
+  transform: perspective(250px) rotateX(12deg) rotate(-4deg);
+  width: 58%;
+}
+
+.anham__tablet-screen {
+  background: linear-gradient(135deg, #173d40, #07171b 70%);
+  border: 1px solid #173337;
+  border-radius: 8% / 15%;
+  box-shadow: inset 0 0 8px #0009;
+  inset: 9% 7%;
+  overflow: hidden;
+  position: absolute;
+}
+
+.anham__tablet-pages {
+  animation: anham-tablet-browse 3.8s ease-in-out infinite;
+  display: grid;
+  gap: 16%;
+  height: 120%;
+  left: 12%;
+  position: absolute;
+  top: 18%;
+  width: 51%;
+}
+
+.anham__tablet-pages i {
+  background: linear-gradient(90deg, #efdc9e, #8fbcb3);
+  border-radius: 10px;
+  display: block;
+  height: 30%;
+  opacity: 0.75;
+}
+
+.anham__tablet-pages i:nth-child(even) { width: 66%; }
+
+.anham__tablet-search {
+  color: #c6e5d9;
+  height: 40%;
+  position: absolute;
+  right: 8%;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+  top: 23%;
+  width: 26%;
+}
+
+.anham__tablet-scan {
+  animation: anham-tablet-scan 3.8s ease-in-out infinite;
+  background: linear-gradient(transparent, #a6dfcd30);
+  border-bottom: 1px solid #b0e5d780;
+  height: 30%;
+  inset: 0 0 auto;
+  position: absolute;
+}
+
+.anham__tablet-touch {
+  animation: anham-tablet-touch 3.8s ease-in-out infinite;
+  border: 1px solid #e3f9e8;
+  border-radius: 50%;
+  height: 18%;
+  opacity: 0;
+  position: absolute;
+  right: 5%;
+  top: 46%;
+  width: 10%;
+}
+
+.anham__tablet-hand {
+  background: linear-gradient(120deg, #fff2c4, #d8ae50 56%, #8d6a22);
+  border: 1px solid #a67a28;
+  border-radius: 45%;
+  box-shadow: 0 2px 3px #08050180, inset 1px 1px 1px #fff6d3;
+  height: 29%;
+  position: absolute;
+  width: 15%;
+}
+
+.anham__tablet-hand--left { left: -7%; top: 47%; transform: rotate(-18deg); }
+.anham__tablet-hand--right {
+  animation: anham-tablet-tap 3.8s ease-in-out infinite;
+  right: -6%;
+  top: 37%;
+  transform: rotate(18deg);
+}
+
+@keyframes anham-read {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  24%, 58% { transform: translateY(1%) rotate(1.5deg) scaleY(0.985); }
+  78% { transform: translateY(-0.6%) rotate(-1deg); }
+}
+
+@keyframes anham-reading-eyes {
+  0%, 100% { transform: scaleY(0.3); }
+  24%, 58% { transform: scaleY(0.46); }
+  64%, 66% { transform: scaleY(1); }
+  73%, 82% { transform: scaleY(0.05); }
+}
+
+@keyframes anham-tablet-browse {
+  0%, 24% { transform: translateY(0); opacity: 0.8; }
+  55%, 78% { transform: translateY(-30%); opacity: 0.8; }
+  86% { transform: translateY(-30%); opacity: 0; }
+  87% { transform: translateY(0); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0.8; }
+}
+
+@keyframes anham-tablet-scan {
+  0%, 100% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 0.7; }
+  78% { transform: translateY(230%); opacity: 0; }
+}
+
+@keyframes anham-tablet-tap {
+  0%, 24%, 70%, 100% { transform: translate(0, 0) rotate(18deg); }
+  36%, 48% { transform: translate(-38%, -12%) rotate(-8deg); }
+}
+
+@keyframes anham-tablet-touch {
+  0%, 34%, 64%, 100% { transform: scale(0.7); opacity: 0; }
+  42% { transform: scale(1); opacity: 0.8; }
+  58% { transform: scale(1.6); opacity: 0; }
+}
+
 /* ---------- state 2: registered ---------- */
 
 .anham--registered .anham__art {
@@ -6127,9 +6301,17 @@ code {
   .anham__lids,
   .anham__lid,
   .anham__ring,
-  .anham__aura i {
+  .anham__aura i,
+  .anham--thinking .anham__figure,
+  .anham--thinking .anham__lid--blink,
+  .anham__tablet-pages,
+  .anham__tablet-scan,
+  .anham__tablet-touch,
+  .anham__tablet-hand--right {
     animation: none;
   }
+
+  .anham__tablet-scan { display: none; }
 }
 
 /* ---------- side panel ---------- */
