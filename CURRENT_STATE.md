@@ -1281,3 +1281,14 @@ audit events. Web search and Document AI show activity counts; all vendor bills
 without a connected usage feed remain explicitly unknown and are excluded from
 the verified minimum. No schema, client API, credential or clinical change.
 Details: docs/architecture/ANNA_PLATFORM_COSTS.md.
+
+## 2026-09-23 — Anham prepares replies with a tablet
+
+The existing avatar has a tablet-reading animation driven by text pending,
+delegated background replies and voice thinking/reading/searching activity.
+Localized status and reduced-motion support accompany the existing artwork.
+Local synthetic browser checks cover small screens, RU/EN, success/error and
+voice speaking/close transitions. No API, role, schema or clinical change.
+Implementation, exact checks, release boundary and rollback are recorded in
+`docs/design/ANHAM_TABLET_ACTIVITY.md`. This is not evidence of a clinical phase
+closure or signed-in production acceptance.
