@@ -59,6 +59,12 @@ describe("assistant durable history", () => {
     expect(f.eq).not.toHaveBeenCalledWith("locale", expect.anything());
     expect(f.in).toHaveBeenCalledWith("tier", ["registered", "client"]);
   });
+  it("projects a scheduled greeting into the active language", async () => {
+    f.query.mockReturnValue({ data: [{ ...stored[1], content: "stored", scheduled_translations: { ru: "Поздравление", en: "Greeting" } }], error: null });
+    const result = await getOwnAssistantHistory("owner", "en");
+    expect(result.status).toBe("ready");
+    if (result.status === "ready") expect(result.messages[0].content).toBe("Greeting");
+  });
   it("isolates personal staff history from case discussions", async () => {
     await getOwnAssistantHistory("owner", "en", 60, { private: true });
     expect(f.in).toHaveBeenCalledWith("tier", ["founder", "karen"]);

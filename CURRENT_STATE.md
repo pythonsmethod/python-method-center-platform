@@ -1,4 +1,81 @@
-# CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
+# CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
+
+## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
+
+Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.
+Document analysis is a NEXORA capability. ANHAM is the AI system within PMC
+and consumes the core through application authorization and domain adapters.
+External technology commercialization belongs to NEXORA / NEXORA API.
+ANKH is retired as a standalone system/product name.
+
+Canonical direction: [NEXORA MASTER ARCHITECTURE](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
+ANHAM is scoped by [its PMC application profile](docs/architecture/ANHAM_PMC_APPLICATION_ARCHITECTURE.md).
+
+This increment changes architecture and working documentation. It does not
+establish a separate deployed core, connect a new runtime, enable public API sales,
+migrate schemas, or change providers or clinical trust. Existing implementation
+remains in PMC. Phase 2.9 remains IN PROGRESS; production auto-verification and
+Phase 3 production remain NO-GO. Historical ANKH names below identify their
+original evidence and compatible technical paths, not another active system.
+
+Next: NX-01 ownership/dependency inventory, then NX-02 capability contract and PMC
+adapter, alongside existing PMC acceptance and the unchanged quality gates.
+
+
+## Mobile site aligned with the desktop site — 2026-09-22 — PUBLISHED
+
+Phones and touch-first devices now get the same site as a wide screen instead
+of a reduced variant. The public header keeps its full row of sections, the
+guest sign-in and sign-up doors and the language switch at every width (the
+separate bottom dock and the header account chip are removed). The homepage
+journey is the same six numbered cards with their explanations on every
+screen; the phone-only ring of step titles without text is removed, and the
+retained app promotion block stays on narrow screens. The team workspace on a
+phone keeps the site header with the language switch, the footer, the top
+navigation row including the founder overview link, and one bilingual home
+page with the session panel, today's queue, the assistant and the knowledge
+base. Client cards in the staff list now carry the contacts and creation date
+the table shows. The client cabinet keeps sign-out in the narrow sidebar and
+the token balance in the phone top bar. No schema, data, payment or PHI
+change. Validation: typecheck, ESLint and the full test suite pass; production
+build passes; phone and tablet screenshots of the public pages reviewed
+locally in RU and EN with no horizontal overflow.
+PR #219 merged as `08195bb3feaf09e037d9586e7c996d2e5ce5c0b1`; the Vercel
+production deployment of `python-method-center-platform` reached READY and is
+aliased to pythonmethodcenter.com. The production homepage serves the full
+header with sign-in, sign-up and the language switch, the six journey cards
+with text and no bottom dock; `/cabinet` sends a guest to `/login`; Vercel
+reported no runtime errors in the first hour. The `main` branch protection now
+requires the `Vercel` status, the name Vercel reports since only one project is
+linked to the repository.
+## Anham message reactions v1 — 2026-09-19 — PUBLISHED
+
+Anham may now attach one small, allowlisted emoji reaction to the person's own
+message in the client chat, then answer in words as before. The model proposes
+a key through one structured `[[reaction:key]]` marker; the server strips the
+marker, applies the eight-key allowlist, restricts guests to a calm subset and
+lets a RU/EN safety classifier veto any reaction on pain, worsening, breathing,
+bleeding, consciousness, seizures, emergency, medication/dosage, self-harm,
+crisis, fear for life, death, diagnosis or serious medical news. A reply that
+had to refuse or escalate also gets none. Registered and paid clients keep the
+reaction on their own `assistant_messages` row, so it survives reload; guests
+are never stored. Staff, Karen and Professor Python conversations are unchanged.
+
+Production migration `20260919 anham_message_reactions` was applied to the
+production Supabase project before the code deploy and verified: nullable
+`reaction` column, `assistant_messages_reaction_allowlist` constraint present,
+zero pre-existing reacted rows. PR #209 passed CI and all three Vercel
+previews and merged as `aba191b1d48320218357e1a77dc3b590401241f3`; the primary
+and clinical production deployments are READY on `pythonmethodcenter.com`. The
+public site returned `200`, the protected cabinet redirected to login and the
+history API returned `401` without a session; no runtime errors or 5xx were
+recorded after the deploy. A real chat exchange could not be sent from the
+release environment because of its network policy, so the first live reaction
+will be observed in ordinary use. Evidence: `docs/ankh/anham_message_reactions.md`.
+
+## Anham birthday greetings — 2026-09-18 — PUBLISHED
+
+The production database has the additive birthday-delivery schema and service-role-only `SECURITY INVOKER` function. PR #203 merged as `5ba27eb38405d68a14e76a5d0dca00139941b90f`; the primary and clinical Vercel production deployments completed successfully. The public site returned `200`, the protected cabinet returned the expected `307` login redirect and the cron route returned the expected `401` without `CRON_SECRET`. The release reuses the latest immutable health-questionnaire birth date, stores one deterministic RU/EN assistant-history message per eligible client/local year and honors the existing outreach opt-out. No birthday RPC was manually invoked against production clients. Evidence: `docs/ankh/anham_birthday_greetings.md`.
 
 ## Staff message email notifications — 2026-09-17 — RELEASE CANDIDATE
 
@@ -60,7 +137,6 @@ The shared Karen/staff and client chess interface now includes bilingual `Экс
 ## Represented-patient identity — 2026-09-14 — RELEASE CANDIDATE
 
 A bilingual self/other-adult/minor onboarding choice now stores the Case patient separately from the authenticated account owner, including both relationship directions, representation reason, authority, patient-data consent and responsibility acknowledgments. Karen-assistant context resolves medical content to the patient while account access remains with the owner. Production schema and Case #483 were corrected with append-only audit; the legacy owner must still reconfirm the new explicit checkboxes. Focused tests 3/3 pass; full release verification remains CI-gated because the isolated local dependency install did not complete.
-
 ## Consent-gated product analytics — 2026-09-13 — PUBLISHED
 
 Aggregate founder analytics, a seven-step consenting-browser funnel and optional

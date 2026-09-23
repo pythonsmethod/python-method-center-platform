@@ -70,6 +70,6 @@ describe("client history integration", () => {
   it("exposes an unacknowledged save", async () => {
     f.context.mockResolvedValue("Saved conversation: earlier topic");
   f.save.mockResolvedValue({ saved: false });
-    expect(await (await POST(request())).json()).toEqual({ reply: "Answer", saved: false });
+    expect(await (await POST(request())).json()).toEqual({ reply: "Answer", reaction: null, saved: false });
   });
 });

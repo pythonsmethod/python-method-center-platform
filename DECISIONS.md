@@ -1,5 +1,43 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
+
+Status: owner-approved product direction; implementation migration pending.
+
+NEXORA is the ecosystem core and owns reusable capabilities, including document
+analysis. ANHAM is the AI system within Python Method Center and uses NEXORA.
+NEXORA capabilities, rather than an ANHAM-owned generic engine, are the external
+technology business. ANKH is no longer an active independent system/product name.
+
+General contracts, provider routing and reusable extraction/verification belong
+to NEXORA. PMC keeps its subject authorization, Case, methodology, expert decisions,
+services and application-specific rules. A shared core does not share private data
+between organizations or grant a model authority to cross roles.
+
+Preserve existing implementation and evidence. Use the current repository during
+logical extraction; do not create a second engine, Case or evidence store.
+Keep historical identifiers until dependencies and compatibility are handled.
+No quality gate is closed by this naming/ownership decision.
+
+Master: [NEXORA](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
+Application: [ANHAM / PMC](docs/architecture/ANHAM_PMC_APPLICATION_ARCHITECTURE.md).
+
+
+## D-071 — Anham reactions are server-validated keys, never model emoji (2026-09-18)
+
+A reaction to a person's message is a separate structured value, not text in
+the reply. The model may propose one through a single `[[reaction:key]]`
+marker in the same protocol family as `[[action:id]]`; the server removes the
+marker, accepts only the closed allowlist (`heart`, `clap`, `celebrate`,
+`thumbs_up`, `eyes`, `smile`, `thanks`, `strength`) and maps keys to emoji
+itself. Safety outranks the gesture without exception: a server-side RU/EN
+classifier on the person's message, plus a check on the delivered reply for
+emergency, refusal or honesty-guard text, forces `null`. At most one reaction
+per message; when unsure, none. Guests get a restrained subset and no storage.
+The reaction is stored on the `user` row as a nullable, constrained column,
+because it describes that message, and only the client route produces it:
+Professor Python, Karen and founder conversations never carry reactions.
+
 ## D-070 — Staff email follows communication ownership (2026-09-17)
 
 Client-authored Support messages notify Anna, while client-authored Professor
@@ -1299,3 +1337,7 @@ must not create a second archive. Each bubble displays the time derived from its
 stored `created_at`, grouped by viewer-local Today/Yesterday/full-date separators.
 The original ISO timestamp remains the semantic source for accessibility and
 audit. This presentation rule is shared by client and staff views.
+
+# 2026-09-14 — Birthday messages reuse canonical questionnaire evidence
+
+Anham birthday greetings read the latest append-only `health_questionnaire_versions.birth_date`; they do not copy birth date into `profiles`. A profile stores only its IANA time zone. Delivery is a fixed bilingual, service-only scheduled message in existing assistant history, honors the existing automatic-message opt-out and is unique per profile/local year. This is not a clinical fact transformation or ordinary outreach activation.

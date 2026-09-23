@@ -30,6 +30,16 @@ function cleanField(value: FormDataEntryValue | null, max: number): string | nul
   return clean.length > 0 ? clean.slice(0, max) : null;
 }
 
+function cleanTimeZone(value: FormDataEntryValue | null): string {
+  const candidate = typeof value === "string" ? value.trim().slice(0, 64) : "";
+  try {
+    new Intl.DateTimeFormat("en", { timeZone: candidate }).format();
+    return candidate;
+  } catch {
+    return "America/Los_Angeles";
+  }
+}
+
 // The client edits their own row under their own session: RLS allows only
 // their profile, and the database trigger keeps role/status out of reach —
 // so this action needs no service key and cannot touch anyone else.
@@ -37,6 +47,7 @@ export async function updateProfileDetails(
   _previousState: ProfileDetailsActionState,
   formData: FormData
 ): Promise<ProfileDetailsActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -48,13 +59,12 @@ export async function updateProfileDetails(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Сессия истекла — войдите заново.");
+    return errorState(locale === "ru" ? "Сессия истекла — войдите заново." : "Your session expired. Please sign in again.");
   }
 
   const fullName = cleanField(formData.get("full_name"), 160);
 
   if (!fullName || !isFullName(fullName)) {
-    const locale = await getLocale();
     return errorState(
       locale === "ru"
         ? "Укажите имя и фамилию полностью."
@@ -66,7 +76,8 @@ export async function updateProfileDetails(
     .from("profiles")
     .update({
       full_name: fullName,
-      phone: cleanField(formData.get("phone"), 40)
+      phone: cleanField(formData.get("phone"), 40),
+      time_zone: cleanTimeZone(formData.get("time_zone"))
     })
     .eq("id", user.id);
 
@@ -74,7 +85,9 @@ export async function updateProfileDetails(
     // The column may not exist until the owner runs the migration; the
     // person should read a human sentence, not a database error.
     return errorState(
-      "Не удалось сохранить данные. Попробуйте ещё раз — а если повторится, напишите в поддержку."
+      locale === "ru"
+        ? "Не удалось сохранить данные. Попробуйте ещё раз — а если повторится, напишите в поддержку."
+        : "Could not save your details. Try again, and contact support if it happens again."
     );
   }
 
@@ -86,7 +99,7 @@ export async function updateProfileDetails(
   // The cabinet greets the person by the name held on this row.
   revalidatePath("/cabinet");
 
-  return { status: "success", message: "Данные сохранены." };
+  return { status: "success", message: locale === "ru" ? "Данные сохранены." : "Details saved." };
 }
 
 export async function uploadProfileAvatar(

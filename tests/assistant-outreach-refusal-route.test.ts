@@ -50,7 +50,7 @@ describe("explicit refusal before AI processing", () => {
     mocks.save.mockResolvedValue({ saved: false });
     const response = await POST(request("unsubscribe"));
     expect(response.status).toBe(200);
-    expect(await response.json()).toEqual({ reply: expect.stringContaining("отключены"), saved: false });
+    expect(await response.json()).toEqual({ reply: expect.stringContaining("отключены"), reaction: null, saved: false });
     expect(mocks.stop).toHaveBeenCalledWith("owner");
     expect(mocks.ai).not.toHaveBeenCalled();
   });
