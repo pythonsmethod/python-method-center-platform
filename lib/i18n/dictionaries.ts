@@ -1102,13 +1102,12 @@ const ru = {
   paymentSuccess: {
     eyebrow: "Оплата получена",
     title: "Благодарим вас!",
-    description: "Ваш платёж успешно принят. Добро пожаловать в сопровождение Python Method.",
+    description: "Ваш платёж успешно принят. Дальнейшие шаги зависят от выбранной услуги и появятся в личном кабинете.",
     whatNextLabel: "Что происходит дальше",
     steps: [
-      "Оплата привязывается к вашему кейсу автоматически в течение нескольких минут (по аккаунту или email, указанному при оплате). Если через 10 минут её не видно в кабинете — напишите нам.",
-      "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
-      "Вместе с личным сопровождением Professor Python предоставляет свою формулу на оплаченный период в подарок. Доставка уже включена в стоимость сопровождения; трек-номер придёт в чат.",
-      "Professor Python и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
+      "Оплата привязывается к вашему аккаунту автоматически в течение нескольких минут. Если через 10 минут её не видно в кабинете — напишите нам.",
+      "Если вы оплатили оценку состояния, команда начнёт разбор после получения необходимых материалов и направит ответ в личный кабинет.",
+      "Если вы оплатили личное сопровождение, команда сообщит о начале оплаченного периода в личном кабинете. Информация о подарочной формуле и доставке поступит туда же."
     ],
     cabinetCta: "Перейти в кабинет",
     questionLabel: "Есть вопрос?",
@@ -2251,13 +2250,12 @@ const en: typeof ru = {
   paymentSuccess: {
     eyebrow: "Payment received",
     title: "Thank you!",
-    description: "Your payment has been received. Welcome to the Python Method support program.",
+    description: "Your payment has been received. The next steps depend on the service you selected and will appear in your account.",
     whatNextLabel: "What happens next",
     steps: [
-      "The payment is linked to your case automatically within a few minutes (by your account or the email used at checkout). If you don't see it in your account after 10 minutes — write to us.",
-      "The team will confirm the activation of your support program — you will get a message in your account chat.",
-      "With Personal Support, Professor Python provides his formula for the paid period as a complimentary gift. Delivery is already included in the support price; the tracking number will arrive in the chat.",
-      "Professor Python and the team will study your case and begin the support program. All communication happens in your account."
+      "The payment is linked to your account automatically within a few minutes. If you don't see it in your account after 10 minutes, write to us.",
+      "If you purchased a condition assessment, the team will begin its review after receiving the necessary materials and send the response to your account.",
+      "If you purchased Personal Support, the team will confirm the start of your paid period in your account. Information about the complimentary formula and delivery will appear there too."
     ],
     cabinetCta: "Go to my account",
     questionLabel: "Have a question?",

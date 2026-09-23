@@ -1,0 +1,51 @@
+{
+  "checkedAtUtc": "2026-09-23 21:37:26 UTC",
+  "releaseStatus": "HOLD",
+  "environment": {
+    "vercelProject": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
+    "previewBranch": "agent/pmc-dynamic-checkout-20260922",
+    "previewDeployment": "CR7huYL6ekc8pcQbD3NwWif5fErP",
+    "supabaseProject": "thylrayzjczsxlyqhtfc",
+    "stripeSandboxAccount": "acct_1SUwZgE5bkDqmDrJ"
+  },
+  "configuration": {
+    "supabasePublicUrlAndAnonKey": "separate Production and Preview values",
+    "supabaseServiceRoleKey": "separate Production and Preview secrets",
+    "stripeSecretKeyAndWebhookSecret": "separate Production and Preview secrets",
+    "previewCheckoutMode": "test",
+    "previewCheckoutEnabled": true,
+    "previewAutomaticTax": false,
+    "stripeWebhookDestination": "we_1UIx1gE5bkDqmDrJIFZVp6G8",
+    "stripeWebhookEvents": [
+      "checkout.session.completed",
+      "checkout.session.expired",
+      "invoice.paid",
+      "invoice.payment_failed",
+      "customer.subscription.updated",
+      "customer.subscription.deleted"
+    ]
+  },
+  "acceptance": {
+    "russianPricingPage": "passed: USD 299 assessment, USD 1300 per 30 days, 1–12 prepaid periods",
+    "englishPricingPage": "passed: equivalent pricing and choices",
+    "assessmentCheckout": "passed: Stripe sandbox showed USD 299 as a one-time payment",
+    "assessmentTestCardPayment": "passed: Stripe redirected to the payment success page",
+    "paymentLinkedInStagingDatabase": false,
+    "stagingPaymentRowsForSyntheticBuyer": 0,
+    "webhookDelivery": "failed: HTTP 401 Protected deployment",
+    "webhookEvent": "evt_1UIxjCE5bkDqmDrJKYMgMAyu",
+    "supportRenewalCheckout": "not run: the automated approval review rejected starting a separate USD 2600 renewal checkout"
+  },
+  "finding": "Vercel Authentication protects the Preview webhook URL from Stripe. Stripe retries the completed event, but the purchase is not yet reflected in the staging database.",
+  "securityReview": "An automated approval review rejected placing the project-wide Vercel protection bypass secret in the Stripe webhook URL because that would disclose the credential to a third party. No bypass URL was saved.",
+  "copyCorrection": "The payment success page now uses service-conditional Russian and English wording so an assessment purchase does not promise Personal Support or a formula.",
+  "localVerification": {
+    "focusedCheckoutTests": "90 passed",
+    "fullTests": "2045 passed, 1 skipped",
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed; security checker self-test 6 passed and boundary inventory passed",
+    "diffCheck": "passed"
+  },
+  "nextGate": "Provide an explicitly approved, secure webhook delivery design; resend the failed sandbox event and verify the payment row before accepting support renewal or launching production."
+}
