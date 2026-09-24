@@ -118,21 +118,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* The approved circular journey on phones and tablets; the numbered
-          cards with their text on a wide screen. */}
-      <section className="app-route" aria-labelledby="route-title" data-scroll-reveal>
+      {/* The approved circular journey, on every screen. */}
+      <section className="app-route" aria-label={mobile.journeyTitle} data-scroll-reveal>
         <HomeJourney title={mobile.journeyTitle} steps={mobileSteps} />
-        <div className="app-mobile-route">
-          <h2 id="route-title">{mobile.journeyTitle}</h2>
-          <ol>
-            {mobileSteps.map((step, index) => (
-              <li key={step.title}>
-                <span>{index + 1}</span>
-                <div><h3>{step.title}</h3><p>{step.text}</p></div>
-              </li>
-            ))}
-          </ol>
-        </div>
       </section>
 
       <section className="app-expert" aria-labelledby="expert-title" data-scroll-reveal>
