@@ -468,7 +468,7 @@ const ru = {
     eyebrow: "Анкета",
     title: "Расскажите о вашей ситуации",
     description:
-      "Анкета создаёт ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам.",
+      "Анкета создаст или дополнит ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам.",
     setupTitle: "Анкета",
     setupDescription: "Для заполнения анкеты требуется настроенная аутентификация.",
     setupNotice: "Анкета требует настройки Supabase Auth",
@@ -1682,7 +1682,7 @@ const en: typeof ru = {
     eyebrow: "Questionnaire",
     title: "Tell us about your situation",
     description:
-      "The questionnaire creates your case: the team will read it and contact you about the next steps.",
+      "The questionnaire creates or completes your case: the team will read it and contact you about the next steps.",
     setupTitle: "Questionnaire",
     setupDescription: "Authentication must be configured before the questionnaire can be filled in.",
     setupNotice: "The questionnaire needs Supabase Auth configured",

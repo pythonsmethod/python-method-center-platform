@@ -1,5 +1,16 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-BILLING-2026-09-24-02 — Lifecycle events use the shared active schema
+
+The staging Case lifecycle table has no retired `from_status` / `to_status`
+columns; production retains them only as nullable historical fields. New
+payment and service-period events write only active columns, and client/staff
+history queries select only fields common to both environments. Archived
+classification rows remain untouched and `status_changed` remains withheld
+from user-facing activity. Do not restore a Case processing status to make a
+query work. The staging/production difference is a release-compatibility
+constraint, not authorization for a production migration.
+
 ## PMC-BILLING-2026-09-24-01 — Payment before intake opens one existing Case shell
 
 For an authenticated, Stripe-confirmed paid Checkout, fulfillment finds the

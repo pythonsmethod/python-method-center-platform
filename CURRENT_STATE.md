@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## Payment-to-access chain follow-up — 2026-09-24 — PREVIEW PENDING
+## Payment-to-access chain follow-up — 2026-09-24 — PREVIEW VERIFIED, RELEASE HOLD
 
 The authenticated six-period EN Sandbox charge exposed a general issue:
 fulfillment skipped `service_periods` when a newly registered purchaser had
@@ -23,8 +23,21 @@ was changed. Focused webhook, Case, return and delayed-delivery tests pass;
 the full local suite passed 2,080 tests (one existing skip), TypeScript,
 ESLint and security check pass. A local build passed after disabling only the
 disk build cache for that run and allowing the official font fetch; this
-temporary config was reverted. Preview deployment and a fresh no-Case paid
-webhook test are still pending. Production publication remains NO-GO.
+temporary config was reverted. Preview `dpl_4ukBRUCrChuCnjm4mc9ME1hVNCf8`
+is READY. On the authenticated EN return, the repaired six-period charge shows
+the exact paid dates; the English questionnaire, linked Case, cabinet access
+end, subscription management and preparing gift shipment are visible. A direct
+EN return originally left the single-address questionnaire in Russian; the
+branch now persists the EN preference on the public return response, and a
+new READY Preview verifies the questionnaire in English. The questionnaire
+text now accounts for a Case created by payment before intake.
+
+The Preview also exposed a staging/production lifecycle-schema difference:
+staging has removed retired `from_status` and `to_status` fields while
+production retains nullable archived fields. Common Case history reads and
+new event writes now omit those fields, without deleting or migrating archived
+rows. A fresh no-Case paid webhook on this revision and publication gates
+remain pending. Production publication remains NO-GO.
 
 ## Personal Support billing launch — 2026-09-24 — RELEASE HOLD
 

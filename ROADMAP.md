@@ -10,8 +10,11 @@
       later address update; prompt for missing address in the cabinet.
 - [x] Keep Stripe invoice-paid renewals, failed-payment non-extension and
       Customer Portal cancellation/card management tied to existing records.
-- [ ] Deploy this revision to isolated Preview and verify the repaired
-      synthetic Case, access, delivery and return page end to end.
+- [x] Deploy the payment-to-access revision to isolated Preview and verify the
+      repaired synthetic Case, access, delivery and EN paid return. Preserve
+      EN through the single-address questionnaire and remove a lifecycle
+      history query that assumed retired columns still existed in staging.
+- [ ] Verify the corrected Case history section on the next READY Preview.
 - [ ] Verify a fresh no-Case Sandbox purchase through the new webhook revision.
 - [ ] Finish remaining release gates before enabling Production Checkout.
 

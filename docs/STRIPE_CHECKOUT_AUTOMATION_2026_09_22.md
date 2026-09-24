@@ -1,5 +1,22 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Payment-to-access Preview follow-up — 2026-09-24
+
+The authenticated EN six-period Sandbox payment was read back as paid in
+Stripe and linked in staging to its one Case, exact 180-day entitlement,
+subscription and six-period gift task. The deployed EN success page shows the
+paid dates; its questionnaire, cabinet access date, Portal entry point and
+gift delivery page were inspected in Preview. English is now persisted when
+the browser reaches a public `/en` return URL, so the subsequent private
+questionnaire stays English without a separate language-switch click.
+
+The same browser run found the Case history query selecting retired
+classification columns absent from staging. Both client/staff reads and new
+lifecycle writes now use the shared active columns; no archived production
+event or schema was changed. The corrected history still requires a READY
+Preview check. A fresh paid no-Case webhook on the new revision remains open;
+the repaired payment alone does not prove it. Production remains HOLD.
+
 ## Pre-onboarding paid fulfillment — 2026-09-24
 
 An authenticated client may pay before completing medical intake. The signed

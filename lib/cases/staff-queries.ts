@@ -171,7 +171,7 @@ export async function getStaffCaseDetail(
        onboarding_submissions(id, status, submitted_at, payload),
        uploaded_documents(id, original_filename, document_status, identity_review_status, created_at),
        payments(id, product, status, amount_cents, currency, processor_reference, paid_at, created_at),
-       case_lifecycle_events(id, event_type, from_status, to_status, actor_role, notes, created_at)`
+       case_lifecycle_events(id, event_type, actor_role, notes, created_at)`
     )
     .eq("id", caseId)
     .maybeSingle();
