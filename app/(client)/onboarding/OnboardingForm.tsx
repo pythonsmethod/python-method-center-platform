@@ -1,7 +1,7 @@
 "use client";
 
 import { Link } from "@/components/LocaleLink";
-import { useActionState, useState } from "react";
+import { startTransition, useActionState, useState, type FormEvent } from "react";
 import type { Dictionary } from "@/lib/i18n/dictionaries";
 import type { Locale } from "@/lib/i18n/locale";
 import { submitOnboarding } from "@/lib/onboarding/actions";
@@ -40,8 +40,18 @@ export function OnboardingForm({
     .map((code) => ({ code, name: regionNames.of(code) ?? code }))
     .sort((a, b) => a.name.localeCompare(b.name, locale));
 
+  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    // React resets uncontrolled fields after a form action resolves, including
+    // validation failures. Submit a snapshot of the form through the action
+    // state without handing the live form to React's automatic reset.
+    event.preventDefault();
+    if (pending) return;
+    const formData = new FormData(event.currentTarget);
+    startTransition(() => formAction(formData));
+  }
+
   return (
-    <form action={formAction} className="onboarding-form">
+    <form action={formAction} className="onboarding-form" onSubmit={handleSubmit}>
       <label className="field">
         <span>{labels.fullName}</span>
         <input

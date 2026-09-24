@@ -10,7 +10,16 @@
 - [x] Bounded local regression and isolated synthetic staging SQL with rollback.
 - [x] Staging private source bucket and restrictive ownership/no-overwrite policies.
 - [x] Verify automatic preview build of corrected commit `f0aa757`; Vercel `dpl_EAifp1MPctLApepC5463JgitHybB` READY in main website project, without production release.
-- [ ] Deploy the same code to the dedicated isolated PMC staging; its current deployment remains old `b0503cbb`. Direct deployment connector unavailable; browser fallback requires owner permission.
+- [x] Deploy exact `454cd064` to dedicated isolated PMC staging: `dpl_Fkvpy2YbndZHNvsHjvAB7771hDhS` READY; deployed public DB binding is `thylrayzjczsxlyqhtfc`.
+- [x] Verify public home, login RU/EN and unauthenticated admin redirect.
+- [x] Resolve legitimate staging client sign-in with a separate confirmed account; client cabinet visible.
+- [x] Repair missing `profiles.country_code` in isolated staging migration `20260924044828_restore_staging_profiles_country_code_20260924`; verify schema readback.
+- [x] Owner resubmitted onboarding after the staging schema repair; one Case, one submission and two consents confirmed.
+- [x] Upload only the new synthetic PDF into the isolated client Case; verify original storage, opening and atomic job registration.
+- [ ] Identify and repair the external header-reader failure (`HEADER_READER_UNAVAILABLE` after three attempts). A local safe-category diagnostic patch is tested but not deployed; retain the same stored source for rerun.
+- [ ] Deploy and verify the service-failure status correction (`Сбой обработки` / `Processing failed`) in RU/EN.
+- [ ] Deploy and verify the local failed-submit draft-retention fix in RU/EN; targeted tests, TypeScript and lint pass locally.
+- [x] Owner explicitly approved removing temporary staging Git connection; Vercel Git settings confirm the isolated project is disconnected again.
 - [ ] Actual provider and legitimate Karen/client RU/EN acceptance on preview.
 - [ ] Establish permitted release-CI scope without the excluded Case; assess production.
 

@@ -60,7 +60,7 @@ export async function askAssistantWithAttachments(
   attachments: ChatAttachment[],
   options: { timeoutMs?: number; allowContinuation?: boolean } = {}
 ): Promise<AssistantResult> {
-  if (!hasClaudeEnv()) return { status: "unavailable" };
+  if (!hasClaudeEnv()) return { status: "unavailable", failureClass: "not_configured" };
   return askClaude(system, messages, maxTokens, attachments, options);
 }
 
