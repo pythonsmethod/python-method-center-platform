@@ -16,6 +16,8 @@ import {
 import "./home.css";
 import "./home-app-promo.css";
 import { HomeAppPromo } from "@/components/home/HomeAppPromo";
+import { HomeJourney } from "@/components/home/HomeJourney";
+import "./home-journey.css";
 
 const PROFESSOR_IMAGE = "/images/professor-python.png";
 
@@ -116,21 +118,9 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* One journey on every screen. The phone used to get a ring of
-          numbered buttons instead: the step titles alone, with the text
-          that explains each step never shown anywhere. */}
-      <section className="app-route" aria-labelledby="route-title" data-scroll-reveal>
-        <div className="app-mobile-route">
-          <h2 id="route-title">{mobile.journeyTitle}</h2>
-          <ol>
-            {mobileSteps.map((step, index) => (
-              <li key={step.title}>
-                <span>{index + 1}</span>
-                <div><h3>{step.title}</h3><p>{step.text}</p></div>
-              </li>
-            ))}
-          </ol>
-        </div>
+      {/* The approved circular journey, on every screen. */}
+      <section className="app-route" aria-label={mobile.journeyTitle} data-scroll-reveal>
+        <HomeJourney title={mobile.journeyTitle} steps={mobileSteps} />
       </section>
 
       <section className="app-expert" aria-labelledby="expert-title" data-scroll-reveal>
