@@ -40,9 +40,13 @@ card was changed or clock advanced for that scenario. Failed payment, final
 Portal cancellation, 6-period payment and authenticated return flow remain
 unverified. The 12-period synthetic fixture was created directly in staging
 and its Checkout through Stripe API, so it does not prove app authentication or
-consent persistence. Live Stripe still
-lacks product-write consent; Live catalog/webhook settings and production
-publication remain open. Commercial launch is NO-GO.
+consent persistence. After the owner updated the official Live Stripe
+connection, `product_write` succeeded and all four deterministic RU/EN Live
+products were created and read back. The first Live price create was denied
+`plan_write`; Portal configuration create was denied `customer_portal_write`.
+No Live prices or Portal configurations were created, and the new Checkout
+remains disabled in Production. Further official permission expansion, Live
+catalog/webhook setup and publication remain open. Commercial launch is NO-GO.
 
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 

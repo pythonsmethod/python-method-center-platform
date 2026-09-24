@@ -28,8 +28,14 @@ consent persistence are not thereby verified. A separate RU 6-period
 prepaid-only session displays 7,800 USD / 180 days but remains unpaid. The
 owner declined the proposed failed-renewal simulation; no failing card or
 clock change was made for it. Failed renewal, final Portal cancellation,
-6-period paid flow and authenticated app Checkout remain open. Live Stripe
-still denies `product_write`; production is not released. Earlier checkpoint
+6-period paid flow and authenticated app Checkout remain open. The owner
+expanded the official Live Stripe connection; `product_write` now works and
+all four deterministic RU/EN Live products were created and read back. The
+first Live price create was denied `plan_write`, and Portal configuration
+create was denied `customer_portal_write`. No Live prices or Portal
+configurations exist yet; Checkout remains disabled in Production and the site
+is not released. The owner was asked to grant Prices/Plans, Customer Portal
+and webhook write access through official reconsent. Earlier checkpoint
 statements below describe their state at the time and do not override this
 update.
 

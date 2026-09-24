@@ -823,10 +823,14 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
       existing service-period rows and owner-only billing reads.
 - [x] Inventory the Live catalog and webhook; prepare exact environment values
       and record missing recurring events.
-- [ ] Obtain official Live Stripe permission expansion after `PostProducts`
-      was rejected; do not use another credential or interface to bypass it.
-- [ ] Authenticate Vercel for environment configuration, then finish the open
-      acceptance/UX gates and publish the approved model.
+- [x] Obtain official Live Stripe `product_write` expansion and create/read
+      all four localized products through the approved connection.
+- [ ] Obtain official Live Stripe `plan_write` and `customer_portal_write`
+      expansion after the first Price and Portal writes were denied. Do not
+      bypass either refusal through another credential or interface.
+- [x] Authenticate Vercel and stage the Production configuration with
+      `STRIPE_CHECKOUT_ENABLED=false`; sales remain disabled.
+- [ ] Finish the open acceptance/UX gates and publish the approved model.
 
 Evidence: `docs/validation/stripe-production-readiness-2026-09-22.json`.
 Production schema is prepared; commercial publication remains HOLD.
@@ -843,7 +847,9 @@ Production schema is prepared; commercial publication remains HOLD.
   entitlement/delivery and authenticated app Checkout/consent in the isolated
   Stripe Sandbox + staging Preview. The owner deferred the failed-renewal
   simulation; do not run it until newly authorized.
-- [ ] Obtain official Live Stripe `product_write` capability, configure Live
-  catalog/Portal/webhook events and verified Vercel production environment.
+- [x] Obtain official Live Stripe `product_write` and create the four RU/EN
+  Products; no Prices were created.
+- [ ] Obtain official `plan_write`, `customer_portal_write` and webhook write
+  access, finish the Live Prices/Portal/events and verify Production runtime.
 - [ ] Merge PR #215 then #216, publish, retire old offers for new sales and run
   RU/EN production smoke. Until all unchecked items pass: NO-GO.
