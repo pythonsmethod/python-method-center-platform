@@ -1435,3 +1435,10 @@ one active 180-day service period and one assigned gift-delivery task
 (quantity 6). Authenticated Checkout, failed renewal (owner deferred), final
 Portal cancellation and production recurring webhook events remain open.
 Neither PR #215 nor #216 is merged; the new model is NOT LIVE.
+
+Read-only Live Payment Link inventory found three currently active links whose
+line items explicitly sell the retired terms: two named “Сопровождение 100
+дней” and one named “Сопровождение 5 недель”. Their exact IDs are in the
+production-readiness validation JSON. They were not deactivated before launch;
+other personalized/generic Payment Links were left outside this retirement
+scope rather than being guessed from amount alone.

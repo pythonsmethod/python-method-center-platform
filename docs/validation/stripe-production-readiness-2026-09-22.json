@@ -107,6 +107,23 @@
     "deliveryQuantity": 6,
     "deliveryAssigned": true
   },
+  "legacySalesLinksToRetireAtLaunch": [
+    {
+      "id": "plink_1UDfUHE6esfE5qRjw8KrqTM7",
+      "description": "Сопровождение 100 дней",
+      "activeOnReview": true
+    },
+    {
+      "id": "plink_1TwF0iE6esfE5qRj18cUVWU7",
+      "description": "Сопровождение 100 дней",
+      "activeOnReview": true
+    },
+    {
+      "id": "plink_1TwDYFE6esfE5qRjQcTCRkjA",
+      "description": "Сопровождение 5 недель",
+      "activeOnReview": true
+    }
+  ],
   "remaining": [
     "Isolated Preview and signed Sandbox webhook passed paid assessment, one-period renewal, six-period prepaid-only and 12-period exact entitlement. Failed renewal was deferred by the owner; final Portal cancellation and authenticated Checkout/consent remain open.",
     "The copy revision removes the unverified claim that Stripe calculates taxes at Checkout and advances the offer to v10. It passed 2057 local tests, typecheck, lint, security check, build, GitHub CI and READY Preview; RU/EN route switching and 390x844 mobile rendering were verified. The six-period charge used the earlier v9 consent.",
