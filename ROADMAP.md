@@ -822,8 +822,11 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
       The draft branch now uses Checkout Elements for renewal-selected 2–12
       terms. Preview exposed a disabled Pay button because the required full
       billing address was not collected. The branch now mounts Stripe's
-      BillingAddressElement and passes local tests/build; a new Preview and
-      paid-flow acceptance remain open.
+      BillingAddressElement; READY Preview `8c75ba6` enabled Pay and the owner
+      completed the EN six-period Sandbox payment. The paid return, invoice,
+      subscription and gift task pass. A pre-onboarding buyer has no Case, so
+      no paid service period was created: resolve and retest this access gap
+      before treating the full paid flow as accepted.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
       RU/EN customer pages; local tests alone do not close these gates.
 - [ ] Publish only after the existing release gate; deactivate retired sales

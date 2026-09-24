@@ -86,9 +86,20 @@ unpaid 7,800 USD EN Elements Session: Stripe required a full billing address,
 but the form mounted only the Payment Element. The branch now mounts Stripe's
 BillingAddressElement with RU/EN headings. Focused tests, 2,069 full-suite
 tests (one skip), typecheck, lint, security check and build pass locally.
-The revised form still needs a new READY Preview and browser acceptance; the
-actual Elements payment, paid return and webhook delivery are unverified.
-Do not enable Production sales from local proof.
+Commit `8c75ba6` passed GitHub CI and deployed as READY Preview
+`dpl_BAWrG3RtFWCJwFFaiHwwn9BM6Wi6`. The owner completed its EN
+six-period Elements payment on the authenticated Preview. Stripe Sandbox
+confirms Checkout `complete` / `paid`, a 7,800 USD paid invoice, an active
+subscription and a schedule changing from the paid 180-day term ending
+2027-03-23 19:29:45 UTC to 1,300 USD every 30 days. The authenticated EN
+return page displayed `Payment received`. Staging has exactly one 7,800 USD
+paid payment, one active billing-subscription row, and one preparing gift
+delivery task with quantity six. It has **no service-period row for this
+payment**: this synthetic profile had no Case before Checkout, and the
+webhook only opens a service period when a Case exists. The paid return and
+payment/delivery linkage are verified; immediate paid entitlement for a
+pre-onboarding buyer is not. Commercial release stays NO-GO until that gap is
+resolved and retested. No Live charge or Production change was made.
 
 With the owner's action-time approval, the synthetic 12-period Sandbox
 subscription was canceled through the Russian Customer Portal. Portal now

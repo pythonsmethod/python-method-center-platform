@@ -8,9 +8,17 @@ Element's card fields, leaving Checkout `canConfirm=false` and Pay disabled.
 The branch now mounts Stripe's `BillingAddressElement` before `PaymentElement`
 with RU/EN section headings; the full address requirement remains intact.
 Focused tests and the full local gate pass (2,069 tests, one skip, TypeScript,
-ESLint, security check, production build). A new Preview and actual Sandbox
-card submission are still required to prove that the button enables and the
-paid return/webhook path works. Production remains disabled.
+ESLint, security check, production build). On READY Preview `8c75ba6`, a
+synthetic billing address and Stripe 4242 card enabled Pay. The owner submitted
+the EN six-period payment; Sandbox Checkout and invoice are paid for 7,800 USD,
+the authenticated return says `Payment received`, and staging has one payment,
+one subscription and a six-unit gift-delivery task. The paid invoice period is
+2026-09-24 19:29:45 UTC to 2027-03-23 19:29:45 UTC; the active schedule then
+switches to 1,300 USD every 30 days. There is no staging service-period row
+for this payment because the synthetic buyer had no Case before Checkout and
+the webhook skips period creation when `case_id` is absent. Treat pre-onboarding
+paid entitlement as a release blocker; do not equate the success page with
+completed access. Production remains disabled.
 
 ## Acceptance update — 2026-09-24
 
