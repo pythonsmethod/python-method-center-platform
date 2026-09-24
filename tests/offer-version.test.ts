@@ -30,6 +30,7 @@ import { OFFER_VERSION } from "@/lib/legal/offer";
 //
 // Never edit an existing entry.
 const FINGERPRINTS: Record<string, string> = {
+  "oferta-v10": "e024b71ea7db448f57159b581a177b58b4c4091a0e7ff768f10b7fe69b531ab1",
   "oferta-v9": "ae73691ef19fc9ab2bf9cb4f0ed21c975d06b57e9eb19992ba8707f59397de2c",
   "oferta-v8": "c55d205e4f4e578598f7ec9f61e30209189976670cd55eac2b013d2875b17513",
   "oferta-v4": "012a725c1a4ed0aab17db4aa4b8151daeecf0b2abbb39b39e86c782a4276c27d",

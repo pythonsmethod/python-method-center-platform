@@ -1074,7 +1074,7 @@ const ru = {
     offerHint:
       "Чтобы перейти к оплате, отметьте оба пункта выше.",
     refundLink: "Подробные условия оплаты и возврата",
-    feeNote: "Стоимость личного сопровождения включает формулу Professor Python на оплаченный период и её доставку. Налоги, если они юридически применимы к покупке, рассчитываются отдельно при оформлении оплаты.",
+    feeNote: "Стоимость личного сопровождения включает формулу Professor Python на оплаченный период и её доставку.",
     planReviewTitle: "Оценка состояния",
     planReviewDesc:
       "Оценка текущего состояния, разбор актуальных анализов и предварительная консультация по личному протоколу реабилитации от Professor Python. Разовая услуга, без обязательства покупать сопровождение.",
@@ -1098,7 +1098,7 @@ const ru = {
       "subscription-exists": "У вас уже подключено автопродление. Управлять им можно в настройках аккаунта.",
       "period-active": "У вас уже есть оплаченный срок сопровождения. Автопродление можно подключить после его окончания."
     },
-    taxNote: "Применимые налоги, если они требуются законодательством вашей страны или региона, рассчитываются отдельно в Stripe Checkout."
+    taxNote: "Итоговая сумма показана в Stripe Checkout до подтверждения оплаты."
   },
   paymentSuccess: {
     eyebrow: "Оплата получена",
@@ -2223,7 +2223,7 @@ const en: typeof ru = {
     offerHint:
       "To proceed to payment, please tick both boxes above.",
     refundLink: "Full payment and refund terms",
-    feeNote: "The Personal Support price includes Professor Python's formula for the paid period and delivery. Taxes, where legally applicable to the purchase, are calculated separately at checkout.",
+    feeNote: "The Personal Support price includes Professor Python's formula for the paid period and delivery.",
     planReviewTitle: "Condition assessment",
     planReviewDesc:
       "An assessment of your current condition, review of current test results and a preliminary consultation on your personal rehabilitation protocol by Professor Python. A one-time service with no obligation to purchase support.",
@@ -2247,7 +2247,7 @@ const en: typeof ru = {
       "subscription-exists": "Automatic renewal is already connected. Manage it in your account settings.",
       "period-active": "You already have a paid support period. You can enable automatic renewal after it ends."
     },
-    taxNote: "Applicable taxes, if required by the laws of your country or region, are calculated separately in Stripe Checkout."
+    taxNote: "Stripe Checkout shows the total before you confirm payment."
   },
   paymentSuccess: {
     eyebrow: "Payment received",

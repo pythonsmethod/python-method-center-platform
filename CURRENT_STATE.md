@@ -1401,3 +1401,26 @@ voice speaking/close transitions. No API, role, schema or clinical change.
 Implementation, exact checks, release boundary and rollback are recorded in
 `docs/design/ANHAM_TABLET_ACTIVITY.md`. This is not evidence of a clinical phase
 closure or signed-in production acceptance.
+
+## 2026-09-24 — Live Stripe catalog ready; Checkout release still HOLD
+
+After official owner reconsent, the Live account accepted all four RU/EN
+products, 30 exact-amount Prices for the 1–12-period model and two localized
+Customer Portal configurations. The Portal enables card changes and
+end-of-period cancellation, without plan changes. All were read back. The
+existing Live webhook was not yet expanded beyond its five original events.
+Vercel Production shows `STRIPE_CHECKOUT_MODE=live`, the production return
+origin, automatic tax disabled and `STRIPE_CHECKOUT_ENABLED=false`; both
+Stripe secret variable names exist as write-only values, not disclosed.
+
+The owner deferred tax setup. Stripe Tax has zero Live registrations and its
+settings are pending; this is not a determination that no tax is owed. Preview
+RU→EN→RU switching and 6-/12-period displayed totals passed. The false claim
+that taxes would be calculated separately at Checkout was removed in both
+languages, the offer and assistant context. The amended offer is v10 with a
+new fingerprint; existing v9 history is retained. Full local regression:
+2,057 passed, one skipped; TypeScript, ESLint, security check, build and diff
+check pass. The copy revision is not yet deployed. Authenticated Checkout,
+six-period paid flow, failed renewal (owner deferred), final Portal
+cancellation and production recurring webhook events remain open. Neither
+PR #215 nor #216 is merged; the new model is NOT LIVE.

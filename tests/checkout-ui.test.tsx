@@ -32,4 +32,8 @@ describe.each(["ru", "en"] as const)("payment UI in %s", locale => {
       expect(/[А-Яа-я]/.test(message)).toBe(locale === "ru");
     }
   });
+  it("shows the Checkout total without promising unconfigured tax calculation", () => {
+    expect(render(true)).toContain(labels.taxNote);
+    expect(labels.taxNote.toLowerCase()).not.toMatch(/tax|налог/);
+  });
 });

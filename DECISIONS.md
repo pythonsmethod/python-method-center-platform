@@ -1447,3 +1447,17 @@ between Checkout creation and the owner's test-card payment: the old code
 recorded access 22 minutes after Stripe's billing anchor. Production had no
 new-model subscriptions at this point. Existing manual/legacy period extension
 behavior remains unchanged.
+
+## 2026-09-24 — Defer Stripe Tax configuration and state Checkout totals honestly
+
+The owner does not know whether a California Seller's Permit exists outside
+Stripe and deferred a decision on tax-inclusive versus tax-added prices.
+Keep `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`; do not create a registration, guess
+a product tax code, or imply that this resolves tax obligations. Live Stripe
+Tax settings are pending with zero registrations. Because the current Checkout
+does not calculate tax, remove claims that it does from RU/EN payment and
+offer copy and assistant price context. Amend the offer to v10; retain the
+v9 fingerprint and earlier consent history. The 299/1,300 USD commercial
+amounts, complimentary Formula and included delivery do not change. Current
+Prices are `tax_behavior=exclusive`; a later inclusive-tax decision requires
+a deliberate new Price/catalog version, not mutation of the existing Prices.

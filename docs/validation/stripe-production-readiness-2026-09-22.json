@@ -25,10 +25,13 @@
     "livemode": true,
     "checkoutNamespace": "pmc-20260922-v1",
     "namespaceObjectsPresent": true,
-    "newObjectsCreated": 4,
+    "newObjectsCreated": 36,
     "localizedProductsCreatedAndReadBack": 4,
-    "localizedPricesCreated": 0,
-    "portalConfigurationsCreated": 0,
+    "localizedPricesCreatedAndReadBack": 30,
+    "portalConfigurationsCreatedAndReadBack": 2,
+    "priceTaxBehavior": "exclusive; automatic tax remains disabled, no tax is added by this integration",
+    "taxSettingsStatus": "pending",
+    "taxRegistrations": 0,
     "permissionChecks": [
       {
         "operation": "PostProducts",
@@ -37,13 +40,13 @@
       },
       {
         "operation": "PostPrices",
-        "result": "insufficient_permissions; no price created",
-        "requiredPermission": "plan_write"
+        "result": "succeeded after official reconsent",
+        "permission": "plan_write"
       },
       {
         "operation": "PostBillingPortalConfigurations",
-        "result": "insufficient_permissions; no configuration created",
-        "requiredPermission": "customer_portal_write"
+        "result": "succeeded after official reconsent",
+        "permission": "customer_portal_write"
       }
     ],
     "existingWebhook": {
@@ -70,8 +73,8 @@
   "vercel": {
     "projectId": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
     "readyPreview": {
-      "commit": "811644785db09f5208d3ec25ce122a2caffceb9e",
-      "deploymentId": "dpl_Etk7GzmxRiuLhRGYydAjaK5Xsdi4",
+      "commit": "bb00c22fabb154fbc10b1d4b0838b913cc565326",
+      "deploymentId": "dpl_4Dx2GEeWwMYrZb9Mp1dErgt9Qxmy",
       "status": "READY"
     },
     "productionEnvironmentModified": true,
@@ -89,9 +92,10 @@
     ]
   },
   "remaining": [
-    "Owner must grant Live plan_write and customer_portal_write through official reconsent; webhook_write was requested for endpoint configuration. Do not retry either rejected write through another credential or interface.",
     "Isolated Preview and signed Sandbox webhook passed paid assessment, one-period renewal and 12-period exact entitlement. Failed renewal was deferred by the owner; six-period payment, final Portal cancellation and authenticated Checkout/consent remain open.",
-    "Provision Live Prices and localized Portal, add required recurring webhook events, verify production runtime, merge and verify the public deployment.",
+    "A new copy-only revision removes the unverified claim that Stripe calculates taxes at Checkout and advances the offer to v10; 2057 tests, typecheck, lint, security check and build pass locally, but this revision is not deployed yet.",
+    "Add the four recurring events to the existing Live webhook after the handler is deployed; preserve the original events, URL, signing secret and API version. Then verify production runtime, merge and verify the public deployment.",
+    "Tax classification and any external seller registration are not established. The owner deferred tax setup; do not imply that Stripe Tax disabled means no tax obligation.",
     "Deactivate retired sale links only as part of the verified launch; preserve history and existing subscriptions."
   ]
 }

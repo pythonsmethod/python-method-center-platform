@@ -4,9 +4,13 @@
 assessment, 1,300 USD first support payment, first 30-day automatic renewal,
 webhook redelivery without duplicate effects, and gift-task creation. A
 Stripe Test Clock exposed a webhook-time offset; the invoice-period anchoring
-fix passed local checks but awaits a fresh paid Preview run. Failed renewal,
-6/12-period paid flows, final Portal cancellation, Live catalog permissions
-and production publication are still open. The release remains HOLD.
+fix then passed a fresh paid 12-period Preview run with exact 360-day access.
+The Live RU/EN catalog (four products, 30 prices) and two Portal configurations
+were created through the authorized connection. Failed renewal was deferred by
+the owner; 6-period paid flow, final Portal cancellation, authenticated app
+Checkout, production webhook events and publication remain open. Tax setup was
+deferred and the unverified tax-at-Checkout copy removed in offer v10. The
+release remains HOLD.
 
 ## Owner decision
 

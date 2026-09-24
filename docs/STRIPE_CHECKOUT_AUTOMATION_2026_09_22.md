@@ -29,24 +29,34 @@ prepaid-only session displays 7,800 USD / 180 days but remains unpaid. The
 owner declined the proposed failed-renewal simulation; no failing card or
 clock change was made for it. Failed renewal, final Portal cancellation,
 6-period paid flow and authenticated app Checkout remain open. The owner
-expanded the official Live Stripe connection; `product_write` now works and
-all four deterministic RU/EN Live products were created and read back. The
-first Live price create was denied `plan_write`, and Portal configuration
-create was denied `customer_portal_write`. No Live prices or Portal
-configurations exist yet; Checkout remains disabled in Production and the site
-is not released. The owner was asked to grant Prices/Plans, Customer Portal
-and webhook write access through official reconsent. Earlier checkpoint
-statements below describe their state at the time and do not override this
-update.
+completed official Live Stripe reconsent. All four deterministic RU/EN Live
+products, 30 prices (assessment, prepaid-only, 30-day renewal, and 1–12 paid
+initial terms for each language), and two Portal configurations were created
+and read back. Portal permits card changes and end-of-period cancellation,
+not plan changes. The existing Live webhook still has its five historical
+events; the four recurring events have not yet been added. Production Checkout
+remains disabled and the site is not released.
+
+The owner deferred tax setup. Live Stripe Tax settings are pending with zero
+registrations, and Vercel has `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`. The
+unverified claim that Stripe would calculate tax at Checkout was removed from
+both payment languages, the offer, and assistant price context; the offer is
+now v10 so new consent records cannot be confused with v9. The prices retain
+the application's `tax_behavior=exclusive`; changing that later requires a
+new Price/catalog version. This does not determine whether the business owes
+sales or use tax. The copy-only revision passed 2,057 tests (one skip),
+TypeScript, ESLint, security check and production build locally; it still
+needs a new Preview and acceptance. Earlier checkpoint statements below
+describe their state at the time and do not override this update.
 
 Status: implementation in draft PR #216 on top of draft PR #215; Sandbox catalog,
 Portal configuration and isolated staging migration completed on 2026-09-22.
 Hosted test Checkout pages were inspected in RU/EN. The owner completed the
 RU one-period renewal test payment; Stripe confirmed its paid invoice.
 The owner subsequently authorized production launch. The additive production
-billing migration is now applied and verified; latest Preview `ae9e6d3` is READY.
-Commercial release remains HOLD because Live Stripe writes were denied,
-Vercel environment access needs sign-in, and acceptance/UX gates remain open.
+billing migration is now applied and verified; Preview `bb00c22` is READY.
+Commercial release remains HOLD because the remaining paid acceptance and
+production webhook gates are open.
 Existing public offers remain live until the pricing release passes its gate.
 
 ## A. Existing implementation

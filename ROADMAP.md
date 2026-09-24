@@ -825,9 +825,9 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
       and record missing recurring events.
 - [x] Obtain official Live Stripe `product_write` expansion and create/read
       all four localized products through the approved connection.
-- [ ] Obtain official Live Stripe `plan_write` and `customer_portal_write`
-      expansion after the first Price and Portal writes were denied. Do not
-      bypass either refusal through another credential or interface.
+- [x] Obtain official Live Stripe `plan_write` and `customer_portal_write`
+      expansion after the first Price and Portal writes were denied. The
+      authorized connection created/read back 30 Prices and two Portal configs.
 - [x] Authenticate Vercel and stage the Production configuration with
       `STRIPE_CHECKOUT_ENABLED=false`; sales remain disabled.
 - [ ] Finish the open acceptance/UX gates and publish the approved model.
@@ -848,8 +848,13 @@ Production schema is prepared; commercial publication remains HOLD.
   Stripe Sandbox + staging Preview. The owner deferred the failed-renewal
   simulation; do not run it until newly authorized.
 - [x] Obtain official Live Stripe `product_write` and create the four RU/EN
-  Products; no Prices were created.
-- [ ] Obtain official `plan_write`, `customer_portal_write` and webhook write
-  access, finish the Live Prices/Portal/events and verify Production runtime.
+  Products.
+- [x] Obtain official `plan_write` and `customer_portal_write`; create and
+  read back 30 Live Prices and two localized Portal configurations.
+- [x] Verify Production Vercel mode/origin/tax/disabled-sales settings without
+  revealing Stripe secrets; remove false tax-at-Checkout copy in RU/EN and
+  advance the offer fingerprint to v10. Local regression/build gates pass.
+- [ ] Add the four recurring events to the existing Live webhook after the
+  handler is deployed, then verify Production runtime.
 - [ ] Merge PR #215 then #216, publish, retire old offers for new sales and run
   RU/EN production smoke. Until all unchecked items pass: NO-GO.
