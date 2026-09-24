@@ -79,6 +79,27 @@ async function applyRememberPreference(formData: FormData): Promise<void> {
   }
 }
 
+// The language Supabase's own emails are written in. Accounts created before
+// the language was recorded, or used in the other language since, are
+// brought up to date at sign-in, so a later password-reset email matches
+// the language the person reads the site in. Best-effort: a failure here
+// must never stand between someone and their cabinet.
+async function rememberAuthEmailLocale(
+  supabase: NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>,
+  stored: unknown,
+  locale: "ru" | "en"
+): Promise<void> {
+  if (stored === locale) {
+    return;
+  }
+
+  try {
+    await supabase.auth.updateUser({ data: { locale } });
+  } catch {
+    // Keep signing in.
+  }
+}
+
 export async function signInWithPassword(
   _previousState: AuthActionState,
   formData: FormData
@@ -108,6 +129,7 @@ export async function signInWithPassword(
   }
 
   await applyRememberPreference(formData);
+  await rememberAuthEmailLocale(supabase, data.user?.user_metadata?.locale, locale);
 
   let nextPath = sanitizeNextPath(formData.get("next"));
 
@@ -181,8 +203,10 @@ export async function signUpWithPassword(
       emailRedirectTo: await getEmailRedirectTo(nextPath),
       // Also kept on the auth user, so the number is visible in the
       // Supabase dashboard even if the service key is missing and the
-      // profile row below never gets written.
-      data: { phone }
+      // profile row below never gets written. The language goes with it:
+      // Supabase writes the confirmation and password-reset emails itself,
+      // and its templates pick Russian or English from .Data.locale.
+      data: { phone, locale }
     }
   });
 
@@ -289,10 +313,9 @@ export async function resendConfirmationEmail(
 
   return {
     status: "success",
-    message:
-      "Письмо отправлено заново на " +
-      email +
-      ". Проверьте почту и папку «Спам»."
+    message: locale === "ru"
+      ? `Письмо отправлено заново на ${email}. Проверьте почту и папку «Спам».`
+      : `The email has been sent again to ${email}. Check your inbox and the Spam folder.`
   };
 }
 
