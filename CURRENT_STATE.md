@@ -1,5 +1,7 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+2026-09-23 questionnaire recovery release candidate: latest owner-scoped onboarding and delivery answers now prefill from canonical `onboarding_submissions.payload`, with profile fallback; controlled inputs retain all live values across validation/persistence errors. No schema, local-storage, external transfer or clinical change. Full regression 1,951 passed / 1 skipped; security, TypeScript, ESLint, 59-page build, dependency audit and diff check pass. Automated verification CLOSED; preview/production acceptance remains open. See `docs/ankh/onboarding_form_recovery_2026_09_23.md`.
+
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
 Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.
