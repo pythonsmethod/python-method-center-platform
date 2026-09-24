@@ -80,6 +80,55 @@ describe("значение из строки бланка", () => {
     expect(splitValue("без патологии")).toBeNull();
     expect(splitValue("< 5")).toBeNull();
     expect(splitValue("")).toBeNull();
+    expect(splitValue("1 of 2")).toBeNull();
+    expect(splitValue("2 из 3")).toBeNull();
+  });
+});
+
+describe("отдельные поля анализа и результата", () => {
+  const anchor = (page: number, excerpt: string) => ({
+    level: "PAGE" as const, page, sourceHash: "synthetic-hash", excerpt, region: null
+  });
+  const context = { specimen: "Serum", method: "Immunoturbidimetry" };
+  const rows = [1, 2].flatMap((page) => {
+    const date = page === 1 ? "2026-09-20" : "2026-09-24";
+    const value = page === 1 ? "1.2 mg/L" : "1.4 mg/L";
+    return [
+      { section: "Header", label: "Page", value: `${page} of 2`, reference: "-", referenceConfirmed: true, source: anchor(page, `Page ${page} of 2`) },
+      { section: "Laboratory results", label: "Test", value: "C-reactive protein (CRP)", reference: "-", referenceConfirmed: true, collectionDate: date, comparisonContext: context, source: anchor(page, "Test | C-reactive protein (CRP)") },
+      { section: "Laboratory results", label: "Result", value, reference: "0.0 - 5.0 mg/L", referenceConfirmed: true, collectionDate: date, comparisonContext: context, source: anchor(page, `Result | ${value} | 0.0 - 5.0 mg/L`) }
+    ];
+  });
+
+  it("связывает ровно одну пару на каждой физической странице, сохраняя обе ссылки", () => {
+    const result = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:rows}]});
+    expect(result.labValues).toHaveLength(2);
+    expect(result.labValues.map(row => [row.label_original,row.analyte,row.value_canonical,row.measured_on])).toEqual([
+      ["Result","crp",1.2,"2026-09-20"],
+      ["Result","crp",1.4,"2026-09-24"]
+    ]);
+    expect(result.labValues.map(row => row.source_anchor?.related?.page)).toEqual([1,2]);
+    expect(result.labValues[0].source_anchor?.excerpt).toBe("Result | 1.2 mg/L | 0.0 - 5.0 mg/L");
+    expect(result.labValues[0].source_anchor?.related?.excerpt).toBe("Test | C-reactive protein (CRP)");
+    expect(result.trends.crp).toBeDefined();
+  });
+
+  it("не связывает повторные названия, противоречивый контекст и разные страницы", () => {
+    const test = rows[1];
+    const result = rows[2];
+    const ambiguous = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:[
+      test, {...test,value:"Ferritin",source:anchor(1,"Test | Ferritin")}, result
+    ]}]});
+    expect(ambiguous.labValues[0]).toMatchObject({label_original:"Result",analyte:null,value_canonical:null});
+    expect(ambiguous.labValues[0].source_anchor?.related).toBeUndefined();
+    const otherPage = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:[
+      test, {...result,source:anchor(2,"Result | 1.2 mg/L")}
+    ]}]});
+    expect(otherPage.labValues[0].analyte).toBeNull();
+    const conflictingDate = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:[
+      test, {...result,collectionDate:"2026-09-21"}
+    ]}]});
+    expect(conflictingDate.labValues[0].analyte).toBeNull();
   });
 });
 

@@ -81,6 +81,17 @@ export function resolveAnalyteLabel(printed: string | null | undefined): LabelRe
     return { status: "resolved", analyte: direct.analyte, matched: direct.matched };
   }
 
+  // A form may print both the long name and its acronym. Accept the pair
+  // only when each half independently resolves to the same known analyte.
+  const pair = (printed ?? "").trim().match(/^(.+?)\s*\(([^()]+)\)$/u);
+  if (pair) {
+    const name = LABELS[normalise(pair[1])];
+    const acronym = LABELS[normalise(pair[2])];
+    if (name && acronym && name.analyte === acronym.analyte) {
+      return { status: "resolved", analyte: name.analyte, matched: printed!.trim() };
+    }
+  }
+
   // Both attempts are exact lookups in the same table, so this is a second
   // spelling of the caption rather than a second, looser rule.
   const trimmed = withoutTrailingUnit(printed ?? "");

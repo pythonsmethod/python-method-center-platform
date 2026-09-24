@@ -12,6 +12,8 @@ import { referenceSetVersion } from "@/lib/reference/tables";
 export type ExtractedRow = {
   // Exactly as printed on the form.
   labelPrinted: string;
+  // Only an unambiguous, source-linked Test/Result pair may supply this.
+  analyteLabelPrinted?: string;
   value: number;
   unitPrinted?: string | null;
   referencePrinted?: string | null;
@@ -47,7 +49,7 @@ export function needsHumanReview(record: LabValueRecord): boolean {
 }
 
 export function buildLabValue(row: ExtractedRow): LabValueRecord {
-  const label = resolveAnalyteLabel(row.labelPrinted);
+  const label = resolveAnalyteLabel(row.analyteLabelPrinted ?? row.labelPrinted);
   const analyte = label.status === "resolved" ? label.analyte : null;
 
   const base = {

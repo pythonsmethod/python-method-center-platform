@@ -11,6 +11,9 @@ export type SourceAnchor = {
   excerpt: string | null;
   // A model transcription is not a measured bounding box or OCR token span.
   region: null;
+  // An explicitly paired label may live in a different row on the same page.
+  // Keep its separate literal row anchor; never pretend the two were one span.
+  related?: SourceAnchor;
 };
 export type PageCoverage = {
   page: number;

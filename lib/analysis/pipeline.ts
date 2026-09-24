@@ -1,5 +1,6 @@
 import { forInterpretation, personFactsFrom, type BlockAssessment, type Measurement } from "@/lib/analysis/blockers";
 import { buildLabValue, needsHumanReview, type LabValueRecord } from "@/lib/analysis/lab-value";
+import { resolveAnalyteLabel } from "@/lib/analysis/analyte-labels";
 import { assessTrend, type TrendAssessment, type TrendPoint } from "@/lib/analysis/trend-gate";
 import { analysisVersions, type AnalysisVersions } from "@/lib/analysis/versions";
 import type { QuestionnaireVersion } from "@/lib/health/questionnaire";
@@ -45,6 +46,7 @@ export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 export type ExtractedValueRow = {
   collectionDate?: string | null;
   comparisonContext?: { specimen: string | null; method: string | null };
+  section?: string;
   label: string;
   value: string;
   reference: string;
@@ -114,6 +116,8 @@ export function splitValue(printed: string): { value: number; unit: string } | n
 
   // Neither punctuation nor the document's language establishes a thousands/decimal convention.
   if (/^[1-9]\d{0,2}[.,]\d{3}$/.test(match[2]) || /^[-–—]\s*\d/.test(match[3]) || (/^\d/.test(match[3]) && !/^\d+\^/.test(match[3]))) return null;
+  // Pagination is numeric source metadata, never a laboratory measurement.
+  if (/^(?:of|из)\s+\d+$/i.test(match[3].trim())) return null;
 
   const value = Number(match[2].replace(",", "."));
 
@@ -127,6 +131,39 @@ export function splitValue(printed: string): { value: number; unit: string } | n
   }
 
   return { value, unit: match[3].trim() };
+}
+
+function samePrintedContext(a: ExtractedValueRow, b: ExtractedValueRow): boolean {
+  const aContext = a.comparisonContext;
+  const bContext = b.comparisonContext;
+  const pairs: Array<[string | null | undefined, string | null | undefined]> = [
+    [a.collectionDate, b.collectionDate],
+    [aContext?.specimen, bContext?.specimen],
+    [aContext?.method, bContext?.method]
+  ];
+  return pairs.every(([first, second]) => !first || !second || first === second);
+}
+
+// Some forms print "Test: CRP" and "Result: 1.2 mg/L" as separate rows.
+// Associate them only when the entire section on one physical page contains
+// exactly one of each, with matching available date/material/method context.
+// The raw rows stay separate; both anchors survive in the numeric projection.
+function unambiguousTestLabels(rows: ExtractedValueRow[]): Map<ExtractedValueRow, ExtractedValueRow> {
+  const groups = new Map<string, ExtractedValueRow[]>();
+  for (const row of rows) {
+    if (!row.section?.trim() || row.source?.level !== "PAGE" || !row.source.page || !row.source.sourceHash) continue;
+    const key = JSON.stringify([row.source.sourceHash, row.source.page, row.section.trim().toLowerCase()]);
+    groups.set(key, [...(groups.get(key) ?? []), row]);
+  }
+  const pairs = new Map<ExtractedValueRow, ExtractedValueRow>();
+  for (const group of groups.values()) {
+    const tests = group.filter(row => /^(?:test|анализ|показатель)$/i.test(row.label.trim()));
+    const results = group.filter(row => /^(?:result|результат)$/i.test(row.label.trim()) && splitValue(row.value));
+    if (tests.length !== 1 || results.length !== 1 || !samePrintedContext(tests[0], results[0])) continue;
+    if (resolveAnalyteLabel(tests[0].value).status !== "resolved") continue;
+    pairs.set(results[0], tests[0]);
+  }
+  return pairs;
 }
 
 function toMeasurement(row: NewLabValue | PriorLabValue, documentId: string): Measurement & { documentId: string } {
@@ -158,6 +195,7 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
   const labValues: NewLabValue[] = [];
 
   for (const document of input.documents) {
+    const pairedLabels = unambiguousTestLabels(document.agreed);
     for (const row of document.agreed) {
       const split = splitValue(row.value);
 
@@ -165,9 +203,11 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
         continue;
       }
 
+      const paired = pairedLabels.get(row);
       labValues.push({
         ...buildLabValue({
           labelPrinted: row.label,
+          analyteLabelPrinted: paired?.value,
           value: split.value,
           unitPrinted: split.unit,
           referencePrinted: row.reference,
@@ -177,7 +217,7 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
         document_id: document.documentId,
         value_printed: row.value,
         comparison_context: row.comparisonContext ?? null,
-        source_anchor: row.source ?? null
+        source_anchor: paired?.source && row.source ? { ...row.source, related: paired.source } : row.source ?? null
       });
     }
   }

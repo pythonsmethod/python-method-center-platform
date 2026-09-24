@@ -35,6 +35,12 @@ const rows: ExtractedRow[] = [
 ];
 
 describe("строка бланка становится записью факта", () => {
+  it("два согласованных написания в скобках дают один показатель, исходная подпись остаётся дословной", () => {
+    const row = buildLabValue({labelPrinted:"Result",analyteLabelPrinted:"C-reactive protein (CRP)",value:1.2,unitPrinted:"mg/L",referencePrinted:"0.0 - 5.0 mg/L"});
+    expect(row).toMatchObject({label_original:"Result",analyte:"crp",value_canonical:1.2});
+    const conflict = buildLabValue({labelPrinted:"Result",analyteLabelPrinted:"ALT (AST)",value:1.2,unitPrinted:"U/L"});
+    expect(conflict.analyte).toBeNull();
+  });
   it("подпись и число разбираются вместе", () => {
     const record = buildLabValue(rows[0]);
 

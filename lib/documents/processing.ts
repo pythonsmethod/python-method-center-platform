@@ -268,7 +268,7 @@ async function processClaimedDocument(supabase: NonNullable<ReturnType<typeof cr
   const prior: PriorLabValue[] = (priorRows ?? []).filter(row => activeDocuments.has(String(row.document_id)) && !excludedDocuments.has(String(row.document_id)))
     .map(row => ({ ...row, documentId: row.document_id })) as PriorLabValue[];
   const run = runAnalysis({ documents: [{ documentId: job.document_id, collectionDate: header.collectionDate,
-    agreed: exactDuplicate || classification === "EMPTY_TEMPLATE" ? [] : agreed.map(row => ({ label: row.label, value: row.value, reference: row.reference, referenceConfirmed: row.referenceConfirmed, source: row.source, collectionDate: toIsoDate(row.collectionDatePrinted ?? null), comparisonContext: { specimen: row.specimen ?? null, method: row.method ?? null } })) }],
+    agreed: exactDuplicate || classification === "EMPTY_TEMPLATE" ? [] : agreed.map(row => ({ section: row.section, label: row.label, value: row.value, reference: row.reference, referenceConfirmed: row.referenceConfirmed, source: row.source, collectionDate: toIsoDate(row.collectionDatePrinted ?? null), comparisonContext: { specimen: row.specimen ?? null, method: row.method ?? null } })) }],
     prior, questionnaire: subjectQuestionnaire, extractionModelVersion: ASSISTANT_MODEL });
   if (!hasAllVersions(run.versions)) return finishFailure(job, "service", "ANALYSIS_VERSION_MISSING");
   const sourceRecord = { source_hash: source.hash, page_count: source.pageCount, pages: pages.map(page => page.coverage), processor_version: DOCUMENT_PROCESSOR_VERSION,
