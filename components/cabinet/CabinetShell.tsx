@@ -107,6 +107,7 @@ export function CabinetShell({ children, email, greetingName, unread, tokens,
           <LanguageSwitcher locale={locale} />
           <Link aria-label={ru ? `Токены: ${tokens}` : `Tokens: ${tokens}`} className="web-cab__token" href={`${root}/tokens`}><IconScarab /><span>{tokens}</span></Link>
           <Link aria-label={ru ? "Открыть профиль" : "Open profile"} className="web-cab__account" href={`${root}/account`}><ClientAvatar name={greetingName} url={avatarUrl} /><span><strong>{greetingName}</strong><small>{email ?? t.clientFallback}</small></span></Link>
+          {preview ? null : <form action={logoutAction} className="web-cab__logout"><button type="submit">{ru ? "Выйти" : "Sign out"}</button></form>}
         </div>
       </header>
       <main className="web-cab__content">{children}</main>

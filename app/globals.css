@@ -5856,6 +5856,26 @@ code {
   border-color: var(--accent);
 }
 
+/* "Выйти" is a button in a form, styled as the sign-in door it replaces. */
+form.site-nav__auth {
+  align-items: stretch;
+  display: flex;
+  grid-column: auto;
+  margin: 0;
+  width: auto;
+}
+
+.site-nav__logout {
+  align-items: center;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  font-family: inherit;
+  justify-content: center;
+  line-height: inherit;
+}
+
 .site-nav__signup {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   border: 1px solid transparent;
@@ -7563,6 +7583,9 @@ body.cabinet-menu-open { overflow: hidden; }
 .web-cab__top-actions .lang-switch__btn--on { background:rgba(216,168,65,.14); color:var(--wc-bright); }
 .web-cab__token { border:1px solid var(--wc-line); border-radius:99px; color:var(--wc-bright); gap:5px; height:38px; padding:0 12px; }
 .web-cab__token svg { height:20px; width:20px; }
+.web-cab__logout { margin:0; }
+.web-cab__logout button { background:transparent; border:1px solid var(--wc-line); border-radius:99px; color:var(--wc-bright); cursor:pointer; font-size:.72rem; font-weight:700; height:38px; padding:0 14px; white-space:nowrap; }
+.web-cab__logout button:hover { border-color:var(--wc-gold); }
 .web-cab__account { color:var(--wc-text); gap:8px; }
 .client-avatar { align-items:center; background:#0b0d0b center/cover no-repeat; border:1px solid var(--wc-gold, var(--accent)); border-radius:50%; color:var(--wc-bright, var(--accent-strong)); display:inline-flex; flex:0 0 auto; font-weight:700; justify-content:center; overflow:hidden; }
 .staff-case-client,.staff-case-profile-heading { align-items:center; display:flex; gap:10px; }
@@ -7628,7 +7651,12 @@ body.cabinet-menu-open { overflow: hidden; }
   .web-cab__token { font-size:.8rem; height:34px; padding:0 9px; }
   .web-cab__token svg { height:17px; width:17px; }
   .web-cab__top-actions { gap:8px; }
-  .web-cab__mobile-brand span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* The phone top bar holds the menu, the site sign, the language switch,
+     the token balance, the profile and "Выйти". The words give way first so
+     every control stays on screen. */
+  .web-cab__mobile-brand { min-width:0; }
+  .web-cab__mobile-brand span,.web-cab__menu-label { display:none; }
+  .web-cab__top-actions { flex:0 0 auto; margin-left:auto; }
   .web-cab__sidebar-foot a,.web-cab__sidebar-foot button { font-size:.72rem; padding:9px; text-align:left; }
   .web-cab__menu { align-items:center; background:transparent; border:0; color:var(--wc-bright); cursor:pointer; display:flex; gap:8px; min-height:44px; padding:8px; }
   .web-cab__menu-icon { display:grid; gap:5px; }
@@ -7643,6 +7671,13 @@ body.cabinet-menu-open { overflow: hidden; }
   .contact-card__primary,.contact-card__anham-button { margin-top:22px; }
   .case-shortcut,.web-app-promo { align-items:start; grid-template-columns:auto 1fr; padding:16px; }
   .case-shortcut>span:last-child,.web-app-promo a { grid-column:2; width:max-content; }
+}
+@media (max-width:430px) {
+  /* The balance is one tap away in the menu ("Токены"); the way out is not. */
+  .web-cab__token { display:none; }
+  .web-cab__topbar { gap:6px; padding-inline:10px; }
+  .web-cab__top-actions { gap:6px; }
+  .web-cab__logout button { padding:0 11px; }
 }
 @media (prefers-reduced-motion:reduce) { .web-cab * { transition:none!important; } }
 /* Professor Python explicitly approves each durable memory after a reply. */

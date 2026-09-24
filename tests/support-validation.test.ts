@@ -5,7 +5,6 @@ const valid = {
   contactName: "Иван Иванов",
   email: "guest@example.com",
   phone: "+1 (202) 555-0123",
-  category: "payment",
   message: "Оплатила тариф, но не вижу оплату в кабинете.",
   consent: true,
   honeypot: ""
@@ -21,7 +20,6 @@ describe("validatePublicSupportInput", () => {
   });
   it("accepts a valid guest request", () => {
     expect(validatePublicSupportInput(valid)).toEqual({
-      category: "payment",
       contactName: "Иван Иванов"
     });
   });
@@ -42,12 +40,6 @@ describe("validatePublicSupportInput", () => {
   it("rejects bad email", () => {
     expect(
       validatePublicSupportInput({ ...valid, email: "nope" })
-    ).toHaveProperty("error");
-  });
-
-  it("rejects unknown category", () => {
-    expect(
-      validatePublicSupportInput({ ...valid, category: "hack" })
     ).toHaveProperty("error");
   });
 

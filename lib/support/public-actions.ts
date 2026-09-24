@@ -2,10 +2,7 @@
 
 import { headers } from "next/headers";
 import type { SupportRequestActionState } from "@/lib/support/types";
-import {
-  validatePublicSupportInput,
-  type PublicSupportCategory
-} from "@/lib/support/validation";
+import { validatePublicSupportInput } from "@/lib/support/validation";
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { sendGuestSupportEmail } from "@/lib/notifications/guest-support-email";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -38,25 +35,9 @@ function errorState(message: string): SupportRequestActionState {
   return { status: "error", message };
 }
 
-// What the form offers, mapped onto support_request_category in the
-// database. Everything that was not "payment" used to be filed as
-// "technical", so "Другой вопрос" arrived in the team's queue wearing the
-// wrong label and could not be filtered apart. A sign-in problem genuinely
-// is technical; the enum has no value of its own for it, and adding one is
-// a migration rather than a mapping.
-const DB_CATEGORY: Record<PublicSupportCategory, string> = {
-  login: "technical",
-  other: "other",
-  payment: "payment",
-  technical: "technical"
-};
-
-const categorySubjects: Record<string, string> = {
-  login: "Гость: проблема со входом",
-  payment: "Гость: вопрос по оплате",
-  technical: "Гость: технический вопрос",
-  other: "Гость: другой вопрос"
-};
+// The form no longer asks the guest to pick a topic: the message itself says
+// what it is about. Every guest request is filed under one subject.
+const GUEST_SUBJECT = "Гость: обращение с сайта";
 
 // Public guest support request: no account required. Writes to
 // support_requests with profile_id = null and a reply-to contact_email.
@@ -69,7 +50,6 @@ export async function submitPublicSupportRequest(
     contactName: String(formData.get("contactName") ?? ""),
     email: String(formData.get("email") ?? ""),
     phone: String(formData.get("phone") ?? ""),
-    category: String(formData.get("category") ?? ""),
     message: String(formData.get("message") ?? ""),
     consent: formData.get("consent") === "on",
     honeypot: String(formData.get("website") ?? ""),
@@ -104,8 +84,8 @@ export async function submitPublicSupportRequest(
     .from("support_requests")
     .insert({
       profile_id: null,
-      category: DB_CATEGORY[validation.category],
-      subject: categorySubjects[validation.category],
+      category: "other",
+      subject: GUEST_SUBJECT,
       body: message,
       contact_name: validation.contactName,
       contact_email: email,
@@ -127,8 +107,7 @@ export async function submitPublicSupportRequest(
     dedupeKey: `support_request:${request.id}`,
     title: "📨 Новое обращение с сайта (гость)",
     lines: [
-      `Тема: ${categorySubjects[validation.category]}`,
-      `Имя: ${validation.contactName}`,
+            `Имя: ${validation.contactName}`,
       `Ответить на: ${email}`,
       `Телефон: ${phone}`,
       "Откройте раздел «Обращения», чтобы прочитать."
@@ -136,7 +115,7 @@ export async function submitPublicSupportRequest(
     link: requestLink
   }), sendGuestSupportEmail({
     requestId: request.id,
-    subject: categorySubjects[validation.category],
+    subject: GUEST_SUBJECT,
     guestName: validation.contactName,
     guestEmail: email,
     guestPhone: phone,
