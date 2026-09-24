@@ -1,10 +1,10 @@
 {
-  "checkedAtUtc": "2026-09-23 21:37:26 UTC",
+  "checkedAtUtc": "2026-09-24 01:10:13 UTC",
   "releaseStatus": "HOLD",
   "environment": {
     "vercelProject": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
     "previewBranch": "agent/pmc-dynamic-checkout-20260922",
-    "previewDeployment": "CR7huYL6ekc8pcQbD3NwWif5fErP",
+    "previewDeployment": "dpl_9Wn7D3JLmyjFLsYnMTR1h9cCmoWZ",
     "supabaseProject": "thylrayzjczsxlyqhtfc",
     "stripeSandboxAccount": "acct_1SUwZgE5bkDqmDrJ"
   },
@@ -15,7 +15,10 @@
     "previewCheckoutMode": "test",
     "previewCheckoutEnabled": true,
     "previewAutomaticTax": false,
+    "stagingDeliverySchema": "legacy delivery workflow migration plus 20260924011000 and 20260924011100 parity migrations applied; production delivery schema was already complete",
+    "syntheticDeliveryFixture": "one case, fictional address in AQ and synthetic staging volunteer assignment; no real shipment",
     "stripeWebhookDestination": "we_1UIx1gE5bkDqmDrJIFZVp6G8",
+    "stripeWebhookTarget": "isolated Preview deployment with a dedicated revocable Vercel bypass parameter; value omitted",
     "stripeWebhookEvents": [
       "checkout.session.completed",
       "checkout.session.expired",
@@ -30,22 +33,24 @@
     "englishPricingPage": "passed: equivalent pricing and choices",
     "assessmentCheckout": "passed: Stripe sandbox showed USD 299 as a one-time payment",
     "assessmentTestCardPayment": "passed: Stripe redirected to the payment success page",
-    "paymentLinkedInStagingDatabase": false,
-    "stagingPaymentRowsForSyntheticBuyer": 0,
-    "webhookDelivery": "failed: HTTP 401 Protected deployment",
+    "paymentLinkedInStagingDatabase": true,
+    "stagingPaymentRowsForSyntheticBuyer": 1,
+    "webhookDelivery": "passed: manual resend returned HTTP 200; second resend also returned HTTP 200 and left exactly one USD 299 payment row",
     "webhookEvent": "evt_1UIxjCE5bkDqmDrJKYMgMAyu",
-    "supportRenewalCheckout": "not run: the automated approval review rejected starting a separate USD 2600 renewal checkout"
+    "supportRenewalCheckout": "prepared: RU 1-period auto-renew hosted Checkout displays USD 1300 per 30 days without a free trial; owner final Sandbox payment pending",
+    "supportSixAndTwelvePeriods": "unpaid Sandbox Checkout Sessions prepared: 6 periods USD 7800; 12 periods USD 15600; recurring initial prices use 180 and 360 days respectively",
+    "desktopAndMobilePricing": "passed: RU and EN routes, USD 299 assessment, all 1-12 prepaid totals, mobile viewport 390px without horizontal overflow"
   },
-  "finding": "Vercel Authentication protects the Preview webhook URL from Stripe. Stripe retries the completed event, but the purchase is not yet reflected in the staging database.",
-  "securityReview": "An automated approval review rejected placing the project-wide Vercel protection bypass secret in the Stripe webhook URL because that would disclose the credential to a third party. No bypass URL was saved.",
+  "finding": "The assessment purchase is now recorded in staging after successful Sandbox webhook delivery. The RU one-period paid Checkout is awaiting owner submission. Support purchase, renewal, failure, cancellation, entitlement and gift-task flows remain unverified end-to-end.",
+  "securityReview": "The project-wide existing bypass secret was never used. After explicit owner approval, a separate revocable secret was created and sent only to the Stripe Sandbox endpoint URL. Its value is not recorded in the repository. Vercel Authentication remains enabled for Preview. This separate secret grants project-wide Preview access and should be revoked when the acceptance run is finished.",
   "copyCorrection": "The payment success page now uses service-conditional Russian and English wording so an assessment purchase does not promise Personal Support or a formula.",
   "localVerification": {
     "focusedCheckoutTests": "90 passed",
-    "fullTests": "2045 passed, 1 skipped",
+    "fullTests": "2048 passed, 1 skipped",
     "typecheck": "passed",
     "lint": "passed",
     "productionBuild": "passed; security checker self-test 6 passed and boundary inventory passed",
     "diffCheck": "passed"
   },
-  "nextGate": "Provide an explicitly approved, secure webhook delivery design; resend the failed sandbox event and verify the payment row before accepting support renewal or launching production."
+  "nextGate": "Complete Sandbox support payments for 1/6/12 prepaid periods and both renewal choices, then verify schedule transition, first renewal, payment failure, Portal cancellation, entitlement and gift task before any production release."
 }

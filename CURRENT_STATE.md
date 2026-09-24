@@ -1,16 +1,30 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## Personal Support billing launch — 2026-09-22 — RELEASE HOLD
+## Personal Support billing launch — 2026-09-24 — RELEASE HOLD
 
-PR #216 now has a local follow-up that removes Stripe trial semantics from the
-prepaid renewal flow. Checkout charges the selected paid `N×30`-day initial
-term as its real first subscription period; the signed webhook then attaches an
-idempotent schedule that changes only the following phase to 1,300 USD every
-30 days. Focused tests pass 112/112, full regression 2,045/2,045 with one
-existing skip, and TypeScript, ESLint, security checks and production build
-pass. Sandbox hosted-page/schedule/Portal acceptance, isolated Preview runtime,
-Live Stripe permissions, Live catalog/webhook events and production publication
-remain open. Commercial launch is still NO-GO.
+PR #215 and PR #216 are open, mergeable and have passing CI/READY Preview
+deployments; neither is published. PR #216 replaces misleading Stripe trial
+semantics with a paid `N×30`-day initial subscription period followed by a
+scheduled 1,300 USD / 30-day renewal phase. Local regression passes 2,048 tests
+with one existing skip; typecheck, lint, security checks and build pass.
+
+Sandbox assessment payment of 299 USD was delivered through a protected Preview
+webhook after the owner approved a separate revocable Vercel bypass secret for
+Stripe Sandbox. Stripe returned HTTP 200 twice for the same event; staging has
+exactly one paid assessment row. The existing project-wide bypass secret was
+not used. RU/EN pricing and all 1–12 displayed totals passed desktop/mobile
+checks. A new RU 1-period auto-renew Checkout displays 1,300 USD / 30 days as
+paid, not a free trial; its final Sandbox payment is awaiting owner submission.
+Unpaid 6- and 12-period sessions show the expected 7,800 and 15,600 USD totals.
+
+Staging had an older delivery schema than production. The missing historical
+delivery workflow migration and two additive parity migrations were applied
+to staging, preserving existing rows. A synthetic case/address and volunteer
+assignment are ready to verify paid entitlement and the gift-delivery task;
+no real client data or shipment is involved. First renewal, failed payment,
+Portal cancellation and full issuance remain unverified. Live Stripe still
+lacks product-write consent; Live catalog/webhook settings and production
+publication remain open. Commercial launch is NO-GO.
 
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
