@@ -5,7 +5,7 @@
 PR #215 and PR #216 are open, mergeable and have passing CI/READY Preview
 deployments; neither is published. PR #216 replaces misleading Stripe trial
 semantics with a paid `N×30`-day initial subscription period followed by a
-scheduled 1,300 USD / 30-day renewal phase. Local regression passes 2,048 tests
+scheduled 1,300 USD / 30-day renewal phase. Local regression passes 2,055 tests
 with one existing skip; typecheck, lint, security checks and build pass.
 
 Sandbox assessment payment of 299 USD was delivered through a protected Preview
@@ -13,16 +13,24 @@ webhook after the owner approved a separate revocable Vercel bypass secret for
 Stripe Sandbox. Stripe returned HTTP 200 twice for the same event; staging has
 exactly one paid assessment row. The existing project-wide bypass secret was
 not used. RU/EN pricing and all 1–12 displayed totals passed desktop/mobile
-checks. A new RU 1-period auto-renew Checkout displays 1,300 USD / 30 days as
-paid, not a free trial; its final Sandbox payment is awaiting owner submission.
-Unpaid 6- and 12-period sessions show the expected 7,800 and 15,600 USD totals.
+checks. A new RU 1-period auto-renew Checkout displayed 1,300 USD / 30 days as
+paid, not a free trial. The owner completed its Sandbox card payment; its first
+automatic renewal was charged on a Stripe Test Clock for another 1,300 USD.
+Both invoices are paid. Staging has exactly one payment, access period and
+gift-delivery task for each charge; repeated invoice webhook delivery produced
+no duplicates. Unpaid 6- and 12-period sessions show the expected 7,800 and
+15,600 USD totals.
 
 Staging had an older delivery schema than production. The missing historical
 delivery workflow migration and two additive parity migrations were applied
 to staging, preserving existing rows. A synthetic case/address and volunteer
-assignment are ready to verify paid entitlement and the gift-delivery task;
-no real client data or shipment is involved. First renewal, failed payment,
-Portal cancellation and full issuance remain unverified. Live Stripe still
+assignment verified paid entitlement and both gift-delivery tasks; no real
+client data or shipment is involved. Sandbox exposed a 22-minute difference
+between Stripe's frozen Test Clock and webhook wall time. The code now anchors
+subscription access to the exact paid invoice period and blocks overlapping
+auto-renew purchases; this revision still needs deployed acceptance. Failed
+payment, Portal cancellation, 6/12-period payments and authenticated return
+flow remain unverified. Live Stripe still
 lacks product-write consent; Live catalog/webhook settings and production
 publication remain open. Commercial launch is NO-GO.
 

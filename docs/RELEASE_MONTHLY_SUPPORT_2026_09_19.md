@@ -1,5 +1,13 @@
 # PMC Monthly Personal Support — release preparation — 2026-09-19
 
+2026-09-24 gate update: isolated Sandbox/staging acceptance passed the 299 USD
+assessment, 1,300 USD first support payment, first 30-day automatic renewal,
+webhook redelivery without duplicate effects, and gift-task creation. A
+Stripe Test Clock exposed a webhook-time offset; the invoice-period anchoring
+fix passed local checks but awaits a fresh paid Preview run. Failed renewal,
+6/12-period paid flows, final Portal cancellation, Live catalog permissions
+and production publication are still open. The release remains HOLD.
+
 ## Owner decision
 
 New public commercial model:

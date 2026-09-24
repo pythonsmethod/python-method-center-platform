@@ -22,9 +22,14 @@ function database() {
     contains: vi.fn().mockResolvedValue({ data: [], error: null }),
     insert: vi.fn().mockResolvedValue({ error: null })
   };
+  const periods = {
+    select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(),
+    gt: vi.fn().mockReturnThis(), limit: vi.fn().mockReturnThis(),
+    maybeSingle: vi.fn().mockResolvedValue({ data: null, error: null })
+  };
   const auth = { getUser: vi.fn().mockResolvedValue({ data: { user: { id: owner, email: "synthetic@example.test" } }, error: null }) };
-  const from = vi.fn((table: string) => table === "consent_records" ? consent : billing);
-  return { auth, from, billing, consent };
+  const from = vi.fn((table: string) => table === "consent_records" ? consent : table === "service_periods" ? periods : billing);
+  return { auth, from, billing, consent, periods };
 }
 function stripeClient() {
   return {
@@ -103,6 +108,11 @@ describe("authenticated checkout action", () => {
   it("does not create another renewal for an account with an existing subscription", async () => {
     db.billing.maybeSingle.mockResolvedValue({ data: { stripe_customer_id: "cus_owner", status: "active" }, error: null });
     await expect(createPaymentCheckout(input)).resolves.toEqual({ error: "subscription-exists" });
+    expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+  });
+  it("does not start a renewing subscription during existing paid support", async () => {
+    db.periods.maybeSingle.mockResolvedValue({ data: { id: "paid-period" }, error: null });
+    await expect(createPaymentCheckout(input)).resolves.toEqual({ error: "period-active" });
     expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
   });
   it("rejects tampered ownership, amount or legacy product before any side effect", async () => {

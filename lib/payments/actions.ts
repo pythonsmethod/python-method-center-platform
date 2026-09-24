@@ -32,6 +32,16 @@ export async function createPaymentCheckout(raw: unknown): Promise<CheckoutResul
         .neq("status", "cancelled").limit(1).maybeSingle();
       if (error) return { error: "unavailable" };
       if (input.autoRenew && existing) return { error: "subscription-exists" };
+      if (input.autoRenew) {
+        // Stripe starts its prepaid subscription today. A prior paid support
+        // term would make its first renewal precede the end of access.
+        const { data: activePeriod, error: periodError } = await supabase.from("service_periods")
+          .select("id").eq("profile_id", user.id).eq("status", "active")
+          .in("product", ["personal_support", "support_5_weeks", "support_15_weeks"])
+          .gt("ends_at", new Date().toISOString()).limit(1).maybeSingle();
+        if (periodError) return { error: "unavailable" };
+        if (activePeriod) return { error: "period-active" };
+      }
       customerId = existing?.stripe_customer_id ?? null;
     }
 

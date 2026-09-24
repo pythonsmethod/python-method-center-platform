@@ -800,13 +800,18 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
 - [x] Owner completed the prepared RU one-period Sandbox payment; verify paid
       invoice, subscription and exact 30-day deferral from Test Clock start.
 - [x] Inspect actual RU Portal invoice/card and cancellation preview end date.
-- [ ] Execute final cancellation and actual renewal collection; previewing the
-      cancellation confirmation does not close these acceptance cases.
+- [x] Advance a Stripe Sandbox Test Clock and collect the first 1,300 USD
+      automatic renewal; verify paid invoice, next access period, delivery task
+      and idempotent webhook resend in staging.
+- [ ] Execute final Portal cancellation; previewing the confirmation does not
+      close this acceptance case.
 - [x] Verify a READY Vercel Preview for the latest revision (`ae9e6d3`);
       protected success page returns HTTP 200 through authorized connector access.
 - [ ] Finish browser sign-in and verify the complete authenticated return flow.
-- [ ] Connect isolated Preview secrets and signed Stripe webhook.
-- [ ] Resolve Stripe's "free trial" labeling of the prepaid renewal deferral.
+- [x] Connect isolated Preview secrets and signed Stripe Sandbox webhook with
+      a separate revocable bypass secret approved by the owner.
+- [x] Resolve Stripe's "free trial" labeling with a paid initial subscription
+      period; hosted Sandbox Checkout showed no free-trial language.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
       RU/EN customer pages; local tests alone do not close these gates.
 - [ ] Publish only after the existing release gate; deactivate retired sales
@@ -831,8 +836,8 @@ Production schema is prepared; commercial publication remains HOLD.
   subscription period and scheduled 30-day renewal phase.
 - [x] Prove 1–12 amount/duration contracts and webhook schedule idempotency in
   automated tests; run full regression, type, lint, security and build gates.
-- [ ] Verify revised Checkout, first schedule transition, failed renewal,
-  webhook redelivery, Portal cancellation and entitlement/delivery effects in
+- [ ] Verify revised Checkout after invoice-period anchoring, failed renewal,
+  Portal cancellation and 6/12-period entitlement/delivery effects in
   isolated Stripe Sandbox + staging Preview.
 - [ ] Obtain official Live Stripe `product_write` capability, configure Live
   catalog/Portal/webhook events and verified Vercel production environment.

@@ -1435,3 +1435,15 @@ copy customization. Webhook processing fails and retries if schedule creation
 cannot be confirmed. Customer Portal remains the self-service surface for card
 updates and end-of-period cancellation. Sandbox acceptance remains mandatory
 before live enablement.
+## 2026-09-24 — Stripe invoice dates govern paid subscription access
+
+Stripe's paid subscription invoice line defines the exact `N × 30`-day access
+window, including the first prepaid charge and each 30-day renewal. Webhook
+arrival time is recorded for audit but must not shift the contractual access
+window. Reject ambiguous or mismatched invoice lines and actual charges, and
+do not begin an auto-renewing subscription while another paid support period
+is active. This was prompted by a Sandbox Test Clock that remained frozen
+between Checkout creation and the owner's test-card payment: the old code
+recorded access 22 minutes after Stripe's billing anchor. Production had no
+new-model subscriptions at this point. Existing manual/legacy period extension
+behavior remains unchanged.

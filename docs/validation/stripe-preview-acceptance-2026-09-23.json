@@ -1,5 +1,5 @@
 {
-  "checkedAtUtc": "2026-09-24 01:10:13 UTC",
+  "checkedAtUtc": "2026-09-24 01:58:26 UTC",
   "releaseStatus": "HOLD",
   "environment": {
     "vercelProject": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
@@ -37,20 +37,25 @@
     "stagingPaymentRowsForSyntheticBuyer": 1,
     "webhookDelivery": "passed: manual resend returned HTTP 200; second resend also returned HTTP 200 and left exactly one USD 299 payment row",
     "webhookEvent": "evt_1UIxjCE5bkDqmDrJKYMgMAyu",
-    "supportRenewalCheckout": "prepared: RU 1-period auto-renew hosted Checkout displays USD 1300 per 30 days without a free trial; owner final Sandbox payment pending",
+    "supportRenewalCheckout": "passed: RU 1-period auto-renew hosted Checkout displayed USD 1300 per 30 days without a free trial; owner completed test-card payment",
+    "supportInitialInvoice": "passed: in_1UJ1ZME5bkDqmDrJhg8NmuZx paid USD 1300; line period 2026-09-24 01:13:18 UTC to 2026-10-24 01:13:18 UTC",
+    "firstAutomaticRenewal": "passed: Stripe Test Clock advanced to 2026-10-24 02:13 UTC; in_1UJ1iTE5bkDqmDrJoBt7x0dt paid USD 1300 for 2026-10-24 01:13:18 UTC to 2026-11-23 01:13:18 UTC",
+    "renewalWebhook": "passed: invoice.paid event evt_1UJ1iZE5bkDqmDrJwRoTmVYk delivered with HTTP 200; staging recorded exactly one renewal payment, one 30-day access period and one delivery task; event resent with no duplicate rows",
+    "stagingSupportDelivery": "passed: both paid support charges created one assigned synthetic gift-delivery task each; no shipment occurred",
+    "portalReadOnlyChecks": "passed: RU Portal showed saved test card, card-update option, paid invoice and cancellation preview preserving paid access; final cancellation not submitted",
     "supportSixAndTwelvePeriods": "unpaid Sandbox Checkout Sessions prepared: 6 periods USD 7800; 12 periods USD 15600; recurring initial prices use 180 and 360 days respectively",
     "desktopAndMobilePricing": "passed: RU and EN routes, USD 299 assessment, all 1-12 prepaid totals, mobile viewport 390px without horizontal overflow"
   },
-  "finding": "The assessment purchase is now recorded in staging after successful Sandbox webhook delivery. The RU one-period paid Checkout is awaiting owner submission. Support purchase, renewal, failure, cancellation, entitlement and gift-task flows remain unverified end-to-end.",
+  "finding": "Assessment, one-period support purchase, first automatic renewal, entitlement, gift-task creation and webhook redelivery passed in Sandbox/staging. The Test Clock exposed a 22-minute difference between frozen Stripe billing time and webhook wall time in the deployed revision. A code fix now derives subscription access from paid invoice line periods and blocks overlapping auto-renew purchases; it passed local tests but still requires a new deployed Preview acceptance. Failure, final Portal cancellation, 6/12-period payments and authenticated application Checkout remain unverified.",
   "securityReview": "The project-wide existing bypass secret was never used. After explicit owner approval, a separate revocable secret was created and sent only to the Stripe Sandbox endpoint URL. Its value is not recorded in the repository. Vercel Authentication remains enabled for Preview. This separate secret grants project-wide Preview access and should be revoked when the acceptance run is finished.",
   "copyCorrection": "The payment success page now uses service-conditional Russian and English wording so an assessment purchase does not promise Personal Support or a formula.",
   "localVerification": {
     "focusedCheckoutTests": "90 passed",
-    "fullTests": "2048 passed, 1 skipped",
+    "fullTests": "2055 passed, 1 skipped",
     "typecheck": "passed",
     "lint": "passed",
     "productionBuild": "passed; security checker self-test 6 passed and boundary inventory passed",
     "diffCheck": "passed"
   },
-  "nextGate": "Complete Sandbox support payments for 1/6/12 prepaid periods and both renewal choices, then verify schedule transition, first renewal, payment failure, Portal cancellation, entitlement and gift task before any production release."
+  "nextGate": "Deploy invoice-period fix to isolated Preview, verify a fresh paid subscription against Stripe invoice dates, complete Sandbox 6/12-period payments, failed renewal and final Portal cancellation; then obtain Live product_write, configure production and release."
 }

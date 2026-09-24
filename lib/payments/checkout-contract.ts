@@ -21,7 +21,7 @@ export type CheckoutInput = {
   startAccepted: true;
   requestId: string;
 };
-export type CheckoutError = "invalid" | "signin" | "unavailable" | "consent" | "subscription-exists";
+export type CheckoutError = "invalid" | "signin" | "unavailable" | "consent" | "subscription-exists" | "period-active";
 export type CheckoutResult = { url: string } | { error: CheckoutError };
 
 export function parseCheckoutInput(raw: unknown): CheckoutInput | null {

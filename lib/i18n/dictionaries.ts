@@ -1095,7 +1095,8 @@ const ru = {
       signin: "Войдите в аккаунт, чтобы продолжить оплату.",
       unavailable: "Не удалось открыть оплату. Попробуйте ещё раз или напишите команде через кабинет.",
       consent: "Не удалось сохранить согласие с условиями. Попробуйте ещё раз.",
-      "subscription-exists": "У вас уже подключено автопродление. Управлять им можно в настройках аккаунта."
+      "subscription-exists": "У вас уже подключено автопродление. Управлять им можно в настройках аккаунта.",
+      "period-active": "У вас уже есть оплаченный срок сопровождения. Автопродление можно подключить после его окончания."
     },
     taxNote: "Применимые налоги, если они требуются законодательством вашей страны или региона, рассчитываются отдельно в Stripe Checkout."
   },
@@ -2243,7 +2244,8 @@ const en: typeof ru = {
       signin: "Sign in to continue to payment.",
       unavailable: "We could not open checkout. Try again or contact the team through your account.",
       consent: "We could not save your acceptance of the terms. Please try again.",
-      "subscription-exists": "Automatic renewal is already connected. Manage it in your account settings."
+      "subscription-exists": "Automatic renewal is already connected. Manage it in your account settings.",
+      "period-active": "You already have a paid support period. You can enable automatic renewal after it ends."
     },
     taxNote: "Applicable taxes, if required by the laws of your country or region, are calculated separately in Stripe Checkout."
   },

@@ -20,6 +20,7 @@ import { isUuid } from "@/lib/utils/uuid";
 import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
 import { ensureCheckoutPrice } from "@/lib/payments/checkout-catalog";
 import { ensureThirtyDayRenewalSchedule } from "@/lib/payments/renewal-schedule";
+import { paidSubscriptionInvoicePeriod } from "@/lib/payments/stripe-invoice-period";
 
 export const runtime = "nodejs";
 
@@ -286,6 +287,22 @@ async function handlePaidSession(
     product === "personal_support"
       ? supportMonthsFromMetadata(session.metadata, amountCents, session.currency)
       : 1;
+  const stripeSubscriptionId =
+    typeof session.subscription === "string"
+      ? session.subscription
+      : session.subscription?.id ?? null;
+  const initialInvoiceId = typeof session.invoice === "string"
+    ? session.invoice : session.invoice?.id ?? null;
+  const stripePeriod = product === "personal_support" && stripeSubscriptionId
+    ? initialInvoiceId
+      ? paidSubscriptionInvoicePeriod(
+          await stripe.invoices.retrieve(initialInvoiceId), stripeSubscriptionId, purchasedMonths
+        )
+      : null
+    : null;
+  if (stripeSubscriptionId && !stripePeriod) {
+    throw new Error("paid subscription invoice missing from checkout");
+  }
 
   if (product === "personal_support") {
     const metadataMonths = personalSupportMonthsFromMetadata(session.metadata);
@@ -294,6 +311,11 @@ async function handlePaidSession(
       metadataMonths === null ||
       !isValidPersonalSupportCharge({
         amountCents: baseAmountCents,
+        currency: session.currency,
+        months: metadataMonths
+      }) ||
+      !isValidPersonalSupportCharge({
+        amountCents,
         currency: session.currency,
         months: metadataMonths
       })
@@ -306,7 +328,7 @@ async function handlePaidSession(
           `Событие: ${eventId}`,
           `Metadata product: ${session.metadata?.product ?? "не задано"}`,
           `Metadata months: ${session.metadata?.months ?? "не задано"}`,
-          `Базовая сумма: ${baseAmountCents ?? 0} ${(session.currency ?? "не задано").toUpperCase()}`,
+          `Базовая сумма: ${baseAmountCents ?? 0}; списано: ${amountCents} ${(session.currency ?? "не задано").toUpperCase()}`,
           "Доступ не выдан: проверьте тестовую Payment Link и metadata."
         ],
         link: adminLink("/admin")
@@ -428,7 +450,8 @@ async function handlePaidSession(
       paymentId: payment.id,
       product,
       paidAt,
-      months: purchasedMonths
+      months: purchasedMonths,
+      ...(stripePeriod ? { stripePeriod } : {})
     });
 
     if (period.status === "failed") {
@@ -469,11 +492,6 @@ async function handlePaidSession(
   // 6) A subscription-mode Payment Link means the client enabled automatic
   // renewal. The initial prepaid term was charged above; later invoice.paid
   // events extend access by exactly one 30-day period. No card data is stored.
-  const stripeSubscriptionId =
-    typeof session.subscription === "string"
-      ? session.subscription
-      : session.subscription?.id ?? null;
-
   if (product === "personal_support" && stripeSubscriptionId) {
     const stripeCustomerId =
       typeof session.customer === "string"
@@ -615,10 +633,16 @@ async function handlePaidSubscriptionInvoice(
   const currency = (invoice.currency ?? "usd").toUpperCase();
   const paidAt = new Date();
   const reference = invoicePaymentReference(invoice);
+  const stripePeriod = paidSubscriptionInvoicePeriod(invoice, subscriptionId, 1);
 
   if (
     !isValidPersonalSupportCharge({
       amountCents: baseAmountCents,
+      currency: invoice.currency,
+      months: 1
+    }) ||
+    !isValidPersonalSupportCharge({
+      amountCents,
       currency: invoice.currency,
       months: 1
     })
@@ -688,7 +712,8 @@ async function handlePaidSubscriptionInvoice(
       paymentId: payment.id,
       product: "personal_support",
       paidAt,
-      months: 1
+      months: 1,
+      stripePeriod
     });
 
     if (period.status === "failed") {
@@ -731,7 +756,8 @@ async function handlePaidSubscriptionInvoice(
     .from("billing_subscriptions")
     .update({
       status: "active",
-      last_invoice_id: invoice.id
+      last_invoice_id: invoice.id,
+      current_period_end: stripePeriod.endsAt.toISOString()
     })
     .eq("stripe_subscription_id", subscriptionId);
 

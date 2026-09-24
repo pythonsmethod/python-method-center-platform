@@ -1,5 +1,29 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Acceptance update — 2026-09-24
+
+The isolated Vercel Preview now uses staging Supabase, Stripe Sandbox keys and
+a signed Sandbox webhook. A separate revocable Preview bypass secret, approved
+by the owner and omitted here, is held only in Vercel/Stripe; the existing
+project-wide secret was not used. The Sandbox assessment, RU one-period paid
+support Checkout and first automatic 1,300 USD renewal succeeded. The renewal
+invoice had one 30-day line; staging recorded one payment, access period and
+gift-delivery task for each support charge. Replaying `invoice.paid` did not
+create duplicates. The RU Portal showed the test card and cancellation-at-end
+preview; final cancellation was not submitted.
+
+The Test Clock exposed a 22-minute difference between Stripe's frozen billing
+anchor and the deployed webhook's wall-clock-based access dates. The latest
+code instead uses the paid invoice line start/end for both initial and renewal
+access, validates the actual charge, and refuses an auto-renew Checkout while
+another support term is active. Local checks pass (2,055 tests, one skip,
+typecheck, lint, security check and build). This correction still requires a
+fresh deployed paid-flow acceptance. Failed renewal, 6/12-period paid flows,
+final Portal cancellation and authenticated app Checkout are open. Live Stripe
+still denies `product_write`; production is not released. Earlier checkpoint
+statements below describe their state at the time and do not override this
+update.
+
 Status: implementation in draft PR #216 on top of draft PR #215; Sandbox catalog,
 Portal configuration and isolated staging migration completed on 2026-09-22.
 Hosted test Checkout pages were inspected in RU/EN. The owner completed the
