@@ -1,5 +1,22 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-BILLING-2026-09-24-01 — Payment before intake opens one existing Case shell
+
+For an authenticated, Stripe-confirmed paid Checkout, fulfillment finds the
+profile's single continuous Case or creates an empty Case shell. It never
+creates medical content, infers a care decision, or bypasses questionnaire
+consent. The paid Personal Support period is linked to that Case immediately,
+using the exact paid Stripe invoice period for subscriptions. Later onboarding
+fills the same Case. The return page distinguishes Stripe payment confirmation
+from the database's actual service-period record; a paid charge alone is not
+presented as active support access. A delayed delivery address must retain the
+original paid term quantity. Existing subscription cancellation preserves
+already-paid access until its recorded end.
+
+This is an implementation decision for PR #216, not evidence of production
+publication. Staging repair of one synthetic payment is recorded in
+`CURRENT_STATE.md`; no production client record was changed for this decision.
+
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
 Status: owner-approved product direction; implementation migration pending.

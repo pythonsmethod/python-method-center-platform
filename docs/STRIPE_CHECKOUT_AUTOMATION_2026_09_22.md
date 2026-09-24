@@ -1,5 +1,20 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Pre-onboarding paid fulfillment — 2026-09-24
+
+An authenticated client may pay before completing medical intake. The signed
+paid webhook now finds or creates that profile's one empty `client_cases` row,
+without writing questionnaire or clinical information, then links the paid
+payment, support period, subscription and gift task. A repeat event cannot
+create a second Case or period. The RU/EN paid return confirms Stripe payment
+separately from actual access; it shows paid dates only after a matching
+`service_periods` row exists. Onboarding later fills the same Case. If the
+address is supplied after payment, gift fulfillment uses the original number
+of paid terms, not a default of one. The delivery page shows that an address
+is still required. One already-paid synthetic staging record was repaired
+against its verified Stripe invoice period; this was not a second payment or
+a production edit. Fresh Preview acceptance is still required.
+
 ## Elements billing-address blocker — 2026-09-24
 
 The authenticated EN six-period Sandbox Elements Session requires

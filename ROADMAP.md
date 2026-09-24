@@ -1,5 +1,20 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Personal Support payment-to-access chain — 2026-09-24 — RELEASE HOLD
+
+- [x] Create/reuse the existing Case shell only after verified paid Checkout;
+      open the paid support period before questionnaire completion.
+- [x] Show Stripe-paid versus database-access-pending honestly in RU/EN;
+      show exact access dates only when a period exists.
+- [x] Preserve purchased quantity when the gift task is created after a
+      later address update; prompt for missing address in the cabinet.
+- [x] Keep Stripe invoice-paid renewals, failed-payment non-extension and
+      Customer Portal cancellation/card management tied to existing records.
+- [ ] Deploy this revision to isolated Preview and verify the repaired
+      synthetic Case, access, delivery and return page end to end.
+- [ ] Verify a fresh no-Case Sandbox purchase through the new webhook revision.
+- [ ] Finish remaining release gates before enabling Production Checkout.
+
 ## NEXORA capability ownership and migration — 2026-09-23
 
 Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future

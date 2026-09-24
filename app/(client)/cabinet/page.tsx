@@ -20,7 +20,7 @@ const copy = {
     preview: "Я изучаю ваши материалы. Если потребуется уточнение, напишу вам здесь.",
     newMessage: "Новые сообщения появятся здесь", continueDialog: "Продолжить диалог",
     caseTitle: "Мой случай", caseReview: "Материалы на рассмотрении",
-    caseEmpty: "Заполните анкету, чтобы создать случай", openCase: "Открыть случай",
+    caseEmpty: "Заполните анкету, чтобы дополнить свой случай", openCase: "Открыть случай",
     appTitle: "Больше возможностей — в приложении",
     appText: "Ежедневная сводка, персональные напоминания и расширенные функции аккаунта доступны в приложении Python Method Center.",
     appCta: "Узнать о приложении", protected: "Защищённый диалог", askAnham: "Спросить Анхама",
@@ -38,7 +38,7 @@ const copy = {
     preview: "I am reviewing your materials. If I need any clarification, I will message you here.",
     newMessage: "New messages will appear here", continueDialog: "Continue conversation",
     caseTitle: "My case", caseReview: "Materials under review",
-    caseEmpty: "Complete the questionnaire to create your case", openCase: "Open case",
+    caseEmpty: "Complete the questionnaire to fill in your case", openCase: "Open case",
     appTitle: "More features in the app",
     appText: "Daily summaries, personal reminders, and expanded account features are available in the Python Method Center app.",
     appCta: "Learn about the app", protected: "Protected conversation", askAnham: "Ask Anham",
@@ -58,6 +58,7 @@ export default async function CabinetPage() {
   const c = copy[locale];
   const auth = await getRequiredUser("/cabinet");
   let hasCase = false;
+  let caseHasIntake = false;
   let questionnaireFilled = true;
   let latestMessage: string | null = null;
   let professorUnread = 0;
@@ -72,6 +73,7 @@ export default async function CabinetPage() {
     supportUnread = unreadSupport;
     const clientCase = caseResult.status === "ready" ? caseResult.case : null;
     hasCase = Boolean(clientCase);
+    caseHasIntake = Boolean(clientCase?.title);
     if (clientCase) {
       const [messages, unreadProfessor] = await Promise.all([
         getCaseMessages(clientCase.id),
@@ -127,9 +129,9 @@ export default async function CabinetPage() {
     </Link>}
 
     <div className="web-home__secondary">
-      <Link className="case-shortcut" href={hasCase ? "/cabinet/account" : "/onboarding"}>
+      <Link className="case-shortcut" href={hasCase && caseHasIntake ? "/cabinet/account" : "/onboarding"}>
         <span className="case-shortcut__icon"><IconAnkh /></span>
-        <span><small>{c.caseTitle}</small><strong>{hasCase ? c.caseReview : c.caseEmpty}</strong></span>
+        <span><small>{c.caseTitle}</small><strong>{caseHasIntake ? c.caseReview : c.caseEmpty}</strong></span>
         <span>{c.openCase} →</span>
       </Link>
       <aside className="web-app-promo">

@@ -1,5 +1,31 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Payment-to-access chain follow-up — 2026-09-24 — PREVIEW PENDING
+
+The authenticated six-period EN Sandbox charge exposed a general issue:
+fulfillment skipped `service_periods` when a newly registered purchaser had
+not completed onboarding and thus had no Case. The branch now creates or
+reuses the existing empty Case shell only after verified paid Checkout,
+links payment/subscription/gift and opens the paid period. Intake subsequently
+updates the same Case. The paid return page checks the owned Stripe Session
+and distinguishes actual database entitlement from a pending webhook, with
+RU/EN dates and questionnaire/address next steps. The cabinet shows the
+recorded access end and no longer treats a blank Case as completed intake.
+Late address entry now preserves the paid gift quantity; the delivery page
+shows the pending-address obligation even before a task can be created.
+
+One synthetic staging payment was repaired without another charge. Stripe
+Sandbox confirmed the $7,800 invoice and its exact 2026-09-24 19:29:45 UTC
+to 2027-03-23 19:29:45 UTC period. Post-repair staging readback shows one
+Case, one linked payment, one exact paid period, one linked subscription and
+one linked six-period gift task. No production database or Live Stripe charge
+was changed. Focused webhook, Case, return and delayed-delivery tests pass;
+the full local suite passed 2,080 tests (one existing skip), TypeScript,
+ESLint and security check pass. A local build passed after disabling only the
+disk build cache for that run and allowing the official font fetch; this
+temporary config was reverted. Preview deployment and a fresh no-Case paid
+webhook test are still pending. Production publication remains NO-GO.
+
 ## Personal Support billing launch — 2026-09-24 — RELEASE HOLD
 
 PR #215 and PR #216 are open, mergeable and have passing CI/READY Preview

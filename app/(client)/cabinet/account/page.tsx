@@ -55,18 +55,26 @@ export default async function AccountPage() {
         .maybeSingle()
     : { data: null };
 
-  const [caseResult, paymentsResult, subscriptionResult] = await Promise.all([
+  const [caseResult, paymentsResult, subscriptionResult, periodResult] = await Promise.all([
     getClientCaseShell(auth.userId),
     getOwnPayments(auth.userId),
     supabase
       ? supabase
           .from("billing_subscriptions")
-          .select("id, status")
+          .select("id, status, current_period_end")
           .eq("profile_id", auth.userId)
           .in("status", ["trialing", "active", "past_due", "paused", "unpaid", "incomplete"])
           .order("created_at", { ascending: false })
           .limit(1)
           .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+    supabase
+      ? supabase.from("service_periods")
+          .select("starts_at, ends_at")
+          .eq("profile_id", auth.userId).eq("status", "active")
+          .in("product", ["personal_support", "support_5_weeks", "support_15_weeks"])
+          .gt("ends_at", new Date().toISOString())
+          .order("ends_at", { ascending: false }).limit(1).maybeSingle()
       : Promise.resolve({ data: null, error: null })
   ]);
   const avatarUrl = await createProfileAvatarUrl(profileRow?.avatar_path ?? null);
@@ -138,6 +146,9 @@ export default async function AccountPage() {
                   {t.caseCreated}: {formatDateTime(caseResult.case.created_at, locale)}
                 </li>
               </ul>
+              {!caseResult.case.title ? <div className="panel-actions">
+                <Link className="button" href="/onboarding">{t.caseFinishCta}</Link>
+              </div> : null}
             </>
           ) : (
             <>
@@ -180,6 +191,12 @@ export default async function AccountPage() {
               ))}
             </ul>
           )}
+
+          {periodResult.data ? <div className="account-subscription">
+            <span className="panel__label">{t.paidAccessLabel}</span>
+            <h3>{t.paidAccessTitle}</h3>
+            <p>{t.paidAccessUntil}: {formatDateTime(periodResult.data.ends_at, locale)}</p>
+          </div> : null}
 
           {subscriptionResult.data ? (
             <div className="account-subscription">
