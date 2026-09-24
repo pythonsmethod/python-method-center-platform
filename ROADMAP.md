@@ -1,6 +1,6 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
-2026-09-23 questionnaire recovery: release candidate implemented. Next gate: full automated verification, isolated preview, authenticated RU/EN validation-error retention and saved-submission prefill, then production publication if clean.
+2026-09-23 questionnaire recovery: PR #227 is in production; automated verification, both previews, post-merge CI and production route smoke passed. Next optional acceptance: use an authorized test account to visually confirm saved-payload prefill and rejected-submit retention in RU and EN. No client must repeat or submit real medical text merely for testing.
 
 ## NEXORA capability ownership and migration — 2026-09-23
 
