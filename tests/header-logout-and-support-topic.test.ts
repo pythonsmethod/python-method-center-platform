@@ -36,6 +36,9 @@ describe("support forms without a topic", () => {
     const form = read("components", "support", "PublicSupportForm.tsx");
     expect(form).not.toContain('name="category"');
     expect(read("lib", "support", "validation.ts")).not.toContain("category");
+    const dict = read("lib", "i18n", "dictionaries.ts");
+    expect(dict).not.toContain("выбрав тему");
+    expect(dict).not.toContain("Payment question” topic");
   });
 
   it("does not ask a signed-in client for a subject", () => {
