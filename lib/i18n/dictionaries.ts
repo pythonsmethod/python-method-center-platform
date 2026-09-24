@@ -1042,7 +1042,7 @@ const ru = {
     eyebrow: "Оплата",
     title: "Тарифы",
     description:
-      "Оплата проходит через защищённую страницу Stripe. Платформа не хранит данные карт.",
+      "Оплата обрабатывается Stripe в защищённой форме. Платформа не хранит данные карт.",
     planLabel: "Тариф",
     payButton: "Перейти к оплате",
     unavailable: "Оплата по этому тарифу временно оформляется через команду",
@@ -1098,7 +1098,7 @@ const ru = {
       "subscription-exists": "У вас уже подключено автопродление. Управлять им можно в настройках аккаунта.",
       "period-active": "У вас уже есть оплаченный срок сопровождения. Автопродление можно подключить после его окончания."
     },
-    taxNote: "Итоговая сумма показана в Stripe Checkout до подтверждения оплаты."
+    taxNote: "Итоговая сумма показана до подтверждения оплаты."
   },
   paymentSuccess: {
     eyebrow: "Оплата получена",
@@ -2199,7 +2199,7 @@ const en: typeof ru = {
     eyebrow: "Payment",
     title: "Plans",
     description:
-      "Payment goes through a secure Stripe page. The platform does not store card data.",
+      "Payment is processed by Stripe in a secure form. The platform does not store card data.",
     planLabel: "Plan",
     payButton: "Proceed to payment",
     unavailable: "Payment for this plan is temporarily arranged through the team",
@@ -2251,7 +2251,7 @@ const en: typeof ru = {
       "subscription-exists": "Automatic renewal is already connected. Manage it in your account settings.",
       "period-active": "You already have a paid support period. You can enable automatic renewal after it ends."
     },
-    taxNote: "Stripe Checkout shows the total before you confirm payment."
+    taxNote: "The total is shown before you confirm payment."
   },
   paymentSuccess: {
     eyebrow: "Payment received",
