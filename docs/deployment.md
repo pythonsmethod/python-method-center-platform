@@ -44,6 +44,7 @@ STRIPE_CHECKOUT_ENABLED=false
 STRIPE_CHECKOUT_MODE=test
 STRIPE_CHECKOUT_RETURN_ORIGIN=https://your-isolated-staging.example
 STRIPE_CHECKOUT_AUTOMATIC_TAX=false
+STRIPE_PUBLISHABLE_KEY=pk_test_... # public key; match test/live Checkout mode
 ```
 
 The exact metadata, 30-day renewal and trial requirements are documented in
