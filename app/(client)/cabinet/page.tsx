@@ -18,6 +18,9 @@ const copy = {
     intro: "Выберите, с кем хотите продолжить диалог.",
     karen: "Karen — Professor Python", personal: "Личное сопровождение",
     preview: "Я изучаю ваши материалы. Если потребуется уточнение, напишу вам здесь.",
+    previewBeforeIntake: "Сначала заполните анкету и добавьте материалы. После этого команда сможет изучить ваш случай и ответить здесь.",
+    intakeFirst: "Сначала заполните анкету", startQuestionnaire: "Заполнить анкету",
+    anhamBeforeIntake: "Анхам поможет разобраться, как заполнить анкету, добавить документы и пользоваться кабинетом. Это бесплатно и не заменяет личный разбор Professor Python.",
     newMessage: "Новые сообщения появятся здесь", continueDialog: "Продолжить диалог",
     caseTitle: "Мой случай", caseReview: "Материалы на рассмотрении",
     caseEmpty: "Заполните анкету, чтобы дополнить свой случай", openCase: "Открыть случай",
@@ -36,6 +39,9 @@ const copy = {
     intro: "Choose who you would like to continue the conversation with.",
     karen: "Karen — Professor Python", personal: "Personal guidance",
     preview: "I am reviewing your materials. If I need any clarification, I will message you here.",
+    previewBeforeIntake: "First complete the questionnaire and add your materials. The team can then review your case and reply here.",
+    intakeFirst: "Complete the questionnaire first", startQuestionnaire: "Complete questionnaire",
+    anhamBeforeIntake: "Anham can help you complete the questionnaire, add documents and use your account. It is free and does not replace Professor Python's personal review.",
     newMessage: "New messages will appear here", continueDialog: "Continue conversation",
     caseTitle: "My case", caseReview: "Materials under review",
     caseEmpty: "Complete the questionnaire to fill in your case", openCase: "Open case",
@@ -99,12 +105,12 @@ export default async function CabinetPage() {
             ? <b aria-label={`${c.unread}: ${professorUnread}`} className="unread-badge unread-badge--inline">{professorUnread}</b>
             : <span className="contact-card__lock" title={c.protected}>⌾</span>}
         </div>
-        <blockquote>{latestMessage ?? c.preview}</blockquote>
-        <span className="contact-card__status"><i />{latestMessage ? c.protected : c.newMessage}</span>
-        <Link className="contact-card__primary" href="/cabinet/dialog">{c.continueDialog}<span>→</span></Link>
+        <blockquote>{latestMessage ?? (caseHasIntake ? c.preview : c.previewBeforeIntake)}</blockquote>
+        <span className="contact-card__status"><i />{latestMessage ? c.protected : caseHasIntake ? c.newMessage : c.intakeFirst}</span>
+        <Link className="contact-card__primary" href={caseHasIntake ? "/cabinet/dialog" : "/onboarding"}>{caseHasIntake ? c.continueDialog : c.startQuestionnaire}<span>→</span></Link>
       </section>
 
-      <CabinetAnhamCard button={c.askAnham} label={t.inviteLabel} title={t.inviteTitle} text={t.inviteText} questions={t.inviteQuestions} boundary={t.inviteBoundary} />
+      <CabinetAnhamCard button={c.askAnham} label={t.inviteLabel} title={t.inviteTitle} text={caseHasIntake ? t.inviteText : c.anhamBeforeIntake} questions={t.inviteQuestions} boundary={t.inviteBoundary} />
 
       <section className="contact-card contact-card--support" aria-labelledby="support-title">
         <div className="contact-card__head">
