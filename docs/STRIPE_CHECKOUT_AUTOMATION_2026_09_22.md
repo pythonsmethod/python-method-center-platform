@@ -13,13 +13,22 @@ create duplicates. The RU Portal showed the test card and cancellation-at-end
 preview; final cancellation was not submitted.
 
 The Test Clock exposed a 22-minute difference between Stripe's frozen billing
-anchor and the deployed webhook's wall-clock-based access dates. The latest
-code instead uses the paid invoice line start/end for both initial and renewal
-access, validates the actual charge, and refuses an auto-renew Checkout while
-another support term is active. Local checks pass (2,055 tests, one skip,
-typecheck, lint, security check and build). This correction still requires a
-fresh deployed paid-flow acceptance. Failed renewal, 6/12-period paid flows,
-final Portal cancellation and authenticated app Checkout are open. Live Stripe
+anchor and the earlier webhook's wall-clock-based access dates. The corrected
+code uses the paid invoice line start/end for both initial and renewal access,
+validates the actual charge, and refuses an auto-renew Checkout while another
+support term is active. Local checks pass (2,055 tests, one skip, typecheck,
+lint, security check and build). The corrected READY Preview then processed a
+fresh EN 12-period renewal-selected Sandbox payment of 15,600 USD. Its Stripe
+paid invoice and staging service period both run exactly from
+2026-09-24 02:15:10 UTC to 2027-09-19 02:15:10 UTC; Stripe schedules 1,300 USD
+every 30 days afterward. The signed webhook returned HTTP 200 and created one
+paid access period and one gift-delivery task. This particular Checkout used a
+synthetic staging fixture and direct Stripe API, so app authentication and
+consent persistence are not thereby verified. A separate RU 6-period
+prepaid-only session displays 7,800 USD / 180 days but remains unpaid. The
+owner declined the proposed failed-renewal simulation; no failing card or
+clock change was made for it. Failed renewal, final Portal cancellation,
+6-period paid flow and authenticated app Checkout remain open. Live Stripe
 still denies `product_write`; production is not released. Earlier checkpoint
 statements below describe their state at the time and do not override this
 update.

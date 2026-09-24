@@ -18,8 +18,14 @@ paid, not a free trial. The owner completed its Sandbox card payment; its first
 automatic renewal was charged on a Stripe Test Clock for another 1,300 USD.
 Both invoices are paid. Staging has exactly one payment, access period and
 gift-delivery task for each charge; repeated invoice webhook delivery produced
-no duplicates. Unpaid 6- and 12-period sessions show the expected 7,800 and
-15,600 USD totals.
+no duplicates. A fresh EN 12-period renewal-selected Checkout on the corrected
+READY Preview then charged 15,600 USD in Sandbox. Its paid invoice and staging
+access both run from 2026-09-24 02:15:10 UTC to 2027-09-19 02:15:10 UTC,
+exactly 360 days despite later webhook arrival. Stripe scheduled 1,300 USD
+renewals every 30 days thereafter, without a trial. The new webhook delivery
+returned HTTP 200 and staging created one paid period and one gift-delivery
+task. A separate RU 6-period prepaid-only Checkout shows 7,800 USD / 180 days
+without renewal but remains unpaid.
 
 Staging had an older delivery schema than production. The missing historical
 delivery workflow migration and two additive parity migrations were applied
@@ -28,9 +34,13 @@ assignment verified paid entitlement and both gift-delivery tasks; no real
 client data or shipment is involved. Sandbox exposed a 22-minute difference
 between Stripe's frozen Test Clock and webhook wall time. The code now anchors
 subscription access to the exact paid invoice period and blocks overlapping
-auto-renew purchases; this revision still needs deployed acceptance. Failed
-payment, Portal cancellation, 6/12-period payments and authenticated return
-flow remain unverified. Live Stripe still
+auto-renew purchases; the 12-period payment above verifies this on the deployed
+revision. The owner declined a proposed failed-renewal simulation, so no test
+card was changed or clock advanced for that scenario. Failed payment, final
+Portal cancellation, 6-period payment and authenticated return flow remain
+unverified. The 12-period synthetic fixture was created directly in staging
+and its Checkout through Stripe API, so it does not prove app authentication or
+consent persistence. Live Stripe still
 lacks product-write consent; Live catalog/webhook settings and production
 publication remain open. Commercial launch is NO-GO.
 

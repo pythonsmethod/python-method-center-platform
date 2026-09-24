@@ -836,9 +836,13 @@ Production schema is prepared; commercial publication remains HOLD.
   subscription period and scheduled 30-day renewal phase.
 - [x] Prove 1–12 amount/duration contracts and webhook schedule idempotency in
   automated tests; run full regression, type, lint, security and build gates.
-- [ ] Verify revised Checkout after invoice-period anchoring, failed renewal,
-  Portal cancellation and 6/12-period entitlement/delivery effects in
-  isolated Stripe Sandbox + staging Preview.
+- [x] Verify revised invoice-period anchoring on the READY Preview with a
+  fresh paid 12-period Sandbox subscription: Stripe and staging share the
+  exact 360-day dates, one paid period and one gift-delivery task.
+- [ ] Verify failed renewal, final Portal cancellation, 6-period paid
+  entitlement/delivery and authenticated app Checkout/consent in the isolated
+  Stripe Sandbox + staging Preview. The owner deferred the failed-renewal
+  simulation; do not run it until newly authorized.
 - [ ] Obtain official Live Stripe `product_write` capability, configure Live
   catalog/Portal/webhook events and verified Vercel production environment.
 - [ ] Merge PR #215 then #216, publish, retire old offers for new sales and run
