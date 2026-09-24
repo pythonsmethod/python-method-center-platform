@@ -1,5 +1,7 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+2026-09-23 questionnaire recovery: reuse the latest authenticated owner's canonical onboarding payload and profile delivery fields; keep current input in React state across server-action failures. Do not create a parallel draft store or put medical questionnaire text in browser local storage. Never claim recovery for values that were not persisted before a reload.
+
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
 Status: owner-approved product direction; implementation migration pending.
