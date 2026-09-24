@@ -1,5 +1,15 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-BILLING-2026-09-24-03 — Replay cannot extend prepaid access or duplicate delivery
+
+For a verified paid one-time Checkout, the first persisted `payments.paid_at`
+anchors the `N × 30`-day entitlement. On a signed webhook replay, reuse that
+timestamp rather than webhook arrival time. An existing gift task for the
+payment is reused and linked to the verified owned Case when missing; do not
+create another task or change its shipping status. A delivery-task failure
+must fail webhook processing so Stripe can retry. This is implemented in
+PR #216 and verified in Sandbox Preview, not yet published to Production.
+
 ## PMC-BILLING-2026-09-24-02 — Lifecycle events use the shared active schema
 
 The staging Case lifecycle table has no retired `from_status` / `to_status`

@@ -1,5 +1,40 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Authenticated one-period payment-to-access acceptance — 2026-09-24 — PREVIEW VERIFIED, RELEASE HOLD
+
+On the isolated staging/Sandbox Preview, a newly created synthetic account
+with no Case completed the EN one-period prepaid-only Checkout for 1,300 USD
+using Stripe's test card. Stripe Session
+`cs_test_a1zfEwEzR7bkaszpfootkiwFZQJv8XiDyIgPZRidRtjfEmrdoq4V2Wq4qt`
+is `complete` / `paid`, `livemode=false`, with no automatic renewal. The
+initial webhook went to an older immutable Preview and recorded payment and
+gift, but not Case or access. The Sandbox destination was corrected to the
+stable protected branch alias without changing its signing secret, API
+version or event set. The same signed paid event was replayed; no second
+charge occurred. A further repair/replay check on commit `9bcbd3c` verified
+that the original payment time, rather than replay time, anchors access and
+that the existing gift task receives the Case link. An ordinary duplicate
+resend was delivered successfully without creating duplicate records.
+
+Staging now has exactly one Case, one paid 1,300 USD payment, one active
+30-day service period (2026-09-24 21:38:07.751 UTC through 2026-10-24
+21:38:07.751 UTC), one linked gift task and one processed-event row for this
+synthetic buyer. The EN and RU paid return shows the exact dates; the private
+cabinet shows payment, entitlement and questionnaire entry; delivery shows
+the one-unit formula task with entirely fake shipping details. At 390px,
+return, account and delivery have no horizontal overflow. GitHub security/
+regression workflow and Vercel deployment `dpl_233ki52csTkYyWMPWKbhSpdDgw8w`
+passed for `9bcbd3c`. The follow-up RU/EN success-page copy now tells the
+buyer to review delivery details and add an address only if missing. Local
+full regression passed 2,092 tests with one existing skip; TypeScript,
+ESLint, security check, diff check and dependency audit passed.
+
+This demonstrates signed paid-event recovery, not a pristine first delivery
+to the latest handler from an empty staging data set. That final fresh-path
+E2E check remains open. The owner declined failed-renewal simulation, so it
+remains untested. Production Checkout remains disabled; Live webhook expansion,
+merges and publication have not happened. No real payment or shipment was made.
+
 ## Payment-to-access chain follow-up — 2026-09-24 — PREVIEW VERIFIED, RELEASE HOLD
 
 The authenticated six-period EN Sandbox charge exposed a general issue:

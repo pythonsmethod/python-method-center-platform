@@ -52,7 +52,7 @@ describe("payment return page", () => {
     const html = await render(sessionId);
     expect(html).toContain("Your paid access is active");
     expect(html).toContain("March 23, 2027");
-    expect(html).toContain("Add delivery address");
+    expect(html).toContain("Review delivery details");
     expect(mocks.from).toHaveBeenCalledWith("service_periods");
   });
   it("does not claim support access for a paid assessment", async () => {
@@ -80,6 +80,20 @@ describe("payment return page", () => {
   it("localizes an unconfirmed return in Russian", async () => {
     mocks.getLocale.mockResolvedValue("ru");
     expect(await render("not-a-session")).toContain("Платёж пока не подтверждён");
+  });
+  it("shows neutral delivery next steps in Russian when support access is active", async () => {
+    mocks.getLocale.mockResolvedValue("ru");
+    mocks.from.mockImplementation((table: string) => ({
+      select: () => ({ eq: () => ({ eq: () => ({ maybeSingle: async () => ({
+        data: table === "payments"
+          ? { id: "payment-1", product: "personal_support", status: "paid" }
+          : { starts_at: "2026-09-24T21:38:07Z", ends_at: "2026-10-24T21:38:07Z" },
+        error: null
+      }) }) }) })
+    }));
+    const html = await render(sessionId);
+    expect(html).toContain("Проверить сведения о доставке");
+    expect(html).toContain("добавьте адрес, если он ещё не указан");
   });
   it("keeps browser metadata neutral until the payment is verified", async () => {
     expect(await generateMetadata()).toMatchObject({ title: "Payment status" });

@@ -1,5 +1,35 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Authenticated prepaid-only chain and webhook recovery — 2026-09-24
+
+A new synthetic staging account with no Case completed the EN 1-period,
+prepaid-only Stripe Sandbox Checkout for 1,300 USD. Stripe readback shows
+`complete` / `paid`, `livemode=false`, no subscription and no automatic
+renewal. The first webhook delivery still targeted an older immutable
+Preview, which wrote one payment and gift task but no paid entitlement. The
+Sandbox destination was changed to the stable protected branch alias; the
+same existing signed event was replayed without taking another payment.
+After the Case/period recovery fix and a further replay on READY Preview
+`dpl_233ki52csTkYyWMPWKbhSpdDgw8w` (`9bcbd3c`), staging has exactly
+one Case, one payment, one paid period and one gift task, all linked to the
+same synthetic buyer. The gift retains quantity one. The 30-day entitlement
+starts at the original payment timestamp, 2026-09-24 21:38:07.751 UTC, and
+ends at 2026-10-24 21:38:07.751 UTC; replay time does not extend access.
+Another ordinary resend returned Delivered and all four record counts plus
+the event ledger count stayed at one. The webhook runtime returned HTTP 200.
+
+EN/RU paid return, private cabinet and delivery views display the entitlement
+and fictional fulfillment in the Preview; the 390px layout has no horizontal
+overflow. The paid-return copy now says “Review
+delivery details” / “Проверить сведения о доставке” because an address may
+already exist. The full local run passed 2,092 tests (one existing skip),
+typecheck, lint, security check and dependency audit; GitHub security/
+regression CI passed for `9bcbd3c` and the Preview is READY. This is a
+signed-event recovery test, **not** a pristine first-delivery test on the
+latest revision. Failed renewal was declined by the owner; Live launch,
+Production Checkout, Live webhook changes, PR merges and real shipment remain
+on hold.
+
 ## Payment-to-access Preview follow-up — 2026-09-24
 
 The authenticated EN six-period Sandbox payment was read back as paid in

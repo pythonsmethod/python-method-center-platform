@@ -1,5 +1,24 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Authenticated paid chain — 2026-09-24 — Preview acceptance, release HOLD
+
+- [x] Complete one authenticated EN 1-period, prepaid-only 1,300 USD
+      Stripe Sandbox payment from a synthetic account with no prior Case.
+- [x] Recover the signed paid event through the current protected branch
+      Preview; issue one Case, exact 30-day access and one gift task, linked
+      to the one payment. Replayed event keeps the original paid timestamp.
+- [x] Resend the same event again without a second charge or duplicate
+      Case, payment, access period, gift task or event ledger row.
+- [x] Inspect EN/RU paid return, private account and delivery in Preview;
+      verify 390px layout, amount, dates and fictional delivery details.
+- [ ] Prove a pristine first delivery to the latest webhook handler from a
+      completely empty synthetic buyer. The first paid delivery in this run
+      reached an older immutable Preview before the destination was fixed.
+- [ ] Run failed-renewal acceptance only if the owner later authorizes it;
+      the owner declined this test.
+- [ ] Complete Live webhook, tax/legal and release checks; keep Production
+      Checkout disabled until release gates pass.
+
 ## Personal Support payment-to-access chain — 2026-09-24 — RELEASE HOLD
 
 - [x] Create/reuse the existing Case shell only after verified paid Checkout;
@@ -19,7 +38,8 @@
 - [x] Verify mobile paid account/return/delivery at 390px, show the paid gift
       quantity, and route an empty paid Case to questionnaire without claiming
       a medical review has started.
-- [ ] Verify a fresh no-Case Sandbox purchase through the new webhook revision.
+- [ ] Verify a pristine first no-Case paid webhook on the latest revision;
+      signed-event replay recovery is verified separately above.
 - [ ] Finish remaining release gates before enabling Production Checkout.
 
 ## NEXORA capability ownership and migration — 2026-09-23

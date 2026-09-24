@@ -1118,7 +1118,7 @@ const ru = {
     accessPendingText: "Не оплачивайте повторно. Обновите статус через минуту; если доступ не появится в течение 10 минут, напишите в поддержку.",
     refreshCta: "Обновить статус",
     questionnaireCta: "Заполнить анкету",
-    deliveryCta: "Указать адрес доставки",
+    deliveryCta: "Проверить сведения о доставке",
     pendingEyebrow: "Проверка оплаты",
     pendingTitle: "Платёж пока не подтверждён",
     pendingDescription: "Мы не можем подтвердить оплату по этой ссылке. Проверьте состояние в личном кабинете; если списание произошло, не платите повторно и напишите в поддержку.",
@@ -1127,7 +1127,7 @@ const ru = {
     steps: [
       "Оплата привязывается к вашему аккаунту автоматически в течение нескольких минут. Если через 10 минут её не видно в кабинете — напишите нам.",
       "Если вы оплатили оценку состояния, команда начнёт разбор после получения необходимых материалов и направит ответ в личный кабинет.",
-      "Если вы оплатили личное сопровождение, срок доступа указан выше после подтверждения записи. Укажите адрес, чтобы мы подготовили доставку подарочной формулы."
+      "Если вы оплатили личное сопровождение, срок доступа указан выше после подтверждения записи. Проверьте сведения о доставке и добавьте адрес, если он ещё не указан."
     ],
     cabinetCta: "Перейти в кабинет",
     questionLabel: "Есть вопрос?",
@@ -2286,7 +2286,7 @@ const en: typeof ru = {
     accessPendingText: "Do not pay again. Refresh the status in a minute; if access is not available within 10 minutes, contact support.",
     refreshCta: "Refresh status",
     questionnaireCta: "Complete questionnaire",
-    deliveryCta: "Add delivery address",
+    deliveryCta: "Review delivery details",
     pendingEyebrow: "Payment check",
     pendingTitle: "Payment not yet confirmed",
     pendingDescription: "We cannot confirm payment from this link. Check your account; if you were charged, do not pay again and contact support.",
@@ -2295,7 +2295,7 @@ const en: typeof ru = {
     steps: [
       "The payment is linked to your account automatically within a few minutes. If you don't see it in your account after 10 minutes, write to us.",
       "If you purchased a condition assessment, the team will begin its review after receiving the necessary materials and send the response to your account.",
-      "If you purchased Personal Support, your access dates appear above once recorded. Add an address so we can prepare delivery of your complimentary formula."
+      "If you purchased Personal Support, your access dates appear above once recorded. Review your delivery details and add an address if one is missing."
     ],
     cabinetCta: "Go to my account",
     questionLabel: "Have a question?",
