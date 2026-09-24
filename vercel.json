@@ -6,7 +6,7 @@
     },
     {
       "path": "/api/documents/process",
-      "schedule": "*/5 * * * *"
+      "schedule": "0 15 * * *"
     },
     {
       "path": "/api/medical-digest/generate",

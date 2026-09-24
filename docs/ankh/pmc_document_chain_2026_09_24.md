@@ -26,7 +26,7 @@ The provider boundary remains the existing PMC Claude attachment reader. No new 
 
 - Lost HTTP acknowledgement after committed success reconciles to ready; stale leases cannot reset another worker.
 - Extraction, numeric projection, immutable snapshot and ready state commit atomically; errors roll everything back.
-- Queue schedule in code becomes every five minutes, with a bounded page budget. No existing hosted worker was invoked.
+- The active cabinet resumes its owner's queue on entry, upload and visibility return, with a one-minute retry timer and bounded page requests. The existing daily cron remains the closed-cabinet fallback. Five-minute cron was rejected by the current Vercel Hobby plan; that incompatible change was removed. Closed-cabinet background retries can wait until the next daily run. No existing hosted worker was invoked.
 - Source/reading/review changes invalidate approval. Multi-query evidence reads check a stable fingerprint. Save success requires readback.
 - Queries paginate past PostgREST's row cap; a failed page or 100,000-row ceiling returns unavailable. Internal synthesis has an explicit 180,000-character picture bound.
 - New RPCs are invoker-rights and service-role-only. No client Case status, urgency or priority was added.
@@ -61,6 +61,6 @@ Legacy expectations were changed explicitly for the new conservative contract: n
 
 Implementation and isolated DB path are complete for this increment. Hosted application acceptance and production release are **NOT CLOSED**. Do not claim all eleven steps are accepted on the live site.
 
-Vercel deployment connector returns `Tool deploy_to_vercel not found`; CLI is logged out. Observed staging deployment `dpl_CPwYYorG1UcaJB3ETAqqyn8qrM6V` still points to old `b0503cbb7a9c198cb87a119940cb985667c21990`, not this branch. Git CLI push lacks credentials; the connected GitHub write API is used for durable code storage.
+Vercel deployment connector returns `Tool deploy_to_vercel not found`; CLI is logged out. Git integration is active: the first branch commit was rejected because five-minute cron exceeds the project's Hobby plan. The cron was restored to daily and cabinet resume added; automatic deployment of this corrected commit is the next check. Last observed staging deployment `dpl_CPwYYorG1UcaJB3ETAqqyn8qrM6V` points to old `b0503cbb7a9c198cb87a119940cb985667c21990`. Git CLI push lacks credentials; the connected GitHub write API is used for durable code storage.
 
 GO: code review and exact-commit isolated PMC preview. NO-GO: production clinical activation, automatic VERIFIED, universal accuracy claims or the excluded Case. Next required gate: legitimate synthetic upload → actual provider read → source opening → save/reload correction → Karen approval → explicit client-visible result, RU/EN, on that exact preview. Browser fallback after the failed Vercel connector requires user approval under browser-access instructions; no browser session was assumed.

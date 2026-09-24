@@ -6,7 +6,7 @@ Owner direction: complete PMC first; do not migrate to NEXORA. Old Case 2.9 and 
 
 Four migrations applied only to isolated staging `thylrayzjczsxlyqhtfc`; synthetic registration through publication passed with rollback. The private source bucket and restrictive owner/no-overwrite rules were repaired. Local acceptance: 278 app tests, 55 contract tests and 1 synthetic benchmark; typecheck/lint/security/build pass. Full historical CI is excluded.
 
-Hosted release is open: Vercel deployment connector reports tool not found; CLI is logged out. Production was not migrated/deployed. Do not call all eleven steps accepted or claim full v2 skill-runtime activation. [Exact evidence and next gate](docs/ankh/pmc_document_chain_2026_09_24.md).
+Hosted release is open: automatic Git deployment rejected the five-minute cron on Hobby. Daily cron is restored and the cabinet resumes its owner's pending work on entry and once a minute while visible; corrected deployment is pending. Direct deployment connector is unavailable and CLI is logged out. Production was not migrated/deployed. Do not call all eleven steps accepted or claim full v2 skill-runtime activation. [Exact evidence and next gate](docs/ankh/pmc_document_chain_2026_09_24.md).
 
 ## Document and lab skills strengthened — 2026-09-24 — PACKAGE CANDIDATE
 

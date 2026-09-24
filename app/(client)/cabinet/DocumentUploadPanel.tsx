@@ -94,6 +94,9 @@ export function DocumentUploadPanel({
   const [openError, setOpenError] = useState<string>("");
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const hasPendingRef = useRef(false);
+  const processingRef = useRef(false);
+  const resumeProcessingRef = useRef<() => void>(() => undefined);
 
   useEffect(() => {
     setDocuments(initialDocuments);
@@ -109,11 +112,48 @@ export function DocumentUploadPanel({
     .sort()
     .join(",");
 
-  // A document waits for the queue, and the queue is drained by a cron that
-  // runs once a day, so "still processing" can mean hours. The old poll
-  // asked the server for the whole page every 10 seconds for as long as the
-  // tab stayed open — around 8,600 full re-renders a day, none of which the
-  // reader was waiting for after the first minute.
+  // Resume on return to the cabinet as well as after upload. The daily cron
+  // remains a fallback; an open cabinet continues page checkpoints and retries.
+  useEffect(() => {
+    let active = true;
+
+    async function drain() {
+      if (!active || processingRef.current || !hasPendingRef.current || document.hidden) return;
+      processingRef.current = true;
+      try {
+        for (let page = 0; page < 300 && active && hasPendingRef.current && !document.hidden; page += 1) {
+          const response = await fetch("/api/documents/process", { method: "POST" });
+          if (!response.ok) break;
+          const result = await response.json() as { status?: string };
+          if (!active) break;
+          if (result.status !== "continued") router.refresh();
+          if (result.status !== "continued" && result.status !== "ready") break;
+        }
+      } catch {
+        // A lost response is safe to retry: the server reconciles its lease.
+      } finally {
+        processingRef.current = false;
+      }
+    }
+
+    const resume = () => { void drain(); };
+    resumeProcessingRef.current = resume;
+    resume();
+    const timer = window.setInterval(resume, MAX_POLL_INTERVAL_MS);
+    document.addEventListener("visibilitychange", resume);
+    return () => {
+      active = false;
+      window.clearInterval(timer);
+      document.removeEventListener("visibilitychange", resume);
+    };
+  }, [caseId, router]);
+
+  useEffect(() => {
+    hasPendingRef.current = Boolean(pendingSignature);
+    resumeProcessingRef.current();
+  }, [pendingSignature]);
+
+  // Refresh the displayed state with backoff while the queue is active.
   useEffect(() => {
     if (!pendingSignature) {
       return;
@@ -303,14 +343,7 @@ export function DocumentUploadPanel({
         status: "success",
         message: labels.uploaded
       });
-      void (async () => {
-        for (let page = 0; page < 300; page += 1) {
-          const response = await fetch("/api/documents/process", { method: "POST" });
-          if (!response.ok) break;
-          const result = await response.json() as { status?: string };
-          if (result.status !== "continued" && result.status !== "ready") break;
-        }
-      })().catch(() => undefined);
+      // The pending-signature effect starts/resumes the authenticated worker.
     });
   }
 

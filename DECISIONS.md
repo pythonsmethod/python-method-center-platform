@@ -6,6 +6,8 @@ Current owner instruction defers NEXORA migration. Reuse existing PMC Cases/stor
 
 Only isolated staging changes. Old Case and real-data replays stay excluded. Preserve full release gates and add separately named bounded synthetic CI. Hosted role acceptance/production remain pending exact-commit deployment and legitimate sessions. [Evidence](docs/ankh/pmc_document_chain_2026_09_24.md).
 
+The current Vercel Hobby plan rejects sub-daily cron schedules. Keep the existing daily fallback and resume the authenticated owner's pending queue on cabinet entry/upload/visibility return, retrying once a minute while open. Background recovery while the cabinet is closed is daily; do not promise five-minute unattended processing or change billing.
+
 ## NEXORA-2026-09-24-01 — Strengthen existing document and laboratory instructions
 
 Reuse the two owner-supplied instruction exports and their existing skill names.
