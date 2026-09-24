@@ -2,6 +2,7 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/env";
 import { SITE_URL } from "@/lib/config/site";
+import { localeCookieDomain } from "@/lib/i18n/cookie-domain";
 import {
   LOCALE_COOKIE,
   LOCALE_HEADER,
@@ -66,7 +67,20 @@ function resolveLanguageRouting(request: NextRequest): NextResponse | null {
     headers.set(LOCALE_HEADER, "en");
     headers.set(PATH_HEADER, path);
 
-    return NextResponse.rewrite(target, { request: { headers } });
+    const response = NextResponse.rewrite(target, { request: { headers } });
+    // A direct English URL (including Stripe's return URL) also chooses the
+    // language for the single-address authenticated pages it links to.
+    // Otherwise /en/payment/success -> /onboarding falls back to Russian
+    // unless the visitor happened to press the language switch first.
+    const domain = localeCookieDomain(request.nextUrl.host);
+    response.cookies.set(LOCALE_COOKIE, "en", {
+      path: "/",
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: "lax",
+      secure: request.nextUrl.protocol === "https:",
+      ...(domain ? { domain } : {})
+    });
+    return response;
   }
 
   const chosen = request.cookies.get(LOCALE_COOKIE)?.value;
