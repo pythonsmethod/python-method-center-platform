@@ -2,12 +2,14 @@ import { aiFetch } from "@/lib/security/ai-transport";
 import type { AssistantResult, ChatMessage } from "./claude";
 import { ARCHIVE_RULE, availableConversationTools, executeConversationArchiveTool } from "./conversation-archive";
 import { isExplicitPolicyError, providerPolicyRefusal } from "./policy-refusal";
+import { assistantToolRoundLimit } from "./live-context";
 
 type Output = { type: string; call_id?: string; name?: string; arguments?: string; content?: { type: string; text?: string }[]; [key: string]: unknown };
 // Responses supports native tools together with reasoning. Store remains false;
 // the application's archive, not a provider conversation ID, is authoritative.
 export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string; model: string; system: string; messages: ChatMessage[]; maxTokens: number; reasoningEffort?: "high" }): Promise<AssistantResult> {
   const input: Record<string, unknown>[] = [{ role: "system", content: `${config.system}\n${ARCHIVE_RULE}` }, ...config.messages.map(message => ({ ...message }))];
+  const roundLimit = assistantToolRoundLimit();
   let toolRounds = 0, continued = false, reply = "";
   try {
     for (;;) {
@@ -16,7 +18,7 @@ export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string
         body: JSON.stringify({ model: config.model, store: false, input,
           include: ["reasoning.encrypted_content"], max_output_tokens: config.maxTokens,
           ...(config.reasoningEffort ? { reasoning: { effort: config.reasoningEffort } } : {}),
-          tools: availableConversationTools().map(tool => ({ ...tool, strict: false })), tool_choice: toolRounds < 4 && !continued ? "auto" : "none" })
+          tools: availableConversationTools().map(tool => ({ ...tool, strict: false })), tool_choice: toolRounds < roundLimit && !continued ? "auto" : "none" })
       });
       if (!response.ok) {
         if (await isExplicitPolicyError(response)) return providerPolicyRefusal();
@@ -29,7 +31,7 @@ export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string
       const calls = output.filter(item => item.type === "function_call");
       input.push(...output);
       if (calls.length) {
-        if (toolRounds >= 4 || continued || calls.length > 3) throw new Error("tool budget");
+        if (toolRounds >= roundLimit || continued || calls.length > 3) throw new Error("tool budget");
         toolRounds++;
         for (const call of calls) {
           let result: unknown;
@@ -39,6 +41,7 @@ export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string
           } catch { result = { status: "invalid" }; }
           input.push({ type: "function_call_output", call_id: call.call_id, output: JSON.stringify(result) });
         }
+        if (toolRounds === roundLimit) input.push({ role: "system", content: "The tool budget for this turn is exhausted. Answer only from retrieved sources; state incomplete coverage explicitly. Do not claim all records were searched, and do not invent further results." });
         continue;
       }
       const text = output.flatMap(item => item.content ?? []).filter(part => part.type === "output_text").map(part => part.text ?? "").join("\n").trim();

@@ -1,17 +1,35 @@
-export type CaseSubjectSource = {
-  profiles?: { full_name?: string | null } | null;
-  care_recipients?: Array<{ full_name?: string | null; birth_date?: string | null; relationship_to_client?: string | null; client_role_for_recipient?: string | null; reason_for_representation?: string | null; is_current?: boolean }> | null;
+export type CareRecipientSubject = {
+  full_name?: string | null;
+  birth_date?: string | null;
+  relationship_to_client?: string | null;
+  client_role_for_recipient?: string | null;
+  reason_for_representation?: string | null;
+  is_current?: boolean;
 };
 
+export type CaseSubjectSource = {
+  profiles?: { full_name?: string | null } | null;
+  // A UNIQUE case_id relationship can be embedded as one object by PostgREST.
+  // Older queries and fixtures return arrays. Normalize both at this boundary.
+  care_recipients?: CareRecipientSubject | CareRecipientSubject[] | null;
+};
+
+function text(value: unknown): string | null {
+  return typeof value === "string" ? value.trim() || null : null;
+}
+
 export function resolveCaseSubject(source: CaseSubjectSource) {
-  const patient = source.care_recipients?.find((item) => item.is_current !== false);
-  if (patient?.full_name?.trim()) return {
+  const relation = source.care_recipients;
+  const recipients = Array.isArray(relation) ? relation : relation ? [relation] : [];
+  const patient = recipients.find((item) => item && typeof item === "object" && item.is_current !== false);
+  const fullName = text(patient?.full_name);
+  if (patient && fullName) return {
     kind: "care_recipient" as const,
-    fullName: patient.full_name.trim(),
-    birthDate: patient.birth_date ?? null,
-    relationshipToClient: patient.relationship_to_client?.trim() || null,
-    clientRoleForRecipient: patient.client_role_for_recipient?.trim() || null,
-    representationReason: patient.reason_for_representation?.trim() || null
+    fullName,
+    birthDate: text(patient.birth_date),
+    relationshipToClient: text(patient.relationship_to_client),
+    clientRoleForRecipient: text(patient.client_role_for_recipient),
+    representationReason: text(patient.reason_for_representation)
   };
-  return { kind: "account_owner" as const, fullName: source.profiles?.full_name?.trim() || null, birthDate: null, relationshipToClient: null, clientRoleForRecipient: null, representationReason: null };
+  return { kind: "account_owner" as const, fullName: text(source.profiles?.full_name), birthDate: null, relationshipToClient: null, clientRoleForRecipient: null, representationReason: null };
 }
