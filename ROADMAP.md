@@ -1,5 +1,7 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+2026-09-23 questionnaire recovery: release candidate implemented. Next gate: full automated verification, isolated preview, authenticated RU/EN validation-error retention and saved-submission prefill, then production publication if clean.
+
 ## NEXORA capability ownership and migration — 2026-09-23
 
 Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future
