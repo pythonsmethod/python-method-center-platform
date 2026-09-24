@@ -36,8 +36,13 @@ The Preview also exposed a staging/production lifecycle-schema difference:
 staging has removed retired `from_status` and `to_status` fields while
 production retains nullable archived fields. Common Case history reads and
 new event writes now omit those fields, without deleting or migrating archived
-rows. A fresh no-Case paid webhook on this revision and publication gates
-remain pending. Production publication remains NO-GO.
+rows. Preview `dpl_96BXibANiutHozREbMCpdLBrkL9X` is READY: the same
+account page now shows “No events yet” instead of a database error, with
+the payment, paid-through date and Portal button intact. RU → EN switching
+on that private route preserves the route and localizes both states. The
+final full local run passed 2,083 tests with one existing skip; TypeScript,
+ESLint, security check and diff check pass. A fresh no-Case paid webhook on
+this revision and publication gates remain pending. Production is NO-GO.
 
 ## Personal Support billing launch — 2026-09-24 — RELEASE HOLD
 

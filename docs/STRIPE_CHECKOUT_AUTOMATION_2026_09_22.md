@@ -13,8 +13,10 @@ questionnaire stays English without a separate language-switch click.
 The same browser run found the Case history query selecting retired
 classification columns absent from staging. Both client/staff reads and new
 lifecycle writes now use the shared active columns; no archived production
-event or schema was changed. The corrected history still requires a READY
-Preview check. A fresh paid no-Case webhook on the new revision remains open;
+event or schema was changed. READY Preview
+`dpl_96BXibANiutHozREbMCpdLBrkL9X` shows an empty history rather than a
+database error, while the payment, paid-through date and Portal entry point
+remain visible in RU and EN. A fresh paid no-Case webhook remains open;
 the repaired payment alone does not prove it. Production remains HOLD.
 
 ## Pre-onboarding paid fulfillment — 2026-09-24

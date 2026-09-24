@@ -4,7 +4,7 @@
 
 The staging Case lifecycle table has no retired `from_status` / `to_status`
 columns; production retains them only as nullable historical fields. New
-payment and service-period events write only active columns, and client/staff
+Case lifecycle events write only active columns, and client/staff
 history queries select only fields common to both environments. Archived
 classification rows remain untouched and `status_changed` remains withheld
 from user-facing activity. Do not restore a Case processing status to make a

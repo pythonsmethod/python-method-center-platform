@@ -14,7 +14,8 @@
       repaired synthetic Case, access, delivery and EN paid return. Preserve
       EN through the single-address questionnaire and remove a lifecycle
       history query that assumed retired columns still existed in staging.
-- [ ] Verify the corrected Case history section on the next READY Preview.
+- [x] Verify the corrected Case history section on a READY Preview: no raw
+      database error; RU → EN private-route copy and paid entitlement persist.
 - [ ] Verify a fresh no-Case Sandbox purchase through the new webhook revision.
 - [ ] Finish remaining release gates before enabling Production Checkout.
 
