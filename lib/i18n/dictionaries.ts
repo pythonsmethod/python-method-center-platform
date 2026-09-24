@@ -106,8 +106,6 @@ const ru = {
       saving: "Сохраняю…"
     },
     supportForm: {
-      subject: "Тема",
-      subjectPlaceholder: "Например: вопрос по документам",
       message: "Сообщение",
       messagePlaceholder: "Опишите вопрос — команда ответит в кабинете.",
       submit: "Отправить сообщение",
@@ -643,6 +641,7 @@ const ru = {
     "/payment": "Тарифы",
     "/support": "Поддержка",
     signup: "Регистрация",
+    logout: "Выйти",
     sections: "Разделы сайта"
   } as Record<string, string>,
   footer: {
@@ -1119,11 +1118,6 @@ const ru = {
     formName: "Имя и фамилия (обязательно)",
     formEmail: "Email для ответа",
     formPhone: "Телефон для связи (обязательно)",
-    formCategory: "Тема обращения",
-    catLogin: "Не получается войти в аккаунт",
-    catPayment: "Вопрос по оплате",
-    catTechnical: "Техническая проблема",
-    catOther: "Другой вопрос",
     formMessage: "Опишите вопрос",
     formConsent:
       "Соглашаюсь на обработку указанных имени, телефона и email для ответа на моё обращение",
@@ -1296,8 +1290,6 @@ const en: typeof ru = {
       saving: "Saving…"
     },
     supportForm: {
-      subject: "Subject",
-      subjectPlaceholder: "For example: a question about my documents",
       message: "Message",
       messagePlaceholder: "Describe your question — the team will reply in your cabinet.",
       submit: "Send message",
@@ -1822,6 +1814,7 @@ const en: typeof ru = {
     "/payment": "Plans",
     "/support": "Help",
     signup: "Sign up",
+    logout: "Sign out",
     sections: "Site sections"
   },
   footer: {
@@ -2253,11 +2246,6 @@ const en: typeof ru = {
     formName: "First and last name (required)",
     formEmail: "Email for our reply",
     formPhone: "Contact phone (required)",
-    formCategory: "Topic",
-    catLogin: "Can't sign in to my account",
-    catPayment: "Payment question",
-    catTechnical: "Technical problem",
-    catOther: "Other question",
     formMessage: "Describe your question",
     formConsent:
       "I agree to the processing of the provided name, phone number and email address for the purpose of replying to my request",

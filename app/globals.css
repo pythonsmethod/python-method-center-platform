@@ -5856,6 +5856,26 @@ code {
   border-color: var(--accent);
 }
 
+/* "Выйти" is a button in a form, styled as the sign-in door it replaces. */
+form.site-nav__auth {
+  align-items: stretch;
+  display: flex;
+  grid-column: auto;
+  margin: 0;
+  width: auto;
+}
+
+.site-nav__logout {
+  align-items: center;
+  background: transparent;
+  cursor: pointer;
+  display: flex;
+  flex: 1 1 auto;
+  font-family: inherit;
+  justify-content: center;
+  line-height: inherit;
+}
+
 .site-nav__signup {
   background: linear-gradient(135deg, var(--accent), var(--accent-strong));
   border: 1px solid transparent;
@@ -7563,6 +7583,9 @@ body.cabinet-menu-open { overflow: hidden; }
 .web-cab__top-actions .lang-switch__btn--on { background:rgba(216,168,65,.14); color:var(--wc-bright); }
 .web-cab__token { border:1px solid var(--wc-line); border-radius:99px; color:var(--wc-bright); gap:5px; height:38px; padding:0 12px; }
 .web-cab__token svg { height:20px; width:20px; }
+.web-cab__logout { margin:0; }
+.web-cab__logout button { background:transparent; border:1px solid var(--wc-line); border-radius:99px; color:var(--wc-bright); cursor:pointer; font-size:.72rem; font-weight:700; height:38px; padding:0 14px; white-space:nowrap; }
+.web-cab__logout button:hover { border-color:var(--wc-gold); }
 .web-cab__account { color:var(--wc-text); gap:8px; }
 .client-avatar { align-items:center; background:#0b0d0b center/cover no-repeat; border:1px solid var(--wc-gold, var(--accent)); border-radius:50%; color:var(--wc-bright, var(--accent-strong)); display:inline-flex; flex:0 0 auto; font-weight:700; justify-content:center; overflow:hidden; }
 .staff-case-client,.staff-case-profile-heading { align-items:center; display:flex; gap:10px; }
