@@ -22,8 +22,12 @@ describe("sign-out in the top bar", () => {
     expect(dict).toContain('logout: "Sign out",\n    sections: "Site sections"');
   });
 
-  it("is in the client cabinet top bar too", () => {
+  it("is in the client cabinet top bar too, and fits on a phone", () => {
     expect(cabinet).toContain('className="web-cab__logout"');
+    const css = read("app", "globals.css");
+    // On a phone the words in the bar give way so the button stays on screen.
+    expect(css).toContain(".web-cab__mobile-brand span,.web-cab__menu-label { display:none; }");
+    expect(css).toMatch(/@media \(max-width:430px\) \{\n[^}]*\.web-cab__token \{ display:none; \}/);
   });
 });
 
@@ -32,6 +36,9 @@ describe("support forms without a topic", () => {
     const form = read("components", "support", "PublicSupportForm.tsx");
     expect(form).not.toContain('name="category"');
     expect(read("lib", "support", "validation.ts")).not.toContain("category");
+    const dict = read("lib", "i18n", "dictionaries.ts");
+    expect(dict).not.toContain("выбрав тему");
+    expect(dict).not.toContain("Payment question” topic");
   });
 
   it("does not ask a signed-in client for a subject", () => {

@@ -1129,7 +1129,7 @@ const ru = {
     helpLoginCta: "Восстановить пароль",
     helpPaymentTitle: "Оплатили, но оплата не видна?",
     helpPaymentText:
-      "Оплата появляется в кабинете автоматически в течение нескольких минут. Если её нет через 10 минут — напишите через форму, выбрав тему «Вопрос по оплате», и укажите email, с которым платили.",
+      "Оплата появляется в кабинете автоматически в течение нескольких минут. Если её нет через 10 минут — напишите через форму выше и укажите email, с которым платили.",
     loginCta: "Войти в аккаунт"
   },
   login: {
@@ -2257,7 +2257,7 @@ const en: typeof ru = {
     helpLoginCta: "Reset password",
     helpPaymentTitle: "Paid, but the payment isn't visible?",
     helpPaymentText:
-      "Payments appear in your account automatically within a few minutes. If it's not there after 10 minutes — write via the form, choosing the “Payment question” topic, and mention the email you paid with.",
+      "Payments appear in your account automatically within a few minutes. If it's not there after 10 minutes — write via the form above and mention the email you paid with.",
     loginCta: "Sign in"
   },
   login: {
