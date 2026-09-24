@@ -9,7 +9,8 @@
 - [x] Separate Karen approval and linked, idempotent client publication.
 - [x] Bounded local regression and isolated synthetic staging SQL with rollback.
 - [x] Staging private source bucket and restrictive ownership/no-overwrite policies.
-- [ ] Verify automatic deployment of the corrected exact branch to isolated PMC preview; incompatible five-minute cron removed, direct Vercel deployment access unavailable.
+- [x] Verify automatic preview build of corrected commit `f0aa757`; Vercel `dpl_EAifp1MPctLApepC5463JgitHybB` READY in main website project, without production release.
+- [ ] Deploy the same code to the dedicated isolated PMC staging; its current deployment remains old `b0503cbb`. Direct deployment connector unavailable; browser fallback requires owner permission.
 - [ ] Actual provider and legitimate Karen/client RU/EN acceptance on preview.
 - [ ] Establish permitted release-CI scope without the excluded Case; assess production.
 

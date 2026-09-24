@@ -8,6 +8,8 @@ Only isolated staging changes. Old Case and real-data replays stay excluded. Pre
 
 The current Vercel Hobby plan rejects sub-daily cron schedules. Keep the existing daily fallback and resume the authenticated owner's pending queue on cabinet entry/upload/visibility return, retrying once a minute while open. Background recovery while the cabinet is closed is daily; do not promise five-minute unattended processing or change billing.
 
+Automatic preview of corrected commit `f0aa757` is READY in the main website project. This does not prove isolated database wiring or the role workflow. The dedicated clinical-staging deployment is still old; require exact-code isolated deployment and legitimate roles before the synthetic upload/provider/approval/publication acceptance. Do not work around this by testing against production or by impersonating Karen.
+
 ## NEXORA-2026-09-24-01 — Strengthen existing document and laboratory instructions
 
 Reuse the two owner-supplied instruction exports and their existing skill names.
