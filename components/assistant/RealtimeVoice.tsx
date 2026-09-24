@@ -13,8 +13,8 @@ import { voiceCopy, voiceErrorMessage, type VoiceState } from "@/lib/assistant/r
 import type { VoiceExchange, VoiceTranscript } from "@/lib/assistant/realtime-turns";
 import type { Locale } from "@/lib/i18n/locale";
 
-type Props = { locale: Locale; scope: "client" | "staff"; caseId?: string; disabled?: boolean; onActive: (active: boolean) => void; onExchange?: (pair: VoiceExchange) => void; onTranscript?: (text: VoiceTranscript, sessionId: string) => void; onBackgroundTask?: (exchangeId: string, active: boolean) => void };
-export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExchange, onTranscript, onBackgroundTask }: Props) {
+type Props = { locale: Locale; scope: "client" | "staff"; caseId?: string; disabled?: boolean; thinking?: boolean; onActive: (active: boolean) => void; onExchange?: (pair: VoiceExchange) => void; onTranscript?: (text: VoiceTranscript, sessionId: string) => void; onBackgroundTask?: (exchangeId: string, active: boolean) => void };
+export function RealtimeVoice({ locale, scope, caseId, disabled, thinking = false, onActive, onExchange, onTranscript, onBackgroundTask }: Props) {
   const copy = voiceCopy[locale];
   const descriptionId = useId();
   const dialogRef = useRef<HTMLDialogElement | null>(null);
@@ -38,6 +38,7 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
   const epoch = useRef(0);
   useEffect(() => { callbacks.current = { onActive, onExchange, onTranscript, onBackgroundTask }; }, [onActive, onExchange, onTranscript, onBackgroundTask]);
   const active = !["idle", "ended", "error", "paused"].includes(state);
+  const preparingReply = ["thinking", "reading", "searching"].includes(state);
   useEffect(() => {
     if (!open) return;
     const dialog = dialogRef.current;
@@ -130,7 +131,7 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
     <button className="assistant-voice-launcher" type="button" aria-label={copy.start} title={copy.start}
       aria-haspopup="dialog" aria-expanded={open} disabled={(disabled && !active) || choice.loading || choice.unavailable}
       onClick={() => { setOpen(true); if (!choice.live) start(); }}>
-      <AnhamAvatar size={44} />
+      <AnhamAvatar size={44} activity={thinking || preparingReply ? "thinking" : "idle"} />
       {saving === "saveError" ? <span className="assistant-voice-launcher__notice" aria-label={copy.saveError}>!</span> : null}
     </button>
     {open ? createPortal(<dialog className="anham-call" ref={dialogRef} aria-labelledby={`${descriptionId}-title`}
@@ -145,7 +146,7 @@ export function RealtimeVoice({ locale, scope, caseId, disabled, onActive, onExc
           <button className="anham-call__close" type="button" aria-label={copy.close} title={copy.close} onClick={close}>×</button>
         </header>
         {choosing ? <VoicePicker locale={locale} scope={scope} caseId={caseId} voices={choice.voices} selected={choice.selected} onChange={choice.choose} onBusy={setPreviewBusy} /> : <><div className="anham-call__stage">
-          <div className="anham-call__portrait" aria-hidden="true"><AnhamAvatar size={280} /></div>
+          <div className="anham-call__portrait" aria-hidden="true"><AnhamAvatar size={280} activity={preparingReply ? "thinking" : "idle"} /></div>
           <p className="anham-call__state" role="status">{copy[state]}</p>
           <span className="anham-call__waves" aria-hidden="true"><i /><i /><i /><i /><i /></span>
         </div>

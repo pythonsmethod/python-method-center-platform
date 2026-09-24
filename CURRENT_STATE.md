@@ -1,4 +1,4 @@
-# CURRENT_STATE.md — ANKH ANALYSIS SYSTEM
+# CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
 ## Personal Support billing launch — 2026-09-22 — RELEASE HOLD
 
@@ -11,6 +11,55 @@ existing skip, and TypeScript, ESLint, security checks and production build
 pass. Sandbox hosted-page/schedule/Portal acceptance, isolated Preview runtime,
 Live Stripe permissions, Live catalog/webhook events and production publication
 remain open. Commercial launch is still NO-GO.
+
+## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
+
+Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.
+Document analysis is a NEXORA capability. ANHAM is the AI system within PMC
+and consumes the core through application authorization and domain adapters.
+External technology commercialization belongs to NEXORA / NEXORA API.
+ANKH is retired as a standalone system/product name.
+
+Canonical direction: [NEXORA MASTER ARCHITECTURE](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
+ANHAM is scoped by [its PMC application profile](docs/architecture/ANHAM_PMC_APPLICATION_ARCHITECTURE.md).
+
+This increment changes architecture and working documentation. It does not
+establish a separate deployed core, connect a new runtime, enable public API sales,
+migrate schemas, or change providers or clinical trust. Existing implementation
+remains in PMC. Phase 2.9 remains IN PROGRESS; production auto-verification and
+Phase 3 production remain NO-GO. Historical ANKH names below identify their
+original evidence and compatible technical paths, not another active system.
+
+Next: NX-01 ownership/dependency inventory, then NX-02 capability contract and PMC
+adapter, alongside existing PMC acceptance and the unchanged quality gates.
+
+
+## Mobile site aligned with the desktop site — 2026-09-22 — PUBLISHED
+
+Phones and touch-first devices now get the same site as a wide screen instead
+of a reduced variant. The public header keeps its full row of sections, the
+guest sign-in and sign-up doors and the language switch at every width (the
+separate bottom dock and the header account chip are removed). The homepage
+journey is the same six numbered cards with their explanations on every
+screen; the phone-only ring of step titles without text is removed, and the
+retained app promotion block stays on narrow screens. The team workspace on a
+phone keeps the site header with the language switch, the footer, the top
+navigation row including the founder overview link, and one bilingual home
+page with the session panel, today's queue, the assistant and the knowledge
+base. Client cards in the staff list now carry the contacts and creation date
+the table shows. The client cabinet keeps sign-out in the narrow sidebar and
+the token balance in the phone top bar. No schema, data, payment or PHI
+change. Validation: typecheck, ESLint and the full test suite pass; production
+build passes; phone and tablet screenshots of the public pages reviewed
+locally in RU and EN with no horizontal overflow.
+PR #219 merged as `08195bb3feaf09e037d9586e7c996d2e5ce5c0b1`; the Vercel
+production deployment of `python-method-center-platform` reached READY and is
+aliased to pythonmethodcenter.com. The production homepage serves the full
+header with sign-in, sign-up and the language switch, the six journey cards
+with text and no bottom dock; `/cabinet` sends a guest to `/login`; Vercel
+reported no runtime errors in the first hour. The `main` branch protection now
+requires the `Vercel` status, the name Vercel reports since only one project is
+linked to the repository.
 
 ## Anham message reactions v1 — 2026-09-19 — PUBLISHED
 
@@ -1305,3 +1354,14 @@ No Live Stripe settings, production environment variables, main branch or
 public offers were changed. The trial-wording and payment acceptance gates
 remain open. The site has NOT launched the new model. Exact readiness evidence:
 `docs/validation/stripe-production-readiness-2026-09-22.json`.
+
+## 2026-09-23 — Anham prepares replies with a tablet
+
+The existing avatar has a tablet-reading animation driven by text pending,
+delegated background replies and voice thinking/reading/searching activity.
+Localized status and reduced-motion support accompany the existing artwork.
+Local synthetic browser checks cover small screens, RU/EN, success/error and
+voice speaking/close transitions. No API, role, schema or clinical change.
+Implementation, exact checks, release boundary and rollback are recorded in
+`docs/design/ANHAM_TABLET_ACTIVITY.md`. This is not evidence of a clinical phase
+closure or signed-in production acceptance.

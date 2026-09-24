@@ -2,7 +2,6 @@ import { Link } from "@/components/LocaleLink";
 import { notFound } from "next/navigation";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
-import { LogoutButton } from "@/components/LogoutButton";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
 import { getStaffUnreadCounts } from "@/lib/messages/queries";
 import { getDeliveryAttentionCounts } from "@/lib/delivery/queries";
@@ -40,9 +39,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         requests: "Обращения",
         delivery: "Доставки",
         founder: "Обзор",
-        costs: "Расходы",
-        home: "На главную сайта",
-        logout: "Выйти"
+        costs: "Расходы"
       }
     : {
         workspace: "Team workspace",
@@ -56,9 +53,7 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
         requests: "Requests",
         delivery: "Deliveries",
         founder: "Overview",
-        costs: "Costs",
-        home: "Website home",
-        logout: "Sign out"
+        costs: "Costs"
       };
 
   const privateAssistantRole = auth.status === "authorized"
@@ -113,12 +108,6 @@ export default async function AdminLayout({ children }: AdminLayoutProps) {
 
   return (
     <>
-      {auth.status === "authorized" ? (
-        <div className="admin-mobile-utility" aria-label={labels.workspace}>
-          <Link href="/">← {labels.home}</Link>
-          <LogoutButton label={labels.logout} />
-        </div>
-      ) : null}
       <div className="admin-nav">
         <span className="admin-nav__label">{labels.workspace}</span>
         <nav aria-label={labels.navigation}>
