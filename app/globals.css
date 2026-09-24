@@ -7651,7 +7651,12 @@ body.cabinet-menu-open { overflow: hidden; }
   .web-cab__token { font-size:.8rem; height:34px; padding:0 9px; }
   .web-cab__token svg { height:17px; width:17px; }
   .web-cab__top-actions { gap:8px; }
-  .web-cab__mobile-brand span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  /* The phone top bar holds the menu, the site sign, the language switch,
+     the token balance, the profile and "Выйти". The words give way first so
+     every control stays on screen. */
+  .web-cab__mobile-brand { min-width:0; }
+  .web-cab__mobile-brand span,.web-cab__menu-label { display:none; }
+  .web-cab__top-actions { flex:0 0 auto; margin-left:auto; }
   .web-cab__sidebar-foot a,.web-cab__sidebar-foot button { font-size:.72rem; padding:9px; text-align:left; }
   .web-cab__menu { align-items:center; background:transparent; border:0; color:var(--wc-bright); cursor:pointer; display:flex; gap:8px; min-height:44px; padding:8px; }
   .web-cab__menu-icon { display:grid; gap:5px; }
@@ -7666,6 +7671,13 @@ body.cabinet-menu-open { overflow: hidden; }
   .contact-card__primary,.contact-card__anham-button { margin-top:22px; }
   .case-shortcut,.web-app-promo { align-items:start; grid-template-columns:auto 1fr; padding:16px; }
   .case-shortcut>span:last-child,.web-app-promo a { grid-column:2; width:max-content; }
+}
+@media (max-width:430px) {
+  /* The balance is one tap away in the menu ("Токены"); the way out is not. */
+  .web-cab__token { display:none; }
+  .web-cab__topbar { gap:6px; padding-inline:10px; }
+  .web-cab__top-actions { gap:6px; }
+  .web-cab__logout button { padding:0 11px; }
 }
 @media (prefers-reduced-motion:reduce) { .web-cab * { transition:none!important; } }
 /* Professor Python explicitly approves each durable memory after a reply. */
