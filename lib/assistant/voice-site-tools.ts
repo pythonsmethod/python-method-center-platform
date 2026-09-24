@@ -1,3 +1,4 @@
+import { DOCUMENT_EVIDENCE_TOOL, readCaseDocumentEvidence } from "./document-evidence-tool";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { VoiceFailure, type VoiceActor } from "./realtime-server";
 import { isUuid } from "@/lib/utils/uuid";
@@ -18,6 +19,7 @@ export function voiceSiteTools(scope: VoiceActor["scope"], actor?: VoiceActor) {
   return [
     ...CONVERSATION_ARCHIVE_TOOLS,
     { type: "function", name: "ask_text_assistant", description: "Use the same private text assistant for reasoning, methodology, archive memory and explicit remember/save commands. The server uses the actual user transcript, not model-written instructions. Call once per turn and speak the returned reply accurately.", parameters: { type: "object", properties: {}, additionalProperties: false } },
+    DOCUMENT_EVIDENCE_TOOL,
     ...STAFF_DATA_TOOLS,
     ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : []),
     { type: "function", name: "registration_counts", description: "Read exact total currently registered client accounts and new registrations today from the site. Excludes staff accounts. Always use this for registration numbers.", parameters: { type: "object", properties: {}, additionalProperties: false } },
@@ -53,6 +55,7 @@ export function voiceToday(timeZone: string, now = new Date()) {
 type Incoming = { id: string; profile_id: string | null; body: string | null; created_at: string; case_id?: string; support_request_id?: string };
 export async function runVoiceSiteTool(actor: VoiceActor, name: unknown, args: unknown, timeZone: string, now = new Date(), locale: Locale = "ru") {
   if (actor.scope !== "founder" && actor.scope !== "karen") throw new VoiceFailure("forbidden", 403);
+  if (name === DOCUMENT_EVIDENCE_TOOL.name) return readCaseDocumentEvidence({ profileId: actor.profileId, private: true, caseId: actor.caseId }, args, "voice");
   if (typeof name === "string" && STAFF_DATA_TOOLS.some(t => t.name === name)) {
     return { ...await runStaffDataTool(actor, name, args, locale, now), ...voiceToday(timeZone, now) };
   }

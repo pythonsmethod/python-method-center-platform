@@ -1,3 +1,4 @@
+import { DOCUMENT_EVIDENCE_TOOL, readCaseDocumentEvidence } from "./document-evidence-tool";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { currentLiveContext } from "./live-context";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -23,7 +24,7 @@ export function availableConversationTools() {
   if (live) return live.tools;
   const scope = conversationArchiveScope();
   if (!scope?.private && scope?.clientTools && isClientVoicePilot(scope.clientTools.email)) return [...CONVERSATION_ARCHIVE_TOOLS, CLIENT_CASE_TOOL, ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : [])];
-  return CONVERSATION_ARCHIVE_TOOLS;
+  return scope?.private && scope.caseId ? [...CONVERSATION_ARCHIVE_TOOLS, DOCUMENT_EVIDENCE_TOOL] : CONVERSATION_ARCHIVE_TOOLS;
 }
 const PAGE = 20, CHUNK = 8000;
 const columns = "id,case_id,role,content,created_at,message_sequence,source,voice_state,locale";
@@ -91,5 +92,6 @@ export async function executeConversationArchiveTool(name: unknown, args: unknow
       return { status: "ready", ...result.webResult, instruction: "Cite these returned public URLs in your answer. Search is public evidence, not verified Case evidence. Do not claim other actions." };
     } catch { return { status: "unavailable", instruction: "Lookup failed. Say so; do not invent results." }; }
   }
+  if (scope && name === DOCUMENT_EVIDENCE_TOOL.name) return readCaseDocumentEvidence(scope, args, "text");
   return scope ? runConversationArchiveTool(scope, name, args) : { status: "forbidden" };
 }

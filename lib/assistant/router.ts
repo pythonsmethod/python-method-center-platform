@@ -57,10 +57,11 @@ export async function askAssistantWithAttachments(
   system: string,
   messages: ChatMessage[],
   maxTokens: number,
-  attachments: ChatAttachment[]
+  attachments: ChatAttachment[],
+  options: { timeoutMs?: number; allowContinuation?: boolean } = {}
 ): Promise<AssistantResult> {
   if (!hasClaudeEnv()) return { status: "unavailable" };
-  return askClaude(system, messages, maxTokens, attachments);
+  return askClaude(system, messages, maxTokens, attachments, options);
 }
 
 async function askWithFallback(

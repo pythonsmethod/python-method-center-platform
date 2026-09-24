@@ -1,0 +1,103 @@
+{
+  "contract_version": "lab-analysis/2",
+  "comparison_id": "synthetic:comparison1",
+  "case_id": "synthetic:case1",
+  "subject_id": "synthetic:subject1",
+  "left": {
+    "finding_id": "synthetic:f1",
+    "source_version": "synthetic:source-v1",
+    "snapshot_id": "synthetic:snapshot1",
+    "event_date_kind": "collection",
+    "event_date": "2026-09-01",
+    "result_kind": "EXACT",
+    "exact_decimal": "10.1",
+    "unit": "mg/L",
+    "trust_state": "NEEDS_REVIEW",
+    "decision_id": null,
+    "decision_finding_id": null,
+    "decision_snapshot_id": null,
+    "decision_source_version": null,
+    "decision_shadow_only": true,
+    "excluded": false,
+    "exclusion_reasons": []
+  },
+  "right": {
+    "finding_id": "synthetic:f2",
+    "source_version": "synthetic:source-v1",
+    "snapshot_id": "synthetic:snapshot1",
+    "event_date_kind": "collection",
+    "event_date": "2026-09-10",
+    "result_kind": "EXACT",
+    "exact_decimal": "10.2",
+    "unit": "mg/L",
+    "trust_state": "NEEDS_REVIEW",
+    "decision_id": null,
+    "decision_finding_id": null,
+    "decision_snapshot_id": null,
+    "decision_source_version": null,
+    "decision_shadow_only": true,
+    "excluded": false,
+    "exclusion_reasons": []
+  },
+  "compatibility": {
+    "analyte": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "units": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "specimen": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "method": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "anatomy_laterality": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "date_kind": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "temporal_order": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "result_kind": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "provenance": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    },
+    "version": {
+      "state": "COMPATIBLE",
+      "reason": null,
+      "rule_id": null
+    }
+  },
+  "trust_eligible": false,
+  "rule": null,
+  "result": "POTENTIAL_CHANGE",
+  "reason_codes": [
+    "REVIEW_ONLY_EVIDENCE"
+  ],
+  "contradictions": [],
+  "delta": "0.1",
+  "relative_delta": null
+}

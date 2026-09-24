@@ -1,5 +1,43 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## PMC document chain — current owner priority, 2026-09-24
+
+- [x] Literal-data repair and source-bound review inside PMC; no NEXORA transition.
+- [x] Atomic queue/source writes, page checkpoints and immutable source snapshots.
+- [x] Row/date/unit uncertainty and laboratory comparison context.
+- [x] Saved evidence in text/voice and synthesis with existing knowledge/history.
+- [x] Separate Karen approval and linked, idempotent client publication.
+- [x] Bounded local regression and isolated synthetic staging SQL with rollback.
+- [x] Staging private source bucket and restrictive ownership/no-overwrite policies.
+- [ ] Deploy exact branch to isolated PMC preview; current Vercel access is blocked.
+- [ ] Actual provider and legitimate Karen/client RU/EN acceptance on preview.
+- [ ] Establish permitted release-CI scope without the excluded Case; assess production.
+
+[Implementation record](docs/ankh/pmc_document_chain_2026_09_24.md). Historical tasks below do not override this order or exclusions.
+
+## Document and laboratory instruction strengthening — 2026-09-24
+
+- [x] Strengthen the two supplied instruction bodies and define v2 result contracts.
+- [x] Add local contract checks and 55 tests on new synthetic fixtures only.
+- [ ] Read the existing Case assembler and verify all actual dependency bindings.
+- [ ] Implement validated field/history mapping and persistence/readback in the adapter.
+- [ ] Accept a new authorized document in isolated staging under a legitimate Karen role.
+
+No production activation or client response is part of this package task.
+The owner-excluded old Case 2.9 must not be resumed by historical items below.
+Record: [skill revision](docs/ankh/document_lab_skills_strengthening_2026_09_24.md).
+
+## Current owner scope — eleven-step chain / data integrity — 2026-09-23
+
+The old Case 2.9 is explicitly excluded. Earlier roadmap proposals to continue
+it are historical and must not drive this task.
+
+- [x] NX-03.2: Preserve units, alternate readings and review reasons; reject ambiguous date normalization. Local related regression 102/102 and synthetic benchmark 1/1; typecheck/lint passed.
+- [ ] Review the narrow branch and accept the two synthetic scenarios in a legitimately authenticated, isolated Karen environment; production publication is not done.
+- [ ] Next separate increment: make original-file persistence → queue handoff reliable.
+
+Evidence: [document data integrity](docs/ankh/document_data_integrity_2026_09_23.md).
+
 ## NEXORA capability ownership and migration — 2026-09-23
 
 Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future

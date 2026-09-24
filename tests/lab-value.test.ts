@@ -39,10 +39,10 @@ describe("строка бланка становится записью факт
     const record = buildLabValue(rows[0]);
 
     expect(record.analyte).toBe("hemoglobin");
-    expect(record.unit_resolution_method).toBe("resolved_by_reference");
-    expect(record.unit_resolved).toBe("g/L");
-    expect(record.value_canonical).toBeCloseTo(96, 6);
-    expect(record.position_in_reference).not.toBeNull();
+    expect(record.unit_resolution_method).toBe("unresolved");
+    expect(record.unit_resolved).toBeNull();
+    expect(record.value_canonical).toBeNull();
+    expect(record.position_in_reference).toBeNull();
   });
 
   it("оригинал сохраняется таким, как напечатан", () => {
@@ -100,7 +100,7 @@ describe("нераспознанное не проходит молча", () => 
     expect(needsHumanReview(buildLabValue(rows[9]))).toBe(true);
     expect(needsHumanReview(buildLabValue(rows[7]))).toBe(true);
     expect(needsHumanReview(buildLabValue(rows[8]))).toBe(true);
-    expect(needsHumanReview(buildLabValue(rows[0]))).toBe(false);
+    expect(needsHumanReview(buildLabValue(rows[0]))).toBe(true);
   });
 });
 

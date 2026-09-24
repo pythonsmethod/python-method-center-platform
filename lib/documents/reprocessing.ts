@@ -15,6 +15,7 @@ export function buildRequeueRecords(input: {
     case_id: input.caseId,
     profile_id: input.profileId,
     status: "queued",
+    progress: {},
     attempts: 0,
     available_at: input.now,
     locked_at: null,

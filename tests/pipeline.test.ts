@@ -88,16 +88,16 @@ describe("прогон целиком", () => {
     documentId: "doc-new",
     collectionDate: "2026-08-14",
     agreed: [
-      { label: "Гемоглобин", value: "9,6", reference: "12–15.5", referenceConfirmed: true },
-      { label: "MCV", value: "88 фл", reference: "80-100", referenceConfirmed: true },
-      { label: "Ферритин", value: "43 нг/мл", reference: "30-400", referenceConfirmed: true },
-      { label: "Глюкоза", value: "5,1 ммоль/л", reference: "3.9-6.1", referenceConfirmed: true },
-      { label: "Заключение", value: "Без патологии", reference: "", referenceConfirmed: true },
+      { label: "Гемоглобин", value: "9,6 г/дл", reference: "12–15.5", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "MCV", value: "88 фл", reference: "80-100", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "Ферритин", value: "43 нг/мл", reference: "30-400", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "Глюкоза", value: "5,1 ммоль/л", reference: "3.9-6.1", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "Заключение", value: "Без патологии", reference: "", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
       { label: "Онкомаркер CA 125", value: "12 Ед/мл", reference: "0-35", referenceConfirmed: true }
     ]
   };
   const priorHemoglobin = {
-    documentId: "doc-old",
+    documentId: "doc-old", comparison_context: { specimen: "synthetic serum", method: "synthetic assay" },
     analyte: "hemoglobin",
     measured_on: "2026-05-10",
     value_canonical: 118,
@@ -179,5 +179,16 @@ describe("прогон целиком", () => {
     for (const value of result.labValues) {
       expect(accounted.has(value.analyte ?? value.label_original), value.label_original).toBe(true);
     }
+  });
+});
+
+describe("source context gates", () => {
+  it("never substitutes the document header date for an explicitly unknown row date", () => {
+    const result = run({documents:[{documentId:"synthetic",collectionDate:"2026-09-24",agreed:[{label:"CRP",value:"5 mg/L",reference:"0-5",referenceConfirmed:true,collectionDate:null}]}]});
+    expect(result.labValues[0].measured_on).toBeNull();
+  });
+  it("blocks a numeric change when specimen or method is absent", () => {
+    const result = run({documents:[{documentId:"synthetic",collectionDate:"2026-09-24",agreed:[{label:"CRP",value:"10 mg/L",reference:"0-5",referenceConfirmed:true}]}],prior:[{documentId:"older",analyte:"crp",measured_on:"2026-09-01",value_canonical:1,unit_resolved:"mg/L",unit_resolution_method:"explicit",reference_low:0,reference_high:5,position_in_reference:0.2}]});
+    expect(result.trends.crp).toMatchObject({verdict:"not_comparable",reason:"MISSING_OR_DIFFERENT_SPECIMEN_METHOD",versus_previous:null});
   });
 });

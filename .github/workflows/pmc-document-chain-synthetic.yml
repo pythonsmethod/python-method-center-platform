@@ -1,0 +1,32 @@
+name: PMC document chain synthetic acceptance
+on:
+  push:
+    branches: [fix/pmc-document-chain-20260924]
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: npm ci
+      - run: npm run security:check
+      - run: npm run typecheck
+      - run: npm run lint
+      # Owner excludes the old Case and every real-data replay. This is an
+      # additional bounded workflow, not a replacement for the main release gate.
+      - run: npm run test:pmc-document-chain
+      - run: python -m unittest discover -s tests/skills -p 'test_document_lab_contracts.py'
+      - run: npm run benchmark:ankh
+        env:
+          ANKH_BENCHMARK_OUTPUT: /tmp/pmc-synthetic-benchmark.json
+      - run: npm run build
+      - run: git diff --check

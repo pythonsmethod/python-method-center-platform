@@ -1,5 +1,41 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC document chain — 2026-09-24 — CODE + ISOLATED DB; HOSTED ACCEPTANCE OPEN
+
+Owner direction: complete PMC first; do not migrate to NEXORA. Old Case 2.9 and real-data replays remain excluded. Branch `fix/pmc-document-chain-20260924` adds atomic upload/job registration, immutable source/run snapshots, resumable physical-page reads, literal row context, source-bound Karen review/approval and explicit linked publication. Text/voice share paginated saved evidence.
+
+Four migrations applied only to isolated staging `thylrayzjczsxlyqhtfc`; synthetic registration through publication passed with rollback. The private source bucket and restrictive owner/no-overwrite rules were repaired. Local acceptance: 278 app tests, 55 contract tests and 1 synthetic benchmark; typecheck/lint/security/build pass. Full historical CI is excluded.
+
+Hosted release is open: Vercel deployment connector reports tool not found; CLI is logged out. Production was not migrated/deployed. Do not call all eleven steps accepted or claim full v2 skill-runtime activation. [Exact evidence and next gate](docs/ankh/pmc_document_chain_2026_09_24.md).
+
+## Document and lab skills strengthened — 2026-09-24 — PACKAGE CANDIDATE
+
+Owner-requested revision of document-analysis and lab-analysis is reconstructed
+from the supplied DOCX instruction exports in .agents/skills/. It adds precise
+routing, source/run/fact/snapshot binding, save/readback honesty, partial coverage,
+review completeness and ordered comparison gates. Two local validators and
+55 isolated synthetic contract tests pass; no application behavior is activated.
+The original Windows packages are unavailable; original exports remain unchanged.
+Details and limits: [skill revision](docs/ankh/document_lab_skills_strengthening_2026_09_24.md).
+Old Case 2.9 is excluded by the owner's current instruction; historical tasks
+below do not authorize opening or replaying it. Runtime/hosted acceptance is open.
+
+## NX-03.2 — Document data integrity — 2026-09-23 — LOCAL IMPLEMENTATION
+
+The owner's current eleven-step audit explicitly excludes the old Case 2.9.
+Do not reopen its files, data or replay it based on historical next steps below.
+The first scoped repair retains disputed units, both readings, source IDs and
+review decisions in Karen's presentation; formatting no longer clears review.
+Ambiguous numeric dates remain null with their printed text preserved, including
+the report date. No language-based date guess, clinical trust promotion, schema
+change or production data write. These corrections are independent of draft #222.
+
+Local evidence: 38 new synthetic checks; final related regression 102/102,
+synthetic benchmark 1/1, typecheck and lint PASS. Full historical tests and the
+automatic PR workflow were not run because they include excluded real fixtures.
+Remote branch preparation is not production deployment or hosted acceptance.
+Details and exact next action: [data integrity report](docs/ankh/document_data_integrity_2026_09_23.md).
+
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
 Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.

@@ -284,9 +284,7 @@ export function DocumentUploadPanel({
       });
 
       if (metadataResult.status === "error") {
-        await supabase.storage.from(DOCUMENT_STORAGE_BUCKET).remove([
-          storagePath
-        ]);
+        // A lost server response may follow a committed registration. Keep the original.
         setState({
           status: "error",
           message: metadataResult.message
@@ -305,7 +303,14 @@ export function DocumentUploadPanel({
         status: "success",
         message: labels.uploaded
       });
-      void fetch("/api/documents/process", { method: "POST" }).catch(() => undefined);
+      void (async () => {
+        for (let page = 0; page < 300; page += 1) {
+          const response = await fetch("/api/documents/process", { method: "POST" });
+          if (!response.ok) break;
+          const result = await response.json() as { status?: string };
+          if (result.status !== "continued" && result.status !== "ready") break;
+        }
+      })().catch(() => undefined);
     });
   }
 

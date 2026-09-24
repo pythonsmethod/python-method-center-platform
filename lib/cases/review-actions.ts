@@ -1,6 +1,10 @@
 "use server";
 
+import { readAllRows } from "@/lib/documents/read-all";
 import { revalidatePath } from "next/cache";
+import { getKnowledgeForPrompt } from "@/lib/assistant/knowledge";
+import { conversationContext } from "@/lib/assistant/conversation-context";
+import { withConversationArchive } from "@/lib/assistant/conversation-archive";
 import { askClaude } from "@/lib/assistant/claude";
 import {
   CASE_REVIEW_SYSTEM_PROMPT,
@@ -17,7 +21,8 @@ import { buildCaseContext } from "@/lib/assistant/case-context";
 import { formatMachineFindings, type StoredRun } from "@/lib/analysis/findings";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { resolvePrivateAssistantRole } from "@/lib/auth/require-karen";
-import { fingerprintDocuments } from "@/lib/cases/case-documents";
+import { caseEvidenceFingerprint } from "./evidence-fingerprint";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { diffReviewText } from "@/lib/cases/review-diff";
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 import type { CaseReviewActionState } from "@/lib/cases/review-state";
@@ -28,68 +33,65 @@ function errorState(message: string): CaseReviewActionState {
   return { status: "error", message };
 }
 
-// Reads the case's own analyses and writes down what the assistant made of
-// them. Staff only, and stored where no client can reach it.
-//
-// The draft reply produced here is never sent anywhere by this action or by
-// any other. It is text on Professor Python's screen, which he copies into
-// the message box, edits, and sends himself.
+// Internal synthesis, a separate human decision, and explicit publication.
 export async function generateCaseReview(
   _previous: CaseReviewActionState,
   formData: FormData
 ): Promise<CaseReviewActionState> {
+  const locale = formData.get("locale") === "en" ? "en" : "ru";
   const auth = await getStaffUserState();
 
   if (auth.status !== "authorized") {
-    return errorState("Недостаточно прав.");
+    return errorState(locale === "en" ? "Access denied." : "Недостаточно прав.");
   }
 
   const caseId = String(formData.get("case_id") ?? "");
-  const locale = formData.get("locale") === "en" ? "en" : "ru";
 
   if (!isUuid(caseId)) {
-    return errorState("Некорректный кейс.");
+    return errorState(locale === "en" ? "Invalid case." : "Некорректный кейс.");
   }
 
   const supabase = createSupabaseServiceClient();
 
   if (!supabase) {
-    return errorState("Service role key не настроен — разбор недоступен.");
+    return errorState(locale === "en" ? "The review service is unavailable." : "Service role key не настроен — разбор недоступен.");
   }
 
+  const fingerprint = await caseEvidenceFingerprint(caseId);
   const { data: documents, error: documentsError } = await supabase
     .from("uploaded_documents")
     // metadata carries the mime type the browser reported at upload;
     // there is no mime_type column on this table.
     .select("id, original_filename, document_status, created_at")
     .eq("case_id", caseId)
+    .is("archived_at", null)
     .order("created_at", { ascending: true })
-    .limit(60);
+    .limit(1000);
 
   if (documentsError) {
     return errorState(
-      `Не удалось получить список документов кейса: ${documentsError.message}`
+      locale === "en" ? "The document list is unavailable." : "Не удалось получить список документов кейса."
     );
   }
 
   if (!documents || documents.length === 0) {
-    return errorState("В кейсе пока нет загруженных документов.");
+    return errorState(locale === "en" ? "This case has no uploaded documents." : "В кейсе пока нет загруженных документов.");
   }
 
   const waiting = documents.filter((row) => row.document_status !== "ready");
   if (waiting.length > 0) {
     const reupload = waiting.filter((row) => row.document_status === "needs_reupload").length;
     return errorState(
-      reupload > 0
+      locale === "en" ? `Documents are not ready: ${waiting.length} remaining, ${reupload} need a clearer source.` : reupload > 0
         ? `Итог пока не собирается: ${reupload} файл(а) клиенту нужно загрузить повторно. Остальные документы сохранены.`
         : `Документы ещё распознаются: готово ${documents.length - waiting.length} из ${documents.length}.`
     );
   }
 
-  const { data: extractions, error: extractionError } = await supabase
+  const { data: extractions, error: extractionError } = await readAllRows((from, to) => supabase
     .from("document_extractions")
     .select("document_id, agreed_values, disputed_values")
-    .eq("case_id", caseId);
+    .eq("case_id", caseId).order("id").range(from, to));
 
   if (extractionError) {
     return errorState(`Не удалось получить распознанные документы: ${extractionError.message}`);
@@ -114,7 +116,7 @@ export async function generateCaseReview(
   const numberedFile = (documentId: string, file: string) =>
     `№${numberByDocument.get(documentId) ?? "?"} «${file}»`;
 
-  const numberedAgreed = (extractions ?? []).flatMap((row) =>
+  const numberedAgreed = (extractions ?? []).filter(row => numberByDocument.has(row.document_id)).flatMap((row) =>
     Array.isArray(row.agreed_values)
       ? (row.agreed_values as TranscribedValue[]).map((value) => ({
           ...value,
@@ -122,7 +124,7 @@ export async function generateCaseReview(
         }))
       : []
   );
-  const numberedDisputed = (extractions ?? []).flatMap((row) =>
+  const numberedDisputed = (extractions ?? []).filter(row => numberByDocument.has(row.document_id)).flatMap((row) =>
     Array.isArray(row.disputed_values)
       ? (row.disputed_values as DisputedValue[]).map((value) => ({
           ...value,
@@ -132,7 +134,7 @@ export async function generateCaseReview(
   );
 
   if (numberedAgreed.length === 0 && numberedDisputed.length === 0) {
-    return errorState("В распознанных документах не найдено содержимого для итогового разбора.");
+    return errorState(locale === "en" ? "The readings contain no content to review." : "В распознанных документах не найдено содержимого для итогового разбора.");
   }
 
   // The newest analysis run: what modules 1, 3 and 4 made of these same
@@ -149,67 +151,69 @@ export async function generateCaseReview(
 
   if (!runRow) {
     return errorState(
-      "Прогон анализа для этого кейса ещё не выполнен — дождитесь обработки последнего документа и попробуйте снова."
+      locale === "en" ? "Analysis is not ready. Wait for document processing and try again." : "Прогон анализа для этого кейса ещё не выполнен — дождитесь обработки последнего документа и попробуйте снова."
     );
   }
 
+  const picture = await getCaseAnalyticalPicture(caseId);
+  if (!fingerprint || picture.status !== "ready") return errorState(locale === "en" ? "The evidence snapshot is unavailable." : "Снимок исходных данных недоступен.");
+  const evidenceContext = JSON.stringify(picture.picture);
+  if (evidenceContext.length > 180000 || documents.length >= 1000) return errorState(locale === "en" ? "The case exceeds the current review limit. No partial review was saved." : "Объём кейса превышает текущий предел разбора. Частичный итог не сохранён.");
   const findings = formatMachineFindings(runRow as unknown as StoredRun);
 
-  const context = await buildCaseContext(caseId);
+  const scope = { profileId: auth.userId, private: true, caseId };
+  const [context, knowledge, history] = await Promise.all([buildCaseContext(caseId), getKnowledgeForPrompt("staff"), conversationContext(scope, "Case document review: " + picture.picture.extractedEvidence.slice(0, 20).map(row => row.label).join(" "))]);
   const disputedNote = numberedDisputed.length > 0
     ? `\n\nСПОРНЫЕ МЕСТА. Перенеси их все в раздел «${CASE_REVIEW_UNREAD_HEADING}» дословно:\n${formatDisputed(numberedDisputed)}`
     : `\n\nСПОРНЫХ МЕСТ НЕТ. После разделителя «${CASE_REVIEW_UNREAD_HEADING}» напиши только «НЕТ».`;
 
-  const result = await askClaude(
-    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write both the client-ready text and the verification list in English." : "Русский. Оба раздела пиши по-русски."}\n\n${context ?? ""}`,
+  const result = await withConversationArchive(scope, () => askClaude(
+    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write the internal review and unresolved questions in English." : "Русский. Оба раздела пиши по-русски."}\n\n${context ?? ""}\n\n${knowledge}\n\n${history}`,
     [
       {
         role: "user",
-        content: `Вот значения, переписанные из документов клиента и подтверждённые двумя независимыми чтениями. Сначала подготовь готовый клиентский текст, затем короткий блок проверки. Опирайся только на эти данные.\n\n${formatAgreed(
+        content: `Вот непроверенные машинные чтения документов. Подготовь внутреннюю картину для Карена и все неразрешённые вопросы, без клиентского ответа. Совпадение чтений не является подтверждением фактов.\n\n${formatAgreed(
           numberedAgreed
-        )}${disputedNote}\n\nМАШИННАЯ ПРОВЕРКА (единицы, блокираторы, порог значимости):\n${findings}`
+        )}${disputedNote}\n\nМАШИННАЯ ПРОВЕРКА (единицы, блокираторы, порог значимости):\n${findings}\n\nПОЛНАЯ ВНУТРЕННЯЯ КАРТИНА С ID И ИСТОЧНИКАМИ:\n${evidenceContext}`
       }
     ],
     4000
-  );
+  ));
 
   if (result.status !== "ok") {
     return errorState(
-      "Ассистент сейчас недоступен. Попробуйте через минуту."
+      locale === "en" ? "The assistant is unavailable. Try again shortly." : "Ассистент сейчас недоступен. Попробуйте через минуту."
     );
   }
 
   const parsed = parseCaseReview(result.reply, locale);
 
   if (parsed.status !== "ok") {
-    return errorState("Ассистент вернул ответ, который не удалось разобрать.");
+    return errorState(locale === "en" ? "The assistant returned an unreadable response." : "Ассистент вернул ответ, который не удалось разобрать.");
   }
 
-  const { error: saveError } = await supabase.from("case_ai_reviews").upsert(
-    {
-      case_id: caseId,
-      summary: parsed.parts.summary,
-      draft: parsed.parts.draft,
-      documents_fingerprint: fingerprintDocuments(documents),
-      documents_count: documents.length,
-      analysis_run_id: runRow.id,
-      created_by: auth.userId,
-      created_at: new Date().toISOString()
-    },
-    { onConflict: "case_id" }
-  );
+  const sourceIds = [...picture.picture.extractedEvidence, ...picture.picture.timeline].map(row => row.id);
+  const citations = [...parsed.parts.draft.matchAll(/\[([a-f0-9]{8}-[a-f0-9-]{27}(?:-(?:agreed|disputed)-\d+)?)\]/gi)].map(match => match[1]);
+  if (!citations.length || citations.some(id => !sourceIds.includes(id))) return errorState(locale === "en" ? "The draft lacks valid source references. Generate it again." : "В черновике нет корректных ссылок на источники. Соберите разбор заново.");
 
-  if (saveError) {
+  const { data: savedId, error: saveError } = await supabase.rpc("save_pmc_case_review", {
+    p_case_id: caseId, p_fingerprint: fingerprint, p_summary: parsed.parts.summary,
+    p_draft: parsed.parts.draft, p_actor: auth.userId, p_run: runRow.id
+  });
+
+  if (saveError || !savedId) {
     return errorState(
-      "Разбор готов, но сохранить его не удалось. Применена ли миграция case_ai_reviews?"
+      locale === "en" ? "The review could not be saved. The evidence may have changed; refresh the case." : "Разбор готов, но сохранить его не удалось. Применена ли миграция case_ai_reviews?"
     );
   }
 
+  const saved = await supabase.from("case_ai_reviews").select("id,documents_fingerprint,draft,summary").eq("id", savedId).eq("case_id", caseId).maybeSingle();
+  if (saved.error || saved.data?.documents_fingerprint !== fingerprint || saved.data?.draft !== parsed.parts.draft || saved.data?.summary !== parsed.parts.summary) return errorState(locale === "en" ? "Save readback failed. Reload the case." : "Сохранение не подтверждено. Обновите кейс.");
   revalidatePath(`/admin/cases/${caseId}`);
 
   return {
     status: "success",
-    message: `Итог собран из всех документов: ${documents.length}.`
+    message: locale === "en" ? `Internal review saved from ${documents.length} documents.` : `Внутренний разбор сохранён из всех документов: ${documents.length}.`
   };
 }
 
@@ -229,7 +233,7 @@ export async function approveCaseReview(
 
   const pictureResult = await getCaseAnalyticalPicture(caseId);
   if (pictureResult.status !== "ready" || pictureResult.picture.reviewSummary.approvalBlocked) {
-    return errorState(locale === "en" ? "Review every critical evidence item in the whole-case picture before approval." : "Перед утверждением проверьте все критические свидетельства в целостной картине кейса.");
+    return errorState(locale === "en" ? "Resolve every disputed reading before approval." : "Перед утверждением разберите все спорные чтения в картине кейса.");
   }
 
   const supabase = createSupabaseServiceClient();
@@ -243,20 +247,39 @@ export async function approveCaseReview(
     .maybeSingle();
   if (!review) return errorState(locale === "en" ? "The AI draft was not found." : "Черновик ИИ не найден.");
 
+  const expectedCreatedAt = String(formData.get("review_created_at") ?? "");
+  const expectedFingerprint = String(formData.get("evidence_fingerprint") ?? "");
+  if (!expectedCreatedAt || !expectedFingerprint || review.documents_fingerprint !== expectedFingerprint) return errorState(locale === "en" ? "The review changed. Reload and check it again." : "Разбор изменился. Обновите страницу и проверьте его заново.");
+  const session = await createSupabaseServerClient();
+  const verified = session ? await session.auth.getUser() : null;
+  if (!verified?.data.user || verified.error || verified.data.user.id !== auth.userId || resolvePrivateAssistantRole(verified.data.user.email) !== "karen") return errorState(locale === "en" ? "Karen sign-in is required." : "Требуется вход Карена.");
   const diff = diffReviewText(String(review.draft), approvedText);
-  const { error } = await supabase.from("case_review_learning_events").insert({
-    case_id: caseId,
-    review_id: reviewId,
-    ai_draft: String(review.draft),
-    approved_text: approvedText,
-    edit_operations: diff.operations,
-    removed_fragments: diff.removed,
-    added_fragments: diff.added,
-    documents_fingerprint: String(review.documents_fingerprint),
-    approved_by: auth.userId
+  const { data: approvalId, error } = await supabase.rpc("approve_pmc_case_review", {
+    p_case_id: caseId, p_review_id: reviewId, p_review_created_at: expectedCreatedAt,
+    p_fingerprint: expectedFingerprint, p_actor: auth.userId, p_text: approvedText, p_diff: diff
   });
-
-  if (error) return errorState(locale === "en" ? "Could not save the approval history. Apply the latest database migration." : "Не удалось сохранить историю утверждения. Примените последнюю миграцию базы данных.");
+  if (error || !approvalId) return errorState(locale === "en" ? "The sources changed or approval could not be saved. Reload and review again." : "Источники изменились или решение не удалось сохранить. Обновите страницу и проверьте заново.");
+  const saved = await supabase.from("case_review_learning_events").select("id,approved_text").eq("id", approvalId).eq("case_id", caseId).maybeSingle();
+  if (saved.error || saved.data?.approved_text !== approvedText) return errorState(locale === "en" ? "Approval readback failed. Reload before retrying." : "Не удалось подтвердить сохранение решения. Обновите страницу перед повтором.");
   revalidatePath(`/admin/cases/${caseId}`);
-  return { status: "success", message: locale === "en" ? "Approved. The AI draft, edits, and final conclusion have been saved for learning." : "Утверждено. Черновик ИИ, правки и итоговое заключение сохранены для обучения." };
+  return { status: "success", message: locale === "en" ? "The decision and its source version are saved. You can now publish the approved text." : "Решение и версия источников сохранены. Теперь можно отправить утверждённый текст клиенту." };
+}
+
+export async function publishCaseReview(_previous: CaseReviewActionState, formData: FormData): Promise<CaseReviewActionState> {
+  const en = formData.get("locale") === "en";
+  const caseId = String(formData.get("case_id") ?? "");
+  const approvalId = String(formData.get("approval_id") ?? "");
+  const auth = await getStaffUserState();
+  const session = await createSupabaseServerClient();
+  const verified = session ? await session.auth.getUser() : null;
+  if (auth.status !== "authorized" || !verified?.data.user || verified.error || auth.userId !== verified.data.user.id || resolvePrivateAssistantRole(verified.data.user.email) !== "karen") return errorState(en ? "Only Karen can publish a conclusion." : "Отправить заключение может только Карен.");
+  if (!isUuid(caseId) || !isUuid(approvalId)) return errorState(en ? "Invalid decision." : "Некорректное решение.");
+  const db = createSupabaseServiceClient();
+  if (!db) return errorState(en ? "The database is unavailable." : "База данных недоступна.");
+  const { data: messageId, error } = await db.rpc("publish_pmc_case_review", { p_case_id: caseId, p_approval_id: approvalId, p_actor: auth.userId });
+  if (error || !messageId) return errorState(en ? "The sources or decision changed. Review the latest version before publishing." : "Источники или решение изменились. Проверьте актуальную версию перед отправкой.");
+  const saved = await db.from("case_messages").select("id,approved_review_event_id").eq("id", messageId).eq("case_id", caseId).maybeSingle();
+  if (saved.error || saved.data?.approved_review_event_id !== approvalId) return errorState(en ? "Publication readback failed. Reload before retrying." : "Не удалось подтвердить публикацию. Обновите страницу перед повтором.");
+  revalidatePath(`/admin/cases/${caseId}`); revalidatePath("/cabinet");
+  return { status: "success", message: en ? "The approved result is saved in the client's conversation." : "Утверждённый результат сохранён в переписке клиента." };
 }

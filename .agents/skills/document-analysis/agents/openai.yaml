@@ -1,0 +1,6 @@
+interface:
+  display_name: "Разбор документа / Document analysis"
+  short_description: "Исходные данные и источники / Source evidence"
+  default_prompt: "Используй $document-analysis для чтения одного разрешённого документа с исходными значениями, источниками и видимыми сомнениями."
+policy:
+  allow_implicit_invocation: true

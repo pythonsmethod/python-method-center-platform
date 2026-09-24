@@ -1,5 +1,39 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-2026-09-24-01 — Complete PMC document chain before NEXORA
+
+Current owner instruction defers NEXORA migration. Reuse existing PMC Cases/storage/extractions/runs/notes/learning events/messages. Retain original source separately; add atomic persistence and version binding. Provenance is physical page + original SHA256 + transcribed excerpt, without fabricated bounding boxes/tokens. Per-result dates/material/method and comparison gates prevent unsupported dynamics. Karen decision and explicit publication are separate source-bound transactions with readback.
+
+Only isolated staging changes. Old Case and real-data replays stay excluded. Preserve full release gates and add separately named bounded synthetic CI. Hosted role acceptance/production remain pending exact-commit deployment and legitimate sessions. [Evidence](docs/ankh/pmc_document_chain_2026_09_24.md).
+
+## NEXORA-2026-09-24-01 — Strengthen existing document and laboratory instructions
+
+Reuse the two owner-supplied instruction exports and their existing skill names.
+Record their source provenance and the unavailable original Windows packages;
+do not claim a byte-for-byte update of those files or a personal installation.
+Contracts require literal/source/version retention, non-recursive handoff,
+version-bound trust, explicit save/readback outcome and complete review coverage.
+Compatibility precedes potential-change claims; a policy-bound rule is required
+for CHANGE/STABLE. Implement no duplicate clinical engine or data store.
+Skill/reference/validator tests are distinct from live API/storage acceptance.
+Only new synthetic fixtures are authorized here; the old Case remains excluded.
+See [implementation record](docs/ankh/document_lab_skills_strengthening_2026_09_24.md).
+
+## NEXORA-2026-09-23-03 — Preserve uncertainty in the current document path
+
+Owner instruction: begin the eleven-step chain with preservation of reliable
+data; the old Case 2.9 is excluded from this task. Historical next steps do not
+authorize accessing it. NX-03.2 fixes the two newly reproduced mechanisms.
+
+Presentation must preserve source rows, units, comparators, review reasons and
+human decisions. Text similarity is not a verification operation. Date parsing
+must retain the printed source and return no normalized date when more than one
+calendar interpretation is valid. Language and punctuation alone do not prove
+day/month order. Use the existing source/evidence/header stores without a new
+Case model, trust upgrade or production rewrite.
+
+Evidence and limits: [NX-03.2](docs/ankh/document_data_integrity_2026_09_23.md).
+
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
 Status: owner-approved product direction; implementation migration pending.

@@ -1,4 +1,4 @@
-import type { TrendAssessment } from "@/lib/analysis/trend-gate";
+import { assessTrend, type TrendAssessment } from "@/lib/analysis/trend-gate";
 
 export type PictureDocument = {
   id: string;
@@ -20,8 +20,9 @@ export type PictureFact = {
   reference: string | null;
   comparisonKey: string | null;
   trustState: "NEEDS_REVIEW" | "SOURCE_ONLY";
-  provenance: { level: "DOCUMENT"; page: null };
+  provenance: { level: "DOCUMENT" | "PAGE"; page: number | null; sourceHash?: string | null; excerpt?: string | null };
   analysisRunId: string | null;
+  comparisonContext?: { specimen?: string | null; method?: string | null };
 };
 
 export type PictureReviewNote = {
@@ -33,6 +34,8 @@ export type PictureReviewNote = {
 };
 
 export type ExtractedClinicalEvidence = {
+  reviewSnapshot?: import("./review-snapshot").StoredReviewSnapshot | null;
+  reviewToken?: string;
   id: string;
   documentId: string;
   section: string;
@@ -42,7 +45,7 @@ export type ExtractedClinicalEvidence = {
   category: "RADIOLOGY" | "PATHOLOGY" | "PROCEDURE" | "BIOMARKER" | "UNKNOWN";
   trustState: "SOURCE_ONLY" | "NEEDS_REVIEW";
   disputeReason: string | null;
-  provenance: { level: "DOCUMENT"; page: null };
+  provenance: { level: "DOCUMENT" | "PAGE"; page: number | null; sourceHash?: string | null; excerpt?: string | null };
   priority: "CRITICAL" | "IMPORTANT" | "SUPPORTING" | "TECHNICAL";
   reviewDecision: "PENDING" | "CONFIRMED" | "CORRECTED" | "REJECTED";
   correction: string | null;
@@ -57,7 +60,7 @@ export type CaseAnalyticalPicture = {
   comparisons: Array<{
     comparisonKey: string;
     verdict: "POTENTIAL_CHANGE" | "NO_CONFIRMED_CHANGE" | "NOT_COMPARABLE" | "INSUFFICIENT_DATA";
-    reasonCode: "SIGNIFICANT_THRESHOLD" | "BELOW_THRESHOLD" | "UNIT_MISMATCH" | "MISSING_DATES" | "STALE_ANALYSIS" | "INSUFFICIENT_EVIDENCE";
+    reasonCode: "SIGNIFICANT_THRESHOLD" | "BELOW_THRESHOLD" | "UNIT_MISMATCH" | "MISSING_DATES" | "STALE_ANALYSIS" | "INSUFFICIENT_EVIDENCE" | "MISSING_CONTEXT";
     evidenceFactIds: string[];
     reviewRequired: true;
   }>;
@@ -110,13 +113,15 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
     factsByKey.set(fact.comparisonKey, [...(factsByKey.get(fact.comparisonKey) ?? []), fact]);
   }
 
-  const comparisons = Object.entries(input.trends).map(([comparisonKey, trend]) => {
-    const evidence = (factsByKey.get(comparisonKey) ?? []).filter((fact) => fact.analysisRunId === input.analysisRunId);
+  const comparisons = [...new Set([...Object.keys(input.trends), ...factsByKey.keys()])].map(comparisonKey => {
+    const evidence = (factsByKey.get(comparisonKey) ?? []);
     const evidenceFactIds = evidence.map((fact) => fact.id);
+    const trend = input.trends[comparisonKey] ?? assessTrend(comparisonKey, evidence.map(fact => ({ valueCanonical: fact.canonicalValue, unitResolutionMethod: fact.canonicalValue === null ? "unresolved" : "explicit", unitResolved: fact.canonicalUnit, measuredOn: fact.observedAt, positionInReference: null, referenceLow: null, referenceHigh: null })));
     if (!input.analysisCurrent) return { comparisonKey, verdict: "INSUFFICIENT_DATA" as const, reasonCode: "STALE_ANALYSIS" as const, evidenceFactIds, reviewRequired: true as const };
     if (evidence.length < 2) return { comparisonKey, verdict: "INSUFFICIENT_DATA" as const, reasonCode: "INSUFFICIENT_EVIDENCE" as const, evidenceFactIds, reviewRequired: true as const };
     if (evidence.some((fact) => !fact.observedAt)) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "MISSING_DATES" as const, evidenceFactIds, reviewRequired: true as const };
     if (new Set(evidence.map((fact) => fact.canonicalUnit)).size !== 1 || evidence.some((fact) => !fact.canonicalUnit)) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "UNIT_MISMATCH" as const, evidenceFactIds, reviewRequired: true as const };
+    if (evidence.some(fact => !fact.comparisonContext?.specimen || !fact.comparisonContext?.method) || new Set(evidence.map(fact => JSON.stringify(fact.comparisonContext))).size !== 1) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "MISSING_CONTEXT" as const, evidenceFactIds, reviewRequired: true as const };
     if (trend.verdict === "significant") {
       return { comparisonKey, verdict: "POTENTIAL_CHANGE" as const, reasonCode: "SIGNIFICANT_THRESHOLD" as const, evidenceFactIds, reviewRequired: true as const };
     }
@@ -140,12 +145,12 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
     ...(input.requests.length ? [{ code: "ANALYSIS_REQUESTS" as const, count: input.requests.length }] : []),
     ...(input.excluded.length ? [{ code: "EXCLUDED_EVIDENCE" as const, count: input.excluded.length }] : []),
     ...(!input.analysisCurrent && input.analysisRunId ? [{ code: "STALE_ANALYSIS" as const }] : []),
-    { code: "PAGE_TOKEN_PROVENANCE" as const },
+    ...(input.facts.some(fact => fact.provenance.page === null) ? [{ code: "PAGE_TOKEN_PROVENANCE" as const }] : []),
   ];
 
   const extractedEvidence = [...(input.extractedEvidence ?? [])];
   const unresolved = extractedEvidence.filter((item) =>
-    item.priority !== "TECHNICAL" && item.trustState === "NEEDS_REVIEW",
+    item.trustState === "NEEDS_REVIEW",
   ).sort((left, right) =>
     Number(right.reviewDecision === "PENDING") - Number(left.reviewDecision === "PENDING"),
   );
@@ -177,7 +182,7 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
       criticalCompleted: criticalCompleted.length,
       machineMatched: extractedEvidence.filter((item) => item.trustState === "SOURCE_ONLY").length,
       archived: extractedEvidence.filter((item) => item.priority === "TECHNICAL").length,
-      approvalBlocked: criticalCompleted.length < critical.length,
+      approvalBlocked: completed.length < reviewable.length || input.documents.some(document => document.status !== "ready"),
     },
     notes: [...input.notes].sort((left, right) => right.createdAt.localeCompare(left.createdAt)),
     limitations: ["NOT_DIAGNOSIS", "NO_CAUSALITY", "NO_LIVE_TRUST_PERSISTENCE"],

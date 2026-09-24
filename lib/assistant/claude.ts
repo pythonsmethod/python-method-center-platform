@@ -221,7 +221,8 @@ export async function askClaude(
   system: string,
   messages: ChatMessage[],
   maxTokens: number,
-  attachments?: ChatAttachment[]
+  attachments?: ChatAttachment[],
+  options: { timeoutMs?: number; allowContinuation?: boolean } = {}
 ): Promise<AssistantResult> {
   const archiveEnabled = Boolean(conversationArchiveScope());
   if (archiveEnabled) system += `\n${ARCHIVE_RULE}`;
@@ -242,7 +243,7 @@ export async function askClaude(
       system: buildSystemParam(system),
       messages: requestMessages,
         ...(archiveEnabled ? { tools: availableConversationTools().map(tool => ({ name: tool.name, description: tool.description, input_schema: tool.parameters as Anthropic.Tool.InputSchema })), tool_choice: { type: round < 4 ? "auto" as const : "none" as const } } : {})
-    });
+    }, options.timeoutMs ? { timeout: options.timeoutMs, maxRetries: 0 } : undefined);
     let response = await call(0);
     for (let round = 0; archiveEnabled && response.stop_reason === "tool_use"; round++) {
       const calls = response.content.filter(block => block.type === "tool_use");
@@ -275,7 +276,7 @@ export async function askClaude(
     // A token ceiling is not a completed answer. Ask once for the missing
     // ending and return one seamless message instead of exposing a sentence
     // cut in half. One continuation keeps latency and cost bounded.
-    if (response.stop_reason === "max_tokens") {
+    if (response.stop_reason === "max_tokens" && options.allowContinuation !== false) {
       try {
         const continuation = await anthropic.messages.create({
           model: ASSISTANT_MODEL,

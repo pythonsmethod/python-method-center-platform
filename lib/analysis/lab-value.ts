@@ -86,7 +86,7 @@ export function buildLabValue(row: ExtractedRow): LabValueRecord {
     value: row.value,
     unitPrinted: row.unitPrinted,
     referencePrinted: row.referencePrinted,
-    referenceConfirmed: row.referenceConfirmed
+    referenceConfirmed: false // Missing printed units remain unresolved; a reference range is not a unit.
   });
 
   return {

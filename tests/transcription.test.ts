@@ -561,9 +561,9 @@ describe("what the analysis is allowed to work from", () => {
 });
 
 describe("the instruction given to the reader", () => {
-  it("forbids reading a table by position", () => {
+  it("binds table cells by headers and geometry without medical guessing", () => {
     // The offset column is the whole reason this exists.
-    expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("Сопоставляй по смыслу");
+    expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("по заголовкам столбцов, границам и геометрии таблицы");
     expect(TRANSCRIPTION_SYSTEM_PROMPT).toContain("ЧУЖОЕ значение");
   });
 

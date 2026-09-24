@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import {
   processNextCaseDocument,
-  processNextDocument
+  processNextDocument,
+  processNextOwnerDocument
 } from "@/lib/documents/processing";
 import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 import { getStaffUserState } from "@/lib/auth/require-staff";
@@ -45,7 +46,7 @@ export async function GET(request: NextRequest) {
 
   while (
     documents < BATCH_MAX_DOCUMENTS &&
-    Date.now() - startedAt < BATCH_BUDGET_MS
+    Date.now() - startedAt < BATCH_BUDGET_MS - 100_000
   ) {
     const result = await processNextDocument();
 
@@ -67,7 +68,7 @@ export async function GET(request: NextRequest) {
     expiredPeriods,
     // True when the run hit its budget rather than emptying the queue, so
     // an operator reading the log can tell the difference.
-    truncated: documents >= BATCH_MAX_DOCUMENTS
+    truncated: documents >= BATCH_MAX_DOCUMENTS || Date.now() - startedAt >= BATCH_BUDGET_MS - 100_000
   });
 }
 
@@ -118,6 +119,6 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ status: "idle" });
   }
 
-  const result = await processNextDocument();
+  const result = await processNextOwnerDocument(user.id);
   return NextResponse.json({ status: result.status });
 }

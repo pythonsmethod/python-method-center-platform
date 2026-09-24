@@ -13,7 +13,8 @@
     "lint": "eslint . --max-warnings=0",
     "benchmark:ankh": "vitest run tests/gold-benchmark-report.test.ts",
     "eval:honesty": "vitest run --config vitest.honesty-eval.config.ts",
-    "security:check": "node scripts/security-check.mjs --self-test && node scripts/security-check.mjs"
+    "security:check": "node scripts/security-check.mjs --self-test && node scripts/security-check.mjs",
+    "test:pmc-document-chain": "vitest run tests/pmc-document-chain-sql.test.ts tests/pmc-document-source.test.ts tests/pmc-document-evidence-tool.test.ts tests/evidence-review-action.test.ts tests/evidence-review-readback.test.ts tests/evidence-review-snapshot.test.ts tests/document-data-integrity.test.ts tests/case-review.test.ts tests/case-review-localization.test.tsx tests/lab-value.test.ts tests/pipeline.test.ts tests/document-processing.test.ts tests/case-analytical-picture-live.test.ts tests/conversation-archive.test.ts tests/voice-site-tools.test.ts tests/metadata.test.ts tests/identity.test.ts tests/document-timeline.test.ts tests/case-document-reprocessing.test.ts tests/document-identity-review.test.ts tests/transcription.test.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.112.3",
@@ -22,6 +23,7 @@
     "chess.js": "^1.4.0",
     "next": "^15.3.4",
     "openai": "^7.15.0",
+    "pdf-lib": "1.17.1",
     "posthog-js": "1.428.11",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",

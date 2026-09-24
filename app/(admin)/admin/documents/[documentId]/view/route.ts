@@ -77,5 +77,8 @@ export async function GET(
     return NextResponse.json({ error: signedUrlError.message }, { status: 500 });
   }
 
-  return NextResponse.redirect(signedUrl.signedUrl);
+  const page = Number(new URL(request.url).searchParams.get("page"));
+  const location = new URL(signedUrl.signedUrl);
+  if (Number.isSafeInteger(page) && page > 0 && page <= 250) location.hash = `page=${page}`;
+  return NextResponse.redirect(location);
 }

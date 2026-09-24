@@ -43,10 +43,13 @@ export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 
 // One agreed row from the double reading, as the extraction table stores it.
 export type ExtractedValueRow = {
+  collectionDate?: string | null;
+  comparisonContext?: { specimen: string | null; method: string | null };
   label: string;
   value: string;
   reference: string;
   referenceConfirmed: boolean;
+  source?: import("@/lib/documents/source").SourceAnchor;
 };
 
 export type ExtractedDocument = {
@@ -60,6 +63,7 @@ export type ExtractedDocument = {
 
 // A value already in lab_values from an earlier document of the case.
 export type PriorLabValue = {
+  comparison_context?: { specimen: string | null; method: string | null } | null;
   documentId: string | null;
   analyte: string | null;
   measured_on: string | null;
@@ -78,7 +82,7 @@ export type AnalysisInput = {
   extractionModelVersion: string;
 };
 
-export type NewLabValue = LabValueRecord & { document_id: string };
+export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
 
 export type AnalysisRun = {
   versions: AnalysisVersions;
@@ -102,11 +106,14 @@ export type AnalysisRun = {
 // "9,6 г/л" → 9.6 and "г/л". A row whose value does not start with a
 // number is text — a conclusion, a drug name — and is not a lab value.
 export function splitValue(printed: string): { value: number; unit: string } | null {
-  const match = printed.trim().match(/^([<>≤≥]?\s*)?(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  const match = printed.trim().replace(/−/g, "-").match(/^([<>≤≥]?\s*)?([+-]?\d+(?:[.,]\d+)?(?:e[+-]?\d+)?)\s*(.*)$/i);
 
   if (!match) {
     return null;
   }
+
+  // Neither punctuation nor the document's language establishes a thousands/decimal convention.
+  if (/^[1-9]\d{0,2}[.,]\d{3}$/.test(match[2]) || /^[-–—]\s*\d/.test(match[3]) || (/^\d/.test(match[3]) && !/^\d+\^/.test(match[3]))) return null;
 
   const value = Number(match[2].replace(",", "."));
 
@@ -165,9 +172,12 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
           unitPrinted: split.unit,
           referencePrinted: row.reference,
           referenceConfirmed: row.referenceConfirmed,
-          measuredOn: document.collectionDate
+          measuredOn: row.collectionDate === undefined ? document.collectionDate : row.collectionDate
         }),
-        document_id: document.documentId
+        document_id: document.documentId,
+        value_printed: row.value,
+        comparison_context: row.comparisonContext ?? null,
+        source_anchor: row.source ?? null
       });
     }
   }
@@ -219,7 +229,10 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
       continue;
     }
 
-    trends[analyte] = assessTrend(analyte, series.map(toPoint));
+    const trend = assessTrend(analyte, series.map(toPoint));
+    const contexts = series.map(row => row.comparison_context);
+    const comparable = contexts.every(context => context?.specimen && context.method) && new Set(contexts.map(context => JSON.stringify(context))).size === 1;
+    trends[analyte] = series.length >= 2 && !comparable ? { ...trend, verdict: "not_comparable", reason: "MISSING_OR_DIFFERENT_SPECIMEN_METHOD", versus_previous: null, versus_baseline: null, direction: null } : trend;
   }
 
   for (const assessment of blocked) {
