@@ -327,6 +327,30 @@ sign-in, finish isolated Preview credentials and signed webhook configuration,
 resolve the trial wording, and complete the remaining acceptance cases and release gate in
 `RELEASE_MONTHLY_SUPPORT_2026_09_19.md`.
 
+## Later acceptance status — 2026-09-24
+
+This section supersedes the older outstanding setup list above. The Live
+account now has the four localized products, 30 exact Prices and two localized
+Customer Portal configurations; these were created through the officially
+expanded connection and read back. The existing Live webhook still needs the
+four recurring events after the new handler is deployed. Production Checkout
+remains disabled.
+
+The paid-initial-period implementation (without a free trial) passed a paid
+Sandbox 1-period Checkout, a Test Clock first renewal, a paid 12-period
+renewal-selected Checkout, and a paid 6-period prepaid-only Checkout. The
+last charged 7,800 USD, created exactly one 180-day staging access period and
+one assigned gift-delivery task with quantity 6. The assessment paid flow and
+duplicate webhook idempotency also passed. The 6-period payment used offer v9;
+the v10 tax-copy revision has passing CI and READY Preview, with RU/EN and
+mobile tariff rendering checked, but authenticated v10 consent is still open.
+The owner explicitly deferred the failed-renewal simulation. Final Portal
+cancellation, authenticated Checkout/return, and the Live webhook expansion
+remain unverified. Release status remains **HOLD / NOT LIVE**. Tax setup is
+deferred, not deemed unnecessary; automatic tax remains disabled. See
+`CURRENT_STATE.md` and `validation/stripe-production-readiness-2026-09-22.json`
+for the current gate.
+
 ## Primary references
 
 - [Checkout Session creation](https://docs.stripe.com/api/checkout/sessions/create)

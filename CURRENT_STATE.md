@@ -5,8 +5,9 @@
 PR #215 and PR #216 are open, mergeable and have passing CI/READY Preview
 deployments; neither is published. PR #216 replaces misleading Stripe trial
 semantics with a paid `N×30`-day initial subscription period followed by a
-scheduled 1,300 USD / 30-day renewal phase. Local regression passes 2,055 tests
-with one existing skip; typecheck, lint, security checks and build pass.
+scheduled 1,300 USD / 30-day renewal phase. Latest local regression passes
+2,057 tests with one existing skip; typecheck, lint, security checks and build
+pass. Commit `f39e4e0` has passing GitHub CI and READY Vercel Preview.
 
 Sandbox assessment payment of 299 USD was delivered through a protected Preview
 webhook after the owner approved a separate revocable Vercel bypass secret for
@@ -24,8 +25,11 @@ access both run from 2026-09-24 02:15:10 UTC to 2027-09-19 02:15:10 UTC,
 exactly 360 days despite later webhook arrival. Stripe scheduled 1,300 USD
 renewals every 30 days thereafter, without a trial. The new webhook delivery
 returned HTTP 200 and staging created one paid period and one gift-delivery
-task. A separate RU 6-period prepaid-only Checkout shows 7,800 USD / 180 days
-without renewal but remains unpaid.
+task. A separate RU 6-period prepaid-only Checkout charged 7,800 USD in
+Sandbox after the owner submitted the test card. Stripe confirms `complete` /
+`paid`, with no subscription or automatic tax. Staging has exactly one paid
+payment, one active 180-day period and one assigned gift-delivery task with
+quantity 6; no real client data or shipment is involved.
 
 Staging had an older delivery schema than production. The missing historical
 delivery workflow migration and two additive parity migrations were applied
@@ -37,16 +41,17 @@ subscription access to the exact paid invoice period and blocks overlapping
 auto-renew purchases; the 12-period payment above verifies this on the deployed
 revision. The owner declined a proposed failed-renewal simulation, so no test
 card was changed or clock advanced for that scenario. Failed payment, final
-Portal cancellation, 6-period payment and authenticated return flow remain
-unverified. The 12-period synthetic fixture was created directly in staging
+Portal cancellation and authenticated return flow remain unverified. The
+6-period payment used the earlier v9 offer before the tax-copy correction.
+The 12-period synthetic fixture was created directly in staging
 and its Checkout through Stripe API, so it does not prove app authentication or
 consent persistence. After the owner updated the official Live Stripe
-connection, `product_write` succeeded and all four deterministic RU/EN Live
-products were created and read back. The first Live price create was denied
-`plan_write`; Portal configuration create was denied `customer_portal_write`.
-No Live prices or Portal configurations were created, and the new Checkout
-remains disabled in Production. Further official permission expansion, Live
-catalog/webhook setup and publication remain open. Commercial launch is NO-GO.
+connection, all four deterministic RU/EN Live products, 30 Prices and two
+localized Portal configurations were created and read back. The Live webhook
+still lacks four recurring-billing events, and the new Checkout remains
+disabled in Production. Authenticated consent/return acceptance, declined
+renewal (owner deferred), final Portal cancellation, webhook expansion,
+merges and publication remain open. Commercial launch is NO-GO.
 
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
@@ -1420,7 +1425,13 @@ that taxes would be calculated separately at Checkout was removed in both
 languages, the offer and assistant context. The amended offer is v10 with a
 new fingerprint; existing v9 history is retained. Full local regression:
 2,057 passed, one skipped; TypeScript, ESLint, security check, build and diff
-check pass. The copy revision is not yet deployed. Authenticated Checkout,
-six-period paid flow, failed renewal (owner deferred), final Portal
-cancellation and production recurring webhook events remain open. Neither
-PR #215 nor #216 is merged; the new model is NOT LIVE.
+check pass. The copy revision at `f39e4e0` has passing CI and a READY isolated
+Preview. Its RU/EN pages show the revised final-total wording, preserve the
+tariff route across both language switches, and render the 12-period $15,600
+choice and separate renewal control at a 390×844 mobile viewport. A v9 RU
+six-period prepaid-only Sandbox Checkout was subsequently paid for $7,800.
+Stripe confirms `complete` / `paid`, and staging contains exactly one payment,
+one active 180-day service period and one assigned gift-delivery task
+(quantity 6). Authenticated Checkout, failed renewal (owner deferred), final
+Portal cancellation and production recurring webhook events remain open.
+Neither PR #215 nor #216 is merged; the new model is NOT LIVE.

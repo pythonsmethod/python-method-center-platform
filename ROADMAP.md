@@ -843,17 +843,22 @@ Production schema is prepared; commercial publication remains HOLD.
 - [x] Verify revised invoice-period anchoring on the READY Preview with a
   fresh paid 12-period Sandbox subscription: Stripe and staging share the
   exact 360-day dates, one paid period and one gift-delivery task.
-- [ ] Verify failed renewal, final Portal cancellation, 6-period paid
-  entitlement/delivery and authenticated app Checkout/consent in the isolated
-  Stripe Sandbox + staging Preview. The owner deferred the failed-renewal
-  simulation; do not run it until newly authorized.
+- [x] Verify a 6-period prepaid-only Sandbox payment: 7,800 USD, no renewal,
+  exactly one active 180-day staging period and one assigned gift-delivery task
+  with quantity 6. This Checkout used the earlier v9 offer.
+- [ ] Verify failed renewal, final Portal cancellation and authenticated app
+  Checkout/v10 consent in the isolated Stripe Sandbox + staging Preview. The
+  owner deferred the failed-renewal simulation; do not run it until newly
+  authorized.
 - [x] Obtain official Live Stripe `product_write` and create the four RU/EN
   Products.
 - [x] Obtain official `plan_write` and `customer_portal_write`; create and
   read back 30 Live Prices and two localized Portal configurations.
 - [x] Verify Production Vercel mode/origin/tax/disabled-sales settings without
   revealing Stripe secrets; remove false tax-at-Checkout copy in RU/EN and
-  advance the offer fingerprint to v10. Local regression/build gates pass.
+  advance the offer fingerprint to v10. Local regression/build, GitHub CI and
+  READY Preview pass; RU/EN route switching and 390×844 mobile tariff rendering
+  pass.
 - [ ] Add the four recurring events to the existing Live webhook after the
   handler is deployed, then verify Production runtime.
 - [ ] Merge PR #215 then #216, publish, retire old offers for new sales and run
