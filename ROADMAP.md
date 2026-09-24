@@ -820,8 +820,10 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
       while the scheduled subsequent billing is `$1,300 every 30 days`.
       An unpaid $0-recurring-plus-one-time pilot retained the same headline.
       The draft branch now uses Checkout Elements for renewal-selected 2–12
-      terms; local build and an unpaid Sandbox Elements Session pass, but
-      Preview UI and paid-flow acceptance remain open.
+      terms. Preview exposed a disabled Pay button because the required full
+      billing address was not collected. The branch now mounts Stripe's
+      BillingAddressElement and passes local tests/build; a new Preview and
+      paid-flow acceptance remain open.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
       RU/EN customer pages; local tests alone do not close these gates.
 - [ ] Publish only after the existing release gate; deactivate retired sales

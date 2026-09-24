@@ -80,11 +80,15 @@ renewal-selected 2–12-period terms. Its PMC-owned RU/EN summary separates the
 initial paid term from subsequent 30-day charges; the server still creates a
 Checkout Session and keeps the webhook/Portal schedule model. The paid return
 page now checks the Stripe Session and authenticated owner before saying
-payment succeeded. A Sandbox Elements Session was created unpaid with 7,800 USD
-total, `mode=subscription`, and a client secret. Local tests and build pass;
-browser rendering, actual Elements payment, paid return and webhook delivery
-remain unverified. A matching Sandbox publishable key is required in the
-isolated Preview environment. Do not enable Production sales from local proof.
+payment succeeded. The matching Sandbox publishable key is configured only in
+the isolated Preview. Browser rendering exposed a disabled Pay button in an
+unpaid 7,800 USD EN Elements Session: Stripe required a full billing address,
+but the form mounted only the Payment Element. The branch now mounts Stripe's
+BillingAddressElement with RU/EN headings. Focused tests, 2,069 full-suite
+tests (one skip), typecheck, lint, security check and build pass locally.
+The revised form still needs a new READY Preview and browser acceptance; the
+actual Elements payment, paid return and webhook delivery are unverified.
+Do not enable Production sales from local proof.
 
 With the owner's action-time approval, the synthetic 12-period Sandbox
 subscription was canceled through the Russian Customer Portal. Portal now

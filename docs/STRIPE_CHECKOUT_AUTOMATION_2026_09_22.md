@@ -1,5 +1,17 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Elements billing-address blocker — 2026-09-24
+
+The authenticated EN six-period Sandbox Elements Session requires
+`billing_address_collection=required`. The Preview rendered only the Payment
+Element's card fields, leaving Checkout `canConfirm=false` and Pay disabled.
+The branch now mounts Stripe's `BillingAddressElement` before `PaymentElement`
+with RU/EN section headings; the full address requirement remains intact.
+Focused tests and the full local gate pass (2,069 tests, one skip, TypeScript,
+ESLint, security check, production build). A new Preview and actual Sandbox
+card submission are still required to prove that the button enables and the
+paid return/webhook path works. Production remains disabled.
+
 ## Acceptance update — 2026-09-24
 
 The isolated Vercel Preview now uses staging Supabase, Stripe Sandbox keys and

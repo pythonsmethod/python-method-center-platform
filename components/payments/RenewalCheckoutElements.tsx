@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckoutElementsProvider, PaymentElement, useCheckoutElements } from "@stripe/react-stripe-js/checkout";
+import { BillingAddressElement, CheckoutElementsProvider, PaymentElement, useCheckoutElements } from "@stripe/react-stripe-js/checkout";
 import { loadStripe } from "@stripe/stripe-js";
 import { useMemo, useState, type FormEvent } from "react";
 import type { Locale } from "@/lib/i18n/locale";
@@ -20,6 +20,7 @@ const copy = {
     due: "Сегодня к оплате",
     term: (days: number) => `За ${days} дней сопровождения. Формула — в подарок на оплаченный период, доставка включена.`,
     renewal: "После оплаченного периода: 1 300 USD каждые 30 дней. Автопродление можно отключить до следующего списания.",
+    billingAddress: "Платёжный адрес",
     pay: "Оплатить сейчас",
     paying: "Обрабатываем оплату…",
     back: "Вернуться к выбору",
@@ -32,6 +33,7 @@ const copy = {
     due: "Due today",
     term: (days: number) => `For ${days} days of support. Formula is complimentary for the paid period; delivery is included.`,
     renewal: "After the paid period: USD 1,300 every 30 days. You can turn off renewal before the next charge.",
+    billingAddress: "Billing address",
     pay: "Pay now",
     paying: "Processing payment…",
     back: "Back to selection",
@@ -79,6 +81,8 @@ function RenewalPaymentForm({ sessionId, months, locale, onBack }: Pick<Props, "
       <p className="price-line">{t.due}: {amount}</p>
       <p>{t.term(months * 30)}</p>
       <p>{t.renewal}</p>
+      <h3>{t.billingAddress}</h3>
+      <BillingAddressElement />
       <PaymentElement options={{ layout: "accordion" }} />
       {error ? <p role="alert">{error}</p> : null}
       <div className="panel-actions">
