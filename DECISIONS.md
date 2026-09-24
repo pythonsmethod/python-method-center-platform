@@ -1,5 +1,18 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## NEXORA-2026-09-24-01 — Strengthen existing document and laboratory instructions
+
+Reuse the two owner-supplied instruction exports and their existing skill names.
+Record their source provenance and the unavailable original Windows packages;
+do not claim a byte-for-byte update of those files or a personal installation.
+Contracts require literal/source/version retention, non-recursive handoff,
+version-bound trust, explicit save/readback outcome and complete review coverage.
+Compatibility precedes potential-change claims; a policy-bound rule is required
+for CHANGE/STABLE. Implement no duplicate clinical engine or data store.
+Skill/reference/validator tests are distinct from live API/storage acceptance.
+Only new synthetic fixtures are authorized here; the old Case remains excluded.
+See [implementation record](docs/ankh/document_lab_skills_strengthening_2026_09_24.md).
+
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
 Status: owner-approved product direction; implementation migration pending.

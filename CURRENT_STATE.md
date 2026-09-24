@@ -1,5 +1,17 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Document and lab skills strengthened — 2026-09-24 — PACKAGE CANDIDATE
+
+Owner-requested revision of document-analysis and lab-analysis is reconstructed
+from the supplied DOCX instruction exports in .agents/skills/. It adds precise
+routing, source/run/fact/snapshot binding, save/readback honesty, partial coverage,
+review completeness and ordered comparison gates. Two local validators and
+55 isolated synthetic contract tests pass; no application behavior is activated.
+The original Windows packages are unavailable; original exports remain unchanged.
+Details and limits: [skill revision](docs/ankh/document_lab_skills_strengthening_2026_09_24.md).
+Old Case 2.9 is excluded by the owner's current instruction; historical tasks
+below do not authorize opening or replaying it. Runtime/hosted acceptance is open.
+
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 
 Owner decision NEXORA-2026-09-23-01 makes NEXORA the shared ecosystem core.

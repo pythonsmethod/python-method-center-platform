@@ -1,5 +1,17 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Document and laboratory instruction strengthening — 2026-09-24
+
+- [x] Strengthen the two supplied instruction bodies and define v2 result contracts.
+- [x] Add local contract checks and 55 tests on new synthetic fixtures only.
+- [ ] Read the existing Case assembler and verify all actual dependency bindings.
+- [ ] Implement validated field/history mapping and persistence/readback in the adapter.
+- [ ] Accept a new authorized document in isolated staging under a legitimate Karen role.
+
+No production activation or client response is part of this package task.
+The owner-excluded old Case 2.9 must not be resumed by historical items below.
+Record: [skill revision](docs/ankh/document_lab_skills_strengthening_2026_09_24.md).
+
 ## NEXORA capability ownership and migration — 2026-09-23
 
 Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future
