@@ -6,9 +6,13 @@ import { describeFailedPayment, stripeDashboardUrl } from "@/lib/payments/failur
 import { openServicePeriod } from "@/lib/payments/service-period";
 import {
   emailExactMatchPattern,
+  expectedPersonalSupportAmountCents,
   getStripe,
+  isValidPersonalSupportCharge,
   normalizePayerEmail,
-  resolveStripeProduct
+  personalSupportMonthsFromMetadata,
+  resolveStripeProduct,
+  supportMonthsFromMetadata
 } from "@/lib/payments/stripe";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
@@ -25,7 +29,10 @@ export const runtime = "nodejs";
 //   automatic payment record + active service period;
 // - checkout.session.async_payment_failed / payment_intent.payment_failed →
 //   team alert;
-// - charge.refunded → payment marked refunded + team alert.
+// - invoice.paid → recurring Personal Support payment + another 30-day period;
+ // - invoice.payment_failed → team alert without extending access;
+ // - customer.subscription.updated/deleted → subscription state sync;
+ // - charge.refunded → payment marked refunded + team alert.
 //
 // Idempotency: stripe_events insert-first (unique id) rejects redelivered
 // events; payments.processor_reference unique index blocks double records.
@@ -98,6 +105,30 @@ export async function POST(request: Request) {
         );
         break;
       }
+      case "invoice.paid": {
+        await handlePaidSubscriptionInvoice(
+          supabase,
+          event.data.object as Stripe.Invoice,
+          event
+        );
+        break;
+      }
+      case "invoice.payment_failed": {
+        await handleFailedSubscriptionInvoice(
+          supabase,
+          event.data.object as Stripe.Invoice,
+          event
+        );
+        break;
+      }
+      case "customer.subscription.updated":
+      case "customer.subscription.deleted": {
+        await syncSubscriptionState(
+          supabase,
+          event.data.object as Stripe.Subscription
+        );
+        break;
+      }
       case "charge.refunded": {
         const charge = event.data.object as Stripe.Charge;
         await handleRefund(supabase, charge, event.id);
@@ -119,9 +150,10 @@ export async function POST(request: Request) {
       link: adminLink("/admin")
     });
 
-    // The event stays in stripe_events: we alerted a human instead of
-    // letting Stripe retry into the same failure.
-    return NextResponse.json({ received: true, alerted: true });
+    // Release the idempotency claim so Stripe can retry. Downstream writes are
+    // independently idempotent by processor_reference/payment_id.
+    await supabase.from("stripe_events").delete().eq("id", event.id);
+    return NextResponse.json({ error: "processing-failed" }, { status: 500 });
   }
 
   return NextResponse.json({ received: true });
@@ -247,6 +279,38 @@ async function handlePaidSession(
     amountCents,
     currency: session.currency
   });
+  const purchasedMonths =
+    product === "personal_support"
+      ? supportMonthsFromMetadata(session.metadata, amountCents, session.currency)
+      : 1;
+
+  if (product === "personal_support") {
+    const metadataMonths = personalSupportMonthsFromMetadata(session.metadata);
+    const baseAmountCents = session.amount_subtotal ?? session.amount_total;
+    if (
+      metadataMonths === null ||
+      !isValidPersonalSupportCharge({
+        amountCents: baseAmountCents,
+        currency: session.currency,
+        months: metadataMonths
+      })
+    ) {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `personal-support-contract-mismatch:${eventId}`,
+        title: "ОШИБКА: Stripe Personal Support не совпадает с договором",
+        lines: [
+          `Событие: ${eventId}`,
+          `Metadata product: ${session.metadata?.product ?? "не задано"}`,
+          `Metadata months: ${session.metadata?.months ?? "не задано"}`,
+          `Базовая сумма: ${baseAmountCents ?? 0} ${(session.currency ?? "не задано").toUpperCase()}`,
+          "Доступ не выдан: проверьте тестовую Payment Link и metadata."
+        ],
+        link: adminLink("/admin")
+      });
+      return;
+    }
+  }
 
   // 2) Unmatched client or unknown amount → loud manual-review alert. Never
   // guess who paid.
@@ -291,7 +355,7 @@ async function handlePaidSession(
   // 3) Payment record. The unique index on processor_reference makes a
   // concurrent duplicate insert fail closed.
   const paidAt = new Date();
-  const { data: payment, error: paymentError } = await supabase
+  const { data: insertedPayment, error: paymentError } = await supabase
     .from("payments")
     .insert({
       profile_id: profileId,
@@ -312,34 +376,44 @@ async function handlePaidSession(
     })
     .select("id")
     .single();
+  let payment = insertedPayment;
 
   if (paymentError) {
     if (paymentError.code === "23505") {
-      // Reference already recorded by an earlier webhook delivery.
-      return;
+      const { data: existingPayment, error: existingPaymentError } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("processor_reference", reference)
+        .maybeSingle();
+      if (existingPaymentError || !existingPayment?.id) {
+        throw new Error("duplicate payment could not be resumed");
+      }
+      payment = existingPayment;
+    } else {
+      // Money left the client's card and the platform could not record it.
+      // Silence here is the worst outcome: the client sees an empty cabinet
+      // and no one knows. Tell the team the exact reason, then fail so
+      // Stripe retries the delivery.
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `payment-insert-failed:${eventId}`,
+        title: "ОШИБКА: ОПЛАТА ПОЛУЧЕНА, НО НЕ ЗАПИСАНА",
+        lines: [
+          `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
+          customerEmail ? `Плательщик: ${customerEmail}` : null,
+          `Тариф: ${paymentProductLabel(product)}`,
+          `Ошибка базы: ${paymentError.message}`,
+          `Референс: ${reference}`,
+          "Клиент оплатил, но запись не создана — нужна техническая проверка."
+        ],
+        link: adminLink("/admin/cases")
+      });
+
+      throw new Error(`payment insert failed: ${paymentError.message}`);
     }
-
-    // Money left the client's card and the platform could not record it.
-    // Silence here is the worst outcome: the client sees an empty cabinet
-    // and no one knows. Tell the team the exact reason, then fail so
-    // Stripe retries the delivery.
-    await notifyTeam({
-      kind: "processing_error",
-      dedupeKey: `payment-insert-failed:${eventId}`,
-      title: "ОШИБКА: ОПЛАТА ПОЛУЧЕНА, НО НЕ ЗАПИСАНА",
-      lines: [
-        `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
-        customerEmail ? `Плательщик: ${customerEmail}` : null,
-        `Тариф: ${paymentProductLabel(product)}`,
-        `Ошибка базы: ${paymentError.message}`,
-        `Референс: ${reference}`,
-        "Клиент оплатил, но запись не создана — нужна техническая проверка."
-      ],
-      link: adminLink("/admin/cases")
-    });
-
-    throw new Error(`payment insert failed: ${paymentError.message}`);
   }
+
+  if (!payment) throw new Error("payment record missing after insert");
 
   // 4) Service period activation, tied to the payment. Shared with the
   // manual path on the case page, so a renewal follows the same rule
@@ -350,7 +424,8 @@ async function handlePaidSession(
       caseId: caseRow.id,
       paymentId: payment.id,
       product,
-      paidAt
+      paidAt,
+      months: purchasedMonths
     });
 
     if (period.status === "failed") {
@@ -365,6 +440,7 @@ async function handlePaidSession(
         ],
         link: adminLink(`/admin/cases/${caseRow.id}`)
       });
+      throw new Error(`service period failed: ${period.message}`);
     }
   }
 
@@ -374,7 +450,8 @@ async function handlePaidSession(
     paymentId: payment.id,
     profileId,
     caseId: caseRow?.id ?? null,
-    product
+    product,
+    months: purchasedMonths
   });
   if (!["ready", "not-applicable"].includes(delivery.status)) {
     await notifyTeam({
@@ -386,7 +463,54 @@ async function handlePaidSession(
     });
   }
 
-  // 6) Referral reward: if this client was invited by someone, the referrer
+  // 6) A subscription-mode Payment Link means the client enabled automatic
+  // renewal. The initial prepaid term was charged above; later invoice.paid
+  // events extend access by exactly one 30-day period. No card data is stored.
+  const stripeSubscriptionId =
+    typeof session.subscription === "string"
+      ? session.subscription
+      : session.subscription?.id ?? null;
+
+  if (product === "personal_support" && stripeSubscriptionId) {
+    const stripeCustomerId =
+      typeof session.customer === "string"
+        ? session.customer
+        : session.customer?.id ?? null;
+
+    const { error: subscriptionError } = await supabase
+      .from("billing_subscriptions")
+      .upsert(
+        {
+          profile_id: profileId,
+          case_id: caseRow?.id ?? null,
+          stripe_subscription_id: stripeSubscriptionId,
+          stripe_customer_id: stripeCustomerId,
+          status: "trialing",
+          initial_months: purchasedMonths,
+          renewal_days: 30
+        },
+        { onConflict: "stripe_subscription_id" }
+      );
+
+    if (subscriptionError) {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `subscription-link-failed:${eventId}`,
+        title: "ОШИБКА: автопродление оплачено, но подписка не привязана",
+        lines: [
+          `Subscription: ${stripeSubscriptionId}`,
+          `Ошибка базы: ${subscriptionError.message}`,
+          "Первоначальный оплаченный срок сохранён, но до исправления будущие автоплатежи не смогут автоматически продлевать кейс."
+        ],
+        link: caseRow?.id
+          ? adminLink(`/admin/cases/${caseRow.id}`)
+          : adminLink("/admin/cases")
+      });
+      throw new Error(`subscription link failed: ${subscriptionError.message}`);
+    }
+  }
+
+  // 7) Referral reward: if this client was invited by someone, the referrer
   // earns tokens (once per invited person).
   await awardReferralTokensForPayment({
     payerProfileId: profileId,
@@ -394,7 +518,7 @@ async function handlePaidSession(
     amountCents
   });
 
-  // 7) Team ping about the money.
+  // 8) Team ping about the money.
   await notifyTeam({
     kind: "payment",
     dedupeKey: `payment_recorded:${payment.id}`,
@@ -402,6 +526,8 @@ async function handlePaidSession(
     lines: [
       `Тариф: ${paymentProductLabel(product)}`,
       `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
+      product === "personal_support" ? `Оплаченный срок: ${purchasedMonths} мес. (${purchasedMonths * 30} дней)` : null,
+      stripeSubscriptionId ? "Автопродление: включено" : product === "personal_support" ? "Автопродление: выключено" : null,
       customerEmail ? `Клиент: ${customerEmail}` : null,
       caseRow?.id
         ? `Кейс: ${caseRow.id} — период сопровождения активирован`
@@ -409,6 +535,263 @@ async function handlePaidSession(
     ],
     link: caseRow?.id ? adminLink(`/admin/cases/${caseRow.id}`) : adminLink("/admin/cases")
   });
+}
+
+type InvoiceWithSubscription = Stripe.Invoice & {
+  subscription?: string | Stripe.Subscription | null;
+  payment_intent?: string | Stripe.PaymentIntent | null;
+  parent?: {
+    subscription_details?: {
+      subscription?: string | Stripe.Subscription | null;
+    } | null;
+  } | null;
+};
+
+function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
+  const shaped = invoice as InvoiceWithSubscription;
+  const direct = shaped.subscription;
+  if (typeof direct === "string") return direct;
+  if (direct?.id) return direct.id;
+
+  const nested = shaped.parent?.subscription_details?.subscription;
+  if (typeof nested === "string") return nested;
+  return nested?.id ?? null;
+}
+
+function invoicePaymentReference(invoice: Stripe.Invoice): string {
+  const shaped = invoice as InvoiceWithSubscription;
+  const intent = shaped.payment_intent;
+  if (typeof intent === "string") return intent;
+  return intent?.id ?? invoice.id;
+}
+
+async function handlePaidSubscriptionInvoice(
+  supabase: ServiceClient,
+  invoice: Stripe.Invoice,
+  event: Stripe.Event
+) {
+  // The prepaid checkout itself can also emit an invoice for subscription
+  // creation. Its service period is already opened by checkout.session.completed.
+  if (invoice.billing_reason === "subscription_create") {
+    return;
+  }
+
+  const subscriptionId = invoiceSubscriptionId(invoice);
+  if (!subscriptionId) return;
+
+  const { data: subscription } = await supabase
+    .from("billing_subscriptions")
+    .select("id, profile_id, case_id")
+    .eq("stripe_subscription_id", subscriptionId)
+    .maybeSingle();
+
+  if (!subscription?.profile_id) {
+    await notifyTeam({
+      kind: "payment",
+      dedupeKey: `subscription_invoice_unmatched:${event.id}`,
+      title: "💰 АВТОПЛАТЁЖ ПОЛУЧЕН — подписка не привязана",
+      lines: [
+        `Invoice: ${invoice.id}`,
+        `Subscription: ${subscriptionId}`,
+        "Не удалось найти владельца подписки в billing_subscriptions."
+      ],
+      link: adminLink("/admin/cases")
+    });
+    return;
+  }
+
+  const amountCents = invoice.amount_paid ?? 0;
+  const baseAmountCents = invoice.subtotal ?? 0;
+  const currency = (invoice.currency ?? "usd").toUpperCase();
+  const paidAt = new Date();
+  const reference = invoicePaymentReference(invoice);
+
+  if (
+    !isValidPersonalSupportCharge({
+      amountCents: baseAmountCents,
+      currency: invoice.currency,
+      months: 1
+    })
+  ) {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `subscription-invoice-contract-mismatch:${event.id}`,
+      title: "ОШИБКА: сумма автопродления Personal Support не совпадает",
+      lines: [
+        `Invoice: ${invoice.id}`,
+        `Базовая сумма: ${baseAmountCents} ${currency}`,
+        `Фактически оплачено: ${amountCents} ${currency}`,
+        `Ожидалась базовая сумма: ${expectedPersonalSupportAmountCents()} USD`,
+        "Новый период не открыт."
+      ],
+      link: adminLink("/admin/cases")
+    });
+    return;
+  }
+
+  const { data: insertedPayment, error: paymentError } = await supabase
+    .from("payments")
+    .insert({
+      profile_id: subscription.profile_id,
+      case_id: subscription.case_id,
+      product: "personal_support",
+      status: "paid",
+      amount_cents: amountCents,
+      currency,
+      processor_reference: reference,
+      paid_at: paidAt.toISOString(),
+      metadata: {
+        source: "stripe_subscription_invoice",
+        stripe_event_id: event.id,
+        stripe_invoice_id: invoice.id,
+        stripe_subscription_id: subscriptionId,
+        support_months: 1,
+        auto_renew: true
+      }
+    })
+    .select("id")
+    .single();
+  let payment = insertedPayment;
+
+  if (paymentError) {
+    if (paymentError.code === "23505") {
+      const { data: existingPayment, error: existingPaymentError } = await supabase
+        .from("payments")
+        .select("id")
+        .eq("processor_reference", reference)
+        .maybeSingle();
+      if (existingPaymentError || !existingPayment?.id) {
+        throw new Error("duplicate subscription payment could not be resumed");
+      }
+      payment = existingPayment;
+    } else {
+      throw new Error(`subscription payment insert failed: ${paymentError.message}`);
+    }
+  }
+
+  if (!payment) throw new Error("subscription payment missing after insert");
+
+  if (subscription.case_id) {
+    const period = await openServicePeriod(supabase, {
+      profileId: subscription.profile_id,
+      caseId: subscription.case_id,
+      paymentId: payment.id,
+      product: "personal_support",
+      paidAt,
+      months: 1
+    });
+
+    if (period.status === "failed") {
+      await notifyTeam({
+        kind: "processing_error",
+        dedupeKey: `subscription-period-failed:${event.id}`,
+        title: "ОШИБКА: автоплатёж записан, но сопровождение не продлено",
+        lines: [`Оплата: ${payment.id}`, `Ошибка: ${period.message}`],
+        link: adminLink(`/admin/cases/${subscription.case_id}`)
+      });
+      throw new Error(`subscription service period failed: ${period.message}`);
+    }
+  }
+
+  const delivery = await ensureDeliveryTaskForPayment(supabase, {
+    paymentId: payment.id,
+    profileId: subscription.profile_id,
+    caseId: subscription.case_id,
+    product: "personal_support",
+    months: 1
+  });
+
+  if (!["ready", "not-applicable"].includes(delivery.status)) {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `subscription-delivery-pending:${payment.id}`,
+      title: "📦 Автопродление оплачено, отправка подарка ожидает",
+      lines: [
+        delivery.status === "address-required"
+          ? "Клиент должен заполнить полный адрес."
+          : "Для страны не назначен волонтёр."
+      ],
+      link: subscription.case_id
+        ? adminLink(`/admin/cases/${subscription.case_id}`)
+        : adminLink("/admin/fulfillment")
+    });
+  }
+
+  await supabase
+    .from("billing_subscriptions")
+    .update({
+      status: "active",
+      last_invoice_id: invoice.id
+    })
+    .eq("stripe_subscription_id", subscriptionId);
+
+  await awardReferralTokensForPayment({
+    payerProfileId: subscription.profile_id,
+    paymentId: payment.id,
+    amountCents
+  });
+
+  await notifyTeam({
+    kind: "payment",
+    dedupeKey: `subscription_payment_recorded:${payment.id}`,
+    title: "💰 Автопродление сопровождения оплачено",
+    lines: [
+      `Сумма: ${(amountCents / 100).toFixed(2)} ${currency}`,
+      "Продление: +30 дней",
+      `Subscription: ${subscriptionId}`
+    ],
+    link: subscription.case_id
+      ? adminLink(`/admin/cases/${subscription.case_id}`)
+      : adminLink("/admin/cases")
+  });
+}
+
+async function handleFailedSubscriptionInvoice(
+  supabase: ServiceClient,
+  invoice: Stripe.Invoice,
+  event: Stripe.Event
+) {
+  const subscriptionId = invoiceSubscriptionId(invoice);
+  if (!subscriptionId) return;
+
+  await supabase
+    .from("billing_subscriptions")
+    .update({ status: "past_due", last_invoice_id: invoice.id })
+    .eq("stripe_subscription_id", subscriptionId);
+
+  await notifyTeam({
+    kind: "payment",
+    dedupeKey: `subscription_payment_failed:${event.id}`,
+    title: "⚠️ Автопродление не оплачено",
+    lines: [
+      `Invoice: ${invoice.id}`,
+      `Subscription: ${subscriptionId}`,
+      "Новый 30-дневный период не открыт и подарок к нему не отправляется."
+    ],
+    link: adminLink("/admin/cases")
+  });
+}
+
+async function syncSubscriptionState(
+  supabase: ServiceClient,
+  subscription: Stripe.Subscription
+) {
+  const status =
+    subscription.status === "canceled"
+      ? "cancelled"
+      : subscription.status === "trialing" ||
+          subscription.status === "active" ||
+          subscription.status === "past_due" ||
+          subscription.status === "paused" ||
+          subscription.status === "unpaid" ||
+          subscription.status === "incomplete"
+        ? subscription.status
+        : "active";
+
+  await supabase
+    .from("billing_subscriptions")
+    .update({ status })
+    .eq("stripe_subscription_id", subscription.id);
 }
 
 async function handleRefund(

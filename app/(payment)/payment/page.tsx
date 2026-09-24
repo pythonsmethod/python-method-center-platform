@@ -53,15 +53,22 @@ export default async function PaymentPage() {
 
   const plans = getPaymentPlans(locale).map((plan) => ({
     ...plan,
-    paymentLinkUrl: withClientReference(plan.paymentLinkUrl, profileId)
+    paymentLinkUrl: withClientReference(plan.paymentLinkUrl, profileId),
+    supportOptions: plan.supportOptions?.map((option) => ({
+      ...option,
+      paymentLinkUrl: withClientReference(option.paymentLinkUrl, profileId),
+      autoRenewPaymentLinkUrl: withClientReference(
+        option.autoRenewPaymentLinkUrl,
+        profileId
+      )
+    }))
   }));
 
   return (
     <div className="page-shell payment-page">
-      {/* Three formats, one list. The review used to have a panel of its
-          own above the cards, from the days it was the free offer; as a
-          plan it is a card like the other two, and a panel repeating the
-          card's text word for word was the same paragraph twice. */}
+      {/* Two current services: one-time condition assessment and one
+          configurable Personal Support product. Legacy 5-week / 100-day
+          products stay in historical records only and never render here. */}
       <PageHeader
         eyebrow={t.eyebrow}
         title={t.title}
@@ -79,7 +86,15 @@ export default async function PaymentPage() {
           offerHint: t.offerHint,
           refundLink: t.refundLink,
           signInToPay: t.signInToPay,
-          signInWhy: t.signInWhy
+          signInWhy: t.signInWhy,
+          durationLabel: t.durationLabel,
+          durationOption: t.durationOption,
+          selectedTotal: t.selectedTotal,
+          giftIncluded: t.giftIncluded,
+          autoRenewLabel: t.autoRenewLabel,
+          autoRenewText: t.autoRenewText,
+          autoRenewUnavailable: t.autoRenewUnavailable,
+          taxNote: t.taxNote
         }}
         plans={plans}
         signInHref="/login?mode=signup&next=/payment"

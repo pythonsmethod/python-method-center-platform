@@ -44,10 +44,10 @@ export function tokensToUsd(tokens: number): number {
 // payment, never on sign-up: a reward for registering is a reward for
 // creating empty accounts.
 //
-// It applies to everything the invited person buys — a support programme
-// or capsules from the shop — and to every purchase they make, not only
-// the first. The capsules included in a support programme need no separate
-// rule: their cost is inside the price the share is taken from.
+// It applies to eligible paid services on the platform and to every
+// qualifying payment, not only the first. Professor Python's formula is not
+// sold separately; the token accounting anchor below is an internal legacy
+// valuation rule and must not be presented as a product price or quantity.
 export const REFERRAL_SHARE = 0.05;
 
 // Never nothing. Someone who brought a paying client has earned at least

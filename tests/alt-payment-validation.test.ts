@@ -4,7 +4,7 @@ import { validateAltPaymentInput } from "@/lib/payments/alt-validation";
 const valid = {
   email: "person@example.com",
   country: "Казахстан",
-  plan: "support_5_weeks",
+  plan: "personal_support",
   method: "bank",
   comment: "Карта банка не проходит",
   consent: true,
@@ -18,7 +18,7 @@ describe("alternative payment request", () => {
     expect(result).toEqual({
       email: "person@example.com",
       country: "Казахстан",
-      plan: "support_5_weeks",
+      plan: "personal_support",
       method: "bank",
       comment: "Карта банка не проходит"
     });

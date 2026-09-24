@@ -5,7 +5,7 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 import { OFFER_CONTENT } from "@/lib/legal/offer-content";
 import { PRIVACY_CONTENT, REFUND_CONTENT } from "@/lib/legal/policy-content";
 import { SHOP_CATALOG, SHOP_SECTIONS } from "@/lib/shop/catalog";
-import { getPaymentPlans, PLAN_5W_TOTAL_USD, PLAN_100D_TOTAL_USD, REVIEW_TOTAL_USD } from "@/lib/payments/config";
+import { getPaymentPlans, PERSONAL_SUPPORT_MONTHLY_USD, REVIEW_TOTAL_USD } from "@/lib/payments/config";
 import type { Locale } from "@/lib/i18n/locale";
 import { SITE_DATASETS, SITE_DATA_BOUNDARY, type SiteDataset } from "./site-data-catalog";
 import { VoiceFailure, type VoiceActor } from "./realtime-server";
@@ -110,7 +110,7 @@ export async function runStaffDataTool(actor: VoiceActor, name: string, raw: unk
     keys(input, ["section", "offset"]);
     const sections: Record<string, unknown> = {
       ...getDictionary(locale), legal_offer: OFFER_CONTENT[locale], legal_privacy: PRIVACY_CONTENT[locale], legal_refund: REFUND_CONTENT[locale], shop_catalog: { sections: SHOP_SECTIONS, text: SHOP_CATALOG[locale] },
-      service_prices: { currency: "USD", reviewTotal: REVIEW_TOTAL_USD, fiveWeeksTotal: PLAN_5W_TOTAL_USD, hundredDaysTotal: PLAN_100D_TOTAL_USD, plans: getPaymentPlans(locale).map(p => ({ product: p.product, title: p.title, description: p.description, priceLine: p.priceLine, paymentLinkConfigured: Boolean(p.paymentLinkUrl) })) },
+      service_prices: { currency: "USD", reviewTotal: REVIEW_TOTAL_USD, personalSupportPer30Days: PERSONAL_SUPPORT_MONTHLY_USD, plans: getPaymentPlans(locale).map(p => ({ product: p.product, title: p.title, description: p.description, priceLine: p.priceLine, paymentLinkConfigured: Boolean(p.paymentLinkUrl), supportOptions: p.supportOptions?.map(option => ({ months: option.months, durationDays: option.durationDays, amountUsd: option.amountUsd, paymentLinkConfigured: Boolean(option.paymentLinkUrl), autoRenewPaymentLinkConfigured: Boolean(option.autoRenewPaymentLinkUrl) })) })) },
       runtime_availability: { voiceEnabled: process.env.ANHAM_REALTIME_ENABLED === "true", voiceProviderKeyConfigured: Boolean(process.env.OPENAI_REALTIME_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim()), voiceSigningSecretConfigured: (process.env.ANHAM_REALTIME_SESSION_SECRET?.trim().length ?? 0) >= 32, textOpenAIConfigured: Boolean(process.env.OPENAI_API_KEY?.trim()), textClaudeConfigured: Boolean(process.env.ANTHROPIC_API_KEY?.trim()), publicAssistantMode: ["off", "open", "guarded"].includes(process.env.PUBLIC_ASSISTANT_MODE ?? "") ? process.env.PUBLIC_ASSISTANT_MODE : "unspecified", evidence: "Configuration presence on this application server only, not provider health, billing balance or deployment telemetry." },
     };
     if (input.section === undefined) return { ...stamp, locale, source: "bundled site content", sections: Object.keys(sections) };

@@ -773,3 +773,17 @@ docs/architecture/ANNA_PLATFORM_COSTS.md.
 - [x] Verify the public site, cabinet login gate and unauthenticated cron denial without sending a real greeting.
 
 Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next action: observe the next scheduled run and client history; do not manually invoke the production birthday RPC. No Anham clinical phase gate changes.
+
+# Personal Support staging acceptance — 2026-09-19
+
+- [x] Harden checkout and recurring-invoice amount/term validation.
+- [x] Make webhook processing retryable and service-period issuance idempotent.
+- [x] Add focused regression tests for 1–12 month amounts and duplicate access.
+- [ ] Apply and verify `20260919123000_personal_support_billing.sql` on the
+  confirmed `ankh-staging` project only.
+- [ ] Configure 12 prepaid and 12 auto-renew Stripe Test Mode links with exact
+  metadata, amount, 30-day interval and trial durations.
+- [ ] Verify success, failure, redelivery, renewal, cancellation and Customer
+  Portal against staging without real charges.
+- [ ] Run the full clean dependency/build/regression gate and publish a new PR
+  preview. Production and merge remain HOLD.

@@ -16,8 +16,7 @@ export type AltPaymentMethodId = (typeof ALT_PAYMENT_METHODS)[number];
 
 export const ALT_PAYMENT_PLANS = [
   "preliminary_assessment",
-  "support_5_weeks",
-  "support_15_weeks",
+  "personal_support",
   "undecided"
 ] as const;
 
@@ -101,8 +100,7 @@ export const altPaymentMethodLabels: Record<AltPaymentMethodId, string> = {
 };
 
 export const altPaymentPlanLabels: Record<AltPaymentPlanId, string> = {
-  preliminary_assessment: "Разбор анализов — 500 USD",
-  support_5_weeks: "Сопровождение — 5 недель",
-  support_15_weeks: "Сопровождение — 100 дней",
+  preliminary_assessment: "Оценка состояния — 299 USD",
+  personal_support: "Личное сопровождение — $1,300 / 30 дней",
   undecided: "Ещё не решил(а) — нужен совет"
 };

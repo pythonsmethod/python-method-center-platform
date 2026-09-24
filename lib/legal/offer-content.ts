@@ -93,14 +93,12 @@ const RU: OfferDocument = {
     {
       heading: "3. Форматы участия",
       paragraphs: [
-        "Полный разбор анализов с рекомендациями Карена (Professor Python) по восстановлению и реабилитации — 299 USD вместо 500 USD до 1 декабря 2026 года (до 00:00 по времени Лос-Анджелеса). С 1 декабря 2026 года стоимость составляет 500 USD. Это итоговая стоимость без дополнительных сборов, временная цена, не акция.",
-        "После регистрации вы заполняете анкету, загружаете анализы и оплачиваете разбор. Карен лично готовит полный разбор и рекомендации: ответ поступает файлом в личный кабинет в течение трёх рабочих дней после подтверждения оплаты и получения всех материалов. Затем три рабочих дня открыт чат для вопросов. Длительное сопровождение и формула в этот тариф не входят.",
-        "Сопровождение 5 недель — 1 200 USD. Полный разбор ваших документов и показателей, заключение Professor Python и 5 недель индивидуального сопровождения: ваша восстановительная программа, её корректировки и возможность задавать вопросы на всём протяжении срока.",
-        "Сопровождение 100 дней — 3 500 USD. Для тех, кому нужна длительная работа: восстановление в динамике, прохождение нескольких этапов, поддержка в периоды лечения. Качество работы во всех форматах одинаковое — отличается только продолжительность участия Professor Python.",
-        "Формула Professor Python. На обоих форматах сопровождения Professor Python отправляет свою формулу от своего имени как подарок: 200 капсул на формате «5 недель» и 600 капсул на формате «100 дней». На формате «5 недель» доставка формулы оплачивается отдельно — 180 USD, и входит в итоговую сумму к оплате. На формате «100 дней» доставка также стоит 180 USD и входит в итоговую сумму к оплате. В разбор анализов формула не входит.",
-        "Итоговая сумма к оплате. К платежам за сопровождение добавляется сервисный сбор за обработку международного платежа — 5%; в цену разбора анализов он уже включён. Итог по формату «5 недель»: 1 200 USD + 5% + 180 USD доставки = 1 440 USD. Итог по формату «100 дней»: 3 500 USD + 5% + 180 USD доставки = 3 855 USD. Итог по формату «Разбор анализов»: 299 USD до 1 декабря 2026 года по времени Лос-Анджелеса, затем 500 USD.",
-        "Переход на сопровождение. Разбор анализов оплачивается отдельно, и при переходе на сопровождение оплачивается полная стоимость выбранного формата. Ваш кейс и история сохраняются и доступны Professor Python при старте сопровождения.",
-        "Продление. Любое сопровождение можно продлить по вашему желанию — столько раз, сколько вам нужно."
+        "Оценка состояния, разбор анализов и предварительная консультация по личному протоколу реабилитации — 299 USD, разовая оплата. После регистрации вы заполняете анкету и загружаете необходимые материалы. Professor Python лично изучает ваш кейс и предоставляет оценку и предварительную консультацию. Личное сопровождение и формула в эту услугу не входят.",
+        "Личное сопровождение — 1 300 USD за каждый оплаченный 30-дневный период. Вы самостоятельно выбираете первоначальный срок от 1 до 12 месяцев; итоговая сумма первой оплаты равна 1 300 USD, умноженным на выбранное количество месяцев.",
+        "Формула Professor Python на оплаченный период личного сопровождения предоставляется клиенту в подарок без отдельной продажной цены. Доставка подарочной формулы включена в стоимость личного сопровождения. Количество и комплектация отправки определяются центром для соответствующего оплаченного периода и не являются отдельным предметом продажи.",
+        "Налоги, если их начисление и сбор требуются законодательством применимой юрисдикции клиента, рассчитываются платёжным провайдером отдельно при оформлении оплаты. Стоимость доставки и отдельный сервисный сбор к цене личного сопровождения не добавляются.",
+        "Переход на сопровождение. Оценка состояния оплачивается отдельно. При покупке личного сопровождения оплачивается весь выбранный первоначальный срок; ваш кейс и история сохраняются и доступны Professor Python.",
+        "Автоматическое продление является добровольным. Если клиент отдельно включает его при оплате, после окончания уже оплаченного первоначального срока сопровождение продлевается на следующие 30 дней по действующей на момент списания стоимости. Автопродление можно отключить до следующего списания. Если очередное списание не состоялось, новый оплаченный период не открывается."
       ]
     },
     {
@@ -142,7 +140,8 @@ const RU: OfferDocument = {
       paragraphs: [
         "Работа с вашим кейсом начинается в день подтверждения оплаты: ваш кейс активируется в системе, и Professor Python приступает к разбору материалов. С этого момента в работу вкладывается время, опыт и личное внимание автора метода, которые невозможно вернуть обратно.",
         "Поэтому возврат денежных средств после оплаты не предусмотрен. Перед оплатой вы отдельно подтверждаете, что просите начать работу немедленно и понимаете, что в связи с немедленным началом исполнения право отказа от договора, предусмотренное законодательством некоторых стран, не применяется.",
-        "Доступ к методу, материалам и рекомендациям — персональный. Передача их третьим лицам форматом участия не предусмотрена."
+        "Доступ к методу, материалам и рекомендациям — персональный. Передача их третьим лицам форматом участия не предусмотрена.",
+        "При включённом автопродлении дата и сумма следующего списания определяются выбранным первоначальным сроком и условиями, показанными в Stripe Checkout. Клиент может отключить автопродление до следующего списания."
       ]
     },
     {
@@ -215,14 +214,12 @@ const EN: OfferDocument = {
     {
       heading: "3. Ways to take part",
       paragraphs: [
-        "A full review of test results with recovery and rehabilitation recommendations from Karen (Professor Python) costs 299 USD instead of 500 USD until 1 December 2026 (before 00:00 Los Angeles time). From 1 December 2026, the price is 500 USD. This is the final price with no additional fees, a temporary price, not a promotion.",
-        "After registration, complete the questionnaire, upload your test results and pay for the review. Karen personally prepares the full review and recommendations. Your report arrives as a file in your personal account within three working days after payment confirmation and receipt of all materials, followed by three working days of chat for questions. Ongoing support and the formula are not included.",
-        "Support programme, 5 weeks — 1,200 USD. A full review of your documents and indicators, Professor Python's conclusion, and 5 weeks of individual support: your recovery programme, its adjustments, and the ability to ask questions throughout the period.",
-        "Support programme, 100 days — 3,500 USD. For those who need longer work: recovery followed over time, moving through several stages, and support during periods of treatment. The quality of the work is the same in every format — only the length of Professor Python's involvement differs.",
-        "Professor Python's formula. On both support formats Professor Python sends his formula personally, as a gift: 200 capsules on the 5-week format and 600 capsules on the 100-day format. On the 5-week format, delivery of the formula is paid separately — 180 USD, included in the final amount payable. On the 100-day format, delivery also costs 180 USD and is included in the final amount payable. The formula is not part of the analyses review.",
-        "The final amount payable. A service fee for processing an international payment — 5% — is added to the support programmes; the analyses review price already includes it. Total for the 5-week format: 1,200 USD + 5% + 180 USD delivery = 1,440 USD. Total for the 100-day format: 3,500 USD + 5% + 180 USD delivery = 3,855 USD. Total for the analyses review: 299 USD until 1 December 2026, Los Angeles time, then 500 USD.",
-        "Moving to the support programme. The analyses review is paid separately, and when you move to a support programme the full price of the chosen format is payable. Your case and your history are kept and are available to Professor Python when the support programme starts.",
-        "Extension. Any support programme can be extended if you wish — as many times as you need."
+        "Condition assessment, test-results review and a preliminary consultation on a personal rehabilitation protocol costs 299 USD as a one-time payment. After registration you complete the questionnaire and upload the required materials. Professor Python personally reviews your case and provides the assessment and preliminary consultation. Personal Support and the formula are not included in this service.",
+        "Personal Support costs 1,300 USD for each paid 30-day period. You choose an initial prepaid duration from 1 to 12 months; the first payment equals 1,300 USD multiplied by the number of months selected.",
+        "Professor Python's formula for the paid Personal Support period is provided as a complimentary gift with no separate sale price. Delivery of the complimentary formula is included in the Personal Support price. The quantity and shipment configuration are determined by the centre for the corresponding paid period and are not sold as a separate item.",
+        "Taxes, where their calculation and collection are required by the laws applicable to the client's jurisdiction, are calculated separately by the payment provider at checkout. No separate delivery charge or service fee is added to the Personal Support price.",
+        "Moving to Personal Support. The condition assessment is paid separately. When Personal Support is purchased, the entire selected initial prepaid term is paid; your case and history remain available to Professor Python.",
+        "Automatic renewal is optional. If the client separately enables it at checkout, after the already-paid initial term ends, Personal Support renews for the next 30 days at the price in force at the time of the charge. Automatic renewal can be turned off before the next charge. If a renewal payment does not succeed, no new paid period is opened."
       ]
     },
     {
@@ -264,7 +261,8 @@ const EN: OfferDocument = {
       paragraphs: [
         "Work on your case begins on the day your payment is confirmed: your case is activated in the system and Professor Python starts reviewing your materials. From that moment onwards, the time, experience and personal attention of the author of the method are invested in the work, and they cannot be returned.",
         "For this reason, no refund of funds is provided after payment. Before paying, you separately confirm that you are asking for the work to begin immediately, and that you understand that, because performance begins immediately, the right of withdrawal from the contract provided for by the legislation of some countries does not apply.",
-        "Access to the method, the materials and the recommendations is personal. Passing them on to third parties is not part of any format of participation."
+        "Access to the method, the materials and the recommendations is personal. Passing them on to third parties is not part of any format of participation.",
+        "When automatic renewal is enabled, the next charge date and amount follow the prepaid term and the terms shown in Stripe Checkout. The client can turn automatic renewal off before the next charge."
       ]
     },
     {

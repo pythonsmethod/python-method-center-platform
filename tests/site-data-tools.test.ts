@@ -122,7 +122,7 @@ describe("broad staff read tools", () => {
     expect(await run("query_site_records", { dataset: "canonical_facts", fields: Object.keys(row) })).toMatchObject({ rows: [row], caution: expect.stringContaining("Source extraction") });
   });
   it("routes voice reads with the signed local day and active locale", async () => {
-    expect(await runVoiceSiteTool(actor, "read_site_content", { section: "service_prices" }, "America/Los_Angeles", now, "en")).toMatchObject({ locale: "en", date: "2026-09-09", timeZone: "America/Los_Angeles", text: expect.stringContaining('"fiveWeeksTotal":1440') });
+    expect(await runVoiceSiteTool(actor, "read_site_content", { section: "service_prices" }, "America/Los_Angeles", now, "en")).toMatchObject({ locale: "en", date: "2026-09-09", timeZone: "America/Los_Angeles", text: expect.stringContaining('"personalSupportPer30Days":1300') });
   });
 });
 

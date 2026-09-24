@@ -330,10 +330,10 @@ const REFUND_RU: LegalDocument = {
     {
       heading: "4. Из чего складывается сумма",
       paragraphs: [
-        "Полный разбор анализов с рекомендациями Карена (Professor Python) по восстановлению и реабилитации — 299 USD вместо 500 USD до 1 декабря 2026 года (до 00:00 по времени Лос-Анджелеса). С 1 декабря 2026 года стоимость составляет 500 USD. Это итоговая стоимость без дополнительных сборов, временная цена, не акция.",
-        "Сопровождение 5 недель: 1 200 USD программа + 5% сервисный сбор + 180 USD доставка индивидуальной формулы (200 капсул). Итого 1 440 USD.",
-        "Сопровождение 100 дней: 3 500 USD программа + 5% сервисный сбор + 180 USD доставка. Итого 3 855 USD. Индивидуальная формула на весь срок (600 капсул) входит в стоимость.",
-        "Сервисный сбор 5% — это комиссия платёжной системы, он указан отдельно, а не спрятан в цене."
+        "Оценка состояния, разбор анализов и предварительная консультация по личному протоколу реабилитации — 299 USD, разовая оплата.",
+        "Личное сопровождение — 1 300 USD за каждый оплаченный 30-дневный период. При первой оплате вы выбираете от 1 до 12 месяцев, и сумма равна 1 300 USD, умноженным на выбранное количество месяцев.",
+        "Формула Professor Python на оплаченный период предоставляется в подарок и отдельно не продаётся. Её доставка включена в стоимость сопровождения; отдельного сервисного сбора или платы за доставку нет.",
+        "Если по законодательству вашей страны или региона к покупке применяется налог, платёжный провайдер рассчитывает его отдельно при оформлении оплаты."
       ]
     },
     {
@@ -359,14 +359,14 @@ const REFUND_RU: LegalDocument = {
       ]
     },
     {
-      heading: "7. Смена тарифа",
+      heading: "8. Продление сопровождения",
       paragraphs: [
-        "Перейти с 5 недель на 100 дней можно: вы доплачиваете разницу, а пройденное время засчитывается. Обратный переход с возвратом разницы не предусмотрен — работа по расширенной программе к этому моменту уже ведётся.",
-        "Напишите нам, и мы посчитаем доплату лично для вашего случая."
+        "Первоначальный оплаченный срок выбирается до оплаты. Уже начавшийся оплаченный период не сокращается с возвратом части стоимости.",
+        "Если вы включили автоматическое продление, после окончания первоначально оплаченного срока следующее продление происходит на 30 дней по действующей стоимости. Автопродление можно отключить до следующего списания."
       ]
     },
     {
-      heading: "8. Куда писать",
+      heading: "9. Куда писать",
       paragraphs: [
         "По любому вопросу об оплате: pythonsusa@gmail.com или страница «Поддержка» в кабинете. Мы отвечаем на email в течение 24 часов в рабочие дни.",
         "Если что-то в условиях непонятно — спросите до оплаты. Мы отвечаем на такие вопросы лично и не считаем их лишними."
@@ -407,10 +407,10 @@ const REFUND_EN: LegalDocument = {
     {
       heading: "4. What the amount is made of",
       paragraphs: [
-        "A full review of test results with recovery and rehabilitation recommendations from Karen (Professor Python) costs 299 USD instead of 500 USD until 1 December 2026 (before 00:00 Los Angeles time). From 1 December 2026, the price is 500 USD. This is the final price with no additional fees, a temporary price, not a promotion.",
-        "Five-week support programme: 1,200 USD for the programme + a 5% service fee + 180 USD for delivery of the individual formula (200 capsules). Total 1,440 USD.",
-        "100-day support programme: 3,500 USD for the programme + a 5% service fee + 180 USD delivery. Total 3,855 USD. The individual formula for the whole term (600 capsules) is included.",
-        "The 5% service fee is the payment system's commission; it is shown separately rather than hidden inside the price."
+        "Condition assessment, test-results review and a preliminary consultation on a personal rehabilitation protocol costs 299 USD as a one-time payment.",
+        "Personal Support costs 1,300 USD for each paid 30-day period. On the first payment you choose from 1 to 12 months, and the amount equals 1,300 USD multiplied by the number of months selected.",
+        "Professor Python's formula for the paid period is complimentary and is not sold separately. Delivery is included in the Personal Support price; there is no separate service or delivery charge.",
+        "If a tax applies to the purchase under the laws of your country or region, the payment provider calculates it separately at checkout."
       ]
     },
     {
@@ -436,14 +436,14 @@ const REFUND_EN: LegalDocument = {
       ]
     },
     {
-      heading: "7. Changing your plan",
+      heading: "8. Extending Personal Support",
       paragraphs: [
-        "You can move from the five-week programme to the 100-day one: you pay the difference and the time already spent counts towards it. Moving back, with the difference returned, is not provided for — by that point the work on the longer programme is already under way.",
-        "Write to us and we will calculate the difference for your particular case."
+        "The initial prepaid duration is selected before payment. A paid period that has already begun is not shortened in exchange for a partial refund.",
+        "If you enabled automatic renewal, after the initial prepaid term ends the next renewal is for 30 days at the then-current price. Automatic renewal can be turned off before the next charge."
       ]
     },
     {
-      heading: "8. Where to write",
+      heading: "9. Where to write",
       paragraphs: [
         "For any question about payment: pythonsusa@gmail.com, or the Support page in your cabinet. We answer email within 24 hours on working days.",
         "If anything in the terms is unclear, ask before you pay. We answer such questions personally and never consider them a nuisance."
