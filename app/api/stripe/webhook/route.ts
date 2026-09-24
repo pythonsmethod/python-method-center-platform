@@ -376,7 +376,10 @@ async function handlePaidSession(
 
   // 3) Payment record. The unique index on processor_reference makes a
   // concurrent duplicate insert fail closed.
-  const paidAt = new Date();
+  // A delayed or retried webhook must not start a prepaid term at replay time.
+  // Stripe's signed event timestamp is the completion time for this Checkout.
+  const eventPaidAt = new Date(event.created * 1000);
+  if (!Number.isFinite(eventPaidAt.getTime())) throw new Error("invalid paid checkout timestamp");
   const { data: insertedPayment, error: paymentError } = await supabase
     .from("payments")
     .insert({
@@ -387,7 +390,7 @@ async function handlePaidSession(
       amount_cents: amountCents,
       currency,
       processor_reference: reference,
-      paid_at: paidAt.toISOString(),
+      paid_at: eventPaidAt.toISOString(),
       metadata: {
         source: "stripe_webhook",
         stripe_event_id: eventId,
@@ -396,7 +399,7 @@ async function handlePaidSession(
         stripe_metadata: session.metadata
       }
     })
-    .select("id, profile_id, case_id")
+    .select("id, profile_id, case_id, paid_at")
     .single();
   let payment = insertedPayment;
 
@@ -404,7 +407,7 @@ async function handlePaidSession(
     if (paymentError.code === "23505") {
       const { data: existingPayment, error: existingPaymentError } = await supabase
         .from("payments")
-        .select("id, profile_id, case_id")
+        .select("id, profile_id, case_id, paid_at")
         .eq("processor_reference", reference)
         .maybeSingle();
       if (existingPaymentError || !existingPayment?.id) {
@@ -444,6 +447,10 @@ async function handlePaidSession(
       .eq("id", payment.id).eq("profile_id", profileId).is("case_id", null);
     if (error) throw new Error(`payment case link failed: ${error.message}`);
   }
+  // On a duplicate payment, preserve its original paid_at instead of moving
+  // the access window to the time Stripe happened to redeliver the event.
+  const paidAt = new Date(payment.paid_at ?? eventPaidAt.toISOString());
+  if (!Number.isFinite(paidAt.getTime())) throw new Error("invalid recorded payment timestamp");
 
   // 4) Service period activation, tied to the payment. Shared with the
   // manual path on the case page, so a renewal follows the same rule
@@ -481,6 +488,7 @@ async function handlePaidSession(
     product,
     months: purchasedMonths
   });
+  if (delivery.status === "error") throw new Error(`delivery task failed: ${delivery.message}`);
   if (!["ready", "not-applicable"].includes(delivery.status)) {
     await notifyTeam({
       kind: "processing_error",
@@ -746,6 +754,7 @@ async function handlePaidSubscriptionInvoice(
     product: "personal_support",
     months: 1
   });
+  if (delivery.status === "error") throw new Error(`subscription delivery task failed: ${delivery.message}`);
 
   if (!["ready", "not-applicable"].includes(delivery.status)) {
     await notifyTeam({

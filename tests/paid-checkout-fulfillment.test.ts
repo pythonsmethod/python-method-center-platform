@@ -4,7 +4,7 @@ import { POST } from "@/app/api/stripe/webhook/route";
 
 const mocks = vi.hoisted(() => ({
   client: vi.fn(), ensureCase: vi.fn(), openPeriod: vi.fn(), delivery: vi.fn(),
-  notify: vi.fn(), referral: vi.fn(), ledgerDuplicate: false
+  notify: vi.fn(), referral: vi.fn(), ledgerDuplicate: false, paymentDuplicate: false
 }));
 vi.mock("@/lib/supabase/service", () => ({ createSupabaseServiceClient: mocks.client }));
 vi.mock("@/lib/cases/ensure-paid-case", () => ({ ensureCaseForPaidProfile: mocks.ensureCase }));
@@ -32,9 +32,17 @@ function db() {
     if (table === "profiles") return { select: () => ({ eq: () => ({
       maybeSingle: async () => ({ data: { id: profileId }, error: null })
     }) }) };
-    if (table === "payments") return { insert: (value: Record<string, unknown>) => ({ select: () => ({
-      single: async () => ({ data: { id: "payment-1", profile_id: profileId, case_id: value.case_id }, error: null })
-    }) }) };
+    if (table === "payments") return {
+      insert: (value: Record<string, unknown>) => ({ select: () => ({
+        single: async () => mocks.paymentDuplicate
+          ? { data: null, error: { code: "23505" } }
+          : { data: { id: "payment-1", profile_id: profileId, case_id: value.case_id, paid_at: value.paid_at }, error: null }
+      }) }),
+      select: () => ({ eq: () => ({ maybeSingle: async () => ({
+        data: { id: "payment-1", profile_id: profileId, case_id: null, paid_at: "2026-09-24T21:38:07.751Z" }, error: null
+      }) }) }),
+      update: () => ({ eq: () => ({ eq: () => ({ is: async () => ({ error: null }) }) }) })
+    };
     throw new Error(`unexpected table ${table}`);
   } };
 }
@@ -42,6 +50,7 @@ function db() {
 function request() {
   const payload = JSON.stringify({
     id: "evt_paid_new_case", object: "event", type: "checkout.session.completed", livemode: false,
+    created: 1790285885,
     data: { object: {
       id: "cs_test_synthetic", object: "checkout.session", livemode: false,
       client_reference_id: profileId, payment_status: "paid", status: "complete",
@@ -59,6 +68,7 @@ function request() {
 beforeEach(() => {
   vi.clearAllMocks();
   mocks.ledgerDuplicate = false;
+  mocks.paymentDuplicate = false;
   process.env.STRIPE_WEBHOOK_SECRET = secret;
   mocks.client.mockImplementation(db);
   mocks.ensureCase.mockResolvedValue(caseId);
@@ -78,10 +88,21 @@ describe("signed paid checkout fulfillment", () => {
     expect(response.status).toBe(200);
     expect(mocks.ensureCase).toHaveBeenCalledWith(expect.anything(), profileId);
     expect(mocks.openPeriod).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
-      profileId, caseId, paymentId: "payment-1", product: "personal_support", months: 6
+      profileId, caseId, paymentId: "payment-1", product: "personal_support", months: 6,
+      paidAt: new Date(1790285885 * 1000)
     }));
     expect(mocks.delivery).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
       paymentId: "payment-1", caseId, months: 6
+    }));
+  });
+
+  it("resumes a recorded payment without shifting its original paid term on webhook replay", async () => {
+    mocks.paymentDuplicate = true;
+    const response = await POST(request());
+    expect(response.status).toBe(200);
+    expect(mocks.ensureCase).toHaveBeenCalledWith(expect.anything(), profileId);
+    expect(mocks.openPeriod).toHaveBeenCalledWith(expect.anything(), expect.objectContaining({
+      profileId, caseId, paymentId: "payment-1", paidAt: new Date("2026-09-24T21:38:07.751Z")
     }));
   });
 
