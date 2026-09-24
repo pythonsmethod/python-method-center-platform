@@ -16,6 +16,9 @@
       history query that assumed retired columns still existed in staging.
 - [x] Verify the corrected Case history section on a READY Preview: no raw
       database error; RU → EN private-route copy and paid entitlement persist.
+- [x] Verify mobile paid account/return/delivery at 390px, show the paid gift
+      quantity, and route an empty paid Case to questionnaire without claiming
+      a medical review has started.
 - [ ] Verify a fresh no-Case Sandbox purchase through the new webhook revision.
 - [ ] Finish remaining release gates before enabling Production Checkout.
 

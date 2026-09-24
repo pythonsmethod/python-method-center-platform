@@ -19,6 +19,12 @@ database error, while the payment, paid-through date and Portal entry point
 remain visible in RU and EN. A fresh paid no-Case webhook remains open;
 the repaired payment alone does not prove it. Production remains HOLD.
 
+Subsequent READY Previews show the six-period gift task's quantity to the
+client and fulfillment team, and the 390px paid account/return/delivery pages
+no longer overflow horizontally. A paid but empty Case sends the client to
+the questionnaire instead of claiming that Karen is already reviewing
+materials. Full local regression: 2,088 passed, one existing skip.
+
 ## Pre-onboarding paid fulfillment — 2026-09-24
 
 An authenticated client may pay before completing medical intake. The signed

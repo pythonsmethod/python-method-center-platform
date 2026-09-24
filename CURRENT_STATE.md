@@ -40,9 +40,15 @@ rows. Preview `dpl_96BXibANiutHozREbMCpdLBrkL9X` is READY: the same
 account page now shows “No events yet” instead of a database error, with
 the payment, paid-through date and Portal button intact. RU → EN switching
 on that private route preserves the route and localizes both states. The
-final full local run passed 2,083 tests with one existing skip; TypeScript,
-ESLint, security check and diff check pass. A fresh no-Case paid webhook on
-this revision and publication gates remain pending. Production is NO-GO.
+final full local run passed 2,088 tests with one existing skip; TypeScript,
+ESLint, security check and diff check pass. At 390px width the paid cabinet,
+delivery and EN return have no horizontal overflow. The paid six-period gift
+task visibly says quantity six in the READY Preview. An empty paid Case now
+prompts for the questionnaire without claiming Karen is already reviewing
+materials; RU/EN tests and READY Preview `dpl_GEBjS9L2jZ6wDt3YhFbEnbFqNnaR`
+pass. GitHub PR CI for `46f69be` passed. A fresh no-Case paid
+webhook on this revision and publication gates remain pending. Production is
+NO-GO.
 
 ## Personal Support billing launch — 2026-09-24 — RELEASE HOLD
 
