@@ -343,13 +343,55 @@ last charged 7,800 USD, created exactly one 180-day staging access period and
 one assigned gift-delivery task with quantity 6. The assessment paid flow and
 duplicate webhook idempotency also passed. The 6-period payment used offer v9;
 the v10 tax-copy revision has passing CI and READY Preview, with RU/EN and
-mobile tariff rendering checked, but authenticated v10 consent is still open.
+mobile tariff rendering checked. Authenticated v10 consent was verified in the
+later Preview check below.
 The owner explicitly deferred the failed-renewal simulation. Final Portal
-cancellation, authenticated Checkout/return, and the Live webhook expansion
+cancellation (since verified below), authenticated paid return, the payment-page
+disclosure issue and the Live webhook expansion
 remain unverified. Release status remains **HOLD / NOT LIVE**. Tax setup is
 deferred, not deemed unnecessary; automatic tax remains disabled. See
 `CURRENT_STATE.md` and `validation/stripe-production-readiness-2026-09-22.json`
 for the current gate.
+
+### Authenticated Preview and disclosure check — 2026-09-24
+
+A confirmed synthetic staging Auth user and matching minimal client profile
+signed in through the Preview RU login page. RU prepaid-only 1-period and EN
+auto-renew 6-period Sessions opened in Stripe Sandbox without charging a card.
+The matching staging `consent_records` each contain the two `oferta-v10` sources
+and the selected term/renewal metadata. Stripe readback confirms RU `payment`
+mode, 1,300 USD, no renewal; EN `subscription` mode, 7,800 USD, six periods,
+renewal enabled. Vercel verified the Checkout return hostname is the branch
+alias pointing to the latest READY deployment, not an older Preview.
+
+Hosted Stripe Checkout nevertheless headlines the EN initial subscription as
+`$7,800 every 180 days`. The smaller submit text correctly states `$7,800
+today for 180 days, then $1,300 every 30 days`, but the two statements are
+materially inconsistent in prominence. An unpaid Sandbox pilot with a one-time
+$7,800 item and a $0/180-day recurring item did not fix the headline; Stripe
+still rendered `$7,800 every 180 days`. Stripe's Subscription prebilling API
+supports advance collection but is not exposed in Checkout Session
+`subscription_data` and has separate Customer Portal cancellation semantics.
+Do not claim the payment-page wording blocker closed or enable Live sales until
+the final architecture is proven end to end.
+
+The branch now contains a conditional Checkout Elements form for the
+renewal-selected 2–12-period case. It retains server-created Checkout Sessions
+and the existing post-payment schedule/Portal behavior, while placing the
+primary due-today and subsequent-renewal disclosures on the PMC page in both
+languages. A mode-checked Sandbox publishable key is required as
+`STRIPE_PUBLISHABLE_KEY` in the isolated Preview. An unpaid six-period Elements
+Session was accepted by Stripe with 7,800 USD total and `mode=subscription`;
+local typecheck, security gate and build pass. No browser or paid return check
+of this new form has yet passed; release stays HOLD.
+
+The owner separately approved final cancellation of the synthetic 12-period
+Sandbox subscription. RU Portal scheduled cancellation for 19 September 2027,
+the exact end of the paid 360 days. Stripe readback: subscription still active,
+`cancel_at=1821320110`, transition schedule detached; staging readback: paid
+service period still active through `2027-09-19 02:15:10+00`. Portal's add-card
+form opens, but no new test card was entered or saved. The owner has **not**
+authorized the previously declined failed-renewal simulation.
 
 ## Primary references
 

@@ -803,15 +803,25 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
 - [x] Advance a Stripe Sandbox Test Clock and collect the first 1,300 USD
       automatic renewal; verify paid invoice, next access period, delivery task
       and idempotent webhook resend in staging.
-- [ ] Execute final Portal cancellation; previewing the confirmation does not
-      close this acceptance case.
+- [x] Execute final Portal cancellation for the owner's approved synthetic
+      12-period Sandbox subscription; verify renewal off and paid access
+      preserved through 19 September 2027.
 - [x] Verify a READY Vercel Preview for the latest revision (`ae9e6d3`);
       protected success page returns HTTP 200 through authorized connector access.
-- [ ] Finish browser sign-in and verify the complete authenticated return flow.
+- [x] Sign in as a synthetic staging client and open authenticated RU/EN
+      Sandbox Checkout Sessions; verify `oferta-v10` consent rows and totals.
+- [ ] Complete an authenticated paid return from Stripe to the Preview app.
 - [x] Connect isolated Preview secrets and signed Stripe Sandbox webhook with
       a separate revocable bypass secret approved by the owner.
 - [x] Resolve Stripe's "free trial" labeling with a paid initial subscription
       period; hosted Sandbox Checkout showed no free-trial language.
+- [ ] Resolve a remaining hosted Checkout disclosure conflict: its prominent
+      EN summary says `$7,800 every 180 days` for a six-period initial term,
+      while the scheduled subsequent billing is `$1,300 every 30 days`.
+      An unpaid $0-recurring-plus-one-time pilot retained the same headline.
+      The draft branch now uses Checkout Elements for renewal-selected 2–12
+      terms; local build and an unpaid Sandbox Elements Session pass, but
+      Preview UI and paid-flow acceptance remain open.
 - [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
       RU/EN customer pages; local tests alone do not close these gates.
 - [ ] Publish only after the existing release gate; deactivate retired sales
@@ -846,8 +856,9 @@ Production schema is prepared; commercial publication remains HOLD.
 - [x] Verify a 6-period prepaid-only Sandbox payment: 7,800 USD, no renewal,
   exactly one active 180-day staging period and one assigned gift-delivery task
   with quantity 6. This Checkout used the earlier v9 offer.
-- [ ] Verify failed renewal, final Portal cancellation and authenticated app
-  Checkout/v10 consent in the isolated Stripe Sandbox + staging Preview. The
+- [ ] Verify failed renewal and authenticated paid return in the isolated
+  Stripe Sandbox + staging Preview. Final Portal cancellation passed; app Checkout/v10
+  consent is verified with unpaid RU 1-period and EN 6-period Sessions. The
   owner deferred the failed-renewal simulation; do not run it until newly
   authorized.
 - [x] Obtain official Live Stripe `product_write` and create the four RU/EN

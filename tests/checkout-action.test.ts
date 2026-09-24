@@ -34,7 +34,7 @@ function database() {
 function stripeClient() {
   return {
     customers: { create: vi.fn().mockResolvedValue({ id: "cus_owner" }), update: vi.fn().mockResolvedValue({ id: "cus_owner" }) },
-    checkout: { sessions: { create: vi.fn().mockResolvedValue({ url: "https://checkout.stripe.com/fixture", livemode: false }) } },
+    checkout: { sessions: { create: vi.fn().mockResolvedValue({ id: "cs_test_fixture", client_secret: "cs_test_fixture_secret_fixture", url: "https://checkout.stripe.com/fixture", livemode: false }) } },
     billingPortal: { sessions: { create: vi.fn().mockResolvedValue({ url: "https://billing.stripe.com/fixture" }) } }
   };
 }
@@ -44,7 +44,8 @@ beforeEach(() => {
   vi.clearAllMocks();
   for (const [name, value] of Object.entries({
     STRIPE_CHECKOUT_ENABLED: "true", STRIPE_CHECKOUT_MODE: "test", STRIPE_SECRET_KEY: "sk_test_fixture",
-    STRIPE_WEBHOOK_SECRET: "whsec_fixture", STRIPE_CHECKOUT_RETURN_ORIGIN: origin
+    STRIPE_WEBHOOK_SECRET: "whsec_fixture", STRIPE_CHECKOUT_RETURN_ORIGIN: origin,
+    STRIPE_PUBLISHABLE_KEY: "pk_test_abcdefghijklmnopqrstuvwxyz"
   })) vi.stubEnv(name, value);
   db = database(); stripe = stripeClient();
   mocks.supabase.mockResolvedValue(db); mocks.stripe.mockReturnValue(stripe);
@@ -55,7 +56,9 @@ afterEach(() => vi.unstubAllEnvs());
 
 describe("authenticated checkout action", () => {
   it("binds the owner on the server, stores two exact consents and requests the selected language", async () => {
-    await expect(createPaymentCheckout(input)).resolves.toEqual({ url: "https://checkout.stripe.com/fixture" });
+    await expect(createPaymentCheckout(input)).resolves.toEqual({ elements: {
+      clientSecret: "cs_test_fixture_secret_fixture", publishableKey: "pk_test_abcdefghijklmnopqrstuvwxyz", sessionId: "cs_test_fixture"
+    } });
     expect(db.billing.eq).toHaveBeenCalledWith("profile_id", owner);
     expect(db.consent.insert).toHaveBeenCalledWith([
       expect.objectContaining({ profile_id: owner, source: "payment_page", metadata: expect.objectContaining({ months: 12, auto_renew: true, ui_locale: "en", immediate_start: false }) }),
@@ -65,6 +68,7 @@ describe("authenticated checkout action", () => {
     expect(stripe.customers.create).toHaveBeenCalledWith(expect.objectContaining({ preferred_locales: ["en"], metadata: { profile_id: owner } }), expect.anything());
     expect(stripe.checkout.sessions.create).toHaveBeenCalledWith(expect.objectContaining({
       client_reference_id: owner, customer: "cus_owner", locale: "en", mode: "subscription",
+      ui_mode: "elements",
       line_items: [{ price: "price_prepaid-renewal", quantity: 1 }],
       subscription_data: expect.not.objectContaining({ trial_period_days: expect.anything() })
     }), expect.objectContaining({ idempotencyKey: expect.any(String) }));
@@ -130,6 +134,14 @@ describe("authenticated checkout action", () => {
     vi.stubEnv("STRIPE_CHECKOUT_ENABLED", "false");
     await expect(createPaymentCheckout(input)).resolves.toEqual({ error: "unavailable" });
     expect(mocks.supabase).not.toHaveBeenCalled();
+  });
+  it("fails before side effects when the Elements publishable key is missing or live", async () => {
+    for (const key of ["", "pk_live_abcdefghijklmnopqrstuvwxyz"]) {
+      vi.stubEnv("STRIPE_PUBLISHABLE_KEY", key);
+      await expect(createPaymentCheckout(input)).resolves.toEqual({ error: "unavailable" });
+    }
+    expect(mocks.supabase).not.toHaveBeenCalled();
+    expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
   });
 });
 

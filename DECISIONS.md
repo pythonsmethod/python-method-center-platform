@@ -1461,3 +1461,24 @@ v9 fingerprint and earlier consent history. The 299/1,300 USD commercial
 amounts, complimentary Formula and included delivery do not change. Current
 Prices are `tax_behavior=exclusive`; a later inclusive-tax decision requires
 a deliberate new Price/catalog version, not mutation of the existing Prices.
+
+## 2026-09-24 — Use Checkout Elements for multi-period automatic renewal (pending Preview acceptance)
+
+Stripe-hosted Checkout prominently describes a paid `N × 30`-day initial
+subscription Price as `1,300 × N USD every N × 30 days`, even though the
+post-payment schedule switches subsequent invoices to 1,300 USD every 30 days.
+A smaller custom-text explanation cannot cure that conflicting headline.
+For renewal-selected terms of 2–12 periods, keep server-created Checkout
+Sessions and the existing webhook, schedule and Portal contract, but render
+Stripe's Payment Element inside a bilingual PMC-owned checkout summary. Show
+the actual Checkout Session total due today and clearly distinguish the paid
+term from subsequent 30-day renewals. One-period renewals and non-renewing
+purchases continue through hosted Checkout. The publishable key is mode-checked
+and returned only with an authenticated Elements Session; no client-controlled
+amount, account, catalog or return URL is accepted. A return URL does not prove
+payment: the success page must verify the completed, paid Session belongs to
+the signed-in account.
+
+This change is in the draft branch only. A successful local build and unpaid
+Sandbox Elements Session do **not** close Preview UI/payment, paid return or
+Live launch acceptance. Keep sales disabled until end-to-end validation.

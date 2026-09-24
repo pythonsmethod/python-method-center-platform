@@ -4,8 +4,8 @@ import { createHash } from "node:crypto";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { getOfferDocumentLocale, OFFER_BINDING_LOCALE, OFFER_VERSION } from "@/lib/legal/offer";
 import { getStripe } from "@/lib/payments/stripe";
-import { getCheckoutSettings } from "@/lib/payments/checkout-settings";
-import { buildCheckoutSession, parseCheckoutInput, type CheckoutResult } from "@/lib/payments/checkout-contract";
+import { getCheckoutElementsPublishableKey, getCheckoutSettings } from "@/lib/payments/checkout-settings";
+import { buildCheckoutSession, parseCheckoutInput, requiresCheckoutElements, type CheckoutResult } from "@/lib/payments/checkout-contract";
 import { ensureCheckoutPrice, ensurePortalConfiguration } from "@/lib/payments/checkout-catalog";
 
 // Next Server Actions enforce POST and Origin/Host validation. Every invocation
@@ -16,6 +16,9 @@ export async function createPaymentCheckout(raw: unknown): Promise<CheckoutResul
   if (!input) return { error: "invalid" };
   const settings = getCheckoutSettings();
   if (!settings) return { error: "unavailable" };
+  const elements = requiresCheckoutElements(input);
+  const publishableKey = elements ? getCheckoutElementsPublishableKey(settings.livemode) : null;
+  if (elements && !publishableKey) return { error: "unavailable" };
   try {
     const supabase = await createSupabaseServerClient();
     if (!supabase) return { error: "unavailable" };
@@ -86,7 +89,12 @@ export async function createPaymentCheckout(raw: unknown): Promise<CheckoutResul
       buildCheckoutSession(input, user.id, customerId, { prepaid, renewal }, settings),
       { idempotencyKey: key }
     );
-    if (!session.url || session.livemode !== settings.livemode) return { error: "unavailable" };
+    if (session.livemode !== settings.livemode) return { error: "unavailable" };
+    if (elements) {
+      if (!session.client_secret || !publishableKey) return { error: "unavailable" };
+      return { elements: { clientSecret: session.client_secret, publishableKey, sessionId: session.id } };
+    }
+    if (!session.url) return { error: "unavailable" };
     return { url: session.url };
   } catch {
     // Stripe responses can contain payer information; never return them to UI.

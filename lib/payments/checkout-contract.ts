@@ -22,7 +22,18 @@ export type CheckoutInput = {
   requestId: string;
 };
 export type CheckoutError = "invalid" | "signin" | "unavailable" | "consent" | "subscription-exists" | "period-active";
-export type CheckoutResult = { url: string } | { error: CheckoutError };
+export type CheckoutResult =
+  | { url: string }
+  | { elements: { clientSecret: string; publishableKey: string; sessionId: string } }
+  | { error: CheckoutError };
+
+// Hosted Checkout describes an N-period initial Price as recurring every
+// N×30 days, even though our subscription schedule changes it to 30 days.
+// Render the payment form ourselves for that case so the primary billing
+// disclosure matches the actual first charge and subsequent renewals.
+export function requiresCheckoutElements(input: CheckoutInput): boolean {
+  return input.product === PERSONAL_SUPPORT_PRODUCT && input.autoRenew && input.months > 1;
+}
 
 export function parseCheckoutInput(raw: unknown): CheckoutInput | null {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return null;
@@ -51,6 +62,7 @@ export function checkoutMetadata(input: CheckoutInput, profileId: string) {
 
 export function buildCheckoutSession(input: CheckoutInput, profileId: string, customerId: string,
   prices: { prepaid: string; renewal?: string }, settings: CheckoutSettings): Stripe.Checkout.SessionCreateParams {
+  const elements = requiresCheckoutElements(input);
   const support = input.product === PERSONAL_SUPPORT_PRODUCT;
   const days = input.months * PERSONAL_SUPPORT_PERIOD_DAYS;
   const amount = support ? input.months * PERSONAL_SUPPORT_MONTHLY_USD : REVIEW_TOTAL_USD;
@@ -86,9 +98,13 @@ export function buildCheckoutSession(input: CheckoutInput, profileId: string, cu
         metadata
       }
     } : { payment_intent_data: { metadata } }),
-    custom_text: { submit: { message: summary + (settings.automaticTax
+    ...(elements ? { ui_mode: "elements" as const } : {}),
+    ...(!elements ? { custom_text: { submit: { message: summary + (settings.automaticTax
       ? (ru ? " Применимые налоги добавляются при оплате." : " Applicable taxes are added at checkout.") : "") } },
-    success_url: `${settings.origin}${localizedHref("/payment/success", input.locale)}?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${settings.origin}${localizedHref("/payment", input.locale)}`
+      success_url: `${settings.origin}${localizedHref("/payment/success", input.locale)}?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${settings.origin}${localizedHref("/payment", input.locale)}`
+    } : {
+      return_url: `${settings.origin}${localizedHref("/payment/success", input.locale)}?session_id={CHECKOUT_SESSION_ID}`
+    })
   };
 }

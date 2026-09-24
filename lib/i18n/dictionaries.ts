@@ -1104,6 +1104,10 @@ const ru = {
     eyebrow: "Оплата получена",
     title: "Благодарим вас!",
     description: "Ваш платёж успешно принят. Дальнейшие шаги зависят от выбранной услуги и появятся в личном кабинете.",
+    pendingEyebrow: "Проверка оплаты",
+    pendingTitle: "Платёж пока не подтверждён",
+    pendingDescription: "Мы не можем подтвердить оплату по этой ссылке. Проверьте состояние в личном кабинете; если списание произошло, не платите повторно и напишите в поддержку.",
+    retryCta: "Вернуться к тарифам",
     whatNextLabel: "Что происходит дальше",
     steps: [
       "Оплата привязывается к вашему аккаунту автоматически в течение нескольких минут. Если через 10 минут её не видно в кабинете — напишите нам.",
@@ -2253,6 +2257,10 @@ const en: typeof ru = {
     eyebrow: "Payment received",
     title: "Thank you!",
     description: "Your payment has been received. The next steps depend on the service you selected and will appear in your account.",
+    pendingEyebrow: "Payment check",
+    pendingTitle: "Payment not yet confirmed",
+    pendingDescription: "We cannot confirm payment from this link. Check your account; if you were charged, do not pay again and contact support.",
+    retryCta: "Back to plans",
     whatNextLabel: "What happens next",
     steps: [
       "The payment is linked to your account automatically within a few minutes. If you don't see it in your account after 10 minutes, write to us.",

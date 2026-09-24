@@ -40,8 +40,9 @@ between Stripe's frozen Test Clock and webhook wall time. The code now anchors
 subscription access to the exact paid invoice period and blocks overlapping
 auto-renew purchases; the 12-period payment above verifies this on the deployed
 revision. The owner declined a proposed failed-renewal simulation, so no test
-card was changed or clock advanced for that scenario. Failed payment, final
-Portal cancellation and authenticated return flow remain unverified. The
+card was changed or clock advanced for that scenario. Failed renewal, the
+authenticated paid return flow and truthful payment-page disclosure remain
+unverified; final Sandbox Portal cancellation passed as recorded below. The
 6-period payment used the earlier v9 offer before the tax-copy correction.
 The 12-period synthetic fixture was created directly in staging
 and its Checkout through Stripe API, so it does not prove app authentication or
@@ -49,9 +50,51 @@ consent persistence. After the owner updated the official Live Stripe
 connection, all four deterministic RU/EN Live products, 30 Prices and two
 localized Portal configurations were created and read back. The Live webhook
 still lacks four recurring-billing events, and the new Checkout remains
-disabled in Production. Authenticated consent/return acceptance, declined
-renewal (owner deferred), final Portal cancellation, webhook expansion,
+disabled in Production. Authenticated consent passed; paid return, declined
+renewal (owner deferred), payment-page disclosure, webhook expansion,
 merges and publication remain open. Commercial launch is NO-GO.
+
+Later authenticated Preview check: a separate confirmed synthetic staging
+client signed in through the deployed RU login page. Its minimal client profile
+was added in staging because Dashboard-created Auth users bypass the app's
+registration-profile hook. RU 1-period prepaid-only and EN 6-period
+renewal-selected Checkout Sessions opened in Stripe Sandbox without payment.
+Each produced two `oferta-v10` consent rows with the exact locale, term and
+renewal choice; Stripe confirmed totals of 1,300 USD and 7,800 USD, respectively.
+The EN return URL is the branch Preview alias, verified by Vercel to resolve to
+the latest READY commit. These unpaid sessions do not prove authenticated
+post-payment return or delivery.
+
+The EN six-period Checkout exposed a remaining disclosure defect: Stripe's
+prominent summary says `7,800 USD every 180 days`, while the lower custom text
+correctly says the next charge is 1,300 USD every 30 days. A Sandbox pilot using
+a one-time 7,800 USD line plus a zero-price 180-day recurring line still showed
+`7,800 USD every 180 days`; it was not paid or deployed. This replaces the
+earlier free-trial wording but does not yet satisfy the requirement that the
+hosted payment page unambiguously state the one-time initial term and different
+future renewal cadence. Commercial launch remains NO-GO pending an acceptable
+payment-page design and the other release gates above.
+
+An unmerged branch change now selects Stripe Checkout Elements for
+renewal-selected 2–12-period terms. Its PMC-owned RU/EN summary separates the
+initial paid term from subsequent 30-day charges; the server still creates a
+Checkout Session and keeps the webhook/Portal schedule model. The paid return
+page now checks the Stripe Session and authenticated owner before saying
+payment succeeded. A Sandbox Elements Session was created unpaid with 7,800 USD
+total, `mode=subscription`, and a client secret. Local tests and build pass;
+browser rendering, actual Elements payment, paid return and webhook delivery
+remain unverified. A matching Sandbox publishable key is required in the
+isolated Preview environment. Do not enable Production sales from local proof.
+
+With the owner's action-time approval, the synthetic 12-period Sandbox
+subscription was canceled through the Russian Customer Portal. Portal now
+shows cancellation scheduled for 19 September 2027 and still offers a card
+update form (opened but no payment method was changed). Stripe readback shows
+the subscription remains `active`, `cancel_at` equals the paid 360-day period
+end, and the transition schedule has been detached. Staging retains an active
+personal-support service period through the same timestamp. This validates
+turning off renewal without shortening paid access; it does not test a failed
+renewal or actual card replacement.
 
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 

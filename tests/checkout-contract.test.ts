@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { buildCheckoutSession, parseCheckoutInput, type CheckoutInput } from "@/lib/payments/checkout-contract";
-import { getBillingSettings, getCheckoutSettings } from "@/lib/payments/checkout-settings";
+import { buildCheckoutSession, parseCheckoutInput, requiresCheckoutElements, type CheckoutInput } from "@/lib/payments/checkout-contract";
+import { getBillingSettings, getCheckoutElementsPublishableKey, getCheckoutSettings } from "@/lib/payments/checkout-settings";
 import { languageSwitchHref } from "@/lib/i18n/routing";
 
 const requestId = "8f4b852e-1111-4222-8333-fbc5515f5dee";
@@ -26,8 +26,10 @@ describe.each(["ru", "en"] as const)("Checkout contract in %s", locale => {
       expect(session).not.toHaveProperty("shipping_options");
       const submit = session.custom_text?.submit;
       const copy = submit ? submit.message : "";
-      expect(copy).toContain(locale === "ru" ? `${months * 30} дней` : `${months * 30} days`);
-      expect(copy).toContain(locale === "ru" ? "доставка включена" : "delivery is included");
+      if (!autoRenew || months === 1) {
+        expect(copy).toContain(locale === "ru" ? `${months * 30} дней` : `${months * 30} days`);
+        expect(copy).toContain(locale === "ru" ? "доставка включена" : "delivery is included");
+      }
       if (autoRenew) {
         expect(session.mode).toBe("subscription");
         expect(session.line_items).toHaveLength(1);
@@ -35,7 +37,7 @@ describe.each(["ru", "en"] as const)("Checkout contract in %s", locale => {
         expect(session.subscription_data).not.toHaveProperty("trial_settings");
         expect(session.subscription_data?.metadata).toEqual(session.metadata);
         expect(session.payment_method_collection).toBe("always");
-        expect(copy).toContain(locale === "ru" ? "1,300 USD каждые 30 дней" : "USD 1,300 every 30 days");
+        if (months === 1) expect(copy).toContain(locale === "ru" ? "1,300 USD каждые 30 дней" : "USD 1,300 every 30 days");
       } else {
         expect(session.mode).toBe("payment");
         expect(session.line_items).toHaveLength(1);
@@ -43,8 +45,17 @@ describe.each(["ru", "en"] as const)("Checkout contract in %s", locale => {
         expect(session.payment_intent_data).not.toHaveProperty("setup_future_usage");
         expect(session).not.toHaveProperty("invoice_creation");
       }
-      expect(session.cancel_url).toBe(`${settings.origin}${locale === "en" ? "/en" : ""}/payment`);
-      expect(session.success_url).toBe(`${settings.origin}${locale === "en" ? "/en" : ""}/payment/success?session_id={CHECKOUT_SESSION_ID}`);
+      if (autoRenew && months > 1) {
+        expect(requiresCheckoutElements(selection)).toBe(true);
+        expect(session.ui_mode).toBe("elements");
+        expect(session.return_url).toBe(`${settings.origin}${locale === "en" ? "/en" : ""}/payment/success?session_id={CHECKOUT_SESSION_ID}`);
+        expect(session).not.toHaveProperty("success_url");
+        expect(session).not.toHaveProperty("cancel_url");
+      } else {
+        expect(requiresCheckoutElements(selection)).toBe(false);
+        expect(session.cancel_url).toBe(`${settings.origin}${locale === "en" ? "/en" : ""}/payment`);
+        expect(session.success_url).toBe(`${settings.origin}${locale === "en" ? "/en" : ""}/payment/success?session_id={CHECKOUT_SESSION_ID}`);
+      }
     }
   );
   it("charges the assessment once without a support term or renewal", () => {
@@ -92,5 +103,13 @@ describe("environment boundary", () => {
   });
   it("keeps portal cancellation available with new sales disabled", () => {
     expect(getBillingSettings({ ...validEnv, STRIPE_CHECKOUT_ENABLED: "false" })).toEqual(settings);
+  });
+  it("never gives an Elements session a publishable key from the other mode", () => {
+    const testKey = "pk_test_abcdefghijklmnopqrstuvwxyz";
+    const liveKey = "pk_live_abcdefghijklmnopqrstuvwxyz";
+    expect(getCheckoutElementsPublishableKey(false, { NODE_ENV: "test", STRIPE_PUBLISHABLE_KEY: testKey })).toBe(testKey);
+    expect(getCheckoutElementsPublishableKey(true, { NODE_ENV: "test", STRIPE_PUBLISHABLE_KEY: testKey })).toBeNull();
+    expect(getCheckoutElementsPublishableKey(true, { NODE_ENV: "test", STRIPE_PUBLISHABLE_KEY: liveKey })).toBe(liveKey);
+    expect(getCheckoutElementsPublishableKey(false, { NODE_ENV: "test", STRIPE_PUBLISHABLE_KEY: liveKey })).toBeNull();
   });
 });

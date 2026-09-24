@@ -28,3 +28,8 @@ export function getBillingSettings(env: NodeJS.ProcessEnv = process.env) {
 }
 
 export type CheckoutSettings = NonNullable<ReturnType<typeof getCheckoutSettings>>;
+
+export function getCheckoutElementsPublishableKey(livemode: boolean, env: NodeJS.ProcessEnv = process.env): string | null {
+  const key = env.STRIPE_PUBLISHABLE_KEY?.trim() ?? "";
+  return key.startsWith(livemode ? "pk_live_" : "pk_test_") && key.length > 20 ? key : null;
+}

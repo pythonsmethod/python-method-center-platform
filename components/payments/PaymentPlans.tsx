@@ -6,6 +6,7 @@ import type { PaymentPlan } from "@/lib/payments/config";
 import { createPaymentCheckout } from "@/lib/payments/actions";
 import type { CheckoutError } from "@/lib/payments/checkout-contract";
 import type { Locale } from "@/lib/i18n/locale";
+import { RenewalCheckoutElements } from "@/components/payments/RenewalCheckoutElements";
 
 const PERSONAL_SUPPORT_PRODUCT = "personal_support" as const;
 
@@ -82,6 +83,9 @@ export function PaymentPlans({
   const attemptRef = useRef<{ selection: string; requestId: string } | null>(null);
   const [pendingProduct, setPendingProduct] = useState<string | null>(null);
   const [checkoutError, setCheckoutError] = useState<CheckoutError | null>(null);
+  const [elementsCheckout, setElementsCheckout] = useState<{
+    clientSecret: string; publishableKey: string; sessionId: string; months: number;
+  } | null>(null);
 
   async function startCheckout(plan: PaymentPlan) {
     if (busyRef.current) return;
@@ -103,6 +107,10 @@ export function PaymentPlans({
         offerAccepted, startAccepted, requestId: attemptRef.current.requestId
       });
       if ("error" in result) { setCheckoutError(result.error); return; }
+      if ("elements" in result) {
+        setElementsCheckout({ ...result.elements, months });
+        return;
+      }
       window.location.assign(result.url);
       leaving = true;
     } catch {
@@ -168,6 +176,14 @@ export function PaymentPlans({
         {pendingProduct === plan.product ? labels.checkoutPending : labels.payButton}
       </button>
     );
+  }
+
+  if (elementsCheckout) {
+    return <RenewalCheckoutElements
+      {...elementsCheckout}
+      locale={locale}
+      onBack={() => { attemptRef.current = null; setElementsCheckout(null); }}
+    />;
   }
 
   return (
