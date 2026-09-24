@@ -1,4 +1,21 @@
-# AGENTS.md — ANKH ANALYSIS SYSTEM OPERATING RULES
+# AGENTS.md — NEXORA CORE / PMC APPLICATION OPERATING RULES
+
+## Owner-approved architecture — 2026-09-23
+
+Read `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` before new architecture work.
+NEXORA owns reusable capabilities, including document analysis. ANHAM is the
+AI system within Python Method Center and consumes those capabilities through
+a PMC authorization/domain adapter. External capability commercialization belongs
+to NEXORA / NEXORA API. ANKH is retired as a standalone system/product name.
+
+The implementation is still hosted in this repository; the approved target does
+not prove a separate NEXORA runtime or released API. Do not duplicate Cases,
+source documents, evidence or an entire processing engine to satisfy the naming.
+Keep organization/app/subject authorization and PMC-specific methodology separate.
+
+Legacy `docs/ankh`, harness, script, environment and provider identifiers remain
+compatibility references until a reviewed migration updates their dependants.
+Do not relabel historical benchmark evidence as new NEXORA runtime validation.
 
 ## Repository-wide boundaries
 
@@ -8,13 +25,13 @@
 - The retired client processing classification remains retired. Client cases and support requests have no processing status, urgency, prioritization, automatic transition, badge or filter. `docs/architecture/CLIENT_PROCESSING_WITHOUT_CLASSIFICATION.md` is authoritative.
 - Every user-facing change must be complete in Russian and English. Visible copy, accessibility labels, validation, metadata, navigation and states must follow the active locale. Language switching must preserve the route and be verified in both directions.
 
-These repository-wide rules remain authoritative for Ankh work. The rest of this file adds the permanent Ankh operating memory.
+These repository-wide rules remain authoritative for NEXORA capability work inside PMC. The rest of this file preserves the document-analysis operating memory.
 
 ## 1. Purpose
 
-This repository contains the Ankh Analysis System / Python Method Center clinical-document analysis platform.
+This repository contains the PMC application and the existing implementation intended to supply NEXORA document-analysis capabilities.
 
-This file defines how Codex must work on the Ankh analysis/document-processing system.
+This file defines how Codex must work on document analysis and its PMC integration.
 
 The goal is to build a precise, explainable, safe, scalable system that:
 
@@ -38,7 +55,7 @@ Source Document
 → Canonical Facts / Clinical Evidence
 → Trust Decision
 → Longitudinal Evidence Model
-→ Ankh Analytical Engine
+→ NEXORA Document Analysis + PMC Domain Adapter
 → Karen Review / Decision
 → Client Response
 
@@ -62,15 +79,15 @@ Ask the owner only for genuine owner-only actions such as:
 
 Do not return a long manual click-through guide if the action can be performed directly.
 
-## 3. Read before any Ankh work
+## 3. Read before document-analysis work
 
-Before changing Ankh code, read:
+Before changing document-analysis code, read:
 
 1. `AGENTS.md`
 2. `CURRENT_STATE.md`
 3. `ROADMAP.md`
 4. `DECISIONS.md`
-5. `Ankh_Analysis_System_Master_Concept_v1_ru.docx` or its repository Markdown equivalent
+5. `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` and the ANHAM/PMC application profile; the former `Ankh_Analysis_System_Master_Concept_v1_ru.docx` is a historical reference only
 6. relevant documents under `docs/ankh/`
 7. existing canonical Case / AI / Karen / safety documents referenced by the project
 
@@ -156,7 +173,7 @@ Until `CURRENT_STATE.md` explicitly changes this:
 DO NOT:
 - enable production auto-verification;
 - enable production PHI processing for all client uploads;
-- apply Ankh staging migrations to production without a dedicated task;
+- apply document-analysis staging migrations to production without a dedicated task;
 - start automatic diagnosis/recommendation generation;
 - generate client-facing medical interpretation without the approved workflow;
 - silently convert `NEEDS_REVIEW` to `VERIFIED`.
@@ -213,7 +230,7 @@ At minimum run relevant:
 - ESLint;
 - `git diff --check`.
 
-For extraction/trust changes, also run the current Ankh benchmark suite.
+For extraction/trust changes, also run the existing document-analysis benchmark suite under its compatible script name.
 
 ## 9. PHI / document handling
 
@@ -248,9 +265,9 @@ Use provider adapters.
 
 Do not add Azure/AWS merely to inflate accuracy without a defined validation need.
 
-## 12. Karen and Ankh roles
+## 12. NEXORA capability and PMC expert roles
 
-Ankh:
+NEXORA document analysis (through the PMC adapter):
 - extracts;
 - structures;
 - compares;
@@ -264,7 +281,7 @@ Karen:
 - interprets;
 - makes the Case decision within the Center model.
 
-Ankh must not silently turn review-only evidence into established truth.
+The capability and its PMC adapter must not silently turn review-only evidence into established truth.
 
 ## 13. Main product principle
 

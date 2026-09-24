@@ -572,54 +572,131 @@ h3 {
   margin-top: 6px;
 }
 
-/* Karen's phone-first workspace. The approved public mobile site stays
-   untouched; these rules apply only inside the protected staff area. */
+/* Today's queue on the team home: the latest cases, each a card that opens
+   the focused Today workspace. */
+.karen-queue__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.karen-queue__head p {
+  color: var(--muted);
+  font-size: 13px;
+  margin: 6px 0 0;
+}
+
+.karen-queue__head > a {
+  flex: 0 0 auto;
+  color: #e1bd48;
+  font-size: 0.78rem;
+  font-weight: 700;
+  padding-bottom: 2px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.karen-queue__list {
+  display: grid;
+  gap: 9px;
+  margin-top: 14px;
+}
+
+.karen-client-card {
+  display: grid;
+  grid-template-columns: 42px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 11px;
+  min-height: 82px;
+  padding: 12px;
+  border: 1px solid rgba(212, 168, 68, 0.23);
+  border-radius: 18px;
+  background: rgba(27, 22, 13, 0.9);
+  color: inherit;
+  text-decoration: none;
+}
+
+.karen-client-card:hover {
+  border-color: rgba(212, 168, 68, 0.5);
+}
+
+.karen-client-card__avatar {
+  display: grid;
+  width: 42px;
+  height: 42px;
+  place-items: center;
+  border: 1px solid rgba(229, 187, 66, 0.48);
+  border-radius: 50%;
+  background: #302714;
+  color: #f1ca4b;
+  font-family: var(--font-playfair), Georgia, serif;
+  font-size: 1.2rem;
+}
+
+.karen-client-card__content,
+.karen-client-card__topline {
+  min-width: 0;
+}
+
+.karen-client-card__topline {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.karen-client-card__topline strong,
+.karen-client-card__content > span,
+.karen-client-card__content small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.karen-client-card__topline strong {
+  color: #fff5dc;
+  font-size: 0.96rem;
+}
+
+.karen-client-card__topline b {
+  flex: 0 0 auto;
+  padding: 3px 6px;
+  border-radius: 999px;
+  background: #dbb536;
+  color: #171105;
+  font-size: 0.66rem;
+}
+
+.karen-client-card__content > span {
+  margin-top: 3px;
+  color: #c8baa0;
+  font-size: 0.78rem;
+}
+
+.karen-client-card__content small {
+  margin-top: 5px;
+  color: #887c64;
+  font-size: 0.68rem;
+}
+
+.karen-client-card__arrow {
+  color: #d9b13d;
+  font-size: 1.6rem;
+}
+
+/* The team workspace on a phone keeps everything the wide screen has: the
+   site header with the language switch, the workspace navigation as one
+   wrapping row of links, the same home page. Only the client and document
+   tables become card lists, because a seven-column table does not fit. */
 .admin-nav__icon,
-.karen-mobile-home,
 .staff-case-mobile,
-.staff-document-mobile,
-.admin-mobile-utility {
+.staff-document-mobile {
   display: none;
 }
 
 @media (max-width: 720px) {
-  body:has(.karen-mobile-home),
-  body:has(.admin-nav) {
-    padding-bottom: calc(86px + env(safe-area-inset-bottom));
-  }
-
-  body:has(.admin-nav) .site-header,
-  body:has(.admin-nav) .site-footer {
-    display: none;
-  }
-
-  .admin-mobile-utility {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    width: min(calc(100% - 32px), 560px);
-    margin: calc(12px + env(safe-area-inset-top)) auto 0;
-  }
-
-  .admin-mobile-utility > a,
-  .admin-mobile-utility button {
-    min-height: 40px;
-    padding: 9px 13px;
-    border: 1px solid rgba(212, 168, 68, 0.3);
-    border-radius: 999px;
-    background: rgba(24, 19, 11, 0.88);
-    color: #d8c89f;
-    font-size: 0.74rem;
-    font-weight: 700;
-    line-height: 1;
-    text-decoration: none;
-  }
-
-  .admin-mobile-utility form {
-    margin: 0;
-  }
-
   .assistant-invite .assistant-chat {
     margin-top: 18px;
   }
@@ -630,50 +707,19 @@ h3 {
   }
 
   .admin-nav {
-    position: fixed;
-    z-index: 70;
-    right: 8px;
-    bottom: calc(8px + env(safe-area-inset-bottom));
-    left: 8px;
-    margin: 0;
-    padding: 4px;
-    border: 1px solid rgba(212, 168, 68, 0.34);
-    border-radius: 18px;
-    background: rgba(11, 9, 6, 0.96);
-    box-shadow: 0 14px 40px rgba(0, 0, 0, 0.48);
-    backdrop-filter: blur(18px);
-  }
-
-  .admin-nav__label {
-    display: none;
+    gap: 8px;
+    padding: 10px 16px;
   }
 
   .admin-nav nav {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(0, 1fr));
-    gap: 2px;
-  }
-
-  .admin-nav nav a,
-  .admin-nav nav a.admin-nav__founder {
-    min-width: 0;
-    min-height: 62px;
-    padding: 7px 2px 5px;
-    border: 0;
-    border-radius: 13px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
     gap: 4px;
-    color: #c9b98f;
-    font-size: 0.64rem;
-    line-height: 1.1;
-    text-align: center;
   }
 
-  .admin-nav nav a.admin-nav__founder {
-    display: none;
+  .admin-nav a {
+    font-size: 13px;
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
   }
 
   .karen-ai-page {
@@ -699,220 +745,7 @@ h3 {
     font-size: 0.82rem;
   }
 
-  .admin-nav__icon {
-    display: block;
-    color: #e2b936;
-    font-size: 1.25rem;
-    line-height: 1;
-  }
-
-  .page-shell:has(.karen-mobile-home) {
-    width: 100%;
-    padding: 0 16px 32px;
-  }
-
-  .karen-mobile-home {
-    display: block;
-    max-width: 560px;
-    margin: 0 auto;
-  }
-
-  .karen-desktop-home {
-    display: none;
-  }
-
-  .karen-mobile-hero {
-    padding: calc(28px + env(safe-area-inset-top)) 4px 20px;
-    text-align: left;
-  }
-
-  .karen-mobile-hero > span,
-  .karen-mobile-section-head .panel__label {
-    color: #d9ae37;
-    font-size: 0.72rem;
-    font-weight: 800;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-  }
-
-  .karen-mobile-hero h1 {
-    margin: 6px 0 4px;
-    color: #fff7df;
-    font-family: var(--font-playfair), Georgia, serif;
-    font-size: clamp(2.05rem, 11vw, 3.15rem);
-    line-height: 0.96;
-  }
-
-  .karen-mobile-hero strong {
-    display: block;
-    margin-top: 16px;
-    color: #f2e9d3;
-    font-size: 1.08rem;
-  }
-
-  .karen-mobile-hero p,
-  .karen-mobile-section-head p {
-    margin: 6px 0 0;
-    color: #b8aa8b;
-    font-size: 0.9rem;
-    line-height: 1.5;
-  }
-
-  .karen-mobile-stats {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 7px;
-    margin-bottom: 18px;
-  }
-
-  .karen-mobile-stats a {
-    min-width: 0;
-    padding: 14px 8px;
-    border: 1px solid rgba(212, 168, 68, 0.25);
-    border-radius: 16px;
-    background: linear-gradient(160deg, rgba(62, 48, 19, 0.72), rgba(24, 19, 11, 0.92));
-    color: #c7b99a;
-    text-decoration: none;
-  }
-
-  .karen-mobile-stats b {
-    display: block;
-    margin-bottom: 4px;
-    color: #f1c944;
-    font-size: 1.55rem;
-    line-height: 1;
-  }
-
-  .karen-mobile-stats span {
-    display: block;
-    font-size: 0.69rem;
-    line-height: 1.22;
-  }
-
-  .karen-mobile-alert {
-    margin-bottom: 22px;
-    padding: 16px;
-    border: 1px solid rgba(227, 93, 75, 0.5);
-    border-radius: 18px;
-    background: rgba(75, 25, 19, 0.24);
-  }
-
-  .karen-mobile-section-head {
-    display: flex;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 12px;
-    margin: 8px 2px 12px;
-  }
-
-  .karen-mobile-section-head > a {
-    flex: 0 0 auto;
-    padding-bottom: 2px;
-    color: #e1bd48;
-    font-size: 0.78rem;
-    text-decoration: none;
-  }
-
-  .karen-mobile-queue {
-    display: grid;
-    gap: 9px;
-  }
-
-  .karen-client-card {
-    display: grid;
-    grid-template-columns: 42px minmax(0, 1fr) 18px;
-    align-items: center;
-    gap: 11px;
-    min-height: 82px;
-    padding: 12px;
-    border: 1px solid rgba(212, 168, 68, 0.23);
-    border-radius: 18px;
-    background: rgba(27, 22, 13, 0.9);
-    color: inherit;
-    text-decoration: none;
-  }
-
-  .karen-client-card__avatar {
-    display: grid;
-    width: 42px;
-    height: 42px;
-    place-items: center;
-    border: 1px solid rgba(229, 187, 66, 0.48);
-    border-radius: 50%;
-    background: #302714;
-    color: #f1ca4b;
-    font-family: var(--font-playfair), Georgia, serif;
-    font-size: 1.2rem;
-  }
-
-  .karen-client-card__content,
-  .karen-client-card__topline {
-    min-width: 0;
-  }
-
-  .karen-client-card__topline {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 8px;
-  }
-
-  .karen-client-card__topline strong,
-  .karen-client-card__content > span,
-  .karen-client-card__content small {
-    display: block;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
-
-  .karen-client-card__topline strong {
-    color: #fff5dc;
-    font-size: 0.96rem;
-  }
-
-  .karen-client-card__topline b {
-    flex: 0 0 auto;
-    padding: 3px 6px;
-    border-radius: 999px;
-    background: #dbb536;
-    color: #171105;
-    font-size: 0.66rem;
-  }
-
-  .karen-client-card__content > span {
-    margin-top: 3px;
-    color: #c8baa0;
-    font-size: 0.78rem;
-  }
-
-  .karen-client-card__content small {
-    margin-top: 5px;
-    color: #887c64;
-    font-size: 0.68rem;
-  }
-
-  .karen-client-card__arrow {
-    color: #d9b13d;
-    font-size: 1.6rem;
-  }
-
-  .karen-mobile-assistant {
-    scroll-margin-top: 18px;
-    margin-top: 22px;
-    padding: 18px 14px;
-    border: 1px solid rgba(212, 168, 68, 0.3);
-    border-radius: 20px;
-    background: linear-gradient(160deg, rgba(55, 43, 18, 0.58), rgba(20, 16, 10, 0.96));
-  }
-
-  .karen-mobile-assistant .staff-assistant__title {
-    margin: 8px 0 14px;
-    color: #fff4d8;
-  }
-
-  .staff-case-desktop,
-  .staff-session-panel {
+  .staff-case-desktop {
     display: none;
   }
 
@@ -1295,8 +1128,7 @@ h3 {
   min-height: calc(100dvh - 72px);
 }
 
-body:has(.karen-ai-page) .admin-nav,
-body:has(.karen-ai-page) .admin-mobile-utility {
+body:has(.karen-ai-page) .admin-nav {
   display: none;
 }
 
@@ -2698,6 +2530,17 @@ code {
 .assistant-msg--pending {
   color: var(--muted);
   font-style: italic;
+}
+
+.assistant-msg--thinking {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-width: 0;
+}
+
+.assistant-msg--thinking > span:last-child {
+  min-width: 0;
 }
 
 /* Upload history: one block per round, a golden thread down the left —
@@ -6029,18 +5872,6 @@ code {
   outline-offset: 3px;
 }
 
-@media (max-width: 560px) {
-  .site-nav__auth {
-    width: 100%;
-  }
-
-  .site-nav__signin,
-  .site-nav__signup {
-    flex: 1 1 0;
-    text-align: center;
-  }
-}
-
 /* ============================================================
    Анхам — the companion, not a chat button.
 
@@ -6141,6 +5972,13 @@ code {
   position: relative;
 }
 
+.anham__figure {
+  display: block;
+  height: 100%;
+  position: relative;
+  width: 100%;
+}
+
 /* He breathes rather than bounces: presence without demanding attention.
    The glow lives here rather than in the artwork, so it can deepen by
    tier without a second file. */
@@ -6225,6 +6063,162 @@ code {
   }
 }
 
+/* Preparing a reply: a gentle lean, lowered eyes and a tablet he browses.
+   One wrapper keeps the artwork, measured lids and tablet aligned. */
+.anham--thinking .anham__figure {
+  animation: anham-read 5.6s ease-in-out infinite;
+  transform-origin: 50% 75%;
+}
+
+.anham--thinking .anham__art,
+.anham--thinking .anham__lids {
+  animation: none;
+}
+
+.anham--thinking .anham__lid--blink {
+  animation: anham-reading-eyes 5.6s ease-in-out infinite;
+  transform: scaleY(0.3);
+}
+
+.anham--thinking .anham__lid--wink {
+  animation: none;
+  transform: scaleY(0);
+}
+
+.anham__tablet {
+  background: linear-gradient(145deg, #fff0bd, #b5842d 48%, #f4d582 75%, #8d6a22);
+  border: 1px solid #f3d78f;
+  border-radius: 12% / 20%;
+  box-shadow: 0 3px 8px #08050180, inset 0 0 0 1px #fff0bd80;
+  height: 29%;
+  left: 21%;
+  pointer-events: none;
+  position: absolute;
+  top: 56%;
+  transform: perspective(250px) rotateX(12deg) rotate(-4deg);
+  width: 58%;
+}
+
+.anham__tablet-screen {
+  background: linear-gradient(135deg, #173d40, #07171b 70%);
+  border: 1px solid #173337;
+  border-radius: 8% / 15%;
+  box-shadow: inset 0 0 8px #0009;
+  inset: 9% 7%;
+  overflow: hidden;
+  position: absolute;
+}
+
+.anham__tablet-pages {
+  animation: anham-tablet-browse 3.8s ease-in-out infinite;
+  display: grid;
+  gap: 16%;
+  height: 120%;
+  left: 12%;
+  position: absolute;
+  top: 18%;
+  width: 51%;
+}
+
+.anham__tablet-pages i {
+  background: linear-gradient(90deg, #efdc9e, #8fbcb3);
+  border-radius: 10px;
+  display: block;
+  height: 30%;
+  opacity: 0.75;
+}
+
+.anham__tablet-pages i:nth-child(even) { width: 66%; }
+
+.anham__tablet-search {
+  color: #c6e5d9;
+  height: 40%;
+  position: absolute;
+  right: 8%;
+  stroke: currentColor;
+  stroke-linecap: round;
+  stroke-width: 1.8;
+  top: 23%;
+  width: 26%;
+}
+
+.anham__tablet-scan {
+  animation: anham-tablet-scan 3.8s ease-in-out infinite;
+  background: linear-gradient(transparent, #a6dfcd30);
+  border-bottom: 1px solid #b0e5d780;
+  height: 30%;
+  inset: 0 0 auto;
+  position: absolute;
+}
+
+.anham__tablet-touch {
+  animation: anham-tablet-touch 3.8s ease-in-out infinite;
+  border: 1px solid #e3f9e8;
+  border-radius: 50%;
+  height: 18%;
+  opacity: 0;
+  position: absolute;
+  right: 5%;
+  top: 46%;
+  width: 10%;
+}
+
+.anham__tablet-hand {
+  background: linear-gradient(120deg, #fff2c4, #d8ae50 56%, #8d6a22);
+  border: 1px solid #a67a28;
+  border-radius: 45%;
+  box-shadow: 0 2px 3px #08050180, inset 1px 1px 1px #fff6d3;
+  height: 29%;
+  position: absolute;
+  width: 15%;
+}
+
+.anham__tablet-hand--left { left: -7%; top: 47%; transform: rotate(-18deg); }
+.anham__tablet-hand--right {
+  animation: anham-tablet-tap 3.8s ease-in-out infinite;
+  right: -6%;
+  top: 37%;
+  transform: rotate(18deg);
+}
+
+@keyframes anham-read {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  24%, 58% { transform: translateY(1%) rotate(1.5deg) scaleY(0.985); }
+  78% { transform: translateY(-0.6%) rotate(-1deg); }
+}
+
+@keyframes anham-reading-eyes {
+  0%, 100% { transform: scaleY(0.3); }
+  24%, 58% { transform: scaleY(0.46); }
+  64%, 66% { transform: scaleY(1); }
+  73%, 82% { transform: scaleY(0.05); }
+}
+
+@keyframes anham-tablet-browse {
+  0%, 24% { transform: translateY(0); opacity: 0.8; }
+  55%, 78% { transform: translateY(-30%); opacity: 0.8; }
+  86% { transform: translateY(-30%); opacity: 0; }
+  87% { transform: translateY(0); opacity: 0; }
+  100% { transform: translateY(0); opacity: 0.8; }
+}
+
+@keyframes anham-tablet-scan {
+  0%, 100% { transform: translateY(0); opacity: 0; }
+  20% { opacity: 0.7; }
+  78% { transform: translateY(230%); opacity: 0; }
+}
+
+@keyframes anham-tablet-tap {
+  0%, 24%, 70%, 100% { transform: translate(0, 0) rotate(18deg); }
+  36%, 48% { transform: translate(-38%, -12%) rotate(-8deg); }
+}
+
+@keyframes anham-tablet-touch {
+  0%, 34%, 64%, 100% { transform: scale(0.7); opacity: 0; }
+  42% { transform: scale(1); opacity: 0.8; }
+  58% { transform: scale(1.6); opacity: 0; }
+}
+
 /* ---------- state 2: registered ---------- */
 
 .anham--registered .anham__art {
@@ -6307,9 +6301,17 @@ code {
   .anham__lids,
   .anham__lid,
   .anham__ring,
-  .anham__aura i {
+  .anham__aura i,
+  .anham--thinking .anham__figure,
+  .anham--thinking .anham__lid--blink,
+  .anham__tablet-pages,
+  .anham__tablet-scan,
+  .anham__tablet-touch,
+  .anham__tablet-hand--right {
     animation: none;
   }
+
+  .anham__tablet-scan { display: none; }
 }
 
 /* ---------- side panel ---------- */
@@ -7317,70 +7319,10 @@ body:has(.pm-app) > .site-header,
 body:has(.pm-app) > .site-footer { display: none; }
 .native-app-route > main { min-height: 100dvh; }
 
-/* Mobile navigation is permanent for every viewer on phone-class devices.\n   Authentication changes only the account destination, never its position. */
-.public-mobile-dock { display: none; }
-
 @media (max-width: 560px), (hover: none) and (pointer: coarse) {
-  body:has(.public-mobile-dock) { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
-  body:has(.public-mobile-dock) .site-header .site-nav { display: none; }
   body:has(.app-home) .site-header {
     min-height: calc(64px + env(safe-area-inset-top));
     padding-block: calc(16px + env(safe-area-inset-top)) 10px;
-  }
-  body:has(.public-mobile-dock) .site-header__right {
-    margin-left: auto;
-    width: auto;
-  }
-  .public-mobile-dock {
-    background: rgba(12, 10, 7, .97);
-    border-top: 1px solid var(--line);
-    bottom: 0;
-    display: grid;
-    gap: 1px;
-    grid-template-columns: repeat(3, 1fr);
-    left: 0;
-    padding: 5px 6px calc(5px + env(safe-area-inset-bottom));
-    position: fixed;
-    right: 0;
-    z-index: 60;
-  }
-  .public-mobile-dock a {
-    align-items: center;
-    border: 1px solid rgba(212, 175, 55, .23);
-    border-radius: 8px;
-    color: var(--muted);
-    display: flex;
-    flex-direction: column;
-    font-size: 9px;
-    font-weight: 650;
-    gap: 2px;
-    justify-content: center;
-    line-height: 1.15;
-    min-height: 52px;
-    padding: 4px 3px;
-    text-align: center;
-  }
-  .public-mobile-dock a:first-child,
-  .public-mobile-dock a:last-child { color: var(--accent-strong); }
-  .public-mobile-dock__icon { color: var(--accent); height: 22px; width: 22px; }
-  /* The conversation is its own mobile surface. Keeping the fixed dock
-     underneath it covered the composer on short iPhones, and iOS Safari
-     could not scroll the clipped panel far enough to reveal the textarea.
-     Hide the dock until the conversation closes and size the panel against
-     the visual viewport so the keyboard can shrink it safely. */
-  body:has(.anham-companion.is-open) .public-mobile-dock {
-    display: none;
-  }
-
-  /* Анхам rests above the dock, not inside it.
-     The bar is fixed at z-index 60 and painted after him, so on a phone the
-     button that opens the assistant sat entirely underneath it: a tap at the
-     centre of the figure landed on a dock link instead. 126px is the height
-     the page already reserves for the bar in body's padding, so this uses
-     the same number rather than a second guess at it. The open panel is
-     untouched — it takes the whole screen and hides the dock itself. */
-  body:has(.public-mobile-dock) .anham-companion {
-    bottom: calc(126px + env(safe-area-inset-bottom));
   }
 
   .anham-companion.is-open {
@@ -7511,17 +7453,19 @@ body:has(.pm-app) > .site-footer { display: none; }
     width: 100%;
   }
 
+  /* The sign-in pair takes two of the three columns: squeezed into one,
+     "Регистрация" was cut off mid-word on a tablet. */
   .site-nav__auth {
     align-items: stretch;
     display: grid;
     gap: .55rem;
-    grid-column: auto;
+    grid-column: span 2;
     grid-template-columns: 1fr 1fr;
     width: 100%;
   }
 
   .site-nav__signin,
-  .site-nav__signup { min-width: 0; padding-inline: .55rem; }
+  .site-nav__signup { align-items: center; display: flex; justify-content: center; min-width: 0; padding-inline: .55rem; }
 }
 
 @media (min-width: 721px) {
@@ -7664,7 +7608,8 @@ body.cabinet-menu-open { overflow: hidden; }
 @media (max-width:1100px) {
   .web-cab { grid-template-columns:88px minmax(0,1fr); }
   .web-cab__sidebar { padding-inline:12px; }
-  .web-cab__brand>span:last-child,.web-cab__nav-title,.web-cab__nav-link>span:nth-child(2),.web-cab__nav-link>i,.web-cab__sidebar-foot { display:none; }
+  .web-cab__brand>span:last-child,.web-cab__nav-title,.web-cab__nav-link>span:nth-child(2),.web-cab__nav-link>i { display:none; }
+  .web-cab__sidebar-foot a,.web-cab__sidebar-foot button { font-size:.66rem; padding:9px 4px; text-align:center; }
   .web-cab__brand,.web-cab__nav-link { justify-content:center; }
   .web-cab__nav-link { display:flex; }
   .web-home__priority,.web-home__secondary { grid-template-columns:1fr; }
@@ -7679,7 +7624,12 @@ body.cabinet-menu-open { overflow: hidden; }
   .web-cab__nav-link { display:grid; justify-content:stretch; }
   .web-cab__backdrop { background:rgba(0,0,0,.72); border:0; inset:0; position:fixed; z-index:70; }
   .web-cab__topbar { gap:10px; min-height:66px; padding:9px 14px; }
-  .web-cab__welcome,.web-cab__token { display:none; }
+  .web-cab__welcome { display:none; }
+  .web-cab__token { font-size:.8rem; height:34px; padding:0 9px; }
+  .web-cab__token svg { height:17px; width:17px; }
+  .web-cab__top-actions { gap:8px; }
+  .web-cab__mobile-brand span { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  .web-cab__sidebar-foot a,.web-cab__sidebar-foot button { font-size:.72rem; padding:9px; text-align:left; }
   .web-cab__menu { align-items:center; background:transparent; border:0; color:var(--wc-bright); cursor:pointer; display:flex; gap:8px; min-height:44px; padding:8px; }
   .web-cab__menu-icon { display:grid; gap:5px; }
   .web-cab__menu-icon i { background:currentColor; display:block; height:1px; width:22px; }
@@ -7855,59 +7805,8 @@ body.cabinet-menu-open { overflow: hidden; }
   .case-conversation-workspace { grid-template-columns: 1fr; }
 }
 
-/* Karen's case workspace on phones: keep the reading surface light and the
-   six primary destinations in one unobtrusive row. The navigation gets out
-   of the way completely while the on-screen keyboard is being used. */
+/* Karen's case workspace on phones: keep the reading surface light. */
 @media (max-width: 720px) {
-  body:has(.karen-case-workspace) {
-    padding-bottom: calc(68px + env(safe-area-inset-bottom));
-  }
-
-  body:has(.karen-case-workspace) .admin-nav {
-    right: 0;
-    bottom: 0;
-    left: 0;
-    padding: 2px 6px max(2px, env(safe-area-inset-bottom));
-    border: 0;
-    border-top: 1px solid rgba(212, 168, 68, 0.12);
-    border-radius: 0;
-    box-shadow: 0 -8px 24px rgba(0, 0, 0, 0.26);
-  }
-
-  body:has(.karen-case-workspace) .admin-nav nav {
-    grid-template-columns: repeat(6, minmax(0, 1fr));
-    gap: 3px;
-  }
-
-  body:has(.karen-case-workspace) .admin-nav nav a,
-  body:has(.karen-case-workspace) .admin-nav nav a.admin-nav__founder {
-    min-height: 58px;
-    padding: 6px 3px 4px;
-    border-radius: 0;
-    font-size: clamp(0.5rem, 2.15vw, 0.6rem);
-    line-height: 1.08;
-    overflow: hidden;
-    white-space: normal;
-  }
-
-  body:has(.karen-case-workspace) .admin-nav nav a > span:last-child {
-    display: block;
-    max-width: 100%;
-    overflow: hidden;
-  }
-
-  body:has(.karen-case-workspace) .admin-nav__icon {
-    font-size: 1.08rem;
-  }
-
-  body:has(.karen-case-workspace):has(textarea:focus) .admin-nav {
-    display: none;
-  }
-
-  body:has(.karen-case-workspace) .public-mobile-dock {
-    display: none;
-  }
-
   .karen-case-workspace .case-conversation-workspace {
     gap: 12px;
   }
@@ -8071,54 +7970,10 @@ body.cabinet-menu-open { overflow: hidden; }
 .hq-nudge small { color:var(--wc-text); display:block; line-height:1.55; margin-top:4px; }
 .hq-nudge__cta { color:var(--wc-bright); font-size:.75rem; font-weight:800; white-space:nowrap; }
 @media (max-width:640px) { .hq-nudge { grid-template-columns:auto 1fr; } .hq-nudge__cta { grid-column:1 / -1; } }
-/* Public mobile navigation: one text row beneath the header. */
-@media (max-width: 860px), (hover: none) and (pointer: coarse) {
-  body:has(.public-mobile-dock) { padding-bottom: 0; }
-  body:has(.public-mobile-dock) .site-header .site-nav { display: none; }
-  .public-mobile-dock {
-    position: relative;
-    inset: auto;
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 5px;
-    overflow-x: auto;
-    max-width: 100%;
-    padding: 6px max(8px, env(safe-area-inset-right)) 6px max(8px, env(safe-area-inset-left));
-    background: #151109;
-    border-block: 1px solid #d4af3733;
-    scrollbar-width: thin;
-    scrollbar-color: #a18339 transparent;
-    z-index: 1;
-  }
-  .public-mobile-dock a {
-    flex: 1 0 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    min-height: 44px;
-    padding: 8px 11px;
-    border: 1px solid #d4af3733;
-    border-radius: 7px;
-    color: #e6cd8a;
-    font-size: 12px;
-    font-weight: 600;
-    line-height: 1.2;
-    white-space: nowrap;
-    text-decoration: none;
-  }
-  .public-mobile-dock .public-mobile-dock__icon { display: none; }
-  .public-mobile-dock a:focus-visible { outline: 2px solid #9de9ff; outline-offset: -3px; }
-}
-.mobile-header-account { display: none; }
-@media (max-width: 860px), (hover: none) and (pointer: coarse) {
-  .site-header { flex-wrap: wrap; gap: 8px; }
-  body:has(.public-mobile-dock) .site-header__right { display: flex; flex-wrap: nowrap; align-items: center; gap: 8px; width: auto; margin-left: auto; }
-  .mobile-header-account { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 6px 10px; border: 1px solid #d4af374d; border-radius: 8px; color: #e6cd8a; font-size: 12px; white-space: nowrap; text-decoration: none; }
-  .mobile-header-account:focus-visible { outline: 2px solid #9de9ff; outline-offset: 2px; }
-  .public-mobile-dock a:last-child { display: none; }
-  .public-mobile-dock { gap: 4px; }
-  .public-mobile-dock a { flex: 1 1 auto; padding-inline: 5px; font-size: clamp(10px, 2.8vw, 12px); }
-}
+/* The header on a phone or a touch-first device is the same header as on a
+   wide screen, with the same signs in it: nothing is swapped for a smaller
+   menu. Below 720px the bar is the two-row grid defined above (brand and
+   language first, every sign beneath); nothing is hidden at any width. */
 
 .assistant-web-result { margin-top: 1rem; padding-top: .75rem; border-top: 1px solid currentColor; overflow-wrap: anywhere; white-space: normal; }
 .assistant-web-result p { white-space: pre-wrap; margin: .5rem 0 0; }

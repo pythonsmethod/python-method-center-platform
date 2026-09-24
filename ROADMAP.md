@@ -1,4 +1,23 @@
-# ROADMAP.md — ANKH ANALYSIS SYSTEM
+# ROADMAP.md — NEXORA CORE / PMC APPLICATION
+
+## NEXORA capability ownership and migration — 2026-09-23
+
+Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future
+external consumers. Retire ANKH as a standalone system name. Technical aliases
+remain until the compatible migration is verified.
+
+- [x] NX-00: Record the decision, NEXORA master and subordinate ANHAM/PMC profile in the architecture work branch.
+- [ ] NX-01: Map each current component to shared capability, PMC domain adapter or user interface, with callers and data ownership.
+- [ ] NX-02: Introduce the document-analysis contract and thin PMC adapter without copying the engine or source history.
+- [ ] NX-03: Continue Phase 2.9 and isolated persistence/source/authorization acceptance.
+- [ ] NX-04: Accept ANHAM's complete document → Karen → saved client response flow through the shared boundary.
+- [ ] NX-05: Accept a versioned external NEXORA API with organization isolation, access control, limits, usage accounting and documentation.
+- [ ] NX-06: Expand capabilities and products only after their individual acceptance.
+
+Keep existing PMC payment/access work and clinical gates distinct. A new name does
+not require a new repository, database or deployed service at this step.
+Master: [NEXORA](docs/architecture/NEXORA_MASTER_ARCHITECTURE.md).
+
 
 ## Staff email notifications — 2026-09-17
 
@@ -393,7 +412,7 @@ Phase closure requires additional authorized real source material and independen
 
 ---
 
-# PHASE 3 — ANKH ANALYTICAL ENGINE
+# PHASE 3 — NEXORA DOCUMENT ANALYSIS / PMC DOMAIN INTEGRATION
 
 ## Phase 3A — Longitudinal Evidence Model
 Status: CONDITIONAL FUTURE / TEST-ONLY
@@ -427,7 +446,7 @@ Build:
 - deterministic document relations;
 - explicit separation between association and causality.
 
-## Phase 3D — Ankh Analytical Picture
+## Phase 3D — PMC Analytical Picture from NEXORA Evidence
 
 Build:
 - concise Case picture for Karen;
