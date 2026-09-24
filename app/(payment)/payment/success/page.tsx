@@ -10,7 +10,7 @@ import { createSupabaseServerClient } from "@/lib/supabase/server";
 export async function generateMetadata(): Promise<Metadata> {
   const t = getDictionary(await getLocale()).paymentSuccess;
 
-  return { title: t.eyebrow, description: t.description };
+  return { title: t.metadataTitle, description: t.metadataDescription };
 }
 
 export default async function PaymentSuccessPage({ searchParams }: { searchParams: Promise<{ session_id?: string }> }) {

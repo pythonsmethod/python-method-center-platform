@@ -1,6 +1,6 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import PaymentSuccessPage from "@/app/(payment)/payment/success/page";
+import PaymentSuccessPage, { generateMetadata } from "@/app/(payment)/payment/success/page";
 
 const mocks = vi.hoisted(() => ({
   getLocale: vi.fn(), supabase: vi.fn(), stripe: vi.fn(), settings: vi.fn()
@@ -48,5 +48,10 @@ describe("payment return page", () => {
   it("localizes an unconfirmed return in Russian", async () => {
     mocks.getLocale.mockResolvedValue("ru");
     expect(await render("not-a-session")).toContain("Платёж пока не подтверждён");
+  });
+  it("keeps browser metadata neutral until the payment is verified", async () => {
+    expect(await generateMetadata()).toMatchObject({ title: "Payment status" });
+    mocks.getLocale.mockResolvedValue("ru");
+    expect(await generateMetadata()).toMatchObject({ title: "Статус оплаты" });
   });
 });

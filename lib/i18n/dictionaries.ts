@@ -1101,6 +1101,8 @@ const ru = {
     taxNote: "Итоговая сумма показана до подтверждения оплаты."
   },
   paymentSuccess: {
+    metadataTitle: "Статус оплаты",
+    metadataDescription: "Проверка состояния платежа и дальнейшие шаги.",
     eyebrow: "Оплата получена",
     title: "Благодарим вас!",
     description: "Ваш платёж успешно принят. Дальнейшие шаги зависят от выбранной услуги и появятся в личном кабинете.",
@@ -2254,6 +2256,8 @@ const en: typeof ru = {
     taxNote: "The total is shown before you confirm payment."
   },
   paymentSuccess: {
+    metadataTitle: "Payment status",
+    metadataDescription: "Check your payment status and next steps.",
     eyebrow: "Payment received",
     title: "Thank you!",
     description: "Your payment has been received. The next steps depend on the service you selected and will appear in your account.",
