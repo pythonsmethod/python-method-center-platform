@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="ru">
+<head><style>body.private-boot{visibility:hidden}</style>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="robots" content="noindex,nofollow"><meta name="referrer" content="no-referrer"><meta name="theme-color" content="#090e19">
+<title>NEXORA — ANNA</title>
+<link rel="stylesheet" href="/nexora-hub/style.css">
+</head>
+<body class="private-boot">
+<header class="header"><a class="brand" href="/nexora-hub/index.html" aria-label="NEXORA">NEXORA <span>ANNA</span></a><div class="header-center"><i class="dot"></i><span data-t="personal">Личное пространство</span></div><nav><button id="history-btn" data-t="history">История</button><button id="settings-btn" data-t="branches">Ветки</button><button id="lang-btn" aria-label="Switch language">EN</button><a id="login-link" href="/login?next=%2Fnexora-hub%2Findex.html" data-t="login">Войти</a></nav></header>
+<main>
+<section class="scene" aria-label="NEXORA ecosystem">
+<img id="scene-art" class="scene-art" src="https://d2ol7oe51mr4n9.cloudfront.net/user_3IxXJd4FuSD0CpWRgsBuGwVhiGZ/146d3022-693c-43bf-806d-4cd085e26474.jpg" alt="Две грани Анны: яркая жизнь у океана и создание систем. Между ними — NEXORA." fetchpriority="high">
+<div class="scene-shade"></div>
+<svg class="rays" viewBox="0 0 1536 864" aria-hidden="true"><path data-ray="anham" d="M768 459 Q850 310 768 155"/><path data-ray="way" d="M768 459 Q590 470 420 340"/><path data-ray="woman-club" d="M768 459 Q956 453 1120 340"/><path data-ray="api" d="M768 459 Q607 693 434 629"/><path data-ray="python-method-center" d="M768 459 Q973 492 1100 650"/></svg>
+<canvas id="neural-canvas" class="neural-canvas" aria-hidden="true"></canvas>
+<button id="core-button" class="core-button" aria-label="Открыть голосового и текстового ассистента NEXORA"><span class="core-ring"></span><span class="core-call" data-t="talk">Поговорить с NEXORA</span></button>
+<button class="branch-hotspot branch-anham" data-branch="anham" aria-label="ANHAM"><span class="branch-tag"><b>ANHAM</b><span data-t="anham">Тело и восстановление</span><i>↗</i></span></button>
+<button class="branch-hotspot branch-way" data-branch="way" aria-label="WAY"><span class="branch-tag"><b>WAY</b><span data-t="way">Жизнь и возможности</span><i>↗</i></span></button>
+<button class="branch-hotspot branch-club" data-branch="woman-club" aria-label="Woman Club"><span class="branch-tag"><b>WOMAN CLUB</b><span data-t="club">Сообщество и встречи</span><i>↗</i></span></button>
+<button class="branch-hotspot branch-api" data-branch="api" aria-label="NEXORA API"><span class="branch-tag"><b>API</b><span data-t="api">Интеграции и развитие</span><i>↗</i></span></button>
+<button class="branch-hotspot branch-python" data-branch="python-method-center" aria-label="Python Method Center"><span class="branch-tag"><b>PYTHON METHOD CENTER</b><span data-t="python">Управление центром</span><i>↗</i></span></button>
+<div class="scene-caption"><span class="tiny-line"></span><p data-t="caption">Одна ты. Много миров. Единое пространство.</p></div>
+</section>
+<section class="bottom-bar"><div><span class="status-light" id="status-light"></span><span id="system-status" role="status" data-t="checking">Проверяю подключение…</span></div><button id="opportunities" data-t="possibilities">Возможности</button><button id="ceiling" data-t="ceiling">Без потолка</button><button id="reduced-motion" data-t="motion">Уменьшить движение</button></section>
+<p class="honesty-note" data-t="note">Фон — выбранная иллюстрация. Сфера, связи и кнопки интерактивны. Личные данные доступны только после входа.</p>
+</main>
+<dialog id="workspace" aria-labelledby="workspace-title">
+<div class="workspace-header"><div><small id="workspace-eyebrow">NEXORA / CORE</small><h1 id="workspace-title">Поговорим?</h1></div><button id="close-dialog" class="close" aria-label="Закрыть">×</button></div>
+<div id="branch-summary" class="branch-summary" hidden></div>
+<div class="tabs"><button data-tab="chat" class="active" data-t="assistant">Ассистент</button><button data-tab="history" data-t="history">История</button><button data-tab="settings" data-t="connections">Подключения</button></div>
+<section id="chat-view" class="view"><div id="messages" class="messages" aria-live="polite"></div><div id="feedback-box" hidden><label data-t="outcome">Что произошло после нашего шага?</label><textarea id="outcome" maxlength="2000" rows="2"></textarea><label data-t="lesson">Что ты просишь учитывать в следующий раз? Необязательно.</label><textarea id="lesson" maxlength="1000" rows="2"></textarea><button id="save-feedback" data-t="saveFeedback">Сохранить результат</button><p data-t="feedbackNote">Это твой опыт, не универсальный вывод о других людях.</p></div>
+<div id="consent-box" class="consent-box"><label><input type="checkbox" id="ai-consent"><span data-t="consent">Разрешаю передавать мои сообщения и релевантный контекст в OpenAI, сохранять разговор и обратную связь в моей базе NEXORA.</span></label></div>
+<form id="chat-form"><label class="sr-only" for="message" data-t="question">Твой вопрос</label><textarea id="message" rows="2" maxlength="6000" placeholder="С чего начнём сегодня?"></textarea><div class="compose-actions"><button id="record-btn" type="button" data-t="record">◉ Надиктовать</button><label class="voice-label"><input type="checkbox" id="speak-replies"><span data-t="speak">Читать ответы голосом устройства</span></label><button id="send-btn" type="submit" class="primary" data-t="send">Отправить ↗</button></div><p id="audio-status" role="status"></p></form><p class="privacy-mini" data-t="audioPrivacy">Микрофон включается только по нажатию. Для расшифровки запись передаётся в OpenAI; в NEXORA аудио не сохраняется. Расшифровку можно исправить перед отправкой.</p></section>
+<section id="history-view" class="view" hidden><div id="history-list"></div></section>
+<section id="settings-view" class="view" hidden><p data-t="settingsIntro">Здесь настраиваются переходы к твоим системам. Ссылка не даёт NEXORA доступ к данным приложения и не заменяет его авторизацию.</p><form id="settings-form"><div id="url-fields"></div><button class="primary" data-t="saveLinks">Сохранить переходы</button></form><div id="readiness"></div></section>
+<p id="notice" class="notice" role="status"></p>
+</dialog>
+<script type="module" src="/nexora-hub/app.mjs"></script>
+</body></html>

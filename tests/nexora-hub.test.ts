@@ -1,0 +1,13 @@
+import assert from 'node:assert/strict'; import { test } from 'vitest';
+import { destination,validateLinks,resolvedBranches,isBranch,parseAnswer,extractOutput,canUseEnvironment } from '../lib/nexora/core';
+test('known branches only',()=>{assert.ok(isBranch('way'));assert.ok(!isBranch('someone-else'));assert.ok(!isBranch(null));});
+test('verified local paths and HTTPS only',()=>{assert.equal(destination('/admin'),'/admin');assert.equal(destination('https://example.org/app'),'https://example.org/app');assert.equal(destination(''),'');});
+test('reject unsafe navigation and credentials',()=>{for(const x of ['javascript:alert(1)','//evil.example','/\\evil','http://example.com','https://user:pass@example.com','https://127.0.0.1','https://localhost','https://10.0.0.1','/%2f%2fevil'])assert.throws(()=>destination(x),x);});
+test('reject unknown settings',()=>assert.throws(()=>validateLinks({evil:'https://example.com'})));
+test('default branch navigation is honest',()=>{const a=resolvedBranches({});assert.equal(a.find(x=>x.id==='way')?.url,'');assert.equal(a.find(x=>x.id==='python-method-center')?.url,'/admin');});
+test('URL can be deliberately cleared',()=>assert.equal(resolvedBranches({'anham':''}).find(x=>x.id==='anham')?.url,''));
+test('validated structured answer',()=>assert.equal(parseAnswer({answer:'Hello',capability:'focus',skills:[],next_step:'one step',sources:[],uncertainties:[]}).answer,'Hello'));
+test('invalid or missing fields are rejected',()=>{for(const x of [null,{},'hello',{answer:'',capability:'x',next_step:'',skills:[],sources:[],uncertainties:[]}])assert.throws(()=>parseAnswer(x));});
+test('incomplete or refused provider output never pretends success',()=>{assert.throws(()=>extractOutput({status:'incomplete',output:[]}));assert.throws(()=>extractOutput({status:'completed',output:[{content:[{type:'refusal'}]}]}));});
+test('completed output collected from all text parts',()=>assert.equal(extractOutput({status:'completed',output:[{content:[{type:'output_text',text:'a'},{type:'output_text',text:'b'}]}]}),'ab'));
+test('production gated, correct staging allowed',()=>{assert.equal(canUseEnvironment('https://thylrayzjczsxlyqhtfc.supabase.co',undefined),true);assert.equal(canUseEnvironment('https://other.supabase.co',undefined),false);assert.equal(canUseEnvironment('https://other.supabase.co','true'),true);});

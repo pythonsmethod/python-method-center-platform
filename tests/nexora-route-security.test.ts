@@ -1,0 +1,33 @@
+import { beforeEach, afterEach, expect, test, vi } from "vitest";
+const m=vi.hoisted(()=>({getUser:vi.fn(),from:vi.fn(),eq:vi.fn(),maybeSingle:vi.fn(),upsert:vi.fn(),rpc:vi.fn(),ai:vi.fn()}));
+vi.mock("@/lib/supabase/server",()=>({createSupabaseServerClient:async()=>({auth:{getUser:m.getUser}})}));
+vi.mock("@/lib/supabase/service",()=>({createSupabaseServiceClient:()=>({from:m.from,rpc:m.rpc})}));
+vi.mock("@/lib/auth/require-founder",()=>({PRIMARY_FOUNDER_EMAIL:"owner@example.test"}));
+vi.mock("@/lib/security/ai-transport",()=>({aiFetch:m.ai}));
+import { GET,POST } from "../app/api/nexora/[action]/route";
+const base="https://nexora.example.test";
+const ownerId="10000000-1111-4000-8000-000000000001";
+const runId="20000000-1111-4000-8000-000000000002";
+const params=(action:string)=>({params:Promise.resolve({action})});
+function post(action:string,body:unknown,origin=base){return new Request(`${base}/api/nexora/${action}`,{method:"POST",headers:{origin,"X-Nexora-Client":"hub-v1","Content-Type":"application/json"},body:JSON.stringify(body)});}
+beforeEach(()=>{
+ vi.resetAllMocks();vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL","https://thylrayzjczsxlyqhtfc.supabase.co");vi.stubEnv("NEXORA_RUNTIME_ENABLED","");vi.stubEnv("OPENAI_API_KEY","");
+ m.getUser.mockResolvedValue({data:{user:{id:ownerId,email:"owner@example.test",email_confirmed_at:"2026-01-01"}},error:null});
+ m.maybeSingle.mockResolvedValue({data:{id:ownerId,status:"active"},error:null});m.eq.mockReturnValue({maybeSingle:m.maybeSingle});
+ m.from.mockReturnValue({select:()=>({eq:m.eq}),upsert:m.upsert});m.upsert.mockResolvedValue({error:null});m.rpc.mockResolvedValue({data:"event-id",error:null});
+});
+afterEach(()=>vi.unstubAllEnvs());
+test("anonymous read is denied without touching database",async()=>{m.getUser.mockResolvedValue({data:{user:null},error:null});const r=await GET(new Request(`${base}/api/nexora/history`),params("history"));expect(r.status).toBe(401);expect(m.from).not.toHaveBeenCalled();expect(r.headers.get("cache-control")).toContain("no-store");});
+test("wrong authenticated owner is denied",async()=>{m.getUser.mockResolvedValue({data:{user:{id:ownerId,email:"other@example.test",email_confirmed_at:"2026-01-01"}},error:null});expect((await GET(new Request(`${base}/api/nexora/status`),params("status"))).status).toBe(403);expect(m.from).not.toHaveBeenCalled();});
+test("unconfirmed owner is denied",async()=>{m.getUser.mockResolvedValue({data:{user:{id:ownerId,email:"owner@example.test",email_confirmed_at:null}},error:null});expect((await GET(new Request(`${base}/api/nexora/status`),params("status"))).status).toBe(403);});
+test("cross-origin POST is rejected before authentication or provider",async()=>{expect((await POST(post("settings",{urls:{}},"https://attacker.test"),params("settings"))).status).toBe(403);expect(m.getUser).not.toHaveBeenCalled();expect(m.ai).not.toHaveBeenCalled();});
+test("missing CSRF client marker is rejected",async()=>{const req=post("settings",{urls:{}});req.headers.delete("X-Nexora-Client");expect((await POST(req,params("settings"))).status).toBe(403);});
+test("production environment remains gated",async()=>{vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL","https://production.supabase.co");expect((await POST(post("settings",{urls:{}}),params("settings"))).status).toBe(503);expect(m.from).not.toHaveBeenCalled();});
+test("suspended owner cannot mutate",async()=>{m.maybeSingle.mockResolvedValue({data:{id:ownerId,status:"suspended"},error:null});expect((await POST(post("settings",{urls:{}}),params("settings"))).status).toBe(403);expect(m.upsert).not.toHaveBeenCalled();});
+test("streamed oversized JSON is rejected",async()=>{expect((await POST(post("settings",{value:"x".repeat(25000)}),params("settings"))).status).toBe(413);expect(m.upsert).not.toHaveBeenCalled();});
+test("malformed JSON is rejected",async()=>{const r=new Request(`${base}/api/nexora/settings`,{method:"POST",headers:{origin:base,"X-Nexora-Client":"hub-v1","Content-Type":"application/json"},body:"{"});expect((await POST(r,params("settings"))).status).toBe(400);});
+test("untrusted navigation is rejected",async()=>{expect((await POST(post("settings",{urls:{way:"javascript:alert(1)"}}),params("settings"))).status).toBe(400);expect(m.upsert).not.toHaveBeenCalled();});
+test("client supplied identity cannot redirect a settings write",async()=>{const r=await POST(post("settings",{profile_id:"someone-else",urls:{way:"https://example.test/app"}}),params("settings"));expect(r.status).toBe(200);expect(m.upsert.mock.calls[0][0].profile_id).toBe(ownerId);expect(m.eq).toHaveBeenCalledWith("id",ownerId);});
+test("feedback is scoped to the server owner, not body identity",async()=>{const r=await POST(post("feedback",{profile_id:"someone-else",run_id:runId,outcome:"Tried it",lesson:"Ask for one next step"}),params("feedback"));expect(r.status).toBe(200);expect(m.rpc).toHaveBeenCalledWith("hcs_hub_record_feedback",expect.objectContaining({p_profile:ownerId,p_run:runId}));});
+test("missing processing consent prevents model use",async()=>{const r=await POST(post("chat",{message:"Hello"}),params("chat"));expect(r.status).toBe(400);expect(m.ai).not.toHaveBeenCalled();});
+test("missing key returns explicit error, not simulated reply",async()=>{const r=await POST(post("chat",{consent:true,message:"Hello",request_id:runId,branch:"core"}),params("chat"));expect(r.status).toBe(503);expect((await r.json()).error).toBe("openai_key_missing");expect(m.ai).not.toHaveBeenCalled();});

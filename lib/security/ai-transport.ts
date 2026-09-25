@@ -1,4 +1,5 @@
 import { withAiSafety } from "./ai-policy";
+import { safeTranscriptionForm } from "./transcription-form";
 import WebSocket from "ws";
 
 export function attachLiveSession(id: string, apiKey: string) {
@@ -16,7 +17,10 @@ export async function aiFetch(destination: string, init: RequestInit): Promise<R
     throw new Error("AI_DESTINATION_DENIED");
   }
   let body: BodyInit;
-  if (url.pathname === "/v1/realtime/calls") {
+  if (url.pathname === "/v1/audio/transcriptions") {
+    // Explicit owner-consented, bounded dictation; caller still enforces authorization and quota.
+    body = safeTranscriptionForm(init.body);
+  } else if (url.pathname === "/v1/realtime/calls") {
     if (!(init.body instanceof FormData)) throw new Error("AI_BODY_DENIED");
     const raw = init.body.get("session");
     if (typeof raw !== "string") throw new Error("AI_BODY_DENIED");
