@@ -1,5 +1,28 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Pristine first paid webhook acceptance — 2026-09-24 PDT — PREVIEW VERIFIED, RELEASE HOLD
+
+A second, entirely synthetic staging buyer with no prior Case completed one
+Russian-language, one-period prepaid-only Stripe Sandbox Checkout for 1,300 USD.
+Session `cs_test_a1CEQidd12RFfTf9lcsUsPm9n7Ab1WfAVU2s2vrn9iNT9lge62roFPk82h`
+is `complete` / `paid`, `livemode=false`, with `auto_renew=false` and no
+subscription. Its first signed `checkout.session.completed` event
+`evt_1UJMvuE5bkDqmDrJCFKtJvQp` reached the current protected branch
+deployment `dpl_CdntCsibTx2ndATUYCbZpPdMibuJ` (`a0ff577`) directly;
+Vercel recorded one webhook POST with HTTP 200 at 2026-09-25 00:24:10 UTC.
+No event replay or manual repair was needed for this buyer.
+
+The before-payment staging counts were zero. After the webhook, staging has
+exactly one Case (`#492`), one `paid` 130,000-cent payment linked to the
+Stripe PaymentIntent, one `active` service period from 2026-09-25
+00:24:10 UTC through 2026-10-25 00:24:10 UTC (exactly 30 days), one linked
+gift-delivery task of quantity one (`preparing`), and one processed-event
+ledger row. All records belong to the synthetic profile. This closes the
+previously open pristine first-delivery Preview check. It does not clear the
+owner-deferred failed-renewal test or the Live tax/legal, webhook and release
+gates. Production Checkout is still disabled; no real charge or shipment was
+made.
+
 ## Authenticated one-period payment-to-access acceptance — 2026-09-24 — PREVIEW VERIFIED, RELEASE HOLD
 
 On the isolated staging/Sandbox Preview, a newly created synthetic account

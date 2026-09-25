@@ -1,5 +1,26 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Pristine paid webhook acceptance — 2026-09-24 PDT
+
+A new authenticated synthetic staging buyer with zero Case, payment,
+service-period and delivery-task rows completed one RU, one-period,
+prepaid-only 1,300 USD Stripe Sandbox Checkout. Session
+`cs_test_a1CEQidd12RFfTf9lcsUsPm9n7Ab1WfAVU2s2vrn9iNT9lge62roFPk82h`
+is `complete` / `paid`, `livemode=false`, `auto_renew=false`, with no
+subscription. The first signed `checkout.session.completed` event
+`evt_1UJMvuE5bkDqmDrJCFKtJvQp` hit the current protected branch
+deployment `dpl_CdntCsibTx2ndATUYCbZpPdMibuJ` (`a0ff577`) at
+2026-09-25 00:24:10 UTC; its Vercel webhook POST returned HTTP 200.
+No replay or manual repair was performed for this buyer.
+
+Staging readback shows exactly one Case `#492`, one paid 130,000-cent
+PaymentIntent-linked payment, one active service period from 2026-09-25
+00:24:10 UTC through 2026-10-25 00:24:10 UTC (30 days), one linked
+quantity-one gift task in `preparing`, and one processed event. The prior
+recovery test and this pristine first-delivery test are distinct. This
+verifies Sandbox/staging fulfillment only. The declined failed-renewal test,
+Live webhook, tax/legal review, PR merges and Production launch remain open.
+
 ## Authenticated prepaid-only chain and webhook recovery — 2026-09-24
 
 A new synthetic staging account with no Case completed the EN 1-period,

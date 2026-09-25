@@ -1,5 +1,17 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Pristine paid first delivery — 2026-09-24 PDT — Preview accepted, release HOLD
+
+- [x] Start with an entirely new authenticated synthetic staging buyer with no
+      Case, payment, support period or gift task.
+- [x] Complete exactly one 1,300 USD prepaid-only Russian Stripe Sandbox
+      Checkout without renewal; first signed webhook POST reaches the current
+      protected branch deployment and returns HTTP 200.
+- [x] Read back one linked Case, paid payment, exact 30-day active period,
+      quantity-one gift task and processed-event row without replay or repair.
+- [ ] Keep Production Checkout disabled until the remaining Live webhook,
+      tax/legal and release gates pass; failed renewal remains owner-deferred.
+
 ## Authenticated paid chain — 2026-09-24 — Preview acceptance, release HOLD
 
 - [x] Complete one authenticated EN 1-period, prepaid-only 1,300 USD
@@ -11,9 +23,9 @@
       Case, payment, access period, gift task or event ledger row.
 - [x] Inspect EN/RU paid return, private account and delivery in Preview;
       verify 390px layout, amount, dates and fictional delivery details.
-- [ ] Prove a pristine first delivery to the latest webhook handler from a
-      completely empty synthetic buyer. The first paid delivery in this run
-      reached an older immutable Preview before the destination was fixed.
+- [x] Prove a pristine first delivery to the latest webhook handler from a
+      separate, completely empty synthetic buyer; the earlier buyer's first
+      delivery reached an older immutable Preview and was recovered by replay.
 - [ ] Run failed-renewal acceptance only if the owner later authorizes it;
       the owner declined this test.
 - [ ] Complete Live webhook, tax/legal and release checks; keep Production
@@ -38,8 +50,8 @@
 - [x] Verify mobile paid account/return/delivery at 390px, show the paid gift
       quantity, and route an empty paid Case to questionnaire without claiming
       a medical review has started.
-- [ ] Verify a pristine first no-Case paid webhook on the latest revision;
-      signed-event replay recovery is verified separately above.
+- [x] Verify a pristine first no-Case paid webhook on the latest revision
+      with a separate buyer; signed-event replay recovery is verified separately.
 - [ ] Finish remaining release gates before enabling Production Checkout.
 
 ## NEXORA capability ownership and migration — 2026-09-23
