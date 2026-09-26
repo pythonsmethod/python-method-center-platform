@@ -1,0 +1,42 @@
+{
+  "checkedOn": "2026-09-25 PDT",
+  "environment": "Stripe Sandbox + protected Vercel Preview + staging Supabase",
+  "liveMode": false,
+  "ownerAuthorizedScope": "Change only the synthetic Sandbox subscription to test card 0341 and advance its test clock through the next 1300 USD renewal",
+  "stripe": {
+    "account": "acct_1SUwZgE5bkDqmDrJ",
+    "customer": "cus_VJeYsaHGxVDnQq",
+    "subscription": "sub_1UJ1ZOE5bkDqmDrJXrV8p5Zs",
+    "testClock": "clock_1UJ1E1E5bkDqmDrJvJ0RNQYS",
+    "clockTimeBeforeUtc": "2026-10-24 02:13",
+    "clockTimeAfterUtc": "2026-11-24 02:13",
+    "nextInvoiceDateUtc": "2026-11-23",
+    "subscriptionDefaultPaymentMethod": "pm_1UJjjwE5bkDqmDrJz2rO8qSd",
+    "cardLast4": "0341",
+    "subscriptionStatus": "past_due",
+    "invoice": "in_1UJjmZE5bkDqmDrJndf02ZDf",
+    "invoiceNumber": "EVLY33GS-0003",
+    "invoiceAmountCents": 130000,
+    "invoiceAmountRemainingCents": 130000,
+    "invoiceDashboardStatus": "Retrying",
+    "failedPaymentIntent": "pi_3UJjmcE5bkDqmDrJ0Jkhdt6l",
+    "failedEvent": "evt_1UJjmjE5bkDqmDrJ9YcEr9RW"
+  },
+  "webhook": {
+    "previewDeployment": "dpl_491RAFf9BeFJH3o6Sn2SuzKDy1Qx",
+    "branch": "agent/pmc-dynamic-checkout-20260922",
+    "vercelRuntimeHttpStatus": 200,
+    "stagingProcessedEventPresent": true
+  },
+  "staging": {
+    "project": "thylrayzjczsxlyqhtfc",
+    "profile": "95f84089-c2c2-4183-8bb0-b095d9763d41",
+    "billingSubscriptionStatus": "past_due",
+    "billingSubscriptionLastInvoice": "in_1UJjmZE5bkDqmDrJndf02ZDf",
+    "failedInvoicePaymentRows": 0,
+    "supportPeriodRowsBeforeAndAfter": 3,
+    "giftTaskRowsBeforeAndAfter": 3
+  },
+  "result": "PASS: failed renewal did not create paid access or a new gift task",
+  "releaseStatus": "HOLD: Live webhook and tax/legal release gates remain open; Production Checkout disabled"
+}

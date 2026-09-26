@@ -1,6 +1,23 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## Failed-renewal webhook fail-closed hardening — 2026-09-25 PDT — PREVIEW READY, LIVE HOLD
+## Declined renewal acceptance — 2026-09-25 PDT — SANDBOX VERIFIED, LIVE HOLD
+
+The owner reversed the earlier refusal and explicitly approved changing only
+the synthetic Stripe Sandbox subscription's payment method and advancing its
+Test Clock. Subscription `sub_1UJ1ZOE5bkDqmDrJXrV8p5Zs` now uses the
+decline-after-attach test card ending 0341, read back from Stripe. Its clock
+advanced from 24 October to 24 November 2026 UTC, crossing the scheduled
+23 November renewal. Stripe created invoice
+`in_1UJjmZE5bkDqmDrJndf02ZDf` for 1,300 USD, recorded a failed payment,
+left 1,300 USD due and marked the subscription `past_due` (invoice `Retrying`).
+The signed `invoice.payment_failed` event `evt_1UJjmjE5bkDqmDrJ9YcEr9RW`
+reached the protected branch Preview; Vercel reported HTTP 200 and the event
+appears in staging's processed-event ledger. Staging `billing_subscriptions`
+has `past_due` and this invoice ID. The failed invoice has zero payment rows;
+the synthetic profile still has exactly three support periods and three gift
+tasks. No unpaid extension or gift was created. This closes the failed-renewal
+acceptance gate, not the Live release gate. Stripe has a future Sandbox retry
+scheduled; it must not be mistaken for a successful payment.
 
 The `invoice.payment_failed` handler now rejects a failed Supabase
 `billing_subscriptions` status update instead of acknowledging the signed
@@ -8,10 +25,8 @@ event. The shared webhook catch releases the event-ledger claim and returns
 HTTP 500 so Stripe can retry; no unpaid support period is opened. Two new
 positive/negative route tests pass. Full local regression passed 2,094 tests
 with one existing skip; TypeScript, ESLint, security check, production build
-and `git diff --check` passed. GitHub CI passed and Vercel Preview is READY
-for commit `f5a24d8`. The actual declined-renewal Test Clock scenario has
-**not** yet been run: no synthetic payment method was changed and no test
-clock was advanced. Live webhook and tax/legal release gates remain open;
+and `git diff --check` passed. GitHub CI passed and Vercel Preview was READY
+for commit `f5a24d8`. Live webhook and tax/legal release gates remain open;
 Production Checkout is disabled.
 
 ## Pristine first paid webhook acceptance — 2026-09-24 PDT — PREVIEW VERIFIED, RELEASE HOLD

@@ -514,7 +514,34 @@ the exact end of the paid 360 days. Stripe readback: subscription still active,
 `cancel_at=1821320110`, transition schedule detached; staging readback: paid
 service period still active through `2027-09-19 02:15:10+00`. Portal's add-card
 form opens, but no new test card was entered or saved. The owner has **not**
-authorized the previously declined failed-renewal simulation.
+authorized the previously declined failed-renewal simulation at that time.
+
+### Declined renewal acceptance — 2026-09-25 PDT
+
+The owner explicitly reversed the earlier refusal for the synthetic Sandbox
+subscription only. The existing Test Clock subscription
+`sub_1UJ1ZOE5bkDqmDrJXrV8p5Zs` was changed from the successful 4242 card
+to Stripe's decline-after-attach test card ending 0341. Stripe readback shows
+that card as the subscription's own default payment method. The clock moved
+from 24 October to 24 November 2026 UTC, across the next 30-day renewal.
+Stripe created invoice `in_1UJjmZE5bkDqmDrJndf02ZDf` for 1,300 USD, with
+one failed payment attempt, 1,300 USD still due and invoice state `Retrying`.
+The subscription is `past_due`; a future test-only retry is scheduled.
+
+The signed `invoice.payment_failed` event
+`evt_1UJjmjE5bkDqmDrJ9YcEr9RW` reached the protected Preview webhook:
+Vercel runtime logs show HTTP 200 and the staging `stripe_events` ledger
+contains the event. Staging `billing_subscriptions` records `past_due` and
+the failed invoice ID. There is no `payments` row for that invoice, and the
+synthetic profile remains at three support periods and three gift-delivery
+tasks, unchanged from before the failed renewal. Thus the application did not
+grant an unpaid period or dispatch a new gift. No Live Stripe, Production DB,
+real card or real shipment was touched. Evidence is recorded in
+`validation/stripe-sandbox-failed-renewal-2026-09-25.json`.
+
+This closes the failed-renewal acceptance item only. Live webhook expansion,
+tax/legal determination and the final release verification are still open;
+Production Checkout remains disabled.
 
 ## Primary references
 

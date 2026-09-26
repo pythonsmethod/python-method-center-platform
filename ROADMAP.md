@@ -1,16 +1,16 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
-## Failed-renewal acceptance — 2026-09-25 PDT — release HOLD
+## Failed-renewal acceptance — 2026-09-25 PDT — Sandbox CLOSED, release HOLD
 
 - [x] Make `invoice.payment_failed` fail closed and retryable if saving
       `past_due` fails; prove both success and persistence-error routes in tests.
 - [x] Pass 2,094 local tests (one existing skip), TypeScript, ESLint,
       security check, production build and GitHub CI on the corrected branch.
-- [ ] In Stripe Sandbox only, replace the card on the synthetic Test Clock
-      subscription with the decline-after-attach card, advance to the next
-      renewal and verify a failed invoice, signed webhook, `past_due` state,
-      zero unpaid access extension and zero new gift task. No card or clock
-      mutation has occurred yet.
+- [x] In Stripe Sandbox only, replace the card on the synthetic Test Clock
+      subscription with decline-after-attach 0341 and advance past the next
+      renewal. Invoice `in_1UJjmZE5bkDqmDrJndf02ZDf` is a failed 1,300 USD
+      charge; the signed failure webhook reached staging, the subscription is
+      `past_due`, and no unpaid access extension or new gift task appeared.
 - [ ] Complete Live webhook, tax/legal and release checks before turning on
       Production Checkout.
 
@@ -24,7 +24,8 @@
 - [x] Read back one linked Case, paid payment, exact 30-day active period,
       quantity-one gift task and processed-event row without replay or repair.
 - [ ] Keep Production Checkout disabled until the remaining Live webhook,
-      tax/legal and release gates pass; failed renewal remains owner-deferred.
+      tax/legal and release gates pass; the later owner-approved failed
+      renewal has now passed in Sandbox (see top entry).
 
 ## Authenticated paid chain — 2026-09-24 — Preview acceptance, release HOLD
 
@@ -40,8 +41,8 @@
 - [x] Prove a pristine first delivery to the latest webhook handler from a
       separate, completely empty synthetic buyer; the earlier buyer's first
       delivery reached an older immutable Preview and was recovered by replay.
-- [ ] Run failed-renewal acceptance only if the owner later authorizes it;
-      the owner declined this test.
+- [x] Run failed-renewal acceptance after the owner explicitly reverses the
+      earlier refusal; the Sandbox-only result is recorded above.
 - [ ] Complete Live webhook, tax/legal and release checks; keep Production
       Checkout disabled until release gates pass.
 

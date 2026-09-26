@@ -6,8 +6,9 @@ For a signed `invoice.payment_failed`, the subscription status write to
 `past_due` is part of event processing, not best-effort telemetry. If that
 write fails, return HTTP 500 and release the event-ledger claim so Stripe can
 retry. Do not create a support period or gift task for an unpaid invoice.
-This is implemented and route-tested in PR #216; the actual declined-card
-Sandbox Test Clock scenario remains a separate acceptance gate. Production
+This is implemented and route-tested in PR #216. The owner later authorized
+the declined-card Sandbox Test Clock scenario; it passed with a 1,300 USD
+unpaid invoice, persisted `past_due` and no new access or gift task. Production
 sales remain disabled until the remaining release gates pass.
 
 ## PMC-BILLING-2026-09-24-03 — Replay cannot extend prepaid access or duplicate delivery
