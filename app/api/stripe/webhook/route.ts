@@ -18,6 +18,10 @@ import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { awardReferralTokensForPayment } from "@/lib/tokens/award";
 import { isUuid } from "@/lib/utils/uuid";
 import { ensureDeliveryTaskForPayment } from "@/lib/delivery/create-task";
+import { ensureCheckoutPrice } from "@/lib/payments/checkout-catalog";
+import { ensureThirtyDayRenewalSchedule } from "@/lib/payments/renewal-schedule";
+import { paidSubscriptionInvoicePeriod } from "@/lib/payments/stripe-invoice-period";
+import { ensureCaseForPaidProfile } from "@/lib/cases/ensure-paid-case";
 
 export const runtime = "nodejs";
 
@@ -91,7 +95,7 @@ export async function POST(request: Request) {
 
         // Delayed payment methods complete later via async_payment_succeeded.
         if (session.payment_status === "paid") {
-          await handlePaidSession(supabase, session, event);
+          await handlePaidSession(supabase, stripe, session, event);
         }
         break;
       }
@@ -235,6 +239,7 @@ async function handleFailedPayment(
 
 async function handlePaidSession(
   supabase: ServiceClient,
+  stripe: Stripe,
   session: Stripe.Checkout.Session,
   event: Stripe.Event
 ) {
@@ -283,6 +288,22 @@ async function handlePaidSession(
     product === "personal_support"
       ? supportMonthsFromMetadata(session.metadata, amountCents, session.currency)
       : 1;
+  const stripeSubscriptionId =
+    typeof session.subscription === "string"
+      ? session.subscription
+      : session.subscription?.id ?? null;
+  const initialInvoiceId = typeof session.invoice === "string"
+    ? session.invoice : session.invoice?.id ?? null;
+  const stripePeriod = product === "personal_support" && stripeSubscriptionId
+    ? initialInvoiceId
+      ? paidSubscriptionInvoicePeriod(
+          await stripe.invoices.retrieve(initialInvoiceId), stripeSubscriptionId, purchasedMonths
+        )
+      : null
+    : null;
+  if (stripeSubscriptionId && !stripePeriod) {
+    throw new Error("paid subscription invoice missing from checkout");
+  }
 
   if (product === "personal_support") {
     const metadataMonths = personalSupportMonthsFromMetadata(session.metadata);
@@ -291,6 +312,11 @@ async function handlePaidSession(
       metadataMonths === null ||
       !isValidPersonalSupportCharge({
         amountCents: baseAmountCents,
+        currency: session.currency,
+        months: metadataMonths
+      }) ||
+      !isValidPersonalSupportCharge({
+        amountCents,
         currency: session.currency,
         months: metadataMonths
       })
@@ -303,7 +329,7 @@ async function handlePaidSession(
           `Событие: ${eventId}`,
           `Metadata product: ${session.metadata?.product ?? "не задано"}`,
           `Metadata months: ${session.metadata?.months ?? "не задано"}`,
-          `Базовая сумма: ${baseAmountCents ?? 0} ${(session.currency ?? "не задано").toUpperCase()}`,
+          `Базовая сумма: ${baseAmountCents ?? 0}; списано: ${amountCents} ${(session.currency ?? "не задано").toUpperCase()}`,
           "Доступ не выдан: проверьте тестовую Payment Link и metadata."
         ],
         link: adminLink("/admin")
@@ -346,26 +372,25 @@ async function handlePaidSession(
     return;
   }
 
-  const { data: caseRow } = await supabase
-    .from("client_cases")
-    .select("id")
-    .eq("profile_id", profileId)
-    .maybeSingle();
+  const caseId = await ensureCaseForPaidProfile(supabase, profileId);
 
   // 3) Payment record. The unique index on processor_reference makes a
   // concurrent duplicate insert fail closed.
-  const paidAt = new Date();
+  // A delayed or retried webhook must not start a prepaid term at replay time.
+  // Stripe's signed event timestamp is the completion time for this Checkout.
+  const eventPaidAt = new Date(event.created * 1000);
+  if (!Number.isFinite(eventPaidAt.getTime())) throw new Error("invalid paid checkout timestamp");
   const { data: insertedPayment, error: paymentError } = await supabase
     .from("payments")
     .insert({
       profile_id: profileId,
-      case_id: caseRow?.id ?? null,
+      case_id: caseId,
       product,
       status: "paid",
       amount_cents: amountCents,
       currency,
       processor_reference: reference,
-      paid_at: paidAt.toISOString(),
+      paid_at: eventPaidAt.toISOString(),
       metadata: {
         source: "stripe_webhook",
         stripe_event_id: eventId,
@@ -374,7 +399,7 @@ async function handlePaidSession(
         stripe_metadata: session.metadata
       }
     })
-    .select("id")
+    .select("id, profile_id, case_id, paid_at")
     .single();
   let payment = insertedPayment;
 
@@ -382,7 +407,7 @@ async function handlePaidSession(
     if (paymentError.code === "23505") {
       const { data: existingPayment, error: existingPaymentError } = await supabase
         .from("payments")
-        .select("id")
+        .select("id, profile_id, case_id, paid_at")
         .eq("processor_reference", reference)
         .maybeSingle();
       if (existingPaymentError || !existingPayment?.id) {
@@ -414,34 +439,44 @@ async function handlePaidSession(
   }
 
   if (!payment) throw new Error("payment record missing after insert");
+  if (payment.profile_id !== profileId || (payment.case_id && payment.case_id !== caseId)) {
+    throw new Error("payment ownership mismatch");
+  }
+  if (!payment.case_id) {
+    const { error } = await supabase.from("payments").update({ case_id: caseId })
+      .eq("id", payment.id).eq("profile_id", profileId).is("case_id", null);
+    if (error) throw new Error(`payment case link failed: ${error.message}`);
+  }
+  // On a duplicate payment, preserve its original paid_at instead of moving
+  // the access window to the time Stripe happened to redeliver the event.
+  const paidAt = new Date(payment.paid_at ?? eventPaidAt.toISOString());
+  if (!Number.isFinite(paidAt.getTime())) throw new Error("invalid recorded payment timestamp");
 
   // 4) Service period activation, tied to the payment. Shared with the
   // manual path on the case page, so a renewal follows the same rule
   // wherever the money came from.
-  if (caseRow?.id) {
-    const period = await openServicePeriod(supabase, {
-      profileId,
-      caseId: caseRow.id,
-      paymentId: payment.id,
-      product,
-      paidAt,
-      months: purchasedMonths
-    });
+  const period = await openServicePeriod(supabase, {
+    profileId,
+    caseId,
+    paymentId: payment.id,
+    product,
+    paidAt,
+    months: purchasedMonths,
+    ...(stripePeriod ? { stripePeriod } : {})
+  });
 
-    if (period.status === "failed") {
-      await notifyTeam({
-        kind: "processing_error",
-        dedupeKey: `service-period-failed:${eventId}`,
-        title: "ОШИБКА ОБРАБОТКИ: период сопровождения не создан",
-        lines: [
-          `Оплата ${payment.id} записана, но период сопровождения не активирован.`,
-          `Ошибка: ${period.message}`,
-          "Создайте период вручную."
-        ],
-        link: adminLink(`/admin/cases/${caseRow.id}`)
-      });
-      throw new Error(`service period failed: ${period.message}`);
-    }
+  if (period.status === "failed") {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `service-period-failed:${eventId}`,
+      title: "ОШИБКА ОБРАБОТКИ: период сопровождения не создан",
+      lines: [
+        `Оплата ${payment.id} записана, но период сопровождения не активирован.`,
+        `Ошибка: ${period.message}`
+      ],
+      link: adminLink(`/admin/cases/${caseId}`)
+    });
+    throw new Error(`service period failed: ${period.message}`);
   }
 
   // 5) Create the delivery task when the address and a country volunteer
@@ -449,45 +484,48 @@ async function handlePaidSession(
   const delivery = await ensureDeliveryTaskForPayment(supabase, {
     paymentId: payment.id,
     profileId,
-    caseId: caseRow?.id ?? null,
+    caseId,
     product,
     months: purchasedMonths
   });
+  if (delivery.status === "error") throw new Error(`delivery task failed: ${delivery.message}`);
   if (!["ready", "not-applicable"].includes(delivery.status)) {
     await notifyTeam({
       kind: "processing_error",
       dedupeKey: `delivery-not-created:${payment.id}`,
       title: "📦 Оплата получена, задание доставки ожидает",
       lines: [delivery.status === "address-required" ? "Клиент должен заполнить полный адрес." : "Для страны не назначен волонтёр."],
-      link: caseRow?.id ? adminLink(`/admin/cases/${caseRow.id}`) : adminLink("/admin/fulfillment")
+      link: adminLink(`/admin/cases/${caseId}`)
     });
   }
 
   // 6) A subscription-mode Payment Link means the client enabled automatic
   // renewal. The initial prepaid term was charged above; later invoice.paid
   // events extend access by exactly one 30-day period. No card data is stored.
-  const stripeSubscriptionId =
-    typeof session.subscription === "string"
-      ? session.subscription
-      : session.subscription?.id ?? null;
-
   if (product === "personal_support" && stripeSubscriptionId) {
     const stripeCustomerId =
       typeof session.customer === "string"
         ? session.customer
         : session.customer?.id ?? null;
 
+    const locale = session.metadata?.ui_locale === "en" ? "en" : "ru";
+    const renewalPriceId = await ensureCheckoutPrice(stripe, "renewal", locale);
+    await ensureThirtyDayRenewalSchedule(stripe, stripeSubscriptionId, renewalPriceId);
+    const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
+    const periodEnd = (stripeSubscription.items.data[0] as Stripe.SubscriptionItem & { current_period_end?: number })?.current_period_end;
+
     const { error: subscriptionError } = await supabase
       .from("billing_subscriptions")
       .upsert(
         {
           profile_id: profileId,
-          case_id: caseRow?.id ?? null,
+          case_id: caseId,
           stripe_subscription_id: stripeSubscriptionId,
           stripe_customer_id: stripeCustomerId,
-          status: "trialing",
+          status: "active",
           initial_months: purchasedMonths,
-          renewal_days: 30
+          renewal_days: 30,
+          current_period_end: periodEnd ? new Date(periodEnd * 1000).toISOString() : null
         },
         { onConflict: "stripe_subscription_id" }
       );
@@ -502,9 +540,7 @@ async function handlePaidSession(
           `Ошибка базы: ${subscriptionError.message}`,
           "Первоначальный оплаченный срок сохранён, но до исправления будущие автоплатежи не смогут автоматически продлевать кейс."
         ],
-        link: caseRow?.id
-          ? adminLink(`/admin/cases/${caseRow.id}`)
-          : adminLink("/admin/cases")
+        link: adminLink(`/admin/cases/${caseId}`)
       });
       throw new Error(`subscription link failed: ${subscriptionError.message}`);
     }
@@ -529,11 +565,11 @@ async function handlePaidSession(
       product === "personal_support" ? `Оплаченный срок: ${purchasedMonths} мес. (${purchasedMonths * 30} дней)` : null,
       stripeSubscriptionId ? "Автопродление: включено" : product === "personal_support" ? "Автопродление: выключено" : null,
       customerEmail ? `Клиент: ${customerEmail}` : null,
-      caseRow?.id
-        ? `Кейс: ${caseRow.id} — период сопровождения активирован`
-        : "Кейс ещё не создан (клиент не заполнил анкету) — оплата привязана к профилю"
+      product === "personal_support"
+        ? `Кейс: ${caseId} — период сопровождения активирован`
+        : `Кейс: ${caseId} — оплата оценки записана`
     ],
-    link: caseRow?.id ? adminLink(`/admin/cases/${caseRow.id}`) : adminLink("/admin/cases")
+    link: adminLink(`/admin/cases/${caseId}`)
   });
 }
 
@@ -600,15 +636,26 @@ async function handlePaidSubscriptionInvoice(
     return;
   }
 
+  const caseId = await ensureCaseForPaidProfile(supabase, subscription.profile_id);
+  if (subscription.case_id && subscription.case_id !== caseId) {
+    throw new Error("subscription Case ownership mismatch");
+  }
+
   const amountCents = invoice.amount_paid ?? 0;
   const baseAmountCents = invoice.subtotal ?? 0;
   const currency = (invoice.currency ?? "usd").toUpperCase();
   const paidAt = new Date();
   const reference = invoicePaymentReference(invoice);
+  const stripePeriod = paidSubscriptionInvoicePeriod(invoice, subscriptionId, 1);
 
   if (
     !isValidPersonalSupportCharge({
       amountCents: baseAmountCents,
+      currency: invoice.currency,
+      months: 1
+    }) ||
+    !isValidPersonalSupportCharge({
+      amountCents,
       currency: invoice.currency,
       months: 1
     })
@@ -633,7 +680,7 @@ async function handlePaidSubscriptionInvoice(
     .from("payments")
     .insert({
       profile_id: subscription.profile_id,
-      case_id: subscription.case_id,
+      case_id: caseId,
       product: "personal_support",
       status: "paid",
       amount_cents: amountCents,
@@ -649,7 +696,7 @@ async function handlePaidSubscriptionInvoice(
         auto_renew: true
       }
     })
-    .select("id")
+    .select("id, profile_id, case_id")
     .single();
   let payment = insertedPayment;
 
@@ -657,7 +704,7 @@ async function handlePaidSubscriptionInvoice(
     if (paymentError.code === "23505") {
       const { data: existingPayment, error: existingPaymentError } = await supabase
         .from("payments")
-        .select("id")
+        .select("id, profile_id, case_id")
         .eq("processor_reference", reference)
         .maybeSingle();
       if (existingPaymentError || !existingPayment?.id) {
@@ -670,36 +717,44 @@ async function handlePaidSubscriptionInvoice(
   }
 
   if (!payment) throw new Error("subscription payment missing after insert");
+  if (payment.profile_id !== subscription.profile_id || (payment.case_id && payment.case_id !== caseId)) {
+    throw new Error("subscription payment ownership mismatch");
+  }
+  if (!payment.case_id) {
+    const { error } = await supabase.from("payments").update({ case_id: caseId })
+      .eq("id", payment.id).eq("profile_id", subscription.profile_id).is("case_id", null);
+    if (error) throw new Error(`subscription payment case link failed: ${error.message}`);
+  }
 
-  if (subscription.case_id) {
-    const period = await openServicePeriod(supabase, {
-      profileId: subscription.profile_id,
-      caseId: subscription.case_id,
-      paymentId: payment.id,
-      product: "personal_support",
-      paidAt,
-      months: 1
+  const period = await openServicePeriod(supabase, {
+    profileId: subscription.profile_id,
+    caseId,
+    paymentId: payment.id,
+    product: "personal_support",
+    paidAt,
+    months: 1,
+    stripePeriod
+  });
+
+  if (period.status === "failed") {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `subscription-period-failed:${event.id}`,
+      title: "ОШИБКА: автоплатёж записан, но сопровождение не продлено",
+      lines: [`Оплата: ${payment.id}`, `Ошибка: ${period.message}`],
+      link: adminLink(`/admin/cases/${caseId}`)
     });
-
-    if (period.status === "failed") {
-      await notifyTeam({
-        kind: "processing_error",
-        dedupeKey: `subscription-period-failed:${event.id}`,
-        title: "ОШИБКА: автоплатёж записан, но сопровождение не продлено",
-        lines: [`Оплата: ${payment.id}`, `Ошибка: ${period.message}`],
-        link: adminLink(`/admin/cases/${subscription.case_id}`)
-      });
-      throw new Error(`subscription service period failed: ${period.message}`);
-    }
+    throw new Error(`subscription service period failed: ${period.message}`);
   }
 
   const delivery = await ensureDeliveryTaskForPayment(supabase, {
     paymentId: payment.id,
     profileId: subscription.profile_id,
-    caseId: subscription.case_id,
+    caseId,
     product: "personal_support",
     months: 1
   });
+  if (delivery.status === "error") throw new Error(`subscription delivery task failed: ${delivery.message}`);
 
   if (!["ready", "not-applicable"].includes(delivery.status)) {
     await notifyTeam({
@@ -711,9 +766,7 @@ async function handlePaidSubscriptionInvoice(
           ? "Клиент должен заполнить полный адрес."
           : "Для страны не назначен волонтёр."
       ],
-      link: subscription.case_id
-        ? adminLink(`/admin/cases/${subscription.case_id}`)
-        : adminLink("/admin/fulfillment")
+      link: adminLink(`/admin/cases/${caseId}`)
     });
   }
 
@@ -721,7 +774,9 @@ async function handlePaidSubscriptionInvoice(
     .from("billing_subscriptions")
     .update({
       status: "active",
-      last_invoice_id: invoice.id
+      case_id: caseId,
+      last_invoice_id: invoice.id,
+      current_period_end: stripePeriod.endsAt.toISOString()
     })
     .eq("stripe_subscription_id", subscriptionId);
 
@@ -740,9 +795,7 @@ async function handlePaidSubscriptionInvoice(
       "Продление: +30 дней",
       `Subscription: ${subscriptionId}`
     ],
-    link: subscription.case_id
-      ? adminLink(`/admin/cases/${subscription.case_id}`)
-      : adminLink("/admin/cases")
+    link: adminLink(`/admin/cases/${caseId}`)
   });
 }
 
@@ -754,10 +807,14 @@ async function handleFailedSubscriptionInvoice(
   const subscriptionId = invoiceSubscriptionId(invoice);
   if (!subscriptionId) return;
 
-  await supabase
+  const { error } = await supabase
     .from("billing_subscriptions")
     .update({ status: "past_due", last_invoice_id: invoice.id })
     .eq("stripe_subscription_id", subscriptionId);
+
+  if (error) {
+    throw new Error(`failed to record subscription payment failure: ${error.message}`);
+  }
 
   await notifyTeam({
     kind: "payment",

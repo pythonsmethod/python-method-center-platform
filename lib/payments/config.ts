@@ -20,8 +20,6 @@ export type SupportDurationOption = {
   months: number;
   durationDays: number;
   amountUsd: number;
-  paymentLinkUrl: string | null;
-  autoRenewPaymentLinkUrl: string | null;
 };
 
 export type PaymentPlan = {
@@ -29,25 +27,8 @@ export type PaymentPlan = {
   title: string;
   description: string;
   priceLine: string;
-  paymentLinkUrl: string | null;
   supportOptions?: SupportDurationOption[];
 };
-
-function readPaymentLink(value: string | undefined): string | null {
-  const url = value?.trim();
-
-  if (!url || !url.startsWith("https://")) {
-    return null;
-  }
-
-  return url;
-}
-
-function supportLink(months: number, autoRenew: boolean): string | null {
-  const suffix = autoRenew ? "_AUTORENEW" : "";
-  const key = `STRIPE_PAYMENT_LINK_SUPPORT_${months}M${suffix}`;
-  return readPaymentLink(process.env[key]);
-}
 
 export function getSupportDurationOptions(): SupportDurationOption[] {
   return Array.from({ length: PERSONAL_SUPPORT_MAX_MONTHS }, (_, index) => {
@@ -55,9 +36,7 @@ export function getSupportDurationOptions(): SupportDurationOption[] {
     return {
       months,
       durationDays: months * PERSONAL_SUPPORT_PERIOD_DAYS,
-      amountUsd: months * PERSONAL_SUPPORT_MONTHLY_USD,
-      paymentLinkUrl: supportLink(months, false),
-      autoRenewPaymentLinkUrl: supportLink(months, true)
+      amountUsd: months * PERSONAL_SUPPORT_MONTHLY_USD
     };
   });
 }
@@ -71,18 +50,13 @@ export function getPaymentPlans(locale: Locale = "ru", now = new Date()): Paymen
       product: REVIEW_PRODUCT,
       title: review.title,
       description: review.description,
-      priceLine: review.price,
-      paymentLinkUrl: readPaymentLink(
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299 ||
-          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW
-      )
+      priceLine: review.price
     },
     {
       product: PERSONAL_SUPPORT_PRODUCT,
       title: t.personalSupportTitle,
       description: t.personalSupportDesc,
       priceLine: t.personalSupportPrice,
-      paymentLinkUrl: null,
       supportOptions: getSupportDurationOptions()
     }
   ];

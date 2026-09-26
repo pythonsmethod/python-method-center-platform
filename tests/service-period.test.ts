@@ -102,6 +102,33 @@ describe("Personal Support service periods", () => {
     expect(daysBetween(inserted[0].starts_at as string, inserted[0].ends_at as string)).toBe(30);
   });
 
+  it("uses Stripe's paid period exactly even when the webhook arrives later", async () => {
+    const { client, inserted } = fakeSupabase();
+    const startsAt = new Date("2026-09-24T01:13:18.000Z");
+    const endsAt = new Date("2026-10-24T01:13:18.000Z");
+    await openServicePeriod(client, {
+      ...BASE, product: "personal_support", months: 1,
+      paidAt: new Date("2026-09-24T01:35:34.000Z"),
+      stripePeriod: { startsAt, endsAt }
+    });
+    expect(inserted[0].starts_at).toBe(startsAt.toISOString());
+    expect(inserted[0].ends_at).toBe(endsAt.toISOString());
+  });
+
+  it("fails closed if a Stripe subscription would overlap paid access", async () => {
+    const { client, inserted } = fakeSupabase({ activeEndsAt: "2026-10-24T02:00:00.000Z" });
+    const result = await openServicePeriod(client, {
+      ...BASE, product: "personal_support", months: 1,
+      paidAt: new Date("2026-09-24T01:35:34.000Z"),
+      stripePeriod: {
+        startsAt: new Date("2026-09-24T01:13:18.000Z"),
+        endsAt: new Date("2026-10-24T01:13:18.000Z")
+      }
+    });
+    expect(result).toEqual({ status: "failed", message: "Stripe paid period overlaps existing paid access" });
+    expect(inserted).toHaveLength(0);
+  });
+
   it("reports an insertion failure instead of pretending access is open", async () => {
     const { client } = fakeSupabase({ insertError: "permission denied" });
 

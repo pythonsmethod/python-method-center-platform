@@ -10,6 +10,7 @@ import { formatDeliveryAddress, isDeliveryProfileComplete, readDeliveryProfile }
 import { adminLink, notifyTeam } from "@/lib/notifications/notify";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { getLocale } from "@/lib/i18n/locale";
+import { paidDeliveryQuantity } from "@/lib/delivery/paid-quantity";
 import type { DeliveryActionState } from "@/lib/delivery/types";
 
 const clean = (form: FormData, name: string, max = 300) => String(form.get(name) ?? "").trim().replace(/\s+/g, " ").slice(0, max);
@@ -39,7 +40,10 @@ export async function updateDeliveryProfile(_: DeliveryActionState, form: FormDa
   await db.from("delivery_tasks").update(pendingTaskUpdate)
     .eq("client_profile_id", auth.userId).in("status", ["preparing", "problem"]);
   const { data: payments } = await db.from("payments").select("*").eq("profile_id", auth.userId).eq("status", "paid");
-  await Promise.all((payments ?? []).map(payment => ensureDeliveryTaskForPayment(db, { paymentId: payment.id, profileId: auth.userId, caseId: payment.case_id, product: payment.product })));
+  await Promise.all((payments ?? []).map(payment => ensureDeliveryTaskForPayment(db, {
+    paymentId: payment.id, profileId: auth.userId, caseId: payment.case_id,
+    product: payment.product, months: paidDeliveryQuantity(payment)
+  })));
   revalidatePath("/cabinet/delivery");
   return { status: "success", message: ru ? "Адрес для доставки сохранён." : "Delivery address saved." };
 }
@@ -132,7 +136,10 @@ export async function inviteDeliveryVolunteer(_: DeliveryActionState, form: Form
   const { data: clients } = await db.from("profiles").select("id").eq("delivery_country_code", countryCode);
   for (const client of clients ?? []) {
     const { data: paid } = await db.from("payments").select("*").eq("profile_id", client.id).eq("status", "paid");
-    for (const payment of paid ?? []) await ensureDeliveryTaskForPayment(db, { paymentId: payment.id, profileId: client.id, caseId: payment.case_id, product: payment.product });
+    for (const payment of paid ?? []) await ensureDeliveryTaskForPayment(db, {
+      paymentId: payment.id, profileId: client.id, caseId: payment.case_id,
+      product: payment.product, months: paidDeliveryQuantity(payment)
+    });
   }
   revalidatePath("/admin/fulfillment");
   return { status: "success", message: ru ? "Волонтёр создан, приглашение отправлено." : "Volunteer created and invitation sent." };

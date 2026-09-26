@@ -1,5 +1,54 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-BILLING-2026-09-25-01 — Failed renewal state must persist before webhook acknowledgement
+
+For a signed `invoice.payment_failed`, the subscription status write to
+`past_due` is part of event processing, not best-effort telemetry. If that
+write fails, return HTTP 500 and release the event-ledger claim so Stripe can
+retry. Do not create a support period or gift task for an unpaid invoice.
+This is implemented and route-tested in PR #216. The owner later authorized
+the declined-card Sandbox Test Clock scenario; it passed with a 1,300 USD
+unpaid invoice, persisted `past_due` and no new access or gift task. Production
+sales remain disabled until the remaining release gates pass.
+
+## PMC-BILLING-2026-09-24-03 — Replay cannot extend prepaid access or duplicate delivery
+
+For a verified paid one-time Checkout, the first persisted `payments.paid_at`
+anchors the `N × 30`-day entitlement. On a signed webhook replay, reuse that
+timestamp rather than webhook arrival time. An existing gift task for the
+payment is reused and linked to the verified owned Case when missing; do not
+create another task or change its shipping status. A delivery-task failure
+must fail webhook processing so Stripe can retry. This is implemented in
+PR #216 and verified in Sandbox Preview, not yet published to Production.
+
+## PMC-BILLING-2026-09-24-02 — Lifecycle events use the shared active schema
+
+The staging Case lifecycle table has no retired `from_status` / `to_status`
+columns; production retains them only as nullable historical fields. New
+Case lifecycle events write only active columns, and client/staff
+history queries select only fields common to both environments. Archived
+classification rows remain untouched and `status_changed` remains withheld
+from user-facing activity. Do not restore a Case processing status to make a
+query work. The staging/production difference is a release-compatibility
+constraint, not authorization for a production migration.
+
+## PMC-BILLING-2026-09-24-01 — Payment before intake opens one existing Case shell
+
+For an authenticated, Stripe-confirmed paid Checkout, fulfillment finds the
+profile's single continuous Case or creates an empty Case shell. It never
+creates medical content, infers a care decision, or bypasses questionnaire
+consent. The paid Personal Support period is linked to that Case immediately,
+using the exact paid Stripe invoice period for subscriptions. Later onboarding
+fills the same Case. The return page distinguishes Stripe payment confirmation
+from the database's actual service-period record; a paid charge alone is not
+presented as active support access. A delayed delivery address must retain the
+original paid term quantity. Existing subscription cancellation preserves
+already-paid access until its recorded end.
+
+This is an implementation decision for PR #216, not evidence of production
+publication. Staging repair of one synthetic payment is recorded in
+`CURRENT_STATE.md`; no production client record was changed for this decision.
+
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 
 Status: owner-approved product direction; implementation migration pending.
@@ -1378,3 +1427,107 @@ redelivery. Retried events resume the existing payment, while a unique
 `service_periods.payment_id` boundary makes access issuance idempotent. This
 replaces the previous behavior that acknowledged a partially processed event
 and permanently prevented recovery.
+
+## 2026-09-22 — Generate Checkout instead of maintaining term/language links
+
+Owner requested automation after discussing RU/EN and the potential 50-link
+matrix. Use server-created Stripe Checkout from the approved 299 USD assessment
+and 1,300 USD per 30-day support model. One prepaid price × N covers 1–12 terms;
+optional renewal adds a 30-day recurring price deferred N×30 days. Localized
+Stripe catalog records preserve merchant copy in the selected language.
+
+Both offer/immediate-start consents and the explicit renewal selection must be
+persisted before redirecting to payment. Amount, customer/account reference,
+metadata and return origin are server-controlled. No new legacy sales. Keep
+checkout disabled by default and refuse live keys in preview. Customer Portal
+permits card updates and cancellation at period end, without plan changes.
+Historical subscriptions/records are not migrated by this code change.
+
+### 2026-09-22 — Sandbox proof does not constitute commercial acceptance
+
+Use `Pythons & Co sandbox` and isolated `anham-staging` for this billing rollout.
+Localized catalog and Portal settings are provisioned; the existing additive
+billing migration is applied only to staging. Retain the default-disabled
+Checkout flag until the runtime is isolated and signed webhooks, paid access,
+renewal and cancellation have passed actual payment tests.
+
+Hosted Checkout currently presents the deferred recurring line as a free trial
+despite the correct initial paid line. Treat that observed wording as an open
+release blocker, not as approval of a free service period. Automatic browser
+review blocked final Sandbox payment submission; the next submission must be
+performed by the user through handoff, without an alternate automated route.
+
+### 2026-09-22 — Owner authorized production rollout; respect access boundaries
+
+The request to launch on the existing live site authorizes the billing rollout,
+including its additive production schema, necessary production configuration,
+merge and publication. Do not ask for the same launch authorization again.
+Apply backward-compatible schema preparation independently of enabling sales;
+the production billing migration is now applied and verified.
+
+An explicit Live Stripe permission rejection must be resolved through official
+account reconsent, not a different credential or interface. Vercel environment
+configuration requires the authenticated browser because that operation is
+absent from the connected plugin. Secure sign-in and permission expansion are
+genuine owner-only blockers. They do not close the remaining paid-access,
+renewal/cancellation or misleading trial-wording acceptance gates. Keep the
+commercial launch status accurate until those gates pass and the live site is
+verified.
+# 2026-09-22 — Paid initial subscription phase replaces trial deferral
+
+For optional Personal Support renewal, represent the selected prepaid term as
+the subscription's actual first recurring billing period: `1,300 × N` USD for
+`N × 30` days. After confirmed Checkout payment, attach an idempotent Stripe
+Subscription Schedule that retains that paid phase and switches the next phase
+to 1,300 USD every 30 days. Do not label paid access as a trial or rely on trial
+copy customization. Webhook processing fails and retries if schedule creation
+cannot be confirmed. Customer Portal remains the self-service surface for card
+updates and end-of-period cancellation. Sandbox acceptance remains mandatory
+before live enablement.
+## 2026-09-24 — Stripe invoice dates govern paid subscription access
+
+Stripe's paid subscription invoice line defines the exact `N × 30`-day access
+window, including the first prepaid charge and each 30-day renewal. Webhook
+arrival time is recorded for audit but must not shift the contractual access
+window. Reject ambiguous or mismatched invoice lines and actual charges, and
+do not begin an auto-renewing subscription while another paid support period
+is active. This was prompted by a Sandbox Test Clock that remained frozen
+between Checkout creation and the owner's test-card payment: the old code
+recorded access 22 minutes after Stripe's billing anchor. Production had no
+new-model subscriptions at this point. Existing manual/legacy period extension
+behavior remains unchanged.
+
+## 2026-09-24 — Defer Stripe Tax configuration and state Checkout totals honestly
+
+The owner does not know whether a California Seller's Permit exists outside
+Stripe and deferred a decision on tax-inclusive versus tax-added prices.
+Keep `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`; do not create a registration, guess
+a product tax code, or imply that this resolves tax obligations. Live Stripe
+Tax settings are pending with zero registrations. Because the current Checkout
+does not calculate tax, remove claims that it does from RU/EN payment and
+offer copy and assistant price context. Amend the offer to v10; retain the
+v9 fingerprint and earlier consent history. The 299/1,300 USD commercial
+amounts, complimentary Formula and included delivery do not change. Current
+Prices are `tax_behavior=exclusive`; a later inclusive-tax decision requires
+a deliberate new Price/catalog version, not mutation of the existing Prices.
+
+## 2026-09-24 — Use Checkout Elements for multi-period automatic renewal (pending Preview acceptance)
+
+Stripe-hosted Checkout prominently describes a paid `N × 30`-day initial
+subscription Price as `1,300 × N USD every N × 30 days`, even though the
+post-payment schedule switches subsequent invoices to 1,300 USD every 30 days.
+A smaller custom-text explanation cannot cure that conflicting headline.
+For renewal-selected terms of 2–12 periods, keep server-created Checkout
+Sessions and the existing webhook, schedule and Portal contract, but render
+Stripe's Payment Element inside a bilingual PMC-owned checkout summary. Show
+the actual Checkout Session total due today and clearly distinguish the paid
+term from subsequent 30-day renewals. One-period renewals and non-renewing
+purchases continue through hosted Checkout. The publishable key is mode-checked
+and returned only with an authenticated Elements Session; no client-controlled
+amount, account, catalog or return URL is accepted. A return URL does not prove
+payment: the success page must verify the completed, paid Session belongs to
+the signed-in account.
+
+This change is in the draft branch only. A successful local build and unpaid
+Sandbox Elements Session do **not** close Preview UI/payment, paid return or
+Live launch acceptance. Keep sales disabled until end-to-end validation.

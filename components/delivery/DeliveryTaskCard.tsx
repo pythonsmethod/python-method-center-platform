@@ -10,6 +10,7 @@ export function DeliveryTaskCard({ task, locale, volunteer = false, admin = fals
   const ru = locale === "ru";
   return <article className="panel fulfillment-task">
     <div className="fulfillment-task__head"><div><span className="panel__label">{new Intl.DateTimeFormat(locale).format(new Date(task.created_at))}</span><h2>{task.recipient_name}</h2></div><strong>{deliveryStatusLabel(task.status, locale)}</strong></div>
+    <p><strong>{ru ? "Количество формул" : "Formula quantity"}:</strong> {task.quantity}</p>
     <p><strong>Email:</strong> {task.recipient_email}</p><p><strong>{ru ? "Телефон" : "Phone"}:</strong> {task.recipient_phone}</p>
     <address>{task.delivery_address}</address>
     {task.delivery_instructions ? <p><strong>{ru ? "Дополнительные инструкции" : "Additional instructions"}:</strong> {task.delivery_instructions}</p> : null}

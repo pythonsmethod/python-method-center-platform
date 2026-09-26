@@ -79,7 +79,7 @@ export async function getOwnCaseLifecycleEvents(
 
   const { data, error } = await supabase
     .from("case_lifecycle_events")
-    .select("id, event_type, from_status, to_status, actor_role, notes, created_at")
+    .select("id, event_type, actor_role, notes, created_at")
     .eq("profile_id", profileId)
     .eq("case_id", caseId)
     .order("created_at", { ascending: false })

@@ -17,8 +17,6 @@ export type LifecycleEventInput = {
   profileId: string;
   caseId: string;
   eventType: LifecycleEventType;
-  fromStatus?: string | null;
-  toStatus?: string | null;
   actorId?: string | null;
   actorRole?: ActorRole;
   notes?: string | null;
@@ -46,8 +44,6 @@ export async function writeLifecycleEvent(
     profile_id: input.profileId,
     case_id: input.caseId,
     event_type: input.eventType,
-    from_status: input.fromStatus ?? null,
-    to_status: input.toStatus ?? null,
     actor_id: input.actorId ?? null,
     actor_role: input.actorRole ?? "system",
     notes: input.notes ?? null,
@@ -82,8 +78,6 @@ export async function writeLifecycleEvents(
       profile_id: input.profileId,
       case_id: input.caseId,
       event_type: input.eventType,
-      from_status: input.fromStatus ?? null,
-      to_status: input.toStatus ?? null,
       actor_id: input.actorId ?? null,
       actor_role: input.actorRole ?? "system",
       notes: input.notes ?? null,
@@ -101,8 +95,10 @@ export async function writeLifecycleEvents(
 export type CaseLifecycleEvent = {
   id: string;
   event_type: string;
-  from_status: string | null;
-  to_status: string | null;
+  // Archived production rows may retain retired classification fields, but
+  // current staging no longer has those columns. New events never write them.
+  from_status?: string | null;
+  to_status?: string | null;
   actor_role: string;
   notes: string | null;
   created_at: string;

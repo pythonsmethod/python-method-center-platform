@@ -3,7 +3,10 @@
 import { Link } from "@/components/LocaleLink";
 import { useMemo, useRef, useState, type ReactNode } from "react";
 import type { PaymentPlan } from "@/lib/payments/config";
-import { recordPaymentOfferAcceptance } from "@/lib/payments/actions";
+import { createPaymentCheckout } from "@/lib/payments/actions";
+import type { CheckoutError } from "@/lib/payments/checkout-contract";
+import type { Locale } from "@/lib/i18n/locale";
+import { RenewalCheckoutElements } from "@/components/payments/RenewalCheckoutElements";
 
 const PERSONAL_SUPPORT_PRODUCT = "personal_support" as const;
 
@@ -24,7 +27,8 @@ type PaymentPlanLabels = {
   giftIncluded: string;
   autoRenewLabel: string;
   autoRenewText: string;
-  autoRenewUnavailable: string;
+  checkoutPending: string;
+  checkoutErrors: Record<CheckoutError, string>;
   taxNote: string;
 };
 
@@ -39,8 +43,8 @@ function interpolate(
   );
 }
 
-function money(amountUsd: number): string {
-  return new Intl.NumberFormat("en-US", {
+function money(amountUsd: number, locale: Locale): string {
+  return new Intl.NumberFormat(locale === "ru" ? "ru-RU" : "en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0
@@ -54,12 +58,16 @@ function money(amountUsd: number): string {
 export function PaymentPlans({
   plans,
   labels,
-  signedIn = true,
+  locale,
+  checkoutEnabled,
+  signedIn = false,
   signInHref = "/login",
   children
 }: {
   plans: PaymentPlan[];
   labels: PaymentPlanLabels;
+  locale: Locale;
+  checkoutEnabled: boolean;
   signedIn?: boolean;
   signInHref?: string;
   children?: ReactNode;
@@ -71,6 +79,46 @@ export function PaymentPlans({
   const accepted = offerAccepted && startAccepted;
   const [showHint, setShowHint] = useState(false);
   const gateRef = useRef<HTMLDivElement | null>(null);
+  const busyRef = useRef(false);
+  const attemptRef = useRef<{ selection: string; requestId: string } | null>(null);
+  const [pendingProduct, setPendingProduct] = useState<string | null>(null);
+  const [checkoutError, setCheckoutError] = useState<CheckoutError | null>(null);
+  const [elementsCheckout, setElementsCheckout] = useState<{
+    clientSecret: string; publishableKey: string; sessionId: string; months: number;
+  } | null>(null);
+
+  async function startCheckout(plan: PaymentPlan) {
+    if (busyRef.current) return;
+    if (!accepted) { pointAtConsent(); return; }
+    const isSupport = plan.product === PERSONAL_SUPPORT_PRODUCT;
+    const months = isSupport ? supportMonths : 1;
+    const renewal = isSupport && autoRenew;
+    const selection = `${plan.product}:${months}:${renewal}:${locale}`;
+    if (attemptRef.current?.selection !== selection) {
+      attemptRef.current = { selection, requestId: crypto.randomUUID() };
+    }
+    busyRef.current = true;
+    setPendingProduct(plan.product);
+    setCheckoutError(null);
+    let leaving = false;
+    try {
+      const result = await createPaymentCheckout({
+        product: plan.product, months, autoRenew: renewal, locale,
+        offerAccepted, startAccepted, requestId: attemptRef.current.requestId
+      });
+      if ("error" in result) { setCheckoutError(result.error); return; }
+      if ("elements" in result) {
+        setElementsCheckout({ ...result.elements, months });
+        return;
+      }
+      window.location.assign(result.url);
+      leaving = true;
+    } catch {
+      setCheckoutError("unavailable");
+    } finally {
+      if (!leaving) { busyRef.current = false; setPendingProduct(null); }
+    }
+  }
 
   const supportPlan = plans.find(
     (plan) => plan.product === PERSONAL_SUPPORT_PRODUCT
@@ -88,7 +136,7 @@ export function PaymentPlans({
     gateRef.current?.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
-  function purchaseButton(plan: PaymentPlan, href: string | null) {
+  function purchaseButton(plan: PaymentPlan) {
     if (!signedIn) {
       return (
         <Link className="button" href={signInHref}>
@@ -97,7 +145,7 @@ export function PaymentPlans({
       );
     }
 
-    if (!href) {
+    if (!checkoutEnabled) {
       return <span className="status-badge">{labels.unavailable}</span>;
     }
 
@@ -118,19 +166,24 @@ export function PaymentPlans({
     }
 
     return (
-      <a
+      <button
         className="button"
-        href={href}
-        onClick={() => {
-          void recordPaymentOfferAcceptance(plan.product);
-          void recordPaymentOfferAcceptance(plan.product, true);
-        }}
-        rel="noreferrer"
-        target="_blank"
+        type="button"
+        disabled={pendingProduct !== null}
+        aria-busy={pendingProduct === plan.product}
+        onClick={() => void startCheckout(plan)}
       >
-        {labels.payButton}
-      </a>
+        {pendingProduct === plan.product ? labels.checkoutPending : labels.payButton}
+      </button>
     );
+  }
+
+  if (elementsCheckout) {
+    return <RenewalCheckoutElements
+      {...elementsCheckout}
+      locale={locale}
+      onBack={() => { attemptRef.current = null; setElementsCheckout(null); }}
+    />;
   }
 
   return (
@@ -143,6 +196,7 @@ export function PaymentPlans({
           <label className="offer-gate__label">
             <input
               checked={offerAccepted}
+              disabled={pendingProduct !== null}
               onChange={(event) => {
                 setOfferAccepted(event.target.checked);
                 if (event.target.checked && startAccepted) setShowHint(false);
@@ -160,6 +214,7 @@ export function PaymentPlans({
           <label className="offer-gate__label">
             <input
               checked={startAccepted}
+              disabled={pendingProduct !== null}
               onChange={(event) => {
                 setStartAccepted(event.target.checked);
                 if (event.target.checked && offerAccepted) setShowHint(false);
@@ -183,6 +238,7 @@ export function PaymentPlans({
         </div>
       ) : null}
 
+      {checkoutError ? <p role="alert">{labels.checkoutErrors[checkoutError]}</p> : null}
       <section className="panel-grid payment-plans">
         {children}
         {plans.map((plan) => {
@@ -194,18 +250,13 @@ export function PaymentPlans({
                 <p>{plan.description}</p>
                 <p className="price-line">{plan.priceLine}</p>
                 <div className="panel-actions">
-                  {purchaseButton(plan, plan.paymentLinkUrl)}
+                  {purchaseButton(plan)}
                 </div>
               </div>
             );
           }
 
           const selected = supportOption;
-          const selectedHref = selected
-            ? autoRenew
-              ? selected.autoRenewPaymentLinkUrl
-              : selected.paymentLinkUrl
-            : null;
 
           return (
             <div className="panel personal-support-plan" key={plan.product}>
@@ -218,6 +269,7 @@ export function PaymentPlans({
                 <label className="personal-support-plan__field">
                   <span>{labels.durationLabel}</span>
                   <select
+                    disabled={pendingProduct !== null}
                     onChange={(event) =>
                       setSupportMonths(Number.parseInt(event.target.value, 10))
                     }
@@ -228,7 +280,7 @@ export function PaymentPlans({
                         {interpolate(labels.durationOption, {
                           months: option.months,
                           days: option.durationDays,
-                          amount: money(option.amountUsd)
+                          amount: money(option.amountUsd, locale)
                         })}
                       </option>
                     ))}
@@ -238,7 +290,7 @@ export function PaymentPlans({
                 {selected ? (
                   <div className="personal-support-plan__summary" aria-live="polite">
                     <strong>
-                      {labels.selectedTotal} {money(selected.amountUsd)}
+                      {labels.selectedTotal} {money(selected.amountUsd, locale)}
                     </strong>
                     <span>{labels.giftIncluded}</span>
                   </div>
@@ -247,6 +299,7 @@ export function PaymentPlans({
                 <label className="personal-support-plan__renew">
                   <input
                     checked={autoRenew}
+                    disabled={pendingProduct !== null}
                     onChange={(event) => setAutoRenew(event.target.checked)}
                     type="checkbox"
                   />
@@ -256,17 +309,11 @@ export function PaymentPlans({
                   </span>
                 </label>
 
-                {autoRenew && selected && !selected.autoRenewPaymentLinkUrl ? (
-                  <p className="personal-support-plan__notice" role="status">
-                    {labels.autoRenewUnavailable}
-                  </p>
-                ) : null}
-
                 <p className="personal-support-plan__tax">{labels.taxNote}</p>
               </div>
 
               <div className="panel-actions">
-                {purchaseButton(plan, selectedHref)}
+                {purchaseButton(plan)}
               </div>
             </div>
           );

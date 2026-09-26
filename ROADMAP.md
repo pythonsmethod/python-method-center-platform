@@ -1,5 +1,74 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Failed-renewal acceptance — 2026-09-25 PDT — Sandbox CLOSED, release HOLD
+
+- [x] Make `invoice.payment_failed` fail closed and retryable if saving
+      `past_due` fails; prove both success and persistence-error routes in tests.
+- [x] Pass 2,094 local tests (one existing skip), TypeScript, ESLint,
+      security check, production build and GitHub CI on the corrected branch.
+- [x] In Stripe Sandbox only, replace the card on the synthetic Test Clock
+      subscription with decline-after-attach 0341 and advance past the next
+      renewal. Invoice `in_1UJjmZE5bkDqmDrJndf02ZDf` is a failed 1,300 USD
+      charge; the signed failure webhook reached staging, the subscription is
+      `past_due`, and no unpaid access extension or new gift task appeared.
+- [ ] Complete Live webhook, tax/legal and release checks before turning on
+      Production Checkout.
+
+## Pristine paid first delivery — 2026-09-24 PDT — Preview accepted, release HOLD
+
+- [x] Start with an entirely new authenticated synthetic staging buyer with no
+      Case, payment, support period or gift task.
+- [x] Complete exactly one 1,300 USD prepaid-only Russian Stripe Sandbox
+      Checkout without renewal; first signed webhook POST reaches the current
+      protected branch deployment and returns HTTP 200.
+- [x] Read back one linked Case, paid payment, exact 30-day active period,
+      quantity-one gift task and processed-event row without replay or repair.
+- [ ] Keep Production Checkout disabled until the remaining Live webhook,
+      tax/legal and release gates pass; the later owner-approved failed
+      renewal has now passed in Sandbox (see top entry).
+
+## Authenticated paid chain — 2026-09-24 — Preview acceptance, release HOLD
+
+- [x] Complete one authenticated EN 1-period, prepaid-only 1,300 USD
+      Stripe Sandbox payment from a synthetic account with no prior Case.
+- [x] Recover the signed paid event through the current protected branch
+      Preview; issue one Case, exact 30-day access and one gift task, linked
+      to the one payment. Replayed event keeps the original paid timestamp.
+- [x] Resend the same event again without a second charge or duplicate
+      Case, payment, access period, gift task or event ledger row.
+- [x] Inspect EN/RU paid return, private account and delivery in Preview;
+      verify 390px layout, amount, dates and fictional delivery details.
+- [x] Prove a pristine first delivery to the latest webhook handler from a
+      separate, completely empty synthetic buyer; the earlier buyer's first
+      delivery reached an older immutable Preview and was recovered by replay.
+- [x] Run failed-renewal acceptance after the owner explicitly reverses the
+      earlier refusal; the Sandbox-only result is recorded above.
+- [ ] Complete Live webhook, tax/legal and release checks; keep Production
+      Checkout disabled until release gates pass.
+
+## Personal Support payment-to-access chain — 2026-09-24 — RELEASE HOLD
+
+- [x] Create/reuse the existing Case shell only after verified paid Checkout;
+      open the paid support period before questionnaire completion.
+- [x] Show Stripe-paid versus database-access-pending honestly in RU/EN;
+      show exact access dates only when a period exists.
+- [x] Preserve purchased quantity when the gift task is created after a
+      later address update; prompt for missing address in the cabinet.
+- [x] Keep Stripe invoice-paid renewals, failed-payment non-extension and
+      Customer Portal cancellation/card management tied to existing records.
+- [x] Deploy the payment-to-access revision to isolated Preview and verify the
+      repaired synthetic Case, access, delivery and EN paid return. Preserve
+      EN through the single-address questionnaire and remove a lifecycle
+      history query that assumed retired columns still existed in staging.
+- [x] Verify the corrected Case history section on a READY Preview: no raw
+      database error; RU → EN private-route copy and paid entitlement persist.
+- [x] Verify mobile paid account/return/delivery at 390px, show the paid gift
+      quantity, and route an empty paid Case to questionnaire without claiming
+      a medical review has started.
+- [x] Verify a pristine first no-Case paid webhook on the latest revision
+      with a separate buyer; signed-event replay recovery is verified separately.
+- [ ] Finish remaining release gates before enabling Production Checkout.
+
 ## NEXORA capability ownership and migration — 2026-09-23
 
 Owner-approved target: NEXORA core → reusable capabilities → ANHAM/PMC and future
@@ -785,3 +854,97 @@ Published as main `5ba27eb38405d68a14e76a5d0dca00139941b90f`. Routine next actio
   Portal against staging without real charges.
 - [ ] Run the full clean dependency/build/regression gate and publish a new PR
   preview. Production and merge remain HOLD.
+
+## 2026-09-22 — Stripe Checkout automation follow-up to PR #215
+
+- [x] Replace the 24-link requirement with dynamic authenticated RU/EN Checkout.
+- [x] Automate localized catalog/Portal configuration and validate 1–12 terms.
+- [x] Preserve signed-webhook entitlement contract and record renewal consent.
+- [x] Finish Stripe Sandbox authorization; create/verify four localized products,
+      six prices and two Portal configurations.
+- [x] Apply/verify PR #215 billing migration on isolated `anham-staging`
+      (`thylrayzjczsxlyqhtfc`); production unchanged.
+- [x] Create actual Sandbox Checkout Sessions for assessment and boundary terms;
+      inspect correct RU/EN copy, upfront totals and deferred renewal pricing.
+- [x] Owner completed the prepared RU one-period Sandbox payment; verify paid
+      invoice, subscription and exact 30-day deferral from Test Clock start.
+- [x] Inspect actual RU Portal invoice/card and cancellation preview end date.
+- [x] Advance a Stripe Sandbox Test Clock and collect the first 1,300 USD
+      automatic renewal; verify paid invoice, next access period, delivery task
+      and idempotent webhook resend in staging.
+- [x] Execute final Portal cancellation for the owner's approved synthetic
+      12-period Sandbox subscription; verify renewal off and paid access
+      preserved through 19 September 2027.
+- [x] Verify a READY Vercel Preview for the latest revision (`ae9e6d3`);
+      protected success page returns HTTP 200 through authorized connector access.
+- [x] Sign in as a synthetic staging client and open authenticated RU/EN
+      Sandbox Checkout Sessions; verify `oferta-v10` consent rows and totals.
+- [ ] Complete an authenticated paid return from Stripe to the Preview app.
+- [x] Connect isolated Preview secrets and signed Stripe Sandbox webhook with
+      a separate revocable bypass secret approved by the owner.
+- [x] Resolve Stripe's "free trial" labeling with a paid initial subscription
+      period; hosted Sandbox Checkout showed no free-trial language.
+- [ ] Resolve a remaining hosted Checkout disclosure conflict: its prominent
+      EN summary says `$7,800 every 180 days` for a six-period initial term,
+      while the scheduled subsequent billing is `$1,300 every 30 days`.
+      An unpaid $0-recurring-plus-one-time pilot retained the same headline.
+      The draft branch now uses Checkout Elements for renewal-selected 2–12
+      terms. Preview exposed a disabled Pay button because the required full
+      billing address was not collected. The branch now mounts Stripe's
+      BillingAddressElement; READY Preview `8c75ba6` enabled Pay and the owner
+      completed the EN six-period Sandbox payment. The paid return, invoice,
+      subscription and gift task pass. A pre-onboarding buyer has no Case, so
+      no paid service period was created: resolve and retest this access gap
+      before treating the full paid flow as accepted.
+- [ ] Verify actual Stripe payments, renewal clock, failure/retry/cancellation and
+      RU/EN customer pages; local tests alone do not close these gates.
+- [ ] Publish only after the existing release gate; deactivate retired sales
+      links at launch while preserving subscription/history objects.
+
+### 2026-09-22 — Authorized production preparation
+
+- [x] Apply and verify the additive production billing migration; preserve all
+      existing service-period rows and owner-only billing reads.
+- [x] Inventory the Live catalog and webhook; prepare exact environment values
+      and record missing recurring events.
+- [x] Obtain official Live Stripe `product_write` expansion and create/read
+      all four localized products through the approved connection.
+- [x] Obtain official Live Stripe `plan_write` and `customer_portal_write`
+      expansion after the first Price and Portal writes were denied. The
+      authorized connection created/read back 30 Prices and two Portal configs.
+- [x] Authenticate Vercel and stage the Production configuration with
+      `STRIPE_CHECKOUT_ENABLED=false`; sales remain disabled.
+- [ ] Finish the open acceptance/UX gates and publish the approved model.
+
+Evidence: `docs/validation/stripe-production-readiness-2026-09-22.json`.
+Production schema is prepared; commercial publication remains HOLD.
+# Payment launch checkpoint — 2026-09-22
+
+- [x] Replace misleading trial-based prepaid deferral with a paid initial
+  subscription period and scheduled 30-day renewal phase.
+- [x] Prove 1–12 amount/duration contracts and webhook schedule idempotency in
+  automated tests; run full regression, type, lint, security and build gates.
+- [x] Verify revised invoice-period anchoring on the READY Preview with a
+  fresh paid 12-period Sandbox subscription: Stripe and staging share the
+  exact 360-day dates, one paid period and one gift-delivery task.
+- [x] Verify a 6-period prepaid-only Sandbox payment: 7,800 USD, no renewal,
+  exactly one active 180-day staging period and one assigned gift-delivery task
+  with quantity 6. This Checkout used the earlier v9 offer.
+- [ ] Verify failed renewal and authenticated paid return in the isolated
+  Stripe Sandbox + staging Preview. Final Portal cancellation passed; app Checkout/v10
+  consent is verified with unpaid RU 1-period and EN 6-period Sessions. The
+  owner deferred the failed-renewal simulation; do not run it until newly
+  authorized.
+- [x] Obtain official Live Stripe `product_write` and create the four RU/EN
+  Products.
+- [x] Obtain official `plan_write` and `customer_portal_write`; create and
+  read back 30 Live Prices and two localized Portal configurations.
+- [x] Verify Production Vercel mode/origin/tax/disabled-sales settings without
+  revealing Stripe secrets; remove false tax-at-Checkout copy in RU/EN and
+  advance the offer fingerprint to v10. Local regression/build, GitHub CI and
+  READY Preview pass; RU/EN route switching and 390×844 mobile tariff rendering
+  pass.
+- [ ] Add the four recurring events to the existing Live webhook after the
+  handler is deployed, then verify Production runtime.
+- [ ] Merge PR #215 then #216, publish, retire old offers for new sales and run
+  RU/EN production smoke. Until all unchecked items pass: NO-GO.

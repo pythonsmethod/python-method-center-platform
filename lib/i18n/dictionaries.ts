@@ -47,11 +47,15 @@ const ru = {
       caseNoneText:
         "Заполните анкету, чтобы создать кейс — после этого можно загрузить документы.",
       caseNoneCta: "Заполнить анкету",
+      caseFinishCta: "Заполнить анкету для этого кейса",
       paymentsAria: "Оплаты и история",
       paymentsLabel: "Оплаты",
       paymentsTitle: "Ваши оплаты",
       paymentsEmptyPrefix: "Оплат пока нет. Тарифы описаны на странице ",
       paymentsEmptyLink: "«Сопровождение»",
+      paidAccessLabel: "Оплаченный доступ",
+      paidAccessTitle: "Срок сопровождения",
+      paidAccessUntil: "Доступ оплачен до",
       subscriptionLabel: "Автопродление",
       subscriptionTitle: "Управление подпиской",
       subscriptionText: "Здесь можно открыть защищённый портал Stripe, посмотреть следующую дату списания, изменить способ оплаты или отключить автоматическое продление.",
@@ -464,7 +468,7 @@ const ru = {
     eyebrow: "Анкета",
     title: "Расскажите о вашей ситуации",
     description:
-      "Анкета создаёт ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам.",
+      "Анкета создаст или дополнит ваш кейс: команда изучит её и свяжется с вами по дальнейшим шагам.",
     setupTitle: "Анкета",
     setupDescription: "Для заполнения анкеты требуется настроенная аутентификация.",
     setupNotice: "Анкета требует настройки Supabase Auth",
@@ -1042,7 +1046,7 @@ const ru = {
     eyebrow: "Оплата",
     title: "Тарифы",
     description:
-      "Оплата проходит через защищённую страницу Stripe. Платформа не хранит данные карт.",
+      "Оплата обрабатывается Stripe в защищённой форме. Платформа не хранит данные карт.",
     planLabel: "Тариф",
     payButton: "Перейти к оплате",
     unavailable: "Оплата по этому тарифу временно оформляется через команду",
@@ -1054,7 +1058,7 @@ const ru = {
     offerLabel: "Условия",
     offerTitle: "Оферта",
     offerText:
-      "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Указывайте при оплате тот же email, что и в аккаунте платформы, — по нему команда привяжет платёж к вашему кейсу.",
+      "Оплачивая тариф, вы подтверждаете принятие условий публичной оферты. Платёж автоматически привязывается к аккаунту, из которого вы переходите к оплате.",
     // Регистрация раньше оплаты. Публичную платёжную ссылку мог открыть
     // кто угодно — и тогда деньги приходили без аккаунта, к которому их
     // привязать. Цены при этом видны всем: смысл не в том, чтобы прятать
@@ -1074,7 +1078,7 @@ const ru = {
     offerHint:
       "Чтобы перейти к оплате, отметьте оба пункта выше.",
     refundLink: "Подробные условия оплаты и возврата",
-    feeNote: "Стоимость личного сопровождения включает формулу Professor Python на оплаченный период и её доставку. Налоги, если они юридически применимы к покупке, рассчитываются отдельно при оформлении оплаты.",
+    feeNote: "Стоимость личного сопровождения включает формулу Professor Python на оплаченный период и её доставку.",
     planReviewTitle: "Оценка состояния",
     planReviewDesc:
       "Оценка текущего состояния, разбор актуальных анализов и предварительная консультация по личному протоколу реабилитации от Professor Python. Разовая услуга, без обязательства покупать сопровождение.",
@@ -1088,20 +1092,42 @@ const ru = {
     selectedTotal: "К оплате сегодня:",
     giftIncluded: "Формула Professor Python на выбранный оплаченный период — в подарок. Доставка включена.",
     autoRenewLabel: "Включить автоматическое продление",
-    autoRenewText: "После окончания уже оплаченного срока сопровождение будет продлеваться на следующие 30 дней по действующей цене. Автопродление можно отключить до следующего списания.",
-    autoRenewUnavailable: "Ссылка Stripe для автопродления этого срока ещё не подключена.",
-    taxNote: "Применимые налоги, если они требуются законодательством вашей страны или региона, рассчитываются отдельно в Stripe Checkout."
+    autoRenewText: "После окончания уже оплаченного срока — $1,300 каждые 30 дней. Автопродление можно отключить до следующего списания.",
+    checkoutPending: "Открываем оплату…",
+    checkoutErrors: {
+      invalid: "Проверьте выбранный срок и подтвердите оба согласия.",
+      signin: "Войдите в аккаунт, чтобы продолжить оплату.",
+      unavailable: "Не удалось открыть оплату. Попробуйте ещё раз или напишите команде через кабинет.",
+      consent: "Не удалось сохранить согласие с условиями. Попробуйте ещё раз.",
+      "subscription-exists": "У вас уже подключено автопродление. Управлять им можно в настройках аккаунта.",
+      "period-active": "У вас уже есть оплаченный срок сопровождения. Автопродление можно подключить после его окончания."
+    },
+    taxNote: "Итоговая сумма показана до подтверждения оплаты."
   },
   paymentSuccess: {
+    metadataTitle: "Статус оплаты",
+    metadataDescription: "Проверка состояния платежа и дальнейшие шаги.",
     eyebrow: "Оплата получена",
     title: "Благодарим вас!",
-    description: "Ваш платёж успешно принят. Добро пожаловать в сопровождение Python Method.",
+    description: "Ваш платёж успешно принят. Дальнейшие шаги зависят от выбранной услуги и появятся в личном кабинете.",
+    accessActiveTitle: "Оплаченный доступ открыт",
+    accessDates: "Срок сопровождения",
+    assessmentReadyTitle: "Оплата оценки записана",
+    assessmentReadyText: "Заполните анкету и добавьте необходимые материалы в личном кабинете.",
+    accessPendingTitle: "Платёж принят, доступ ещё оформляется",
+    accessPendingText: "Не оплачивайте повторно. Обновите статус через минуту; если доступ не появится в течение 10 минут, напишите в поддержку.",
+    refreshCta: "Обновить статус",
+    questionnaireCta: "Заполнить анкету",
+    deliveryCta: "Проверить сведения о доставке",
+    pendingEyebrow: "Проверка оплаты",
+    pendingTitle: "Платёж пока не подтверждён",
+    pendingDescription: "Мы не можем подтвердить оплату по этой ссылке. Проверьте состояние в личном кабинете; если списание произошло, не платите повторно и напишите в поддержку.",
+    retryCta: "Вернуться к тарифам",
     whatNextLabel: "Что происходит дальше",
     steps: [
-      "Оплата привязывается к вашему кейсу автоматически в течение нескольких минут (по аккаунту или email, указанному при оплате). Если через 10 минут её не видно в кабинете — напишите нам.",
-      "Команда подтвердит активацию сопровождения — вы получите сообщение в чате вашего кабинета.",
-      "Вместе с личным сопровождением Professor Python предоставляет свою формулу на оплаченный период в подарок. Доставка уже включена в стоимость сопровождения; трек-номер придёт в чат.",
-      "Professor Python и команда изучат ваш кейс и начнут сопровождение. Всё общение — в вашем кабинете."
+      "Оплата привязывается к вашему аккаунту автоматически в течение нескольких минут. Если через 10 минут её не видно в кабинете — напишите нам.",
+      "Если вы оплатили оценку состояния, команда начнёт разбор после получения необходимых материалов и направит ответ в личный кабинет.",
+      "Если вы оплатили личное сопровождение, срок доступа указан выше после подтверждения записи. Проверьте сведения о доставке и добавьте адрес, если он ещё не указан."
     ],
     cabinetCta: "Перейти в кабинет",
     questionLabel: "Есть вопрос?",
@@ -1244,11 +1270,15 @@ const en: typeof ru = {
       caseNoneText:
         "Fill in the questionnaire to create your case — after that you can upload documents.",
       caseNoneCta: "Fill in the questionnaire",
+      caseFinishCta: "Complete the questionnaire for this case",
       paymentsAria: "Payments and history",
       paymentsLabel: "Payments",
       paymentsTitle: "Your payments",
       paymentsEmptyPrefix: "No payments yet. The plans are described on the ",
       paymentsEmptyLink: "“Support program” page",
+      paidAccessLabel: "Paid access",
+      paidAccessTitle: "Support period",
+      paidAccessUntil: "Access paid through",
       subscriptionLabel: "Automatic renewal",
       subscriptionTitle: "Manage subscription",
       subscriptionText: "Open the secure Stripe portal to see the next charge date, update your payment method or turn off automatic renewal.",
@@ -1652,7 +1682,7 @@ const en: typeof ru = {
     eyebrow: "Questionnaire",
     title: "Tell us about your situation",
     description:
-      "The questionnaire creates your case: the team will read it and contact you about the next steps.",
+      "The questionnaire creates or completes your case: the team will read it and contact you about the next steps.",
     setupTitle: "Questionnaire",
     setupDescription: "Authentication must be configured before the questionnaire can be filled in.",
     setupNotice: "The questionnaire needs Supabase Auth configured",
@@ -2188,7 +2218,7 @@ const en: typeof ru = {
     eyebrow: "Payment",
     title: "Plans",
     description:
-      "Payment goes through a secure Stripe page. The platform does not store card data.",
+      "Payment is processed by Stripe in a secure form. The platform does not store card data.",
     planLabel: "Plan",
     payButton: "Proceed to payment",
     unavailable: "Payment for this plan is temporarily arranged through the team",
@@ -2200,7 +2230,7 @@ const en: typeof ru = {
     offerLabel: "Terms",
     offerTitle: "Public offer",
     offerText:
-      "By paying for a plan you confirm acceptance of the public offer. Use the same email as in your platform account — the team links the payment to your case by it.",
+      "By paying for a plan you confirm acceptance of the public offer. Your payment is automatically linked to the account you use to open checkout.",
     signInToPay: "Register and pay",
     signInWhy:
       "Payment opens once you have an account. That way it attaches to your cabinet straight away, access switches on by itself, and you never have to prove anything to anyone. Registering takes a minute.",
@@ -2216,7 +2246,7 @@ const en: typeof ru = {
     offerHint:
       "To proceed to payment, please tick both boxes above.",
     refundLink: "Full payment and refund terms",
-    feeNote: "The Personal Support price includes Professor Python's formula for the paid period and delivery. Taxes, where legally applicable to the purchase, are calculated separately at checkout.",
+    feeNote: "The Personal Support price includes Professor Python's formula for the paid period and delivery.",
     planReviewTitle: "Condition assessment",
     planReviewDesc:
       "An assessment of your current condition, review of current test results and a preliminary consultation on your personal rehabilitation protocol by Professor Python. A one-time service with no obligation to purchase support.",
@@ -2230,20 +2260,42 @@ const en: typeof ru = {
     selectedTotal: "Due today:",
     giftIncluded: "Professor Python's formula for the selected paid period is complimentary. Delivery is included.",
     autoRenewLabel: "Enable automatic renewal",
-    autoRenewText: "After the prepaid period ends, support renews for the next 30 days at the then-current price. You can turn off renewal before the next charge.",
-    autoRenewUnavailable: "The Stripe auto-renew link for this duration has not been connected yet.",
-    taxNote: "Applicable taxes, if required by the laws of your country or region, are calculated separately in Stripe Checkout."
+    autoRenewText: "After the prepaid period ends: $1,300 every 30 days. You can turn off renewal before the next charge.",
+    checkoutPending: "Opening checkout…",
+    checkoutErrors: {
+      invalid: "Check your selected term and confirm both consent boxes.",
+      signin: "Sign in to continue to payment.",
+      unavailable: "We could not open checkout. Try again or contact the team through your account.",
+      consent: "We could not save your acceptance of the terms. Please try again.",
+      "subscription-exists": "Automatic renewal is already connected. Manage it in your account settings.",
+      "period-active": "You already have a paid support period. You can enable automatic renewal after it ends."
+    },
+    taxNote: "The total is shown before you confirm payment."
   },
   paymentSuccess: {
+    metadataTitle: "Payment status",
+    metadataDescription: "Check your payment status and next steps.",
     eyebrow: "Payment received",
     title: "Thank you!",
-    description: "Your payment has been received. Welcome to the Python Method support program.",
+    description: "Your payment has been received. The next steps depend on the service you selected and will appear in your account.",
+    accessActiveTitle: "Your paid access is active",
+    accessDates: "Support period",
+    assessmentReadyTitle: "Assessment payment recorded",
+    assessmentReadyText: "Complete the questionnaire and add the necessary materials in your account.",
+    accessPendingTitle: "Payment received; access is still being set up",
+    accessPendingText: "Do not pay again. Refresh the status in a minute; if access is not available within 10 minutes, contact support.",
+    refreshCta: "Refresh status",
+    questionnaireCta: "Complete questionnaire",
+    deliveryCta: "Review delivery details",
+    pendingEyebrow: "Payment check",
+    pendingTitle: "Payment not yet confirmed",
+    pendingDescription: "We cannot confirm payment from this link. Check your account; if you were charged, do not pay again and contact support.",
+    retryCta: "Back to plans",
     whatNextLabel: "What happens next",
     steps: [
-      "The payment is linked to your case automatically within a few minutes (by your account or the email used at checkout). If you don't see it in your account after 10 minutes — write to us.",
-      "The team will confirm the activation of your support program — you will get a message in your account chat.",
-      "With Personal Support, Professor Python provides his formula for the paid period as a complimentary gift. Delivery is already included in the support price; the tracking number will arrive in the chat.",
-      "Professor Python and the team will study your case and begin the support program. All communication happens in your account."
+      "The payment is linked to your account automatically within a few minutes. If you don't see it in your account after 10 minutes, write to us.",
+      "If you purchased a condition assessment, the team will begin its review after receiving the necessary materials and send the response to your account.",
+      "If you purchased Personal Support, your access dates appear above once recorded. Review your delivery details and add an address if one is missing."
     ],
     cabinetCta: "Go to my account",
     questionLabel: "Have a question?",

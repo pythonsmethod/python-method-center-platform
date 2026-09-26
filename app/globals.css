@@ -7635,7 +7635,7 @@ body.cabinet-menu-open { overflow: hidden; }
   .web-cab__menu-icon i { background:currentColor; display:block; height:1px; width:22px; }
   .web-cab__menu-label { font-size:.72rem; font-weight:750; letter-spacing:.04em; }
   .web-cab__menu:focus-visible { outline:2px solid var(--wc-gold); outline-offset:2px; }
-  .web-cab__mobile-brand { align-items:center; color:var(--wc-text); display:flex; flex:1; font-family:var(--font-serif); font-size:.78rem; gap:6px; }
+  .web-cab__mobile-brand { align-items:center; color:var(--wc-text); display:flex; flex:1; font-family:var(--font-serif); font-size:.78rem; gap:6px; min-width:0; }
   .web-cab__mobile-brand svg { color:var(--wc-bright); height:27px; width:27px; }
   .web-cab__content { padding:26px 16px 46px; }
   .web-home__heading h1,.web-dialog>header h1 { font-size:2rem; }

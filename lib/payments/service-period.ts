@@ -31,9 +31,10 @@ export async function openServicePeriod(
     product: string;
     paidAt: Date;
     months?: number;
+    stripePeriod?: { startsAt: Date; endsAt: Date };
   }
 ): Promise<ServicePeriodOutcome> {
-  const { profileId, caseId, paymentId, product, paidAt } = input;
+  const { profileId, caseId, paymentId, product, paidAt, stripePeriod } = input;
 
   if (!isPlanProduct(product)) {
     return { status: "not-applicable" };
@@ -54,14 +55,18 @@ export async function openServicePeriod(
     .select("ends_at")
     .eq("case_id", caseId)
     .eq("status", "active")
-    .gt("ends_at", paidAt.toISOString())
+    .gt("ends_at", (stripePeriod?.startsAt ?? paidAt).toISOString())
     .order("ends_at", { ascending: false })
     .limit(1)
     .maybeSingle();
 
+  if (stripePeriod && current?.ends_at) {
+    return { status: "failed", message: "Stripe paid period overlaps existing paid access" };
+  }
+
   const extending = Boolean(current?.ends_at);
-  const startsAt = extending ? new Date(current!.ends_at as string) : paidAt;
-  const endsAt = servicePeriodEnd(product, startsAt, input.months ?? 1);
+  const startsAt = stripePeriod?.startsAt ?? (extending ? new Date(current!.ends_at as string) : paidAt);
+  const endsAt = stripePeriod?.endsAt ?? servicePeriodEnd(product, startsAt, input.months ?? 1);
 
   const { error } = await supabase.from("service_periods").insert({
     profile_id: profileId,

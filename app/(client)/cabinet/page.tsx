@@ -18,9 +18,12 @@ const copy = {
     intro: "Выберите, с кем хотите продолжить диалог.",
     karen: "Karen — Professor Python", personal: "Личное сопровождение",
     preview: "Я изучаю ваши материалы. Если потребуется уточнение, напишу вам здесь.",
+    previewBeforeIntake: "Сначала заполните анкету и добавьте материалы. После этого команда сможет изучить ваш случай и ответить здесь.",
+    intakeFirst: "Сначала заполните анкету", startQuestionnaire: "Заполнить анкету",
+    anhamBeforeIntake: "Анхам поможет разобраться, как заполнить анкету, добавить документы и пользоваться кабинетом. Это бесплатно и не заменяет личный разбор Professor Python.",
     newMessage: "Новые сообщения появятся здесь", continueDialog: "Продолжить диалог",
     caseTitle: "Мой случай", caseReview: "Материалы на рассмотрении",
-    caseEmpty: "Заполните анкету, чтобы создать случай", openCase: "Открыть случай",
+    caseEmpty: "Заполните анкету, чтобы дополнить свой случай", openCase: "Открыть случай",
     appTitle: "Больше возможностей — в приложении",
     appText: "Ежедневная сводка, персональные напоминания и расширенные функции аккаунта доступны в приложении Python Method Center.",
     appCta: "Узнать о приложении", protected: "Защищённый диалог", askAnham: "Спросить Анхама",
@@ -36,9 +39,12 @@ const copy = {
     intro: "Choose who you would like to continue the conversation with.",
     karen: "Karen — Professor Python", personal: "Personal guidance",
     preview: "I am reviewing your materials. If I need any clarification, I will message you here.",
+    previewBeforeIntake: "First complete the questionnaire and add your materials. The team can then review your case and reply here.",
+    intakeFirst: "Complete the questionnaire first", startQuestionnaire: "Complete questionnaire",
+    anhamBeforeIntake: "Anham can help you complete the questionnaire, add documents and use your account. It is free and does not replace Professor Python's personal review.",
     newMessage: "New messages will appear here", continueDialog: "Continue conversation",
     caseTitle: "My case", caseReview: "Materials under review",
-    caseEmpty: "Complete the questionnaire to create your case", openCase: "Open case",
+    caseEmpty: "Complete the questionnaire to fill in your case", openCase: "Open case",
     appTitle: "More features in the app",
     appText: "Daily summaries, personal reminders, and expanded account features are available in the Python Method Center app.",
     appCta: "Learn about the app", protected: "Protected conversation", askAnham: "Ask Anham",
@@ -58,6 +64,7 @@ export default async function CabinetPage() {
   const c = copy[locale];
   const auth = await getRequiredUser("/cabinet");
   let hasCase = false;
+  let caseHasIntake = false;
   let questionnaireFilled = true;
   let latestMessage: string | null = null;
   let professorUnread = 0;
@@ -72,6 +79,7 @@ export default async function CabinetPage() {
     supportUnread = unreadSupport;
     const clientCase = caseResult.status === "ready" ? caseResult.case : null;
     hasCase = Boolean(clientCase);
+    caseHasIntake = Boolean(clientCase?.title);
     if (clientCase) {
       const [messages, unreadProfessor] = await Promise.all([
         getCaseMessages(clientCase.id),
@@ -97,12 +105,12 @@ export default async function CabinetPage() {
             ? <b aria-label={`${c.unread}: ${professorUnread}`} className="unread-badge unread-badge--inline">{professorUnread}</b>
             : <span className="contact-card__lock" title={c.protected}>⌾</span>}
         </div>
-        <blockquote>{latestMessage ?? c.preview}</blockquote>
-        <span className="contact-card__status"><i />{latestMessage ? c.protected : c.newMessage}</span>
-        <Link className="contact-card__primary" href="/cabinet/dialog">{c.continueDialog}<span>→</span></Link>
+        <blockquote>{latestMessage ?? (caseHasIntake ? c.preview : c.previewBeforeIntake)}</blockquote>
+        <span className="contact-card__status"><i />{latestMessage ? c.protected : caseHasIntake ? c.newMessage : c.intakeFirst}</span>
+        <Link className="contact-card__primary" href={caseHasIntake ? "/cabinet/dialog" : "/onboarding"}>{caseHasIntake ? c.continueDialog : c.startQuestionnaire}<span>→</span></Link>
       </section>
 
-      <CabinetAnhamCard button={c.askAnham} label={t.inviteLabel} title={t.inviteTitle} text={t.inviteText} questions={t.inviteQuestions} boundary={t.inviteBoundary} />
+      <CabinetAnhamCard button={c.askAnham} label={t.inviteLabel} title={t.inviteTitle} text={caseHasIntake ? t.inviteText : c.anhamBeforeIntake} questions={t.inviteQuestions} boundary={t.inviteBoundary} />
 
       <section className="contact-card contact-card--support" aria-labelledby="support-title">
         <div className="contact-card__head">
@@ -127,9 +135,9 @@ export default async function CabinetPage() {
     </Link>}
 
     <div className="web-home__secondary">
-      <Link className="case-shortcut" href={hasCase ? "/cabinet/account" : "/onboarding"}>
+      <Link className="case-shortcut" href={hasCase && caseHasIntake ? "/cabinet/account" : "/onboarding"}>
         <span className="case-shortcut__icon"><IconAnkh /></span>
-        <span><small>{c.caseTitle}</small><strong>{hasCase ? c.caseReview : c.caseEmpty}</strong></span>
+        <span><small>{c.caseTitle}</small><strong>{caseHasIntake ? c.caseReview : c.caseEmpty}</strong></span>
         <span>{c.openCase} →</span>
       </Link>
       <aside className="web-app-promo">

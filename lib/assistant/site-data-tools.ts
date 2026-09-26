@@ -1,3 +1,4 @@
+import { getCheckoutSettings } from "@/lib/payments/checkout-settings";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { writeAuditLog } from "@/lib/audit/log";
 import { createHash } from "node:crypto";
@@ -110,7 +111,7 @@ export async function runStaffDataTool(actor: VoiceActor, name: string, raw: unk
     keys(input, ["section", "offset"]);
     const sections: Record<string, unknown> = {
       ...getDictionary(locale), legal_offer: OFFER_CONTENT[locale], legal_privacy: PRIVACY_CONTENT[locale], legal_refund: REFUND_CONTENT[locale], shop_catalog: { sections: SHOP_SECTIONS, text: SHOP_CATALOG[locale] },
-      service_prices: { currency: "USD", reviewTotal: REVIEW_TOTAL_USD, personalSupportPer30Days: PERSONAL_SUPPORT_MONTHLY_USD, plans: getPaymentPlans(locale).map(p => ({ product: p.product, title: p.title, description: p.description, priceLine: p.priceLine, paymentLinkConfigured: Boolean(p.paymentLinkUrl), supportOptions: p.supportOptions?.map(option => ({ months: option.months, durationDays: option.durationDays, amountUsd: option.amountUsd, paymentLinkConfigured: Boolean(option.paymentLinkUrl), autoRenewPaymentLinkConfigured: Boolean(option.autoRenewPaymentLinkUrl) })) })) },
+      service_prices: { currency: "USD", reviewTotal: REVIEW_TOTAL_USD, personalSupportPer30Days: PERSONAL_SUPPORT_MONTHLY_USD, plans: getPaymentPlans(locale).map(p => ({ product: p.product, title: p.title, description: p.description, priceLine: p.priceLine, checkoutConfigured: Boolean(getCheckoutSettings()), supportOptions: p.supportOptions?.map(option => ({ months: option.months, durationDays: option.durationDays, amountUsd: option.amountUsd, checkoutConfigured: Boolean(getCheckoutSettings()), autoRenewConfigured: Boolean(getCheckoutSettings()) })) })) },
       runtime_availability: { voiceEnabled: process.env.ANHAM_REALTIME_ENABLED === "true", voiceProviderKeyConfigured: Boolean(process.env.OPENAI_REALTIME_API_KEY?.trim() || process.env.OPENAI_API_KEY?.trim()), voiceSigningSecretConfigured: (process.env.ANHAM_REALTIME_SESSION_SECRET?.trim().length ?? 0) >= 32, textOpenAIConfigured: Boolean(process.env.OPENAI_API_KEY?.trim()), textClaudeConfigured: Boolean(process.env.ANTHROPIC_API_KEY?.trim()), publicAssistantMode: ["off", "open", "guarded"].includes(process.env.PUBLIC_ASSISTANT_MODE ?? "") ? process.env.PUBLIC_ASSISTANT_MODE : "unspecified", evidence: "Configuration presence on this application server only, not provider health, billing balance or deployment telemetry." },
     };
     if (input.section === undefined) return { ...stamp, locale, source: "bundled site content", sections: Object.keys(sections) };

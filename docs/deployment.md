@@ -38,13 +38,20 @@ SUPABASE_SERVICE_ROLE_KEY
 Payment configuration:
 
 ```text
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_REVIEW_299
-STRIPE_PAYMENT_LINK_SUPPORT_1M ... STRIPE_PAYMENT_LINK_SUPPORT_12M
-STRIPE_PAYMENT_LINK_SUPPORT_1M_AUTORENEW ... STRIPE_PAYMENT_LINK_SUPPORT_12M_AUTORENEW
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_CHECKOUT_ENABLED=false
+STRIPE_CHECKOUT_MODE=test
+STRIPE_CHECKOUT_RETURN_ORIGIN=https://your-isolated-staging.example
+STRIPE_CHECKOUT_AUTOMATIC_TAX=false
+STRIPE_PUBLISHABLE_KEY=pk_test_... # public key; match test/live Checkout mode
 ```
 
 The exact metadata, 30-day renewal and trial requirements are documented in
-`docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md`. Personal Support buttons remain unavailable for any duration whose corresponding link is not configured.
+`docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md` and
+`docs/STRIPE_CHECKOUT_AUTOMATION_2026_09_22.md`. Enable Checkout only after
+isolated test payments and the billing migration pass. Static Payment Link
+variables are no longer used. Preview deployments refuse live Stripe keys.
 
 Recommended after the production domain is selected:
 

@@ -47,8 +47,8 @@ describe("condition assessment — permanent 299 USD one-time service", () => {
     expect(plans[1].supportOptions).toHaveLength(12);
   });
 
-  it("uses oferta-v9 with the new payment and gift terms in both languages", () => {
-    expect(OFFER_VERSION).toBe("oferta-v9");
+  it("uses oferta-v10 with the new payment and gift terms in both languages", () => {
+    expect(OFFER_VERSION).toBe("oferta-v10");
 
     expect(clause("ru")).toContain("299 USD, разовая оплата");
     expect(clause("ru")).toContain("1 300 USD");

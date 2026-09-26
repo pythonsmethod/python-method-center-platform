@@ -38,7 +38,10 @@ import type { Locale } from "@/lib/i18n/locale";
 // that prepaid term. Professor Python's formula for the paid support period
 // is complimentary and its delivery is included. The standalone condition
 // assessment is 299 USD as the permanent current price.
-export const OFFER_VERSION = "oferta-v9";
+// v10 (2026-09-24): removes an unverified promise that Stripe will calculate
+// tax separately at checkout while automatic tax remains disabled. The
+// published totals, complimentary formula and included delivery are unchanged.
+export const OFFER_VERSION = "oferta-v10";
 
 // The superseded edition, kept reachable because clients accepted it and
 // clause 12 says their terms do not change.

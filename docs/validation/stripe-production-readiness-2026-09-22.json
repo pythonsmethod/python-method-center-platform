@@ -1,0 +1,134 @@
+{
+  "checkedOn": "2026-09-24",
+  "ownerAuthorizedProductionLaunch": true,
+  "releaseStatus": "HOLD",
+  "published": false,
+  "productionDatabase": {
+    "projectId": "zdrfttgwnyorifmpqgwe",
+    "migration": "supabase/migrations/20260919123000_personal_support_billing.sql",
+    "applied": true,
+    "personalSupportEnum": true,
+    "billingSubscriptionsTable": true,
+    "billingSubscriptionsRls": true,
+    "authenticatedReadPolicy": "profile_id = auth.uid()",
+    "authenticatedSelectGranted": true,
+    "serviceRoleWriteGranted": true,
+    "updatedAtTrigger": true,
+    "uniqueServicePeriodPaymentIndex": true,
+    "billingSubscriptionRowsAfterMigration": 0,
+    "servicePeriodRowsBeforeMigration": 5,
+    "servicePeriodRowsAfterMigration": 5,
+    "securityAdvisorsForBillingTable": 0
+  },
+  "stripeLive": {
+    "stripeContext": "acct_1SUwZYE6esfE5qRj",
+    "livemode": true,
+    "checkoutNamespace": "pmc-20260922-v1",
+    "namespaceObjectsPresent": true,
+    "newObjectsCreated": 36,
+    "localizedProductsCreatedAndReadBack": 4,
+    "localizedPricesCreatedAndReadBack": 30,
+    "portalConfigurationsCreatedAndReadBack": 2,
+    "priceTaxBehavior": "exclusive; automatic tax remains disabled, no tax is added by this integration",
+    "taxSettingsStatus": "pending",
+    "taxRegistrations": 0,
+    "permissionChecks": [
+      {
+        "operation": "PostProducts",
+        "result": "succeeded after official reconsent",
+        "permission": "product_write"
+      },
+      {
+        "operation": "PostPrices",
+        "result": "succeeded after official reconsent",
+        "permission": "plan_write"
+      },
+      {
+        "operation": "PostBillingPortalConfigurations",
+        "result": "succeeded after official reconsent",
+        "permission": "customer_portal_write"
+      }
+    ],
+    "existingWebhook": {
+      "id": "we_1U0AkJE6esfE5qRjmhhRNxmF",
+      "url": "https://pythonmethodcenter.com/api/stripe/webhook",
+      "status": "enabled",
+      "apiVersion": "2025-10-29.clover",
+      "enabledEvents": [
+        "checkout.session.completed",
+        "checkout.session.async_payment_succeeded",
+        "checkout.session.async_payment_failed",
+        "payment_intent.payment_failed",
+        "charge.refunded"
+      ],
+      "missingRecurringEvents": [
+        "invoice.paid",
+        "invoice.payment_failed",
+        "customer.subscription.updated",
+        "customer.subscription.deleted"
+      ],
+      "modified": false
+    }
+  },
+  "vercel": {
+    "projectId": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
+    "readyPreview": {
+      "commit": "f39e4e080f983475fed4299d2b0184974b8e11ce",
+      "deploymentId": "dpl_HRszsTcuXwu85bRfLMfQA1PAp8Fv",
+      "status": "READY"
+    },
+    "productionEnvironmentModified": true,
+    "browserAuthenticated": true,
+    "environmentWriteAvailableInConnector": false,
+    "preparedProductionEnvironment": {
+      "STRIPE_CHECKOUT_ENABLED": "false; do not enable until acceptance",
+      "STRIPE_CHECKOUT_MODE": "live",
+      "STRIPE_CHECKOUT_RETURN_ORIGIN": "https://pythonmethodcenter.com",
+      "STRIPE_CHECKOUT_AUTOMATIC_TAX": "false"
+    },
+    "existingSecretNamesVerifiedWithoutRevealingValues": [
+      "STRIPE_SECRET_KEY",
+      "STRIPE_WEBHOOK_SECRET"
+    ]
+  },
+  "sandboxSixPeriodPrepaidOnly": {
+    "checkoutSessionId": "cs_test_a19KflaAGRmwUsXgBh6nUyr0ol0BRNIVAKHf3KetElDZm1TFDyPrayTyLB",
+    "status": "complete",
+    "paymentStatus": "paid",
+    "amountCents": 780000,
+    "currency": "usd",
+    "months": 6,
+    "days": 180,
+    "autoRenew": false,
+    "offerVersion": "oferta-v9",
+    "stagingPaymentRows": 1,
+    "stagingActiveServicePeriods": 1,
+    "stagingDeliveryTasks": 1,
+    "deliveryQuantity": 6,
+    "deliveryAssigned": true
+  },
+  "legacySalesLinksToRetireAtLaunch": [
+    {
+      "id": "plink_1UDfUHE6esfE5qRjw8KrqTM7",
+      "description": "Сопровождение 100 дней",
+      "activeOnReview": true
+    },
+    {
+      "id": "plink_1TwF0iE6esfE5qRj18cUVWU7",
+      "description": "Сопровождение 100 дней",
+      "activeOnReview": true
+    },
+    {
+      "id": "plink_1TwDYFE6esfE5qRjQcTCRkjA",
+      "description": "Сопровождение 5 недель",
+      "activeOnReview": true
+    }
+  ],
+  "remaining": [
+    "Isolated Preview and signed Sandbox webhook passed paid assessment, one-period renewal, six-period prepaid-only, 12-period exact entitlement, final Portal cancellation, authenticated Checkout/consent and later owner-approved failed-renewal acceptance. The declined 1300 USD invoice produced past_due without extending access or creating a gift task; see stripe-sandbox-failed-renewal-2026-09-25.json.",
+    "The copy revision removes the unverified claim that Stripe calculates taxes at Checkout and advances the offer to v10. It passed 2057 local tests, typecheck, lint, security check, build, GitHub CI and READY Preview; RU/EN route switching and 390x844 mobile rendering were verified. The six-period charge used the earlier v9 consent.",
+    "Add the four recurring events to the existing Live webhook after the handler is deployed; preserve the original events, URL, signing secret and API version. Then verify production runtime, merge and verify the public deployment.",
+    "Tax classification and any external seller registration are not established. The owner deferred tax setup; do not imply that Stripe Tax disabled means no tax obligation.",
+    "Deactivate retired sale links only as part of the verified launch; preserve history and existing subscriptions."
+  ]
+}
