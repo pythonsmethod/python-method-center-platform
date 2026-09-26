@@ -1,5 +1,19 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Failed-renewal webhook fail-closed hardening — 2026-09-25 PDT — PREVIEW READY, LIVE HOLD
+
+The `invoice.payment_failed` handler now rejects a failed Supabase
+`billing_subscriptions` status update instead of acknowledging the signed
+event. The shared webhook catch releases the event-ledger claim and returns
+HTTP 500 so Stripe can retry; no unpaid support period is opened. Two new
+positive/negative route tests pass. Full local regression passed 2,094 tests
+with one existing skip; TypeScript, ESLint, security check, production build
+and `git diff --check` passed. GitHub CI passed and Vercel Preview is READY
+for commit `f5a24d8`. The actual declined-renewal Test Clock scenario has
+**not** yet been run: no synthetic payment method was changed and no test
+clock was advanced. Live webhook and tax/legal release gates remain open;
+Production Checkout is disabled.
+
 ## Pristine first paid webhook acceptance — 2026-09-24 PDT — PREVIEW VERIFIED, RELEASE HOLD
 
 A second, entirely synthetic staging buyer with no prior Case completed one

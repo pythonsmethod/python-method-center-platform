@@ -1,5 +1,17 @@
 # Automatic Stripe Checkout — 2026-09-22
 
+## Failed-renewal persistence hardening — 2026-09-25 PDT
+
+The `invoice.payment_failed` handler now checks whether saving the
+subscription's `past_due` status succeeded. On a database error it fails the
+webhook, releases the event claim and lets Stripe retry instead of returning
+a misleading HTTP 200. New signed-route tests cover the success and failed
+write paths and prove neither grants an unpaid access period. Full local
+regression: 2,094 passed, one existing skip; TypeScript, ESLint, security
+check, production build and GitHub CI passed. Commit `f5a24d8` is READY in
+isolated Preview. The actual declined-renewal Sandbox Test Clock acceptance is
+still pending; neither card nor clock was changed for that scenario.
+
 ## Pristine paid webhook acceptance — 2026-09-24 PDT
 
 A new authenticated synthetic staging buyer with zero Case, payment,

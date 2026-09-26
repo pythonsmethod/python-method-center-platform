@@ -1,5 +1,19 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Failed-renewal acceptance — 2026-09-25 PDT — release HOLD
+
+- [x] Make `invoice.payment_failed` fail closed and retryable if saving
+      `past_due` fails; prove both success and persistence-error routes in tests.
+- [x] Pass 2,094 local tests (one existing skip), TypeScript, ESLint,
+      security check, production build and GitHub CI on the corrected branch.
+- [ ] In Stripe Sandbox only, replace the card on the synthetic Test Clock
+      subscription with the decline-after-attach card, advance to the next
+      renewal and verify a failed invoice, signed webhook, `past_due` state,
+      zero unpaid access extension and zero new gift task. No card or clock
+      mutation has occurred yet.
+- [ ] Complete Live webhook, tax/legal and release checks before turning on
+      Production Checkout.
+
 ## Pristine paid first delivery — 2026-09-24 PDT — Preview accepted, release HOLD
 
 - [x] Start with an entirely new authenticated synthetic staging buyer with no
