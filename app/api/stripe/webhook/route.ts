@@ -807,10 +807,14 @@ async function handleFailedSubscriptionInvoice(
   const subscriptionId = invoiceSubscriptionId(invoice);
   if (!subscriptionId) return;
 
-  await supabase
+  const { error } = await supabase
     .from("billing_subscriptions")
     .update({ status: "past_due", last_invoice_id: invoice.id })
     .eq("stripe_subscription_id", subscriptionId);
+
+  if (error) {
+    throw new Error(`failed to record subscription payment failure: ${error.message}`);
+  }
 
   await notifyTeam({
     kind: "payment",
