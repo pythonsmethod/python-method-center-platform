@@ -1,5 +1,28 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## ANHAM Karen philosophy — 2026-09-27 — CATALOG LIVE, VOICE RELEASE AUTHORIZED
+
+Owner-authorized communication profile v1.0.0 is connected to the existing
+shared prose policy and voice persona. It includes 24 bilingual editorial
+phrases, three selected sourced Karen quotes and six philosophical foundations,
+with explicit attribution, opt-out, crisis and clinical boundaries. No identity,
+role, model, medical workflow or source-extraction change.
+
+The complete 51,750-byte source was saved in five active staff-only records in
+existing assistant_knowledge in Production and anham-staging. Reconstruction
+hash matches the original; anon access remains denied. The private full source
+stays out of this public repository. Full local regression: 2,130 passed / one
+existing skip; TypeScript, ESLint, security gate and production build passed.
+Two additional active client/staff reference records carry the approved RU/EN
+catalog through existing knowledge retrieval. Production RU and EN guest calls
+returned HTTP 200 and used the new fear/support wording. This verifies dynamic
+catalog use, not deployment of the compiled policy or all-channel compliance.
+After the initial auto-review rejection, the owner explicitly authorized
+publishing the prepared code and completing the release, including Voice.
+Realtime staff/client and GPT-Live paths consume the same shared profile.
+Code publication, remote checks, deployment and fresh-session verification
+are now in progress. See [implementation and source manifest](docs/ankh/anham_karen_philosophy.md).
+
 ## Monthly Checkout release preparation — 2026-09-27 PDT — NOT YET LIVE
 
 The owner authorized launching the new model while leaving prior tax

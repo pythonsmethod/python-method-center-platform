@@ -1,5 +1,7 @@
 # NEXORA document analysis and PMC integration — historical directory
 
+Current communication profile: [Karen philosophy, source manifest and release](anham_karen_philosophy.md).
+
 ANKH is no longer a separate system or product name.
 The directory name remains a compatibility locator for existing links and evidence.
 
