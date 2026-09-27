@@ -1,5 +1,29 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Monthly Checkout release preparation — 2026-09-27 PDT — NOT YET LIVE
+
+The owner authorized launching the new model while leaving prior tax
+collection behavior unchanged. All three existing Live support Payment Links
+were read back with `automatic_tax.enabled=false` and no line-item tax. Live
+Stripe Tax has zero registrations; no tax setting or registration was changed.
+Production Vercel retains `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`,
+`STRIPE_CHECKOUT_MODE=live`, the canonical return origin, and disabled sales.
+The Live publishable key was added to Production scope for the 2–12-period
+renewal form; existing server secret names were confirmed without revealing
+their values. A new deployment is needed before that key is available.
+
+The payment branch was merged locally with current main `404557e` to preserve
+the intervening questionnaire, mobile/header, support and email-language
+changes. Documentation conflicts retained both records; the language-routing
+conflict uses main's shared `rememberLocale` helper for English Stripe returns.
+The merged tree passed 2,116 tests (one existing skip), TypeScript, ESLint,
+security gate and production build. The first parallel run had one transient
+security-check timeout and two Windows line-ending-sensitive source-text test
+failures; isolated reruns and the full sequential suite passed. The merge
+commit is `ec8b379`. PR retarget/merge, Live webhook expansion, Production
+deployment, sales enablement and legacy-link retirement are still pending.
+The tax configuration parity check is not a legal tax determination.
+
 ## Declined renewal acceptance — 2026-09-25 PDT — SANDBOX VERIFIED, LIVE HOLD
 
 The owner reversed the earlier refusal and explicitly approved changing only

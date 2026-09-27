@@ -1,5 +1,20 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Monthly Checkout launch — 2026-09-27 PDT — IN PROGRESS
+
+- [x] Owner chose to launch with the previous tax collection setting; verify
+      the three Live legacy links and new Production setting all have automatic
+      tax disabled. Do not change tax registration, rates or business address.
+- [x] Add only the public Live Stripe.js key to Production Vercel scope.
+- [x] Merge current main into the payment branch and pass 2,116 tests, one
+      existing skip, TypeScript, ESLint, security gate and production build.
+- [ ] Publish the combined payment work, expand the existing Live webhook,
+      enable sales, verify RU/EN Live Checkout without a real charge, then
+      deactivate legacy links for new sales while preserving history.
+- [ ] Obtain tax-professional determination separately when the business
+      address/structure is finalized; do not imply that disabled Stripe Tax
+      settles legal tax obligations.
+
 ## Failed-renewal acceptance — 2026-09-25 PDT — Sandbox CLOSED, release HOLD
 
 - [x] Make `invoice.payment_failed` fail closed and retryable if saving

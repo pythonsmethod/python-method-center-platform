@@ -1,5 +1,21 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-BILLING-2026-09-27-01 — Launch with existing tax collection setting
+
+The owner authorized launching the new $299 assessment and $1,300-per-30-day
+Personal Support model while retaining the prior tax collection behavior.
+Readback of the three active legacy Live support Payment Links showed
+`automatic_tax.enabled=false` and zero tax on their current line items. The
+new Checkout keeps `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`; no Stripe Tax
+registration, rate or business address is changed in this release. The new
+catalog Prices are `tax_behavior=exclusive`, which has no effect while
+automatic tax is disabled but would add tax on top if it is enabled later.
+Any later tax change needs a fresh business/tax review, explicit configuration
+decision and, where necessary, a new catalog version. The technical parity
+check does not determine whether taxes are legally owed, especially for the
+complimentary physical Formula. Existing records and subscriptions are not
+reclassified or recalculated.
+
 ## PMC-BILLING-2026-09-25-01 — Failed renewal state must persist before webhook acknowledgement
 
 For a signed `invoice.payment_failed`, the subscription status write to
