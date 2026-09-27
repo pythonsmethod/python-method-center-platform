@@ -14,8 +14,8 @@ import { getDictionary } from "@/lib/i18n/dictionaries";
 // day of the focus group.
 //
 // Signed in, the account id travels with the payment as client_reference_id
-// and the match cannot fail. So both payment pages must decide from the
-// session, not from anything else.
+// via an authenticated Server Action (covered by checkout-action.test.ts).
+// The payment page must still decide from the session.
 
 const PAGES = [
   { file: "app/(payment)/payment/page.tsx", next: "/payment" }
@@ -34,11 +34,7 @@ describe.each(PAGES)("$file", ({ file, next }) => {
     expect(source).toContain(`signInHref="/login?mode=signup&next=${next}"`);
   });
 
-  it("still attaches the account to the payment link", () => {
-    // The whole reason for requiring an account: without this the payment
-    // arrives with nothing but an email to identify it by.
-    expect(source).toContain("client_reference_id");
-  });
+
 });
 
 describe.each(["ru", "en"] as const)("what a visitor without an account reads in %s", (locale) => {

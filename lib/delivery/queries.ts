@@ -11,14 +11,18 @@ async function withDocumentUrls(db: NonNullable<ReturnType<typeof createSupabase
 
 export async function getClientDelivery(profileId: string) {
   const db = createSupabaseServiceClient();
-  if (!db) return { profile: null, tasks: [], error: "Database is not configured." };
-  const [{ data: profile, error }, { data: tasks }] = await Promise.all([
+  if (!db) return { profile: null, tasks: [], awaitingAddressCount: 0, error: "Database is not configured." };
+  const [{ data: profile, error }, { data: tasks }, { data: paidSupport }] = await Promise.all([
     db.from("profiles").select(DELIVERY_PROFILE_COLUMNS).eq("id", profileId).maybeSingle(),
-    db.from("delivery_tasks").select("*").eq("client_profile_id", profileId).order("created_at", { ascending: false })
+    db.from("delivery_tasks").select("*").eq("client_profile_id", profileId).order("created_at", { ascending: false }),
+    db.from("payments").select("id").eq("profile_id", profileId).eq("status", "paid")
+      .in("product", ["personal_support", "support_5_weeks", "support_15_weeks"])
   ]);
   await db.from("delivery_tasks").update({ client_viewed_at: new Date().toISOString() })
     .eq("client_profile_id", profileId).eq("status", "shipped").is("client_viewed_at", null);
-  return { profile: profile as DeliveryProfile | null, tasks: await withDocumentUrls(db, (tasks ?? []) as DeliveryTask[]), error: error?.message ?? null };
+  const taskPaymentIds = new Set((tasks ?? []).map(task => task.payment_id));
+  const awaitingAddressCount = (paidSupport ?? []).filter(payment => !taskPaymentIds.has(payment.id)).length;
+  return { profile: profile as DeliveryProfile | null, tasks: await withDocumentUrls(db, (tasks ?? []) as DeliveryTask[]), awaitingAddressCount, error: error?.message ?? null };
 }
 
 export async function getClientDeliveryUnreadCount(profileId: string): Promise<number> {

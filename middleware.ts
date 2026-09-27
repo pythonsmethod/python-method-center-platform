@@ -96,6 +96,7 @@ function resolveLanguageRouting(request: NextRequest): NextResponse | null {
     headers.set(PATH_HEADER, path);
 
     const response = NextResponse.rewrite(target, { request: { headers } });
+    // Direct English return URLs also keep authenticated pages in English.
     rememberLocale(request, response, "en");
     return response;
   }

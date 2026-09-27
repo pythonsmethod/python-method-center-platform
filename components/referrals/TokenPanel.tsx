@@ -6,9 +6,7 @@ import { initialRedeemState } from "@/lib/tokens/redeem-state";
 import {
   formatUsd,
   MIN_REDEEM_TOKENS,
-  pluralCapsules,
   pluralTokens,
-  tokensToCapsules,
   tokensToUsd
 } from "@/lib/tokens/config";
 import { reasonLabels, type TokenTransaction } from "@/lib/tokens/queries";
@@ -21,8 +19,8 @@ type TokenPanelProps = {
 };
 
 const copy = {
-  ru: { balance:"Ваш баланс", formula:"формулы, или", discount:"$ скидки на любую покупку", peg:"Один токен — это одна капсула. Дорожает капсула — дорожают и ваши токены.", code:"Ваш код скидки", copied:"Скопировано ✓", copy:"Скопировать код", amount:"Сколько токенов использовать", creating:"Создаю код…", create:"Получить код скидки", minimum:"Скидку можно получить, когда на счету будет хотя бы", token:"токенов", reasons: reasonLabels },
-  en: { balance:"Your balance", formula:"formula capsules, or", discount:"$ off any purchase", peg:"One token equals one capsule. When a capsule becomes more valuable, so do your tokens.", code:"Your discount code", copied:"Copied ✓", copy:"Copy code", amount:"Tokens to use", creating:"Creating code…", create:"Get discount code", minimum:"You can redeem a discount once your balance reaches at least", token:"tokens", reasons:{ referral_paid:"Referral started support", redeemed:"Used as a discount", manual_adjustment:"Credit from the team" } }
+  ru: { balance:"Ваш баланс", discount:"$ скидки на оплату на платформе", peg:"Токены можно обменять на скидку по действующим правилам программы.", code:"Ваш код скидки", copied:"Скопировано ✓", copy:"Скопировать код", amount:"Сколько токенов использовать", creating:"Создаю код…", create:"Получить код скидки", minimum:"Скидку можно получить, когда на счету будет хотя бы", token:"токенов", reasons: reasonLabels },
+  en: { balance:"Your balance", discount:"$ off a platform payment", peg:"Tokens can be redeemed for a discount under the programme's current rules.", code:"Your discount code", copied:"Copied ✓", copy:"Copy code", amount:"Tokens to use", creating:"Creating code…", create:"Get discount code", minimum:"You can redeem a discount once your balance reaches at least", token:"tokens", reasons:{ referral_paid:"Referral started support", redeemed:"Used as a discount", manual_adjustment:"Credit from the team" } }
 } as const;
 
 function formatWhen(value: string, locale: Locale): string {
@@ -49,13 +47,8 @@ export function TokenPanel({ balance, transactions, locale }: TokenPanelProps) {
         <strong>
           {balance} {locale === "ru" ? pluralTokens(balance) : balance === 1 ? "token" : "tokens"}
         </strong>
-        {/* Capsules first, dollars second. The capsule is the promise —
-            one token is one capsule and always will be — and the dollar
-            figure is only today's translation of it. Showing it the other
-            way round would make a rise in the capsule price look like us
-            changing the rules. */}
         <span className="tokens__value">
-          = {tokensToCapsules(balance)} {locale === "ru" ? pluralCapsules(tokensToCapsules(balance)) : tokensToCapsules(balance) === 1 ? "capsule" : "capsules"} {t.formula} {formatUsd(tokensToUsd(balance))} {t.discount}
+          = {formatUsd(tokensToUsd(balance))} {t.discount}
         </span>
         <span className="tokens__peg">
           {t.peg}

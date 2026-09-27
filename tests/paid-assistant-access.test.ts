@@ -3,31 +3,35 @@ import { describe, expect, it } from "vitest";
 import { isPaidSupportProduct } from "@/lib/assistant/tiers";
 import {
   getPaymentPlans,
-  SUPPORT_100_DAY_PRODUCT
+  PERSONAL_SUPPORT_PRODUCT
 } from "@/lib/payments/config";
 
 describe("strongest assistant access", () => {
-  it("keeps the legacy id but presents the long plan as 100 days", () => {
-    const ruPlan = getPaymentPlans("ru").find(
-      (plan) => plan.product === SUPPORT_100_DAY_PRODUCT
-    );
-    const enPlan = getPaymentPlans("en").find(
-      (plan) => plan.product === SUPPORT_100_DAY_PRODUCT
-    );
+  it("publishes only the current assessment and Personal Support products", () => {
+    const ru = getPaymentPlans("ru");
+    const en = getPaymentPlans("en");
 
-    expect(SUPPORT_100_DAY_PRODUCT).toBe("support_15_weeks");
-    expect(ruPlan?.title).toBe("Сопровождение — 100 дней");
-    expect(enPlan?.title).toBe("Support — 100 days");
-    expect(ruPlan?.title).not.toContain("15 недель");
-    expect(enPlan?.title).not.toContain("15 weeks");
+    expect(ru.map((plan) => plan.product)).toEqual([
+      "preliminary_assessment",
+      PERSONAL_SUPPORT_PRODUCT
+    ]);
+    expect(en.map((plan) => plan.product)).toEqual([
+      "preliminary_assessment",
+      PERSONAL_SUPPORT_PRODUCT
+    ]);
+    expect(ru[1].title).toBe("Личное сопровождение");
+    expect(en[1].title).toBe("Personal Support");
+    expect(ru[1].priceLine).toContain("$1,300");
+    expect(en[1].priceLine).toContain("$1,300");
   });
 
-  it("is unlocked by every current support tariff", () => {
+  it("is unlocked by current Personal Support and historical paid support", () => {
+    expect(isPaidSupportProduct("personal_support")).toBe(true);
     expect(isPaidSupportProduct("support_5_weeks")).toBe(true);
     expect(isPaidSupportProduct("support_15_weeks")).toBe(true);
   });
 
-  it("is not unlocked by one-off or archived products", () => {
+  it("is not unlocked by one-off or archived test access", () => {
     expect(isPaidSupportProduct("preliminary_assessment")).toBe(false);
     expect(isPaidSupportProduct("test_access")).toBe(false);
     expect(isPaidSupportProduct(null)).toBe(false);

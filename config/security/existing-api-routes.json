@@ -24,6 +24,7 @@
   "app/api/messages/audio/route.ts",
   "app/api/messages/thread/route.ts",
   "app/api/metrics/extract/route.ts",
+  "app/api/stripe/portal/route.ts",
   "app/api/stripe/webhook/route.ts",
   "app/api/supplements/extract/route.ts"
 ]

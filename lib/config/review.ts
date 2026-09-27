@@ -1,47 +1,93 @@
-// One-time review pricing, approved 2026-09-08. All amounts are final USD totals.
+// One-time state assessment pricing approved 2026-09-19.
+// The former temporary 299 USD review becomes the permanent standalone entry
+// service. It is not a support period and it does not include the formula.
 export const REVIEW_PRODUCT = "preliminary_assessment" as const;
-export const REVIEW_TEMPORARY_USD = 299;
-export const REVIEW_STANDARD_USD = 500;
-// Before 1 December 2026, America/Los_Angeles (PST, UTC-08:00).
-export const REVIEW_PRICE_END = "2026-12-01T08:00:00.000Z";
-export function reviewPriceUsd(now = new Date()): number {
-  return now.getTime() < Date.parse(REVIEW_PRICE_END) ? REVIEW_TEMPORARY_USD : REVIEW_STANDARD_USD;
+export const REVIEW_PRICE_USD = 299;
+
+export function reviewPriceUsd(_now = new Date()): number {
+  return REVIEW_PRICE_USD;
 }
-export function getReviewCopy(locale: "ru" | "en", now = new Date()) {
+
+export function getReviewCopy(locale: "ru" | "en", _now = new Date()) {
   const ru = locale === "ru";
-  const temporary = reviewPriceUsd(now) === REVIEW_TEMPORARY_USD;
-  const title = ru ? "Полный разбор анализов от Карена" : "Full test-results review by Karen";
+  const title = ru
+    ? "Оценка состояния, разбор анализов и предварительная консультация"
+    : "Condition assessment, test-results review and preliminary consultation";
   const description = ru
-    ? "Полный разбор анализов и рекомендации Карена (Professor Python) по восстановлению и реабилитации. Ответ — файлом в личном кабинете в течение трёх рабочих дней после подтверждения оплаты и получения всех материалов. Затем — три рабочих дня чата для вопросов. Длительное сопровождение и формула в этот тариф не входят."
-    : "A full review of your test results with recovery and rehabilitation recommendations from Karen (Professor Python). Your report arrives in your personal account within three working days after payment is confirmed and all materials are received, followed by three working days of chat for questions. Ongoing support and the formula are not included.";
-  const price = temporary
-    ? (ru ? "299 USD вместо 500 USD — до 1 декабря 2026 года (по времени Лос-Анджелеса)" : "299 USD instead of 500 USD — until 1 December 2026 (Los Angeles time)")
-    : "500 USD";
-  const cta = ru ? "Получить полный разбор" : "Get the full review";
+    ? "Оценка текущего состояния, разбор актуальных анализов и предварительная консультация по личному протоколу реабилитации от Professor Python. Ответ поступает в личный кабинет после подтверждения оплаты и получения необходимых материалов. Личное сопровождение и формула в эту услугу не входят."
+    : "An assessment of your current condition, review of current test results and a preliminary consultation on your personal rehabilitation protocol by Professor Python. The response is delivered in your personal account after payment is confirmed and the required materials are received. Personal support and the formula are not included.";
+  const price = ru ? "299 USD — разовая оплата" : "299 USD — one-time payment";
+  const cta = ru ? "Получить оценку состояния" : "Get my condition assessment";
+
   return {
-    title, description, price,
+    title,
+    description,
+    price,
     promo: {
-      badge: ru ? "Разбор анализов" : "Test-results review",
-      titlePaid: title, titleFree: title, textPaid: description, textFree: description,
-      pricePaid: price, priceFree: price, priceAmount: "", cta, ctaFree: cta,
-      note: ru ? "Итоговая стоимость без дополнительных сборов. Это экспертное мнение; оно не заменяет консультацию лечащего врача." : "Final price with no additional fees. This is an expert opinion and does not replace your doctor's consultation."
+      badge: ru ? "Оценка состояния" : "Condition assessment",
+      titlePaid: title,
+      titleFree: title,
+      textPaid: description,
+      textFree: description,
+      pricePaid: price,
+      priceFree: price,
+      priceAmount: "",
+      cta,
+      ctaFree: cta,
+      note: ru
+        ? "Разовая услуга. Покупка не обязывает приобретать дальнейшее сопровождение."
+        : "One-time service. Purchasing it does not obligate you to purchase ongoing support."
     },
     details: {
       title: ru ? "Что именно вы получите" : "What you receive",
-      lead: ru ? "Состав разбора, стоимость и сроки." : "Review contents, pricing and timing.",
+      lead: ru
+        ? "Оценка состояния, разбор анализов и предварительная консультация."
+        : "Condition assessment, test-results review and a preliminary consultation.",
       items: [
-        { q: ru ? "Сколько стоит разбор?" : "How much does the review cost?", a: price + (ru ? ". С 1 декабря 2026 года — 500 USD. Дополнительных сборов нет." : ". From 1 December 2026, the price is 500 USD. No additional fees.") },
-        { q: ru ? "Что входит?" : "What is included?", a: description },
-        { q: ru ? "В каком виде придёт ответ?" : "How will I receive the report?", a: ru ? "Отдельным файлом в личном кабинете с ответом Карена." : "As a separate file in your personal account with Karen's response." },
-        { q: ru ? "Сколько ждать?" : "How long does it take?", a: ru ? "До трёх рабочих дней после подтверждения оплаты и получения всех материалов." : "Up to three working days after payment confirmation and receipt of all materials." },
-        { q: ru ? "Можно ли задать вопросы?" : "Can I ask questions?", a: ru ? "Да, три рабочих дня после разбора открыт чат с Кареном." : "Yes. Chat with Karen is available for three working days after the review." },
-        { q: ru ? "Обязательно ли покупать сопровождение?" : "Do I have to purchase ongoing support?", a: ru ? "Нет. Разбор — самостоятельная услуга. Сопровождение можно приобрести отдельно." : "No. The review is a standalone service. Ongoing support can be purchased separately." },
-        { q: ru ? "Это полный разбор или предварительный?" : "Is this a full or preliminary review?", a: ru ? "Полный разбор анализов с рекомендациями Карена по восстановлению и реабилитации." : "A full review of your test results with Karen's recommendations for recovery and rehabilitation." },
-        { q: ru ? "Какие анализы подойдут?" : "Which test results can I submit?", a: ru ? "Анализы и чек-апы за последние 30 дней; дополнительные материалы можно согласовать с командой." : "Test results and check-ups from the past 30 days; ask the team about additional materials." }
+        {
+          q: ru ? "Сколько стоит услуга?" : "How much does it cost?",
+          a: ru ? "299 USD. Разовая оплата." : "299 USD. One-time payment."
+        },
+        {
+          q: ru ? "Что входит?" : "What is included?",
+          a: description
+        },
+        {
+          q: ru ? "В каком виде придёт ответ?" : "How will I receive the response?",
+          a: ru
+            ? "В личном кабинете с ответом Professor Python."
+            : "In your personal account with Professor Python's response."
+        },
+        {
+          q: ru ? "Можно ли задать вопросы?" : "Can I ask questions?",
+          a: ru
+            ? "Да. Вопросы по полученной оценке можно задать в предусмотренный для этой услуги период общения."
+            : "Yes. You can ask questions about the assessment during the communication period provided with this service."
+        },
+        {
+          q: ru ? "Обязательно ли покупать сопровождение?" : "Do I have to purchase ongoing support?",
+          a: ru
+            ? "Нет. Оценка состояния — самостоятельная услуга. Личное сопровождение можно приобрести отдельно."
+            : "No. The condition assessment is a standalone service. Personal support can be purchased separately."
+        },
+        {
+          q: ru ? "Чем это отличается от сопровождения?" : "How is this different from Personal Support?",
+          a: ru
+            ? "Это разовая оценка состояния и предварительная консультация. Личное сопровождение — длительная работа с вашим кейсом по оплачиваемым 30-дневным периодам."
+            : "This is a one-time condition assessment and preliminary consultation. Personal Support is ongoing work with your case in paid 30-day periods."
+        },
+        {
+          q: ru ? "Какие анализы подойдут?" : "Which test results can I submit?",
+          a: ru
+            ? "Актуальные анализы и обследования. Если нужны дополнительные материалы, команда сообщит об этом в кабинете."
+            : "Current test results and examinations. If additional materials are needed, the team will tell you in your account."
+        }
       ],
-      pageCtaTitle: ru ? "Как получить разбор" : "How to get your review",
-      pageCtaText: ru ? "Создайте аккаунт, заполните анкету, загрузите анализы и оплатите разбор." : "Create an account, complete the questionnaire, upload your test results and pay for the review.",
-      pageCta: ru ? "Перейти к оплате разбора" : "Go to review payment"
+      pageCtaTitle: ru ? "Как получить оценку" : "How to get your assessment",
+      pageCtaText: ru
+        ? "Создайте аккаунт, заполните анкету, загрузите материалы и оплатите услугу."
+        : "Create an account, complete the questionnaire, upload your materials and pay for the service.",
+      pageCta: ru ? "Перейти к оплате" : "Go to payment"
     }
   };
 }

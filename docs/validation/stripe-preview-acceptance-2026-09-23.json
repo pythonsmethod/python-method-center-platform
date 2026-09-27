@@ -1,0 +1,65 @@
+{
+  "checkedAtUtc": "2026-09-24 02:30:29 UTC",
+  "releaseStatus": "HOLD",
+  "environment": {
+    "vercelProject": "prj_Lym5X8Vru64nF1iuoW57BGTgtLpE",
+    "previewBranch": "agent/pmc-dynamic-checkout-20260922",
+    "previewDeployment": "dpl_9YPdgz3LAgYGQDR1FV281FzFouEv",
+    "supabaseProject": "thylrayzjczsxlyqhtfc",
+    "stripeSandboxAccount": "acct_1SUwZgE5bkDqmDrJ"
+  },
+  "configuration": {
+    "supabasePublicUrlAndAnonKey": "separate Production and Preview values",
+    "supabaseServiceRoleKey": "separate Production and Preview secrets",
+    "stripeSecretKeyAndWebhookSecret": "separate Production and Preview secrets",
+    "previewCheckoutMode": "test",
+    "previewCheckoutEnabled": true,
+    "previewAutomaticTax": false,
+    "stagingDeliverySchema": "legacy delivery workflow migration plus 20260924011000 and 20260924011100 parity migrations applied; production delivery schema was already complete",
+    "syntheticDeliveryFixture": "one case, fictional address in AQ and synthetic staging volunteer assignment; no real shipment",
+    "stripeWebhookDestination": "we_1UIx1gE5bkDqmDrJIFZVp6G8",
+    "stripeWebhookTarget": "isolated Preview deployment with a dedicated revocable Vercel bypass parameter; value omitted",
+    "stripeWebhookEvents": [
+      "checkout.session.completed",
+      "checkout.session.expired",
+      "invoice.paid",
+      "invoice.payment_failed",
+      "customer.subscription.updated",
+      "customer.subscription.deleted"
+    ]
+  },
+  "acceptance": {
+    "russianPricingPage": "passed: USD 299 assessment, USD 1300 per 30 days, 1–12 prepaid periods",
+    "englishPricingPage": "passed: equivalent pricing and choices",
+    "assessmentCheckout": "passed: Stripe sandbox showed USD 299 as a one-time payment",
+    "assessmentTestCardPayment": "passed: Stripe redirected to the payment success page",
+    "paymentLinkedInStagingDatabase": true,
+    "stagingPaymentRowsForSyntheticBuyer": 1,
+    "webhookDelivery": "passed: manual resend returned HTTP 200; second resend also returned HTTP 200 and left exactly one USD 299 payment row",
+    "webhookEvent": "evt_1UIxjCE5bkDqmDrJKYMgMAyu",
+    "supportRenewalCheckout": "passed: RU 1-period auto-renew hosted Checkout displayed USD 1300 per 30 days without a free trial; owner completed test-card payment",
+    "supportInitialInvoice": "passed: in_1UJ1ZME5bkDqmDrJhg8NmuZx paid USD 1300; line period 2026-09-24 01:13:18 UTC to 2026-10-24 01:13:18 UTC",
+    "firstAutomaticRenewal": "passed: Stripe Test Clock advanced to 2026-10-24 02:13 UTC; in_1UJ1iTE5bkDqmDrJoBt7x0dt paid USD 1300 for 2026-10-24 01:13:18 UTC to 2026-11-23 01:13:18 UTC",
+    "renewalWebhook": "passed: invoice.paid event evt_1UJ1iZE5bkDqmDrJwRoTmVYk delivered with HTTP 200; staging recorded exactly one renewal payment, one 30-day access period and one delivery task; event resent with no duplicate rows",
+    "stagingSupportDelivery": "passed: both paid support charges created one assigned synthetic gift-delivery task each; no shipment occurred",
+    "portalReadOnlyChecks": "passed: RU Portal showed saved test card, card-update option, paid invoice and cancellation preview preserving paid access; final cancellation not submitted",
+    "supportTwelvePeriods": "passed: fresh EN renewal-selected Checkout Session cs_test_a1Ep81tJhAmsKwLUGOTporlRJFwNvx8q9tqCP1OaBdwIjCPfK8fEdXWtRa paid USD 15600; invoice in_1UJ2JGE5bkDqmDrJfLQ8SwCw has one 360-day line from 2026-09-24 02:15:10 UTC to 2027-09-19 02:15:10 UTC, no trial; staging service period 5cfd55fa-9571-4233-962e-7e1a6d152221 has exactly matching dates and one paid USD 15600 payment plus one gift-delivery task; subscription schedule changes to USD 1300 / 30 days afterward",
+    "revisedPreviewWebhook": "passed: new checkout.session.completed event evt_1UJ2JLE5bkDqmDrJA5JKTNxJ delivered HTTP 200 to the corrected immutable Preview; webhook URL contains only the dedicated revocable bypass secret, omitted here",
+    "supportSixPeriods": "RU prepaid-only Checkout Session cs_test_a19KflaAGRmwUsXgBh6nUyr0ol0BRNIVAKHf3KetElDZm1TFDyPrayTyLB displays USD 7800 / 180 days without renewal; remains open and unpaid",
+    "failedRenewal": "not run: owner declined the proposed failing-card and Test Clock simulation; no test card or clock was changed for this scenario",
+    "authenticatedApplicationCheckout": "not proven by the 12-period payment: its account/case/address were synthetic staging fixtures and the Checkout Session was created directly through Stripe API, outside the app consent action",
+    "desktopAndMobilePricing": "passed: RU and EN routes, USD 299 assessment, all 1-12 prepaid totals, mobile viewport 390px without horizontal overflow"
+  },
+  "finding": "Assessment, one-period support purchase, first automatic renewal, entitlement, gift-task creation and webhook redelivery passed in Sandbox/staging. The earlier Test Clock exposed a 22-minute difference between frozen Stripe billing time and webhook wall time. The corrected deployed Preview passed a fresh paid 12-period subscription: invoice and staging access dates match exactly for 360 days, with no trial, one payment and one delivery task. Failed renewal was explicitly deferred by the owner. Final Portal cancellation, 6-period payment and authenticated application Checkout/consent remain unverified.",
+  "securityReview": "The project-wide existing bypass secret was never used. After explicit owner approval, a separate revocable secret was created and sent only to the Stripe Sandbox endpoint URL. Its value is not recorded in the repository. Vercel Authentication remains enabled for Preview. This separate secret grants project-wide Preview access and should be revoked when the acceptance run is finished.",
+  "copyCorrection": "The payment success page now uses service-conditional Russian and English wording so an assessment purchase does not promise Personal Support or a formula.",
+  "localVerification": {
+    "focusedCheckoutTests": "90 passed",
+    "fullTests": "2055 passed, 1 skipped",
+    "typecheck": "passed",
+    "lint": "passed",
+    "productionBuild": "passed; security checker self-test 6 passed and boundary inventory passed",
+    "diffCheck": "passed"
+  },
+  "nextGate": "Complete Sandbox 6-period payment, authenticated Checkout/consent and final Portal cancellation; only perform failed-renewal simulation after fresh owner approval. Then obtain Live product_write, configure production and release."
+}

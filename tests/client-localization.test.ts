@@ -14,7 +14,8 @@ describe("client status labels", () => {
   it("renders every client-facing label family in English", () => {
     expect(documentStatusLabel("uploaded", "en")).toBe("Uploaded");
     expect(lifecycleEventLabel("case_created", "en")).toBe("Case created");
-    expect(paymentProductLabel("support_5_weeks", "en")).toBe("Support — 5 weeks");
+    expect(paymentProductLabel("personal_support", "en")).toBe("Personal Support");
+    expect(paymentProductLabel("support_5_weeks", "en")).toBe("Archive: Support — 5 weeks");
     expect(paymentStatusLabel("paid", "en")).toBe("Paid");
   });
 });

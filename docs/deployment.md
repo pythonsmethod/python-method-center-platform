@@ -35,12 +35,23 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY
 SUPABASE_SERVICE_ROLE_KEY
 ```
 
-Optional (payment buttons on `/payment` stay hidden until these are set):
+Payment configuration:
 
 ```text
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W
-NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_CHECKOUT_ENABLED=false
+STRIPE_CHECKOUT_MODE=test
+STRIPE_CHECKOUT_RETURN_ORIGIN=https://your-isolated-staging.example
+STRIPE_CHECKOUT_AUTOMATIC_TAX=false
+STRIPE_PUBLISHABLE_KEY=pk_test_... # public key; match test/live Checkout mode
 ```
+
+The exact metadata, 30-day renewal and trial requirements are documented in
+`docs/RELEASE_MONTHLY_SUPPORT_2026_09_19.md` and
+`docs/STRIPE_CHECKOUT_AUTOMATION_2026_09_22.md`. Enable Checkout only after
+isolated test payments and the billing migration pass. Static Payment Link
+variables are no longer used. Preview deployments refuse live Stripe keys.
 
 Recommended after the production domain is selected:
 

@@ -13,7 +13,7 @@ import { hasFullClientAssistantPreview } from "./client-voice-pilot";
 export type AssistantTier = "guest" | "registered" | "client";
 
 export function isPaidSupportProduct(product: unknown): boolean {
-  return product === "support_5_weeks" || product === "support_15_weeks";
+  return product === "personal_support" || product === "support_5_weeks" || product === "support_15_weeks";
 }
 
 // What the client's own assistant may read about money, and nothing more.
@@ -75,7 +75,7 @@ export async function resolveAssistantTierForUi(): Promise<AssistantTier> {
       .eq("profile_id", user.id)
       .eq("status", "active")
       .gt("ends_at", new Date().toISOString())
-      .in("product", ["support_5_weeks", "support_15_weeks"])
+      .in("product", ["personal_support", "support_5_weeks", "support_15_weeks"])
       .limit(1);
 
     return hasFullClientAssistantPreview(user) || (data ?? []).some((row) => isPaidSupportProduct(row.product))

@@ -3,6 +3,7 @@ import { Link } from "@/components/LocaleLink";
 import { PageHeader } from "@/components/PageHeader";
 import { PaymentPlans } from "@/components/payments/PaymentPlans";
 import { getPaymentPlans } from "@/lib/payments/config";
+import { getCheckoutSettings } from "@/lib/payments/checkout-settings";
 import { getDictionary } from "@/lib/i18n/dictionaries";
 import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -17,22 +18,6 @@ export async function generateMetadata(): Promise<Metadata> {
     // only place that knows whether this render is the Russian address or
     // the English one. Pinning a canonical here dropped the pair.
   };
-}
-
-// Signed-in clients get their profile id attached to the Stripe link as
-// client_reference_id, so the webhook can bind the payment to the account
-// without relying on email matching.
-function withClientReference(
-  url: string | null,
-  profileId: string | null
-): string | null {
-  if (!url || !profileId) {
-    return url;
-  }
-
-  const target = new URL(url);
-  target.searchParams.set("client_reference_id", profileId);
-  return target.toString();
 }
 
 export default async function PaymentPage() {
@@ -51,17 +36,13 @@ export default async function PaymentPage() {
     profileId = user?.id ?? null;
   }
 
-  const plans = getPaymentPlans(locale).map((plan) => ({
-    ...plan,
-    paymentLinkUrl: withClientReference(plan.paymentLinkUrl, profileId)
-  }));
+  const plans = getPaymentPlans(locale);
 
   return (
     <div className="page-shell payment-page">
-      {/* Three formats, one list. The review used to have a panel of its
-          own above the cards, from the days it was the free offer; as a
-          plan it is a card like the other two, and a panel repeating the
-          card's text word for word was the same paragraph twice. */}
+      {/* Two current services: one-time condition assessment and one
+          configurable Personal Support product. Legacy 5-week / 100-day
+          products stay in historical records only and never render here. */}
       <PageHeader
         eyebrow={t.eyebrow}
         title={t.title}
@@ -79,9 +60,20 @@ export default async function PaymentPage() {
           offerHint: t.offerHint,
           refundLink: t.refundLink,
           signInToPay: t.signInToPay,
-          signInWhy: t.signInWhy
+          signInWhy: t.signInWhy,
+          durationLabel: t.durationLabel,
+          durationOption: t.durationOption,
+          selectedTotal: t.selectedTotal,
+          giftIncluded: t.giftIncluded,
+          autoRenewLabel: t.autoRenewLabel,
+          autoRenewText: t.autoRenewText,
+          checkoutPending: t.checkoutPending,
+          checkoutErrors: t.checkoutErrors,
+          taxNote: t.taxNote
         }}
         plans={plans}
+        locale={locale}
+        checkoutEnabled={Boolean(getCheckoutSettings())}
         signInHref="/login?mode=signup&next=/payment"
         signedIn={Boolean(profileId)}
       />

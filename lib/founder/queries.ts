@@ -1,4 +1,4 @@
-import { getPaymentPlans } from "@/lib/payments/config";
+import { getCheckoutSettings } from "@/lib/payments/checkout-settings";
 import {
   getGuestDailyTotalLimit,
   getPublicAssistantMode
@@ -145,17 +145,10 @@ export async function getFounderOverview(): Promise<FounderOverview> {
     },
     {
       name: "Кнопки оплаты на сайте",
-      ok: Boolean(
-        getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
-          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
-          process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
-      ),
-      detail:
-        getPaymentPlans().find(plan => plan.product === "preliminary_assessment")?.paymentLinkUrl &&
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_5W?.trim() &&
-        process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_15W?.trim()
-          ? "Все три ссылки на тарифы активны"
-          : "Заданы не все ссылки на тарифы (разбор, 5 недель, 100 дней)"
+      ok: Boolean(getCheckoutSettings()),
+      detail: getCheckoutSettings()
+        ? "Серверный Checkout настроен: RU/EN, 1–12 периодов, выбор автопродления. Фактическую оплату подтверждает webhook."
+        : "Checkout выключен или не настроен: проверьте режим Stripe, секреты и адрес возврата"
     }
   ];
 

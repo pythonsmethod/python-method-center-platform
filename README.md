@@ -153,6 +153,8 @@ reads/writes go through the server-only service role. Do not weaken RLS.
 2. Events: `checkout.session.completed`,
    `checkout.session.async_payment_succeeded`,
    `checkout.session.async_payment_failed`, `payment_intent.payment_failed`,
+   `invoice.paid`, `invoice.payment_failed`,
+   `customer.subscription.updated`, `customer.subscription.deleted`,
    `charge.refunded`
 3. Put the signing secret into `STRIPE_WEBHOOK_SECRET` and redeploy.
 
