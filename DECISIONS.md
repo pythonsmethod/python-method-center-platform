@@ -18,6 +18,8 @@ Source/catalog persistence is live. After auto-review initially rejected the
 push, the owner explicitly authorized public publication of the prepared code
 and completing the Voice release on 2026-09-27. That resolves the publication
 gate; no authorization, clinical gate or private-source boundary is weakened.
+The shared profile was released through PR #231 after passing remote checks;
+Production deployment and bounded RU/EN/API observations are in the manifest.
 [Manifest and release evidence](docs/ankh/anham_karen_philosophy.md).
 
 ## PMC-BILLING-2026-09-27-01 — Launch with existing tax collection setting

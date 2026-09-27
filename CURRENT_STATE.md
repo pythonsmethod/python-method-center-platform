@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## ANHAM Karen philosophy — 2026-09-27 — CATALOG LIVE, VOICE RELEASE AUTHORIZED
+## ANHAM Karen philosophy — 2026-09-27 — TEXT AND VOICE RELEASED
 
 Owner-authorized communication profile v1.0.0 is connected to the existing
 shared prose policy and voice persona. It includes 24 bilingual editorial
@@ -17,11 +17,17 @@ Two additional active client/staff reference records carry the approved RU/EN
 catalog through existing knowledge retrieval. Production RU and EN guest calls
 returned HTTP 200 and used the new fear/support wording. This verifies dynamic
 catalog use, not deployment of the compiled policy or all-channel compliance.
-After the initial auto-review rejection, the owner explicitly authorized
-publishing the prepared code and completing the release, including Voice.
-Realtime staff/client and GPT-Live paths consume the same shared profile.
-Code publication, remote checks, deployment and fresh-session verification
-are now in progress. See [implementation and source manifest](docs/ankh/anham_karen_philosophy.md).
+The owner explicitly authorized public publication and completing Voice.
+PR #231 merged as `2a32d4d050269f95e5a5ff63045cbdd1546880a9` after the full
+GitHub security/regression workflow and Vercel Preview passed. Production
+`dpl_DoN5AzB6DDaAFP7tREgS6vwVR2Py` is READY and owns pythonmethodcenter.com.
+Realtime staff/client and GPT-Live now consume the released shared profile.
+Current focused tests: 124 passed, including four RU/EN provider-handshake
+cases. Post-release RU support and EN plain-language requests returned 200;
+both Voice endpoints returned 401 without authentication. A signed-in spoken
+round trip was not run: this browser has no Production login. Existing voice
+sessions need a normal reconnect. No voice access/configuration was widened.
+See [implementation and source manifest](docs/ankh/anham_karen_philosophy.md).
 
 ## Monthly Checkout release preparation — 2026-09-27 PDT — NOT YET LIVE
 

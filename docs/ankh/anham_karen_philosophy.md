@@ -125,8 +125,8 @@ preservation and source-text boundaries, not clinical efficacy or every model
 response. Local production build and security gate passed. Remote checks and production
 runtime readback are recorded in the dated release checkpoint when completed.
 
-Current state: SOURCE SAVED / DYNAMIC CATALOG LIVE / COMPILED POLICY LOCALLY
-TESTED / VOICE RELEASE AUTHORIZED. On 2026-09-27, two synthetic Production guest
+Pre-release checkpoint: SOURCE SAVED / DYNAMIC CATALOG LIVE / COMPILED POLICY
+LOCALLY TESTED / VOICE RELEASE AUTHORIZED. On 2026-09-27, two synthetic Production guest
 requests (Russian and English) returned HTTP 200. The Russian response used
 the catalog's fear/support wording; the English response used its translation
 and a small-step thought. This is bounded evidence of dynamic catalog use,
@@ -148,7 +148,42 @@ integration and completion of the release. Refetch confirmed main is still the
 same base, with no intervening changes to merge. The existing implementation
 already covers Realtime staff, Realtime client through its text prompt, and
 GPT-Live through the shared voice persona. Publication and release are now
-authorized; append deployed ref and verification evidence when observed.
+authorized; the completed release evidence follows.
+
+### Released text and Voice profile — 2026-09-27
+
+PR #231 published commit `57037ba01cb585c8ff99008b26d56283b6aeb2ad`; its tree
+`afde8dda87cbd04786e599ce77329b3ba147bcaa` exactly matched the locally checked
+candidate. Four additional synthetic provider-handshake tests verify the full
+catalog, persona, language and safety policy in RU/EN Realtime staff requests.
+Together with the text/client-context/GPT-Live/bridge suites: 124 passed.
+The first test attempt used a nonexistent staff role in the two Karen fixtures
+and correctly returned 403; the fixtures were aligned with the existing admin
+role, without changing authorization code. TypeScript, ESLint and diff checks
+passed. GitHub run `36352231440` completed successfully, including the full
+regression suite, security checks, dependency audit and build. Preview
+`dpl_4bcj8qQXCpv9gdoE3vyK6DmB4eeA` was READY.
+
+PR #231 merged at 2026-09-27 21:37:26 UTC as
+`2a32d4d050269f95e5a5ff63045cbdd1546880a9`. Production deployment
+`dpl_DoN5AzB6DDaAFP7tREgS6vwVR2Py` is READY, with both pythonmethodcenter.com
+and www.pythonmethodcenter.com attached, on that exact merge commit. This
+releases the compiled profile to text, Realtime staff/client and GPT-Live.
+Existing access flags, voice choices, clinical gates and provider credentials
+are unchanged. Already-open voice sessions must reconnect normally.
+
+Post-release sample: two fresh synthetic public text requests returned 200.
+RU used the catalog's fear/support thought and gave a next step; EN honored a
+request for plain language without quotations. Two unauthenticated attempts,
+one at each Voice session endpoint, returned 401 with a sign-in message. No
+credential or catalog leak appeared in those errors. The public browser was
+signed out; no authenticated Production audio round trip or listening-quality
+acceptance is claimed. This bounded sample is not universal response or
+clinical validation. Phase: IMPLEMENTATION / RELEASE COMPLETE; acoustic
+acceptance remains an explicitly unmeasured observation, not a reason to widen
+access or fabricate a spoken-session result. No schema or patient data changes
+were required. The private status record and saved package are updated to this
+release checkpoint while retaining the original source version and history.
 
 ## Recovery
 
