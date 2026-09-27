@@ -2,12 +2,13 @@ import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { getSupabaseConfig } from "@/lib/supabase/env";
 import { SITE_URL } from "@/lib/config/site";
-import { localeCookieDomain } from "@/lib/i18n/cookie-domain";
 import {
   LOCALE_COOKIE,
   LOCALE_HEADER,
-  PATH_HEADER
+  PATH_HEADER,
+  type Locale
 } from "@/lib/i18n/locale";
+import { localeCookieDomain } from "@/lib/i18n/cookie-domain";
 import {
   hasEnglishTwin,
   localizedHref,
@@ -49,15 +50,42 @@ function captureReferral(request: NextRequest, response: NextResponse): void {
 // English twin. Nobody is moved on the strength of Accept-Language alone:
 // a crawler arrives with all sorts of language headers, and redirecting it
 // away from an address is how versions of a site stop being seen.
+// An English address is a choice of language, the same as pressing EN, and
+// is remembered the same way. Without this, a visitor who arrived on /en
+// from a link or a search read the public pages in English and then met
+// the sign-in, sign-up and cabinet pages in Russian: those have one address
+// and take the language from this cookie, which only the switch used to set.
+function rememberLocale(request: NextRequest, response: NextResponse, locale: Locale): void {
+  if (request.cookies.get(LOCALE_COOKIE)?.value === locale) {
+    return;
+  }
+
+  const host = request.headers.get("x-forwarded-host")?.split(",")[0]?.trim() || request.nextUrl.host;
+  const domain = localeCookieDomain(host);
+
+  response.cookies.set(LOCALE_COOKIE, locale, {
+    path: "/",
+    maxAge: 60 * 60 * 24 * 365,
+    sameSite: "lax",
+    secure: request.nextUrl.protocol === "https:",
+    ...(domain ? { domain } : {})
+  });
+}
+
 function resolveLanguageRouting(request: NextRequest): NextResponse | null {
   const { pathname } = request.nextUrl;
   const { locale, path } = readLocaleFromPath(pathname);
 
   if (locale === "en") {
-    // /en/cabinet and the like have no English twin, so there is nothing to
-    // rewrite them to. They are simply not addresses on this site.
+    // /en/login, /en/cabinet and the like have no English twin: they have
+    // one address and read the language from the cookie. Send the visitor
+    // there in English rather than to a Russian "page not found".
     if (!hasEnglishTwin(path)) {
-      return null;
+      const target = request.nextUrl.clone();
+      target.pathname = path;
+      const response = NextResponse.redirect(target, 307);
+      rememberLocale(request, response, "en");
+      return response;
     }
 
     const target = request.nextUrl.clone();
@@ -68,18 +96,8 @@ function resolveLanguageRouting(request: NextRequest): NextResponse | null {
     headers.set(PATH_HEADER, path);
 
     const response = NextResponse.rewrite(target, { request: { headers } });
-    // A direct English URL (including Stripe's return URL) also chooses the
-    // language for the single-address authenticated pages it links to.
-    // Otherwise /en/payment/success -> /onboarding falls back to Russian
-    // unless the visitor happened to press the language switch first.
-    const domain = localeCookieDomain(request.nextUrl.host);
-    response.cookies.set(LOCALE_COOKIE, "en", {
-      path: "/",
-      maxAge: 60 * 60 * 24 * 365,
-      sameSite: "lax",
-      secure: request.nextUrl.protocol === "https:",
-      ...(domain ? { domain } : {})
-    });
+    // Direct English return URLs also keep authenticated pages in English.
+    rememberLocale(request, response, "en");
     return response;
   }
 

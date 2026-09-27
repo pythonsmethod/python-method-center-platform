@@ -18,4 +18,18 @@ export type OnboardingProfileDefaults = {
   fullName: string;
   phone: string;
   countryCode: string;
+  careRecipientType: CareRecipientType;
+  patientFullName: string;
+  patientBirthDate: string;
+  patientRelationship: string;
+  accountOwnerRole: string;
+  representationReason: string;
+  primaryGoal: string;
+  situationDescription: string;
+  ageConfirmed: boolean;
+  representativeConfirmed: boolean;
+  patientDataConsent: boolean;
+  responsibilityAcknowledged: boolean;
+  offerAccepted: boolean;
+  consentAccepted: boolean;
 };

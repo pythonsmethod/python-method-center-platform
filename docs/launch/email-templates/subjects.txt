@@ -1,0 +1,5 @@
+Confirm signup — Subject:
+{{ if eq .Data.locale "en" }}Confirm your email — Python Method{{ else }}Подтвердите почту — Python Method{{ end }}
+
+Reset password — Subject:
+{{ if eq .Data.locale "en" }}New password — Python Method{{ else }}Новый пароль — Python Method{{ end }}

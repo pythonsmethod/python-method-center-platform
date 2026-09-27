@@ -48,6 +48,9 @@ already-paid access until its recorded end.
 This is an implementation decision for PR #216, not evidence of production
 publication. Staging repair of one synthetic payment is recorded in
 `CURRENT_STATE.md`; no production client record was changed for this decision.
+## Questionnaire recovery — 2026-09-23
+
+Reuse the latest authenticated owner's canonical onboarding payload and profile delivery fields; keep current input in React state across server-action failures. Do not create a parallel draft store or put medical questionnaire text in browser local storage. Never claim recovery for values that were not persisted before a reload.
 
 ## NEXORA-2026-09-23-01 — Shared core, application boundary and retired ANKH name
 

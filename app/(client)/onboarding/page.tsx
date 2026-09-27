@@ -5,28 +5,33 @@ import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { getRequiredUser } from "@/lib/auth/require-user";
 import type { OnboardingProfileDefaults } from "@/lib/onboarding/types";
+import { buildOnboardingDefaults, savedDeliveryDefaults } from "@/lib/onboarding/defaults";
+import { DELIVERY_PROFILE_COLUMNS, type DeliveryProfile } from "@/lib/delivery/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { OnboardingForm } from "./OnboardingForm";
 
+const ONBOARDING_PROFILE_COLUMNS = `full_name, phone, country_code, ${DELIVERY_PROFILE_COLUMNS}`;
+
 async function getProfileDefaults(
   userId: string
-): Promise<OnboardingProfileDefaults> {
+): Promise<{ form: OnboardingProfileDefaults; delivery: Partial<DeliveryProfile> }> {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return { fullName: "", phone: "", countryCode: "" };
+    return {
+      form: buildOnboardingDefaults(null, null),
+      delivery: {}
+    };
   }
 
-  const { data } = await supabase
-    .from("profiles")
-    .select("full_name, phone, country_code")
-    .eq("id", userId)
-    .maybeSingle();
+  const [{ data: submission }, { data: profile }] = await Promise.all([
+    supabase.from("onboarding_submissions").select("payload").eq("profile_id", userId).order("created_at", { ascending: false }).limit(1).maybeSingle(),
+    supabase.from("profiles").select(ONBOARDING_PROFILE_COLUMNS).eq("id", userId).maybeSingle()
+  ]);
 
   return {
-    fullName: String(data?.full_name ?? ""),
-    phone: String(data?.phone ?? ""),
-    countryCode: String(data?.country_code ?? "")
+    form: buildOnboardingDefaults(profile, submission?.payload),
+    delivery: savedDeliveryDefaults(profile, submission?.payload)
   };
 }
 
@@ -50,7 +55,7 @@ export default async function OnboardingPage() {
     );
   }
 
-  const profileDefaults = await getProfileDefaults(auth.userId);
+  const defaults = await getProfileDefaults(auth.userId);
 
   return (
     <div className="page-shell">
@@ -77,7 +82,7 @@ export default async function OnboardingPage() {
       </section>
 
       <section className="form-section" aria-label={t.formLabel}>
-        <OnboardingForm labels={t} locale={locale} profileDefaults={profileDefaults} />
+        <OnboardingForm deliveryDefaults={defaults.delivery} labels={t} locale={locale} profileDefaults={defaults.form} />
       </section>
     </div>
   );

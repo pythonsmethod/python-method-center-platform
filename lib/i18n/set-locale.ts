@@ -3,6 +3,7 @@
 import { cookies, headers } from "next/headers";
 import { localeCookieDomain } from "@/lib/i18n/cookie-domain";
 import { isLocale, LOCALE_COOKIE, type Locale } from "@/lib/i18n/locale";
+import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 // Switching the language, done by the server rather than by the browser.
 //
@@ -37,6 +38,19 @@ export async function setLocale(locale: Locale): Promise<void> {
     secure: Boolean(domain) || !host.startsWith("localhost"),
     ...(domain ? { domain } : {})
   });
+
+  // A signed-in person's choice also sets the language of the emails
+  // Supabase sends them (password reset), which read .Data.locale.
+  // Best-effort and silent: switching the language must always work.
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data } = supabase ? await supabase.auth.getUser() : { data: { user: null } };
+    if (supabase && data.user && data.user.user_metadata?.locale !== locale) {
+      await supabase.auth.updateUser({ data: { locale } });
+    }
+  } catch {
+    // The cookie above is what the site itself reads.
+  }
 
   // Deliberately no redirect from here.
   //

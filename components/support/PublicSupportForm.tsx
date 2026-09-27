@@ -8,11 +8,6 @@ type PublicSupportFormLabels = {
   name: string;
   email: string;
   phone: string;
-  category: string;
-  categoryLogin: string;
-  categoryPayment: string;
-  categoryTechnical: string;
-  categoryOther: string;
   message: string;
   consent: string;
   submit: string;
@@ -52,15 +47,6 @@ export function PublicSupportForm({ labels, locale }: { labels: PublicSupportFor
       <label className="field">
         <span>{labels.phone}</span>
         <input autoComplete="tel" maxLength={32} name="phone" required type="tel" />
-      </label>
-      <label className="field">
-        <span>{labels.category}</span>
-        <select defaultValue="other" name="category">
-          <option value="login">{labels.categoryLogin}</option>
-          <option value="payment">{labels.categoryPayment}</option>
-          <option value="technical">{labels.categoryTechnical}</option>
-          <option value="other">{labels.categoryOther}</option>
-        </select>
       </label>
       <label className="field">
         <span>{labels.message}</span>

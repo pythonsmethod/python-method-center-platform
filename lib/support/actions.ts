@@ -11,6 +11,7 @@ import { writeLifecycleEvent } from "@/lib/cases/lifecycle";
 import type { StaffActionState } from "@/lib/cases/staff-types";
 import { getStaffUserState } from "@/lib/auth/require-staff";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
+import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
@@ -38,23 +39,18 @@ export async function createSupportRequest(
     redirect("/login?next=/cabinet");
   }
 
-  const subject = String(formData.get("subject") ?? "").trim();
+  const en = (await getLocale()) === "en";
+  // The form asks for the message only; the request is filed under one
+  // subject in the client's language.
+  const subject = en ? "Message to support" : "Сообщение в поддержку";
   const body = String(formData.get("body") ?? "").trim();
 
-  if (!subject) {
-    return errorState("Укажите тему сообщения.");
-  }
-
   if (!body) {
-    return errorState("Напишите текст сообщения.");
-  }
-
-  if (subject.length > 200) {
-    return errorState("Тема должна быть короче 200 символов.");
+    return errorState(en ? "Write your message." : "Напишите текст сообщения.");
   }
 
   if (body.length > 5000) {
-    return errorState("Сообщение должно быть короче 5000 символов.");
+    return errorState(en ? "The message must be shorter than 5,000 characters." : "Сообщение должно быть короче 5000 символов.");
   }
 
   const { data: clientCase } = await supabase
@@ -86,7 +82,6 @@ export async function createSupportRequest(
       title: "📨 Новое обращение из кабинета",
       lines: [
         `Клиент: ${user.email ?? user.id}`,
-        `Тема: ${subject.slice(0, 120)}`,
         "Откройте раздел «Обращения», чтобы ответить."
       ],
       link: adminLink("/admin/requests")
@@ -117,7 +112,9 @@ export async function createSupportRequest(
 
   return {
     status: "success",
-    message: "Сообщение отправлено. Команда ответит вам по указанным контактам."
+    message: en
+      ? "Message sent. The team will reply here in your account."
+      : "Сообщение отправлено. Команда ответит вам здесь, в кабинете."
   };
 }
 

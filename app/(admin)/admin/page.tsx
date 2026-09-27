@@ -16,21 +16,23 @@ import { hasAssistantEnv } from "@/lib/assistant/router";
 import { canSeeProviderNames, isFounderEmail } from "@/lib/auth/require-founder";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
+import { getDictionary } from "@/lib/i18n/dictionaries";
 
 export default async function AdminPage() {
   const auth = await getRequiredStaffUser("/admin");
   const locale = await getLocale();
 
+  const ru = locale === "ru";
+  const shell = ru
+    ? { eyebrow: "Рабочее место команды", title: "Админ-панель", setupText: "Для доступа требуется настроенная аутентификация.", setupTitle: "Админ-панель требует настройки Supabase Auth", errorText: "Не удалось проверить доступ.", errorLabel: "Ошибка доступа", errorTitle: "Админ-панель недоступна" }
+    : { eyebrow: "Team workspace", title: "Admin panel", setupText: "Access requires authentication to be configured.", setupTitle: "The admin panel needs Supabase Auth to be configured", errorText: "Access could not be verified.", errorLabel: "Access error", errorTitle: "The admin panel is unavailable" };
+
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
-        <PageHeader
-          eyebrow="Рабочее место команды"
-          title="Админ-панель"
-          description="Для доступа требуется настроенная аутентификация."
-        />
+        <PageHeader eyebrow={shell.eyebrow} title={shell.title} description={shell.setupText} />
 
-        <AuthSetupNotice title="Админ-панель требует настройки Supabase Auth" />
+        <AuthSetupNotice labels={getDictionary(locale).setup} title={shell.setupTitle} />
       </div>
     );
   }
@@ -42,15 +44,11 @@ export default async function AdminPage() {
   if (auth.status === "error") {
     return (
       <div className="page-shell">
-        <PageHeader
-          eyebrow="Рабочее место команды"
-          title="Админ-панель"
-          description="Не удалось проверить доступ."
-        />
+        <PageHeader eyebrow={shell.eyebrow} title={shell.title} description={shell.errorText} />
 
         <div className="notice notice--warning">
-          <span className="panel__label">Ошибка доступа</span>
-          <h2>Админ-панель недоступна</h2>
+          <span className="panel__label">{shell.errorLabel}</span>
+          <h2>{shell.errorTitle}</h2>
           <p>{auth.message}</p>
         </div>
       </div>

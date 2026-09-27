@@ -9,6 +9,7 @@ import {
   IconWingedSun
 } from "@/components/icons/EgyptianIcons";
 import { navRoutes } from "@/lib/routes";
+import { logoutAction } from "@/lib/auth/actions";
 
 const icons: Record<string, (props: { className?: string }) => React.ReactElement> = {
   "/": IconWingedSun,
@@ -67,20 +68,29 @@ export function SiteNav({ labels, viewer }: SiteNavProps) {
       })}
 
       {viewer !== "anonymous" ? (
-        <Link
-          aria-current={accountActive ? "page" : undefined}
-          className={`site-nav__item${accountActive ? " site-nav__item--active" : ""}`}
-          href={accountHref}
-        >
-          <span className="site-nav__icon">
-            <IconAnkh />
-          </span>
-          <span className="site-nav__label">
-            {isStaff
-              ? (labels["/admin"] ?? "Рабочее место")
-              : (labels["/cabinet"] ?? "Кабинет")}
-          </span>
-        </Link>
+        <>
+          <Link
+            aria-current={accountActive ? "page" : undefined}
+            className={`site-nav__item${accountActive ? " site-nav__item--active" : ""}`}
+            href={accountHref}
+          >
+            <span className="site-nav__icon">
+              <IconAnkh />
+            </span>
+            <span className="site-nav__label">
+              {isStaff
+                ? (labels["/admin"] ?? "Рабочее место")
+                : (labels["/cabinet"] ?? "Кабинет")}
+            </span>
+          </Link>
+          {/* Signed in, the sign-in door becomes the way out, in the same
+              place for clients, the team and the founder. */}
+          <form action={logoutAction} className="site-nav__auth">
+            <button className="site-nav__signin site-nav__logout" type="submit">
+              {labels.logout ?? "Выйти"}
+            </button>
+          </form>
+        </>
       ) : (
         // A guest sees the two doors named apart. "Регистрация" opens the
         // signup tab directly — landing on the login form would make the

@@ -1,21 +1,11 @@
 // Pure validation for the public (guest) support form (unit-tested).
 
-export const PUBLIC_SUPPORT_CATEGORIES = [
-  "login",
-  "payment",
-  "technical",
-  "other"
-] as const;
-
-export type PublicSupportCategory = (typeof PUBLIC_SUPPORT_CATEGORIES)[number];
-
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
 export type PublicSupportInput = {
   contactName: string;
   email: string;
   phone: string;
-  category: string;
   message: string;
   consent: boolean;
   honeypot: string;
@@ -24,7 +14,7 @@ export type PublicSupportInput = {
 
 export function validatePublicSupportInput(
   input: PublicSupportInput
-): { error: string } | { category: PublicSupportCategory; contactName: string } {
+): { error: string } | { contactName: string } {
   const en = input.locale === "en";
   // Bots fill every field; humans never see this one.
   if (input.honeypot.trim() !== "") {
@@ -53,10 +43,6 @@ export function validatePublicSupportInput(
     return { error: en ? "Enter a valid contact phone number including country code." : "Укажите корректный номер телефона для связи с кодом страны." };
   }
 
-  if (!(PUBLIC_SUPPORT_CATEGORIES as readonly string[]).includes(input.category)) {
-    return { error: en ? "Choose a request category." : "Выберите тему обращения." };
-  }
-
   const message = input.message.trim();
 
   if (message.length < 10) {
@@ -71,5 +57,5 @@ export function validatePublicSupportInput(
     return { error: en ? "Consent to process the provided contact details is required." : "Нужно согласие на обработку указанных контактных данных." };
   }
 
-  return { category: input.category as PublicSupportCategory, contactName };
+  return { contactName };
 }

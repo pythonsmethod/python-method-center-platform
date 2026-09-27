@@ -247,6 +247,9 @@ end, and the transition schedule has been detached. Staging retains an active
 personal-support service period through the same timestamp. This validates
 turning off renewal without shortening paid access; it does not test a failed
 renewal or actual card replacement.
+## Questionnaire recovery production release — 2026-09-23
+
+PR #227 merged as b43df82. Latest owner-scoped onboarding and delivery answers prefill from canonical `onboarding_submissions.payload`, with profile fallback; controlled inputs retain all live values across validation/persistence errors. Full regression 1,951 passed / 1 skipped; security, TypeScript, ESLint, 59-page build, dependency audit and diff check pass. Both Vercel deployments and post-merge CI passed; production home returned 200 and `/onboarding` preserved the protected route for RU and EN locale cookies. No schema, local-storage, external transfer or clinical change. Release CLOSED; authenticated saved-payload visual acceptance remains a follow-up because no test-user session was used. See `docs/ankh/onboarding_form_recovery_2026_09_23.md`.
 
 ## NEXORA core / ANHAM application — 2026-09-23 — ARCHITECTURE RECORDED
 

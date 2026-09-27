@@ -19,17 +19,6 @@ export function SupportRequestForm({ labels }: SupportRequestFormProps) {
   return (
     <form action={formAction} className="onboarding-form">
       <label className="field">
-        <span>{labels.subject}</span>
-        <input
-          maxLength={200}
-          name="subject"
-          placeholder={labels.subjectPlaceholder}
-          required
-          type="text"
-        />
-      </label>
-
-      <label className="field">
         <span>{labels.message}</span>
         <textarea
           maxLength={5000}
