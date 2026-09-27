@@ -13,8 +13,13 @@
 - [x] Obtain explicit authorization to publish this prepared change to the
       public repository after auto-review rejected the branch push; the owner
       also explicitly requested Voice integration and release completion.
-- [ ] Pass remote checks, release the compiled policy, then verify fresh text
-      and voice sessions without claiming clinical or acoustic validation.
+- [x] Pass full remote checks, merge PR #231 and deploy the shared text/Voice
+      policy to Production; verify RU support, EN plain-language behavior and
+      unauthenticated rejection at both Voice endpoints.
+
+The implementation/release is complete. Spoken conversation quality with a
+signed-in account was not tested; provider-payload/role/language coverage and
+Production access-boundary checks do not establish acoustic acceptance.
 
 See [the source manifest and release record](docs/ankh/anham_karen_philosophy.md).
 
