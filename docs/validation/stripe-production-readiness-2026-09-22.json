@@ -124,6 +124,33 @@
       "activeOnReview": true
     }
   ],
+  "cutoverUpdate2026_09_27": {
+    "status": "partial; three legacy direct links remain active",
+    "mergedPullRequests": [215, 216],
+    "mainCommit": "fba352419d71831ad5363601b5a2ae35cdd69359",
+    "productionDeploymentId": "dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr",
+    "productionDeploymentState": "READY",
+    "productionCheckoutEnabled": true,
+    "automaticTaxEnabled": false,
+    "liveWebhookRecurringEventsAdded": [
+      "invoice.paid",
+      "invoice.payment_failed",
+      "customer.subscription.updated",
+      "customer.subscription.deleted"
+    ],
+    "originalWebhookEventsPreserved": true,
+    "liveInitialRecurringPricesVerified": 24,
+    "livePortalConfigurationsVerified": 2,
+    "publicPaymentPagesVerified": ["/payment", "/en/payment"],
+    "liveTestPurchaseMade": false,
+    "liveCheckoutTransitionVerified": false,
+    "legacyDirectLinksActive": [
+      "plink_1UDfUHE6esfE5qRjw8KrqTM7",
+      "plink_1TwF0iE6esfE5qRj18cUVWU7",
+      "plink_1TwDYFE6esfE5qRjQcTCRkjA"
+    ],
+    "legacyLinkRetirementBlocker": "Stripe connector denied PostPaymentLinksPaymentLink; official Payment Link write reconsent needed"
+  },
   "remaining": [
     "Isolated Preview and signed Sandbox webhook passed paid assessment, one-period renewal, six-period prepaid-only, 12-period exact entitlement, final Portal cancellation, authenticated Checkout/consent and later owner-approved failed-renewal acceptance. The declined 1300 USD invoice produced past_due without extending access or creating a gift task; see stripe-sandbox-failed-renewal-2026-09-25.json.",
     "The copy revision removes the unverified claim that Stripe calculates taxes at Checkout and advances the offer to v10. It passed 2057 local tests, typecheck, lint, security check, build, GitHub CI and READY Preview; RU/EN route switching and 390x844 mobile rendering were verified. The six-period charge used the earlier v9 consent.",

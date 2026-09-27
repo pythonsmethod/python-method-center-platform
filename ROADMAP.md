@@ -1,6 +1,23 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
-## Monthly Checkout launch — 2026-09-27 PDT — IN PROGRESS
+## Monthly Checkout production cutover — 2026-09-27 PDT — PARTIAL
+
+- [x] Merge PR #216 including PR #215; deploy the combined code to Production.
+- [x] Add four recurring events to the original Live webhook without changing
+      its URL, API version, original events or signing secret.
+- [x] Enable Production Checkout, redeploy READY, read back all 24 RU/EN
+      prepaid-renewal Live prices and both Portal configurations, and verify
+      public RU/EN pages and 1/6/12-period amounts without a Live purchase.
+- [ ] Obtain official Stripe Payment Link write permission and deactivate the
+      three identified 5-week/100-day links; all three remain active after the
+      connector's explicit permission denial.
+- [ ] Verify an authenticated no-charge transition into Live Checkout and
+      production-domain return when an existing owner account is available;
+      never use Live keys or the production database for a test purchase.
+- [ ] Finalize release documentation and mark the cutover complete only after
+      link retirement and remaining checks are verified.
+
+## Monthly Checkout launch — 2026-09-27 PDT — PRE-CUTOVER RECORD
 
 - [x] Owner chose to launch with the previous tax collection setting; verify
       the three Live legacy links and new Production setting all have automatic

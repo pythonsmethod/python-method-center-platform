@@ -1,5 +1,17 @@
 # PMC Monthly Personal Support — release preparation — 2026-09-19
 
+2026-09-27 cutover update: PR #216, containing PR #215, is merged; the new
+code and `STRIPE_CHECKOUT_ENABLED=true` are READY on the Production domain.
+The Live webhook's four recurring events were added without removing prior
+events or changing its URL/API version. The approved prior tax collection
+setting (`STRIPE_CHECKOUT_AUTOMATIC_TAX=false`) remains unchanged. All 24 Live
+1–12-period RU/EN initial recurring prices and both Portal configurations
+were read back; public RU/EN prices and renewal choice were inspected. No
+Live test purchase was made. Retirement of three old direct Payment Links is
+blocked by the official connection's denied `PostPaymentLinksPaymentLink`
+permission; all three remain active. Do not call the cutover complete until
+the owner updates that permission and the links are read back inactive.
+
 2026-09-24 gate update: isolated Sandbox/staging acceptance passed the 299 USD
 assessment, 1,300 USD first support payment, first 30-day automatic renewal,
 webhook redelivery without duplicate effects, and gift-task creation. A

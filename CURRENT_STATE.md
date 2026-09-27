@@ -1,6 +1,35 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## Monthly Checkout release preparation — 2026-09-27 PDT — NOT YET LIVE
+## Monthly Checkout production cutover — 2026-09-27 PDT — PARTIAL, LEGACY LINKS ACTIVE
+
+PR #216 was merged into `main` as `fba352419d71831ad5363601b5a2ae35cdd69359`;
+its included base PR #215 is also marked merged. Production deployment
+`dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr` is READY on
+`https://pythonmethodcenter.com` with `STRIPE_CHECKOUT_ENABLED=true`,
+`STRIPE_CHECKOUT_MODE=live`, the canonical return origin and
+`STRIPE_CHECKOUT_AUTOMATIC_TAX=false`. The existing Live webhook retained its
+URL, API version and five prior events while adding `invoice.paid`,
+`invoice.payment_failed`, `customer.subscription.updated` and
+`customer.subscription.deleted`. No Live test purchase was made.
+
+Live catalog readback confirmed all 24 RU/EN initial recurring prices for
+1–12 prepaid periods with exact `130000 × N` cents and `30 × N`-day intervals,
+plus the 299 USD assessment and 1300 USD one-time/renewal prices. Both Live
+Portal configurations remain active, with card updates, invoice history and
+cancel-at-period-end enabled. Public RU/EN payment pages show the new prices,
+duration selector and renewal choice. No production buyer was authenticated
+for an actual no-charge transition into Live Checkout, and no real payment
+or return was tested.
+
+Three retired 5-week/100-day Live Payment Links are still `active=true`.
+The official Stripe connection rejected `PostPaymentLinksPaymentLink` with
+insufficient permissions before any link was changed. The owner must grant
+Payment Link write permission through Stripe's official connection-management
+flow; do not bypass the refusal with a different key or interface. Until then,
+the old links must not be reported as retired and the release is partial.
+No tax registration, rate, business address or existing subscription changed.
+
+## Monthly Checkout release preparation — 2026-09-27 PDT — HISTORICAL PRE-CUTOVER
 
 The owner authorized launching the new model while leaving prior tax
 collection behavior unchanged. All three existing Live support Payment Links

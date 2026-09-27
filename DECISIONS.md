@@ -1,5 +1,16 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-BILLING-2026-09-27-02 — Do not bypass Stripe Payment Link permission denial
+
+The combined monthly Checkout code and Production feature flag are deployed,
+but the official Stripe connection denied `PostPaymentLinksPaymentLink` when
+retiring the three 5-week/100-day links. Keep the links' actual active state
+visible in release reporting. Seek a scoped permission update through the
+official Stripe connection-management flow; do not use a different key or
+interface to evade the denial. Preserve historical purchases and existing
+subscriptions. The new public payment page does not present retired plans,
+but an old direct link remains usable until Stripe confirms `active=false`.
+
 ## PMC-BILLING-2026-09-27-01 — Launch with existing tax collection setting
 
 The owner authorized launching the new $299 assessment and $1,300-per-30-day
