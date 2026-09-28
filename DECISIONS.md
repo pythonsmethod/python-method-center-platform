@@ -13,6 +13,13 @@ boundary affects live uploads, so release requires an exact candidate Preview,
 role acceptance and a separately checked production schema step. No NEXORA
 migration. [Record](docs/ankh/pmc_live_integration_2026_09_28.md).
 
+On 2026-09-28 the owner authorized publishing the prepared PMC branch. The
+exact tested tree is published at `28844f0`, remote synthetic CI passed, and
+the existing isolated staging project built a READY Preview. Its temporary
+Git connection was removed. This resolves the branch-publication gate only;
+no Karen decision, client publication, production migration or live processing
+was authorized by the successful build.
+
 ## NX-04-ANHAM-PHILOSOPHY-20260927 — Karen's values are a shared PMC communication profile
 
 The owner authorized implementation of the prepared philosophy material in

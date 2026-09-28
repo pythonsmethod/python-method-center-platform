@@ -6,11 +6,13 @@
       application `main` without replacing its newer account, billing and ANHAM work.
 - [x] Pass local PMC-chain, oncology and onboarding tests, typecheck, ESLint,
       security check, synthetic benchmark and production build.
-- [ ] Explicitly authorize publication of the prepared integration branch
-      (code commit `e64b301` plus test/report follow-ups) to the public repository
-      `pythonsmethod/python-method-center-platform`, branch
-      `feature/pmc-document-chain-live-integration`. Automatic approval review
-      rejected the push; do not bypass it through another tool.
+- [x] Owner explicitly authorized publication; branch
+      `feature/pmc-document-chain-live-integration` is published to
+      `pythonsmethod/python-method-center-platform`; code commit `28844f0` has the exact
+      tested tree. Remote synthetic CI passed.
+- [x] Deploy the exact code candidate to isolated staging Preview
+      `dpl_EiPJAmQnZdrSoJc1qKtozeBmv9Nr` and restore its disconnected Git
+      state. RU/EN sign-in pages render; this does not prove role acceptance.
 - [ ] Verify the integrated candidate in the isolated PMC Preview with the
       existing fictional source, including Karen evidence decisions, internal
       draft/approval, distinct publication and client readback in RU and EN.

@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## PMC document chain on current application — 2026-09-27 PDT — RELEASE CANDIDATE, NOT LIVE
+## PMC document chain on current application — 2026-09-28 UTC — STAGING PREVIEW, NOT LIVE
 
 The existing eleven-step PMC source → extraction → review → approved response path and
 the review-only oncology marker recognition were merged locally onto current application
@@ -20,14 +20,20 @@ zero security issues. This is not a clinical accuracy claim. Production schema h
 none of the four PMC-chain migrations or its RPCs; read-only inventory shows 72 active
 documents, no queued jobs, four existing internal reviews and no approval events.
 No production migration, deployment, document reprocessing, Karen decision or client
-publication has occurred. Applying the migrations and releasing the merged processing
+publication has occurred. The owner explicitly authorized publication to the
+PMC repository; its code commit `28844f0` has the exact tested tree. Remote
+synthetic CI passed. The isolated
+staging project deployed that commit as READY Preview
+`dpl_EiPJAmQnZdrSoJc1qKtozeBmv9Nr`; RU/EN sign-in renders. A read-only
+stage count found one extraction with nine disputed readings and no review or
+approval. The staging Git connection was disconnected again after deployment.
+Applying the migrations and releasing the merged processing
 path would affect new live uploads, so production activation remains NO-GO until the
 bounded role and source acceptance described in
 [the integration record](docs/ankh/pmc_live_integration_2026_09_28.md).
-Automatic approval review rejected publishing the prepared `e64b301` branch to the
-public PMC GitHub repository: this request did not explicitly authorize disclosure
-of the source code to that destination. No push, PR or Preview was made, and no
-alternate publication route is permitted without that exact approval.
+The main application Preview also built, but its data binding is unverified and
+was not used for document actions. No PR or merge to `main` was made. The exact
+staging role path and production schema gate remain open.
 
 ## ANHAM Karen philosophy — 2026-09-27 — TEXT AND VOICE RELEASED
 
