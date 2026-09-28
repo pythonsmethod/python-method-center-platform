@@ -114,6 +114,17 @@ describe("authenticated checkout action", () => {
     await expect(createPaymentCheckout(input)).resolves.toEqual({ error: "subscription-exists" });
     expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
   });
+  it("does not sell an extra prepaid term while a subscription is live", async () => {
+    db.billing.maybeSingle.mockResolvedValue({ data: { stripe_customer_id: "cus_owner", status: "active" }, error: null });
+    await expect(createPaymentCheckout({ ...input, autoRenew: false })).resolves.toEqual({ error: "subscription-exists" });
+    expect(mocks.price).not.toHaveBeenCalled();
+    expect(stripe.checkout.sessions.create).not.toHaveBeenCalled();
+  });
+  it("counts test access as existing paid time before a renewal", async () => {
+    await createPaymentCheckout(input).catch(() => undefined);
+    const products = db.periods.in.mock.calls.at(-1)?.[1];
+    expect(products).toContain("test_access");
+  });
   it("does not start a renewing subscription during existing paid support", async () => {
     db.periods.maybeSingle.mockResolvedValue({ data: { id: "paid-period" }, error: null });
     await expect(createPaymentCheckout(input)).resolves.toEqual({ error: "period-active" });

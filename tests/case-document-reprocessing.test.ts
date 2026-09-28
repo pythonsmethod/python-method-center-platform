@@ -2,6 +2,7 @@ import { readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { buildRequeueRecords } from "@/lib/documents/reprocessing";
 import { getReprocessingCopy } from "@/lib/documents/reprocessing-copy";
+import { drainCaseReprocessing, type ReprocessingStep } from "@/lib/documents/reprocessing-progress";
 
 describe("staff Case document reprocessing", () => {
   it("resets only derived processing state for the selected documents", () => {
@@ -31,8 +32,28 @@ describe("staff Case document reprocessing", () => {
     expect(en.resumeButton(5)).toContain("5");
     expect(ru.resumeDescription).toContain("не перечитывает готовые");
     expect(en.resumeDescription).toContain("does not reprocess completed");
+    expect(ru.pendingReview(1, 3)).toContain("1 из 3");
+    expect(en.pendingReview(1, 3)).toContain("1 of 3");
     expect(ru.description).toContain("Исходные документы не изменятся");
     expect(en.description).toContain("Source documents will not be changed");
+  });
+
+  it("counts completed files, not page checkpoints, and permits a bounded resume", async () => {
+    const steps: ReprocessingStep[] = ["continued", "continued", "ready", "continued", "ready"];
+    const seen: number[] = [];
+    const first = await drainCaseReprocessing(2, async () => steps.shift()!, count => seen.push(count), () => false, 4);
+    expect(first).toEqual({ outcome: "pending", ready: 1, requests: 4 });
+    expect(seen).toEqual([1]);
+    const second = await drainCaseReprocessing(1, async () => steps.shift()!, count => seen.push(count));
+    expect(second).toEqual({ outcome: "ready", ready: 1, requests: 1 });
+    expect(seen).toEqual([1, 1]);
+  });
+
+  it("stops on a scheduled retry or a source that needs human attention", async () => {
+    expect(await drainCaseReprocessing(2, async () => "retrying", () => {}))
+      .toEqual({ outcome: "pending", ready: 0, requests: 1 });
+    expect(await drainCaseReprocessing(2, async () => "identity_mismatch", () => {}))
+      .toEqual({ outcome: "attention", ready: 0, requests: 1 });
   });
 
   it("routes a staff-triggered run through a Case-scoped queue claim", () => {
