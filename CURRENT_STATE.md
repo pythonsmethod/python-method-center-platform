@@ -1,5 +1,28 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC bounded document pilot — 2026-09-28 — LIVE CODE, FIRST CASE PAUSED
+
+PR #237 merged as `bfb5d1a`: the new document chain is deployed to the live
+PMC site behind a per-Case allowlist. The four document-chain migrations, pilot
+gate, and server metadata boundary were applied in the guarded release order.
+Existing nonpilot Cases retain their previous reader and review actions. One
+identified Case was enrolled for acceptance, then paused before any real file
+was requeued. No new analysis run, Karen decision or client publication was
+made for that Case. Its signed-in staff account can see the Case but does not
+currently receive the Karen-only reprocessing and review controls; the
+Production allowlist value is write-only and its exact content is unknown.
+Changing that access configuration was blocked by automatic approval review.
+
+A local follow-up fixes the staff reprocessing progress loop: `continued`
+header/page checkpoints no longer count as finished files, the run stops after
+24 requests or on a retry/exception, and queued/processing files can be resumed.
+This follow-up has passed 290 focused chain tests, TypeScript, targeted ESLint,
+security checks and a production build. It is not yet deployed. See
+`docs/ankh/pmc_reprocessing_progress_2026_09_28.md`.
+
+The historical integration checkpoint below predates PR #237 and describes
+the earlier staging candidate, not the current live release.
+
 ## PMC document chain on current application — 2026-09-28 UTC — STAGING PREVIEW, NOT LIVE
 
 The existing eleven-step PMC source → extraction → review → approved response path and
