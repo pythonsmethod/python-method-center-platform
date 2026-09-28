@@ -1,8 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDocumentReuploadMessage,
-  buildDocumentServiceFailureMessage
+  buildDocumentServiceFailureMessage,
+  documentReaderFailureCode,
+  isUsableReaderResult
 } from "@/lib/documents/processing";
+import { classifyClaudeHttpFailure } from "@/lib/assistant/claude";
 import { clientDocumentStatusLabel } from "@/lib/i18n/status-labels";
 import {
   MAX_DOCUMENT_FILE_SIZE_BYTES,
@@ -22,6 +25,26 @@ describe("document processing client notification", () => {
     expect(message).toContain("“MRI.pdf”");
     expect(message).toContain("upload this file again");
     expect(message).toContain("other documents remain safely attached");
+  });
+});
+
+describe("bounded provider diagnostics for document reads", () => {
+  it("distinguishes configuration, access, request, throttling and service failures without provider bodies", () => {
+    expect(classifyClaudeHttpFailure(401)).toBe("authorization");
+    expect(classifyClaudeHttpFailure(402)).toBe("billing");
+    expect(classifyClaudeHttpFailure(400)).toBe("invalid_request");
+    expect(classifyClaudeHttpFailure(429)).toBe("rate_limited");
+    expect(classifyClaudeHttpFailure(503)).toBe("provider_service");
+    expect(classifyClaudeHttpFailure(undefined)).toBe("provider_api");
+    expect(documentReaderFailureCode("HEADER", { status: "unavailable", failureClass: "not_configured" })).toBe("HEADER_READER_NOT_CONFIGURED");
+    expect(documentReaderFailureCode("PAGE", { status: "error", code: "temporarilyDown", message: "private provider body", failureClass: "authorization" })).toBe("PAGE_READER_AUTHORIZATION");
+  });
+
+  it("rejects a provider policy refusal as source evidence", () => {
+    const refused = { status: "ok" as const, refusal: "provider_policy" as const, reply: "generic refusal" };
+    expect(isUsableReaderResult(refused)).toBe(false);
+    expect(documentReaderFailureCode("HEADER", refused)).toBe("HEADER_READER_REFUSED");
+    expect(isUsableReaderResult({ status: "ok", reply: "literal source row" })).toBe(true);
   });
 });
 
@@ -103,7 +126,8 @@ describe("document status as the client reads it", () => {
   it("names the finished and the failed states plainly", () => {
     expect(clientDocumentStatusLabel("ready", "en")).toBe("Ready");
     expect(clientDocumentStatusLabel("needs_reupload", "en")).toBe("Needs a new file");
-    expect(clientDocumentStatusLabel("failed", "en")).toBe("Needs a new file");
+    expect(clientDocumentStatusLabel("failed", "ru")).toBe("Сбой обработки");
+    expect(clientDocumentStatusLabel("failed", "en")).toBe("Processing failed");
     expect(clientDocumentStatusLabel("archived", "ru")).toBe("В архиве");
   });
 

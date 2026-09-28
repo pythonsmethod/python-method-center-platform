@@ -1,5 +1,78 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC bounded document pilot — 2026-09-28 — LIVE CODE, FIRST CASE PAUSED
+
+PR #237 merged as `bfb5d1a`: the new document chain is deployed to the live
+PMC site behind a per-Case allowlist. The four document-chain migrations, pilot
+gate, and server metadata boundary were applied in the guarded release order.
+Existing nonpilot Cases retain their previous reader and review actions. One
+identified Case was enrolled for acceptance, then paused before any real file
+was requeued. No new analysis run, Karen decision or client publication was
+made for that Case. Its signed-in staff account can see the Case but does not
+currently receive the Karen-only reprocessing and review controls; the
+Production allowlist value is write-only and its exact content is unknown.
+Changing that access configuration was blocked by automatic approval review.
+
+A local follow-up fixes the staff reprocessing progress loop: `continued`
+header/page checkpoints no longer count as finished files, the run stops after
+24 requests or on a retry/exception, and queued/processing files can be resumed.
+This follow-up has passed 290 focused chain tests, TypeScript, targeted ESLint,
+security checks and a production build. It is not yet deployed. See
+`docs/ankh/pmc_reprocessing_progress_2026_09_28.md`.
+
+The historical integration checkpoint below predates PR #237 and describes
+the earlier staging candidate, not the current live release.
+
+## PMC document chain on current application — 2026-09-28 UTC — STAGING PREVIEW, NOT LIVE
+
+The existing eleven-step PMC source → extraction → review → approved response path and
+the review-only oncology marker recognition were merged locally onto current application
+`main` `f6db4e3`, retaining its newer account, billing and ANHAM changes. The formerly
+broken local Git worktree was reconstructed against the published PMC branch; the
+integration uses the same Case, source, jobs, evidence and staff knowledge store.
+An onboarding test fixture was updated for the newer complete profile defaults.
+
+Local verification: 285/285 PMC-chain tests, 24/24 onboarding and oncology tests,
+82/82 related ANHAM/approval tests and 55/55 document/lab package contracts,
+TypeScript, ESLint, security check, dependency audit and production build pass.
+The current-main review-learning test initially failed on an obsolete direct
+insert assertion; it now checks the atomic approval RPC and version guard.
+Synthetic benchmark:
+three documents/four pages, zero critical extraction errors, zero false VERIFIED and
+zero security issues. This is not a clinical accuracy claim. Production schema has
+none of the four PMC-chain migrations or its RPCs; read-only inventory shows 72 active
+documents, no queued jobs, four existing internal reviews and no approval events.
+No production migration, deployment, document reprocessing, Karen decision or client
+publication has occurred. The owner explicitly authorized publication to the
+PMC repository; its code commit `28844f0` has the exact tested tree. Remote
+synthetic CI passed. The isolated
+staging project deployed that commit as READY Preview
+`dpl_EiPJAmQnZdrSoJc1qKtozeBmv9Nr`; RU/EN sign-in renders. A read-only
+stage count found one extraction with nine disputed readings and no review or
+approval. The staging Git connection was disconnected again after deployment.
+Applying the migrations and releasing the merged processing
+path would affect new live uploads, so production activation remains NO-GO until the
+bounded role and source acceptance described in
+[the integration record](docs/ankh/pmc_live_integration_2026_09_28.md).
+The main application Preview also built, but its data binding is unverified and
+was not used for document actions. No PR or merge to `main` was made. The exact
+staging role path and production schema gate remain open.
+
+## Monthly Checkout Live renewal smoke — 2026-09-28 PDT — NO-CHARGE FORM VERIFIED
+
+The owner personally reselected both legal consents, six prepaid periods and
+automatic renewal on the authenticated Production payment page. The embedded
+Live Stripe form opened on `https://pythonmethodcenter.com/payment` and showed
+7,800 USD due today for 180 days, the complimentary formula with delivery
+included, then 1,300 USD every 30 days after the paid term. It did not label
+the prepaid term a free trial. Stripe readback confirmed `livemode=true`,
+`ui_mode=elements`, `mode=subscription`, `amount_total=780000`,
+`metadata.months=6`, `metadata.auto_renew=true`, `status=open`,
+`payment_status=unpaid` and a Production-domain return URL. The form was
+closed through “Return to selection” without entering card details or making
+a Live charge. This verifies the renewal-specific no-charge transition and
+display, not paid fulfillment, a real success return or a Live renewal.
+
 ## Monthly Checkout Live smoke — 2026-09-28 PDT — PREPAID PATH VERIFIED
 
 The authenticated owner personally checked both required legal-consent boxes.
@@ -12,9 +85,9 @@ readback confirmed `livemode=true`, `mode=payment`, `amount_total=780000`,
 Production domain. No card details were entered and no Live payment occurred.
 The initially automated renewal-checkbox change did not persist to application
 state, so this session proves the prepaid-only path, not the renewal path.
-The page reset legal consent after return. A renewed owner consent and a
-separate no-charge embedded-renewal check remain outstanding, as do a real
-paid success return and first real renewal.
+The page reset legal consent after return. The owner later renewed consent
+and completed the no-charge embedded-renewal check recorded above. A real
+paid success return and first real renewal remain outstanding.
 
 ## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, LEGACY LINKS RETIRED
 

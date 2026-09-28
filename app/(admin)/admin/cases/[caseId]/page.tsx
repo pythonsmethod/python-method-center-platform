@@ -15,6 +15,7 @@ import { AssistantChat } from "@/components/assistant/AssistantChat";
 import { CaseMessageThread } from "@/components/messages/CaseMessageThread";
 import { CaseConversationWorkspace } from "@/components/cases/CaseConversationWorkspace";
 import { CaseReviewPanel } from "@/components/cases/CaseReviewPanel";
+import { LegacyCaseReviewPanel } from "@/components/cases/LegacyCaseReviewPanel";
 import { getCaseReview } from "@/lib/cases/review-queries";
 import { DocumentTimeline } from "@/components/documents/DocumentTimeline";
 import { SavedAssistantThread } from "@/components/assistant/SavedAssistantThread";
@@ -30,7 +31,10 @@ import { canAccessProfessorMessages, resolvePrivateAssistantRole } from "@/lib/a
 import { createProfileAvatarUrl } from "@/lib/profile/avatar";
 import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
 import { CaseAnalyticalPicturePanel } from "@/components/cases/CaseAnalyticalPicturePanel";
+import { LegacyCaseAnalyticalPicturePanel } from "@/components/cases/LegacyCaseAnalyticalPicturePanel";
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
+import { getCaseAnalyticalPicture as getLegacyCaseAnalyticalPicture } from "@/lib/analytical-picture/legacy-queries";
+import { getDocumentChainPilotStatus } from "@/lib/documents/pilot";
 
 type StaffCasePageProps = {
   params: Promise<{
@@ -245,6 +249,7 @@ export default async function StaffCaseDetailPage({
   // Classification transitions stay in audit storage and are not presented
   // here as current facts. See lib/cases/activity.ts.
   const activity = caseActivityEntries(clientCase.case_lifecycle_events, locale);
+  const pilotStatus = await getDocumentChainPilotStatus(clientCase.id);
   const [caseMessages, supportThread, assistantHistory, review, casePicture] = await Promise.all([
     canReadProfessorConversation
       ? getCaseMessages(clientCase.id)
@@ -252,7 +257,7 @@ export default async function StaffCaseDetailPage({
     getCaseSupportThread(clientCase.id, locale),
     getAssistantHistoryForCase(clientCase.profile_id, locale),
     getCaseReview(clientCase.id, documents, locale),
-    getCaseAnalyticalPicture(clientCase.id)
+    pilotStatus === "legacy" ? getLegacyCaseAnalyticalPicture(clientCase.id) : getCaseAnalyticalPicture(clientCase.id)
   ]);
 
   return (
@@ -364,24 +369,36 @@ export default async function StaffCaseDetailPage({
           he opens it rather than made on demand. Above the file list, so
           the reading and the files it came from sit together. */}
       <section className="intake-section">
-        <CaseAnalyticalPicturePanel
+        {pilotStatus === "legacy" ? <LegacyCaseAnalyticalPicturePanel
           canConfirm={resolvePrivateAssistantRole(auth.email) === "karen"}
           caseId={clientCase.id}
           locale={locale}
-          result={casePicture}
-        />
+          result={casePicture as Awaited<ReturnType<typeof getLegacyCaseAnalyticalPicture>>}
+        /> : <CaseAnalyticalPicturePanel
+          canConfirm={resolvePrivateAssistantRole(auth.email) === "karen"}
+          caseId={clientCase.id}
+          locale={locale}
+          result={casePicture as Awaited<ReturnType<typeof getCaseAnalyticalPicture>>}
+        />}
       </section>
 
       <section className="intake-section" aria-label={copy.reviewAria}>
         <div className="panel">
-          <CaseReviewPanel
+          {pilotStatus === "legacy" ? <LegacyCaseReviewPanel
             caseId={clientCase.id}
             documentsCount={documents.length}
             documentStatuses={documents.map((document) => document.document_status)}
             review={review}
             locale={locale}
             approvalBlocked={casePicture.status === "ready" && casePicture.picture.reviewSummary.approvalBlocked}
-          />
+          /> : pilotStatus === "unavailable" ? <p role="status">{locale === "ru" ? "Разбор временно недоступен. Документы и переписка кейса сохранены." : "The review is temporarily unavailable. Case documents and messages remain available."}</p> : <CaseReviewPanel
+            caseId={clientCase.id}
+            documentsCount={documents.length}
+            documentStatuses={documents.map((document) => document.document_status)}
+            review={review}
+            locale={locale}
+            approvalBlocked={casePicture.status === "ready" && casePicture.picture.reviewSummary.approvalBlocked}
+          />}
         </div>
       </section>
 
@@ -408,7 +425,7 @@ export default async function StaffCaseDetailPage({
               <ReprocessCaseDocumentsForm
                 caseId={clientCase.id}
                 queuedDocumentCount={documents.filter(
-                  (document) => document.document_status === "queued"
+                  (document) => document.document_status === "queued" || document.document_status === "processing"
                 ).length}
                 locale={locale}
               />

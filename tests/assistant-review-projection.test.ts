@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+vi.mock("@/lib/documents/pilot", () => ({ getDocumentChainPilotStatus: async () => "legacy" }));
 const source = vi.hoisted(() => ({
   review: { id: "synthetic", draft: "~~5 mg~~\n> .5 mg/L", summary: "**Needs review**", documents_fingerprint: "v1" },
   approved: "**Human decision** — unchanged"

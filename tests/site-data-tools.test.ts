@@ -49,7 +49,7 @@ describe("catalog matches the repository's real business schema", () => {
     // deliberately absent from the assistant's own site-data tools: the
     // assistant must not be able to read the record of its own refusals.
     expect([...schema.keys()].filter(t => !covered.has(t))).toEqual(expect.arrayContaining(["escalation_events", "assistant_usage", "assistant_client_actions", "assistant_gap_events", "assistant_gap_reads", "product_events"]));
-    expect([...schema.keys()].filter(t => !covered.has(t)).sort()).toEqual(["assistant_client_actions", "assistant_gap_events", "assistant_gap_reads", "assistant_usage", "escalation_events", "product_events"]);
+    expect([...schema.keys()].filter(t => !covered.has(t)).sort()).toEqual(["assistant_client_actions", "assistant_gap_events", "assistant_gap_reads", "assistant_usage", "escalation_events", "pmc_document_chain_pilot_cases", "product_events"]);
     for (const dataset of Object.values(SITE_DATASETS)) {
       expect(schema.has(dataset.table), dataset.table).toBe(true);
       for (const field of [...dataset.fields, dataset.key, dataset.order, ...dataset.numeric]) expect(schema.get(dataset.table)?.has(field), `${dataset.table}.${field}`).toBe(true);

@@ -78,7 +78,21 @@ export function resolveAnalyteLabel(printed: string | null | undefined): LabelRe
   const direct = LABELS[normalised];
 
   if (direct) {
+    // Punctuation is generally cosmetic, but a percentage sign changes a
+    // free PSA concentration into a ratio. Do not erase that distinction.
+    if (direct.analyte === "psa_free" && (printed ?? "").includes("%")) return { status: "unknown", normalised };
     return { status: "resolved", analyte: direct.analyte, matched: direct.matched };
+  }
+
+  // A form may print both the long name and its acronym. Accept the pair
+  // only when each half independently resolves to the same known analyte.
+  const pair = (printed ?? "").trim().match(/^(.+?)\s*\(([^()]+)\)$/u);
+  if (pair) {
+    const name = LABELS[normalise(pair[1])];
+    const acronym = LABELS[normalise(pair[2])];
+    if (name && acronym && name.analyte === acronym.analyte) {
+      return { status: "resolved", analyte: name.analyte, matched: printed!.trim() };
+    }
   }
 
   // Both attempts are exact lookups in the same table, so this is a second
@@ -87,6 +101,7 @@ export function resolveAnalyteLabel(printed: string | null | undefined): LabelRe
   const withoutUnit = trimmed ? LABELS[normalise(trimmed)] : undefined;
 
   if (withoutUnit) {
+    if (withoutUnit.analyte === "psa_free" && (printed ?? "").includes("%")) return { status: "unknown", normalised };
     return {
       status: "resolved",
       analyte: withoutUnit.analyte,
@@ -101,4 +116,12 @@ export function resolveAnalyteLabel(printed: string | null | undefined): LabelRe
 // table and the conversion table from drifting apart.
 export function knownAnalytes(): string[] {
   return Object.keys(REFERENCE_TABLES.analyteLabels.labels).sort();
+}
+
+const ONCOLOGY_ANALYTES = new Set<string>(REFERENCE_TABLES.analyteLabels._meta.oncology_analytes);
+
+// A matched name is a candidate laboratory identity, not a diagnosis or a
+// reviewed measurement. Every form is explicit in the same label table.
+export function isOncologyAnalyte(analyte: string | null | undefined): analyte is string {
+  return analyte !== null && analyte !== undefined && ONCOLOGY_ANALYTES.has(analyte);
 }

@@ -1,0 +1,111 @@
+{
+  "contract_version": "lab-analysis/2",
+  "comparison_id": "synthetic:temporary:crp-comparison-v1-v2",
+  "case_id": "synthetic:case",
+  "subject_id": "synthetic:person",
+  "left": {
+    "finding_id": "synthetic:old-f1",
+    "source_version": "synthetic:v1",
+    "snapshot_id": null,
+    "event_date_kind": "COLLECTION",
+    "event_date": "2026-09-01",
+    "result_kind": "EXACT",
+    "exact_decimal": "4.2",
+    "unit": "mg/L",
+    "trust_state": "NEEDS_REVIEW",
+    "decision_id": null,
+    "decision_source_version": null,
+    "decision_shadow_only": false,
+    "excluded": false,
+    "exclusion_reasons": [],
+    "decision_finding_id": null,
+    "decision_snapshot_id": null
+  },
+  "right": {
+    "finding_id": "synthetic:temporary:new-crp-v2",
+    "source_version": "synthetic:v2",
+    "snapshot_id": null,
+    "event_date_kind": "COLLECTION",
+    "event_date": null,
+    "result_kind": "CENSORED",
+    "exact_decimal": null,
+    "unit": null,
+    "trust_state": "NEEDS_REVIEW",
+    "decision_id": null,
+    "decision_source_version": null,
+    "decision_shadow_only": false,
+    "excluded": false,
+    "exclusion_reasons": [],
+    "decision_finding_id": null,
+    "decision_snapshot_id": null
+  },
+  "compatibility": {
+    "analyte": {
+      "state": "UNKNOWN",
+      "reason": "Совпадает буквальная метка CRP; аналитическая идентичность и авторизованное сопоставление не проверены.",
+      "rule_id": null
+    },
+    "units": {
+      "state": "UNKNOWN",
+      "reason": "Для synthetic:v2 единица не читается; mg/L из synthetic:v1 не переносится.",
+      "rule_id": null
+    },
+    "specimen": {
+      "state": "UNKNOWN",
+      "reason": "Материал не предоставлен; утверждённого правила NOT_APPLICABLE нет.",
+      "rule_id": null
+    },
+    "method": {
+      "state": "UNKNOWN",
+      "reason": "Метод не предоставлен; утверждённого правила NOT_APPLICABLE нет.",
+      "rule_id": null
+    },
+    "anatomy_laterality": {
+      "state": "UNKNOWN",
+      "reason": "Данные и правило неприменимости не предоставлены.",
+      "rule_id": null
+    },
+    "date_kind": {
+      "state": "COMPATIBLE",
+      "reason": "Обе переданные даты обозначены как COLLECTION; это не устанавливает точную новую дату.",
+      "rule_id": null
+    },
+    "temporal_order": {
+      "state": "UNKNOWN",
+      "reason": "Дата COLLECTION нового результата неоднозначна; точная нормализованная дата отсутствует.",
+      "rule_id": null
+    },
+    "result_kind": {
+      "state": "INCOMPATIBLE",
+      "reason": "EXACT и CENSORED; утверждённого правила сравнения точного значения с границей нет.",
+      "rule_id": null
+    },
+    "provenance": {
+      "state": "UNKNOWN",
+      "reason": "Предоставлены только синтетические текст/запись и номера страниц, без авторизованного readback или исходных изображений.",
+      "rule_id": null
+    },
+    "version": {
+      "state": "UNKNOWN",
+      "reason": "Указаны source_version synthetic:v1 и synthetic:v2, но связь версий/дубликатов/исправлений не разрешена.",
+      "rule_id": null
+    }
+  },
+  "trust_eligible": false,
+  "rule": null,
+  "result": "NOT_COMPARABLE",
+  "reason_codes": [
+    "CURRENT_UNIT_UNKNOWN",
+    "COLLECTION_DATE_AMBIGUOUS",
+    "EXACT_CENSORED_RULE_UNAVAILABLE",
+    "SPECIMEN_METHOD_UNKNOWN",
+    "APPLICABILITY_RULE_UNAVAILABLE",
+    "SOURCE_VERSION_RELATION_UNRESOLVED",
+    "AUTHORIZED_PROVENANCE_UNAVAILABLE",
+    "BOTH_NEEDS_REVIEW",
+    "COMPARISON_RULE_UNAVAILABLE"
+  ],
+  "contradictions": [],
+  "delta": null,
+  "relative_delta": null
+}

@@ -1,5 +1,6 @@
 import { createHash } from "node:crypto";
 import { CASE_REVIEW_SYSTEM_PROMPT } from "@/lib/assistant/case-review";
+import { ONCOLOGY_REVIEW_GUIDANCE_VERSION } from "@/lib/assistant/oncology-review-guidance";
 import { METADATA_SYSTEM_PROMPT } from "@/lib/assistant/metadata";
 import { TRANSCRIPTION_SYSTEM_PROMPT } from "@/lib/assistant/transcription";
 import { referenceSetVersion } from "@/lib/reference/tables";
@@ -15,7 +16,7 @@ import { referenceSetVersion } from "@/lib/reference/tables";
 // The arithmetic itself. Bumped by hand when the analysis code changes in a
 // way that could move an answer; a commit hash would change on every
 // comment edit and say nothing.
-export const ANALYSIS_ENGINE_VERSION = "ankh-analysis-1.0.0";
+export const ANALYSIS_ENGINE_VERSION = "pmc-analysis-1.3.0";
 
 export type AnalysisVersions = {
   extraction_model_version: string;
@@ -36,7 +37,8 @@ export function promptVersion(): string {
   return [
     `read=${short(TRANSCRIPTION_SYSTEM_PROMPT)}`,
     `header=${short(METADATA_SYSTEM_PROMPT)}`,
-    `review=${short(CASE_REVIEW_SYSTEM_PROMPT)}`
+    `review=${short(CASE_REVIEW_SYSTEM_PROMPT)}`,
+    `oncology=${ONCOLOGY_REVIEW_GUIDANCE_VERSION}`
   ].join(";");
 }
 

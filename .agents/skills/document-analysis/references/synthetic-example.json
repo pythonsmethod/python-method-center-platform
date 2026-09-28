@@ -1,0 +1,194 @@
+{
+  "contract_version": "document-analysis/2",
+  "execution_mode": "SIMULATION",
+  "outcome": "RESULT",
+  "context": {
+    "case_id": "synthetic:case1",
+    "subject_id": "synthetic:subject1",
+    "document_id": "synthetic:doc1",
+    "source_version": "synthetic:source-v1",
+    "source_digest": null,
+    "digest_unavailable_reason": "NO_FILE_IN_CONTRACT_EXAMPLE"
+  },
+  "run": {
+    "run_id": "synthetic:run1",
+    "skill_version": "2.0",
+    "provider": "synthetic:fixture",
+    "processor_version": "synthetic:1",
+    "parser_version": "synthetic:1",
+    "schema_version": "document-analysis/2",
+    "unavailable_reasons": []
+  },
+  "reading": {
+    "status": "COMPLETE",
+    "expected_pages": 1,
+    "pages": [
+      {
+        "page": 1,
+        "state": "READ",
+        "issue_codes": []
+      }
+    ],
+    "coverage_issues": [],
+    "languages": [
+      "ru",
+      "en"
+    ],
+    "document_type": "LABORATORY"
+  },
+  "findings": [
+    {
+      "finding_id": "synthetic:f1",
+      "source_version": "synthetic:source-v1",
+      "evidence_snapshot_id": null,
+      "evidence_kind": "LAB",
+      "fields": [
+        {
+          "name": "analyte",
+          "original": "Analyte A",
+          "parsed": null,
+          "normalized": null,
+          "null_reason": null,
+          "anchor_ids": [
+            "synthetic:a1"
+          ]
+        },
+        {
+          "name": "result",
+          "original": "10",
+          "parsed": {
+            "kind": "EXACT",
+            "decimal": "10"
+          },
+          "normalized": null,
+          "null_reason": null,
+          "anchor_ids": [
+            "synthetic:a1"
+          ]
+        },
+        {
+          "name": "unit",
+          "original": "mg/L",
+          "parsed": null,
+          "normalized": null,
+          "null_reason": null,
+          "anchor_ids": [
+            "synthetic:a1"
+          ]
+        },
+        {
+          "name": "reference",
+          "original": null,
+          "parsed": null,
+          "normalized": null,
+          "null_reason": "NOT_PRINTED",
+          "anchor_ids": []
+        },
+        {
+          "name": "source_flag",
+          "original": null,
+          "parsed": null,
+          "normalized": null,
+          "null_reason": "NOT_PRINTED",
+          "anchor_ids": []
+        },
+        {
+          "name": "specimen",
+          "original": null,
+          "parsed": null,
+          "normalized": null,
+          "null_reason": "NOT_PRINTED",
+          "anchor_ids": []
+        },
+        {
+          "name": "method",
+          "original": null,
+          "parsed": null,
+          "normalized": null,
+          "null_reason": "NOT_PRINTED",
+          "anchor_ids": []
+        }
+      ],
+      "anchors": [
+        {
+          "anchor_id": "synthetic:a1",
+          "document_id": "synthetic:doc1",
+          "source_version": "synthetic:source-v1",
+          "page": 1,
+          "region": null,
+          "span": null,
+          "quote": "Analyte A 10 mg/L 09/10/2026",
+          "provenance_level": "P1",
+          "missing_reason": "NO_REGION_OR_TOKENS",
+          "token_provenance": null
+        }
+      ],
+      "trust": {
+        "state": "NEEDS_REVIEW",
+        "decision_id": null,
+        "policy_version": null,
+        "bound_finding_id": null,
+        "bound_snapshot_id": null,
+        "bound_source_version": "synthetic:source-v1",
+        "shadow_only": true,
+        "reason_codes": [
+          "SYNTHETIC_EXAMPLE",
+          "DATE_EVENT_UNCERTAIN"
+        ]
+      },
+      "review_required": true,
+      "issue_codes": [
+        "DATE_EVENT_UNCERTAIN"
+      ],
+      "reading_ids": [
+        "synthetic:read1"
+      ],
+      "dates": [
+        {
+          "kind": "collection",
+          "original": "09/10/2026",
+          "normalized": null,
+          "precision": "DAY",
+          "ambiguous": true,
+          "null_reason": "AMBIGUOUS_DAY_MONTH",
+          "anchor_ids": [
+            "synthetic:a1"
+          ]
+        }
+      ]
+    }
+  ],
+  "persistence": {
+    "status": "NOT_ATTEMPTED",
+    "snapshot_id": null,
+    "receipt_id": null,
+    "idempotency_key": null,
+    "readback_confirmed": false,
+    "source_version": "synthetic:source-v1",
+    "error_code": null
+  },
+  "review_queue": {
+    "items": [
+      {
+        "item_id": "synthetic:f1",
+        "kind": "FACT",
+        "reason_codes": [
+          "DATE_EVENT_UNCERTAIN"
+        ]
+      }
+    ],
+    "total": 1,
+    "shown": 1,
+    "next_cursor": null,
+    "delivery_complete": true
+  },
+  "summary": [
+    {
+      "text": "Synthetic source prints 10 mg/L; the collection date is ambiguous.",
+      "finding_ids": [
+        "synthetic:f1"
+      ]
+    }
+  ],
+  "omissions": []
+}

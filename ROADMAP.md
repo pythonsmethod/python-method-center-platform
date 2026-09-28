@@ -1,13 +1,57 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Live PMC focus pilot — 2026-09-28
+
+- [x] Merge and deploy PR #237 with an initially empty Case allowlist and
+      keep nonpilot files on the prior worker.
+- [x] Identify one Case by its actual source identity, verify the originals,
+      and pause the enrolled Case before any reprocessing while Karen access is
+      unavailable. Do not put patient identifiers in this public roadmap.
+- [ ] Publish the bounded staff reprocessing-progress repair after review.
+- [ ] Restore the existing Karen account's intended access through a separately
+      authorized Production configuration change and verify the actual UI role.
+- [ ] Resume only the selected pilot Case, re-read its source files, review
+      page coverage and facts with Karen, then separately accept the internal
+      draft, decision and client readback. No automatic trust promotion.
+
+The earlier current-main integration checklist below is historical; PR #237
+supersedes its staging-only deployment entries.
+
+## PMC document chain and oncology knowledge — current-main integration
+
+- [x] Recover local PMC chain and marker changes and merge them with current
+      application `main` without replacing its newer account, billing and ANHAM work.
+- [x] Pass local PMC-chain, oncology and onboarding tests, typecheck, ESLint,
+      security check, synthetic benchmark and production build.
+- [x] Owner explicitly authorized publication; branch
+      `feature/pmc-document-chain-live-integration` is published to
+      `pythonsmethod/python-method-center-platform`; code commit `28844f0` has the exact
+      tested tree. Remote synthetic CI passed.
+- [x] Deploy the exact code candidate to isolated staging Preview
+      `dpl_EiPJAmQnZdrSoJc1qKtozeBmv9Nr` and restore its disconnected Git
+      state. RU/EN sign-in pages render; this does not prove role acceptance.
+- [ ] Verify the integrated candidate in the isolated PMC Preview with the
+      existing fictional source, including Karen evidence decisions, internal
+      draft/approval, distinct publication and client readback in RU and EN.
+- [ ] Review the production schema/RLS impact and apply the four additive
+      migrations only for a separately accepted production release. Existing
+      production documents and drafts must remain intact.
+- [ ] Release the exact accepted code through the protected PMC repository and
+      verify live role access and saved outcomes; do not enable automatic
+      VERIFIED or diagnosis from oncology markers.
+
+[Integration evidence and limits](docs/ankh/pmc_live_integration_2026_09_28.md).
+
 ## Monthly Checkout Live acceptance — 2026-09-28 PDT
 
 - [x] With owner-selected legal consent, open a six-period prepaid-only Live
       Checkout for 7,800 USD without paying. Read back `unpaid` in Stripe and
       return to the Production payment page through Checkout cancellation.
-- [ ] With renewed owner-selected consent, verify the separate six-period
-      automatic-renewal embedded Checkout display without paying; do not treat
-      the prepaid-only session as renewal acceptance.
+- [x] With renewed owner-selected consent, verify the separate six-period
+      automatic-renewal embedded Live Checkout: 7,800 USD today for 180 days,
+      then 1,300 USD per 30 days, no free-trial label. Stripe readback showed
+      a subscription-mode session `open / unpaid`; return to selection without
+      entering card details or paying.
 - [ ] Observe a genuine paid Production success return and first Live renewal
       only through normal customer activity; do not create a Live test charge.
 

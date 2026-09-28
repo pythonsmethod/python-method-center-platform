@@ -84,10 +84,34 @@ export type AssistantErrorCode =
   | "unreachable"
   | "emptyReply";
 
+// A bounded operational category for the document queue. Never store the
+// provider's raw error body: it may contain request or document content.
+export type AssistantFailureClass =
+  | "not_configured"
+  | "rate_limited"
+  | "authorization"
+  | "billing"
+  | "invalid_request"
+  | "provider_service"
+  | "provider_api"
+  | "timeout"
+  | "network"
+  | "empty_reply";
+
+export function classifyClaudeHttpFailure(status: number | undefined): AssistantFailureClass {
+  if (status === 401 || status === 403) return "authorization";
+  if (status === 402) return "billing";
+  if (status === 400 || status === 413 || status === 422) return "invalid_request";
+  if (status === 429) return "rate_limited";
+  if (status === 408 || status === 504) return "timeout";
+  if (status !== undefined && status >= 500) return "provider_service";
+  return "provider_api";
+}
+
 export type AssistantResult =
   | { status: "ok"; reply: string; refusal?: "provider_policy" }
-  | { status: "unavailable" }
-  | { status: "error"; message: string; code?: AssistantErrorCode };
+  | { status: "unavailable"; failureClass?: AssistantFailureClass }
+  | { status: "error"; message: string; code?: AssistantErrorCode; failureClass?: AssistantFailureClass };
 
 const CONTINUE_INSTRUCTION =
   "Продолжи ответ ровно с того места, где он оборвался. Не повторяй уже написанное, сохрани язык и закончи мысль кратко и естественно.";
@@ -221,7 +245,8 @@ export async function askClaude(
   system: string,
   messages: ChatMessage[],
   maxTokens: number,
-  attachments?: ChatAttachment[]
+  attachments?: ChatAttachment[],
+  options: { timeoutMs?: number; allowContinuation?: boolean } = {}
 ): Promise<AssistantResult> {
   const archiveEnabled = Boolean(conversationArchiveScope());
   if (archiveEnabled) system += `\n${ARCHIVE_RULE}`;
@@ -242,7 +267,7 @@ export async function askClaude(
       system: buildSystemParam(system),
       messages: requestMessages,
         ...(archiveEnabled ? { tools: availableConversationTools().map(tool => ({ name: tool.name, description: tool.description, input_schema: tool.parameters as Anthropic.Tool.InputSchema })), tool_choice: { type: round < 4 ? "auto" as const : "none" as const } } : {})
-    });
+    }, options.timeoutMs ? { timeout: options.timeoutMs, maxRetries: 0 } : undefined);
     let response = await call(0);
     for (let round = 0; archiveEnabled && response.stop_reason === "tool_use"; round++) {
       const calls = response.content.filter(block => block.type === "tool_use");
@@ -268,6 +293,7 @@ export async function askClaude(
       return {
         status: "error",
         code: "emptyReply",
+        failureClass: "empty_reply",
         message: "Пустой ответ ассистента."
       };
     }
@@ -275,7 +301,7 @@ export async function askClaude(
     // A token ceiling is not a completed answer. Ask once for the missing
     // ending and return one seamless message instead of exposing a sentence
     // cut in half. One continuation keeps latency and cost bounded.
-    if (response.stop_reason === "max_tokens") {
+    if (response.stop_reason === "max_tokens" && options.allowContinuation !== false) {
       try {
         const continuation = await anthropic.messages.create({
           model: ASSISTANT_MODEL,
@@ -308,14 +334,24 @@ export async function askClaude(
       return {
         status: "error",
         code: "overloaded",
+        failureClass: "rate_limited",
         message: "Ассистент перегружен. Попробуйте через минуту."
       };
+    }
+
+    if (error instanceof Anthropic.APIConnectionTimeoutError) {
+      return { status: "error", code: "unreachable", failureClass: "timeout", message: "Не удалось связаться с ассистентом. Попробуйте позже." };
+    }
+
+    if (error instanceof Anthropic.APIConnectionError) {
+      return { status: "error", code: "unreachable", failureClass: "network", message: "Не удалось связаться с ассистентом. Попробуйте позже." };
     }
 
     if (error instanceof Anthropic.APIError) {
       return {
         status: "error",
         code: "temporarilyDown",
+        failureClass: classifyClaudeHttpFailure(error.status),
         message: "Ассистент временно недоступен. Попробуйте позже."
       };
     }
@@ -323,6 +359,7 @@ export async function askClaude(
     return {
       status: "error",
       code: "unreachable",
+      failureClass: "network",
       message: "Не удалось связаться с ассистентом. Попробуйте позже."
     };
   }
