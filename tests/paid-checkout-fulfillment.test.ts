@@ -26,9 +26,13 @@ const beforeSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 function db() {
   return { from: (table: string) => {
-    if (table === "stripe_events") return { insert: async () => ({
-      error: mocks.ledgerDuplicate ? { code: "23505" } : null
-    }) };
+    if (table === "stripe_events") return {
+      insert: async () => ({ error: mocks.ledgerDuplicate ? { code: "23505" } : null }),
+      select: () => ({ eq: () => ({ maybeSingle: async () => ({
+        data: { created_at: "2026-09-24T21:38:07Z", processed_at: "2026-09-24T21:38:09Z" }, error: null
+      }) }) }),
+      update: () => ({ eq: async () => ({ error: null }) })
+    };
     if (table === "profiles") return { select: () => ({ eq: () => ({
       maybeSingle: async () => ({ data: { id: profileId }, error: null })
     }) }) };
@@ -47,7 +51,7 @@ function db() {
   } };
 }
 
-function request() {
+function request(overrides: Record<string, unknown> = {}) {
   const payload = JSON.stringify({
     id: "evt_paid_new_case", object: "event", type: "checkout.session.completed", livemode: false,
     created: 1790285885,
@@ -56,7 +60,8 @@ function request() {
       client_reference_id: profileId, payment_status: "paid", status: "complete",
       amount_total: 780000, amount_subtotal: 780000, currency: "usd",
       payment_intent: "pi_synthetic_6", customer_details: { email: "synthetic@example.test" },
-      metadata: { product: "personal_support", months: "6", auto_renew: "false" }
+      metadata: { product: "personal_support", months: "6", auto_renew: "false" },
+      ...overrides
     } }
   });
   const signature = Stripe.webhooks.generateTestHeaderString({ payload, secret });
@@ -112,5 +117,18 @@ describe("signed paid checkout fulfillment", () => {
     expect(response.status).toBe(200);
     expect(mocks.ensureCase).not.toHaveBeenCalled();
     expect(mocks.openPeriod).not.toHaveBeenCalled();
+  });
+
+  it("accepts tax added on top of the contract price", async () => {
+    const response = await POST(request({ amount_total: 858000, total_details: { amount_tax: 78000, amount_discount: 0 } }));
+    expect(response.status).toBe(200);
+    expect(mocks.openPeriod).toHaveBeenCalled();
+  });
+
+  it("holds access for a discounted charge and alerts the team", async () => {
+    const response = await POST(request({ amount_total: 700000, total_details: { amount_tax: 0, amount_discount: 80000 } }));
+    expect(response.status).toBe(200);
+    expect(mocks.openPeriod).not.toHaveBeenCalled();
+    expect(mocks.notify).toHaveBeenCalledWith(expect.objectContaining({ title: expect.stringContaining("не совпадает") }));
   });
 });

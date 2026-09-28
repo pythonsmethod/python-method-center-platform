@@ -12,6 +12,10 @@ function catalog() {
       create: vi.fn(async (params: Stripe.ProductCreateParams) => {
         const product = { ...params, active: true } as Stripe.Product;
         products.set(product.id, product); return product;
+      }),
+      update: vi.fn(async (id: string, params: Stripe.ProductUpdateParams) => {
+        const product = { ...products.get(id)!, ...params } as Stripe.Product;
+        products.set(id, product); return product;
       })
     },
     prices: {
@@ -80,5 +84,14 @@ describe("automatic Stripe catalog", () => {
     });
     configurations[0].features.subscription_update.enabled = true;
     await expect(ensurePortalConfiguration(stripe, "https://staging.example.test", "en")).rejects.toThrow("portal mismatch");
+  });
+
+  it("updates edited product wording instead of blocking checkout", async () => {
+    const { client, stripe, products } = catalog();
+    await ensureCheckoutPrice(stripe, "renewal", "ru");
+    const [id, product] = [...products.entries()][0];
+    products.set(id, { ...product, name: "Old wording" });
+    await expect(ensureCheckoutPrice(stripe, "renewal", "ru")).resolves.toMatch(/^price_/);
+    expect(client.products.update).toHaveBeenCalledWith(id, expect.objectContaining({ name: product.name }));
   });
 });

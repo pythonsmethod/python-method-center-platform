@@ -28,8 +28,15 @@ export async function ensureCheckoutPrice(stripe: Stripe, kind: PriceKind, local
     catalogProduct = await stripe.products.create({ id: productId, name: plan.title, description: plan.description, metadata },
       { idempotencyKey: productId });
   }
-  if (!catalogProduct.active || catalogProduct.name !== plan.title || catalogProduct.description !== plan.description ||
-      catalogProduct.metadata.checkout_version !== CHECKOUT_VERSION) throw new Error("checkout product mismatch");
+  if (!catalogProduct.active || catalogProduct.metadata.checkout_version !== CHECKOUT_VERSION) {
+    throw new Error("checkout product mismatch");
+  }
+  // Wording on the site may be edited. Name and description are display text
+  // only (amounts and periods live on the Price and are checked below), so
+  // bring Stripe in line instead of blocking every new payment.
+  if (catalogProduct.name !== plan.title || catalogProduct.description !== plan.description) {
+    catalogProduct = await stripe.products.update(productId, { name: plan.title, description: plan.description });
+  }
   const price = data[0] ?? await stripe.prices.create({
     currency: "usd", unit_amount: amount, product: productId, lookup_key: lookupKey,
     tax_behavior: "exclusive", metadata,
