@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { parseMetadata, toIsoDate } from "@/lib/assistant/metadata";
 
 describe("шапка документа", () => {
-  it("читает семь полей и превращает даты в ISO, сохраняя напечатанное", () => {
+  it("читает семь полей и нормализует только однозначные даты, сохраняя напечатанное", () => {
     const h = parseMetadata(`ФИО: Дубровенко Анна Викторовна
 ДАТА РОЖДЕНИЯ: 12.04.1980
 ЛАБОРАТОРИЯ: Инвитро
@@ -12,10 +12,11 @@ describe("шапка документа", () => {
 ЯЗЫК: русский`);
 
     expect(h.fullName).toBe("Дубровенко Анна Викторовна");
-    expect(h.birthDate).toBe("1980-04-12");
+    expect(h.birthDate).toBeNull();
     expect(h.birthDatePrinted).toBe("12.04.1980");
     expect(h.collectionDate).toBe("2026-08-14");
     expect(h.reportDate).toBe("2026-08-15");
+    expect(h.reportDatePrinted).toBe("2026-08-15");
     expect(h.accession).toBe("123-45");
   });
 

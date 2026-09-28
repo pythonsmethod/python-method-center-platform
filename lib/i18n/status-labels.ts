@@ -39,7 +39,7 @@ const clientDocumentStatusLabels: LocalizedLabels = {
     ready: "Готово",
     archived: "В архиве",
     needs_reupload: "Нужен новый файл",
-    failed: "Нужен новый файл",
+    failed: "Сбой обработки",
     // Stopped before reading: the header names somebody else. The case chat
     // explains and asks the person to confirm or remove the file.
     identity_mismatch: "Нужна проверка"
@@ -48,7 +48,7 @@ const clientDocumentStatusLabels: LocalizedLabels = {
     ready: "Ready",
     archived: "Archived",
     needs_reupload: "Needs a new file",
-    failed: "Needs a new file",
+    failed: "Processing failed",
     identity_mismatch: "Needs checking"
   }
 };

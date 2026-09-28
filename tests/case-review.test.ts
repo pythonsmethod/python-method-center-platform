@@ -76,38 +76,17 @@ ${CASE_REVIEW_SUMMARY_MARKER}
   });
 });
 
-describe("what the prompt requires", () => {
-  it("tells the draft not to mention the assistant", () => {
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
-      "Не упоминай ИИ, автоматическое распознавание"
-    );
+describe("internal synthesis boundaries", () => {
+  it("never impersonates Karen or treats double reading as verification", () => {
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Не обращайся к клиенту");
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("не пиши от имени Карена");
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("не даёт VERIFIED");
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("не ставь диагноз и не назначай лечение");
   });
-
-  it("keeps diagnosis and treatment out of the client-facing half", () => {
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
-      "Не ставь диагнозов и не назначай лечение"
-    );
-  });
-
-  it("requires plain-language names instead of unexplained abbreviations", () => {
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
-      "Не выдавай техническую россыпь"
-    );
-  });
-
-  it("forbids guessing an unreadable figure", () => {
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Никогда не угадывай цифру");
-  });
-
-  it("forbids long dashes in the client-ready text", () => {
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Символ «—» в готовом тексте запрещён");
-  });
-
-  it("limits holistic conclusions to systems supported by the documents", () => {
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain(
-      "только если по ним действительно есть данные"
-    );
-    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Жёсткий максимум 600 слов");
+  it("requires source IDs, unresolved questions and uncertainty", () => {
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("точным ID свидетельства");
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Нельзя угадывать даты, числа, единицы");
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Не скрывай неполные страницы");
   });
 });
 
@@ -119,7 +98,9 @@ describe("nothing sends the draft", () => {
     // starts writing to case_messages, that guarantee is gone.
     const source = readFileSync("lib/cases/review-actions.ts", "utf8");
 
-    expect(source).not.toContain("case_messages");
+    const generator = source.slice(source.indexOf("export async function generateCaseReview"), source.indexOf("export async function approveCaseReview"));
+    expect(generator).not.toContain("case_messages");
+    expect(generator).not.toContain("publish_pmc_case_review");
     expect(source).not.toContain("sendStaffCaseMessage");
   });
 

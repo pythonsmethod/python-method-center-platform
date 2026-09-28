@@ -1,5 +1,26 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-27-01 — Integrate on current PMC without widening clinical trust
+
+The owner requested the existing eleven-step document chain in the working Python
+Method Center and the oncology-marker knowledge in its local new chain. Keep one
+PMC Case, source store, job and review history; merge into the current application
+rather than overwrite newer main changes. Marker recognition and internal questions
+remain review-only. A successful code build does not authorize production PHI
+processing, automatic VERIFIED, a diagnosis or publication on Karen's behalf.
+The four isolated-stage migrations are absent in production and their source/RLS
+boundary affects live uploads, so release requires an exact candidate Preview,
+role acceptance and a separately checked production schema step. No NEXORA
+migration. [Record](docs/ankh/pmc_live_integration_2026_09_28.md).
+
+On 2026-09-28 the owner authorized publishing the prepared PMC branch. The
+exact tested tree is published at `28844f0`, remote synthetic CI passed, and
+the existing isolated staging project built a READY Preview. Its temporary
+Git connection was removed. This resolves the branch-publication gate only;
+no Karen decision, client publication, production migration or live processing
+was authorized by the successful build.
+
+
 ## PMC-BILLING-2026-09-27-02 — Do not bypass Stripe Payment Link permission denial
 
 The combined monthly Checkout code and Production feature flag are deployed,

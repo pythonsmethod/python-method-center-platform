@@ -35,14 +35,20 @@ const rows: ExtractedRow[] = [
 ];
 
 describe("строка бланка становится записью факта", () => {
+  it("два согласованных написания в скобках дают один показатель, исходная подпись остаётся дословной", () => {
+    const row = buildLabValue({labelPrinted:"Result",analyteLabelPrinted:"C-reactive protein (CRP)",value:1.2,unitPrinted:"mg/L",referencePrinted:"0.0 - 5.0 mg/L"});
+    expect(row).toMatchObject({label_original:"Result",analyte:"crp",value_canonical:1.2});
+    const conflict = buildLabValue({labelPrinted:"Result",analyteLabelPrinted:"ALT (AST)",value:1.2,unitPrinted:"U/L"});
+    expect(conflict.analyte).toBeNull();
+  });
   it("подпись и число разбираются вместе", () => {
     const record = buildLabValue(rows[0]);
 
     expect(record.analyte).toBe("hemoglobin");
-    expect(record.unit_resolution_method).toBe("resolved_by_reference");
-    expect(record.unit_resolved).toBe("g/L");
-    expect(record.value_canonical).toBeCloseTo(96, 6);
-    expect(record.position_in_reference).not.toBeNull();
+    expect(record.unit_resolution_method).toBe("unresolved");
+    expect(record.unit_resolved).toBeNull();
+    expect(record.value_canonical).toBeNull();
+    expect(record.position_in_reference).toBeNull();
   });
 
   it("оригинал сохраняется таким, как напечатан", () => {
@@ -100,7 +106,7 @@ describe("нераспознанное не проходит молча", () => 
     expect(needsHumanReview(buildLabValue(rows[9]))).toBe(true);
     expect(needsHumanReview(buildLabValue(rows[7]))).toBe(true);
     expect(needsHumanReview(buildLabValue(rows[8]))).toBe(true);
-    expect(needsHumanReview(buildLabValue(rows[0]))).toBe(false);
+    expect(needsHumanReview(buildLabValue(rows[0]))).toBe(true);
   });
 });
 

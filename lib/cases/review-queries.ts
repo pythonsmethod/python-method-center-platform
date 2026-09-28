@@ -1,10 +1,12 @@
 import {
-  fingerprintDocuments,
   type CaseDocumentRow
 } from "@/lib/cases/case-documents";
+import { caseEvidenceFingerprint } from "./evidence-fingerprint";
 import type { CaseReview } from "@/lib/cases/review-state";
 import { normalizeAnhamResponse } from "@/lib/assistant/response-style";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
+import { getDocumentChainPilotStatus } from "@/lib/documents/pilot";
+import { getCaseReview as getLegacyCaseReview } from "./legacy-review-queries";
 
 // The stored reading, if there is one. Read with the service key: the
 // table has RLS on and no policy, so a client cannot reach the machine's
@@ -18,6 +20,9 @@ export async function getCaseReview(
   documents: Pick<CaseDocumentRow, "id" | "created_at">[],
   locale?: "ru" | "en"
 ): Promise<CaseReview | null> {
+  const pilot = await getDocumentChainPilotStatus(caseId);
+  if (pilot === "legacy") return getLegacyCaseReview(caseId, documents, locale);
+  if (pilot === "unavailable") return null;
   const supabase = createSupabaseServiceClient();
 
   if (!supabase) {
@@ -34,10 +39,11 @@ export async function getCaseReview(
     return null;
   }
 
-  const current = fingerprintDocuments(documents);
+  const current = await caseEvidenceFingerprint(caseId);
+  void documents;
   const { data: approvals } = await supabase
     .from("case_review_learning_events")
-    .select("ai_draft, approved_text, approved_at")
+    .select("id, ai_draft, approved_text, approved_at")
     .eq("review_id", data.id)
     .eq("documents_fingerprint", data.documents_fingerprint)
     .order("approved_at", { ascending: false })
@@ -47,7 +53,10 @@ export async function getCaseReview(
   );
   const latestApproval = matchingApprovals[0] ?? null;
 
+  const publication = latestApproval ? await supabase.from("case_messages").select("id").eq("approved_review_event_id", latestApproval.id).eq("case_id", caseId).maybeSingle() : null;
   return {
+    approvalId: latestApproval ? String(latestApproval.id) : null,
+    publishedMessageId: publication?.data?.id ? String(publication.data.id) : null,
     id: String(data.id),
     summary: normalizeAnhamResponse(String(data.summary ?? ""), locale),
     draft: normalizeAnhamResponse(String(data.draft ?? ""), locale),

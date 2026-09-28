@@ -17,6 +17,8 @@ export type CaseReview = {
   approvedText: string | null;
   approvedAt: string | null;
   approvalCount: number;
+  approvalId?: string | null;
+  publishedMessageId?: string | null;
 };
 
 export type CaseReviewActionState = {

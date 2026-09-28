@@ -4,7 +4,7 @@ export type CaseSubjectSource = {
 };
 
 export function resolveCaseSubject(source: CaseSubjectSource) {
-  const patient = source.care_recipients?.find((item) => item.is_current !== false);
+  const patient = (Array.isArray(source.care_recipients) ? source.care_recipients : source.care_recipients ? [source.care_recipients] : []).find((item) => item.is_current !== false);
   if (patient?.full_name?.trim()) return {
     kind: "care_recipient" as const,
     fullName: patient.full_name.trim(),

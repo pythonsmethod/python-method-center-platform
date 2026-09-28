@@ -1,4 +1,5 @@
 import { createHash } from "node:crypto";
+import { isOncologyAnalyte, resolveAnalyteLabel } from "@/lib/analysis/analyte-labels";
 import { normalizeLabFlag, normalizeTestName, normalizeUnit, normalizeWhitespace, parseNumericValue, parseReferenceInterval } from "@/lib/canonical-facts/parsing";
 import type { BoundingPolygon, CanonicalFactCounters, CanonicalLabFact, ExtractedLabRow, SelectiveVerificationRequest } from "@/lib/canonical-facts/types";
 
@@ -90,6 +91,8 @@ export function canonicalizeLabRow(row: ExtractedLabRow, context: {
   const unitOriginal = normalizeWhitespace(row.unitOriginal ?? "") || null;
   const referenceOriginal = normalizeWhitespace(row.referenceOriginal ?? "") || null;
   const normalizedTestName = normalizeTestName(originalTestName);
+  const marker = resolveAnalyteLabel(originalTestName);
+  const oncologyReviewOnly = marker.status === "resolved" && isOncologyAnalyte(marker.analyte);
   const unitNormalized = normalizeUnit(unitOriginal);
   const numeric = parseNumericValue(valueOriginal);
   const reference = parseReferenceInterval(referenceOriginal);
@@ -102,6 +105,7 @@ export function canonicalizeLabRow(row: ExtractedLabRow, context: {
   if (numeric.numeric === null && /^[<>≤≥+\-\d.,e\s]+$/i.test(valueOriginal)) issues.push("unparseable_numeric_value");
   if (referenceOriginal && reference.low === null && reference.high === null) issues.push("unresolved_reference_interval");
   if (!normalizedTestName) issues.push("normalization_unresolved");
+  if (oncologyReviewOnly) issues.push("oncology_review_required");
   if (unitOriginal && !unitNormalized) issues.push("unit_normalization_unresolved");
   const verificationStatus = !originalTestName || !valueOriginal
     ? "REJECTED"
@@ -122,7 +126,7 @@ export function canonicalizeLabRow(row: ExtractedLabRow, context: {
     extractionConfidence: row.extractionConfidence ?? null, verificationStatus,
     verificationIssues: issues,
     normalizationStatus: normalizedTestName ? "NORMALIZED" : "UNRESOLVED",
-    comparabilityStatus: normalizedTestName && (!unitOriginal || unitNormalized) ? "HIGH" : normalizedTestName ? "LIMITED" : "NOT_COMPARABLE",
+    comparabilityStatus: oncologyReviewOnly ? "NOT_COMPARABLE" : normalizedTestName && (!unitOriginal || unitNormalized) ? "HIGH" : normalizedTestName ? "LIMITED" : "NOT_COMPARABLE",
     extractionProvider: context.extractionProvider, extractionVersion: context.extractionVersion
   };
 }

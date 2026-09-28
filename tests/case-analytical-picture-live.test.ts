@@ -10,7 +10,7 @@ const fact = (id: string, date: string | null, unit = "mg/L") => ({
   id, documentId: "doc-a", observedAt: date, label: "Synthetic marker", originalValue: "10", originalUnit: unit,
   canonicalValue: 10, canonicalUnit: unit, reference: "5-15", comparisonKey: "marker", trustState: "NEEDS_REVIEW" as const,
   provenance: { level: "DOCUMENT" as const, page: null },
-  analysisRunId: "run-current",
+  analysisRunId: "run-current", comparisonContext: { specimen: "synthetic serum", method: "synthetic method" },
 });
 const base = (overrides: Partial<PictureInput> = {}): PictureInput => ({ caseId: "case-a", documents: [document], facts: [fact("f1", "2026-01-01")], trends: {}, blocked: [], requests: [], excluded: [], notes: [], analysisRunId: "run-current", analysisCurrent: true, ...overrides });
 
@@ -53,7 +53,7 @@ describe("live Case Analytical Picture", () => {
     const disputed = { file: "synthetic.pdf", section: "Pathology", label: "Synthetic field", first: "A", second: "B", reason: "разные значения" as const, note: "" };
     const items = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [agreed], disputed: [disputed] }, new Set(["doc-a"]));
     expect(items).toMatchObject([{ category: "UNKNOWN", trustState: "SOURCE_ONLY" }, { category: "PATHOLOGY", trustState: "NEEDS_REVIEW", value: "A", alternateValue: "B" }]);
-    expect(projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [agreed], disputed: [] }, new Set(["doc-a"]), new Set(["doc-a|Synthetic label|42"]))).toHaveLength(0);
+    expect(projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [agreed], disputed: [] }, new Set(["doc-a"]), new Set(["doc-a|Synthetic label|42"]))).toHaveLength(1);
     expect(() => projectStoredExtractionEvidence({ id: "x", documentId: "foreign", agreed: [], disputed: [] }, new Set(["doc-a"]))).toThrow("another Case");
     expect(items.some((item) => (item.trustState as string) === "VERIFIED")).toBe(false);
   });
@@ -108,38 +108,37 @@ describe("live Case Analytical Picture", () => {
     )).toHaveLength(1);
   });
 
-  it("normalizes formatting-only disagreements, separates generic notes and removes exact duplicates", () => {
+  it("preserves disputed readings and generic notes, removing only repeated identical source rows", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
       { file: "synthetic.pdf", section: "Final Diagnosis", label: "Nottingham grade", first: "* Nottingham grade: Grade 3 of 3.", second: "Grade 3 of 3", reason: "разные значения", note: "" },
       { file: "synthetic.pdf", section: "Note", label: "Text", first: "First independent note", second: "Second independent note", reason: "разные значения", note: "" },
     ] }, new Set(["doc-a"]));
     const prepared = prepareEvidenceForKaren([...projected, projected[0]]);
-    expect(prepared).toHaveLength(3);
-    expect(prepared[0]).toMatchObject({ alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY", priority: "CRITICAL" });
-    expect(prepared.slice(1)).toEqual(expect.arrayContaining([
-      expect.objectContaining({ value: "First independent note", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" }),
-      expect.objectContaining({ value: "Second independent note", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" }),
-    ]));
+    expect(prepared).toHaveLength(2);
+    expect(prepared[0]).toMatchObject({ id: projected[0].id, value: "* Nottingham grade: Grade 3 of 3.", alternateValue: "Grade 3 of 3", disputeReason: "разные значения", trustState: "NEEDS_REVIEW", priority: "CRITICAL" });
+    expect(prepared[1]).toMatchObject({ id: projected[1].id, value: "First independent note", alternateValue: "Second independent note", disputeReason: "разные значения", trustState: "NEEDS_REVIEW" });
   });
 
-  it("collapses complementary dual-read rows into one non-blocking source-only item", () => {
+  it("does not infer corroboration across sections when one reading omits a unit", () => {
     const projected = projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [], disputed: [
       { file: "synthetic.pdf", section: "Hemogram", label: "PLT", first: "243", second: "", reason: "разные значения", note: "" },
       { file: "synthetic.pdf", section: "CBC", label: "PLT", first: "", second: "243 [10^9/L]", reason: "разные значения", note: "" },
     ] }, new Set(["doc-a"]));
     const prepared = prepareEvidenceForKaren(projected);
-    expect(prepared).toHaveLength(1);
-    expect(prepared[0]).toMatchObject({ label: "PLT", value: "243 [10^9/L]", alternateValue: null, disputeReason: null, trustState: "SOURCE_ONLY" });
+    expect(prepared).toHaveLength(2);
+    expect(prepared).toEqual(expect.arrayContaining(projected));
+    expect(buildCaseAnalyticalPicture(base({ extractedEvidence: prepared })).reviewSummary).toMatchObject({ required: 2, completed: 0 });
   });
 
-  it("preserves a reviewed representative when complementary rows are collapsed", () => {
+  it("preserves the reviewed row and the separate pending row", () => {
     const item = (id: string, section: string, value: string | null, alternateValue: string | null, reviewDecision: "PENDING" | "CORRECTED") => ({ id, documentId: "doc-a", section, label: "PLT", value, alternateValue, category: "UNKNOWN" as const, trustState: "NEEDS_REVIEW" as const, disputeReason: "разные значения", provenance: { level: "DOCUMENT" as const, page: null }, priority: "SUPPORTING" as const, reviewDecision, correction: reviewDecision === "CORRECTED" ? "PLT 243 [10^9/L]" : null });
     const prepared = prepareEvidenceForKaren([
       item("pending", "CBC", "243", null, "PENDING"),
       item("reviewed", "Hemogram", null, "243 [10^9/L]", "CORRECTED"),
     ]);
-    expect(prepared).toHaveLength(1);
-    expect(prepared[0]).toMatchObject({ id: "reviewed", reviewDecision: "CORRECTED", correction: "PLT 243 [10^9/L]", trustState: "SOURCE_ONLY" });
+    expect(prepared).toHaveLength(2);
+    expect(prepared[0]).toMatchObject({ id: "pending", reviewDecision: "PENDING", correction: null, trustState: "NEEDS_REVIEW" });
+    expect(prepared[1]).toMatchObject({ id: "reviewed", reviewDecision: "CORRECTED", correction: "PLT 243 [10^9/L]", trustState: "NEEDS_REVIEW" });
   });
 
   it("keeps a genuine dual-read disagreement in the exception queue", () => {
@@ -195,7 +194,7 @@ describe("live Case Analytical Picture", () => {
   it("refuses stale and source-less run conclusions", () => {
     const trend = { marker: { analyte: "marker", verdict: "significant" as const, reason: null, versus_previous: null, versus_baseline: null, latest_within_reference: null, direction: null, reference_breaks: [] } };
     expect(buildCaseAnalyticalPicture(base({ trends: trend, analysisCurrent: false })).comparisons[0]).toMatchObject({ verdict: "INSUFFICIENT_DATA", reasonCode: "STALE_ANALYSIS" });
-    expect(buildCaseAnalyticalPicture(base({ trends: trend, facts: [{ ...fact("other-run", "2026-01-01"), analysisRunId: "run-old" }] })).comparisons[0]).toMatchObject({ verdict: "INSUFFICIENT_DATA", reasonCode: "INSUFFICIENT_EVIDENCE", evidenceFactIds: [] });
+    expect(buildCaseAnalyticalPicture(base({ trends: trend, facts: [{ ...fact("other-run", "2026-01-01"), analysisRunId: "run-old" }] })).comparisons[0]).toMatchObject({ verdict: "INSUFFICIENT_DATA", reasonCode: "INSUFFICIENT_EVIDENCE", evidenceFactIds: ["other-run"] });
   });
 
   it("allows staff drafts but reserves confirmed notes for Karen", () => {
@@ -210,12 +209,12 @@ describe("live Case Analytical Picture", () => {
     const action = readFileSync("lib/analytical-picture/actions.ts", "utf8");
     const approvalAction = readFileSync("lib/cases/review-actions.ts", "utf8");
     expect(query.match(/\.eq\("case_id", caseId\)/g)?.length).toBe(5);
-    expect(query).toContain('.in("document_id", [...documentIds])');
+    expect(query).toContain("documentIds.has(documentId)");
     expect(query).not.toContain('.from("lab_values").insert');
     expect(query).toContain('metadata?.kind !== "case_picture_evidence_review"');
     expect(action).toContain('visibility: "karen_and_admin"');
     expect(action).toContain('resolvePrivateAssistantRole(auth.email) === "karen"');
-    expect(action).toContain('kind: "case_picture_evidence_review"');
+    expect(readFileSync("supabase/migrations/20260924012755_pmc_document_chain.sql", "utf8")).toContain("case_picture_evidence_review");
     expect(action).not.toContain("case_messages");
     expect(approvalAction).toContain("pictureResult.picture.reviewSummary.approvalBlocked");
     expect(approvalAction.indexOf("pictureResult.picture.reviewSummary.approvalBlocked")).toBeLessThan(approvalAction.indexOf('from("case_review_learning_events")'));

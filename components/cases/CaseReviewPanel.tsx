@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { approveCaseReview, generateCaseReview } from "@/lib/cases/review-actions";
+import { approveCaseReview, generateCaseReview, publishCaseReview } from "@/lib/cases/review-actions";
 import {
   initialCaseReviewState,
   type CaseReview
@@ -40,6 +40,7 @@ export function CaseReviewPanel({
     approveCaseReview,
     initialCaseReviewState
   );
+  const [publishState, publishAction, publishing] = useActionState(publishCaseReview, initialCaseReviewState);
   const [copied, setCopied] = useState(false);
   const [editedText, setEditedText] = useState(review?.approvedText ?? review?.draft ?? "");
   useEffect(() => {
@@ -52,9 +53,9 @@ export function CaseReviewPanel({
     ? {
         aria: "Подготовленный разбор анализов",
         label: "ИИ-разбор документов",
-        title: "Готовый текст для клиента",
+        title: "Внутренний разбор и решение Карена",
         empty: "Анализы ещё не прочитаны",
-        build: "Подготовить текст",
+        build: "Собрать внутренний разбор",
         rebuild: "Подготовить заново",
         building: "Готовлю текст...",
         noDocuments: "В кейсе пока нет загруженных документов.",
@@ -62,26 +63,26 @@ export function CaseReviewPanel({
         copy: "Копировать",
         approve: "Утвердить заключение",
         approving: "Сохраняю историю...",
-        note: "Редактируйте прямо здесь. При утверждении система сохранит исходный текст ИИ, всё удалённое и добавленное Кареном и окончательное заключение.",
+        note: "Подготовьте окончательный текст решения здесь. При утверждении система сохранит исходный текст ИИ, всё удалённое и добавленное Кареном и окончательное заключение.",
         history: "Сохранённых утверждений",
         approved: "Утверждённая версия",
         verify: "Требует проверки",
         verifyNote: "ИИ не смог уверенно прочитать эти места. Номер и название помогут сразу открыть нужный файл.",
         verified: "Дополнительная проверка не требуется.",
-        stale: "Клиент загрузил новые документы после подготовки текста. Подготовьте его заново.",
+        stale: "Документы, чтения или решения по строкам изменились. Подготовьте разбор заново.",
         recognized: "Распознано файлов",
         reupload: "Нужна повторная загрузка",
         reuploadHint: "Клиент получил сообщение с названием файла.",
         allReady: "Все материалы учтены — итог можно собрать без повторного чтения файлов.",
         processing: "Остальные файлы находятся в очереди или обрабатываются.",
-        blocked: "Сначала проверьте все критические свидетельства в целостной картине кейса."
+        blocked: "Сначала проверьте все сомнительные свидетельства в целостной картине кейса."
       }
     : {
         aria: "Prepared test result review",
         label: "AI document review",
-        title: "Client-ready text",
+        title: "Internal review and Karen’s decision",
         empty: "The test results have not been reviewed yet",
-        build: "Prepare text",
+        build: "Build internal review",
         rebuild: "Prepare again",
         building: "Preparing text...",
         noDocuments: "No documents have been uploaded to this case yet.",
@@ -89,19 +90,19 @@ export function CaseReviewPanel({
         copy: "Copy",
         approve: "Approve conclusion",
         approving: "Saving history...",
-        note: "Edit directly here. On approval, the system saves the original AI text, everything Karen removed or added, and the final conclusion.",
+        note: "Prepare the final decision text here. On approval, the system saves the original AI text, everything Karen removed or added, and the final conclusion.",
         history: "Saved approvals",
         approved: "Approved version",
         verify: "Requires verification",
         verifyNote: "The AI could not read these items confidently. The file number and name take you directly to the right document.",
         verified: "No additional verification is required.",
-        stale: "The client uploaded new documents after this text was prepared. Prepare it again.",
+        stale: "Documents, readings or evidence decisions changed. Rebuild the review.",
         recognized: "Files recognized",
         reupload: "Re-upload required",
         reuploadHint: "The client received a message with the file name.",
         allReady: "All materials are included, so the result can be prepared without rereading the files.",
         processing: "The remaining files are queued or being processed.",
-        blocked: "Review every critical evidence item in the whole-case picture before approval."
+        blocked: "Review every unresolved evidence item in the whole-case picture before approval."
       };
 
   async function copyDraft() {
@@ -198,6 +199,8 @@ export function CaseReviewPanel({
               <form action={approvalAction}>
                 <input name="case_id" type="hidden" value={caseId} />
                 <input name="review_id" type="hidden" value={review.id} />
+                <input name="review_created_at" type="hidden" value={review.createdAt} />
+                <input name="evidence_fingerprint" type="hidden" value={review.documentsFingerprint} />
                 <input name="locale" type="hidden" value={locale} />
                 <textarea
                   aria-label={t.approved}
@@ -209,13 +212,23 @@ export function CaseReviewPanel({
                   value={editedText}
                 />
                 <div className="panel-actions">
-                  <button className="button" disabled={approvalPending || !editedText.trim() || approvalBlocked} type="submit">
+                  <button className="button" disabled={approvalPending || !editedText.trim() || approvalBlocked || !review.isCurrent} type="submit">
                     {approvalPending ? t.approving : t.approve}
                   </button>
                   {review.approvalCount > 0 ? <span>{t.history}: {review.approvalCount}</span> : null}
                 </div>
                 {approvalBlocked ? <p className="notice notice--warning">{t.blocked}</p> : null}
               </form>
+              {review.approvalId && review.approvedText ? <form action={publishAction}>
+                <input name="case_id" type="hidden" value={caseId} />
+                <input name="approval_id" type="hidden" value={review.approvalId} />
+                <input name="locale" type="hidden" value={locale} />
+                <p>{locale === "ru" ? "Клиент получит именно сохранённый утверждённый текст. Изменения в редакторе сначала нужно утвердить." : "The client receives the saved approved text. Approve any editor changes first."}</p>
+                <button className="button" disabled={publishing || !review.isCurrent || approvalBlocked || Boolean(review.publishedMessageId) || editedText !== review.approvedText} type="submit">
+                  {review.publishedMessageId ? (locale === "ru" ? "Результат уже отправлен" : "Result already published") : publishing ? (locale === "ru" ? "Сохраняю…" : "Saving…") : (locale === "ru" ? "Отправить утверждённый результат клиенту" : "Publish approved result to client")}
+                </button>
+                {publishState.message ? <p role="status">{publishState.message}</p> : null}
+              </form> : null}
               <p className="case-review__draft-note">
                 {t.note}
               </p>
@@ -230,6 +243,16 @@ export function CaseReviewPanel({
           {review.summary ? (
             <aside className="case-review__verification" aria-label={t.verify}>
               <span className="panel__label">{t.verify}</span>
+              {review.approvalId && review.approvedText ? <form action={publishAction}>
+                <input name="case_id" type="hidden" value={caseId} />
+                <input name="approval_id" type="hidden" value={review.approvalId} />
+                <input name="locale" type="hidden" value={locale} />
+                <p>{locale === "ru" ? "Клиент получит именно сохранённый утверждённый текст. Изменения в редакторе сначала нужно утвердить." : "The client receives the saved approved text. Approve any editor changes first."}</p>
+                <button className="button" disabled={publishing || !review.isCurrent || approvalBlocked || Boolean(review.publishedMessageId) || editedText !== review.approvedText} type="submit">
+                  {review.publishedMessageId ? (locale === "ru" ? "Результат уже отправлен" : "Result already published") : publishing ? (locale === "ru" ? "Сохраняю…" : "Saving…") : (locale === "ru" ? "Отправить утверждённый результат клиенту" : "Publish approved result to client")}
+                </button>
+                {publishState.message ? <p role="status">{publishState.message}</p> : null}
+              </form> : null}
               <p className="case-review__draft-note">{t.verifyNote}</p>
               <pre className="case-review__text">{review.summary}</pre>
             </aside>

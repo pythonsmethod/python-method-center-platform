@@ -27,16 +27,18 @@ export const METADATA_SYSTEM_PROMPT = `Ты читаешь только шапк
 ДАТА РОЖДЕНИЯ: как напечатана
 ЛАБОРАТОРИЯ: название лаборатории или учреждения
 НОМЕР: номер заказа, образца или регистрации (accession), если напечатан
-ДАТА ЗАБОРА: дата взятия материала или исследования
-ДАТА ОТЧЁТА: дата выдачи результата
+ДАТА ЗАБОРА: дата взятия материала или исследования ровно как напечатана
+ДАТА ОТЧЁТА: дата выдачи результата ровно как напечатана
 ЯЗЫК: язык документа одним словом
+
+Все даты переписывай посимвольно: сохраняй порядок чисел и разделители. Не переводи даты в другой формат и не выбирай день и месяц по языку документа.
 
 Больше ничего в ответе быть не должно.`;
 
 export type DocumentHeader = {
   fullName: string | null;
-  // ISO date when the printed date could be read as one; the printed text
-  // is kept beside it either way.
+  // ISO only when the printed date has one valid interpretation; the
+  // printed text is kept beside it even when the date stays unresolved.
   birthDate: string | null;
   birthDatePrinted: string | null;
   laboratory: string | null;
@@ -44,6 +46,8 @@ export type DocumentHeader = {
   collectionDate: string | null;
   collectionDatePrinted: string | null;
   reportDate: string | null;
+  // Optional for previously saved headers; new extractions always include it.
+  reportDatePrinted?: string | null;
   language: string | null;
 };
 
@@ -55,31 +59,28 @@ function clean(value: string | undefined): string | null {
   return text.length === 0 || EMPTY.test(text) ? null : text;
 }
 
-// dd.mm.yyyy, dd/mm/yyyy, yyyy-mm-dd. Anything else stays printed-only:
-// a date the parser is unsure of is worse than no date, because a wrong
-// date puts a value in the wrong place on the line.
+// Accept ISO or a numeric day/month date with exactly one valid reading.
+// Neither the separator nor the document language proves a date convention.
+// Ambiguous, invalid and composite strings remain printed-only. A guessed
+// date would silently affect identity, document versions and chronology.
 export function toIsoDate(printed: string | null): string | null {
   if (!printed) {
     return null;
   }
 
-  const european = printed.match(/(\d{1,2})[./](\d{1,2})[./](\d{4})/);
-
-  if (european) {
-    const [, d, m, y] = european;
-    const day = d.padStart(2, "0");
-    const month = m.padStart(2, "0");
-
-    return isRealDate(`${y}-${month}-${day}`) ? `${y}-${month}-${day}` : null;
+  const text = printed.trim();
+  if (/^\d{4}-\d{2}-\d{2}$/.test(text)) {
+    return isRealDate(text) ? text : null;
   }
 
-  const iso = printed.match(/(\d{4})-(\d{2})-(\d{2})/);
+  const numeric = text.match(/^(\d{1,2})([./-])(\d{1,2})\2(\d{4})$/);
+  if (!numeric) return null;
 
-  if (iso) {
-    return isRealDate(iso[0]) ? iso[0] : null;
-  }
-
-  return null;
+  const [, first, , second, year] = numeric;
+  const a = first.padStart(2, "0");
+  const b = second.padStart(2, "0");
+  const candidates = [...new Set([`${year}-${b}-${a}`, `${year}-${a}-${b}`].filter(isRealDate))];
+  return candidates.length === 1 ? candidates[0] : null;
 }
 
 function isRealDate(iso: string): boolean {
@@ -109,6 +110,7 @@ export function parseMetadata(reply: string): DocumentHeader {
 
   const birthPrinted = get("ДАТА РОЖДЕНИЯ");
   const collectionPrinted = get("ДАТА ЗАБОРА");
+  const reportPrinted = get("ДАТА ОТЧЁТА");
 
   return {
     fullName: get("ФИО"),
@@ -118,7 +120,8 @@ export function parseMetadata(reply: string): DocumentHeader {
     accession: get("НОМЕР"),
     collectionDate: toIsoDate(collectionPrinted),
     collectionDatePrinted: collectionPrinted,
-    reportDate: toIsoDate(get("ДАТА ОТЧЁТА")),
+    reportDate: toIsoDate(reportPrinted),
+    reportDatePrinted: reportPrinted,
     language: get("ЯЗЫК")
   };
 }
