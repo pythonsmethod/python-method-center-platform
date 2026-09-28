@@ -5,9 +5,11 @@
 - [x] With owner-selected legal consent, open a six-period prepaid-only Live
       Checkout for 7,800 USD without paying. Read back `unpaid` in Stripe and
       return to the Production payment page through Checkout cancellation.
-- [ ] With renewed owner-selected consent, verify the separate six-period
-      automatic-renewal embedded Checkout display without paying; do not treat
-      the prepaid-only session as renewal acceptance.
+- [x] With renewed owner-selected consent, verify the separate six-period
+      automatic-renewal embedded Live Checkout: 7,800 USD today for 180 days,
+      then 1,300 USD per 30 days, no free-trial label. Stripe readback showed
+      a subscription-mode session `open / unpaid`; return to selection without
+      entering card details or paying.
 - [ ] Observe a genuine paid Production success return and first Live renewal
       only through normal customer activity; do not create a Live test charge.
 
