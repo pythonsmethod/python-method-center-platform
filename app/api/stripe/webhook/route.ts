@@ -318,6 +318,10 @@ async function handlePaidSession(
   if (product === "personal_support") {
     const metadataMonths = personalSupportMonthsFromMetadata(session.metadata);
     const baseAmountCents = session.amount_subtotal ?? session.amount_total;
+    // The contract fixes the pre-tax price. Tax, when enabled, is added on top;
+    // any discount means the price was changed and needs a human.
+    const taxCents = session.total_details?.amount_tax ?? 0;
+    const discountCents = session.total_details?.amount_discount ?? 0;
     if (
       metadataMonths === null ||
       !isValidPersonalSupportCharge({
@@ -325,11 +329,8 @@ async function handlePaidSession(
         currency: session.currency,
         months: metadataMonths
       }) ||
-      !isValidPersonalSupportCharge({
-        amountCents,
-        currency: session.currency,
-        months: metadataMonths
-      })
+      discountCents !== 0 ||
+      amountCents !== (baseAmountCents ?? 0) + taxCents
     ) {
       await notifyTeam({
         kind: "processing_error",
@@ -590,6 +591,10 @@ type InvoiceWithSubscription = Stripe.Invoice & {
   } | null;
 };
 
+function renewalDiscountCents(invoice: Stripe.Invoice): number {
+  return (invoice.total_discount_amounts ?? []).reduce((sum, d) => sum + (d.amount ?? 0), 0);
+}
+
 function invoiceSubscriptionId(invoice: Stripe.Invoice): string | null {
   const shaped = invoice as InvoiceWithSubscription;
   const direct = shaped.subscription;
@@ -661,11 +666,9 @@ async function handlePaidSubscriptionInvoice(
       currency: invoice.currency,
       months: 1
     }) ||
-    !isValidPersonalSupportCharge({
-      amountCents,
-      currency: invoice.currency,
-      months: 1
-    })
+    renewalDiscountCents(invoice) !== 0 ||
+    amountCents !== (invoice.total ?? -1) ||
+    amountCents < baseAmountCents
   ) {
     await notifyTeam({
       kind: "processing_error",
