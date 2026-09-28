@@ -1,5 +1,16 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Monthly Checkout Live acceptance — 2026-09-28 PDT
+
+- [x] With owner-selected legal consent, open a six-period prepaid-only Live
+      Checkout for 7,800 USD without paying. Read back `unpaid` in Stripe and
+      return to the Production payment page through Checkout cancellation.
+- [ ] With renewed owner-selected consent, verify the separate six-period
+      automatic-renewal embedded Checkout display without paying; do not treat
+      the prepaid-only session as renewal acceptance.
+- [ ] Observe a genuine paid Production success return and first Live renewal
+      only through normal customer activity; do not create a Live test charge.
+
 ## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, FOLLOW-UP OPEN
 
 - [x] Merge PR #216 including PR #215; deploy the combined code to Production.
@@ -12,9 +23,9 @@
       three identified 5-week/100-day links; each was read back inactive.
 - [x] Merge the final release record in PR #230 after GitHub CI and Vercel
       Preview passed; its docs-only Production deployment reached READY.
-- [ ] With the authenticated owner account and explicit consent to both legal
-      checkboxes, verify a no-charge transition into Live Checkout and the
-      production-domain return. Never complete a Live test purchase.
+- [x] Verify an authenticated no-charge prepaid-only Live Checkout transition
+      and cancel return to the Production domain. Never complete a Live test
+      purchase; the renewal-specific flow remains separately open above.
 
 ## ANHAM philosophical communication — 2026-09-27
 
