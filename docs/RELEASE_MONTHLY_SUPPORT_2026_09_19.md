@@ -1,5 +1,13 @@
 # PMC Monthly Personal Support — release preparation — 2026-09-19
 
+2026-09-28 Live smoke update: with the owner's own legal consents, a six-period
+prepaid-only Live Checkout opened at 7,800 USD for 180 days. Stripe readback
+confirmed the session was open and unpaid; the cancel link returned to the
+Production payment page. No card details or Live charge were used. The
+automated renewal-checkbox selection did not persist, so the Live renewal
+embedded form is still unverified and must be checked separately. The success
+return after a real payment also remains untested.
+
 2026-09-27 cutover update: PR #216, containing PR #215, is merged; the new
 code and `STRIPE_CHECKOUT_ENABLED=true` are READY on the Production domain.
 The Live webhook's four recurring events were added without removing prior
@@ -10,9 +18,9 @@ were read back; public RU/EN prices and renewal choice were inspected. No
 Live test purchase was made. The owner granted Payment Links Write through
 Stripe's official connection flow after its earlier denial. The three old
 5-week/100-day direct links were changed to `active=false` and read back
-inactive without altering historical purchases or subscriptions. An
-authenticated no-charge Live Checkout transition and a real payment/return
-remain unverified; do not present them as passed.
+inactive without altering historical purchases or subscriptions. At cutover,
+an authenticated no-charge Live Checkout transition and a real payment/return
+were unverified; the later prepaid-only smoke result is above.
 
 2026-09-24 gate update: isolated Sandbox/staging acceptance passed the 299 USD
 assessment, 1,300 USD first support payment, first 30-day automatic renewal,

@@ -168,8 +168,27 @@
     "liveCheckoutTransitionVerified": false,
     "liveTestPurchaseMade": false
   },
+  "liveNoChargeSmoke2026_09_28": {
+    "ownerPersonallySelectedLegalConsent": true,
+    "environment": "live",
+    "product": "personal_support",
+    "months": 6,
+    "days": 180,
+    "autoRenew": false,
+    "mode": "payment",
+    "amountTotalCents": 780000,
+    "currency": "usd",
+    "stripeSessionStatus": "open",
+    "paymentStatus": "unpaid",
+    "cancelReturnVerified": "https://pythonmethodcenter.com/payment",
+    "successReturnConfigured": "https://pythonmethodcenter.com/payment/success",
+    "cardDetailsEntered": false,
+    "liveChargeMade": false,
+    "renewalSpecificCheckoutVerified": false,
+    "note": "The automated renewal-checkbox change did not persist to application state; this session validates prepaid-only Checkout. No session URL, email or buyer identifier is recorded here."
+  },
   "remaining": [
-    "An authenticated, no-charge transition into Live Checkout and the production-domain return have not been verified. No Live test purchase or charge was made.",
+    "The renewal-specific Live embedded Checkout and a real paid success return remain unverified. The prepaid-only six-period Checkout and cancel return were verified without a Live charge.",
     "Tax classification and any external seller registration are not established. The owner retained the prior disabled automatic-tax setting; do not imply that this settles legal tax obligations.",
     "The 2026-09-24 snapshot fields above retain historical Preview and migration observations; the dated cutover update records the later Production state."
   ]

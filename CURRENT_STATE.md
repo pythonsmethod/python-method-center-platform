@@ -1,5 +1,21 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Monthly Checkout Live smoke — 2026-09-28 PDT — PREPAID PATH VERIFIED
+
+The authenticated owner personally checked both required legal-consent boxes.
+A no-charge Live Checkout transition for six prepaid Personal Support periods
+opened Stripe Hosted Checkout, displaying 7,800 USD due today for 180 days,
+the gift formula and included delivery, and no automatic renewal. Stripe
+readback confirmed `livemode=true`, `mode=payment`, `amount_total=780000`,
+`status=open` and `payment_status=unpaid`. The Checkout cancel link returned to
+`https://pythonmethodcenter.com/payment`; its success URL also targets the
+Production domain. No card details were entered and no Live payment occurred.
+The initially automated renewal-checkbox change did not persist to application
+state, so this session proves the prepaid-only path, not the renewal path.
+The page reset legal consent after return. A renewed owner consent and a
+separate no-charge embedded-renewal check remain outstanding, as do a real
+paid success return and first real renewal.
+
 ## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, LEGACY LINKS RETIRED
 
 PR #216 was merged into `main` as `fba352419d71831ad5363601b5a2ae35cdd69359`;
@@ -23,8 +39,9 @@ Portal configurations remain active, with card updates, invoice history and
 cancel-at-period-end enabled. Public RU/EN payment pages show the new prices,
 duration selector and renewal choice. An existing owner account was later
 confirmed authenticated in the browser; the two required legal consent boxes
-were not accepted, so no-charge transition into Live Checkout remains
-unverified. No real Live payment or return was tested.
+were not accepted at that readback, so no-charge transition into Live Checkout
+was then unverified. See the newer prepaid-only smoke result above. No real
+Live payment or success return was tested.
 
 The owner updated the official Stripe connection's Live Payment Links
 permission from Read to Write after its initial `PostPaymentLinksPaymentLink`
@@ -35,7 +52,8 @@ denial. Only the three identified 5-week/100-day Live links
 independently read back inactive. The old direct URLs no longer accept new
 sales. Historical purchases and existing subscriptions remain intact. No
 tax registration, rate or business address changed. An authenticated,
-no-charge Live Checkout transition and real payment/return remain unverified.
+no-charge Live Checkout transition and real payment/return were unverified at
+cutover; the later prepaid-only transition and cancel return are recorded above.
 
 ## ANHAM Karen philosophy — 2026-09-27 — TEXT AND VOICE RELEASED
 
