@@ -10,6 +10,10 @@ official Stripe connection-management flow; do not use a different key or
 interface to evade the denial. Preserve historical purchases and existing
 subscriptions. The new public payment page does not present retired plans,
 but an old direct link remains usable until Stripe confirms `active=false`.
+The owner subsequently granted only Payment Links Write for the Live account
+through that official flow. The three identified retired links were then
+updated and independently read back `active=false`; no other Payment Links,
+historical purchases or subscriptions were changed.
 
 ## PMC-BILLING-2026-09-27-01 — Launch with existing tax collection setting
 

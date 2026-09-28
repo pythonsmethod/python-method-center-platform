@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## Monthly Checkout production cutover — 2026-09-27 PDT — PARTIAL, LEGACY LINKS ACTIVE
+## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, LEGACY LINKS RETIRED
 
 PR #216 was merged into `main` as `fba352419d71831ad5363601b5a2ae35cdd69359`;
 its included base PR #215 is also marked merged. Production deployment
@@ -21,13 +21,16 @@ duration selector and renewal choice. No production buyer was authenticated
 for an actual no-charge transition into Live Checkout, and no real payment
 or return was tested.
 
-Three retired 5-week/100-day Live Payment Links are still `active=true`.
-The official Stripe connection rejected `PostPaymentLinksPaymentLink` with
-insufficient permissions before any link was changed. The owner must grant
-Payment Link write permission through Stripe's official connection-management
-flow; do not bypass the refusal with a different key or interface. Until then,
-the old links must not be reported as retired and the release is partial.
-No tax registration, rate, business address or existing subscription changed.
+The owner updated the official Stripe connection's Live Payment Links
+permission from Read to Write after its initial `PostPaymentLinksPaymentLink`
+denial. Only the three identified 5-week/100-day Live links
+(`plink_1UDfUHE6esfE5qRjw8KrqTM7`,
+`plink_1TwF0iE6esfE5qRj18cUVWU7`,
+`plink_1TwDYFE6esfE5qRjQcTCRkjA`) were changed to `active=false` and
+independently read back inactive. The old direct URLs no longer accept new
+sales. Historical purchases and existing subscriptions remain intact. No
+tax registration, rate or business address changed. An authenticated,
+no-charge Live Checkout transition and real payment/return remain unverified.
 
 ## Monthly Checkout release preparation — 2026-09-27 PDT — HISTORICAL PRE-CUTOVER
 

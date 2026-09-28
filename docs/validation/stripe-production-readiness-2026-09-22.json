@@ -1,8 +1,8 @@
 {
-  "checkedOn": "2026-09-24",
+  "checkedOn": "2026-09-27",
   "ownerAuthorizedProductionLaunch": true,
-  "releaseStatus": "HOLD",
-  "published": false,
+  "releaseStatus": "LIVE_WITH_FOLLOWUP",
+  "published": true,
   "productionDatabase": {
     "projectId": "zdrfttgwnyorifmpqgwe",
     "migration": "supabase/migrations/20260919123000_personal_support_billing.sql",
@@ -59,15 +59,14 @@
         "checkout.session.async_payment_succeeded",
         "checkout.session.async_payment_failed",
         "payment_intent.payment_failed",
-        "charge.refunded"
-      ],
-      "missingRecurringEvents": [
+        "charge.refunded",
         "invoice.paid",
         "invoice.payment_failed",
         "customer.subscription.updated",
         "customer.subscription.deleted"
       ],
-      "modified": false
+      "missingRecurringEvents": [],
+      "modified": true
     }
   },
   "vercel": {
@@ -81,7 +80,7 @@
     "browserAuthenticated": true,
     "environmentWriteAvailableInConnector": false,
     "preparedProductionEnvironment": {
-      "STRIPE_CHECKOUT_ENABLED": "false; do not enable until acceptance",
+      "STRIPE_CHECKOUT_ENABLED": "true; Production deployment READY",
       "STRIPE_CHECKOUT_MODE": "live",
       "STRIPE_CHECKOUT_RETURN_ORIGIN": "https://pythonmethodcenter.com",
       "STRIPE_CHECKOUT_AUTOMATIC_TAX": "false"
@@ -111,21 +110,24 @@
     {
       "id": "plink_1UDfUHE6esfE5qRjw8KrqTM7",
       "description": "Сопровождение 100 дней",
-      "activeOnReview": true
+      "activeOnReview": true,
+      "activeAfterCutover": false
     },
     {
       "id": "plink_1TwF0iE6esfE5qRj18cUVWU7",
       "description": "Сопровождение 100 дней",
-      "activeOnReview": true
+      "activeOnReview": true,
+      "activeAfterCutover": false
     },
     {
       "id": "plink_1TwDYFE6esfE5qRjQcTCRkjA",
       "description": "Сопровождение 5 недель",
-      "activeOnReview": true
+      "activeOnReview": true,
+      "activeAfterCutover": false
     }
   ],
   "cutoverUpdate2026_09_27": {
-    "status": "partial; three legacy direct links remain active",
+    "status": "live; three legacy direct links retired; authenticated Live Checkout transition unverified",
     "mergedPullRequests": [215, 216],
     "mainCommit": "fba352419d71831ad5363601b5a2ae35cdd69359",
     "productionDeploymentId": "dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr",
@@ -144,18 +146,18 @@
     "publicPaymentPagesVerified": ["/payment", "/en/payment"],
     "liveTestPurchaseMade": false,
     "liveCheckoutTransitionVerified": false,
-    "legacyDirectLinksActive": [
+    "legacyDirectLinksRetired": [
       "plink_1UDfUHE6esfE5qRjw8KrqTM7",
       "plink_1TwF0iE6esfE5qRj18cUVWU7",
       "plink_1TwDYFE6esfE5qRjQcTCRkjA"
     ],
-    "legacyLinkRetirementBlocker": "Stripe connector denied PostPaymentLinksPaymentLink; official Payment Link write reconsent needed"
+    "legacyLinkRetirementBlocker": null,
+    "retirementMethod": "official Stripe connector after owner granted Live Payment Links Write",
+    "legacyDirectLinksReadBackInactive": true
   },
   "remaining": [
-    "Isolated Preview and signed Sandbox webhook passed paid assessment, one-period renewal, six-period prepaid-only, 12-period exact entitlement, final Portal cancellation, authenticated Checkout/consent and later owner-approved failed-renewal acceptance. The declined 1300 USD invoice produced past_due without extending access or creating a gift task; see stripe-sandbox-failed-renewal-2026-09-25.json.",
-    "The copy revision removes the unverified claim that Stripe calculates taxes at Checkout and advances the offer to v10. It passed 2057 local tests, typecheck, lint, security check, build, GitHub CI and READY Preview; RU/EN route switching and 390x844 mobile rendering were verified. The six-period charge used the earlier v9 consent.",
-    "Add the four recurring events to the existing Live webhook after the handler is deployed; preserve the original events, URL, signing secret and API version. Then verify production runtime, merge and verify the public deployment.",
-    "Tax classification and any external seller registration are not established. The owner deferred tax setup; do not imply that Stripe Tax disabled means no tax obligation.",
-    "Deactivate retired sale links only as part of the verified launch; preserve history and existing subscriptions."
+    "An authenticated, no-charge transition into Live Checkout and the production-domain return have not been verified. No Live test purchase or charge was made.",
+    "Tax classification and any external seller registration are not established. The owner retained the prior disabled automatic-tax setting; do not imply that this settles legal tax obligations.",
+    "The 2026-09-24 snapshot fields above retain historical Preview and migration observations; the dated cutover update records the later Production state."
   ]
 }
