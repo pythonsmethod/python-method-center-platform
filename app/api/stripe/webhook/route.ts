@@ -22,6 +22,7 @@ import { ensureCheckoutPrice } from "@/lib/payments/checkout-catalog";
 import { ensureThirtyDayRenewalSchedule } from "@/lib/payments/renewal-schedule";
 import { paidSubscriptionInvoicePeriod } from "@/lib/payments/stripe-invoice-period";
 import { ensureCaseForPaidProfile } from "@/lib/cases/ensure-paid-case";
+import { localSubscriptionStatus } from "@/lib/payments/subscription-status";
 
 export const runtime = "nodejs";
 
@@ -770,7 +771,7 @@ async function handlePaidSubscriptionInvoice(
     });
   }
 
-  await supabase
+  const { error: subscriptionUpdateError } = await supabase
     .from("billing_subscriptions")
     .update({
       status: "active",
@@ -779,6 +780,11 @@ async function handlePaidSubscriptionInvoice(
       current_period_end: stripePeriod.endsAt.toISOString()
     })
     .eq("stripe_subscription_id", subscriptionId);
+  // Payment and period are already stored idempotently; a retry only
+  // repeats this update.
+  if (subscriptionUpdateError) {
+    throw new Error(`subscription renewal update failed: ${subscriptionUpdateError.message}`);
+  }
 
   await awardReferralTokensForPayment({
     payerProfileId: subscription.profile_id,
@@ -833,22 +839,25 @@ async function syncSubscriptionState(
   supabase: ServiceClient,
   subscription: Stripe.Subscription
 ) {
-  const status =
-    subscription.status === "canceled"
-      ? "cancelled"
-      : subscription.status === "trialing" ||
-          subscription.status === "active" ||
-          subscription.status === "past_due" ||
-          subscription.status === "paused" ||
-          subscription.status === "unpaid" ||
-          subscription.status === "incomplete"
-        ? subscription.status
-        : "active";
+  const status = localSubscriptionStatus(subscription.status);
+  if (!status) {
+    await notifyTeam({
+      kind: "processing_error",
+      dedupeKey: `subscription-status-unknown:${subscription.id}:${subscription.status}`,
+      title: "Неизвестный статус подписки Stripe",
+      lines: [`Subscription: ${subscription.id}`, `Статус: ${subscription.status}`, "Статус в базе не изменён."],
+      link: adminLink("/admin/cases")
+    });
+    return;
+  }
 
-  await supabase
+  const { error } = await supabase
     .from("billing_subscriptions")
     .update({ status })
     .eq("stripe_subscription_id", subscription.id);
+  // Throw → the event is released and Stripe retries, instead of the change
+  // being silently lost.
+  if (error) throw new Error(`subscription status sync failed: ${error.message}`);
 }
 
 async function handleRefund(
