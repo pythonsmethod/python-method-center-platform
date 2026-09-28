@@ -425,7 +425,7 @@ export default async function StaffCaseDetailPage({
               <ReprocessCaseDocumentsForm
                 caseId={clientCase.id}
                 queuedDocumentCount={documents.filter(
-                  (document) => document.document_status === "queued"
+                  (document) => document.document_status === "queued" || document.document_status === "processing"
                 ).length}
                 locale={locale}
               />

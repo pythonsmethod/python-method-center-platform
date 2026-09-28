@@ -34,18 +34,20 @@ export async function createPaymentCheckout(raw: unknown): Promise<CheckoutResul
         .select("stripe_customer_id, status").eq("profile_id", user.id)
         .neq("status", "cancelled").limit(1).maybeSingle();
       if (error) return { error: "unavailable" };
-      if (input.autoRenew && existing) return { error: "subscription-exists" };
+      // Any live subscription blocks another Personal Support purchase: an extra
+      // prepaid term would overlap the next Stripe renewal period, and that
+      // renewal would then be charged without opening access.
+      if (existing) return { error: "subscription-exists" };
       if (input.autoRenew) {
         // Stripe starts its prepaid subscription today. A prior paid support
         // term would make its first renewal precede the end of access.
         const { data: activePeriod, error: periodError } = await supabase.from("service_periods")
           .select("id").eq("profile_id", user.id).eq("status", "active")
-          .in("product", ["personal_support", "support_5_weeks", "support_15_weeks"])
+          .in("product", ["personal_support", "support_5_weeks", "support_15_weeks", "test_access"])
           .gt("ends_at", new Date().toISOString()).limit(1).maybeSingle();
         if (periodError) return { error: "unavailable" };
         if (activePeriod) return { error: "period-active" };
       }
-      customerId = existing?.stripe_customer_id ?? null;
     }
 
     // Persist both explicit consents and the exact renewal/term selection before
