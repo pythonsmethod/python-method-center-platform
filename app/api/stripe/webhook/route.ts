@@ -22,6 +22,7 @@ import { ensureCheckoutPrice } from "@/lib/payments/checkout-catalog";
 import { ensureThirtyDayRenewalSchedule } from "@/lib/payments/renewal-schedule";
 import { paidSubscriptionInvoicePeriod } from "@/lib/payments/stripe-invoice-period";
 import { ensureCaseForPaidProfile } from "@/lib/cases/ensure-paid-case";
+import { claimStripeEvent, markStripeEventProcessed } from "@/lib/payments/webhook-ledger";
 import { localSubscriptionStatus } from "@/lib/payments/subscription-status";
 import { refundReferenceCandidates, refundStatus } from "@/lib/payments/refund";
 
@@ -76,16 +77,16 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "service-unavailable" }, { status: 500 });
   }
 
-  // Insert-first idempotency: a redelivered event id is a no-op.
-  const { error: ledgerError } = await supabase
-    .from("stripe_events")
-    .insert({ id: event.id, type: event.type });
-
-  if (ledgerError) {
-    if (ledgerError.code === "23505") {
-      return NextResponse.json({ received: true, duplicate: true });
-    }
-
+  // Claim the event. Only a finished event is a duplicate; an abandoned claim
+  // (function killed mid-way) expires so Stripe's retry can finish the work.
+  const claim = await claimStripeEvent(supabase, event);
+  if (claim === "duplicate") {
+    return NextResponse.json({ received: true, duplicate: true });
+  }
+  if (claim === "in-progress") {
+    return NextResponse.json({ error: "event-in-progress" }, { status: 409 });
+  }
+  if (claim === "unavailable") {
     return NextResponse.json({ error: "ledger-unavailable" }, { status: 500 });
   }
 
@@ -162,6 +163,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "processing-failed" }, { status: 500 });
   }
 
+  await markStripeEventProcessed(supabase, event.id);
   return NextResponse.json({ received: true });
 }
 

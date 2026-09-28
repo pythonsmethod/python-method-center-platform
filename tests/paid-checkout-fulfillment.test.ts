@@ -26,9 +26,13 @@ const beforeSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
 function db() {
   return { from: (table: string) => {
-    if (table === "stripe_events") return { insert: async () => ({
-      error: mocks.ledgerDuplicate ? { code: "23505" } : null
-    }) };
+    if (table === "stripe_events") return {
+      insert: async () => ({ error: mocks.ledgerDuplicate ? { code: "23505" } : null }),
+      select: () => ({ eq: () => ({ maybeSingle: async () => ({
+        data: { created_at: "2026-09-24T21:38:07Z", processed_at: "2026-09-24T21:38:09Z" }, error: null
+      }) }) }),
+      update: () => ({ eq: async () => ({ error: null }) })
+    };
     if (table === "profiles") return { select: () => ({ eq: () => ({
       maybeSingle: async () => ({ data: { id: profileId }, error: null })
     }) }) };
