@@ -18,7 +18,9 @@ export function getReprocessingCopy(locale: "ru" | "en") {
         processing: (done: number, total: number) =>
           `Обработано в этом запуске: ${done} из ${total}.`,
         complete: (done: number) => `Повторная обработка завершена: ${done}.`,
-        failed: "Не удалось завершить повторную обработку. Попробуйте ещё раз или проверьте очередь."
+        pendingReview: (done: number, total: number) =>
+          `Готово ${done} из ${total}. Остальные файлы ещё в очереди или ожидают повтора. Проверьте статусы ниже и продолжите очередь.`,
+        failed: "Один из файлов требует внимания или обработка прервалась. Проверьте статусы файлов перед повторным запуском."
       }
     : {
         label: "Reprocessing",
@@ -38,6 +40,8 @@ export function getReprocessingCopy(locale: "ru" | "en") {
         processing: (done: number, total: number) =>
           `Processed in this run: ${done} of ${total}.`,
         complete: (done: number) => `Reprocessing completed: ${done}.`,
-        failed: "Reprocessing could not be completed. Try again or check the queue."
+        pendingReview: (done: number, total: number) =>
+          `${done} of ${total} ready. The remaining files are queued or awaiting a retry. Check their status below and continue the queue.`,
+        failed: "A file needs attention or processing stopped. Check the document statuses before trying again."
       };
 }

@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { getReprocessingCopy } from "@/lib/documents/reprocessing-copy";
+import { drainCaseReprocessing, type ReprocessingStep } from "@/lib/documents/reprocessing-progress";
 import {
   reprocessCaseDocumentsAction,
   type ReprocessCaseActionState
@@ -33,14 +34,15 @@ export function ReprocessCaseDocumentsForm({
     initialReprocessCaseActionState
   );
   const [progress, setProgress] = useState<string | null>(null);
+  const [running, setRunning] = useState(false);
   const [resumeRun, setResumeRun] = useState<{ runId: string; queuedCount: number } | null>(null);
   const [armed, setArmed] = useState(false);
   const startedRun = useRef<string | null>(null);
 
   useEffect(() => {
-    const run = state.status === "queued" && state.runId
+    const run = resumeRun ?? (state.status === "queued" && state.runId
       ? { runId: state.runId, queuedCount: state.queuedCount }
-      : resumeRun;
+      : null);
 
     if (!run || run.queuedCount < 1 || startedRun.current === run.runId) {
       return;
@@ -52,36 +54,32 @@ export function ReprocessCaseDocumentsForm({
 
     async function processQueuedDocuments() {
       setProgress(copy.queued(activeRun.queuedCount));
-      let completed = 0;
+      setRunning(true);
 
       try {
-        for (let index = 0; index < activeRun.queuedCount; index += 1) {
+        const result = await drainCaseReprocessing(activeRun.queuedCount, async () => {
           const response = await fetch("/api/documents/process", {
             method: "POST",
             headers: { "content-type": "application/json" },
             body: JSON.stringify({ caseId })
           });
           if (!response.ok) throw new Error("Processing request failed");
-
-          const result = await response.json() as { status?: string };
-          if (result.status === "idle") break;
-
-          completed += 1;
-          if (!cancelled) {
-            setProgress(copy.processing(completed, activeRun.queuedCount));
-          }
-        }
+          const payload = await response.json() as { status?: string };
+          return (payload.status ?? "failed") as ReprocessingStep;
+        }, (ready) => {
+          if (!cancelled) setProgress(copy.processing(ready, activeRun.queuedCount));
+        }, () => cancelled);
 
         if (!cancelled) {
-          setProgress(
-            completed === activeRun.queuedCount
-              ? copy.complete(completed)
-              : copy.failed
-          );
+          setProgress(result.outcome === "ready" ? copy.complete(result.ready)
+            : result.outcome === "pending" ? copy.pendingReview(result.ready, activeRun.queuedCount)
+            : copy.failed);
           router.refresh();
         }
       } catch {
         if (!cancelled) setProgress(copy.failed);
+      } finally {
+        if (!cancelled) setRunning(false);
       }
     }
 
@@ -96,7 +94,7 @@ export function ReprocessCaseDocumentsForm({
       <span className="panel__label">{copy.label}</span>
       <h2>{copy.title}</h2>
       <p>{copy.description}</p>
-      {queuedDocumentCount > 0 && !progress ? (
+      {queuedDocumentCount > 0 && !running ? (
         <div>
           <p>{copy.resumeDescription}</p>
           <button
