@@ -1,3 +1,5 @@
+import { isOncologyAnalyte, resolveAnalyteLabel } from "@/lib/analysis/analyte-labels";
+
 export type ParsedNumeric = {
   numeric: number | null;
   comparator: "<" | ">" | "<=" | ">=" | null;
@@ -10,6 +12,10 @@ function canonicalNumberText(value: string): string {
 export function parseNumericValue(value: string): ParsedNumeric {
   const match = canonicalNumberText(value).match(/^(<=|>=|<|>|≤|≥)?([+-]?(?:\d+(?:\.\d*)?|\.\d+)(?:e[+-]?\d+)?)$/i);
   if (!match) return { numeric: null, comparator: null };
+  // A single separator followed by exactly three digits may denote a
+  // thousands group. The interface language cannot settle it.
+  const unsigned = value.trim().replace(/^(?:<=|>=|<|>|≤|≥)\s*/, "").replace(/^[+-]/, "");
+  if (/^[1-9]\d{0,2}[.,]\d{3}$/.test(unsigned)) return { numeric: null, comparator: null };
   const numeric = Number(match[2]);
   const rawComparator = match[1] ?? null;
   const comparator = rawComparator === "≤" ? "<=" : rawComparator === "≥" ? ">=" : rawComparator;
@@ -80,7 +86,9 @@ const TEST_NAMES: Record<string, string> = {
 
 export function normalizeTestName(value: string): string | null {
   const key = normalizeWhitespace(value).toLowerCase().replace(/[._]/g, " ").replace(/\s+/g, " ");
-  return TEST_NAMES[key] ?? null;
+  if (TEST_NAMES[key]) return TEST_NAMES[key];
+  const label = resolveAnalyteLabel(value);
+  return label.status === "resolved" && isOncologyAnalyte(label.analyte) ? label.analyte : null;
 }
 
 const SAFE_UNITS: Record<string, string> = {
@@ -88,6 +96,19 @@ const SAFE_UNITS: Record<string, string> = {
   "g/l": "g/L",
   "mg/l": "mg/L",
   "ng/ml": "ng/mL",
+  "нг/мл": "ng/mL",
+  "pg/ml": "pg/mL",
+  "пг/мл": "pg/mL",
+  "ug/l": "ug/L",
+  "мкг/л": "ug/L",
+  "u/ml": "U/mL",
+  "ед/мл": "U/mL",
+  "iu/ml": "IU/mL",
+  "ме/мл": "IU/mL",
+  "miu/ml": "mIU/mL",
+  "мме/мл": "mIU/mL",
+  "iu/l": "IU/L",
+  "ме/л": "IU/L",
   "mmol/l": "mmol/L",
   "u/l": "U/L",
   "ед/л": "U/L",
@@ -107,6 +128,6 @@ const SAFE_UNITS: Record<string, string> = {
 };
 
 export function normalizeUnit(value?: string | null): string | null {
-  const key = normalizeWhitespace(value ?? "").toLowerCase().replace(/µ/g, "u");
+  const key = normalizeWhitespace(value ?? "").toLowerCase().replace(/[µμ]/g, "u");
   return SAFE_UNITS[key] ?? null;
 }

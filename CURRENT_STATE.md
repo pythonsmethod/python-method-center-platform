@@ -1,5 +1,34 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC document chain on current application — 2026-09-27 PDT — RELEASE CANDIDATE, NOT LIVE
+
+The existing eleven-step PMC source → extraction → review → approved response path and
+the review-only oncology marker recognition were merged locally onto current application
+`main` `f6db4e3`, retaining its newer account, billing and ANHAM changes. The formerly
+broken local Git worktree was reconstructed against the published PMC branch; the
+integration uses the same Case, source, jobs, evidence and staff knowledge store.
+An onboarding test fixture was updated for the newer complete profile defaults.
+
+Local verification: 285/285 PMC-chain tests, 24/24 onboarding and oncology tests,
+82/82 related ANHAM/approval tests and 55/55 document/lab package contracts,
+TypeScript, ESLint, security check, dependency audit and production build pass.
+The current-main review-learning test initially failed on an obsolete direct
+insert assertion; it now checks the atomic approval RPC and version guard.
+Synthetic benchmark:
+three documents/four pages, zero critical extraction errors, zero false VERIFIED and
+zero security issues. This is not a clinical accuracy claim. Production schema has
+none of the four PMC-chain migrations or its RPCs; read-only inventory shows 72 active
+documents, no queued jobs, four existing internal reviews and no approval events.
+No production migration, deployment, document reprocessing, Karen decision or client
+publication has occurred. Applying the migrations and releasing the merged processing
+path would affect new live uploads, so production activation remains NO-GO until the
+bounded role and source acceptance described in
+[the integration record](docs/ankh/pmc_live_integration_2026_09_28.md).
+Automatic approval review rejected publishing the prepared `e64b301` branch to the
+public PMC GitHub repository: this request did not explicitly authorize disclosure
+of the source code to that destination. No push, PR or Preview was made, and no
+alternate publication route is permitted without that exact approval.
+
 ## ANHAM Karen philosophy — 2026-09-27 — TEXT AND VOICE RELEASED
 
 Owner-authorized communication profile v1.0.0 is connected to the existing

@@ -14,7 +14,6 @@ import { writeAuditLog } from "@/lib/audit/log";
 import { getLocale } from "@/lib/i18n/locale";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
-import { enqueueDocumentProcessing } from "@/lib/documents/processing";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { revalidatePath } from "next/cache";
 
@@ -133,32 +132,23 @@ export async function recordUploadedDocumentMetadata(
     return errorState(t.notStored);
   }
 
-  const { data: document, error: documentError } = await supabase
-    .from("uploaded_documents")
-    .insert({
-      id: input.documentId,
-      profile_id: user.id,
-      case_id: input.caseId,
-      document_type: "other",
-      status: "uploaded",
-      document_status: "uploaded",
-      storage_path: input.storagePath,
-      original_filename: input.originalFilename,
-      metadata: {
-        storage_bucket: DOCUMENT_STORAGE_BUCKET,
-        mime_type: validation.mimeType,
-        file_size: input.fileSize,
-        uploaded_via: "client_cabinet",
-        storage_path_version: "user_case_document_filename_v1"
-      }
-    })
-    .select(
-      "id, profile_id, case_id, document_type, status, document_status, storage_path, original_filename, metadata, created_at"
-    )
-    .single();
-
-  if (documentError) {
-    return errorState(documentError.message);
+  const service = createSupabaseServiceClient();
+  if (!service) return errorState(locale === "en" ? "The processing queue is unavailable. Your original file is retained." : "Очередь обработки недоступна. Оригинал файла сохранён.");
+  const registration = await service.rpc("register_pmc_document", { p_document: {
+    id: input.documentId, profile_id: user.id, case_id: input.caseId,
+    storage_path: input.storagePath, original_filename: input.originalFilename,
+    metadata: { storage_bucket: DOCUMENT_STORAGE_BUCKET, mime_type: validation.mimeType,
+      file_size: input.fileSize, uploaded_via: "client_cabinet", storage_path_version: "user_case_document_filename_v1" }
+  } });
+  // Reconcile an unknown network outcome before declaring failure or retrying.
+  const readback = await service.from("uploaded_documents")
+    .select("id,profile_id,case_id,document_type,status,document_status,storage_path,original_filename,metadata,created_at")
+    .eq("id", input.documentId).eq("case_id", input.caseId).eq("profile_id", user.id).maybeSingle();
+  const queuedJob = await service.from("document_processing_jobs").select("id").eq("document_id", input.documentId).eq("profile_id", user.id).maybeSingle();
+  const document = readback.data;
+  if (readback.error || queuedJob.error || !document || !queuedJob.data || document.storage_path !== input.storagePath) {
+    console.error("Document registration incomplete", { code: registration.error?.code ?? "READBACK_FAILED" });
+    return errorState(locale === "en" ? "The original file was uploaded, but processing was not confirmed. Please retry; do not delete the file." : "Оригинал загружен, но постановка на обработку не подтверждена. Повторите попытку; файл не удаляйте.");
   }
 
   await writeAuditLog({
@@ -176,19 +166,7 @@ export async function recordUploadedDocumentMetadata(
     }
   });
 
-  const queued = await enqueueDocumentProcessing({
-    documentId: document.id,
-    caseId: input.caseId,
-    profileId: user.id
-  });
-
-  return {
-    status: "success",
-    document: {
-      ...document,
-      document_status: queued ? "queued" : document.document_status
-    } as UploadedDocument
-  };
+  return { status: "success", document: document as UploadedDocument };
 }
 
 export async function deleteOwnDocument(documentId: string): Promise<{ status: "success" | "error"; message: string }> {

@@ -1,3 +1,4 @@
+import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 import { getStaffCaseDetail } from "@/lib/cases/staff-queries";
 import { isClassificationEvent } from "@/lib/cases/activity";
 import { getCaseReview } from "@/lib/cases/review-queries";
@@ -26,6 +27,13 @@ export async function buildCaseSources(caseId: string): Promise<AssistantSource[
   add({ id: "questionnaire", kind: "user_report", origin: "onboarding_submissions", availability: submission ? "available" : "absent", recordedAt: submission?.submitted_at ?? null, scope: "client's own report; payload excerpt up to 4000 characters", data: submission ? { status: submission.status, payload_excerpt: JSON.stringify(submission.payload).slice(0, 4000) } : null });
   const documents = detail.uploaded_documents ?? [];
   add({ id: "documents", kind: "system_record", origin: "uploaded_documents", availability: documents.length ? "available" : "absent", freshness: "current_snapshot", scope: "selected Case inventory; up to 30 metadata rows shown; metadata_only, file contents not read", data: { inventory_count: documents.length, rows: documents.slice(0, 30).map((doc) => ({ id: doc.id, name: doc.original_filename, document_status: doc.document_status, created_at: doc.created_at })) } });
+  const reading = await getCaseAnalyticalPicture(detail.id);
+  const evidence = reading.status === "ready" ? reading.picture.extractedEvidence : [];
+  const visible = evidence.slice(0, 150);
+  add({ id: "document_facts", kind: "system_record", origin: "document_extractions", availability: reading.status === "ready" ? "available" : "unavailable",
+    freshness: "current_snapshot", scope: "Stored source readings, not VERIFIED medical facts. Document/page/excerpt are source anchors. Respect review decisions. A partial selection is not the whole Case.",
+    data: { total_count: evidence.length, displayed_count: visible.length, complete: visible.length === evidence.length, rows: visible,
+      missing_context: reading.status === "ready" ? reading.picture.missingContext : [], continuation: visible.length < evidence.length ? { tool: "read_case_document_evidence", offset: visible.length, limit: 40 } : null, delivery: visible.length < evidence.length ? "PARTIAL_USE_CONTINUATION" : "COMPLETE" } });
   const review = await getCaseReview(detail.id, documents);
   add({ id: "ai_review", kind: "ai_draft", origin: "case_ai_reviews.summary", availability: review ? "available" : "unavailable", recordedAt: review?.createdAt ?? null, humanReviewed: false, freshness: review?.isCurrent ? "unknown" : "historical", scope: "AI summary only; never source facts or a Karen decision, even if another field has approval", data: review ? { text: review.summary, documents_count: review.documentsCount, matches_current_inventory: review.isCurrent } : null });
   // Approval belongs only to approvedText, never to the separate AI summary.

@@ -1,5 +1,28 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## PMC document chain and oncology knowledge — current-main integration
+
+- [x] Recover local PMC chain and marker changes and merge them with current
+      application `main` without replacing its newer account, billing and ANHAM work.
+- [x] Pass local PMC-chain, oncology and onboarding tests, typecheck, ESLint,
+      security check, synthetic benchmark and production build.
+- [ ] Explicitly authorize publication of the prepared integration branch
+      (code commit `e64b301` plus test/report follow-ups) to the public repository
+      `pythonsmethod/python-method-center-platform`, branch
+      `feature/pmc-document-chain-live-integration`. Automatic approval review
+      rejected the push; do not bypass it through another tool.
+- [ ] Verify the integrated candidate in the isolated PMC Preview with the
+      existing fictional source, including Karen evidence decisions, internal
+      draft/approval, distinct publication and client readback in RU and EN.
+- [ ] Review the production schema/RLS impact and apply the four additive
+      migrations only for a separately accepted production release. Existing
+      production documents and drafts must remain intact.
+- [ ] Release the exact accepted code through the protected PMC repository and
+      verify live role access and saved outcomes; do not enable automatic
+      VERIFIED or diagnosis from oncology markers.
+
+[Integration evidence and limits](docs/ankh/pmc_live_integration_2026_09_28.md).
+
 ## ANHAM philosophical communication — 2026-09-27
 
 - [x] Connect one source-labeled RU/EN communication profile to existing text,

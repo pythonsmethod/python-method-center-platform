@@ -1,5 +1,18 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-27-01 — Integrate on current PMC without widening clinical trust
+
+The owner requested the existing eleven-step document chain in the working Python
+Method Center and the oncology-marker knowledge in its local new chain. Keep one
+PMC Case, source store, job and review history; merge into the current application
+rather than overwrite newer main changes. Marker recognition and internal questions
+remain review-only. A successful code build does not authorize production PHI
+processing, automatic VERIFIED, a diagnosis or publication on Karen's behalf.
+The four isolated-stage migrations are absent in production and their source/RLS
+boundary affects live uploads, so release requires an exact candidate Preview,
+role acceptance and a separately checked production schema step. No NEXORA
+migration. [Record](docs/ankh/pmc_live_integration_2026_09_28.md).
+
 ## NX-04-ANHAM-PHILOSOPHY-20260927 — Karen's values are a shared PMC communication profile
 
 The owner authorized implementation of the prepared philosophy material in
