@@ -1,5 +1,38 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, LEGACY LINKS RETIRED
+
+PR #216 was merged into `main` as `fba352419d71831ad5363601b5a2ae35cdd69359`;
+its included base PR #215 is also marked merged. The cutover deployment
+`dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr` was READY. Subsequent `main` deployment
+`dpl_BSrWKBqRxVVW42DqGAqtkozErT3A` is READY on
+`https://pythonmethodcenter.com` with `STRIPE_CHECKOUT_ENABLED=true`,
+`STRIPE_CHECKOUT_MODE=live`, the canonical return origin and
+`STRIPE_CHECKOUT_AUTOMATIC_TAX=false`. The existing Live webhook retained its
+URL, API version and five prior events while adding `invoice.paid`,
+`invoice.payment_failed`, `customer.subscription.updated` and
+`customer.subscription.deleted`. No Live test purchase was made.
+
+Live catalog readback confirmed all 24 RU/EN initial recurring prices for
+1–12 prepaid periods with exact `130000 × N` cents and `30 × N`-day intervals,
+plus the 299 USD assessment and 1300 USD one-time/renewal prices. Both Live
+Portal configurations remain active, with card updates, invoice history and
+cancel-at-period-end enabled. Public RU/EN payment pages show the new prices,
+duration selector and renewal choice. No production buyer was authenticated
+for an actual no-charge transition into Live Checkout, and no real payment
+or return was tested.
+
+The owner updated the official Stripe connection's Live Payment Links
+permission from Read to Write after its initial `PostPaymentLinksPaymentLink`
+denial. Only the three identified 5-week/100-day Live links
+(`plink_1UDfUHE6esfE5qRjw8KrqTM7`,
+`plink_1TwF0iE6esfE5qRj18cUVWU7`,
+`plink_1TwDYFE6esfE5qRjQcTCRkjA`) were changed to `active=false` and
+independently read back inactive. The old direct URLs no longer accept new
+sales. Historical purchases and existing subscriptions remain intact. No
+tax registration, rate or business address changed. An authenticated,
+no-charge Live Checkout transition and real payment/return remain unverified.
+
 ## ANHAM Karen philosophy — 2026-09-27 — TEXT AND VOICE RELEASED
 
 Owner-authorized communication profile v1.0.0 is connected to the existing
@@ -20,7 +53,8 @@ catalog use, not deployment of the compiled policy or all-channel compliance.
 The owner explicitly authorized public publication and completing Voice.
 PR #231 merged as `2a32d4d050269f95e5a5ff63045cbdd1546880a9` after the full
 GitHub security/regression workflow and Vercel Preview passed. Production
-`dpl_DoN5AzB6DDaAFP7tREgS6vwVR2Py` is READY and owns pythonmethodcenter.com.
+`dpl_DoN5AzB6DDaAFP7tREgS6vwVR2Py` was READY on pythonmethodcenter.com;
+the later `main` documentation deployment is now the active Production build.
 Realtime staff/client and GPT-Live now consume the released shared profile.
 Current focused tests: 124 passed, including four RU/EN provider-handshake
 cases. Post-release RU support and EN plain-language requests returned 200;
@@ -29,7 +63,7 @@ round trip was not run: this browser has no Production login. Existing voice
 sessions need a normal reconnect. No voice access/configuration was widened.
 See [implementation and source manifest](docs/ankh/anham_karen_philosophy.md).
 
-## Monthly Checkout release preparation — 2026-09-27 PDT — NOT YET LIVE
+## Monthly Checkout release preparation — 2026-09-27 PDT — HISTORICAL PRE-CUTOVER
 
 The owner authorized launching the new model while leaving prior tax
 collection behavior unchanged. All three existing Live support Payment Links
