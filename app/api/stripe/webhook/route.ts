@@ -293,6 +293,14 @@ async function handlePaidSession(
     typeof session.subscription === "string"
       ? session.subscription
       : session.subscription?.id ?? null;
+  // Attach the 30-day renewal schedule before any check that can stop
+  // fulfillment. Otherwise an unmatched payer or a contract alert would leave
+  // Stripe to charge the whole initial N-period price again at renewal.
+  if (product === "personal_support" && stripeSubscriptionId) {
+    const locale = session.metadata?.ui_locale === "en" ? "en" : "ru";
+    const renewalPriceId = await ensureCheckoutPrice(stripe, "renewal", locale);
+    await ensureThirtyDayRenewalSchedule(stripe, stripeSubscriptionId, renewalPriceId);
+  }
   const initialInvoiceId = typeof session.invoice === "string"
     ? session.invoice : session.invoice?.id ?? null;
   const stripePeriod = product === "personal_support" && stripeSubscriptionId
@@ -509,9 +517,6 @@ async function handlePaidSession(
         ? session.customer
         : session.customer?.id ?? null;
 
-    const locale = session.metadata?.ui_locale === "en" ? "en" : "ru";
-    const renewalPriceId = await ensureCheckoutPrice(stripe, "renewal", locale);
-    await ensureThirtyDayRenewalSchedule(stripe, stripeSubscriptionId, renewalPriceId);
     const stripeSubscription = await stripe.subscriptions.retrieve(stripeSubscriptionId);
     const periodEnd = (stripeSubscription.items.data[0] as Stripe.SubscriptionItem & { current_period_end?: number })?.current_period_end;
 

@@ -1,5 +1,22 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Live PMC focus pilot — 2026-09-28
+
+- [x] Merge and deploy PR #237 with an initially empty Case allowlist and
+      keep nonpilot files on the prior worker.
+- [x] Identify one Case by its actual source identity, verify the originals,
+      and pause the enrolled Case before any reprocessing while Karen access is
+      unavailable. Do not put patient identifiers in this public roadmap.
+- [ ] Publish the bounded staff reprocessing-progress repair after review.
+- [ ] Restore the existing Karen account's intended access through a separately
+      authorized Production configuration change and verify the actual UI role.
+- [ ] Resume only the selected pilot Case, re-read its source files, review
+      page coverage and facts with Karen, then separately accept the internal
+      draft, decision and client readback. No automatic trust promotion.
+
+The earlier current-main integration checklist below is historical; PR #237
+supersedes its staging-only deployment entries.
+
 ## PMC document chain and oncology knowledge — current-main integration
 
 - [x] Recover local PMC chain and marker changes and merge them with current
