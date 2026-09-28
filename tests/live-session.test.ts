@@ -49,6 +49,8 @@ describe("Live server session", () => {
     const payload = JSON.parse(m.fetch.mock.calls[0][1].body);
     expect(payload.session.input[0].content[0].text).toBe("Earlier context");
     expect(payload.session.instructions).toContain("founder's private");
+    expect(payload.session.instructions).toContain("ANHAM_KAREN_PHILOSOPHY v1.0.0");
+    expect(payload.session.instructions).toContain("Faith-specific language is opt-in");
   });
   it("keeps transcripts flowing during backend work and returns only the current delegation", async () => {
     let resolveFirst!: (value: object) => void;

@@ -1,3 +1,4 @@
+import { ANHAM_KAREN_PHILOSOPHY } from "./karen-philosophy";
 import { ARCHIVE_RULE } from "./conversation-archive";
 import { createHash, createHmac, randomUUID, timingSafeEqual } from "node:crypto";
 import { NextResponse } from "next/server";
@@ -109,11 +110,12 @@ export async function reserveVoiceSession(actor: VoiceActor, dailyLimit: number)
   }
 }
 export function voicePersona(actor: VoiceActor): string {
-  return actor.scope === "founder"
+  const persona = actor.scope === "founder"
     ? "You are Anham, the founder's private product, platform and operations partner. The founder owns product decisions; Professor Python owns methodology and Case decisions. Do not impersonate Karen."
     : actor.scope === "karen"
       ? "You are Anham, Professor Python / Karen's private secretary and analytical drafting partner. Only Karen makes Case decisions. Distinguish source facts, observed patterns, hypotheses and Karen decisions. Preserve NEEDS_REVIEW and SOURCE_ONLY. All drafts require Karen review."
       : `You are Anham, a personal navigation and organizational assistant for a signed-in ${actor.tier === "client" ? "client with active paid support" : "registered user"}. Help with the cabinet, onboarding, uploads and questions for Professor Python. Never provide medical interpretation to the client. Navigation: /dashboard, /onboarding, /support.`;
+  return `${persona}\n${ANHAM_KAREN_PHILOSOPHY}`;
 }
 export function voiceInstructions(actor: VoiceActor, locale: Locale): string {
   const sharedRules = platformContext() + (isAssistantDelegate(actor.email) ? "\nThe speaker is an owner-authorized assistant delegate, not Anna or Karen. Use neutral address. Assistant permissions match the founder assistant, but do not claim the speaker owns or administers the platform." : "");

@@ -16,7 +16,32 @@
 - [ ] Merge the final release record and close the no-charge Live Checkout
       transition verification; no Live test purchase is authorized.
 
-## Monthly Checkout launch — 2026-09-27 PDT — PRE-CUTOVER RECORD
+## ANHAM philosophical communication — 2026-09-27
+
+- [x] Connect one source-labeled RU/EN communication profile to existing text,
+      Realtime and GPT-Live persona paths, preserving identity and permissions.
+- [x] Preserve the complete source in existing private knowledge records and
+      verify exact reconstruction in Production and active clinical staging.
+- [x] Pass 2,130 local tests / one existing skip, TypeScript, ESLint, the
+      production build and security gate.
+- [x] Activate the approved RU/EN catalog in existing client/staff knowledge;
+      observe its support wording in real Production RU/EN guest replies.
+- [x] Obtain explicit authorization to publish this prepared change to the
+      public repository after auto-review rejected the branch push; the owner
+      also explicitly requested Voice integration and release completion.
+- [x] Pass full remote checks, merge PR #231 and deploy the shared text/Voice
+      policy to Production; verify RU support, EN plain-language behavior and
+      unauthenticated rejection at both Voice endpoints.
+
+The implementation/release is complete. Spoken conversation quality with a
+signed-in account was not tested; provider-payload/role/language coverage and
+Production access-boundary checks do not establish acoustic acceptance.
+
+See [the source manifest and release record](docs/ankh/anham_karen_philosophy.md).
+
+## Monthly Checkout launch — 2026-09-27 PDT — HISTORICAL PRE-CUTOVER
+
+This checklist records the plan before the cutover; the current status is above.
 
 - [x] Owner chose to launch with the previous tax collection setting; verify
       the three Live legacy links and new Production setting all have automatic

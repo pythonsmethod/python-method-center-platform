@@ -1,0 +1,365 @@
+{
+  "version": "1.0.0",
+  "workId": "NX-04-ANHAM-PHILOSOPHY-20260927",
+  "sourceLibraryId": "libfile_7928b46fe27881919c13911d8ed81f2e",
+  "sourceSha256": "73898411cea1610befbdd5c79ba730ce80aecda5aea7d84a3b19c9a7f90aa8dd",
+  "authorizedBy": "Owner instruction in this conversation, 2026-09-27: implement the reviewed communication material in Anham",
+  "scope": "PMC communication profile only; not clinical evidence or approval of individual care",
+  "phrases": [
+    {
+      "id": "A01",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Первый контакт",
+        "en": "First contact"
+      },
+      "ru": "Здесь можно начать с того, что тревожит вас больше всего.",
+      "en": "You can start with what is troubling you most."
+    },
+    {
+      "id": "A02",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Страх",
+        "en": "Fear"
+      },
+      "ru": "Вам не нужно сначала перестать бояться, чтобы получить помощь.",
+      "en": "You do not have to stop being afraid before you can receive help."
+    },
+    {
+      "id": "A03",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Отношение к телу",
+        "en": "Relationship with the body"
+      },
+      "ru": "Ваше тело заслуживает заботы и тогда, когда вы на него сердитесь.",
+      "en": "Your body deserves care even when you feel angry with it."
+    },
+    {
+      "id": "A04",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Неопределённость",
+        "en": "Uncertainty"
+      },
+      "ru": "Когда весь путь пока не виден, можно прояснить ближайший шаг.",
+      "en": "When the whole path is not yet clear, we can clarify the next step."
+    },
+    {
+      "id": "A05",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Темп восстановления",
+        "en": "Pace of recovery"
+      },
+      "ru": "Сегодняшний темп не определяет вашу ценность.",
+      "en": "Your pace today does not determine your worth."
+    },
+    {
+      "id": "A06",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Трудный день",
+        "en": "A difficult day"
+      },
+      "ru": "Трудный день не отменяет того, что вы уже сделали.",
+      "en": "A difficult day does not erase what you have already done."
+    },
+    {
+      "id": "A07",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Самообвинение",
+        "en": "Self-blame"
+      },
+      "ru": "Вы заслуживаете помощи без необходимости доказывать, что всё делали идеально.",
+      "en": "You deserve help without having to prove that you did everything perfectly."
+    },
+    {
+      "id": "A08",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Усталость",
+        "en": "Fatigue"
+      },
+      "ru": "Отдых не нужно заслуживать изнеможением.",
+      "en": "You do not have to earn rest through exhaustion."
+    },
+    {
+      "id": "A09",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Просьба о помощи",
+        "en": "Asking for help"
+      },
+      "ru": "Просить о поддержке — значит дать заботе возможность стать действием.",
+      "en": "Asking for support gives care a chance to become action."
+    },
+    {
+      "id": "A10",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Маленький шаг",
+        "en": "A small step"
+      },
+      "ru": "Большой путь может начинаться с действия, на которое сегодня хватает сил.",
+      "en": "A long journey can begin with an action you have the strength for today."
+    },
+    {
+      "id": "A11",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Регулярность",
+        "en": "Consistency"
+      },
+      "ru": "Пусть забота о себе станет посильной привычкой.",
+      "en": "Let caring for yourself become a manageable habit."
+    },
+    {
+      "id": "A12",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Пропуск плана",
+        "en": "A missed plan"
+      },
+      "ru": "К заботе о себе можно возвращаться без наказания.",
+      "en": "You can return to caring for yourself without punishment."
+    },
+    {
+      "id": "A13",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Питание",
+        "en": "Food"
+      },
+      "ru": "За вашим столом есть место заботе и удовольствию.",
+      "en": "There is room at your table for both care and enjoyment."
+    },
+    {
+      "id": "A14",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Движение",
+        "en": "Movement"
+      },
+      "ru": "Уважать свои сегодняшние возможности — тоже часть пути.",
+      "en": "Respecting what you can do today is also part of the journey."
+    },
+    {
+      "id": "A15",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Ночь и тревога",
+        "en": "Night-time worry"
+      },
+      "ru": "Ночью не обязательно решать всю завтрашнюю жизнь.",
+      "en": "You do not have to solve all of tomorrow tonight."
+    },
+    {
+      "id": "A16",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Анализы",
+        "en": "Lab results"
+      },
+      "ru": "Данные помогают нам задавать точные вопросы; ваша история шире одной цифры.",
+      "en": "Data help us ask precise questions; your story is bigger than one number."
+    },
+    {
+      "id": "A17",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Гнев",
+        "en": "Anger"
+      },
+      "ru": "Вы можете злиться и при этом выбирать, как защитить себя без лишнего вреда.",
+      "en": "You can feel angry and still choose how to protect yourself without unnecessary harm."
+    },
+    {
+      "id": "A18",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Личные границы",
+        "en": "Boundaries"
+      },
+      "ru": "Бережность к другому включает право беречь себя.",
+      "en": "Being considerate of others includes the right to take care of yourself."
+    },
+    {
+      "id": "A19",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Семья",
+        "en": "Family"
+      },
+      "ru": "Забота становится понятнее, когда у неё есть конкретное действие.",
+      "en": "Care becomes clearer when it has a specific action."
+    },
+    {
+      "id": "A20",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Собственный смысл",
+        "en": "Personal meaning"
+      },
+      "ru": "Что в вашей жизни вам особенно хочется сохранить, пока вы проходите этот путь?",
+      "en": "What in your life would you especially like to preserve as you go through this?"
+    },
+    {
+      "id": "A21",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Достоинство",
+        "en": "Dignity"
+      },
+      "ru": "Вам не нужно становиться прежним, чтобы оставаться ценным человеком.",
+      "en": "You do not have to become your former self to remain a person of worth."
+    },
+    {
+      "id": "A22",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Реальные изменения",
+        "en": "Real changes"
+      },
+      "ru": "Давайте замечать то, что действительно изменилось, даже если это пока немного.",
+      "en": "Let us notice what has actually changed, even if it is still a little."
+    },
+    {
+      "id": "A23",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Вера",
+        "en": "Faith"
+      },
+      "ru": "Если вера поддерживает вас, ей есть место в этом разговоре.",
+      "en": "If faith supports you, there is room for it in this conversation."
+    },
+    {
+      "id": "A24",
+      "kind": "editorial",
+      "topic": {
+        "ru": "Честная надежда",
+        "en": "Honest hope"
+      },
+      "ru": "Надежда может идти рядом с правдой о том, что пока неизвестно.",
+      "en": "Hope can coexist with the truth about what is still unknown."
+    }
+  ],
+  "karenQuotes": [
+    {
+      "id": "K01",
+      "kind": "karen_quote",
+      "source": "K-SRC-001: speech supplied by Anna, 2026-09-26; not a personal Case decision",
+      "ru": "Мы должны создать условия.",
+      "en": "We must create the conditions.",
+      "enKind": "working translation, not verbatim English speech",
+      "faithOnly": false
+    },
+    {
+      "id": "K05",
+      "kind": "karen_quote",
+      "source": "K-SRC-001: speech supplied by Anna, 2026-09-26; not a personal Case decision",
+      "ru": "Поэтому наш помощник должен быть сильным, справедливым, честным, а самое главное — очень полезным для человечества.",
+      "en": "Our assistant should be strong, fair, honest and, above all, very useful to humanity.",
+      "enKind": "working translation, not verbatim English speech",
+      "faithOnly": false
+    },
+    {
+      "id": "K07",
+      "kind": "karen_quote",
+      "source": "K-SRC-001: speech supplied by Anna, 2026-09-26; not a personal Case decision",
+      "ru": "С Божьей помощью я верю, что получится.",
+      "en": "With God's help, I believe it will work out.",
+      "enKind": "working translation, not verbatim English speech",
+      "faithOnly": true
+    }
+  ],
+  "foundations": [
+    {
+      "id": "F01",
+      "name": {
+        "ru": "Даосская традиция",
+        "en": "Taoist tradition"
+      },
+      "source": "Tao Teh King, chapter 64, James Legge translation",
+      "url": "https://www.gutenberg.org/files/216/216-h/216-h.htm",
+      "kind": "working translation",
+      "ru": "Путь в тысячу ли начинается с одного шага.",
+      "en": "A journey of a thousand li begins with a single step.",
+      "use": "A manageable beginning; never a promise of recovery.",
+      "faithOnly": false
+    },
+    {
+      "id": "F02",
+      "name": {
+        "ru": "Буддийская традиция",
+        "en": "Buddhist tradition"
+      },
+      "source": "Dhammapada 5, Acharya Buddharakkhita translation",
+      "url": "https://www.accesstoinsight.org/tipitaka/kn/dhp/dhp.01.budd.html",
+      "kind": "paraphrase",
+      "ru": "Ненависть не прекращается ответной ненавистью.",
+      "en": "Answering hatred with hatred does not bring it to an end.",
+      "use": "Voluntary reflection; never require forgiveness or tolerance of abuse.",
+      "faithOnly": false
+    },
+    {
+      "id": "F03",
+      "name": {
+        "ru": "Стоическая традиция",
+        "en": "Stoic tradition"
+      },
+      "source": "Epictetus, Enchiridion 1, Elizabeth Carter translation",
+      "url": "https://classics.mit.edu/Epictetus/epicench.html",
+      "kind": "working translation",
+      "ru": "Одни вещи зависят от нас, другие нет.",
+      "en": "Some things are in our control and others are not.",
+      "use": "Available choices; emotions and medical outcomes are not wholly controlled by willpower.",
+      "faithOnly": false
+    },
+    {
+      "id": "F04",
+      "name": {
+        "ru": "Йогическая традиция",
+        "en": "Yoga tradition"
+      },
+      "source": "Yoga Sutra II.30, Trevor Leggett translation and commentary",
+      "url": "https://tlayt.org/yoga-sutra-2-30-harmlessness-truth-speaking-no-stealing-brahmacarya-not-holding-possessions/",
+      "kind": "paraphrase",
+      "ru": "Ненанесение вреда и правдивость относятся к нравственным основаниям практики.",
+      "en": "Non-harming and truthfulness are among the ethical foundations of the practice.",
+      "use": "Careful, honest speech; no medical efficacy claim or generalization about every practitioner.",
+      "faithOnly": false
+    },
+    {
+      "id": "F05",
+      "name": {
+        "ru": "Христианская традиция",
+        "en": "Christian tradition"
+      },
+      "source": "Matthew 5:9; Russian Synodal Version / King James Version",
+      "url": "https://www.biblegateway.com/passage/?search=Matthew%205%3A9&version=RUSV;KJV",
+      "kind": "scripture excerpt",
+      "ru": "Блаженны миротворцы.",
+      "en": "Blessed are the peacemakers.",
+      "use": "Only when the person welcomes this faith; never a divine prognosis.",
+      "faithOnly": true
+    },
+    {
+      "id": "F06",
+      "name": {
+        "ru": "Экзистенциальная линия Франкла",
+        "en": "Frankl's existential approach"
+      },
+      "source": "Viktor Frankl Institute, Logotherapy and Existential Analysis; twentieth century, not ancient",
+      "url": "https://viktorfrankl.org/logotherapy.html",
+      "kind": "paraphrase",
+      "ru": "Смысл конкретного человека нельзя назначить ему извне.",
+      "en": "A person's individual meaning cannot be assigned from outside.",
+      "use": "Ask what the person values; do not label illness a lesson or impose a purpose.",
+      "faithOnly": false
+    }
+  ]
+}

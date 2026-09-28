@@ -3,8 +3,9 @@
 ## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, LEGACY LINKS RETIRED
 
 PR #216 was merged into `main` as `fba352419d71831ad5363601b5a2ae35cdd69359`;
-its included base PR #215 is also marked merged. Production deployment
-`dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr` is READY on
+its included base PR #215 is also marked merged. The cutover deployment
+`dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr` was READY. Subsequent `main` deployment
+`dpl_BSrWKBqRxVVW42DqGAqtkozErT3A` is READY on
 `https://pythonmethodcenter.com` with `STRIPE_CHECKOUT_ENABLED=true`,
 `STRIPE_CHECKOUT_MODE=live`, the canonical return origin and
 `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`. The existing Live webhook retained its
@@ -31,6 +32,36 @@ independently read back inactive. The old direct URLs no longer accept new
 sales. Historical purchases and existing subscriptions remain intact. No
 tax registration, rate or business address changed. An authenticated,
 no-charge Live Checkout transition and real payment/return remain unverified.
+
+## ANHAM Karen philosophy — 2026-09-27 — TEXT AND VOICE RELEASED
+
+Owner-authorized communication profile v1.0.0 is connected to the existing
+shared prose policy and voice persona. It includes 24 bilingual editorial
+phrases, three selected sourced Karen quotes and six philosophical foundations,
+with explicit attribution, opt-out, crisis and clinical boundaries. No identity,
+role, model, medical workflow or source-extraction change.
+
+The complete 51,750-byte source was saved in five active staff-only records in
+existing assistant_knowledge in Production and anham-staging. Reconstruction
+hash matches the original; anon access remains denied. The private full source
+stays out of this public repository. Full local regression: 2,130 passed / one
+existing skip; TypeScript, ESLint, security gate and production build passed.
+Two additional active client/staff reference records carry the approved RU/EN
+catalog through existing knowledge retrieval. Production RU and EN guest calls
+returned HTTP 200 and used the new fear/support wording. This verifies dynamic
+catalog use, not deployment of the compiled policy or all-channel compliance.
+The owner explicitly authorized public publication and completing Voice.
+PR #231 merged as `2a32d4d050269f95e5a5ff63045cbdd1546880a9` after the full
+GitHub security/regression workflow and Vercel Preview passed. Production
+`dpl_DoN5AzB6DDaAFP7tREgS6vwVR2Py` was READY on pythonmethodcenter.com;
+the later `main` documentation deployment is now the active Production build.
+Realtime staff/client and GPT-Live now consume the released shared profile.
+Current focused tests: 124 passed, including four RU/EN provider-handshake
+cases. Post-release RU support and EN plain-language requests returned 200;
+both Voice endpoints returned 401 without authentication. A signed-in spoken
+round trip was not run: this browser has no Production login. Existing voice
+sessions need a normal reconnect. No voice access/configuration was widened.
+See [implementation and source manifest](docs/ankh/anham_karen_philosophy.md).
 
 ## Monthly Checkout release preparation — 2026-09-27 PDT — HISTORICAL PRE-CUTOVER
 

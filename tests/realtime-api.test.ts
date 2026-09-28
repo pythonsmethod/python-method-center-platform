@@ -164,6 +164,25 @@ describe("voice authorization and provider handshake", () => {
     const config = JSON.parse((vi.mocked(fetch).mock.calls[0][1]!.body as FormData).get("session") as string);
     expect(config.audio.output.voice).toEqual({ id: "voice_test" }); expect(config.instructions).toContain("founder's private");
   });
+  it.each([
+    ["ru", "founder@example.test", "admin", "founder's private"],
+    ["en", "founder@example.test", "admin", "founder's private"],
+    ["ru", "karen@example.test", "admin", "Only Karen makes Case decisions"],
+    ["en", "karen@example.test", "admin", "Only Karen makes Case decisions"],
+  ] as const)("delivers the shared philosophy to the actual %s Voice handshake for %s", async (locale, email, role, roleRule) => {
+    profile!.role = role;
+    mocks.getUser.mockResolvedValue({ data: { user: { id: userId, email } }, error: null });
+    const result = await session(request({ ...sessionBody, scope: "staff", locale }));
+    expect(result.status).toBe(200);
+    const config = JSON.parse((vi.mocked(fetch).mock.calls[0][1]!.body as FormData).get("session") as string);
+    expect(config.instructions).toContain("ANHAM_KAREN_PHILOSOPHY v1.0.0");
+    expect(config.instructions).toContain('"id":"A24"');
+    expect(config.instructions).toContain(roleRule);
+    expect(config.instructions).toContain("Never promise a cure");
+    expect(config.instructions).toContain(locale === "ru" ? "Russian only" : "English only");
+    expect(config.output_modalities).toEqual(["audio"]);
+    expect(await result.text()).not.toContain("synthetic-provider-key");
+  });
   it.each(["marin", "cedar", "coral", "sage", "verse", "alloy", "ash", "ballad", "echo", "shimmer"])("sends selected %s voice to the actual handshake", async voice => {
     const response = await session(request({ ...sessionBody, voice })); expect(response.status).toBe(200);
     const body = vi.mocked(fetch).mock.calls[0][1]?.body as FormData;

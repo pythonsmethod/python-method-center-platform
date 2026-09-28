@@ -14,6 +14,27 @@ The owner subsequently granted only Payment Links Write for the Live account
 through that official flow. The three identified retired links were then
 updated and independently read back `active=false`; no other Payment Links,
 historical purchases or subscriptions were changed.
+## NX-04-ANHAM-PHILOSOPHY-20260927 — Karen's values are a shared PMC communication profile
+
+The owner authorized implementation of the prepared philosophy material in
+ANHAM on 2026-09-27. Reuse the existing shared prose and voice-persona paths;
+keep the same AI identity and actual permissions. The versioned public
+projection carries 24 RU/EN original phrases, selected exact RU quotations with
+labeled EN translations and source-linked philosophical ideas. No promised
+clinical efficacy, forced positivity, religious imposition or invented Karen
+approval. Emergency instructions and precise analytical/source content take
+precedence. The complete original is retained privately in existing knowledge
+rows and Library, with an exact reconstruction hash. No new knowledge store or
+NEXORA-wide sharing. The same client-safe catalog is also available through
+existing client/staff knowledge retrieval; it remains reference material, not
+an action permission or a substitute for the compiled application policy.
+Source/catalog persistence is live. After auto-review initially rejected the
+push, the owner explicitly authorized public publication of the prepared code
+and completing the Voice release on 2026-09-27. That resolves the publication
+gate; no authorization, clinical gate or private-source boundary is weakened.
+The shared profile was released through PR #231 after passing remote checks;
+Production deployment and bounded RU/EN/API observations are in the manifest.
+[Manifest and release evidence](docs/ankh/anham_karen_philosophy.md).
 
 ## PMC-BILLING-2026-09-27-01 — Launch with existing tax collection setting
 
