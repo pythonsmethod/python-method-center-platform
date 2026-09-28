@@ -155,6 +155,19 @@
     "retirementMethod": "official Stripe connector after owner granted Live Payment Links Write",
     "legacyDirectLinksReadBackInactive": true
   },
+  "postCutoverReadback2026_09_27": {
+    "releaseRecordPr": 230,
+    "releaseRecordMergedCommit": "e89f6bd497dc21276bcb4926315989bc5e64d9ab",
+    "productionDeploymentId": "dpl_HukurFzb3GRySGpkqwUBRympDvhs",
+    "productionDeploymentState": "READY",
+    "productionDomainAssigned": true,
+    "publicRussianAndEnglishPaymentPagesReadBack": true,
+    "runtimeErrorsLastHour": 0,
+    "existingOwnerAccountAuthenticatedInBrowser": true,
+    "requiredLegalConsentBoxesAccepted": false,
+    "liveCheckoutTransitionVerified": false,
+    "liveTestPurchaseMade": false
+  },
   "remaining": [
     "An authenticated, no-charge transition into Live Checkout and the production-domain return have not been verified. No Live test purchase or charge was made.",
     "Tax classification and any external seller registration are not established. The owner retained the prior disabled automatic-tax setting; do not imply that this settles legal tax obligations.",

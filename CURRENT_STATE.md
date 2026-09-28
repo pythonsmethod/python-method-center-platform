@@ -4,9 +4,12 @@
 
 PR #216 was merged into `main` as `fba352419d71831ad5363601b5a2ae35cdd69359`;
 its included base PR #215 is also marked merged. The cutover deployment
-`dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr` was READY. Subsequent `main` deployment
-`dpl_BSrWKBqRxVVW42DqGAqtkozErT3A` is READY on
-`https://pythonmethodcenter.com` with `STRIPE_CHECKOUT_ENABLED=true`,
+`dpl_FgJ2y8rguZJ92shwdTHeGqLsDuvr` was READY. Later `main` deployments
+`dpl_BSrWKBqRxVVW42DqGAqtkozErT3A` and
+`dpl_HukurFzb3GRySGpkqwUBRympDvhs` (docs-only PR #230, merged as
+`e89f6bd497dc21276bcb4926315989bc5e64d9ab`) also reached READY. The
+latter owned `https://pythonmethodcenter.com` at readback. Release settings:
+`STRIPE_CHECKOUT_ENABLED=true`,
 `STRIPE_CHECKOUT_MODE=live`, the canonical return origin and
 `STRIPE_CHECKOUT_AUTOMATIC_TAX=false`. The existing Live webhook retained its
 URL, API version and five prior events while adding `invoice.paid`,
@@ -18,9 +21,10 @@ Live catalog readback confirmed all 24 RU/EN initial recurring prices for
 plus the 299 USD assessment and 1300 USD one-time/renewal prices. Both Live
 Portal configurations remain active, with card updates, invoice history and
 cancel-at-period-end enabled. Public RU/EN payment pages show the new prices,
-duration selector and renewal choice. No production buyer was authenticated
-for an actual no-charge transition into Live Checkout, and no real payment
-or return was tested.
+duration selector and renewal choice. An existing owner account was later
+confirmed authenticated in the browser; the two required legal consent boxes
+were not accepted, so no-charge transition into Live Checkout remains
+unverified. No real Live payment or return was tested.
 
 The owner updated the official Stripe connection's Live Payment Links
 permission from Read to Write after its initial `PostPaymentLinksPaymentLink`
