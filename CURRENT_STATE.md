@@ -1,5 +1,20 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Monthly Checkout Live renewal smoke — 2026-09-28 PDT — NO-CHARGE FORM VERIFIED
+
+The owner personally reselected both legal consents, six prepaid periods and
+automatic renewal on the authenticated Production payment page. The embedded
+Live Stripe form opened on `https://pythonmethodcenter.com/payment` and showed
+7,800 USD due today for 180 days, the complimentary formula with delivery
+included, then 1,300 USD every 30 days after the paid term. It did not label
+the prepaid term a free trial. Stripe readback confirmed `livemode=true`,
+`ui_mode=elements`, `mode=subscription`, `amount_total=780000`,
+`metadata.months=6`, `metadata.auto_renew=true`, `status=open`,
+`payment_status=unpaid` and a Production-domain return URL. The form was
+closed through “Return to selection” without entering card details or making
+a Live charge. This verifies the renewal-specific no-charge transition and
+display, not paid fulfillment, a real success return or a Live renewal.
+
 ## Monthly Checkout Live smoke — 2026-09-28 PDT — PREPAID PATH VERIFIED
 
 The authenticated owner personally checked both required legal-consent boxes.
@@ -12,9 +27,9 @@ readback confirmed `livemode=true`, `mode=payment`, `amount_total=780000`,
 Production domain. No card details were entered and no Live payment occurred.
 The initially automated renewal-checkbox change did not persist to application
 state, so this session proves the prepaid-only path, not the renewal path.
-The page reset legal consent after return. A renewed owner consent and a
-separate no-charge embedded-renewal check remain outstanding, as do a real
-paid success return and first real renewal.
+The page reset legal consent after return. The owner later renewed consent
+and completed the no-charge embedded-renewal check recorded above. A real
+paid success return and first real renewal remain outstanding.
 
 ## Monthly Checkout production cutover — 2026-09-27 PDT — LIVE, LEGACY LINKS RETIRED
 

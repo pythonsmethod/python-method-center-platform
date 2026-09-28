@@ -1,5 +1,5 @@
 {
-  "checkedOn": "2026-09-27",
+  "checkedOn": "2026-09-28",
   "ownerAuthorizedProductionLaunch": true,
   "releaseStatus": "LIVE_WITH_FOLLOWUP",
   "published": true,
@@ -187,8 +187,32 @@
     "renewalSpecificCheckoutVerified": false,
     "note": "The automated renewal-checkbox change did not persist to application state; this session validates prepaid-only Checkout. No session URL, email or buyer identifier is recorded here."
   },
+  "liveRenewalNoChargeSmoke2026_09_28": {
+    "ownerPersonallySelectedLegalConsentAndRenewal": true,
+    "environment": "live",
+    "product": "personal_support",
+    "months": 6,
+    "days": 180,
+    "autoRenew": true,
+    "uiMode": "elements",
+    "mode": "subscription",
+    "amountTotalCents": 780000,
+    "currency": "usd",
+    "nextRenewalAmountDisplayedCents": 130000,
+    "nextRenewalIntervalDisplayedDays": 30,
+    "prepaidTermCalledFreeTrial": false,
+    "stripeSessionStatus": "open",
+    "paymentStatus": "unpaid",
+    "returnOrigin": "https://pythonmethodcenter.com",
+    "returnedToTariffSelectionWithoutPayment": true,
+    "cardDetailsEntered": false,
+    "liveChargeMade": false,
+    "paidSuccessReturnVerified": false,
+    "firstLiveRenewalVerified": false,
+    "note": "Read back the newly opened Live Checkout Session and the embedded form. No session secret, email or buyer identifier is recorded here."
+  },
   "remaining": [
-    "The renewal-specific Live embedded Checkout and a real paid success return remain unverified. The prepaid-only six-period Checkout and cancel return were verified without a Live charge.",
+    "The prepaid-only and auto-renewing six-period Live Checkout forms were verified without a Live charge. A real paid success return and first Live renewal remain unverified.",
     "Tax classification and any external seller registration are not established. The owner retained the prior disabled automatic-tax setting; do not imply that this settles legal tax obligations.",
     "The 2026-09-24 snapshot fields above retain historical Preview and migration observations; the dated cutover update records the later Production state."
   ]

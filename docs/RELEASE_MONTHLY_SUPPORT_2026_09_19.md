@@ -1,12 +1,23 @@
 # PMC Monthly Personal Support — release preparation — 2026-09-19
 
+2026-09-28 Live renewal smoke update: after the owner personally reselected
+both legal consents, six prepaid periods and automatic renewal, the embedded
+Live Stripe form showed 7,800 USD due today for 180 days, then 1,300 USD
+every 30 days after the paid term. The gift formula and included delivery
+were disclosed, without calling the paid term a free trial. Stripe readback
+confirmed a Live subscription-mode, six-period, auto-renewing Checkout Session
+that remained open and unpaid, with a Production-domain return URL. We
+returned to tariff selection without entering card details or charging Live.
+Real paid fulfillment, success return and the first Live renewal remain
+unverified.
+
 2026-09-28 Live smoke update: with the owner's own legal consents, a six-period
 prepaid-only Live Checkout opened at 7,800 USD for 180 days. Stripe readback
 confirmed the session was open and unpaid; the cancel link returned to the
 Production payment page. No card details or Live charge were used. The
-automated renewal-checkbox selection did not persist, so the Live renewal
-embedded form is still unverified and must be checked separately. The success
-return after a real payment also remains untested.
+automated renewal-checkbox selection did not persist in that earlier attempt;
+the separate owner-selected renewal check is recorded above. The success
+return after a real payment remains untested.
 
 2026-09-27 cutover update: PR #216, containing PR #215, is merged; the new
 code and `STRIPE_CHECKOUT_ENABLED=true` are READY on the Production domain.
