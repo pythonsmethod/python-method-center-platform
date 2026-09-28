@@ -18,6 +18,16 @@ export async function ensureThirtyDayRenewalSchedule(
     throw new Error("subscription paid period unavailable");
   }
 
+  // The client already turned renewal off; a late webhook retry must not
+  // switch it back on.
+  if (subscription.schedule && typeof subscription.schedule !== "string" &&
+      subscription.schedule.end_behavior === "cancel") {
+    return subscription.schedule.id;
+  }
+  if (subscription.cancel_at_period_end) {
+    return null;
+  }
+
   const existingScheduleId = subscription.schedule
     ? typeof subscription.schedule === "string" ? subscription.schedule : subscription.schedule.id
     : null;

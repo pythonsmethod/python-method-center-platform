@@ -26,7 +26,12 @@ export const dynamic = "force-dynamic";
 // Everything a person looks at once and then rarely again: who they are,
 // what their case is, and how it got there. The cabinet itself stays for
 // the daily work — documents, chat, payments.
-export default async function AccountPage() {
+export default async function AccountPage({
+  searchParams
+}: {
+  searchParams?: Promise<{ renewal?: string }>;
+}) {
+  const renewalState = (await searchParams)?.renewal;
   const locale = await getLocale();
   const strings = getDictionary(locale);
   const dict = strings.cabinet;
@@ -61,7 +66,7 @@ export default async function AccountPage() {
     supabase
       ? supabase
           .from("billing_subscriptions")
-          .select("id, status, current_period_end")
+          .select("id, status, current_period_end, renewal_cancelled_at")
           .eq("profile_id", auth.userId)
           .in("status", ["trialing", "active", "past_due", "paused", "unpaid", "incomplete"])
           .order("created_at", { ascending: false })
@@ -203,6 +208,22 @@ export default async function AccountPage() {
               <span className="panel__label">{t.subscriptionLabel}</span>
               <h3>{t.subscriptionTitle}</h3>
               <p>{t.subscriptionText}</p>
+              {subscriptionResult.data.renewal_cancelled_at ? (
+                <p>
+                  {t.renewalCancelled}
+                  {subscriptionResult.data.current_period_end
+                    ? ` ${t.renewalCancelledUntil}: ${formatDateTime(subscriptionResult.data.current_period_end, locale)}.`
+                    : ""}
+                </p>
+              ) : (
+                <form action="/api/stripe/cancel-renewal" method="post">
+                  <p>{t.renewalCancelNote}</p>
+                  <button className="button button--secondary" type="submit">
+                    {t.renewalCancel}
+                  </button>
+                </form>
+              )}
+              {renewalState === "error" ? <p role="alert">{t.renewalError}</p> : null}
               <form action="/api/stripe/portal" method="post">
                 <button className="button button--secondary" type="submit">
                   {t.subscriptionManage}
