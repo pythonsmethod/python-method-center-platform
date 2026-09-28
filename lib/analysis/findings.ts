@@ -40,7 +40,7 @@ export function formatMachineFindings(run: StoredRun): string {
 
   if (run.human_review_count > 0) {
     lines.push(
-      `Требуют проверки человеком: ${run.human_review_count} знач. — подпись или единица не определены. Не использовать до проверки.`
+      `Требуют проверки человеком: ${run.human_review_count} знач. — подпись, единица или предметное правило требуют сверки. Не использовать до проверки.`
     );
   }
 

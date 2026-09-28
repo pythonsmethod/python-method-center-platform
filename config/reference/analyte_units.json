@@ -2,9 +2,33 @@
   "_meta": {
     "purpose": "Определение единицы измерения по напечатанному в документе референсному интервалу и приведение к канонической единице.",
     "rule": "Единица НИКОГДА не угадывается по значению. Сначала явная единица в документе, затем отпечаток интервала, затем — unresolved.",
-    "version": "1.0"
+    "version": "1.1-oncology-explicit-only"
   },
   "analytes": {
+    "afp": { "canonical": null, "alt": [], "explicit_only": true },
+    "cea": { "canonical": null, "alt": [], "explicit_only": true },
+    "psa_unspecified": { "canonical": null, "alt": [], "explicit_only": true },
+    "psa_total": { "canonical": null, "alt": [], "explicit_only": true },
+    "psa_free": { "canonical": null, "alt": [], "explicit_only": true },
+    "psa_free_percent": { "canonical": null, "alt": [], "explicit_only": true },
+    "ca125": { "canonical": null, "alt": [], "explicit_only": true },
+    "ca19_9": { "canonical": null, "alt": [], "explicit_only": true },
+    "ca15_3": { "canonical": null, "alt": [], "explicit_only": true },
+    "ca27_29": { "canonical": null, "alt": [], "explicit_only": true },
+    "hcg_unspecified": { "canonical": null, "alt": [], "explicit_only": true },
+    "hcg_total": { "canonical": null, "alt": [], "explicit_only": true },
+    "hcg_beta": { "canonical": null, "alt": [], "explicit_only": true },
+    "hcg_free_beta": { "canonical": null, "alt": [], "explicit_only": true },
+    "calcitonin": { "canonical": null, "alt": [], "explicit_only": true },
+    "thyroglobulin": { "canonical": null, "alt": [], "explicit_only": true },
+    "cga": { "canonical": null, "alt": [], "explicit_only": true },
+    "nse": { "canonical": null, "alt": [], "explicit_only": true },
+    "cyfra21_1": { "canonical": null, "alt": [], "explicit_only": true },
+    "scc_ag": { "canonical": null, "alt": [], "explicit_only": true },
+    "he4": { "canonical": null, "alt": [], "explicit_only": true },
+    "ldh": { "canonical": null, "alt": [], "explicit_only": true },
+    "b2m": { "canonical": null, "alt": [], "explicit_only": true },
+    "ca72_4": { "canonical": null, "alt": [], "explicit_only": true },
     "hemoglobin": {
       "canonical": "g/L",
       "alt": [

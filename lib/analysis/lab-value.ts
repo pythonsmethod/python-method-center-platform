@@ -1,4 +1,4 @@
-import { resolveAnalyteLabel } from "@/lib/analysis/analyte-labels";
+import { isOncologyAnalyte, resolveAnalyteLabel } from "@/lib/analysis/analyte-labels";
 import { resolveUnit } from "@/lib/analysis/unit-resolver";
 import { referenceSetVersion } from "@/lib/reference/tables";
 
@@ -12,6 +12,8 @@ import { referenceSetVersion } from "@/lib/reference/tables";
 export type ExtractedRow = {
   // Exactly as printed on the form.
   labelPrinted: string;
+  // Only an unambiguous, source-linked Test/Result pair may supply this.
+  analyteLabelPrinted?: string;
   value: number;
   unitPrinted?: string | null;
   referencePrinted?: string | null;
@@ -43,11 +45,11 @@ export type LabValueRecord = {
 // Whether a row still needs a person. Both halves count: a number in a
 // known unit under a caption nobody recognised is not usable either.
 export function needsHumanReview(record: LabValueRecord): boolean {
-  return record.analyte === null || record.unit_resolution_method === "unresolved";
+  return record.analyte === null || record.unit_resolution_method === "unresolved" || isOncologyAnalyte(record.analyte);
 }
 
 export function buildLabValue(row: ExtractedRow): LabValueRecord {
-  const label = resolveAnalyteLabel(row.labelPrinted);
+  const label = resolveAnalyteLabel(row.analyteLabelPrinted ?? row.labelPrinted);
   const analyte = label.status === "resolved" ? label.analyte : null;
 
   const base = {
@@ -86,7 +88,7 @@ export function buildLabValue(row: ExtractedRow): LabValueRecord {
     value: row.value,
     unitPrinted: row.unitPrinted,
     referencePrinted: row.referencePrinted,
-    referenceConfirmed: row.referenceConfirmed
+    referenceConfirmed: false // Missing printed units remain unresolved; a reference range is not a unit.
   });
 
   return {

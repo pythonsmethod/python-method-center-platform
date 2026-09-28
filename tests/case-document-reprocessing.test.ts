@@ -41,8 +41,9 @@ describe("staff Case document reprocessing", () => {
 
     expect(route).toContain("processNextCaseDocument(caseId)");
     expect(route).toContain("canAccessProfessorMessages(staff.email)");
-    expect(processing).toContain('.eq("case_id", caseId)');
-    expect(processing).toContain('.eq("status", "queued")');
-    expect(processing).toMatch(/\.eq\("status", "queued"\)\r?\n\s+\.select/);
+    expect(processing).toContain("p_case_id: scope.caseId ?? null");
+    const sql = readFileSync("supabase/migrations/20260924012755_pmc_document_chain.sql", "utf8");
+    expect(sql).toContain("j.status='queued'");
+    expect(sql).toContain("for update of j skip locked");
   });
 });

@@ -48,7 +48,11 @@ type AltUnit = {
   ref_high_range?: number[];
 };
 
-type AnalyteEntry = { canonical: string; alt: AltUnit[] };
+type AnalyteEntry = { canonical: string | null; alt: AltUnit[]; explicit_only?: boolean };
+
+// These are spelling variants, not a conversion table or a normal unit
+// assigned to every tumor marker. No interval can infer one of them.
+const MARKER_LITERAL_UNITS = new Set(["ng/mL", "pg/mL", "ug/L", "mg/L", "U/mL", "IU/mL", "mIU/mL", "pmol/L", "U/L", "IU/L", "%"]);
 
 const ANALYTES = REFERENCE_TABLES.analyteUnits.analytes as unknown as Record<
   string,
@@ -100,7 +104,7 @@ function converterFor(
   entry: AnalyteEntry,
   unit: string
 ): { factor: number | null; convert: (value: number) => number } | null {
-  if (unit === entry.canonical) {
+  if (entry.canonical !== null && unit === entry.canonical) {
     return { factor: 1, convert: (value) => value };
   }
 
@@ -132,6 +136,7 @@ function converterFor(
 function canonicalFingerprint(
   entry: AnalyteEntry
 ): { low: [number, number]; high: [number, number] } | null {
+  if (entry.canonical === null) return null;
   const lows: number[] = [];
   const highs: number[] = [];
 
@@ -169,7 +174,7 @@ function candidatesFor(entry: AnalyteEntry, range: ReferenceRange): string[] {
   const found: string[] = [];
   const canonical = canonicalFingerprint(entry);
 
-  if (canonical && within(range.low, canonical.low) && within(range.high, canonical.high)) {
+  if (entry.canonical !== null && canonical && within(range.low, canonical.low) && within(range.high, canonical.high)) {
     found.push(entry.canonical);
   }
 
@@ -235,6 +240,16 @@ export function resolveUnit(input: UnitResolutionInput): UnitResolution {
 
   if (!entry) {
     return unresolved(base, `Показатель «${input.analyte}» отсутствует в справочнике единиц.`);
+  }
+
+  if (entry.explicit_only) {
+    const spelled = unitOriginal ? canonicaliseUnitSpelling(unitOriginal) : null;
+    if (!spelled || !MARKER_LITERAL_UNITS.has(spelled)) {
+      return unresolved(base, "Для онкомаркера нужна явно напечатанная, однозначная единица; по референсу или названию она не восстанавливается.");
+    }
+    // The resolved unit is the literal unit spelling. The identity factor
+    // performs no conversion; review-only routing prevents clinical trends.
+    return { ...base, unitResolved: spelled, method: "explicit", valueCanonical: input.value, conversionFactor: 1, unresolvedReason: null };
   }
 
   const settle = (unit: string, method: UnitResolutionMethod): UnitResolution => {

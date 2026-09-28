@@ -40,7 +40,11 @@ describe("Professor Python review-learning history", () => {
   it("requires an explicit Professor Python approval", () => {
     const action = readFileSync("lib/cases/review-actions.ts", "utf8");
     expect(action).toContain('resolvePrivateAssistantRole(auth.email) !== "karen"');
-    expect(action).toContain('.from("case_review_learning_events").insert');
+    expect(action).toContain('resolvePrivateAssistantRole(verified.data.user.email) !== "karen"');
+    expect(action).toContain('rpc("approve_pmc_case_review"');
+    const migration = readFileSync("supabase/migrations/20260924012755_pmc_document_chain.sql", "utf8");
+    expect(migration).toContain("insert into public.case_review_learning_events");
+    expect(migration).toContain("STALE_EVIDENCE");
   });
 
   it("keeps prior document versions without showing them as the current approval", () => {

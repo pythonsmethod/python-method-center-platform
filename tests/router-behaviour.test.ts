@@ -331,6 +331,7 @@ describe("how many business modules still name a provider", () => {
       callers.filter(
         (file) =>
           !ALLOWED.includes(file) &&
+          file !== "lib/cases/legacy-review-actions.ts" && // Existing review path remains active outside the pilot.
           file !== "lib/assistant/claude.ts" &&
           file !== "lib/assistant/openai.ts"
       )

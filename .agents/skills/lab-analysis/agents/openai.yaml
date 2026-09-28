@@ -1,0 +1,6 @@
+interface:
+  display_name: "Разбор анализов / Lab analysis"
+  short_description: "Числа и сравнимость / Values and comparability"
+  default_prompt: "Используй $lab-analysis для разбора лабораторных строк и допустимых сравнений с сохранением исходных данных и причин проверки."
+policy:
+  allow_implicit_invocation: true

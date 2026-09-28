@@ -80,6 +80,55 @@ describe("значение из строки бланка", () => {
     expect(splitValue("без патологии")).toBeNull();
     expect(splitValue("< 5")).toBeNull();
     expect(splitValue("")).toBeNull();
+    expect(splitValue("1 of 2")).toBeNull();
+    expect(splitValue("2 из 3")).toBeNull();
+  });
+});
+
+describe("отдельные поля анализа и результата", () => {
+  const anchor = (page: number, excerpt: string) => ({
+    level: "PAGE" as const, page, sourceHash: "synthetic-hash", excerpt, region: null
+  });
+  const context = { specimen: "Serum", method: "Immunoturbidimetry" };
+  const rows = [1, 2].flatMap((page) => {
+    const date = page === 1 ? "2026-09-20" : "2026-09-24";
+    const value = page === 1 ? "1.2 mg/L" : "1.4 mg/L";
+    return [
+      { section: "Header", label: "Page", value: `${page} of 2`, reference: "-", referenceConfirmed: true, source: anchor(page, `Page ${page} of 2`) },
+      { section: "Laboratory results", label: "Test", value: "C-reactive protein (CRP)", reference: "-", referenceConfirmed: true, collectionDate: date, comparisonContext: context, source: anchor(page, "Test | C-reactive protein (CRP)") },
+      { section: "Laboratory results", label: "Result", value, reference: "0.0 - 5.0 mg/L", referenceConfirmed: true, collectionDate: date, comparisonContext: context, source: anchor(page, `Result | ${value} | 0.0 - 5.0 mg/L`) }
+    ];
+  });
+
+  it("связывает ровно одну пару на каждой физической странице, сохраняя обе ссылки", () => {
+    const result = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:rows}]});
+    expect(result.labValues).toHaveLength(2);
+    expect(result.labValues.map(row => [row.label_original,row.analyte,row.value_canonical,row.measured_on])).toEqual([
+      ["Result","crp",1.2,"2026-09-20"],
+      ["Result","crp",1.4,"2026-09-24"]
+    ]);
+    expect(result.labValues.map(row => row.source_anchor?.related?.page)).toEqual([1,2]);
+    expect(result.labValues[0].source_anchor?.excerpt).toBe("Result | 1.2 mg/L | 0.0 - 5.0 mg/L");
+    expect(result.labValues[0].source_anchor?.related?.excerpt).toBe("Test | C-reactive protein (CRP)");
+    expect(result.trends.crp).toBeDefined();
+  });
+
+  it("не связывает повторные названия, противоречивый контекст и разные страницы", () => {
+    const test = rows[1];
+    const result = rows[2];
+    const ambiguous = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:[
+      test, {...test,value:"Ferritin",source:anchor(1,"Test | Ferritin")}, result
+    ]}]});
+    expect(ambiguous.labValues[0]).toMatchObject({label_original:"Result",analyte:null,value_canonical:null});
+    expect(ambiguous.labValues[0].source_anchor?.related).toBeUndefined();
+    const otherPage = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:[
+      test, {...result,source:anchor(2,"Result | 1.2 mg/L")}
+    ]}]});
+    expect(otherPage.labValues[0].analyte).toBeNull();
+    const conflictingDate = run({documents:[{documentId:"synthetic",collectionDate:null,agreed:[
+      test, {...result,collectionDate:"2026-09-21"}
+    ]}]});
+    expect(conflictingDate.labValues[0].analyte).toBeNull();
   });
 });
 
@@ -88,16 +137,16 @@ describe("прогон целиком", () => {
     documentId: "doc-new",
     collectionDate: "2026-08-14",
     agreed: [
-      { label: "Гемоглобин", value: "9,6", reference: "12–15.5", referenceConfirmed: true },
-      { label: "MCV", value: "88 фл", reference: "80-100", referenceConfirmed: true },
-      { label: "Ферритин", value: "43 нг/мл", reference: "30-400", referenceConfirmed: true },
-      { label: "Глюкоза", value: "5,1 ммоль/л", reference: "3.9-6.1", referenceConfirmed: true },
-      { label: "Заключение", value: "Без патологии", reference: "", referenceConfirmed: true },
+      { label: "Гемоглобин", value: "9,6 г/дл", reference: "12–15.5", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "MCV", value: "88 фл", reference: "80-100", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "Ферритин", value: "43 нг/мл", reference: "30-400", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "Глюкоза", value: "5,1 ммоль/л", reference: "3.9-6.1", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
+      { label: "Заключение", value: "Без патологии", reference: "", referenceConfirmed: true, comparisonContext: { specimen: "synthetic serum", method: "synthetic assay" } },
       { label: "Онкомаркер CA 125", value: "12 Ед/мл", reference: "0-35", referenceConfirmed: true }
     ]
   };
   const priorHemoglobin = {
-    documentId: "doc-old",
+    documentId: "doc-old", comparison_context: { specimen: "synthetic serum", method: "synthetic assay" },
     analyte: "hemoglobin",
     measured_on: "2026-05-10",
     value_canonical: 118,
@@ -179,5 +228,16 @@ describe("прогон целиком", () => {
     for (const value of result.labValues) {
       expect(accounted.has(value.analyte ?? value.label_original), value.label_original).toBe(true);
     }
+  });
+});
+
+describe("source context gates", () => {
+  it("never substitutes the document header date for an explicitly unknown row date", () => {
+    const result = run({documents:[{documentId:"synthetic",collectionDate:"2026-09-24",agreed:[{label:"CRP",value:"5 mg/L",reference:"0-5",referenceConfirmed:true,collectionDate:null}]}]});
+    expect(result.labValues[0].measured_on).toBeNull();
+  });
+  it("blocks a numeric change when specimen or method is absent", () => {
+    const result = run({documents:[{documentId:"synthetic",collectionDate:"2026-09-24",agreed:[{label:"CRP",value:"10 mg/L",reference:"0-5",referenceConfirmed:true}]}],prior:[{documentId:"older",analyte:"crp",measured_on:"2026-09-01",value_canonical:1,unit_resolved:"mg/L",unit_resolution_method:"explicit",reference_low:0,reference_high:5,position_in_reference:0.2}]});
+    expect(result.trends.crp).toMatchObject({verdict:"not_comparable",reason:"MISSING_OR_DIFFERENT_SPECIMEN_METHOD",versus_previous:null});
   });
 });
