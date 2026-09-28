@@ -22,6 +22,7 @@ import { ensureCheckoutPrice } from "@/lib/payments/checkout-catalog";
 import { ensureThirtyDayRenewalSchedule } from "@/lib/payments/renewal-schedule";
 import { paidSubscriptionInvoicePeriod } from "@/lib/payments/stripe-invoice-period";
 import { ensureCaseForPaidProfile } from "@/lib/cases/ensure-paid-case";
+import { refundReferenceCandidates, refundStatus } from "@/lib/payments/refund";
 
 export const runtime = "nodejs";
 
@@ -135,7 +136,7 @@ export async function POST(request: Request) {
       }
       case "charge.refunded": {
         const charge = event.data.object as Stripe.Charge;
-        await handleRefund(supabase, charge, event.id);
+        await handleRefund(supabase, stripe, charge, event.id);
         break;
       }
       default:
@@ -853,34 +854,61 @@ async function syncSubscriptionState(
 
 async function handleRefund(
   supabase: ServiceClient,
+  stripe: Stripe,
   charge: Stripe.Charge,
   eventId: string
 ) {
-  const reference =
+  const intentId =
     typeof charge.payment_intent === "string"
       ? charge.payment_intent
       : charge.payment_intent?.id ?? null;
 
-  if (!reference) {
+  if (!intentId) {
     return;
   }
 
-  const { data: payment } = await supabase
-    .from("payments")
-    .update({ status: "refunded", refunded_at: new Date().toISOString() })
-    .eq("processor_reference", reference)
-    .select("id, profile_id, case_id")
-    .maybeSingle();
+  // Subscription payments are stored under a Session or Invoice id, not the
+  // PaymentIntent the refund carries. Stripe errors throw → Stripe retries.
+  const references = await refundReferenceCandidates(stripe as never, intentId);
+  const status = refundStatus(charge);
 
+  const { data: matches, error: updateError } = await supabase
+    .from("payments")
+    .update({ status, refunded_at: new Date().toISOString() })
+    .in("processor_reference", references)
+    .select("id, profile_id, case_id");
+  if (updateError) throw new Error(`refund record failed: ${updateError.message}`);
+  const payment = matches?.[0] ?? null;
+
+  // A full refund ends the access bought by that payment. A partial refund
+  // is a business decision (goodwill, delivery issue), so access is kept and
+  // the team decides.
+  let accessClosed = false;
+  if (payment && status === "refunded") {
+    const { data: closed, error: periodError } = await supabase
+      .from("service_periods")
+      .update({ status: "cancelled" })
+      .eq("payment_id", payment.id)
+      .in("status", ["active", "scheduled"])
+      .select("id");
+    if (periodError) throw new Error(`refund period close failed: ${periodError.message}`);
+    accessClosed = (closed?.length ?? 0) > 0;
+  }
+
+  const amount = `${(charge.amount_refunded / 100).toFixed(2)} ${(charge.currency ?? "usd").toUpperCase()}`;
   await notifyTeam({
     kind: "payment",
     dedupeKey: `payment_refunded:${eventId}`,
-    title: "↩️ Возврат по оплате",
+    title: status === "refunded" ? "↩️ Полный возврат по оплате" : "↩️ Частичный возврат по оплате",
     lines: [
-      `Референс: ${reference}`,
+      `Возвращено: ${amount}`,
+      `Референс: ${intentId}`,
       payment
-        ? `Запись оплаты ${payment.id} помечена как возвращённая`
-        : "Запись оплаты с этим референсом не найдена — проверьте вручную",
+        ? `Запись оплаты ${payment.id} помечена: ${status === "refunded" ? "возвращена" : "частично возвращена"}`
+        : "Запись оплаты не найдена — проверьте вручную",
+      accessClosed ? "Период сопровождения по этой оплате закрыт." : null,
+      payment && status === "partially_refunded" ? "Доступ не менялся — решите вручную, нужно ли его сократить." : null,
+      payment && status === "refunded" ? "Если у клиента есть автопродление, проверьте подписку в Stripe: возврат её не отменяет." : null,
       charge.billing_details?.email
         ? `Email плательщика: ${charge.billing_details.email}`
         : null
