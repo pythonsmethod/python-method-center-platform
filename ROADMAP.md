@@ -10,11 +10,11 @@
       public RU/EN pages and 1/6/12-period amounts without a Live purchase.
 - [x] Obtain official Stripe Payment Link write permission and deactivate the
       three identified 5-week/100-day links; each was read back inactive.
-- [ ] Verify an authenticated no-charge transition into Live Checkout and
-      production-domain return when an existing owner account is available;
-      never use Live keys or the production database for a test purchase.
-- [ ] Merge the final release record and close the no-charge Live Checkout
-      transition verification; no Live test purchase is authorized.
+- [x] Merge the final release record in PR #230 after GitHub CI and Vercel
+      Preview passed; its docs-only Production deployment reached READY.
+- [ ] With the authenticated owner account and explicit consent to both legal
+      checkboxes, verify a no-charge transition into Live Checkout and the
+      production-domain return. Never complete a Live test purchase.
 
 ## ANHAM philosophical communication — 2026-09-27
 
