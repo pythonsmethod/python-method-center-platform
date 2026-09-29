@@ -1,5 +1,17 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## NEXORA diagnostic catalog for staff ANHAM — 2026-09-29 — LOCAL RELEASE CANDIDATE
+
+NEXORA PR #2 merged the standalone `@nexora/diagnostic-catalog` 0.1.0
+package. PMC now has a local candidate that pins its generated artifact and
+offers a reference lookup to staff text and voice ANHAM. The selected Case's
+saved document-evidence tool can tie a lookup to one exact source row/page.
+It does not change the document processor, source facts, numeric values,
+normalization or Karen decisions. Synthetic tests and build pass; production
+release and authenticated readback are not yet claimed. The current real
+Case was not reprocessed. See
+[`docs/ankh/nexora_diagnostic_catalog_pmc_2026_09_29.md`](docs/ankh/nexora_diagnostic_catalog_pmc_2026_09_29.md).
+
 ## PMC internal picture readback — 2026-09-29 UTC — RELEASED, KAREN REVIEW PENDING
 
 PR #251 merged as `e26ea6e6cceb0a675a31b2f8bb90aaf73316b2f8`;

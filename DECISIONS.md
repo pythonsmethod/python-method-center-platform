@@ -1,5 +1,17 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## NEXORA-CATALOG-2026-09-29-01 — Staff reference lookup beside saved Case evidence
+
+Consume NEXORA's versioned diagnostic catalog through an integrity-pinned
+local package in the PMC adapter. Offer the same read-only lookup to staff
+ANHAM text and voice, with an optional saved evidence ID and source anchor
+in the new document tool. Keep patient records, Case authorization, history,
+lab conversions and Karen review in PMC. A catalog candidate never changes
+the original, becomes VERIFIED, supplies a reference interval or assigns a
+patient standard code. Fail closed on unavailable catalog/audit; no model
+supplied Case ID or patient lookup. Releasing this adapter does not require
+a full NEXORA API launch or rerunning the active Case before Before.
+
 ## PMC-CHAIN-2026-09-29-07 — Describe empty sections without negating source exceptions
 
 The structured-fact contradiction list and Karen's note list are distinct

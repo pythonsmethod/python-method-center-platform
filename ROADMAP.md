@@ -1,5 +1,17 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## NEXORA diagnostic catalog → ANHAM, 2026-09-29
+
+- [x] Package NEXORA-owned version 0.1.0 with attribution and artifact integrity.
+- [x] Add bounded staff text/voice lookup and a saved evidence-row link in the
+      new document tool; keep source/trust/Karen decisions unchanged.
+- [x] Pass synthetic authorization, unknown-result, text/voice, type/build and
+      tracing checks locally.
+- [ ] Publish and release the PMC candidate, then read back the deployed
+      catalog version in an authorized staff session using a synthetic term.
+- [ ] After Before is completed, separately decide whether a bounded real
+      Case acceptance lookup is needed; no automatic document reprocessing.
+
 ## Live PMC focus pilot — 2026-09-28
 
 - [x] Merge and deploy PR #237 with an initially empty Case allowlist and

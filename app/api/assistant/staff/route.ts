@@ -177,7 +177,7 @@ export async function POST(request: Request) {
   // Attachments go to the one provider that reads photos and PDFs directly.
   // The arbiter path is skipped for such a question rather than answering it
   // without seeing the file.
-  const result = await withConversationArchive({ profileId: auth.userId, private: true,
+  const result = await withConversationArchive({ profileId: auth.userId, private: true, catalogTools: true,
     caseId: typeof rawCaseId === "string" && isUuid(rawCaseId) ? rawCaseId : null }, async () => attachments
     ? hasClaudeEnv()
       ? await askClaude(system, messages, 5000, attachments)
