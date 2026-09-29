@@ -1,5 +1,11 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Karen daily workspace — 2026-09-29
+
+- [x] Restrict Today to factual same-day Case activity.
+- [x] Remove developer/configuration panels from Today.
+- [ ] Complete authenticated RU → EN → RU production acceptance.
+
 ## NEXORA diagnostic catalog → ANHAM, 2026-09-29
 
 - [x] Package NEXORA-owned version 0.1.0 with attribution and artifact integrity.

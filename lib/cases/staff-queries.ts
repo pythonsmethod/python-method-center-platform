@@ -51,6 +51,55 @@ export type StaffCasesResult =
       message: string;
     };
 
+export type KarenTodayActivity = {
+  caseIds: string[];
+  latestAtByCase: Record<string, string>;
+};
+
+type TodayActivityRow = {
+  case_id?: string | null;
+  id?: string | null;
+  created_at: string;
+};
+
+export async function getKarenTodayActivity(
+  dayStart: string,
+  dayEnd: string
+): Promise<KarenTodayActivity> {
+  const supabase = createSupabaseServiceClient();
+  if (!supabase) return { caseIds: [], latestAtByCase: {} };
+
+  const query = (table: string, columns: string) =>
+    supabase
+      .from(table)
+      .select(columns)
+      .gte("created_at", dayStart)
+      .lt("created_at", dayEnd)
+      .limit(2000);
+  const results = await Promise.all([
+    query("client_cases", "id, created_at"),
+    query("case_messages", "case_id, created_at"),
+    query("uploaded_documents", "case_id, created_at"),
+    query("onboarding_submissions", "case_id, created_at"),
+    query("payments", "case_id, created_at"),
+    query("case_lifecycle_events", "case_id, created_at")
+  ]);
+  const latestAtByCase: Record<string, string> = {};
+
+  for (const result of results) {
+    if (result.error) continue;
+    for (const row of (result.data ?? []) as unknown as TodayActivityRow[]) {
+      const caseId = row.case_id ?? row.id;
+      if (!caseId) continue;
+      if (!latestAtByCase[caseId] || row.created_at > latestAtByCase[caseId]) {
+        latestAtByCase[caseId] = row.created_at;
+      }
+    }
+  }
+
+  return { caseIds: Object.keys(latestAtByCase), latestAtByCase };
+}
+
 export async function getStaffCases(): Promise<StaffCasesResult> {
   const supabase = createSupabaseServiceClient();
 

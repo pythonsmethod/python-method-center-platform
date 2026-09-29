@@ -2,13 +2,10 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { PageHeader } from "@/components/PageHeader";
 import { AuthSetupNotice } from "@/components/AuthSetupNotice";
-import { LogoutButton } from "@/components/LogoutButton";
 import { AnhamAvatar } from "@/components/assistant/AnhamAvatar";
 import { AssistantChat } from "@/components/assistant/AssistantChat";
-import { KnowledgePanel } from "@/components/assistant/KnowledgePanel";
-import { listKnowledgeEntries } from "@/lib/assistant/knowledge";
 import { getStaffUnreadCounts } from "@/lib/messages/queries";
-import { getStaffCases } from "@/lib/cases/staff-queries";
+import { getKarenTodayActivity, getStaffCases } from "@/lib/cases/staff-queries";
 import { countryFlag } from "@/lib/profile/identity";
 import { ClientAvatar } from "@/components/cabinet/ClientAvatar";
 import { createProfileAvatarUrlMap } from "@/lib/profile/avatar";
@@ -17,6 +14,33 @@ import { canSeeProviderNames, isFounderEmail } from "@/lib/auth/require-founder"
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
 import { getLocale } from "@/lib/i18n/locale";
 import { getDictionary } from "@/lib/i18n/dictionaries";
+
+const KAREN_TIME_ZONE = "America/Los_Angeles";
+
+function karenDayBounds(now = new Date()): { start: string; end: string } {
+  const dateParts = new Intl.DateTimeFormat("en-CA", {
+    timeZone: KAREN_TIME_ZONE,
+    year: "numeric", month: "2-digit", day: "2-digit"
+  }).formatToParts(now);
+  const datePart = (type: Intl.DateTimeFormatPartTypes) =>
+    Number(dateParts.find((part) => part.type === type)?.value);
+  const year = datePart("year");
+  const month = datePart("month");
+  const day = datePart("day");
+  const midnight = (y: number, m: number, d: number) => {
+    const guess = Date.UTC(y, m - 1, d);
+    const zoned = new Intl.DateTimeFormat("en-CA", {
+      timeZone: KAREN_TIME_ZONE,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit", hourCycle: "h23"
+    }).formatToParts(new Date(guess));
+    const value = (type: Intl.DateTimeFormatPartTypes) =>
+      Number(zoned.find((part) => part.type === type)?.value);
+    const represented = Date.UTC(value("year"), value("month") - 1, value("day"), value("hour"), value("minute"), value("second"));
+    return new Date(guess - (represented - guess)).toISOString();
+  };
+  return { start: midnight(year, month, day), end: midnight(year, month, day + 1) };
+}
 
 export default async function AdminPage() {
   const auth = await getRequiredStaffUser("/admin");
@@ -61,17 +85,20 @@ export default async function AdminPage() {
     redirect("/admin/founder");
   }
 
-  const [knowledge, unread, casesResult] = await Promise.all([
-    listKnowledgeEntries(),
-    getStaffUnreadCounts(auth.email),
-    getStaffCases()
+  const day = karenDayBounds();
+  const [unread, casesResult, todayActivity] = await Promise.all([
+    getStaffUnreadCounts(auth.email, day.start),
+    getStaffCases(),
+    getKarenTodayActivity(day.start, day.end)
   ]);
-  // The queue: the most recently updated cases, each opening in the focused
-  // Today workspace (conversation and case assistant only).
   const queue = casesResult.status === "ready"
     ? [...casesResult.cases]
-        .sort((a, b) => b.updated_at.localeCompare(a.updated_at))
-        .slice(0, 8)
+        .filter((clientCase) => todayActivity.caseIds.includes(clientCase.id))
+        .sort((a, b) =>
+          (todayActivity.latestAtByCase[b.id] ?? "").localeCompare(
+            todayActivity.latestAtByCase[a.id] ?? ""
+          ) || a.id.localeCompare(b.id)
+        )
     : [];
   const avatarUrls = await createProfileAvatarUrlMap(
     queue.map((clientCase) => clientCase.profiles?.avatar_path)
@@ -87,32 +114,15 @@ export default async function AdminPage() {
   const copy = locale === "ru"
     ? {
         eyebrow: "Рабочее место команды",
-        title: "Админ-панель",
-        description: "Слева — кейсы и обращения, справа — ИИ-помощник Professor Python.",
-        sections: "Рабочие разделы",
-        session: "Сессия",
-        employee: "Сотрудник",
-        role: "Роль",
-        cases: "Кейсы",
-        casesTitle: "Кейсы клиентов",
+        title: "Сегодня",
+        description: "Только сегодняшняя работа с клиентами.",
         unread: "нов.",
-        casesText: "Анкеты онбординга, документы, история и материалы каждого кейса.",
-        casesUnread: " Есть непрочитанные сообщения от клиентов.",
-        openCases: "Открыть кейсы",
-        documents: "Документы",
-        documentsTitle: "Входящие документы",
-        documentsText: "Все загруженные документы с открытием файла по защищённой ссылке.",
-        openDocuments: "Открыть документы",
-        requests: "Обращения",
-        requestsTitle: "Сообщения клиентов",
-        requestsText: "Вопросы из кабинета: контакты клиента и управление статусом.",
-        openRequests: "Открыть обращения",
         queue: "Очередь на сегодня",
-        queueHint: "Сначала показаны последние обновлённые кейсы.",
+        queueHint: "Только клиенты, у которых сегодня были сообщения, документы или другие события.",
         allClients: "Все клиенты",
         open: "Открыть клиента",
         updated: "Обновлено",
-        noCases: "Активных кейсов пока нет.",
+        noCases: "Сегодня по клиентам пока ничего не произошло.",
         caseFallback: "Материалы кейса",
         assistant: "ИИ-помощник Professor Python",
         assistantTitle: "Рабочий чат",
@@ -126,39 +136,19 @@ export default async function AdminPage() {
         ],
         assistantMissingFounder: "ИИ-помощник ещё не подключён: добавьте в Vercel переменную окружения ANTHROPIC_API_KEY (Claude) и/или OPENAI_API_KEY (GPT) и сделайте Redeploy.",
         assistantMissing: "ИИ-помощник ещё не подключён. Напишите основателю — это настройка платформы.",
-        training: "Обучение ИИ",
-        knowledgeTitle: "База знаний",
-        knowledgeText: "Всё, что вы сохраните здесь, ИИ начнёт использовать в ответах: «ИИ клиентов» отвечает посетителям на сайте, «ИИ Professor Python» — вам в этом чате.",
-        logout: "Выйти"
+        todayMessages: "Новых сообщений сегодня"
       }
     : {
         eyebrow: "Team workspace",
-        title: "Admin panel",
-        description: "Cases and requests on the left, the Professor Python AI assistant on the right.",
-        sections: "Work sections",
-        session: "Session",
-        employee: "Team member",
-        role: "Role",
-        cases: "Cases",
-        casesTitle: "Client cases",
+        title: "Today",
+        description: "Only today's client work.",
         unread: "new",
-        casesText: "Onboarding questionnaires, documents, history and materials of every case.",
-        casesUnread: " There are unread messages from clients.",
-        openCases: "Open cases",
-        documents: "Documents",
-        documentsTitle: "Incoming documents",
-        documentsText: "Every uploaded document, opened through a protected link.",
-        openDocuments: "Open documents",
-        requests: "Requests",
-        requestsTitle: "Client messages",
-        requestsText: "Questions from the cabinet: client contacts and status management.",
-        openRequests: "Open requests",
         queue: "Today's queue",
-        queueHint: "The most recently updated cases appear first.",
+        queueHint: "Only clients with messages, documents, or other activity today.",
         allClients: "All clients",
         open: "Open client",
         updated: "Updated",
-        noCases: "There are no active cases yet.",
+        noCases: "Nothing has happened with clients today yet.",
         caseFallback: "Case materials",
         assistant: "Professor Python AI assistant",
         assistantTitle: "Work chat",
@@ -172,10 +162,7 @@ export default async function AdminPage() {
         ],
         assistantMissingFounder: "The AI assistant is not connected yet: add the ANTHROPIC_API_KEY (Claude) and/or OPENAI_API_KEY (GPT) environment variable in Vercel and redeploy.",
         assistantMissing: "The AI assistant is not connected yet. Contact the founder — this is a platform setting.",
-        training: "AI training",
-        knowledgeTitle: "Knowledge base",
-        knowledgeText: "Everything you save here the AI starts using in its answers: the client AI answers visitors on the site, the Professor Python AI answers you in this chat.",
-        logout: "Sign out"
+        todayMessages: "New messages today"
       };
 
   // One page for every screen. Phones used to get a separate "Today" page
@@ -190,35 +177,11 @@ export default async function AdminPage() {
         description={copy.description}
       />
 
-      <div className="admin-split">
-        <section aria-label={copy.sections} className="admin-split__work">
-          <div className="panel">
-            <span className="panel__label">{copy.session}</span>
-            <h2>{auth.email ?? copy.employee}</h2>
-            <p>{copy.role}: {auth.role}</p>
-            <div className="panel-actions">
-              <LogoutButton label={copy.logout} />
-            </div>
-          </div>
-          <div className="panel">
-            <span className="panel__label">{copy.cases}</span>
-            <h2>
-              {copy.casesTitle}
-              {unread.total > 0 ? (
-                <span className="unread-badge unread-badge--inline">
-                  {unread.total} {copy.unread}
-                </span>
-              ) : null}
-            </h2>
-            <p>
-              {copy.casesText}
-              {unread.total > 0 ? copy.casesUnread : ""}
-            </p>
-            <div className="panel-actions">
-              <Link className="button button--secondary" href="/admin/cases">
-                {copy.openCases}
-              </Link>
-            </div>
+      <div className="admin-split karen-today-workspace">
+        <section aria-label={copy.queue} className="admin-split__work">
+          <div className="panel karen-today-summary">
+            <span className="panel__label">{copy.todayMessages}</span>
+            <strong>{unread.total}</strong>
           </div>
           <div className="panel karen-queue">
             <div className="karen-queue__head">
@@ -248,32 +211,12 @@ export default async function AdminPage() {
                         {unreadCount > 0 ? <b>{unreadCount} {copy.unread}</b> : null}
                       </span>
                       <span>{clientCase.title ?? copy.caseFallback}</span>
-                      <small>{copy.updated}: {dateFormatter.format(new Date(clientCase.updated_at))}</small>
+                      <small>{copy.updated}: {dateFormatter.format(new Date(todayActivity.latestAtByCase[clientCase.id]))}</small>
                     </span>
                     <span className="karen-client-card__arrow" aria-label={copy.open}>›</span>
                   </Link>
                 );
               })}
-            </div>
-          </div>
-          <div className="panel">
-            <span className="panel__label">{copy.documents}</span>
-            <h2>{copy.documentsTitle}</h2>
-            <p>{copy.documentsText}</p>
-            <div className="panel-actions">
-              <Link className="button button--secondary" href="/admin/documents">
-                {copy.openDocuments}
-              </Link>
-            </div>
-          </div>
-          <div className="panel">
-            <span className="panel__label">{copy.requests}</span>
-            <h2>{copy.requestsTitle}</h2>
-            <p>{copy.requestsText}</p>
-            <div className="panel-actions">
-              <Link className="button button--secondary" href="/admin/requests">
-                {copy.openRequests}
-              </Link>
             </div>
           </div>
         </section>
@@ -300,13 +243,6 @@ export default async function AdminPage() {
                 {showProviders ? copy.assistantMissingFounder : copy.assistantMissing}
               </p>
             )}
-          </div>
-
-          <div className="panel">
-            <span className="panel__label">{copy.training}</span>
-            <h2>{copy.knowledgeTitle}</h2>
-            <p>{copy.knowledgeText}</p>
-            <KnowledgePanel entries={knowledge.entries} loadError={knowledge.error} locale={locale} />
           </div>
         </section>
       </div>

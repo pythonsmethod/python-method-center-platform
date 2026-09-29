@@ -45,7 +45,7 @@ export async function markThreadRead(
 }
 
 // Unread client messages for staff: total and per case.
-export async function getStaffUnreadCounts(email?: string | null): Promise<{
+export async function getStaffUnreadCounts(email?: string | null, since?: string): Promise<{
   total: number;
   byCase: Record<string, number>;
 }> {
@@ -56,12 +56,15 @@ export async function getStaffUnreadCounts(email?: string | null): Promise<{
     return { total: 0, byCase: {} };
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("case_messages")
     .select("case_id")
     .eq("sender_role", "client")
-    .is("read_at", null)
-    .limit(2000);
+    .is("read_at", null);
+
+  if (since) query = query.gte("created_at", since);
+
+  const { data, error } = await query.limit(2000);
 
   if (error || !data) {
     return { total: 0, byCase: {} };
