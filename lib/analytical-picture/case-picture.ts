@@ -1,4 +1,5 @@
 import { assessTrend, type TrendAssessment } from "@/lib/analysis/trend-gate";
+import type { CatalogLookup } from "@/lib/nexora/diagnostic-catalog/types";
 
 export type PictureDocument = {
   id: string;
@@ -15,6 +16,9 @@ export type PictureFact = {
   label: string;
   originalValue: string;
   originalUnit: string | null;
+  /** Printed source unit, including when originalValue already contains it. */
+  sourceUnit?: string | null;
+  catalog?: CatalogLookup;
   canonicalValue: number | null;
   canonicalUnit: string | null;
   reference: string | null;
@@ -34,6 +38,7 @@ export type PictureReviewNote = {
 };
 
 export type ExtractedClinicalEvidence = {
+  catalog?: CatalogLookup;
   reviewSnapshot?: import("./review-snapshot").StoredReviewSnapshot | null;
   reviewToken?: string;
   id: string;

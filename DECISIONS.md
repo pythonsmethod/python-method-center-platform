@@ -1,5 +1,16 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## NX-03.CATALOG-20260929 — NEXORA owns diagnostic reference lookup
+
+The global diagnostic catalog and its reusable lookup belong to NEXORA inside
+the existing runtime. PMC supplies the authorized document/Case projection and
+human review workflow; ANHAM consumes the same result. Do not duplicate the
+catalog in the assistant, introduce another evidence store or treat catalog
+recognition as clinical verification. The first connection is read-only, uses a
+local frozen snapshot and assigns no patient standard code. Existing pilot
+scope and clinical release gates remain in force. See
+`docs/ankh/nexora_diagnostic_catalog_2026_09_29.md`.
+
 ## PMC-CHAIN-2026-09-28-02 — Literal source rows are broader than laboratory facts
 
 The first bounded real Case reading found numeric patient identifiers, dates

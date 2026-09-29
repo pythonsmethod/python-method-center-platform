@@ -1,5 +1,17 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## NX-03 diagnostic catalog — 2026-09-29 UTC
+
+- [x] Package a versioned local projection of the prepared public catalog with
+      licenses, checksums and a reproducible offline importer.
+- [x] Add NEXORA name/code lookup and PMC read-only source-linked enrichment;
+      expose reference candidates through Karen's RU/EN picture and ANHAM's
+      existing staff evidence tool without changing clinical trust or storage.
+- [ ] Accept the exact candidate in isolated staging with the intended role,
+      source opening, catalog readback and both locales before live release.
+- [ ] Extend input-format adapters and terminology coverage separately; this
+      catalog connection alone does not implement all intake profiles or parsers.
+
 ## Live PMC focus pilot — 2026-09-28
 
 - [x] Merge and deploy PR #237 with an initially empty Case allowlist and

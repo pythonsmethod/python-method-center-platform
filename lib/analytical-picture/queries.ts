@@ -1,4 +1,5 @@
 import { caseEvidenceFingerprint } from "@/lib/cases/evidence-fingerprint";
+import { enrichPictureWithCatalog } from "./catalog-enrichment";
 import { readAllRows } from "@/lib/documents/read-all";
 import { buildCaseAnalyticalPicture, type ExtractedClinicalEvidence, type PictureDocument, type PictureFact, type PictureReviewNote } from "./case-picture";
 import {
@@ -99,6 +100,7 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
     id: String(row.id), documentId: row.document_id ? String(row.document_id) : null,
     observedAt: row.measured_on ? String(row.measured_on) : null, label: String(row.label_original),
     originalValue: String(row.value_printed ?? row.value_original), originalUnit: row.value_printed ? null : row.unit_original ? String(row.unit_original) : null,
+    sourceUnit: row.unit_original ? String(row.unit_original) : null,
     canonicalValue: row.value_canonical === null ? null : Number(row.value_canonical), canonicalUnit: row.unit_resolved ? String(row.unit_resolved) : null,
     reference: row.reference_original ? String(row.reference_original) : null, comparisonKey: row.analyte ? String(row.analyte) : null,
     trustState: row.unit_resolution_method === "unresolved" ? "SOURCE_ONLY" : "NEEDS_REVIEW", provenance: sourceAnchor({ source: row.source_anchor }), analysisRunId: row.analysis_run_id ? String(row.analysis_run_id) : null,
@@ -133,8 +135,9 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
 
   const newestDocumentAt = documents.reduce((latest, item) => item.createdAt > latest ? item.createdAt : latest, "");
   const analysisCurrent = Boolean(run?.id && run.created_at && run.created_at >= newestDocumentAt && documents.every(document => document.status === "ready"));
+  const picture = enrichPictureWithCatalog(buildCaseAnalyticalPicture({ caseId, documents, facts, extractedEvidence: preparedEvidence, trends: run?.trends ?? {}, blocked: run?.blocked ?? [], requests: run?.requests ?? [], excluded: run?.excluded ?? [], notes, analysisRunId: run?.id ? String(run.id) : null, analysisCurrent }));
   if (await caseEvidenceFingerprint(caseId) !== before) return { status: "unavailable", message: "CASE_PICTURE_CHANGED_DURING_READ" };
-  return { status: "ready", picture: buildCaseAnalyticalPicture({ caseId, documents, facts, extractedEvidence: preparedEvidence, trends: run?.trends ?? {}, blocked: run?.blocked ?? [], requests: run?.requests ?? [], excluded: run?.excluded ?? [], notes, analysisRunId: run?.id ? String(run.id) : null, analysisCurrent }) };
+  return { status: "ready", picture };
 }
 
 type PictureInputRun = {

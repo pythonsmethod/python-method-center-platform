@@ -37,6 +37,9 @@ const nextConfig = {
   // Vercel runtime (`mask is not a function`). Keep the package external so
   // the live-session route loads the tested Node package directly.
   serverExternalPackages: ["ws"],
+  // Versioned public terminology is read from disk by the server-only adapter.
+  // Explicit tracing keeps the snapshot available in deployed Node functions.
+  outputFileTracingIncludes: { "/*": ["./data/diagnostic-catalog/**"] },
   async headers() {
     return [
       {

@@ -1,0 +1,183 @@
+{
+  "version": "pmc-catalog-2026-09-28-v0.1",
+  "sources": {
+    "LOINC": {
+      "version": "2.83",
+      "count": 112405,
+      "url": "https://clinicaltables.nlm.nih.gov/apidoc/loinc/v3/doc.html"
+    },
+    "GTR": {
+      "version": "2026-09-27",
+      "count": 64009,
+      "url": "https://www.ncbi.nlm.nih.gov/gtr/docs/maintenance_use/"
+    },
+    "PMC_FAMILY": {
+      "version": "v1",
+      "count": 284
+    }
+  },
+  "files": [
+    {
+      "path": "loinc-01.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "e2ad24d7e437ca56e3b16fff7335ad27ad54ca1fbf10a846f66aaf8b63380f60",
+      "uncompressedBytes": 2250017
+    },
+    {
+      "path": "loinc-02.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "46fd20e90a10d81425d90781fda3a2f0838cd9cbb7dc9e4a7167e8e1b6fb89e1",
+      "uncompressedBytes": 2336234
+    },
+    {
+      "path": "loinc-03.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "30192e993fac7bf59de74af5874bb53c7969ae525eb1f14575d5e68a653178cf",
+      "uncompressedBytes": 2338665
+    },
+    {
+      "path": "loinc-04.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "da6c55613980b67d525e21d14528a4338d844de3a6799d4bff9f4ed247c9f347",
+      "uncompressedBytes": 2294091
+    },
+    {
+      "path": "loinc-05.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "3164c1d2077d4ae7f1cc5ca23227682e5de33ea6ff8079f46a7a070bf2da2fa4",
+      "uncompressedBytes": 2374988
+    },
+    {
+      "path": "loinc-06.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "d3815eb53a9380e28f5d4dd05dbe2271b691475e229a94ba4942d0b1452a9720",
+      "uncompressedBytes": 2355300
+    },
+    {
+      "path": "loinc-07.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "e882806036b0d28ca8576cca6dcfda10a66ab3e1e2271f5224e81f7dbb11c92d",
+      "uncompressedBytes": 2472967
+    },
+    {
+      "path": "loinc-08.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "d42a9e4079d58515b315d0d3b59dd9a66f7f63f511ba454441f67d26c49402e2",
+      "uncompressedBytes": 2448515
+    },
+    {
+      "path": "loinc-09.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "ac6b6ad47cbbb205e8da2deecd2dc9291dd9f9ce4db7ec74991a1c8ee18ad770",
+      "uncompressedBytes": 2462135
+    },
+    {
+      "path": "loinc-10.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "95256a45c244472c550c0fd8626c5ebb8be800a9f465c029893757912d6b774a",
+      "uncompressedBytes": 2420462
+    },
+    {
+      "path": "loinc-11.json.gz",
+      "system": "LOINC",
+      "records": 10000,
+      "sha256": "702968a28cef0a5beb5978a33f51c68ca123f3c1a9d54b3b4d29a6b15afb2138",
+      "uncompressedBytes": 5283882
+    },
+    {
+      "path": "loinc-12.json.gz",
+      "system": "LOINC",
+      "records": 2405,
+      "sha256": "fe319b0cf1016f0277878b4458efcad5f5d104ab11b2b8b6a50964117ac5770b",
+      "uncompressedBytes": 1106344
+    },
+    {
+      "path": "gtr-01.json.gz",
+      "system": "GTR",
+      "records": 10000,
+      "sha256": "d80f95006822868d527db7e50b971a70e650531b9715b082b26848d8d485a950",
+      "uncompressedBytes": 1991750
+    },
+    {
+      "path": "gtr-02.json.gz",
+      "system": "GTR",
+      "records": 10000,
+      "sha256": "de9d5a35b0421418f35478d29562d1b49a2486735667caf1a582c680ec7f2bd1",
+      "uncompressedBytes": 1825854
+    },
+    {
+      "path": "gtr-03.json.gz",
+      "system": "GTR",
+      "records": 10000,
+      "sha256": "8aa364bf1f7505594021ad10f10e6225aa7943e1060df3b73f47192775c1b134",
+      "uncompressedBytes": 1953920
+    },
+    {
+      "path": "gtr-04.json.gz",
+      "system": "GTR",
+      "records": 10000,
+      "sha256": "93835a9ce7c62fb44a62a1e4c65abc91b4902e08d78848cf7e6d43aa2b0745f2",
+      "uncompressedBytes": 2488275
+    },
+    {
+      "path": "gtr-05.json.gz",
+      "system": "GTR",
+      "records": 10000,
+      "sha256": "c37e956c8472d46e574b6f1c17e09c23363ab5bcc8f430657334b1c86498148f",
+      "uncompressedBytes": 3073647
+    },
+    {
+      "path": "gtr-06.json.gz",
+      "system": "GTR",
+      "records": 10000,
+      "sha256": "520163725014d0332cedf4163522a14a1922b1ad6d6102cb242960c6f7931f63",
+      "uncompressedBytes": 2161217
+    },
+    {
+      "path": "gtr-07.json.gz",
+      "system": "GTR",
+      "records": 4009,
+      "sha256": "f244b02887a9f1f86c91fd312518c38494d4dbafb6511581d6a694c761c8478e",
+      "uncompressedBytes": 837249
+    },
+    {
+      "path": "pmc_family-01.json.gz",
+      "system": "PMC_FAMILY",
+      "records": 284,
+      "sha256": "cac721489cc04c4716f6d355d94a3eab0e0d1e0176e57a04ec51ce0aacfa9552",
+      "uncompressedBytes": 35934
+    },
+    {
+      "path": "ucum.json.gz",
+      "system": "UCUM",
+      "records": 759,
+      "sha256": "93918349c9909ccc91b7b4c9c5518b1136f1ba4b73994cf185b17a81bab9a499",
+      "uncompressedBytes": 193650
+    }
+  ],
+  "clinicalValidation": false,
+  "missingLoincAxes": [
+    "SYSTEM",
+    "TIME_ASPCT",
+    "SCALE_TYP",
+    "CLASS",
+    "STATUS"
+  ],
+  "unitConversion": false,
+  "sourceSha256": {
+    "loinc_nlm_2.83.ndjson": "0180d13fee8d68474991f4d95503eb264cb4bb5bafddc7c94cfaab575ab95235",
+    "loinc_external_rights_index.ndjson": "4aaf082529d5511c9f58d55fc703797c5c1513df1c6a74374eb477893b3adc3e",
+    "gtr_current_public_tests.ndjson": "389f0425034eebcc67af9f19101bac5536ae04bb6f87e9d67f5173e4149a9ba6"
+  },
+  "ucumCount": 759
+}

@@ -1,5 +1,19 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## NEXORA diagnostic catalog integration — 2026-09-29 UTC — CANDIDATE, NOT RELEASED
+
+The prepared diagnostic catalog is connected as a read-only reference projection
+of the new PMC document picture. NEXORA owns the local, versioned lookup; PMC
+retains Case authorization, source provenance and Karen decisions; ANHAM uses
+the same metadata through its existing staff text/voice evidence tool. The
+snapshot contains 176,698 reference entries plus a 759-code UCUM list. Matching
+does not assign a clinical code, convert a value or increase trust. Unknown,
+ambiguous and unavailable results remain explicit in RU/EN. The integration
+includes current `main` PR #246 without changing its projection repair.
+No production deployment, reprocessing, role change or client publication is
+part of this catalog increment. See
+`docs/ankh/nexora_diagnostic_catalog_2026_09_29.md` for scope, validation and limits.
+
 ## PMC first real document pilot — 2026-09-28 — SOURCE READ COMPLETE, FACT PROJECTION REPAIR PENDING
 
 The owner authorized the existing Karen account as the Production clinical

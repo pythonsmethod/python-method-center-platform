@@ -27,6 +27,15 @@ describe("shared selected-Case document evidence",()=>{
   expect(await readCaseDocumentEvidence({...scope,private:false},{},"text")).toEqual({status:"forbidden"});
   expect(await readCaseDocumentEvidence({...scope,caseId:null},{},"text")).toMatchObject({status:"select_case"});expect(mock.picture).not.toHaveBeenCalled();
  });
+ it("passes reference metadata to both staff channels without promoting it to a clinical fact",async()=>{
+  const catalog={version:"synthetic-catalog-v1",state:"candidates",assignedStandardCode:null,clinicalFactVerified:false,requiresHumanReview:true,candidates:[{system:"LOINC",code:"1988-5",display:"C reactive protein [Mass/volume] in Serum or Plasma",version:"2.83"}]};
+  mock.picture.mockResolvedValue({status:"ready",picture:{extractedEvidence:[{id:"synthetic-evidence",label:"CRP",value:"1.2 mg/L",trustState:"SOURCE_ONLY",reviewDecision:"PENDING",catalog}],documents:[],comparisons:[],missingContext:[]}});
+  for(const channel of ["text","voice"] as const){
+   const result=await readCaseDocumentEvidence(scope,{},channel);
+   expect(result).toMatchObject({status:"ready",evidence:[{value:"1.2 mg/L",trustState:"SOURCE_ONLY",reviewDecision:"PENDING",catalog}]});
+   expect("coverage" in result && result.coverage).toContain("not a patient finding or accepted code");
+  }
+ });
  it("does not claim evidence is absent when lookup or audit fails",async()=>{
   mock.picture.mockResolvedValue({status:"unavailable"});expect(await readCaseDocumentEvidence(scope,{},"text")).toMatchObject({status:"unavailable"});
  });
