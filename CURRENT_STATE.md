@@ -1,15 +1,20 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## NEXORA diagnostic catalog for staff ANHAM — 2026-09-29 — LOCAL RELEASE CANDIDATE
+## NEXORA diagnostic catalog for staff ANHAM — 2026-09-29 — RELEASED, STAFF READBACK PENDING
 
 NEXORA PR #2 merged the standalone `@nexora/diagnostic-catalog` 0.1.0
-package. PMC now has a local candidate that pins its generated artifact and
-offers a reference lookup to staff text and voice ANHAM. The selected Case's
-saved document-evidence tool can tie a lookup to one exact source row/page.
+package. PMC PR #255 merged as `765cb564f74599103379d235457abaa4a6b2789d`
+after successful GitHub CI and a READY Preview of its exact tree. Production
+deployment `dpl_6naCgxoDL6RPtHSnDSYZUi2XKnLS` reached READY on both
+primary domains; the `/login` page returned HTTP 200. PMC pins the generated
+artifact and offers a reference lookup to staff text and voice ANHAM. The
+selected Case's saved document-evidence tool can tie a lookup to one exact
+source row/page.
 It does not change the document processor, source facts, numeric values,
-normalization or Karen decisions. Synthetic tests and build pass; production
-release and authenticated readback are not yet claimed. The current real
-Case was not reprocessed. See
+normalization or Karen decisions. Six new synthetic checks, the 309-test
+document-chain suite, full remote CI, and the exact production build pass.
+An authenticated staff lookup on the deployed site has not yet been observed;
+the current real Case was not reprocessed. See
 [`docs/ankh/nexora_diagnostic_catalog_pmc_2026_09_29.md`](docs/ankh/nexora_diagnostic_catalog_pmc_2026_09_29.md).
 
 ## PMC internal picture readback — 2026-09-29 UTC — RELEASED, KAREN REVIEW PENDING

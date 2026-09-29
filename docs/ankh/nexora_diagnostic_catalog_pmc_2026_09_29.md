@@ -53,8 +53,13 @@ The catalog is a terminology reference, not all examinations worldwide and
 not a source of normal ranges or patient interpretation. The named code may
 be found without being the correct mapping for a particular report. A live
 NEXORA API and general document capability migration are still separate work.
-Local implementation is complete; release and authenticated staff readback
-need their own receipts. If deployed, use an authorized staff session with a
-synthetic term and confirm the version and source link; leave the current
-real Case untouched until its Before boundary is complete. External NEXORA
-API publication is outside this release.
+Implementation and release: PR #255 merged as
+`765cb564f74599103379d235457abaa4a6b2789d`; all GitHub CI steps passed.
+The exact head Preview `dpl_27SPgQ3GbxoCb84ASWP6yiZjWDUT` and Production
+`dpl_6naCgxoDL6RPtHSnDSYZUi2XKnLS` reached READY. Both primary domains
+were assigned and the Production login page returned HTTP 200. An authorized
+staff lookup in the deployed runtime remains unobserved; a READY deployment
+does not prove that action. The next action is to read a synthetic term in a
+staff session, confirm the version and (for a separately selected synthetic
+Case) source link, and leave the current real Case untouched until its Before
+boundary is complete. External NEXORA API publication is outside this release.
