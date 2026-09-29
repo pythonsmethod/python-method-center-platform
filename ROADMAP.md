@@ -1,5 +1,17 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Multilingual internal document reading — 2026-09-29
+
+- [x] Build a pilot-scoped, source-paired Russian translation view of saved
+      rows with per-row language estimate, page link and fail-closed numeric,
+      unit, completeness and evidence-snapshot checks. Synthetic boundaries
+      include Armenian, German, Bulgarian, Korean, Swiss languages and Spanish.
+- [ ] Release and read back the staff-only view in the existing enabled Case;
+      the current documents are not a multilingual acceptance set.
+- [ ] Validate OCR coverage and translation against human-reviewed real
+      documents across languages/layouts before broader rollout or translated
+      labels can inform canonical facts. No automatic VERIFIED.
+
 ## Live PMC focus pilot — 2026-09-28
 
 - [x] Merge and deploy PR #237 with an initially empty Case allowlist and
