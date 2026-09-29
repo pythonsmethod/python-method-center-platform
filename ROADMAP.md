@@ -33,9 +33,10 @@
       model (PR #251, `e26ea6e`). A fresh three-document internal draft was
       saved: 41 distinct valid source IDs in the draft and 36/36 disputed IDs
       in the unresolved queue. It remains unapproved; 0/36 Karen decisions.
-- [ ] Release the RU/EN empty-state wording repair so the separate
-      `Противоречия` and `Замечания Карен` sections do not claim that the
-      36 source-reading exceptions are absent. Verify both locales live.
+- [x] Release the RU/EN empty-state wording repair (PR #252, `7fa325a`).
+      Signed-in Production readback in RU and EN distinguishes empty
+      structured contradictions and Karen notes from the 36 source-reading
+      exceptions; the Case route survives both language switches.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

@@ -20,9 +20,11 @@ NO-GO** for those downstream steps.
 
 One UI copy contradiction remained: an empty structured-contradiction or
 Karen-note section said no manual discrepancy existed while the exception
-queue held 36. A presentation-only RU/EN follow-up gives each empty section
-its own accurate label and directs source disputes to the queue; release and
-signed-in readback are pending.
+queue held 36. PR #252 merged as `7fa325a5d775fb793d493580571e211e0335db30`;
+Production `dpl_AXiSv4B2Hn5PUvkf2ExEq4CmRKs3` reached READY on both
+primary domains. Signed-in RU → EN → RU readback on the same Case route
+confirms separate accurate empty labels, 36 outstanding exceptions and
+disabled approval. No source evidence or trust state changed.
 
 ## Internal draft citation follow-up — 2026-09-29 UTC
 
