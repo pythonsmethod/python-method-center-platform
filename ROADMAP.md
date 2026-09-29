@@ -14,9 +14,15 @@
 - [x] Read only the selected Case's three active PDFs; confirm page coverage,
       source snapshots and disputed rows. Pause the Case on discovering that
       administrative numbers entered the laboratory timeline.
-- [ ] Release the generic fact-projection repair and rerun the same three PDFs;
-      read back the source anchors, unit/date uncertainty and the absence of
-      administrative facts in the laboratory timeline.
+- [x] Release the generic fact-projection repair (PR #246, `dfbc393`) and
+      rerun the same three PDFs. Readback shows five page-anchored numeric
+      values, no administrative facts in the laboratory timeline, three
+      unresolved units and no usable collection dates. One internal draft is
+      saved, while approval remains blocked.
+- [ ] Improve the generic double-reading representation of matching numbers
+      with disputed date/material/method context. In the blood-count reading,
+      29 such rows remain review-only and no numeric blood-count fact enters
+      the current projection. Keep uncertainty and source history intact.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

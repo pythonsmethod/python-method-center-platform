@@ -13,6 +13,14 @@ to make a timeline look complete. The pilot is paused until a generic repair
 is released and the selected source is rerun; Karen retains verification and
 decision authority.
 
+Release readback: PR #246 and the bounded rerun removed administrative values
+from the laboratory timeline. The pilot is now enabled only for the selected
+Case. Agreement on a printed number with disagreement on material/date/method
+still leaves that row in human review; do not relax the comparator silently.
+An internal AI draft may describe the unresolved rows, but cannot approve them
+or publish a client response. The next comparator change needs a separate
+synthetic safety regression and source review.
+
 ## PMC-CHAIN-2026-09-27-01 — Integrate on current PMC without widening clinical trust
 
 The owner requested the existing eleven-step document chain in the working Python

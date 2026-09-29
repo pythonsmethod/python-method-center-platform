@@ -1,6 +1,6 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## PMC first real document pilot — 2026-09-28 — SOURCE READ COMPLETE, FACT PROJECTION REPAIR PENDING
+## PMC first real document pilot — 2026-09-29 UTC — REPAIR LIVE, KAREN REVIEW PENDING
 
 The owner authorized the existing Karen account as the Production clinical
 reviewer and selected one real Case for a bounded pilot. `KAREN_PRIMARY_EMAIL`
@@ -14,14 +14,25 @@ case-learning event.
 
 The live result exposed a generic projection defect: numeric administrative
 fields from literal source reading entered the laboratory fact timeline. The
-pilot was paused again with its snapshots retained. A source-preserving
-projection repair excludes administrative/date rows and restores document-date
-inheritance only when a row has no printed date. Its synthetic regression and
-release status are tracked in
-`docs/ankh/pmc_fact_projection_pilot_2026_09_28.md`. The pilot must be rerun
-after the repair is released. Most measurements remain unresolved for unit or
-date; neither disputed rows nor the account's weak name-only identity match
-establish a verified clinical fact. No other Case is enrolled.
+pilot was paused with its snapshots retained. PR #246 was merged as
+`dfbc393`; its Production deployment `dpl_5QKJEqqQcrFnkwGfcj1zQPyhnmox`
+reached READY on the primary domains. The source-preserving repair excludes
+administrative/date rows and restores document-date inheritance only when a
+row has no printed date. The same three files were rerun, leaving six immutable
+run snapshots and three latest ready jobs. The new double readings contain
+39 agreed and 52 disputed rows; five numeric values have page anchors and
+none is an administrative field. Three units remain unresolved and no value
+has a usable collection date. In the blood count, 29 disagreements have the
+same printed value but differ in date/material/method context; no blood-count
+number entered the current numeric projection.
+
+One internal AI draft was saved for Karen from the current evidence fingerprint
+and survived reload. All 52 disputed rows still require review. No Karen
+evidence decision, conclusion approval or client publication occurred; the
+approval control is blocked. The account's weak name-only identity match
+remains unreviewed. Exactly one Case is enrolled and enabled for the bounded
+pilot. See `docs/ankh/pmc_fact_projection_pilot_2026_09_28.md`. These facts
+establish the repaired projection on one Case, not general clinical accuracy.
 
 ## PMC bounded document pilot — 2026-09-28 — LIVE CODE, FIRST CASE PAUSED
 
