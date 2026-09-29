@@ -480,6 +480,11 @@ describe("whole-document content classification", () => {
 });
 
 describe("what must never pass quietly", () => {
+  it("does not promote different numeric readings even when their context also differs", () => {
+    const first = row({label:"CRP",value:"5 mg/L",specimen:"Serum"});
+    const second = row({label:"CRP",value:"8 mg/L",specimen:null});
+    expect(compareTranscriptions([first],[second])).toMatchObject({agreed:[],disputed:[{reason:"разные значения",first:"5 mg/L",second:"8 mg/L"}]});
+  });
   it("holds back a value the two readings disagree on", () => {
     // The real failure, reproduced: one reading slid a row and reported the
     // body-mass index as the smoking answer.

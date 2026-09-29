@@ -1,5 +1,23 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC matching values with disputed context — 2026-09-29 UTC — CANDIDATE, NOT YET LIVE
+
+The latest bounded Case extraction has 30 rows where the literal value matches
+between readings but the specimen is reported by only one reader; one of
+those rows also differs in collection date. The source itself has not been
+independently inspected, so the context cannot be settled by the model.
+
+A generic local change represents matching values as page-anchored source-only
+observations while keeping separate context exceptions for Karen. Conflicting
+date/material/method fields remain null in the numeric projection. Such rows
+are counted for human review and excluded from interpretation, prior-point
+reuse and time comparisons even if their printed unit is explicit. Incomplete
+pages cannot produce agreed rows. Analysis/processor versions advance to
+`pmc-analysis-1.4.0` and `pmc-document-chain-v2`; no schema change is needed.
+The existing Case must be reprocessed under a released build before these
+properties can be claimed for its saved snapshot. No source dispute, identity,
+unit or clinical decision is automatically resolved.
+
 ## PMC first real document pilot — 2026-09-29 UTC — REPAIR LIVE, KAREN REVIEW PENDING
 
 The owner authorized the existing Karen account as the Production clinical

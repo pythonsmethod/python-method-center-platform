@@ -22,7 +22,10 @@
 - [ ] Improve the generic double-reading representation of matching numbers
       with disputed date/material/method context. In the blood-count reading,
       29 such rows remain review-only and no numeric blood-count fact enters
-      the current projection. Keep uncertainty and source history intact.
+      the current projection. Local candidate separates matching literal
+      values from context exceptions with exclusion from interpretation;
+      release and exact-Case readback remain before this item can close.
+      Keep uncertainty and source history intact.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

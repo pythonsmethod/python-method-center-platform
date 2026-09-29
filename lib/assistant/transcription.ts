@@ -31,6 +31,9 @@ export type TranscribedValue = {
   collectionDatePrinted?: string | null;
   specimen?: string | null;
   method?: string | null;
+  // The printed value matched, but these contextual fields did not. Keep
+  // the numeric observation separate from the source-bound review item.
+  contextDisputed?: Array<"collectionDatePrinted" | "specimen" | "method">;
   source?: import("@/lib/documents/source").SourceAnchor;
   // The file this was read from, exactly as it is named in the case, so a
   // person can find it.
@@ -64,7 +67,7 @@ export type DisputedValue = {
   // at all — which is itself a disagreement worth a human's eyes.
   first: string | null;
   second: string | null;
-  reason: "разные значения" | "прочитано только один раз" | "чтение неуверенное" | "источник виден не полностью";
+  reason: "разные значения" | "контекст не совпадает" | "прочитано только один раз" | "чтение неуверенное" | "источник виден не полностью";
   note: string;
 };
 
@@ -583,12 +586,6 @@ export function compareTranscriptions(
       continue;
     }
 
-    if (["collectionDatePrinted", "specimen", "method"].some(key => row[key as keyof TranscribedValue] !== match[key as keyof TranscribedValue])) {
-      const literal = (item: TranscribedValue) => [item.value, item.collectionDatePrinted, item.specimen, item.method].map(value => value ?? "?").join(" | ");
-      disputed.push({ file: row.file, section: row.section, label: row.label, first: literal(row), second: literal(match), reason: "разные значения", note: "DATE_SPECIMEN_METHOD_CONFLICT" });
-      continue;
-    }
-
     if (!row.confident || !match.confident) {
       disputed.push({
         file: row.file,
@@ -621,8 +618,18 @@ export function compareTranscriptions(
         note: "совпавший видимый фрагмент не подтверждается автоматически, потому что часть документа отсутствует"
       });
     } else {
+      const contextDisputed = (["collectionDatePrinted", "specimen", "method"] as const)
+        .filter(key => row[key] !== match[key]);
+      if (contextDisputed.length) {
+        const literal = (item: TranscribedValue) => [item.value, item.collectionDatePrinted, item.specimen, item.method].map(value => value ?? "?").join(" | ");
+        disputed.push({ file: row.file, section: row.section, label: row.label, first: literal(row), second: literal(match), reason: "контекст не совпадает", note: "DATE_SPECIMEN_METHOD_CONFLICT" });
+      }
       agreed.push({
         ...row,
+        ...(contextDisputed.length ? {
+          contextDisputed,
+          ...Object.fromEntries(contextDisputed.map(key => [key, null]))
+        } : {}),
         referenceConfirmed: referenceRangesMatch(row.reference, match.reference)
       });
     }
@@ -664,7 +671,7 @@ export function formatAgreed(values: TranscribedValue[]): string {
 
   return [...bySection.entries()]
     .map(([heading, rows]) =>
-      [`### ${heading}`, ...rows.map((row) => `- ${row.label}: ${row.value}`)].join("\n")
+      [`### ${heading}`, ...rows.map((row) => `- ${row.label}: ${row.value}${row.contextDisputed?.length ? " (контекст не совпал; источник и дата/материал/метод требуют проверки Карен)" : ""}`)].join("\n")
     )
     .join("\n\n");
 }

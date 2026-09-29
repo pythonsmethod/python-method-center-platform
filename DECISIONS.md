@@ -1,5 +1,19 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-29-03 — Split printed-value agreement from context disagreement
+
+In the bounded real Case, 30 rows have an identical printed value in both
+readings, while only one reading supplied a specimen; one row also has a date
+disagreement. The source has not been independently checked. A comparator
+must therefore retain the matching literal value and its page anchor separately
+from a review-required context exception, with both original readings retained.
+It must clear only the disputed context fields, prevent an uncertain date from
+inheriting a document date, and exclude that numeric observation from
+interpretation, prior comparisons and trends. A Karen evidence decision remains
+required for every context exception; no automatic VERIFIED or approval follows.
+An incomplete page or uncertain reading cannot contribute even a source-only
+numeric agreement. This is a generic rule, not a correction of source content.
+
 ## PMC-CHAIN-2026-09-28-02 — Literal source rows are broader than laboratory facts
 
 The first bounded real Case reading found numeric patient identifiers, dates

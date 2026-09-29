@@ -36,4 +36,12 @@ describe("Case timeline source label", () => {
     const html = render("ru", { ...result, provenance: { ...result.provenance, related: { page: 1, sourceHash: "b".repeat(64), excerpt: "Test | wrong marker" } } });
     expect(html).not.toContain("Test | wrong marker");
   });
+
+  it("marks matching values with unsettled context in both languages", () => {
+    for (const [locale, caption] of [["ru", "Контекст требует проверки"], ["en", "Context requires review"]] as const) {
+      const html = render(locale, {...result, trustState:"SOURCE_ONLY",comparisonContext:{specimen:null,method:"Immunoturbidimetry",review_required:true}});
+      expect(html).toContain(caption);
+      expect(html).toContain(locale === "ru" ? "только источник" : "source only");
+    }
+  });
 });
