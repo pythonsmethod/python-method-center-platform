@@ -1,5 +1,29 @@
 # Bounded PMC fact-projection pilot — 2026-09-28/29 UTC
 
+## Current internal review and UI follow-up — 2026-09-29 UTC
+
+PR #251 merged as `e26ea6e6cceb0a675a31b2f8bb90aaf73316b2f8`;
+Production `dpl_9dEv2zSwZVukPDFKB5oF97XSYC88` is READY. The signed-in
+Karen action saved a new internal review from all three current files. SQL
+readback found 45 exact source citations in the draft (41 distinct), zero
+foreign IDs; the unresolved queue contains all 36 current disputed IDs
+exactly once at the distinct-ID level, with zero omissions. UI reload shows
+the review current, 0/36 manual decisions and disabled approval.
+
+The 36 disputed readings remain source-review work: 15 one-read, 11
+uncertain, five unit exceptions, three context differences and two literal
+differences. The five matching numbers have bare SOURCE_ONLY observations,
+without a confirmed unit or trend. None became VERIFIED. No original PDF was
+independently inspected, no Karen clinical decision was made, and no client
+response or learning event was created. The pilot remains **NOT CLOSED /
+NO-GO** for those downstream steps.
+
+One UI copy contradiction remained: an empty structured-contradiction or
+Karen-note section said no manual discrepancy existed while the exception
+queue held 36. A presentation-only RU/EN follow-up gives each empty section
+its own accurate label and directs source disputes to the queue; release and
+signed-in readback are pending.
+
 ## Internal draft citation follow-up — 2026-09-29 UTC
 
 PR #250 merged as `81f95d31c8d488c0c519841c8bc26901108fead5`;
