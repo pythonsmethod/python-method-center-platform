@@ -1,5 +1,6 @@
 import { toIsoDate } from "@/lib/assistant/metadata";
 import { compareTranscriptions, parseTranscription, type DisputedValue, type TranscribedValue } from "@/lib/assistant/transcription";
+import type { ExtractedValueRow } from "@/lib/analysis/pipeline";
 import type { PageCoverage, SourceAnchor } from "./source";
 
 export type ReadPage = {
@@ -10,6 +11,18 @@ export type ReadPage = {
   disputed: DisputedValue[];
   coverage: PageCoverage;
 };
+
+export function analysisRowsFromPageReadings(rows: TranscribedValue[]): ExtractedValueRow[] {
+  return rows.map(row => ({
+    section: row.section, label: row.label, value: row.value,
+    reference: row.reference, referenceConfirmed: row.referenceConfirmed,
+    source: row.source,
+    // An absent row date inherits the document's collection date. A printed
+    // but ambiguous row date remains null and never inherits another date.
+    collectionDate: row.collectionDatePrinted ? toIsoDate(row.collectionDatePrinted) : undefined,
+    comparisonContext: { specimen: row.specimen ?? null, method: row.method ?? null }
+  }));
+}
 
 export function buildReadPage(firstText: string, secondText: string, page: number, hash: string, filename: string): ReadPage {
   const anchor = (excerpt: string | null): SourceAnchor => ({ level: "PAGE", page, sourceHash: hash, excerpt, region: null });

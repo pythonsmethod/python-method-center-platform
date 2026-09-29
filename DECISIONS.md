@@ -1,5 +1,18 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-28-02 — Literal source rows are broader than laboratory facts
+
+The first bounded real Case reading found numeric patient identifiers, dates
+and registration fields among agreed literal transcriptions. Agreement between
+two readers establishes a source transcription, not its clinical type. Keep
+those rows in immutable evidence and exclude them from the numeric laboratory
+projection. A missing row date may inherit only an unambiguous collection
+date from the document header; a separately printed but ambiguous row date
+must remain unresolved. Do not infer dates or units from neighboring fields
+to make a timeline look complete. The pilot is paused until a generic repair
+is released and the selected source is rerun; Karen retains verification and
+decision authority.
+
 ## PMC-CHAIN-2026-09-27-01 — Integrate on current PMC without widening clinical trust
 
 The owner requested the existing eleven-step document chain in the working Python

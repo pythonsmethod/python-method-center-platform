@@ -108,6 +108,9 @@ export type AnalysisRun = {
 // "9,6 г/л" → 9.6 and "г/л". A row whose value does not start with a
 // number is text — a conclusion, a drug name — and is not a lab value.
 export function splitValue(printed: string): { value: number; unit: string } | null {
+  // A printed date or timestamp is source metadata, even though it starts
+  // with a number. Keep it in the literal extraction, not in lab_values.
+  if (/^\d{1,2}[./-]\d{1,2}[./-]\d{4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?$/.test(printed.trim())) return null;
   const match = printed.trim().replace(/−/g, "-").match(/^([<>≤≥]?\s*)?([+-]?\d+(?:[.,]\d+)?(?:e[+-]?\d+)?)\s*(.*)$/i);
 
   if (!match) {
@@ -131,6 +134,16 @@ export function splitValue(printed: string): { value: number; unit: string } | n
   }
 
   return { value, unit: match[3].trim() };
+}
+
+// The literal reader also transcribes administrative fields. A number in a
+// patient ID, accession, name, or date must never appear in the laboratory
+// timeline merely because its row passed the double-read comparison.
+export function isAdministrativeMeasurementRow(row: ExtractedValueRow): boolean {
+  const label = row.label.toLowerCase().replace(/ё/g, "е").trim();
+  return /(?:дата|рождени|регистрац|фио|ф\.\s*и\.\s*о|паспорт|инн|исн|идентификатор|штрихкод|катталган|туулган)/u.test(label)
+    || /(?:^|[^a-z])(?:date|birth|registration|patient|passport|identifier|accession|barcode|name|ssn|dob|id)(?=$|[^a-z])/i.test(label)
+    || /^\s*(?:№|#)\s*(?:\/|$)/u.test(label);
 }
 
 function samePrintedContext(a: ExtractedValueRow, b: ExtractedValueRow): boolean {
@@ -197,6 +210,7 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
   for (const document of input.documents) {
     const pairedLabels = unambiguousTestLabels(document.agreed);
     for (const row of document.agreed) {
+      if (isAdministrativeMeasurementRow(row)) continue;
       const split = splitValue(row.value);
 
       if (!split) {
