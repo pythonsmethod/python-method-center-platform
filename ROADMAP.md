@@ -7,8 +7,10 @@
       new document tool; keep source/trust/Karen decisions unchanged.
 - [x] Pass synthetic authorization, unknown-result, text/voice, type/build and
       tracing checks locally.
-- [ ] Publish and release the PMC candidate, then read back the deployed
-      catalog version in an authorized staff session using a synthetic term.
+- [x] Publish and release the PMC candidate as PR #255; GitHub CI, Preview
+      and Production reached green/READY on the exact candidate tree.
+- [ ] Read back the deployed catalog version in an authorized staff session
+      using a synthetic term, without accessing the current real Case.
 - [ ] After Before is completed, separately decide whether a bounded real
       Case acceptance lookup is needed; no automatic document reprocessing.
 
