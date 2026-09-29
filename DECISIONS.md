@@ -1,5 +1,14 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-29-07 — Describe empty sections without negating source exceptions
+
+The structured-fact contradiction list and Karen's note list are distinct
+from the unresolved source-reading queue. When either list is empty, say
+which list is empty and point to the queue for source-reading disputes.
+Never claim that no discrepancies need manual review from the absence of a
+structured contradiction or a Karen note. This changes RU/EN presentation
+only; it does not alter evidence, review counts or trust states.
+
 ## PMC-CHAIN-2026-09-29-06 — Put stored evidence IDs beside model input rows
 
 The internal draft must cite exact IDs already present in the current Case

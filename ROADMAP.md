@@ -29,10 +29,13 @@
       all 32 numeric rows retain unresolved units and absent usable dates.
 - [x] Release the compact, complete model context (PR #250, `81f95d3`). It
       removes the size-limit failure without truncating evidence.
-- [ ] Release inline stable IDs on every literal row supplied to the internal
-      model. The first post-compaction generation failed the exact citation
-      gate and saved no draft. Then generate and inspect a current draft
-      against 36 review items without approving or publishing it.
+- [x] Release inline stable IDs on every literal row supplied to the internal
+      model (PR #251, `e26ea6e`). A fresh three-document internal draft was
+      saved: 41 distinct valid source IDs in the draft and 36/36 disputed IDs
+      in the unresolved queue. It remains unapproved; 0/36 Karen decisions.
+- [ ] Release the RU/EN empty-state wording repair so the separate
+      `Противоречия` and `Замечания Карен` sections do not claim that the
+      36 source-reading exceptions are absent. Verify both locales live.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

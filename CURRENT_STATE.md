@@ -1,5 +1,27 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC internal picture readback — 2026-09-29 UTC — RELEASED, KAREN REVIEW PENDING
+
+PR #251 merged as `e26ea6e6cceb0a675a31b2f8bb90aaf73316b2f8`;
+Production deployment `dpl_9dEv2zSwZVukPDFKB5oF97XSYC88` reached READY on
+both primary domains. A signed-in Karen action saved a fresh internal review
+from the selected Case's three ready documents. The stored draft has 45 exact
+source citations (41 distinct), all resolving to current extraction rows;
+its unresolved queue cites all 36 distinct disputed rows, with no foreign ID
+or omitted disputed row. The current UI no longer marks the review stale,
+shows 0/36 Karen decisions, and keeps conclusion approval disabled. This is
+an internal, unapproved machine synthesis, not a clinical conclusion.
+
+The current latest readings remain 66 agreed and 36 disputed; five numeric
+unit exceptions remain SOURCE_ONLY with separate review items. All 32
+page-anchored numeric rows have unresolved units and no usable collection
+date, so no time trend is established. The original PDFs were not
+independently inspected. A follow-up presentation-only candidate replaces
+the misleading empty-state claim that no manual discrepancies exist in the
+`Противоречия` and `Замечания Карен` sections while the exception queue
+contains 36 items. It does not resolve any source reading. There is no Karen
+evidence decision, approval, client publication or learning event.
+
 ## PMC literal evidence IDs for internal draft — 2026-09-29 UTC — LOCAL FOLLOW-UP
 
 PR #250 merged as `81f95d31c8d488c0c519841c8bc26901108fead5` and
