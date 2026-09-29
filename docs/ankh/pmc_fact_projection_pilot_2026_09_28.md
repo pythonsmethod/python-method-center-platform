@@ -1,5 +1,24 @@
 # Bounded PMC fact-projection pilot — 2026-09-28/29 UTC
 
+## Context-disagreement candidate — 2026-09-29 UTC
+
+Read-only aggregation of the selected Case's latest saved extraction found
+30 rows with a matching printed value and a specimen present in only one
+reading; one of the 30 also has a date difference. This is an OCR/association
+disagreement, not a proven specimen/date from the original PDF. The generic
+candidate stores the matching value with its existing page/source hash as
+`SOURCE_ONLY`, nulls only disputed context fields, and preserves a separate
+`NEEDS_REVIEW` exception carrying both literal readings. The numeric row's
+`comparison_context.review_required` is persisted in the existing JSONB
+field, counted in human review and excluded from interpretation and trend
+points, including when loaded as a prior value. Incomplete pages yield no
+agreed rows. No migration, PHI fixture or clinical trust promotion is added.
+
+This is local implementation evidence until deployment and exact-Case rerun.
+Karen still needs to inspect the source, identity, dates, units and other
+disputes. Neither the prior internal draft nor a machine comparison is her
+decision.
+
 ## A–D. Baseline, change, files and data
 
 The owner authorized the existing Karen account for Production clinical

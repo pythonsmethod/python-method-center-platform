@@ -102,7 +102,38 @@ describe("literal row context and ambiguous row association", () => {
     expect(page.agreed.find(row=>row.label==="CRP")).toMatchObject({collectionDatePrinted:"2026-09-24",specimen:"Serum",method:"Assay A"});
     const mismatch = buildReadPage(text, text.replace("Assay A","Assay B"), 1, hash, "original.pdf");
     expect(mismatch.disputed.find(row=>row.label==="CRP")?.note).toBe("DATE_SPECIMEN_METHOD_CONFLICT");
+    expect(mismatch.disputed.find(row=>row.label==="CRP")?.reason).toBe("контекст не совпадает");
+    expect(mismatch.agreed.find(row=>row.label==="CRP")).toMatchObject({value:"5 mg/L",contextDisputed:["method"],method:null});
     const ambiguous = text.replace("2026-09-24","09/10/2026");
     expect(buildReadPage(ambiguous,ambiguous,1,hash,"original.pdf").disputed.some(row=>row.note==="AMBIGUOUS_OR_UNSUPPORTED_DATE")).toBe(true);
+  });
+
+  it("keeps a matching number as source only while date and specimen await source review", () => {
+    const first = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: 2026-09-24 :: Serum :: Assay A");
+    const second = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: - :: Assay A");
+    const page = buildReadPage(first, second, 2, hash, "synthetic.pdf");
+    const disputed = page.disputed.find(row => row.label === "CRP");
+    expect(disputed).toMatchObject({reason:"контекст не совпадает",source:{level:"PAGE",page:2,sourceHash:hash}});
+    const agreed = page.agreed.find(row => row.label === "CRP");
+    expect(agreed).toMatchObject({value:"5 mg/L",collectionDatePrinted:null,specimen:null,method:"Assay A",contextDisputed:["collectionDatePrinted","specimen"]});
+    const rows = analysisRowsFromPageReadings([agreed!]);
+    expect(rows[0].collectionDate).toBeNull();
+    expect(rows[0].comparisonContext).toEqual({specimen:null,method:"Assay A",review_required:true});
+    const run = runAnalysis({documents:[{documentId:"synthetic-document",collectionDate:"2026-09-25",agreed:rows}],
+      prior:[],questionnaire:null,extractionModelVersion:"synthetic-test"});
+    expect(run.labValues).toHaveLength(1);
+    expect(run.labValues[0]).toMatchObject({value_printed:"5 mg/L",measured_on:null,comparison_context:{specimen:null,method:"Assay A",review_required:true},source_anchor:{page:2,sourceHash:hash}});
+    expect(run.humanReview).toHaveLength(1);
+    expect(run.trends).toEqual({});
+  });
+
+  it("does not project a matching number when either reader or page is uncertain", () => {
+    const context = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: Serum :: Assay A");
+    const missing = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: - :: Assay A");
+    for (const second of [missing.replace("CRP :: 5 mg/L :: 0-5 :: FILLED :: ДА", "CRP :: 5 mg/L :: 0-5 :: FILLED :: НЕТ"), missing.replace("COMPLETE", "PARTIAL")]) {
+      const page = buildReadPage(context, second, 1, hash, "synthetic.pdf");
+      expect(page.agreed.some(row => row.label === "CRP")).toBe(false);
+      expect(page.disputed.some(row => row.label === "CRP")).toBe(true);
+    }
   });
 });

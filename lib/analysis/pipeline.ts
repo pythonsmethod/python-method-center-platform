@@ -45,7 +45,7 @@ export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 // One agreed row from the double reading, as the extraction table stores it.
 export type ExtractedValueRow = {
   collectionDate?: string | null;
-  comparisonContext?: { specimen: string | null; method: string | null };
+  comparisonContext?: { specimen: string | null; method: string | null; review_required?: true };
   section?: string;
   label: string;
   value: string;
@@ -65,7 +65,7 @@ export type ExtractedDocument = {
 
 // A value already in lab_values from an earlier document of the case.
 export type PriorLabValue = {
-  comparison_context?: { specimen: string | null; method: string | null } | null;
+  comparison_context?: { specimen: string | null; method: string | null; review_required?: true } | null;
   documentId: string | null;
   analyte: string | null;
   measured_on: string | null;
@@ -84,7 +84,7 @@ export type AnalysisInput = {
   extractionModelVersion: string;
 };
 
-export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
+export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null; review_required?: true } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
 
 export type AnalysisRun = {
   versions: AnalysisVersions;
@@ -236,15 +236,15 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
     }
   }
 
-  const humanReview = labValues.filter(needsHumanReview);
+  const humanReview = labValues.filter(row => needsHumanReview(row) || row.comparison_context?.review_required);
   const unitUnresolved = humanReview.some((row) => row.analyte !== null && row.unit_resolution_method === "unresolved");
 
   // --- timeline, context_assembly ---
   // Everything readable, old and new, in one list; the blockers look for
   // companions across the whole case, not only the newest document.
-  const resolvedNew = labValues.filter((row) => !needsHumanReview(row));
+  const resolvedNew = labValues.filter((row) => !needsHumanReview(row) && !row.comparison_context?.review_required);
   const resolvedPrior = input.prior.filter(
-    (row) => row.analyte !== null && row.value_canonical !== null && row.unit_resolution_method !== "unresolved"
+    (row) => row.analyte !== null && row.value_canonical !== null && row.unit_resolution_method !== "unresolved" && !row.comparison_context?.review_required
   );
   const measurements = [
     ...resolvedNew.map((row) => toMeasurement(row, row.document_id)),

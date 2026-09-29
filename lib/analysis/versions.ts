@@ -16,7 +16,7 @@ import { referenceSetVersion } from "@/lib/reference/tables";
 // The arithmetic itself. Bumped by hand when the analysis code changes in a
 // way that could move an answer; a commit hash would change on every
 // comment edit and say nothing.
-export const ANALYSIS_ENGINE_VERSION = "pmc-analysis-1.3.0";
+export const ANALYSIS_ENGINE_VERSION = "pmc-analysis-1.4.0";
 
 export type AnalysisVersions = {
   extraction_model_version: string;

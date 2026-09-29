@@ -58,6 +58,20 @@ describe("live Case Analytical Picture", () => {
     expect(items.some((item) => (item.trustState as string) === "VERIFIED")).toBe(false);
   });
 
+  it("keeps a matching value and its context exception separate, with approval still blocked", () => {
+    const agreed = { file:"synthetic.pdf",section:"CBC",label:"HGB",value:"130 g/L",reference:"120-155",
+      referenceConfirmed:true,confident:true,note:"-",contextDisputed:["specimen" as const],specimen:null };
+    const disputed = { file:"synthetic.pdf",section:"CBC",label:"HGB",first:"130 g/L | ? | Blood | ?",
+      second:"130 g/L | ? | ? | ?",reason:"контекст не совпадает" as const,note:"DATE_SPECIMEN_METHOD_CONFLICT" };
+    const evidence = prepareEvidenceForKaren(projectStoredExtractionEvidence(
+      {id:"x",documentId:"doc-a",agreed:[agreed],disputed:[disputed]},new Set(["doc-a"])));
+    const picture = buildCaseAnalyticalPicture(base({extractedEvidence:evidence,
+      facts:[{...fact("f1","2026-01-01"),comparisonContext:{specimen:null,method:"Assay A",review_required:true},trustState:"SOURCE_ONLY"}]}));
+    expect(evidence.map(row => row.trustState)).toEqual(["SOURCE_ONLY","NEEDS_REVIEW"]);
+    expect(picture.reviewSummary).toMatchObject({required:1,completed:0,machineMatched:1,approvalBlocked:true});
+    expect(picture.timeline[0].trustState).toBe("SOURCE_ONLY");
+  });
+
   it("does not project a lone unselected printed template state", () => {
     const unselected = {
       file: "synthetic.pdf",
