@@ -45,7 +45,7 @@ export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 // One agreed row from the double reading, as the extraction table stores it.
 export type ExtractedValueRow = {
   collectionDate?: string | null;
-  comparisonContext?: { specimen: string | null; method: string | null };
+  comparisonContext?: { specimen: string | null; method: string | null; review_required?: true; unit_review_required?: true };
   section?: string;
   label: string;
   value: string;
@@ -65,7 +65,7 @@ export type ExtractedDocument = {
 
 // A value already in lab_values from an earlier document of the case.
 export type PriorLabValue = {
-  comparison_context?: { specimen: string | null; method: string | null } | null;
+  comparison_context?: { specimen: string | null; method: string | null; review_required?: true; unit_review_required?: true } | null;
   documentId: string | null;
   analyte: string | null;
   measured_on: string | null;
@@ -84,7 +84,7 @@ export type AnalysisInput = {
   extractionModelVersion: string;
 };
 
-export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
+export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null; review_required?: true; unit_review_required?: true } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
 
 export type AnalysisRun = {
   versions: AnalysisVersions;
@@ -108,6 +108,9 @@ export type AnalysisRun = {
 // "9,6 г/л" → 9.6 and "г/л". A row whose value does not start with a
 // number is text — a conclusion, a drug name — and is not a lab value.
 export function splitValue(printed: string): { value: number; unit: string } | null {
+  // A printed date or timestamp is source metadata, even though it starts
+  // with a number. Keep it in the literal extraction, not in lab_values.
+  if (/^\d{1,2}[./-]\d{1,2}[./-]\d{4}(?:\s+\d{1,2}:\d{2}(?::\d{2})?)?$/.test(printed.trim())) return null;
   const match = printed.trim().replace(/−/g, "-").match(/^([<>≤≥]?\s*)?([+-]?\d+(?:[.,]\d+)?(?:e[+-]?\d+)?)\s*(.*)$/i);
 
   if (!match) {
@@ -131,6 +134,16 @@ export function splitValue(printed: string): { value: number; unit: string } | n
   }
 
   return { value, unit: match[3].trim() };
+}
+
+// The literal reader also transcribes administrative fields. A number in a
+// patient ID, accession, name, or date must never appear in the laboratory
+// timeline merely because its row passed the double-read comparison.
+export function isAdministrativeMeasurementRow(row: ExtractedValueRow): boolean {
+  const label = row.label.toLowerCase().replace(/ё/g, "е").trim();
+  return /(?:дата|рождени|регистрац|фио|ф\.\s*и\.\s*о|паспорт|инн|исн|идентификатор|штрихкод|катталган|туулган)/u.test(label)
+    || /(?:^|[^a-z])(?:date|birth|registration|patient|passport|identifier|accession|barcode|name|ssn|dob|id)(?=$|[^a-z])/i.test(label)
+    || /^\s*(?:№|#)\s*(?:\/|$)/u.test(label);
 }
 
 function samePrintedContext(a: ExtractedValueRow, b: ExtractedValueRow): boolean {
@@ -197,6 +210,7 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
   for (const document of input.documents) {
     const pairedLabels = unambiguousTestLabels(document.agreed);
     for (const row of document.agreed) {
+      if (isAdministrativeMeasurementRow(row)) continue;
       const split = splitValue(row.value);
 
       if (!split) {
@@ -222,15 +236,15 @@ export function runAnalysis(input: AnalysisInput): AnalysisRun {
     }
   }
 
-  const humanReview = labValues.filter(needsHumanReview);
+  const humanReview = labValues.filter(row => needsHumanReview(row) || row.comparison_context?.review_required);
   const unitUnresolved = humanReview.some((row) => row.analyte !== null && row.unit_resolution_method === "unresolved");
 
   // --- timeline, context_assembly ---
   // Everything readable, old and new, in one list; the blockers look for
   // companions across the whole case, not only the newest document.
-  const resolvedNew = labValues.filter((row) => !needsHumanReview(row));
+  const resolvedNew = labValues.filter((row) => !needsHumanReview(row) && !row.comparison_context?.review_required);
   const resolvedPrior = input.prior.filter(
-    (row) => row.analyte !== null && row.value_canonical !== null && row.unit_resolution_method !== "unresolved"
+    (row) => row.analyte !== null && row.value_canonical !== null && row.unit_resolution_method !== "unresolved" && !row.comparison_context?.review_required
   );
   const measurements = [
     ...resolvedNew.map((row) => toMeasurement(row, row.document_id)),

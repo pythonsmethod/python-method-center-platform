@@ -36,7 +36,12 @@ const nextConfig = {
   // route chunk changed the optional masking helper's module shape in the
   // Vercel runtime (`mask is not a function`). Keep the package external so
   // the live-session route loads the tested Node package directly.
-  serverExternalPackages: ["ws"],
+  serverExternalPackages: ["ws", "@nexora/diagnostic-catalog"],
+  outputFileTracingIncludes: {
+    "/api/assistant/staff": ["./node_modules/@nexora/diagnostic-catalog/data/**/*"],
+    "/api/assistant/live": ["./node_modules/@nexora/diagnostic-catalog/data/**/*"],
+    "/api/assistant/realtime/tools": ["./node_modules/@nexora/diagnostic-catalog/data/**/*"]
+  },
   async headers() {
     return [
       {

@@ -1,13 +1,14 @@
 import { aiFetch } from "@/lib/security/ai-transport";
 import type { AssistantResult, ChatMessage } from "./claude";
-import { ARCHIVE_RULE, availableConversationTools, executeConversationArchiveTool } from "./conversation-archive";
+import { ARCHIVE_RULE, availableConversationTools, executeConversationArchiveTool, conversationArchiveScope } from "./conversation-archive";
+import { DIAGNOSTIC_CATALOG_RULE } from "./diagnostic-catalog-tool";
 import { isExplicitPolicyError, providerPolicyRefusal } from "./policy-refusal";
 
 type Output = { type: string; call_id?: string; name?: string; arguments?: string; content?: { type: string; text?: string }[]; [key: string]: unknown };
 // Responses supports native tools together with reasoning. Store remains false;
 // the application's archive, not a provider conversation ID, is authoritative.
 export async function askOpenAiArchive(config: { apiKey: string; baseUrl: string; model: string; system: string; messages: ChatMessage[]; maxTokens: number; reasoningEffort?: "high" }): Promise<AssistantResult> {
-  const input: Record<string, unknown>[] = [{ role: "system", content: `${config.system}\n${ARCHIVE_RULE}` }, ...config.messages.map(message => ({ ...message }))];
+  const input: Record<string, unknown>[] = [{ role: "system", content: `${config.system}\n${ARCHIVE_RULE}${conversationArchiveScope()?.catalogTools ? `\n${DIAGNOSTIC_CATALOG_RULE}` : ""}` }, ...config.messages.map(message => ({ ...message }))];
   let toolRounds = 0, continued = false, reply = "";
   try {
     for (;;) {

@@ -22,7 +22,7 @@ export type PictureFact = {
   trustState: "NEEDS_REVIEW" | "SOURCE_ONLY";
   provenance: { level: "DOCUMENT" | "PAGE"; page: number | null; sourceHash?: string | null; excerpt?: string | null; related?: { page: number | null; sourceHash?: string | null; excerpt?: string | null } };
   analysisRunId: string | null;
-  comparisonContext?: { specimen?: string | null; method?: string | null };
+  comparisonContext?: { specimen?: string | null; method?: string | null; review_required?: boolean; unit_review_required?: boolean };
 };
 
 export type PictureReviewNote = {
@@ -121,7 +121,7 @@ export function buildCaseAnalyticalPicture(input: PictureInput): CaseAnalyticalP
     if (evidence.length < 2) return { comparisonKey, verdict: "INSUFFICIENT_DATA" as const, reasonCode: "INSUFFICIENT_EVIDENCE" as const, evidenceFactIds, reviewRequired: true as const };
     if (evidence.some((fact) => !fact.observedAt)) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "MISSING_DATES" as const, evidenceFactIds, reviewRequired: true as const };
     if (new Set(evidence.map((fact) => fact.canonicalUnit)).size !== 1 || evidence.some((fact) => !fact.canonicalUnit)) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "UNIT_MISMATCH" as const, evidenceFactIds, reviewRequired: true as const };
-    if (evidence.some(fact => !fact.comparisonContext?.specimen || !fact.comparisonContext?.method) || new Set(evidence.map(fact => JSON.stringify(fact.comparisonContext))).size !== 1) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "MISSING_CONTEXT" as const, evidenceFactIds, reviewRequired: true as const };
+    if (evidence.some(fact => fact.comparisonContext?.review_required || !fact.comparisonContext?.specimen || !fact.comparisonContext?.method) || new Set(evidence.map(fact => JSON.stringify(fact.comparisonContext))).size !== 1) return { comparisonKey, verdict: "NOT_COMPARABLE" as const, reasonCode: "MISSING_CONTEXT" as const, evidenceFactIds, reviewRequired: true as const };
     if (trend.verdict === "significant") {
       return { comparisonKey, verdict: "POTENTIAL_CHANGE" as const, reasonCode: "SIGNIFICANT_THRESHOLD" as const, evidenceFactIds, reviewRequired: true as const };
     }

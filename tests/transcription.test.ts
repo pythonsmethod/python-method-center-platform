@@ -220,6 +220,27 @@ describe("what two readings agree on", () => {
     expect(compareTranscriptions(first, second)).toMatchObject({ agreed: [{ value: "18.6 Ед/л", referenceConfirmed: true }], disputed: [] });
   });
 
+  it("keeps a shared numeric token but disputes a unit attached by only one reading", () => {
+    const first = [row({ section: "Биохимия", label: "Синтетический показатель", value: "18,6", reference: "0-50" })];
+    const second = [
+      row({ section: "Биохимия", label: "Синтетический показатель", value: "18.6", reference: "0-50" }),
+      row({ section: "Биохимия", label: "Синтетический показатель ед.изм.", value: "Ед/л", reference: "" }),
+    ];
+    const result = compareTranscriptions(first, second);
+    expect(result.agreed).toMatchObject([{ value: "18,6", unitDisputed: true, referenceConfirmed: true }]);
+    expect(result.disputed).toMatchObject([{ first: "18,6", second: "18.6 Ед/л", reason: "единица не подтверждена", note: "VALUE_UNIT_UNCONFIRMED" }]);
+    expect(formatAgreed(result.agreed)).toContain("единица не подтверждена вторым чтением");
+  });
+
+  it("leaves different numbers, two incompatible units, censored results and ambiguous decimals in dispute", () => {
+    for (const [first, second] of [["18.6", "18.7 Ед/л"], ["18.6 Ед/л", "18.6 нг/мл"],
+      ["<18.6", "18.6 Ед/л"], ["1,234", "1.234 Ед/л"], ["18.6", "18.6 повтор"]]) {
+      const result = compareTranscriptions([row({ value: first })], [row({ value: second })]);
+      expect(result.agreed).toEqual([]);
+      expect(result.disputed).toMatchObject([{ reason: "разные значения" }]);
+    }
+  });
+
   it("does not discard an orphan presentation fragment", () => {
     const orphan = row({ label: "Калий ед.изм.", value: "ммоль/л" });
     expect(coalesceTranscriptionFragments([orphan])).toEqual([orphan]);
@@ -480,6 +501,11 @@ describe("whole-document content classification", () => {
 });
 
 describe("what must never pass quietly", () => {
+  it("does not promote different numeric readings even when their context also differs", () => {
+    const first = row({label:"CRP",value:"5 mg/L",specimen:"Serum"});
+    const second = row({label:"CRP",value:"8 mg/L",specimen:null});
+    expect(compareTranscriptions([first],[second])).toMatchObject({agreed:[],disputed:[{reason:"разные значения",first:"5 mg/L",second:"8 mg/L"}]});
+  });
   it("holds back a value the two readings disagree on", () => {
     // The real failure, reproduced: one reading slid a row and reported the
     // body-mass index as the smoking answer.
@@ -537,6 +563,12 @@ describe("what a person is given to settle", () => {
     expect(text).toContain("«25»");
   });
 
+  it("places the stored review ID alongside its literal dispute", () => {
+    const text = formatDisputed([{ file: "synthetic.pdf", section: "LAB", label: "CRP", first: "5", second: "5 mg/L",
+      reason: "единица не подтверждена", note: "VALUE_UNIT_UNCONFIRMED", evidenceId: "11111111-1111-4111-8111-111111111111-disputed-0" }]);
+    expect(text).toContain("[11111111-1111-4111-8111-111111111111-disputed-0] Файл");
+  });
+
   it("says nothing when there is nothing to settle", () => {
     expect(formatDisputed([])).toBe("");
   });
@@ -552,6 +584,11 @@ describe("what the analysis is allowed to work from", () => {
     expect(text).toContain("Биохимия — файл «IMG_6220.jpeg»");
     expect(text).toContain("- Креатинин: 71 мкмоль/л");
     expect(text).toContain("- АЛТ: 24 Ед/л");
+  });
+
+  it("places the stored review ID alongside an agreed but unverified row", () => {
+    const text = formatAgreed([row({ label: "CRP", value: "5", evidenceId: "11111111-1111-4111-8111-111111111111-agreed-0" })]);
+    expect(text).toContain("- [11111111-1111-4111-8111-111111111111-agreed-0] CRP: 5");
   });
 
   it("says plainly when nothing survived both readings", () => {

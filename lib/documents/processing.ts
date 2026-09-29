@@ -1,6 +1,6 @@
 import { readAllRows } from "./read-all";
 import { ASSISTANT_MODEL, type AssistantResult } from "@/lib/assistant/claude";
-import { METADATA_SYSTEM_PROMPT, parseMetadata, toIsoDate, type DocumentHeader } from "@/lib/assistant/metadata";
+import { METADATA_SYSTEM_PROMPT, parseMetadata, type DocumentHeader } from "@/lib/assistant/metadata";
 import { askAssistantWithAttachments } from "@/lib/assistant/router";
 import { resolveIdentity, type IdentityVerdict } from "@/lib/analysis/identity";
 import { runAnalysis, type PriorLabValue } from "@/lib/analysis/pipeline";
@@ -13,7 +13,7 @@ import {
 import { readMimeType } from "@/lib/cases/case-documents";
 import { DOCUMENT_STORAGE_BUCKET } from "./config";
 import { prepareDocumentSource, DOCUMENT_PROCESSOR_VERSION } from "./source";
-import { buildReadPage, type ReadPage } from "./page-reading";
+import { analysisRowsFromPageReadings, buildReadPage, type ReadPage } from "./page-reading";
 import { resolveCaseSubject } from "@/lib/cases/case-subject";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { shouldBlockIdentityMismatch } from "@/lib/documents/identity-review";
@@ -282,7 +282,7 @@ async function processClaimedDocument(supabase: NonNullable<ReturnType<typeof cr
   const prior: PriorLabValue[] = (priorRows ?? []).filter(row => activeDocuments.has(String(row.document_id)) && !excludedDocuments.has(String(row.document_id)))
     .map(row => ({ ...row, documentId: row.document_id })) as PriorLabValue[];
   const run = runAnalysis({ documents: [{ documentId: job.document_id, collectionDate: header.collectionDate,
-    agreed: exactDuplicate || classification === "EMPTY_TEMPLATE" ? [] : agreed.map(row => ({ section: row.section, label: row.label, value: row.value, reference: row.reference, referenceConfirmed: row.referenceConfirmed, source: row.source, collectionDate: toIsoDate(row.collectionDatePrinted ?? null), comparisonContext: { specimen: row.specimen ?? null, method: row.method ?? null } })) }],
+    agreed: exactDuplicate || classification === "EMPTY_TEMPLATE" ? [] : analysisRowsFromPageReadings(agreed) }],
     prior, questionnaire: subjectQuestionnaire, extractionModelVersion: ASSISTANT_MODEL });
   if (!hasAllVersions(run.versions)) return finishFailure(job, "service", "ANALYSIS_VERSION_MISSING");
   const sourceRecord = { source_hash: source.hash, page_count: source.pageCount, pages: pages.map(page => page.coverage), processor_version: DOCUMENT_PROCESSOR_VERSION,

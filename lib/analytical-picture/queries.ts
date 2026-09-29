@@ -101,7 +101,7 @@ export async function getCaseAnalyticalPicture(caseId: string): Promise<PictureQ
     originalValue: String(row.value_printed ?? row.value_original), originalUnit: row.value_printed ? null : row.unit_original ? String(row.unit_original) : null,
     canonicalValue: row.value_canonical === null ? null : Number(row.value_canonical), canonicalUnit: row.unit_resolved ? String(row.unit_resolved) : null,
     reference: row.reference_original ? String(row.reference_original) : null, comparisonKey: row.analyte ? String(row.analyte) : null,
-    trustState: row.unit_resolution_method === "unresolved" ? "SOURCE_ONLY" : "NEEDS_REVIEW", provenance: sourceAnchor({ source: row.source_anchor }), analysisRunId: row.analysis_run_id ? String(row.analysis_run_id) : null,
+    trustState: row.unit_resolution_method === "unresolved" || row.comparison_context?.review_required ? "SOURCE_ONLY" : "NEEDS_REVIEW", provenance: sourceAnchor({ source: row.source_anchor }), analysisRunId: row.analysis_run_id ? String(row.analysis_run_id) : null,
   }));
   const structuredKeys = new Set(facts.map((item) => `${item.documentId}|${item.label}|${item.originalValue}`));
   const extractedEvidence: ExtractedClinicalEvidence[] = [];

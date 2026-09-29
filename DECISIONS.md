@@ -4,6 +4,103 @@
 
 Karen's Today route is not a client directory or developer dashboard. It shows only Cases with source-record activity during the current Center calendar day, ordered by latest activity, alongside the work assistant. This is not a processing status, urgency, priority, or automatic workflow.
 
+## NEXORA-CATALOG-2026-09-29-01 — Staff reference lookup beside saved Case evidence
+
+Consume NEXORA's versioned diagnostic catalog through an integrity-pinned
+local package in the PMC adapter. Offer the same read-only lookup to staff
+ANHAM text and voice, with an optional saved evidence ID and source anchor
+in the new document tool. Keep patient records, Case authorization, history,
+lab conversions and Karen review in PMC. A catalog candidate never changes
+the original, becomes VERIFIED, supplies a reference interval or assigns a
+patient standard code. Fail closed on unavailable catalog/audit; no model
+supplied Case ID or patient lookup. Releasing this adapter does not require
+a full NEXORA API launch or rerunning the active Case before Before.
+
+## PMC-CHAIN-2026-09-29-07 — Describe empty sections without negating source exceptions
+
+The structured-fact contradiction list and Karen's note list are distinct
+from the unresolved source-reading queue. When either list is empty, say
+which list is empty and point to the queue for source-reading disputes.
+Never claim that no discrepancies need manual review from the absence of a
+structured contradiction or a Karen note. This changes RU/EN presentation
+only; it does not alter evidence, review counts or trust states.
+
+## PMC-CHAIN-2026-09-29-06 — Put stored evidence IDs beside model input rows
+
+The internal draft must cite exact IDs already present in the current Case
+picture. The literal source lists previously carried the row text and file
+but no ID; the model's answer after compaction failed the exact-ID gate.
+Attach `${extraction_id}-agreed-${index}` and
+`${extraction_id}-disputed-${index}` to the corresponding saved rows only when
+building the internal review prompt. The indices must match the stored array
+and Case picture, with no new evidence store or citation invented. Keep the
+validator and refusal for missing/foreign IDs. Provide enough output budget
+for the complete unresolved queue; no partial or uncited clinical draft is
+saved. This changes presentation to the model, not the source or trust state.
+
+## PMC-CHAIN-2026-09-29-05 — Pass one complete, compact evidence view to the internal draft
+
+The one-Case rerun surfaced a size-limit failure while rebuilding the internal
+review: the UI picture repeated evidence in primary/review lists and included
+action-only review snapshots and tokens. Pass every fact and extracted row
+exactly once to the model with stable ID, value, review decision and source
+page/hash, plus documents, comparisons, missing context, notes and limitations.
+Full literal agreed/disputed readings remain a separate input. Omit only UI
+action artifacts, duplicate lists and repeated excerpts from this model view;
+never truncate or silently skip an evidence row to meet the 180,000-character
+limit. If the compact view still exceeds that bound, save no partial draft.
+This is a packaging change, not a clinical trust or publication decision.
+
+## PMC-CHAIN-2026-09-29-04 — Separate shared numeric token from unconfirmed unit
+
+The bounded rerun exposed a second generic two-reader difference: one reading
+attached an explicit unit from an associated presentation fragment while the
+other retained only the identical number. Preserve the shared bare number
+with page/source hash as a review-only observation; retain both original
+literal readings as a unit exception. Never borrow a unit from just one
+reading or a reference interval to resolve that exception. The numeric row
+remains `SOURCE_ONLY` with unresolved unit, `comparison_context.review_required`
+and `unit_review_required`; interpretation and trend reuse exclude it. Reject
+different numbers, incompatible units, censored values, ambiguous decimals,
+uncertain readings and incomplete pages from this narrow agreement path.
+Only source review by Karen may settle the printed unit; this representation
+does not create a VERIFIED fact or a clinical decision.
+
+## PMC-CHAIN-2026-09-29-03 — Split printed-value agreement from context disagreement
+
+In the bounded real Case, 30 rows have an identical printed value in both
+readings, while only one reading supplied a specimen; one row also has a date
+disagreement. The source has not been independently checked. A comparator
+must therefore retain the matching literal value and its page anchor separately
+from a review-required context exception, with both original readings retained.
+It must clear only the disputed context fields, prevent an uncertain date from
+inheriting a document date, and exclude that numeric observation from
+interpretation, prior comparisons and trends. A Karen evidence decision remains
+required for every context exception; no automatic VERIFIED or approval follows.
+An incomplete page or uncertain reading cannot contribute even a source-only
+numeric agreement. This is a generic rule, not a correction of source content.
+
+## PMC-CHAIN-2026-09-28-02 — Literal source rows are broader than laboratory facts
+
+The first bounded real Case reading found numeric patient identifiers, dates
+and registration fields among agreed literal transcriptions. Agreement between
+two readers establishes a source transcription, not its clinical type. Keep
+those rows in immutable evidence and exclude them from the numeric laboratory
+projection. A missing row date may inherit only an unambiguous collection
+date from the document header; a separately printed but ambiguous row date
+must remain unresolved. Do not infer dates or units from neighboring fields
+to make a timeline look complete. The pilot is paused until a generic repair
+is released and the selected source is rerun; Karen retains verification and
+decision authority.
+
+Release readback: PR #246 and the bounded rerun removed administrative values
+from the laboratory timeline. The pilot is now enabled only for the selected
+Case. Agreement on a printed number with disagreement on material/date/method
+still leaves that row in human review; do not relax the comparator silently.
+An internal AI draft may describe the unresolved rows, but cannot approve them
+or publish a client response. The next comparator change needs a separate
+synthetic safety regression and source review.
+
 ## PMC-CHAIN-2026-09-27-01 — Integrate on current PMC without widening clinical trust
 
 The owner requested the existing eleven-step document chain in the working Python

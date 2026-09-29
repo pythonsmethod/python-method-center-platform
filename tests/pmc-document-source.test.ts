@@ -3,8 +3,8 @@ import { createHash } from "node:crypto";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { prepareDocumentSource, sourceAnchor } from "@/lib/documents/source";
-import { buildReadPage } from "@/lib/documents/page-reading";
-import { splitValue } from "@/lib/analysis/pipeline";
+import { analysisRowsFromPageReadings, buildReadPage } from "@/lib/documents/page-reading";
+import { runAnalysis, splitValue } from "@/lib/analysis/pipeline";
 import { readAllRows } from "@/lib/documents/read-all";
 const hash = "c".repeat(64);
 const reading = (value = "5 mg/L", quality = "COMPLETE") => `wrong.pdf :: [CONTROL] :: [DOCUMENT COVERAGE] :: ${quality} :: - :: FILLED :: ДА :: -\nwrong.pdf :: LAB :: CRP :: ${value} :: 0-5 :: FILLED :: ДА :: -\n[[PMC_PAGE_END]]`;
@@ -43,6 +43,9 @@ describe("original source and complete page reading", () => {
     expect(sourceAnchor({source:{level:"PAGE",page:2,sourceHash:null,excerpt:null,region:null}}).level).toBe("DOCUMENT");
   });
   it.each(["<5 mg/L","1,234 mg/L","1.234 mg/L","3–5 mg/L","1 234 mg/L"])("does not turn ambiguous/censored/range %s into a precise value", value => { expect(splitValue(value)).toBeNull(); });
+  it.each(["21.04.2026 08:44:05", "02.11.1963", "2026-09-23"])("does not make a laboratory measurement from date %s", value => {
+    expect(splitValue(value)).toBeNull();
+  });
   it("keeps explicit count units and signed/exponential values", () => {
     expect(splitValue("4.5 10^9/L")).toEqual({value:4.5,unit:"10^9/L"}); expect(splitValue("−2.5 mg/L")).toEqual({value:-2.5,unit:"mg/L"}); expect(splitValue("2e-3 mg/L")).toEqual({value:0.002,unit:"mg/L"});
   });
@@ -50,6 +53,37 @@ describe("original source and complete page reading", () => {
     const rows = Array.from({length:1203},(_,id)=>({id}));
     expect((await readAllRows(async (from,to) => ({data:rows.slice(from,to+1),error:null}))).data).toHaveLength(1203);
     expect((await readAllRows(async (from,to) => from ? {data:null,error:{code:"DOWN"}} : {data:rows.slice(from,to+1),error:null})).data).toBeNull();
+  });
+});
+
+describe("laboratory fact projection", () => {
+  it("keeps patient identifiers and dates in the literal reading without promoting them to lab values", () => {
+    const agreed = [
+      { section: "Patient", label: "ИСН/ИНН", value: "00303201010038", reference: "-", referenceConfirmed: true },
+      { section: "Patient", label: "Дата регистрации", value: "21.04.2026 08:44:05", reference: "-", referenceConfirmed: true },
+      { section: "Patient", label: "Дата рождения", value: "02.11.1963", reference: "-", referenceConfirmed: true },
+      { section: "Patient", label: "№ / ФИО", value: "4919 Synthetic Person", reference: "-", referenceConfirmed: true },
+      { section: "Laboratory", label: "CRP", value: "5 mg/L", reference: "0-10", referenceConfirmed: true },
+      { section: "Laboratory", label: "New marker", value: "7 mg/L", reference: "-", referenceConfirmed: true }
+    ];
+    const run = runAnalysis({ documents: [{ documentId: "synthetic-document", collectionDate: "2026-09-23", agreed }],
+      prior: [], questionnaire: null, extractionModelVersion: "synthetic-test" });
+    expect(agreed).toHaveLength(6);
+    expect(run.labValues.map(row => row.label_original)).toEqual(["CRP", "New marker"]);
+    expect(run.labValues[0].measured_on).toBe("2026-09-23");
+    expect(run.humanReview.map(row => row.label_original)).toContain("New marker");
+  });
+
+  it("inherits a document date only when the row prints no separate date", () => {
+    const raw = buildReadPage(reading(), reading(), 1, hash, "synthetic.pdf").agreed.filter(row => row.label === "CRP");
+    const undated = analysisRowsFromPageReadings(raw);
+    expect(undated[0].collectionDate).toBeUndefined();
+    const input = (agreed: typeof undated) => ({ documents: [{ documentId: "synthetic-document", collectionDate: "2026-09-23", agreed }],
+      prior: [], questionnaire: null, extractionModelVersion: "synthetic-test" });
+    expect(runAnalysis(input(undated)).labValues[0].measured_on).toBe("2026-09-23");
+    const ambiguous = analysisRowsFromPageReadings([{ ...raw[0], collectionDatePrinted: "09/10/2026" }]);
+    expect(ambiguous[0].collectionDate).toBeNull();
+    expect(runAnalysis(input(ambiguous)).labValues[0].measured_on).toBeNull();
   });
 });
 
@@ -68,7 +102,57 @@ describe("literal row context and ambiguous row association", () => {
     expect(page.agreed.find(row=>row.label==="CRP")).toMatchObject({collectionDatePrinted:"2026-09-24",specimen:"Serum",method:"Assay A"});
     const mismatch = buildReadPage(text, text.replace("Assay A","Assay B"), 1, hash, "original.pdf");
     expect(mismatch.disputed.find(row=>row.label==="CRP")?.note).toBe("DATE_SPECIMEN_METHOD_CONFLICT");
+    expect(mismatch.disputed.find(row=>row.label==="CRP")?.reason).toBe("контекст не совпадает");
+    expect(mismatch.agreed.find(row=>row.label==="CRP")).toMatchObject({value:"5 mg/L",contextDisputed:["method"],method:null});
     const ambiguous = text.replace("2026-09-24","09/10/2026");
     expect(buildReadPage(ambiguous,ambiguous,1,hash,"original.pdf").disputed.some(row=>row.note==="AMBIGUOUS_OR_UNSUPPORTED_DATE")).toBe(true);
+  });
+
+  it("keeps a matching number as source only while date and specimen await source review", () => {
+    const first = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: 2026-09-24 :: Serum :: Assay A");
+    const second = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: - :: Assay A");
+    const page = buildReadPage(first, second, 2, hash, "synthetic.pdf");
+    const disputed = page.disputed.find(row => row.label === "CRP");
+    expect(disputed).toMatchObject({reason:"контекст не совпадает",source:{level:"PAGE",page:2,sourceHash:hash}});
+    const agreed = page.agreed.find(row => row.label === "CRP");
+    expect(agreed).toMatchObject({value:"5 mg/L",collectionDatePrinted:null,specimen:null,method:"Assay A",contextDisputed:["collectionDatePrinted","specimen"]});
+    const rows = analysisRowsFromPageReadings([agreed!]);
+    expect(rows[0].collectionDate).toBeNull();
+    expect(rows[0].comparisonContext).toEqual({specimen:null,method:"Assay A",review_required:true});
+    const run = runAnalysis({documents:[{documentId:"synthetic-document",collectionDate:"2026-09-25",agreed:rows}],
+      prior:[],questionnaire:null,extractionModelVersion:"synthetic-test"});
+    expect(run.labValues).toHaveLength(1);
+    expect(run.labValues[0]).toMatchObject({value_printed:"5 mg/L",measured_on:null,comparison_context:{specimen:null,method:"Assay A",review_required:true},source_anchor:{page:2,sourceHash:hash}});
+    expect(run.humanReview).toHaveLength(1);
+    expect(run.trends).toEqual({});
+  });
+
+  it("projects a bare matching number with unconfirmed unit and page provenance only for Karen", () => {
+    const first = reading("5");
+    const second = reading("5").replace("[[PMC_PAGE_END]]", "wrong.pdf :: LAB :: CRP ед.изм. :: mg/L :: - :: FILLED :: ДА :: -\n[[PMC_PAGE_END]]");
+    const page = buildReadPage(first, second, 2, hash, "synthetic.pdf");
+    expect(page.agreed.find(row => row.label === "CRP")).toMatchObject({ value: "5", unitDisputed: true, source: { page: 2, sourceHash: hash } });
+    expect(page.disputed.find(row => row.label === "CRP")).toMatchObject({ first: "5", second: "5 mg/L", reason: "единица не подтверждена", source: { page: 2, sourceHash: hash } });
+    const rows = analysisRowsFromPageReadings(page.agreed.filter(row => row.label === "CRP"));
+    expect(rows[0].comparisonContext).toEqual({ specimen: null, method: null, review_required: true, unit_review_required: true });
+    const run = runAnalysis({ documents: [{ documentId: "synthetic-document", collectionDate: "2026-09-25", agreed: rows }],
+      prior: [], questionnaire: null, extractionModelVersion: "synthetic-test" });
+    expect(run.labValues).toMatchObject([{ value_printed: "5", unit_original: null, unit_resolved: null, value_canonical: null,
+      unit_resolution_method: "unresolved", comparison_context: { review_required: true, unit_review_required: true }, source_anchor: { page: 2, sourceHash: hash } }]);
+    expect(run.humanReview).toHaveLength(1);
+    expect(run.trends).toEqual({});
+    expect(run.unitUnresolved).toBe(true);
+    expect(buildReadPage(first, second.replace("COMPLETE", "PARTIAL"), 2, hash, "synthetic.pdf").agreed).toEqual([]);
+    expect(buildReadPage(first, second.replace("CRP :: 5 :: 0-5 :: FILLED :: ДА", "CRP :: 5 :: 0-5 :: FILLED :: НЕТ"), 2, hash, "synthetic.pdf").agreed.filter(row => row.label === "CRP")).toEqual([]);
+  });
+
+  it("does not project a matching number when either reader or page is uncertain", () => {
+    const context = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: Serum :: Assay A");
+    const missing = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: - :: Assay A");
+    for (const second of [missing.replace("CRP :: 5 mg/L :: 0-5 :: FILLED :: ДА", "CRP :: 5 mg/L :: 0-5 :: FILLED :: НЕТ"), missing.replace("COMPLETE", "PARTIAL")]) {
+      const page = buildReadPage(context, second, 1, hash, "synthetic.pdf");
+      expect(page.agreed.some(row => row.label === "CRP")).toBe(false);
+      expect(page.disputed.some(row => row.label === "CRP")).toBe(true);
+    }
   });
 });

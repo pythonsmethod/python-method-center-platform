@@ -1,6 +1,7 @@
 import { withAiSafety } from "@/lib/security/ai-policy";
 import Anthropic from "@anthropic-ai/sdk";
 import { ARCHIVE_RULE, availableConversationTools, conversationArchiveScope, executeConversationArchiveTool } from "./conversation-archive";
+import { DIAGNOSTIC_CATALOG_RULE } from "./diagnostic-catalog-tool";
 import { providerPolicyRefusal } from "@/lib/assistant/policy-refusal";
 
 import { withFactualHonesty } from "@/lib/assistant/factual-honesty";
@@ -249,7 +250,10 @@ export async function askClaude(
   options: { timeoutMs?: number; allowContinuation?: boolean } = {}
 ): Promise<AssistantResult> {
   const archiveEnabled = Boolean(conversationArchiveScope());
-  if (archiveEnabled) system += `\n${ARCHIVE_RULE}`;
+  if (archiveEnabled) {
+    system += `\n${ARCHIVE_RULE}`;
+    if (conversationArchiveScope()?.catalogTools) system += `\n${DIAGNOSTIC_CATALOG_RULE}`;
+  }
   const anthropic = getClient();
 
   if (!anthropic) {

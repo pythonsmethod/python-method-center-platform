@@ -132,6 +132,37 @@ describe("отдельные поля анализа и результата", (
   });
 });
 
+describe("совпавшее число со спорным контекстом", () => {
+  it("сохраняет строку для проверки, но не строит интерпретацию и динамику даже с датой и единицей", () => {
+    const runWithConflict = run({
+      documents: [{documentId:"synthetic-new",collectionDate:"2026-09-25",agreed:[
+        {label:"Гемоглобин",value:"130 г/л",reference:"120-155",referenceConfirmed:true,
+          collectionDate:"2026-09-25",comparisonContext:{specimen:"Blood",method:"Assay A",review_required:true}}
+      ]}],
+      prior: [{documentId:"synthetic-prior",analyte:"hemoglobin",measured_on:"2026-09-20",value_canonical:120,
+        unit_resolved:"g/L",unit_resolution_method:"explicit",reference_low:120,reference_high:155,position_in_reference:0,
+        comparison_context:{specimen:"Blood",method:"Assay A"}}]
+    });
+    expect(runWithConflict.labValues[0]).toMatchObject({value_printed:"130 г/л",comparison_context:{review_required:true}});
+    expect(runWithConflict.humanReview).toHaveLength(1);
+    expect(runWithConflict.trends).toEqual({});
+    expect(runWithConflict.blocked).toEqual([]);
+  });
+
+  it("не использует старую строку со спорным контекстом как точку сравнения", () => {
+    const result = run({
+      documents: [{documentId:"synthetic-new",collectionDate:"2026-09-25",agreed:[
+        {label:"CRP",value:"5 mg/L",reference:"0-10",referenceConfirmed:true,
+          comparisonContext:{specimen:"Blood",method:"Assay A"}}
+      ]}],
+      prior: [{documentId:"synthetic-prior",analyte:"crp",measured_on:"2026-09-20",value_canonical:4,
+        unit_resolved:"mg/L",unit_resolution_method:"explicit",reference_low:0,reference_high:10,position_in_reference:0,
+        comparison_context:{specimen:"Blood",method:"Assay A",review_required:true}}]
+    });
+    expect(result.trends.crp).toMatchObject({verdict:"insufficient_points",versus_previous:null});
+  });
+});
+
 describe("прогон целиком", () => {
   const today = {
     documentId: "doc-new",

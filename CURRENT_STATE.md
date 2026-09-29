@@ -4,7 +4,167 @@
 
 `/admin` now contains only the factual daily client queue and work assistant, on desktop and mobile. The queue includes Cases with source-record activity in the current America/Los_Angeles calendar day and keeps the full directories/configuration on their dedicated routes. No schema, processing classification, PHI, AI-policy or clinical-trust change. See `docs/ankh/karen_today_workspace_2026_09_29.md`.
 
+## NEXORA diagnostic catalog for staff ANHAM — 2026-09-29 — LOCAL RELEASE CANDIDATE
+
+NEXORA PR #2 merged the standalone `@nexora/diagnostic-catalog` 0.1.0
+package. PMC now has a local candidate that pins its generated artifact and
+offers a reference lookup to staff text and voice ANHAM. The selected Case's
+saved document-evidence tool can tie a lookup to one exact source row/page.
+It does not change the document processor, source facts, numeric values,
+normalization or Karen decisions. Synthetic tests and build pass; production
+release and authenticated readback are not yet claimed. The current real
+Case was not reprocessed. See
+[`docs/ankh/nexora_diagnostic_catalog_pmc_2026_09_29.md`](docs/ankh/nexora_diagnostic_catalog_pmc_2026_09_29.md).
+
+## PMC internal picture readback — 2026-09-29 UTC — RELEASED, KAREN REVIEW PENDING
+
+PR #251 merged as `e26ea6e6cceb0a675a31b2f8bb90aaf73316b2f8`;
+Production deployment `dpl_9dEv2zSwZVukPDFKB5oF97XSYC88` reached READY on
+both primary domains. A signed-in Karen action saved a fresh internal review
+from the selected Case's three ready documents. The stored draft has 45 exact
+source citations (41 distinct), all resolving to current extraction rows;
+its unresolved queue cites all 36 distinct disputed rows, with no foreign ID
+or omitted disputed row. The current UI no longer marks the review stale,
+shows 0/36 Karen decisions, and keeps conclusion approval disabled. This is
+an internal, unapproved machine synthesis, not a clinical conclusion.
+
+The current latest readings remain 66 agreed and 36 disputed; five numeric
+unit exceptions remain SOURCE_ONLY with separate review items. All 32
+page-anchored numeric rows have unresolved units and no usable collection
+date, so no time trend is established. The original PDFs were not
+independently inspected. PR #252 merged as
+`7fa325a5d775fb793d493580571e211e0335db30` and Production
+`dpl_AXiSv4B2Hn5PUvkf2ExEq4CmRKs3` reached READY on both primary
+domains. Signed-in RU and EN readback, including switching back to RU on the
+same Case route, confirms that the empty `Противоречия` section now points
+to the separate 36-item exception queue and `Замечания Карен` says only
+that Karen has not added notes. Approval stays disabled. This presentation
+repair does not resolve a source reading. There is no Karen evidence
+decision, approval, client publication or learning event.
+
+## PMC literal evidence IDs for internal draft — 2026-09-29 UTC — LOCAL FOLLOW-UP
+
+PR #250 merged as `81f95d31c8d488c0c519841c8bc26901108fead5` and
+Production deployment `dpl_6e8m6JDojtpBoVvCqwtoUwWBdUsB` reached READY.
+The Case's internal draft now reaches generation without the context-size
+error, but the model output failed the existing exact-source-ID validation.
+No new review was saved; the earlier one remains stale and approval blocked.
+The literal agreed/disputed lists lacked the stable evidence IDs that the
+review validator requires. A local follow-up attaches the stored extraction
+ID and row index to each presented source line, reinforces source citations
+in the prompt and allows sufficient output tokens for the 36-item unresolved
+queue. The exact-ID validation remains fail-closed. Release and signed-in
+readback remain open; no new PDF reading is needed for this change.
+
+## PMC current internal draft context — 2026-09-29 UTC — LOCAL FOLLOW-UP
+
+PR #249 merged as `979b460daea285b45cb22ab8de00bcb4dfa47864` and its
+Production deployment `dpl_6eTo7igpCg6vsSZnKtL7fxtxiroY` reached READY.
+The one enrolled Case's same three PDFs were rerun. All three jobs are ready
+at attempt 1 with COMPLETE one-page coverage, matching source hashes and
+processor v3. The latest engine v1.5.0 readings have 66 agreed and 36
+disputed rows: five unit exceptions, three context exceptions, two literal
+value disagreements, 15 one-read items and 11 uncertain items. The three
+context exceptions involve administrative/header descriptions, not a numeric
+laboratory projection. There are 32 page-anchored numeric rows, all with
+unresolved units and no usable collection dates; five explicitly carry the
+unit-review flag. No administrative number entered the numeric projection.
+The signed-in Karen UI shows all five bare numbers as SOURCE_ONLY, each unit
+exception separately, 0/36 review decisions and blocked conclusion approval.
+There are 12 immutable analysis snapshots and no learning event. The old
+internal draft is stale after rereading.
+
+Attempting to rebuild that internal draft exposed another generic boundary:
+the full UI picture, including duplicate primary/review lists, action tokens,
+snapshots and excerpts, exceeds the review action's 180,000-character context
+limit. No partial draft was saved. The local follow-up builds a compact model
+context with every fact and extracted row once, stable ID, value, source page
+and hash, review decision, comparison and summary. Full literal readings are
+still passed separately. It retains the fail-closed size limit and requires
+release and signed-in readback. Karen's source/identity/date/unit review and
+clinical decision remain open.
+
+## PMC matching numbers with an unconfirmed unit — 2026-09-29 UTC — LOCAL CANDIDATE
+
+PR #248 merged as `efe0a345f480501876124e9e923a8cb85d926be6` and its Production
+deployment `dpl_51YvTEeC9g9er7fTwRwBXgdQJ8RT` reached READY. The exact
+Case's three original PDFs were rerun through the signed-in staff interface.
+All three latest jobs are ready, their pages are COMPLETE and three new
+immutable snapshots bring the total to nine. The latest independent readings
+have 64 agreed and 33 disputed literal rows. They contain no matching-value
+context conflicts this time, which reflects new model readings rather than
+proof that the previous source discrepancy was settled. The generic context
+guard is deployed. The current numeric projection has 27 page-anchored blood
+count values, all with unresolved units, no usable collection dates and no
+administrative numeric rows. No Karen evidence decision, conclusion approval,
+client publication or learning occurred.
+
+Five other laboratory results were left entirely in value disputes because
+their numeric tokens match but only one reading attached an explicit unit.
+The local generic candidate preserves a bare numeric observation with a page
+anchor as `SOURCE_ONLY`, keeps both literal readings as a separate unit
+exception requiring Karen, and excludes it from canonical units, interpretation
+and trends. It advances analysis/processor versions to `pmc-analysis-1.5.0`
+and `pmc-document-chain-v3` without a migration. This candidate requires
+release and another exact-Case readback; the original PDF has not been
+independently inspected. No clinical fact becomes VERIFIED from model agreement.
+
+## PMC matching values with disputed context — 2026-09-29 UTC — RELEASED, BOUNDED READBACK
+
+The earlier bounded Case extraction had 30 rows where the literal value matches
+between readings but the specimen is reported by only one reader; one of
+those rows also differs in collection date. The source itself has not been
+independently inspected, so the context cannot be settled by the model.
+
+A generic released change represents matching values as page-anchored source-only
+observations while keeping separate context exceptions for Karen. Conflicting
+date/material/method fields remain null in the numeric projection. Such rows
+are counted for human review and excluded from interpretation, prior-point
+reuse and time comparisons even if their printed unit is explicit. Incomplete
+pages cannot produce agreed rows. Analysis/processor versions advance to
+`pmc-analysis-1.4.0` and `pmc-document-chain-v2`; no schema change is needed.
+The existing Case was reprocessed under the released build; its new independent
+readings no longer produced a context conflict. No source dispute, identity,
+unit or clinical decision is automatically resolved.
+
+## PMC first real document pilot — 2026-09-29 UTC — REPAIR LIVE, KAREN REVIEW PENDING
+
+The owner authorized the existing Karen account as the Production clinical
+reviewer and selected one real Case for a bounded pilot. `KAREN_PRIMARY_EMAIL`
+was set to that account, PR #242's reprocessing repair was released as
+`1737d2c`, and the signed-in Case UI exposed Karen-only controls. Only the
+selected Case was enabled. Its three existing PDFs completed new one-page
+readings with `COMPLETE` page coverage, immutable analysis snapshots, and
+source hashes. The double readings yielded 56 agreed and 43 disputed rows.
+There was no Karen verification, clinical decision, client publication or
+case-learning event.
+
+The live result exposed a generic projection defect: numeric administrative
+fields from literal source reading entered the laboratory fact timeline. The
+pilot was paused with its snapshots retained. PR #246 was merged as
+`dfbc393`; its Production deployment `dpl_5QKJEqqQcrFnkwGfcj1zQPyhnmox`
+reached READY on the primary domains. The source-preserving repair excludes
+administrative/date rows and restores document-date inheritance only when a
+row has no printed date. The same three files were rerun, leaving six immutable
+run snapshots and three latest ready jobs. The new double readings contain
+39 agreed and 52 disputed rows; five numeric values have page anchors and
+none is an administrative field. Three units remain unresolved and no value
+has a usable collection date. In the blood count, 29 disagreements have the
+same printed value but differ in date/material/method context; no blood-count
+number entered the current numeric projection.
+
+One internal AI draft was saved for Karen from the current evidence fingerprint
+and survived reload. All 52 disputed rows still require review. No Karen
+evidence decision, conclusion approval or client publication occurred; the
+approval control is blocked. The account's weak name-only identity match
+remains unreviewed. Exactly one Case is enrolled and enabled for the bounded
+pilot. See `docs/ankh/pmc_fact_projection_pilot_2026_09_28.md`. These facts
+establish the repaired projection on one Case, not general clinical accuracy.
+
 ## PMC bounded document pilot — 2026-09-28 — LIVE CODE, FIRST CASE PAUSED
+
+Historical pre-processing checkpoint; the newer first-pilot section above
+supersedes its deployment and access status.
 
 PR #237 merged as `bfb5d1a`: the new document chain is deployed to the live
 PMC site behind a per-Case allowlist. The four document-chain migrations, pilot

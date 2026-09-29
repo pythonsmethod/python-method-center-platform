@@ -4,6 +4,7 @@ import { buildCaseAnalyticalPicture, type PictureInput } from "@/lib/analytical-
 import { canSavePictureNote } from "@/lib/analytical-picture/review-policy";
 import { projectStoredExtractionEvidence } from "@/lib/analytical-picture/queries";
 import { prepareEvidenceForKaren } from "@/lib/analytical-picture/evidence-presentation";
+import { compactCaseReviewContext } from "@/lib/cases/review-context";
 
 const document = { id: "doc-a", name: "synthetic.pdf", status: "ready", createdAt: "2026-01-01", identityStatus: "match" };
 const fact = (id: string, date: string | null, unit = "mg/L") => ({
@@ -15,6 +16,27 @@ const fact = (id: string, date: string | null, unit = "mg/L") => ({
 const base = (overrides: Partial<PictureInput> = {}): PictureInput => ({ caseId: "case-a", documents: [document], facts: [fact("f1", "2026-01-01")], trends: {}, blocked: [], requests: [], excluded: [], notes: [], analysisRunId: "run-current", analysisCurrent: true, ...overrides });
 
 describe("live Case Analytical Picture", () => {
+  it("keeps every row and source page in a bounded model context without UI action snapshots", () => {
+    const rows = Array.from({ length: 200 }, (_, index) => ({
+      id: `e-${index}`, documentId: "doc-a", section: "Synthetic", label: `Marker ${index}`,
+      value: String(index), alternateValue: null, category: "UNKNOWN" as const,
+      trustState: "SOURCE_ONLY" as const, disputeReason: null,
+      provenance: { level: "PAGE" as const, page: 1, sourceHash: "f".repeat(64), excerpt: "long source excerpt ".repeat(60) },
+      priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null,
+      reviewToken: "action-token", reviewSnapshot: null,
+    }));
+    const picture = buildCaseAnalyticalPicture(base({ extractedEvidence: rows }));
+    expect(JSON.stringify(picture).length).toBeGreaterThan(180000);
+    const compact = compactCaseReviewContext(picture);
+    expect(compact.length).toBeLessThan(180000);
+    const parsed = JSON.parse(compact);
+    expect(parsed.extractedEvidence).toHaveLength(200);
+    expect(parsed.extractedEvidence.map((row: { id: string }) => row.id)).toEqual(rows.map(row => row.id));
+    expect(parsed.extractedEvidence[0]).toMatchObject({ value: "0", provenance: { level: "PAGE", page: 1, sourceHash: "f".repeat(64) } });
+    expect(compact).not.toContain("action-token");
+    expect(compact).not.toContain("long source excerpt");
+    expect(parsed.reviewSummary.machineMatched).toBe(200);
+  });
   it("keeps every live fact review-required and document-grounded", () => {
     const picture = buildCaseAnalyticalPicture(base());
     expect(picture.timeline[0]).toMatchObject({ trustState: "NEEDS_REVIEW", provenance: { level: "DOCUMENT", page: null } });
@@ -56,6 +78,37 @@ describe("live Case Analytical Picture", () => {
     expect(projectStoredExtractionEvidence({ id: "x", documentId: "doc-a", agreed: [agreed], disputed: [] }, new Set(["doc-a"]), new Set(["doc-a|Synthetic label|42"]))).toHaveLength(1);
     expect(() => projectStoredExtractionEvidence({ id: "x", documentId: "foreign", agreed: [], disputed: [] }, new Set(["doc-a"]))).toThrow("another Case");
     expect(items.some((item) => (item.trustState as string) === "VERIFIED")).toBe(false);
+  });
+
+  it("keeps a matching value and its context exception separate, with approval still blocked", () => {
+    const agreed = { file:"synthetic.pdf",section:"CBC",label:"HGB",value:"130 g/L",reference:"120-155",
+      referenceConfirmed:true,confident:true,note:"-",contextDisputed:["specimen" as const],specimen:null };
+    const disputed = { file:"synthetic.pdf",section:"CBC",label:"HGB",first:"130 g/L | ? | Blood | ?",
+      second:"130 g/L | ? | ? | ?",reason:"контекст не совпадает" as const,note:"DATE_SPECIMEN_METHOD_CONFLICT" };
+    const evidence = prepareEvidenceForKaren(projectStoredExtractionEvidence(
+      {id:"x",documentId:"doc-a",agreed:[agreed],disputed:[disputed]},new Set(["doc-a"])));
+    const picture = buildCaseAnalyticalPicture(base({extractedEvidence:evidence,
+      facts:[{...fact("f1","2026-01-01"),comparisonContext:{specimen:null,method:"Assay A",review_required:true},trustState:"SOURCE_ONLY"}]}));
+    expect(evidence.map(row => row.trustState)).toEqual(["SOURCE_ONLY","NEEDS_REVIEW"]);
+    expect(picture.reviewSummary).toMatchObject({required:1,completed:0,machineMatched:1,approvalBlocked:true});
+    expect(picture.timeline[0].trustState).toBe("SOURCE_ONLY");
+  });
+
+  it("keeps a shared number and its unit exception separate until Karen reviews the source", () => {
+    const agreed = { file: "synthetic.pdf", section: "LAB", label: "CRP", value: "5", reference: "0-10",
+      referenceConfirmed: true, confident: true, note: "-", unitDisputed: true as const };
+    const disputed = { file: "synthetic.pdf", section: "LAB", label: "CRP", first: "5", second: "5 mg/L",
+      reason: "единица не подтверждена" as const, note: "VALUE_UNIT_UNCONFIRMED" };
+    const evidence = prepareEvidenceForKaren(projectStoredExtractionEvidence(
+      { id: "x", documentId: "doc-a", agreed: [agreed], disputed: [disputed] }, new Set(["doc-a"])));
+    const picture = buildCaseAnalyticalPicture(base({ extractedEvidence: evidence,
+      facts: [{ ...fact("f1", null), originalValue: "5", originalUnit: null, canonicalValue: null,
+        canonicalUnit: null, comparisonContext: { specimen: null, method: null, review_required: true,
+          unit_review_required: true }, trustState: "SOURCE_ONLY" }] }));
+    expect(evidence.map(row => row.trustState)).toEqual(["SOURCE_ONLY", "NEEDS_REVIEW"]);
+    expect(picture.reviewSummary).toMatchObject({ required: 1, completed: 0, approvalBlocked: true });
+    expect(picture.timeline[0].canonicalUnit).toBeNull();
+    expect(picture.comparisons).toMatchObject([{ verdict: "INSUFFICIENT_DATA", reviewRequired: true }]);
   });
 
   it("does not project a lone unselected printed template state", () => {

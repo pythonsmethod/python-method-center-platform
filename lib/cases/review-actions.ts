@@ -30,6 +30,7 @@ import type { CaseReviewActionState } from "@/lib/cases/review-state";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 import { getDocumentChainPilotStatus } from "@/lib/documents/pilot";
+import { compactCaseReviewContext } from "./review-context";
 
 function errorState(message: string): CaseReviewActionState {
   return { status: "error", message };
@@ -93,7 +94,7 @@ export async function generateCaseReview(
 
   const { data: extractions, error: extractionError } = await readAllRows((from, to) => supabase
     .from("document_extractions")
-    .select("document_id, agreed_values, disputed_values")
+    .select("id, document_id, agreed_values, disputed_values")
     .eq("case_id", caseId).order("id").range(from, to));
 
   if (extractionError) {
@@ -121,17 +122,19 @@ export async function generateCaseReview(
 
   const numberedAgreed = (extractions ?? []).filter(row => numberByDocument.has(row.document_id)).flatMap((row) =>
     Array.isArray(row.agreed_values)
-      ? (row.agreed_values as TranscribedValue[]).map((value) => ({
+      ? (row.agreed_values as TranscribedValue[]).map((value, index) => ({
           ...value,
-          file: numberedFile(row.document_id, value.file)
+          file: numberedFile(row.document_id, value.file),
+          evidenceId: `${row.id}-agreed-${index}`
         }))
       : []
   );
   const numberedDisputed = (extractions ?? []).filter(row => numberByDocument.has(row.document_id)).flatMap((row) =>
     Array.isArray(row.disputed_values)
-      ? (row.disputed_values as DisputedValue[]).map((value) => ({
+      ? (row.disputed_values as DisputedValue[]).map((value, index) => ({
           ...value,
-          file: numberedFile(row.document_id, value.file)
+          file: numberedFile(row.document_id, value.file),
+          evidenceId: `${row.id}-disputed-${index}`
         }))
       : []
   );
@@ -160,7 +163,7 @@ export async function generateCaseReview(
 
   const picture = await getCaseAnalyticalPicture(caseId);
   if (!fingerprint || picture.status !== "ready") return errorState(locale === "en" ? "The evidence snapshot is unavailable." : "Снимок исходных данных недоступен.");
-  const evidenceContext = JSON.stringify(picture.picture);
+  const evidenceContext = compactCaseReviewContext(picture.picture);
   const oncologyContext = oncologyReviewGuidance(picture.picture.timeline.map(item => item.comparisonKey), locale);
   if (evidenceContext.length > 180000 || documents.length >= 1000) return errorState(locale === "en" ? "The case exceeds the current review limit. No partial review was saved." : "Объём кейса превышает текущий предел разбора. Частичный итог не сохранён.");
   const findings = formatMachineFindings(runRow as unknown as StoredRun);
@@ -181,7 +184,7 @@ export async function generateCaseReview(
         )}${disputedNote}\n\nМАШИННАЯ ПРОВЕРКА (единицы, блокираторы, порог значимости):\n${findings}${oncologyContext}\n\nПОЛНАЯ ВНУТРЕННЯЯ КАРТИНА С ID И ИСТОЧНИКАМИ:\n${evidenceContext}`
       }
     ],
-    4000
+    6500
   ));
 
   if (result.status !== "ok") {

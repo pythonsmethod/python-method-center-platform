@@ -3,7 +3,7 @@ import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import type { ChatAttachment } from "@/lib/assistant/attachments";
 
-export const DOCUMENT_PROCESSOR_VERSION = "pmc-document-chain-v1";
+export const DOCUMENT_PROCESSOR_VERSION = "pmc-document-chain-v3";
 export type SourceAnchor = {
   level: "DOCUMENT" | "PAGE";
   page: number | null;

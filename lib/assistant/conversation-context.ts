@@ -4,7 +4,7 @@ import { knowledgeSearchTerms } from "./knowledge-search";
 import type { WebResult } from "./web-results";
 
 type Row = { id: string; role: "user" | "assistant"; content: string; created_at: string; message_sequence: number; voice_state?: string };
-export type ConversationScope = { profileId: string; private: boolean; caseId: string | null; clientTools?: { email: string; locale: "ru" | "en"; webResults?: WebResult[]; webSearchCalls?: number } };
+export type ConversationScope = { profileId: string; private: boolean; caseId: string | null; catalogTools?: true; clientTools?: { email: string; locale: "ru" | "en"; webResults?: WebResult[]; webSearchCalls?: number } };
 const COLUMNS = "id,role,content,created_at,message_sequence,voice_state";
 const RECENT_LIMIT = 60;
 const MATCH_LIMIT = 12;
