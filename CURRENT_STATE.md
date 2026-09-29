@@ -16,11 +16,15 @@ The current latest readings remain 66 agreed and 36 disputed; five numeric
 unit exceptions remain SOURCE_ONLY with separate review items. All 32
 page-anchored numeric rows have unresolved units and no usable collection
 date, so no time trend is established. The original PDFs were not
-independently inspected. A follow-up presentation-only candidate replaces
-the misleading empty-state claim that no manual discrepancies exist in the
-`Противоречия` and `Замечания Карен` sections while the exception queue
-contains 36 items. It does not resolve any source reading. There is no Karen
-evidence decision, approval, client publication or learning event.
+independently inspected. PR #252 merged as
+`7fa325a5d775fb793d493580571e211e0335db30` and Production
+`dpl_AXiSv4B2Hn5PUvkf2ExEq4CmRKs3` reached READY on both primary
+domains. Signed-in RU and EN readback, including switching back to RU on the
+same Case route, confirms that the empty `Противоречия` section now points
+to the separate 36-item exception queue and `Замечания Карен` says only
+that Karen has not added notes. Approval stays disabled. This presentation
+repair does not resolve a source reading. There is no Karen evidence
+decision, approval, client publication or learning event.
 
 ## PMC literal evidence IDs for internal draft — 2026-09-29 UTC — LOCAL FOLLOW-UP
 
