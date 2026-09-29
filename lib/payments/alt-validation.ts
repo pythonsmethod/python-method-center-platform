@@ -5,6 +5,8 @@
 // is losing them for good, so the request form has to be forgiving —
 // only the fields that are genuinely needed to write back are required.
 
+import type { Locale } from "@/lib/i18n/locale";
+
 export const ALT_PAYMENT_METHODS = [
   "bank",
   "crypto",
@@ -43,44 +45,47 @@ export type AltPaymentValidated = {
 };
 
 export function validateAltPaymentInput(
-  input: AltPaymentInput
+  input: AltPaymentInput,
+  locale: Locale = "ru"
 ): { error: string } | AltPaymentValidated {
+  const error = (ru: string, en: string) => ({ error: locale === "ru" ? ru : en });
+
   if (input.honeypot.trim() !== "") {
-    return { error: "Не удалось отправить запрос. Попробуйте ещё раз." };
+    return error("Не удалось отправить запрос. Попробуйте ещё раз.", "Could not send your request. Please try again.");
   }
 
   const email = input.email.trim();
 
   if (!email || !emailPattern.test(email)) {
-    return { error: "Укажите корректный email — на него мы пришлём реквизиты." };
+    return error("Укажите корректный email — на него мы пришлём реквизиты.", "Enter a valid email address so we can send you the payment details.");
   }
 
   const country = input.country.trim();
 
   if (country.length < 2) {
-    return { error: "Напишите страну — от неё зависят доступные способы оплаты." };
+    return error("Напишите страну — от неё зависят доступные способы оплаты.", "Enter your country so we can check which payment methods are available.");
   }
 
   if (country.length > 100) {
-    return { error: "Название страны слишком длинное." };
+    return error("Название страны слишком длинное.", "The country name is too long.");
   }
 
   if (!(ALT_PAYMENT_PLANS as readonly string[]).includes(input.plan)) {
-    return { error: "Выберите тариф или пункт «ещё не решил(а)»." };
+    return error("Выберите тариф или пункт «ещё не решил(а)».", "Choose a service, or select “I’m not sure yet.”");
   }
 
   if (!(ALT_PAYMENT_METHODS as readonly string[]).includes(input.method)) {
-    return { error: "Выберите удобный способ оплаты." };
+    return error("Выберите удобный способ оплаты.", "Choose your preferred payment method.");
   }
 
   const comment = input.comment.trim();
 
   if (comment.length > 2000) {
-    return { error: "Комментарий должен быть короче 2000 символов." };
+    return error("Комментарий должен быть короче 2000 символов.", "Keep your comment under 2,000 characters.");
   }
 
   if (!input.consent) {
-    return { error: "Нужно согласие на обработку указанных контактных данных." };
+    return error("Нужно согласие на обработку указанных контактных данных.", "Please consent to the processing of the contact details you provided.");
   }
 
   return {

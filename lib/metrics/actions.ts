@@ -6,11 +6,17 @@ import { normalizeMetricName } from "@/lib/metrics/chart";
 import { readExtractedRow, MAX_EXTRACTED_ROWS } from "@/lib/metrics/extraction";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getLocale, type Locale } from "@/lib/i18n/locale";
+import { plural } from "@/lib/i18n/plural";
 
 
 
 function errorState(message: string): MetricActionState {
   return { status: "error", message };
+}
+
+function localizedError(locale: Locale, ru: string, en: string): MetricActionState {
+  return errorState(locale === "ru" ? ru : en);
 }
 
 // Everything runs under the person's own session: RLS limits every row to
@@ -19,10 +25,11 @@ export async function addMetricEntry(
   _previous: MetricActionState,
   formData: FormData
 ): Promise<MetricActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return localizedError(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable.");
   }
 
   const {
@@ -30,7 +37,7 @@ export async function addMetricEntry(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Сессия истекла — войдите заново.");
+    return localizedError(locale, "Сессия истекла — войдите заново.", "Your session has expired. Please sign in again.");
   }
 
   const name = normalizeMetricName(String(formData.get("metric_name") ?? ""));
@@ -40,15 +47,15 @@ export async function addMetricEntry(
   const measuredAt = String(formData.get("measured_at") ?? "").trim();
 
   if (!name || name.length > 80) {
-    return errorState("Укажите название показателя — например, «Гемоглобин».");
+    return localizedError(locale, "Укажите название показателя — например, «Гемоглобин».", "Enter a metric name, such as “Hemoglobin.”");
   }
 
   if (!rawValue || !Number.isFinite(value)) {
-    return errorState("Значение должно быть числом — как в бланке анализа.");
+    return localizedError(locale, "Значение должно быть числом — как в бланке анализа.", "Enter the numeric value shown on your lab report.");
   }
 
   if (!/^\d{4}-\d{2}-\d{2}$/.test(measuredAt)) {
-    return errorState("Укажите дату сдачи анализа.");
+    return localizedError(locale, "Укажите дату сдачи анализа.", "Enter the date of the test.");
   }
 
   const { error } = await supabase.from("health_metrics").insert({
@@ -60,24 +67,23 @@ export async function addMetricEntry(
   });
 
   if (error) {
-    return errorState(
-      "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку."
-    );
+    return localizedError(locale, "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку.", "Could not save the entry. Try again, and contact support if it happens again.");
   }
 
   revalidatePath("/cabinet/metrics");
 
-  return { status: "success", message: `«${name}» записан.` };
+  return { status: "success", message: locale === "ru" ? `«${name}» записан.` : `“${name}” saved.` };
 }
 
 export async function deleteMetricEntry(
   _previous: MetricActionState,
   formData: FormData
 ): Promise<MetricActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return localizedError(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable.");
   }
 
   const id = String(formData.get("entry_id") ?? "");
@@ -86,12 +92,12 @@ export async function deleteMetricEntry(
   const { error } = await supabase.from("health_metrics").delete().eq("id", id);
 
   if (error) {
-    return errorState("Не удалось удалить запись.");
+    return localizedError(locale, "Не удалось удалить запись.", "Could not delete the entry.");
   }
 
   revalidatePath("/cabinet/metrics");
 
-  return { status: "success", message: "Запись удалена." };
+  return { status: "success", message: locale === "ru" ? "Запись удалена." : "Entry deleted." };
 }
 
 // Saves the rows a person confirmed after the assistant read them off their
@@ -103,10 +109,11 @@ export async function saveExtractedMetrics(
   _previous: MetricActionState,
   formData: FormData
 ): Promise<MetricActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return localizedError(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable.");
   }
 
   const {
@@ -114,7 +121,7 @@ export async function saveExtractedMetrics(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Сессия истекла — войдите заново.");
+    return localizedError(locale, "Сессия истекла — войдите заново.", "Your session has expired. Please sign in again.");
   }
 
   let parsed: unknown;
@@ -122,11 +129,11 @@ export async function saveExtractedMetrics(
   try {
     parsed = JSON.parse(String(formData.get("rows") ?? "[]"));
   } catch {
-    return errorState("Не удалось прочитать выбранные показатели.");
+    return localizedError(locale, "Не удалось прочитать выбранные показатели.", "Could not read the selected metrics.");
   }
 
   if (!Array.isArray(parsed) || parsed.length === 0) {
-    return errorState("Отметьте хотя бы один показатель.");
+    return localizedError(locale, "Отметьте хотя бы один показатель.", "Select at least one metric.");
   }
 
   const rows = parsed
@@ -135,7 +142,7 @@ export async function saveExtractedMetrics(
     .filter((row): row is NonNullable<typeof row> => row !== null);
 
   if (rows.length === 0) {
-    return errorState("Ни один показатель не прошёл проверку — внесите вручную.");
+    return localizedError(locale, "Ни один показатель не прошёл проверку — внесите вручную.", "None of the selected metrics passed validation. Add them manually instead.");
   }
 
   const { error } = await supabase.from("health_metrics").insert(
@@ -149,15 +156,15 @@ export async function saveExtractedMetrics(
   );
 
   if (error) {
-    return errorState(
-      "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку."
-    );
+    return localizedError(locale, "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку.", "Could not save the metrics. Try again, and contact support if it happens again.");
   }
 
   revalidatePath("/cabinet/metrics");
 
   return {
     status: "success",
-    message: `Записано показателей: ${rows.length}.`
+    message: locale === "ru"
+      ? `Записано показателей: ${rows.length}.`
+      : `${rows.length} ${plural(rows.length, { rule: "en", one: "metric", few: "metrics", many: "metrics" })} saved.`
   };
 }

@@ -10,6 +10,7 @@ import { canAccessProfessorMessages } from "@/lib/auth/require-karen";
 import { sendClientMessageEmail } from "@/lib/notifications/client-message-email";
 import { adminLink } from "@/lib/notifications/notify";
 import { sendStaffMessageEmail } from "@/lib/notifications/staff-message-email";
+import { getLocale } from "@/lib/i18n/locale";
 
 function errorState(message: string): StaffActionState {
   return { status: "error", message };
@@ -20,17 +21,19 @@ export async function sendClientCaseMessage(
   _previousState: StaffActionState,
   formData: FormData
 ): Promise<StaffActionState> {
+  const locale = await getLocale();
+  const clientError = (ru: string, en: string) => errorState(locale === "ru" ? ru : en);
   const body = String(formData.get("body") ?? "").trim();
 
   if (!body || body.length > 8000) {
-    return errorState("Введите сообщение (до 8000 символов).");
+    return clientError("Введите сообщение (до 8000 символов).", "Enter a message of up to 8,000 characters.");
   }
 
   const authClient = await createSupabaseServerClient();
   const supabase = createSupabaseServiceClient();
 
   if (!authClient || !supabase) {
-    return errorState("Сервис временно недоступен.");
+    return clientError("Сервис временно недоступен.", "The service is temporarily unavailable.");
   }
 
   const {
@@ -38,7 +41,7 @@ export async function sendClientCaseMessage(
   } = await authClient.auth.getUser();
 
   if (!user) {
-    return errorState("Войдите в аккаунт, чтобы написать команде.");
+    return clientError("Войдите в аккаунт, чтобы написать команде.", "Sign in to message the team.");
   }
 
   const { data: caseRow } = await supabase
@@ -48,7 +51,7 @@ export async function sendClientCaseMessage(
     .maybeSingle();
 
   if (!caseRow) {
-    return errorState("Сначала заполните анкету — она создаст ваш кейс.");
+    return clientError("Сначала заполните анкету — она создаст ваш кейс.", "Complete the questionnaire first to create your case.");
   }
 
   const { data: message, error } = await supabase
@@ -64,7 +67,7 @@ export async function sendClientCaseMessage(
     .single();
 
   if (error) {
-    return errorState(`Не удалось отправить: ${error.message}`);
+    return clientError(`Не удалось отправить: ${error.message}`, "Could not send your message. Please try again.");
   }
 
   await sendStaffMessageEmail({
@@ -75,7 +78,7 @@ export async function sendClientCaseMessage(
 
   revalidatePath("/cabinet");
 
-  return { status: "success", message: "Сообщение отправлено команде." };
+  return { status: "success", message: locale === "ru" ? "Сообщение отправлено команде." : "Message sent to the team." };
 }
 
 // Staff (Karen/team) sends a text message into a case thread.
