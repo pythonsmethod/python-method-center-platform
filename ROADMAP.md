@@ -19,13 +19,14 @@
       values, no administrative facts in the laboratory timeline, three
       unresolved units and no usable collection dates. One internal draft is
       saved, while approval remains blocked.
-- [ ] Improve the generic double-reading representation of matching numbers
-      with disputed date/material/method context. In the blood-count reading,
-      29 such rows remain review-only and no numeric blood-count fact enters
-      the current projection. Local candidate separates matching literal
-      values from context exceptions with exclusion from interpretation;
-      release and exact-Case readback remain before this item can close.
-      Keep uncertainty and source history intact.
+- [x] Release the generic separation of matching values from disputed
+      date/material/method context (PR #248, `efe0a345`). A new exact-Case
+      reading produced no context mismatch, so the guard is deployed and
+      synthetically tested but Karen has not resolved the earlier dispute.
+- [ ] Release and read back the generic separation of matching numeric tokens
+      from units attached by only one reader. Five current laboratory lines
+      have this form; the local candidate keeps unit unresolved, review
+      required and trend/interpretation excluded. Keep both source readings.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

@@ -45,7 +45,7 @@ export type PipelineStage = (typeof PIPELINE_STAGES)[number];
 // One agreed row from the double reading, as the extraction table stores it.
 export type ExtractedValueRow = {
   collectionDate?: string | null;
-  comparisonContext?: { specimen: string | null; method: string | null; review_required?: true };
+  comparisonContext?: { specimen: string | null; method: string | null; review_required?: true; unit_review_required?: true };
   section?: string;
   label: string;
   value: string;
@@ -65,7 +65,7 @@ export type ExtractedDocument = {
 
 // A value already in lab_values from an earlier document of the case.
 export type PriorLabValue = {
-  comparison_context?: { specimen: string | null; method: string | null; review_required?: true } | null;
+  comparison_context?: { specimen: string | null; method: string | null; review_required?: true; unit_review_required?: true } | null;
   documentId: string | null;
   analyte: string | null;
   measured_on: string | null;
@@ -84,7 +84,7 @@ export type AnalysisInput = {
   extractionModelVersion: string;
 };
 
-export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null; review_required?: true } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
+export type NewLabValue = LabValueRecord & { comparison_context?: { specimen: string | null; method: string | null; review_required?: true; unit_review_required?: true } | null; document_id: string; value_printed?: string; source_anchor?: import("@/lib/documents/source").SourceAnchor | null };
 
 export type AnalysisRun = {
   versions: AnalysisVersions;

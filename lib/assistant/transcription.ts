@@ -34,6 +34,9 @@ export type TranscribedValue = {
   // The printed value matched, but these contextual fields did not. Keep
   // the numeric observation separate from the source-bound review item.
   contextDisputed?: Array<"collectionDatePrinted" | "specimen" | "method">;
+  // The two readers saw the same numeric token, but only one attached a
+  // printed unit. The unit is not part of the agreed observation.
+  unitDisputed?: true;
   source?: import("@/lib/documents/source").SourceAnchor;
   // The file this was read from, exactly as it is named in the case, so a
   // person can find it.
@@ -67,7 +70,7 @@ export type DisputedValue = {
   // at all — which is itself a disagreement worth a human's eyes.
   first: string | null;
   second: string | null;
-  reason: "разные значения" | "контекст не совпадает" | "прочитано только один раз" | "чтение неуверенное" | "источник виден не полностью";
+  reason: "разные значения" | "контекст не совпадает" | "единица не подтверждена" | "прочитано только один раз" | "чтение неуверенное" | "источник виден не полностью";
   note: string;
 };
 
@@ -168,6 +171,22 @@ function normaliseValue(value: string): string {
     .replace(/\s+/g, " ")
     .replace(/[.,;]+$/, "")
     .trim();
+}
+
+// Preserve the shared number when one reader attached an explicit unit and
+// the other returned a bare number. A range, operator, ambiguous decimal,
+// prose suffix, or two different units must remain a value disagreement.
+function matchingNumberWithUnconfirmedUnit(first: string, second: string): string | null {
+  const bare = /^([+-]?(?:0|[1-9]\d*)(?:[.,]\d+)?)$/u;
+  const withUnit = /^([+-]?(?:0|[1-9]\d*)(?:[.,]\d+)?)\s+([\p{L}µμ]+(?:[./·][\p{L}µμ]+)+)$/u;
+  const a = first.trim();
+  const b = second.trim();
+  const pair = bare.test(a) && withUnit.test(b) ? [a, b] : bare.test(b) && withUnit.test(a) ? [b, a] : null;
+  if (!pair) return null;
+  const bareValue = pair[0].match(bare)![1];
+  const suffixedValue = pair[1].match(withUnit)![1];
+  if (/^[+-]?[1-9]\d{0,2}[.,]\d{3}$/u.test(bareValue)) return null;
+  return normaliseValue(bareValue) === normaliseValue(suffixedValue) ? bareValue : null;
 }
 
 function labelFingerprint(value: string): string {
@@ -573,7 +592,9 @@ export function compareTranscriptions(
     }
     seen.add(keyOf(match));
 
-    if (normaliseValue(row.value) !== normaliseValue(match.value)) {
+    const sameValue = normaliseValue(row.value) === normaliseValue(match.value);
+    const sharedNumber = sameValue ? null : matchingNumberWithUnconfirmedUnit(row.value, match.value);
+    if (!sameValue && sharedNumber === null) {
       disputed.push({
         file: row.file,
         section: row.section,
@@ -599,7 +620,7 @@ export function compareTranscriptions(
       continue;
     }
 
-    // The value agreed. Whether the interval beside it also agreed is a
+    // The literal value or its numeric token agreed. Whether the interval beside it also agreed is a
     // separate question with a separate consequence: a disagreement there
     // does not put the value in dispute — the two readings saw the same
     // number — but it does mean the interval cannot be used to decide the
@@ -618,6 +639,11 @@ export function compareTranscriptions(
         note: "совпавший видимый фрагмент не подтверждается автоматически, потому что часть документа отсутствует"
       });
     } else {
+      if (sharedNumber !== null) disputed.push({
+        file: row.file, section: row.section, label: row.label,
+        first: row.value, second: match.value,
+        reason: "единица не подтверждена", note: "VALUE_UNIT_UNCONFIRMED"
+      });
       const contextDisputed = (["collectionDatePrinted", "specimen", "method"] as const)
         .filter(key => row[key] !== match[key]);
       if (contextDisputed.length) {
@@ -626,6 +652,7 @@ export function compareTranscriptions(
       }
       agreed.push({
         ...row,
+        ...(sharedNumber !== null ? { value: sharedNumber, unitDisputed: true as const } : {}),
         ...(contextDisputed.length ? {
           contextDisputed,
           ...Object.fromEntries(contextDisputed.map(key => [key, null]))
@@ -671,7 +698,7 @@ export function formatAgreed(values: TranscribedValue[]): string {
 
   return [...bySection.entries()]
     .map(([heading, rows]) =>
-      [`### ${heading}`, ...rows.map((row) => `- ${row.label}: ${row.value}${row.contextDisputed?.length ? " (контекст не совпал; источник и дата/материал/метод требуют проверки Карен)" : ""}`)].join("\n")
+      [`### ${heading}`, ...rows.map((row) => `- ${row.label}: ${row.value}${row.unitDisputed ? " (единица не подтверждена вторым чтением; требует проверки Карен)" : ""}${row.contextDisputed?.length ? " (контекст не совпал; источник и дата/материал/метод требуют проверки Карен)" : ""}`)].join("\n")
     )
     .join("\n\n");
 }

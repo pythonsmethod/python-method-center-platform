@@ -22,7 +22,7 @@ export type PictureFact = {
   trustState: "NEEDS_REVIEW" | "SOURCE_ONLY";
   provenance: { level: "DOCUMENT" | "PAGE"; page: number | null; sourceHash?: string | null; excerpt?: string | null; related?: { page: number | null; sourceHash?: string | null; excerpt?: string | null } };
   analysisRunId: string | null;
-  comparisonContext?: { specimen?: string | null; method?: string | null; review_required?: boolean };
+  comparisonContext?: { specimen?: string | null; method?: string | null; review_required?: boolean; unit_review_required?: boolean };
 };
 
 export type PictureReviewNote = {
