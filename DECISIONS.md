@@ -1,5 +1,20 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-29-04 — Separate shared numeric token from unconfirmed unit
+
+The bounded rerun exposed a second generic two-reader difference: one reading
+attached an explicit unit from an associated presentation fragment while the
+other retained only the identical number. Preserve the shared bare number
+with page/source hash as a review-only observation; retain both original
+literal readings as a unit exception. Never borrow a unit from just one
+reading or a reference interval to resolve that exception. The numeric row
+remains `SOURCE_ONLY` with unresolved unit, `comparison_context.review_required`
+and `unit_review_required`; interpretation and trend reuse exclude it. Reject
+different numbers, incompatible units, censored values, ambiguous decimals,
+uncertain readings and incomplete pages from this narrow agreement path.
+Only source review by Karen may settle the printed unit; this representation
+does not create a VERIFIED fact or a clinical decision.
+
 ## PMC-CHAIN-2026-09-29-03 — Split printed-value agreement from context disagreement
 
 In the bounded real Case, 30 rows have an identical printed value in both

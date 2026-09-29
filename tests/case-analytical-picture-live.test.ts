@@ -72,6 +72,23 @@ describe("live Case Analytical Picture", () => {
     expect(picture.timeline[0].trustState).toBe("SOURCE_ONLY");
   });
 
+  it("keeps a shared number and its unit exception separate until Karen reviews the source", () => {
+    const agreed = { file: "synthetic.pdf", section: "LAB", label: "CRP", value: "5", reference: "0-10",
+      referenceConfirmed: true, confident: true, note: "-", unitDisputed: true as const };
+    const disputed = { file: "synthetic.pdf", section: "LAB", label: "CRP", first: "5", second: "5 mg/L",
+      reason: "единица не подтверждена" as const, note: "VALUE_UNIT_UNCONFIRMED" };
+    const evidence = prepareEvidenceForKaren(projectStoredExtractionEvidence(
+      { id: "x", documentId: "doc-a", agreed: [agreed], disputed: [disputed] }, new Set(["doc-a"])));
+    const picture = buildCaseAnalyticalPicture(base({ extractedEvidence: evidence,
+      facts: [{ ...fact("f1", null), originalValue: "5", originalUnit: null, canonicalValue: null,
+        canonicalUnit: null, comparisonContext: { specimen: null, method: null, review_required: true,
+          unit_review_required: true }, trustState: "SOURCE_ONLY" }] }));
+    expect(evidence.map(row => row.trustState)).toEqual(["SOURCE_ONLY", "NEEDS_REVIEW"]);
+    expect(picture.reviewSummary).toMatchObject({ required: 1, completed: 0, approvalBlocked: true });
+    expect(picture.timeline[0].canonicalUnit).toBeNull();
+    expect(picture.comparisons).toMatchObject([{ verdict: "INSUFFICIENT_DATA", reviewRequired: true }]);
+  });
+
   it("does not project a lone unselected printed template state", () => {
     const unselected = {
       file: "synthetic.pdf",

@@ -1,21 +1,46 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## PMC matching values with disputed context — 2026-09-29 UTC — CANDIDATE, NOT YET LIVE
+## PMC matching numbers with an unconfirmed unit — 2026-09-29 UTC — LOCAL CANDIDATE
 
-The latest bounded Case extraction has 30 rows where the literal value matches
+PR #248 merged as `efe0a345f480501876124e9e923a8cb85d926be6` and its Production
+deployment `dpl_51YvTEeC9g9er7fTwRwBXgdQJ8RT` reached READY. The exact
+Case's three original PDFs were rerun through the signed-in staff interface.
+All three latest jobs are ready, their pages are COMPLETE and three new
+immutable snapshots bring the total to nine. The latest independent readings
+have 64 agreed and 33 disputed literal rows. They contain no matching-value
+context conflicts this time, which reflects new model readings rather than
+proof that the previous source discrepancy was settled. The generic context
+guard is deployed. The current numeric projection has 27 page-anchored blood
+count values, all with unresolved units, no usable collection dates and no
+administrative numeric rows. No Karen evidence decision, conclusion approval,
+client publication or learning occurred.
+
+Five other laboratory results were left entirely in value disputes because
+their numeric tokens match but only one reading attached an explicit unit.
+The local generic candidate preserves a bare numeric observation with a page
+anchor as `SOURCE_ONLY`, keeps both literal readings as a separate unit
+exception requiring Karen, and excludes it from canonical units, interpretation
+and trends. It advances analysis/processor versions to `pmc-analysis-1.5.0`
+and `pmc-document-chain-v3` without a migration. This candidate requires
+release and another exact-Case readback; the original PDF has not been
+independently inspected. No clinical fact becomes VERIFIED from model agreement.
+
+## PMC matching values with disputed context — 2026-09-29 UTC — RELEASED, BOUNDED READBACK
+
+The earlier bounded Case extraction had 30 rows where the literal value matches
 between readings but the specimen is reported by only one reader; one of
 those rows also differs in collection date. The source itself has not been
 independently inspected, so the context cannot be settled by the model.
 
-A generic local change represents matching values as page-anchored source-only
+A generic released change represents matching values as page-anchored source-only
 observations while keeping separate context exceptions for Karen. Conflicting
 date/material/method fields remain null in the numeric projection. Such rows
 are counted for human review and excluded from interpretation, prior-point
 reuse and time comparisons even if their printed unit is explicit. Incomplete
 pages cannot produce agreed rows. Analysis/processor versions advance to
 `pmc-analysis-1.4.0` and `pmc-document-chain-v2`; no schema change is needed.
-The existing Case must be reprocessed under a released build before these
-properties can be claimed for its saved snapshot. No source dispute, identity,
+The existing Case was reprocessed under the released build; its new independent
+readings no longer produced a context conflict. No source dispute, identity,
 unit or clinical decision is automatically resolved.
 
 ## PMC first real document pilot — 2026-09-29 UTC — REPAIR LIVE, KAREN REVIEW PENDING

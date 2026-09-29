@@ -22,7 +22,8 @@ export function analysisRowsFromPageReadings(rows: TranscribedValue[]): Extracte
     collectionDate: row.contextDisputed?.includes("collectionDatePrinted") ? null
       : row.collectionDatePrinted ? toIsoDate(row.collectionDatePrinted) : undefined,
     comparisonContext: { specimen: row.specimen ?? null, method: row.method ?? null,
-      ...(row.contextDisputed?.length ? { review_required: true as const } : {}) }
+      ...(row.contextDisputed?.length || row.unitDisputed ? { review_required: true as const } : {}),
+      ...(row.unitDisputed ? { unit_review_required: true as const } : {}) }
   }));
 }
 

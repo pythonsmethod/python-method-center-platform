@@ -220,6 +220,27 @@ describe("what two readings agree on", () => {
     expect(compareTranscriptions(first, second)).toMatchObject({ agreed: [{ value: "18.6 Ед/л", referenceConfirmed: true }], disputed: [] });
   });
 
+  it("keeps a shared numeric token but disputes a unit attached by only one reading", () => {
+    const first = [row({ section: "Биохимия", label: "Синтетический показатель", value: "18,6", reference: "0-50" })];
+    const second = [
+      row({ section: "Биохимия", label: "Синтетический показатель", value: "18.6", reference: "0-50" }),
+      row({ section: "Биохимия", label: "Синтетический показатель ед.изм.", value: "Ед/л", reference: "" }),
+    ];
+    const result = compareTranscriptions(first, second);
+    expect(result.agreed).toMatchObject([{ value: "18,6", unitDisputed: true, referenceConfirmed: true }]);
+    expect(result.disputed).toMatchObject([{ first: "18,6", second: "18.6 Ед/л", reason: "единица не подтверждена", note: "VALUE_UNIT_UNCONFIRMED" }]);
+    expect(formatAgreed(result.agreed)).toContain("единица не подтверждена вторым чтением");
+  });
+
+  it("leaves different numbers, two incompatible units, censored results and ambiguous decimals in dispute", () => {
+    for (const [first, second] of [["18.6", "18.7 Ед/л"], ["18.6 Ед/л", "18.6 нг/мл"],
+      ["<18.6", "18.6 Ед/л"], ["1,234", "1.234 Ед/л"], ["18.6", "18.6 повтор"]]) {
+      const result = compareTranscriptions([row({ value: first })], [row({ value: second })]);
+      expect(result.agreed).toEqual([]);
+      expect(result.disputed).toMatchObject([{ reason: "разные значения" }]);
+    }
+  });
+
   it("does not discard an orphan presentation fragment", () => {
     const orphan = row({ label: "Калий ед.изм.", value: "ммоль/л" });
     expect(coalesceTranscriptionFragments([orphan])).toEqual([orphan]);

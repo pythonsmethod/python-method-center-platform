@@ -127,6 +127,25 @@ describe("literal row context and ambiguous row association", () => {
     expect(run.trends).toEqual({});
   });
 
+  it("projects a bare matching number with unconfirmed unit and page provenance only for Karen", () => {
+    const first = reading("5");
+    const second = reading("5").replace("[[PMC_PAGE_END]]", "wrong.pdf :: LAB :: CRP ед.изм. :: mg/L :: - :: FILLED :: ДА :: -\n[[PMC_PAGE_END]]");
+    const page = buildReadPage(first, second, 2, hash, "synthetic.pdf");
+    expect(page.agreed.find(row => row.label === "CRP")).toMatchObject({ value: "5", unitDisputed: true, source: { page: 2, sourceHash: hash } });
+    expect(page.disputed.find(row => row.label === "CRP")).toMatchObject({ first: "5", second: "5 mg/L", reason: "единица не подтверждена", source: { page: 2, sourceHash: hash } });
+    const rows = analysisRowsFromPageReadings(page.agreed.filter(row => row.label === "CRP"));
+    expect(rows[0].comparisonContext).toEqual({ specimen: null, method: null, review_required: true, unit_review_required: true });
+    const run = runAnalysis({ documents: [{ documentId: "synthetic-document", collectionDate: "2026-09-25", agreed: rows }],
+      prior: [], questionnaire: null, extractionModelVersion: "synthetic-test" });
+    expect(run.labValues).toMatchObject([{ value_printed: "5", unit_original: null, unit_resolved: null, value_canonical: null,
+      unit_resolution_method: "unresolved", comparison_context: { review_required: true, unit_review_required: true }, source_anchor: { page: 2, sourceHash: hash } }]);
+    expect(run.humanReview).toHaveLength(1);
+    expect(run.trends).toEqual({});
+    expect(run.unitUnresolved).toBe(true);
+    expect(buildReadPage(first, second.replace("COMPLETE", "PARTIAL"), 2, hash, "synthetic.pdf").agreed).toEqual([]);
+    expect(buildReadPage(first, second.replace("CRP :: 5 :: 0-5 :: FILLED :: ДА", "CRP :: 5 :: 0-5 :: FILLED :: НЕТ"), 2, hash, "synthetic.pdf").agreed.filter(row => row.label === "CRP")).toEqual([]);
+  });
+
   it("does not project a matching number when either reader or page is uncertain", () => {
     const context = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: Serum :: Assay A");
     const missing = reading().replace("0-5 :: FILLED :: ДА :: -", "0-5 :: FILLED :: ДА :: - :: - :: - :: Assay A");

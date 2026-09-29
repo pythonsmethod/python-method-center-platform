@@ -1,5 +1,36 @@
 # Bounded PMC fact-projection pilot — 2026-09-28/29 UTC
 
+## Matching number, unconfirmed unit — 2026-09-29 UTC
+
+The context repair was merged in PR #248 as
+`efe0a345f480501876124e9e923a8cb85d926be6`. Its Production deployment
+`dpl_51YvTEeC9g9er7fTwRwBXgdQJ8RT` was READY on the primary domains before
+the exact Case's three original PDFs were reprocessed. Their three new
+immutable snapshots (nine total) have complete page coverage and unchanged
+source hashes. The independent readings now yielded 64 agreed and 33
+disputed rows. No context disagreement recurred, but five biochemistry/IFA
+laboratory numbers were disputed in their entirety because only one reader
+associated an explicit unit with an otherwise identical numeric token.
+The current numeric projection has 27 page-anchored blood-count observations,
+all with unresolved units and missing usable dates. No administrative number
+appears. A new reading cannot establish that an earlier context dispute was
+clinically settled.
+
+The generic candidate distinguishes a single bare number from that same
+number with one explicit slash-form unit after the row fragments are assembled.
+It saves the shared number without adopting the unit, the two original
+readings as a separate `NEEDS_REVIEW` exception, and an existing JSONB
+comparison flag for unit review. No migration or source-file mutation is
+needed. Different numeric tokens, two incompatible units, ambiguous decimals,
+censored values, unsure reading and incomplete pages do not enter this path.
+Unconfirmed units cannot produce a canonical unit, interpretation or trend.
+Versions advance to `pmc-analysis-1.5.0` / `pmc-document-chain-v3`.
+Synthetic tests cover the page anchor and refusal paths. Release and a bounded
+rerun remain open. The original PDFs have not been independently inspected;
+there are no Karen evidence decisions, approved clinical conclusion, client
+publication or case-learning event. The pilot remains **NOT CLOSED / NO-GO**
+for those downstream phases.
+
 ## Context-disagreement candidate — 2026-09-29 UTC
 
 Read-only aggregation of the selected Case's latest saved extraction found
