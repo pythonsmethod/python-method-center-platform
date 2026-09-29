@@ -6,3 +6,6 @@ The queue includes only Cases with records created during the current `America/L
 
 This is a read-only projection over existing records. It adds no processing classification, urgency, priority, automatic transition, schema, RLS, clinical interpretation, trust promotion, or PHI transmission.
 
+## Production release
+
+PR #257 merged as `9fa8d95a0473c699442fd87e108206e8ccf3f0d7`. Vercel production deployment `DNLo3a7vzk9xECMh74nfNpXs297D` completed successfully. `https://pythonmethodcenter.com/admin` returns the expected protected-route redirect to `/login?next=%2Fadmin`, and `www` redirects to the canonical domain. Authenticated bilingual acceptance remains open.
