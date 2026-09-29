@@ -1,5 +1,18 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-29-05 — Pass one complete, compact evidence view to the internal draft
+
+The one-Case rerun surfaced a size-limit failure while rebuilding the internal
+review: the UI picture repeated evidence in primary/review lists and included
+action-only review snapshots and tokens. Pass every fact and extracted row
+exactly once to the model with stable ID, value, review decision and source
+page/hash, plus documents, comparisons, missing context, notes and limitations.
+Full literal agreed/disputed readings remain a separate input. Omit only UI
+action artifacts, duplicate lists and repeated excerpts from this model view;
+never truncate or silently skip an evidence row to meet the 180,000-character
+limit. If the compact view still exceeds that bound, save no partial draft.
+This is a packaging change, not a clinical trust or publication decision.
+
 ## PMC-CHAIN-2026-09-29-04 — Separate shared numeric token from unconfirmed unit
 
 The bounded rerun exposed a second generic two-reader difference: one reading

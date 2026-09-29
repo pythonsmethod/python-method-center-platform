@@ -30,6 +30,7 @@ import type { CaseReviewActionState } from "@/lib/cases/review-state";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { isUuid } from "@/lib/utils/uuid";
 import { getDocumentChainPilotStatus } from "@/lib/documents/pilot";
+import { compactCaseReviewContext } from "./review-context";
 
 function errorState(message: string): CaseReviewActionState {
   return { status: "error", message };
@@ -160,7 +161,7 @@ export async function generateCaseReview(
 
   const picture = await getCaseAnalyticalPicture(caseId);
   if (!fingerprint || picture.status !== "ready") return errorState(locale === "en" ? "The evidence snapshot is unavailable." : "Снимок исходных данных недоступен.");
-  const evidenceContext = JSON.stringify(picture.picture);
+  const evidenceContext = compactCaseReviewContext(picture.picture);
   const oncologyContext = oncologyReviewGuidance(picture.picture.timeline.map(item => item.comparisonKey), locale);
   if (evidenceContext.length > 180000 || documents.length >= 1000) return errorState(locale === "en" ? "The case exceeds the current review limit. No partial review was saved." : "Объём кейса превышает текущий предел разбора. Частичный итог не сохранён.");
   const findings = formatMachineFindings(runRow as unknown as StoredRun);

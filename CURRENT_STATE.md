@@ -1,5 +1,33 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC current internal draft context — 2026-09-29 UTC — LOCAL FOLLOW-UP
+
+PR #249 merged as `979b460daea285b45cb22ab8de00bcb4dfa47864` and its
+Production deployment `dpl_6eTo7igpCg6vsSZnKtL7fxtxiroY` reached READY.
+The one enrolled Case's same three PDFs were rerun. All three jobs are ready
+at attempt 1 with COMPLETE one-page coverage, matching source hashes and
+processor v3. The latest engine v1.5.0 readings have 66 agreed and 36
+disputed rows: five unit exceptions, three context exceptions, two literal
+value disagreements, 15 one-read items and 11 uncertain items. The three
+context exceptions involve administrative/header descriptions, not a numeric
+laboratory projection. There are 32 page-anchored numeric rows, all with
+unresolved units and no usable collection dates; five explicitly carry the
+unit-review flag. No administrative number entered the numeric projection.
+The signed-in Karen UI shows all five bare numbers as SOURCE_ONLY, each unit
+exception separately, 0/36 review decisions and blocked conclusion approval.
+There are 12 immutable analysis snapshots and no learning event. The old
+internal draft is stale after rereading.
+
+Attempting to rebuild that internal draft exposed another generic boundary:
+the full UI picture, including duplicate primary/review lists, action tokens,
+snapshots and excerpts, exceeds the review action's 180,000-character context
+limit. No partial draft was saved. The local follow-up builds a compact model
+context with every fact and extracted row once, stable ID, value, source page
+and hash, review decision, comparison and summary. Full literal readings are
+still passed separately. It retains the fail-closed size limit and requires
+release and signed-in readback. Karen's source/identity/date/unit review and
+clinical decision remain open.
+
 ## PMC matching numbers with an unconfirmed unit — 2026-09-29 UTC — LOCAL CANDIDATE
 
 PR #248 merged as `efe0a345f480501876124e9e923a8cb85d926be6` and its Production

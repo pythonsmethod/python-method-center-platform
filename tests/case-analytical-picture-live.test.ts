@@ -4,6 +4,7 @@ import { buildCaseAnalyticalPicture, type PictureInput } from "@/lib/analytical-
 import { canSavePictureNote } from "@/lib/analytical-picture/review-policy";
 import { projectStoredExtractionEvidence } from "@/lib/analytical-picture/queries";
 import { prepareEvidenceForKaren } from "@/lib/analytical-picture/evidence-presentation";
+import { compactCaseReviewContext } from "@/lib/cases/review-context";
 
 const document = { id: "doc-a", name: "synthetic.pdf", status: "ready", createdAt: "2026-01-01", identityStatus: "match" };
 const fact = (id: string, date: string | null, unit = "mg/L") => ({
@@ -15,6 +16,27 @@ const fact = (id: string, date: string | null, unit = "mg/L") => ({
 const base = (overrides: Partial<PictureInput> = {}): PictureInput => ({ caseId: "case-a", documents: [document], facts: [fact("f1", "2026-01-01")], trends: {}, blocked: [], requests: [], excluded: [], notes: [], analysisRunId: "run-current", analysisCurrent: true, ...overrides });
 
 describe("live Case Analytical Picture", () => {
+  it("keeps every row and source page in a bounded model context without UI action snapshots", () => {
+    const rows = Array.from({ length: 200 }, (_, index) => ({
+      id: `e-${index}`, documentId: "doc-a", section: "Synthetic", label: `Marker ${index}`,
+      value: String(index), alternateValue: null, category: "UNKNOWN" as const,
+      trustState: "SOURCE_ONLY" as const, disputeReason: null,
+      provenance: { level: "PAGE" as const, page: 1, sourceHash: "f".repeat(64), excerpt: "long source excerpt ".repeat(60) },
+      priority: "SUPPORTING" as const, reviewDecision: "PENDING" as const, correction: null,
+      reviewToken: "action-token", reviewSnapshot: null,
+    }));
+    const picture = buildCaseAnalyticalPicture(base({ extractedEvidence: rows }));
+    expect(JSON.stringify(picture).length).toBeGreaterThan(180000);
+    const compact = compactCaseReviewContext(picture);
+    expect(compact.length).toBeLessThan(180000);
+    const parsed = JSON.parse(compact);
+    expect(parsed.extractedEvidence).toHaveLength(200);
+    expect(parsed.extractedEvidence.map((row: { id: string }) => row.id)).toEqual(rows.map(row => row.id));
+    expect(parsed.extractedEvidence[0]).toMatchObject({ value: "0", provenance: { level: "PAGE", page: 1, sourceHash: "f".repeat(64) } });
+    expect(compact).not.toContain("action-token");
+    expect(compact).not.toContain("long source excerpt");
+    expect(parsed.reviewSummary.machineMatched).toBe(200);
+  });
   it("keeps every live fact review-required and document-grounded", () => {
     const picture = buildCaseAnalyticalPicture(base());
     expect(picture.timeline[0]).toMatchObject({ trustState: "NEEDS_REVIEW", provenance: { level: "DOCUMENT", page: null } });
