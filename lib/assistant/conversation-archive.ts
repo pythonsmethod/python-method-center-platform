@@ -1,4 +1,5 @@
 import { DOCUMENT_EVIDENCE_TOOL, readCaseDocumentEvidence } from "./document-evidence-tool";
+import { DIAGNOSTIC_CATALOG_TOOL, lookupDiagnosticCatalog } from "./diagnostic-catalog-tool";
 import { AsyncLocalStorage } from "node:async_hooks";
 import { currentLiveContext } from "./live-context";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
@@ -24,7 +25,7 @@ export function availableConversationTools() {
   if (live) return live.tools;
   const scope = conversationArchiveScope();
   if (!scope?.private && scope?.clientTools && isClientVoicePilot(scope.clientTools.email)) return [...CONVERSATION_ARCHIVE_TOOLS, CLIENT_CASE_TOOL, ...(process.env.ANHAM_WEB_SEARCH_ENABLED === "true" ? [WEB_SEARCH_TOOL] : [])];
-  return scope?.private && scope.caseId ? [...CONVERSATION_ARCHIVE_TOOLS, DOCUMENT_EVIDENCE_TOOL] : CONVERSATION_ARCHIVE_TOOLS;
+  return scope?.private ? [...CONVERSATION_ARCHIVE_TOOLS, ...(scope.caseId ? [DOCUMENT_EVIDENCE_TOOL] : []), ...(scope.catalogTools ? [DIAGNOSTIC_CATALOG_TOOL] : [])] : CONVERSATION_ARCHIVE_TOOLS;
 }
 const PAGE = 20, CHUNK = 8000;
 const columns = "id,case_id,role,content,created_at,message_sequence,source,voice_state,locale";
@@ -93,5 +94,6 @@ export async function executeConversationArchiveTool(name: unknown, args: unknow
     } catch { return { status: "unavailable", instruction: "Lookup failed. Say so; do not invent results." }; }
   }
   if (scope && name === DOCUMENT_EVIDENCE_TOOL.name) return readCaseDocumentEvidence(scope, args, "text");
+  if (scope?.catalogTools && name === DIAGNOSTIC_CATALOG_TOOL.name) return lookupDiagnosticCatalog(scope, args, "text");
   return scope ? runConversationArchiveTool(scope, name, args) : { status: "forbidden" };
 }
