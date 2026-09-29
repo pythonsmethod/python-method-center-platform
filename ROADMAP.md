@@ -23,10 +23,14 @@
       date/material/method context (PR #248, `efe0a345`). A new exact-Case
       reading produced no context mismatch, so the guard is deployed and
       synthetically tested but Karen has not resolved the earlier dispute.
-- [ ] Release and read back the generic separation of matching numeric tokens
-      from units attached by only one reader. Five current laboratory lines
-      have this form; the local candidate keeps unit unresolved, review
-      required and trend/interpretation excluded. Keep both source readings.
+- [x] Release and read back the generic separation of matching numeric tokens
+      from units attached by only one reader (PR #249, `979b460`). Five
+      current laboratory numbers are SOURCE_ONLY with separate unit exceptions;
+      all 32 numeric rows retain unresolved units and absent usable dates.
+- [ ] Release the compact, complete model context for rebuilding the internal
+      draft. The current full UI picture exceeds its size limit; no partial
+      draft was saved. Then generate and inspect the new draft against the
+      current 36 review items without approving or publishing it.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

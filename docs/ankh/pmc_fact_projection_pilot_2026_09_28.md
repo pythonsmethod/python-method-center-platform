@@ -1,5 +1,31 @@
 # Bounded PMC fact-projection pilot — 2026-09-28/29 UTC
 
+## Unit-disagreement release and internal draft follow-up — 2026-09-29 UTC
+
+PR #249 merged as `979b460daea285b45cb22ab8de00bcb4dfa47864`, and
+Production deployment `dpl_6eTo7igpCg6vsSZnKtL7fxtxiroY` is READY. The
+same three PDFs completed new readings through Karen's signed-in Case UI:
+three jobs ready at attempt 1, three complete pages, unchanged source hashes,
+processor v3 and engine v1.5.0. There are now 12 immutable run snapshots.
+Latest literal counts are 66 agreed and 36 disputed. The five matching
+numeric-token/unit-suffix cases became five bare, page-linked SOURCE_ONLY
+numeric observations with separate unit exceptions; 32 numeric rows in all
+have unresolved units and no usable dates. The interface shows 0/36 manual
+decisions and blocked approval. Three context differences concern administrative
+or header descriptions; two other literal disagreements remain source review
+items. Original PDFs were not independently viewed. No client response or
+learning event was created.
+
+The old internal draft is stale. Rebuilding it returned an explicit size-limit
+error before saving: the full UI picture serializes evidence repeatedly and
+includes review action snapshots/tokens and repeated source excerpts. A local
+follow-up sends each fact and extracted row once with stable ID, value, review
+decision and page/hash, together with documents, comparisons, notes, limits
+and summary. Full original agreed/disputed readings remain in the separate
+input; no evidence is truncated. It retains the limit and is still a local
+candidate pending release and readback. The clinical pilot stays **NOT CLOSED
+/ NO-GO** for a Karen decision, approval, client publication or case learning.
+
 ## Matching number, unconfirmed unit — 2026-09-29 UTC
 
 The context repair was merged in PR #248 as
