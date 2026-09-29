@@ -1,5 +1,11 @@
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
+## Karen daily workspace — 2026-09-29
+
+- [x] Restrict Today to factual same-day Case activity.
+- [x] Remove developer/configuration panels from Today.
+- [ ] Complete authenticated RU → EN → RU production acceptance.
+
 ## Live PMC focus pilot — 2026-09-28
 
 - [x] Merge and deploy PR #237 with an initially empty Case allowlist and

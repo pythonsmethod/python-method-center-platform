@@ -21,6 +21,21 @@ describe("Karen's Today queue", () => {
     );
   });
 
+  it("shows only factual activity from Karen's current day", () => {
+    expect(todayPage).toContain("getKarenTodayActivity(day.start, day.end)");
+    expect(todayPage).toContain("todayActivity.caseIds.includes(clientCase.id)");
+    expect(todayPage).not.toContain(".slice(0, 8)");
+    expect(todayPage).toContain("Только клиенты, у которых сегодня были сообщения");
+    expect(todayPage).toContain("Only clients with messages, documents, or other activity today.");
+  });
+
+  it("keeps developer and configuration panels out of Today", () => {
+    expect(todayPage).not.toContain("<KnowledgePanel");
+    expect(todayPage).not.toContain("<LogoutButton");
+    expect(todayPage).not.toContain("copy.openDocuments");
+    expect(todayPage).not.toContain("copy.openRequests");
+  });
+
   it("shows only the conversation and case assistant in that focused branch", () => {
     const branchStart = casePage.indexOf("if (focusedTodayView)");
     const branchEnd = casePage.indexOf("const submissions =", branchStart);

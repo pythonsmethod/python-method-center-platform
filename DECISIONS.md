@@ -1,5 +1,9 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## 2026-09-29 — Karen Today is a factual daily projection
+
+Karen's Today route is not a client directory or developer dashboard. It shows only Cases with source-record activity during the current Center calendar day, ordered by latest activity, alongside the work assistant. This is not a processing status, urgency, priority, or automatic workflow.
+
 ## PMC-CHAIN-2026-09-27-01 — Integrate on current PMC without widening clinical trust
 
 The owner requested the existing eleven-step document chain in the working Python
