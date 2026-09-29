@@ -4,6 +4,8 @@ import Link from "next/link";
 import { useActionState, useState } from "react";
 import { saveCasePictureNote, saveEvidenceReview, type PictureNoteActionState } from "@/lib/analytical-picture/actions";
 import type { CaseAnalyticalPicture } from "@/lib/analytical-picture";
+import { DocumentTranslationPanel } from "./DocumentTranslationPanel";
+import type { TranslationBatch } from "@/lib/documents/translation";
 
 const initialState: PictureNoteActionState = { status: "idle", message: "" };
 
@@ -47,11 +49,12 @@ function AllEvidenceDetails({ caseId, locale, items, canConfirm, labels, categor
   </details>;
 }
 
-export function CaseAnalyticalPicturePanel({ caseId, locale, result, canConfirm }: {
+export function CaseAnalyticalPicturePanel({ caseId, locale, result, canConfirm, translationBatches = [] }: {
   caseId: string;
   locale: "ru" | "en";
   result: { status: "ready"; picture: CaseAnalyticalPicture } | { status: "unavailable"; message: string };
   canConfirm: boolean;
+  translationBatches?: TranslationBatch[];
 }) {
   const [state, action, pending] = useActionState(saveCasePictureNote, initialState);
   const ru = locale === "ru";
@@ -95,6 +98,7 @@ export function CaseAnalyticalPicturePanel({ caseId, locale, result, canConfirm 
     <span className="panel__label">{t.label}</span><h2>{t.title}</h2><p>{t.intro}</p>
     <div className="case-picture__grid">
       <section><h3>{t.documents}</h3>{picture.documents.length ? <ul className="status-list">{picture.documents.map((document) => <li key={document.id}><strong>{document.name ?? document.id}</strong> · {statusLabel(document.status)} <Link href={`/admin/documents/${document.id}/view`} target="_blank">{t.open}</Link></li>)}</ul> : <p className="empty-state">{t.noDocuments}</p>}</section>
+      {translationBatches.length ? <DocumentTranslationPanel caseId={caseId} locale={locale} picture={picture} batches={translationBatches} /> : null}
       <section><h3>{t.facts}</h3>{picture.timeline.length ? <ol className="case-picture__timeline">{picture.timeline.map((fact) => <li key={fact.id}><time>{fact.observedAt ?? t.dateMissing}</time><strong>{fact.label}</strong>: {fact.originalValue}{fact.originalUnit ? ` ${fact.originalUnit}` : ""}{fact.reference ? ` · ${fact.reference}` : ""}{fact.comparisonContext?.specimen ? ` · ${fact.comparisonContext.specimen}` : ""}{fact.comparisonContext?.method ? ` · ${fact.comparisonContext.method}` : ""}<span className="case-picture__trust">{fact.trustState === "SOURCE_ONLY" ? t.sourceOnly : t.needsReview}</span>{fact.comparisonContext?.review_required ? <small>{fact.comparisonContext.unit_review_required ? t.unitReview : t.contextReview}</small> : null}{fact.documentId ? <Link href={`/admin/documents/${fact.documentId}/view${fact.provenance.page ? `?page=${fact.provenance.page}` : ""}`} target="_blank">{t.open}</Link> : null}<small>{fact.provenance.page ? `${locale === "ru" ? "Страница" : "Page"} ${fact.provenance.page}. ${fact.provenance.excerpt ?? ""}` : t.provenance}{fact.provenance.related?.excerpt && fact.provenance.related.page === fact.provenance.page && fact.provenance.related.sourceHash === fact.provenance.sourceHash ? <><br />{t.relatedSource}: {fact.provenance.related.excerpt}</> : null}</small></li>)}</ol> : <p className="empty-state">{t.noFacts}</p>}</section>
       <section><h3>{t.extracted}</h3><p>{t.extractedIntro}</p><p><strong>{t.manualExceptions}: {picture.reviewSummary.required - picture.reviewSummary.completed}</strong><br />{t.machineMatched}: {picture.reviewSummary.machineMatched}<br />{t.archivedRows}: {picture.reviewSummary.archived}</p>{picture.primaryEvidence.length ? <ul className="status-list case-picture__evidence-list">{picture.primaryEvidence.map((item) => <li key={item.id}><strong>{categoryLabel(item.category)} · {item.section} · {item.label}</strong><br />{item.value ?? "—"}{item.alternateValue !== null ? ` ↔ ${item.alternateValue}` : ""}<br /><span className="case-picture__trust">{item.trustState === "SOURCE_ONLY" ? t.sourceOnly : t.needsReview}</span>{item.disputeReason ? ` · ${item.disputeReason === "контекст не совпадает" ? (ru ? "контекст не совпадает" : "context differs") : item.disputeReason === "единица не подтверждена" ? (ru ? "единица не подтверждена" : "unit unconfirmed") : item.disputeReason}` : ""} · <Link href={`/admin/documents/${item.documentId}/view${item.provenance.page ? `?page=${item.provenance.page}` : ""}`} target="_blank">{t.open}</Link><br /><small>{item.provenance.page ? `${locale === "ru" ? "Страница" : "Page"} ${item.provenance.page}. ${item.provenance.excerpt ?? ""}` : t.provenance}</small>{canConfirm ? <EvidenceReviewControls caseId={caseId} item={item} labels={t} locale={locale} /> : null}</li>)}</ul> : <p className="empty-state">{t.noEvidence}</p>}<AllEvidenceDetails canConfirm={canConfirm} caseId={caseId} categoryLabel={categoryLabel} items={picture.extractedEvidence} labels={t} locale={locale} /></section>
       <section><h3>{t.comparisons}</h3>{picture.comparisons.length ? <ul className="status-list">{picture.comparisons.map((item) => <li key={item.comparisonKey}><strong>{item.comparisonKey}: {comparisonLabel(item.verdict)}</strong><br />{reasonLabel(item.reasonCode)}<br /><small>{t.needsReview} · {item.evidenceFactIds.length} {ru ? "источн." : "evidence items"}</small></li>)}</ul> : <p className="empty-state">{t.noComparisons}</p>}</section>

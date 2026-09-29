@@ -35,6 +35,7 @@ import { LegacyCaseAnalyticalPicturePanel } from "@/components/cases/LegacyCaseA
 import { getCaseAnalyticalPicture } from "@/lib/analytical-picture";
 import { getCaseAnalyticalPicture as getLegacyCaseAnalyticalPicture } from "@/lib/analytical-picture/legacy-queries";
 import { getDocumentChainPilotStatus } from "@/lib/documents/pilot";
+import { translationBatches } from "@/lib/documents/translation";
 
 type StaffCasePageProps = {
   params: Promise<{
@@ -378,6 +379,7 @@ export default async function StaffCaseDetailPage({
           canConfirm={resolvePrivateAssistantRole(auth.email) === "karen"}
           caseId={clientCase.id}
           locale={locale}
+          translationBatches={pilotStatus === "enabled" && casePicture.status === "ready" ? translationBatches(casePicture.picture.extractedEvidence) : []}
           result={casePicture as Awaited<ReturnType<typeof getCaseAnalyticalPicture>>}
         />}
       </section>

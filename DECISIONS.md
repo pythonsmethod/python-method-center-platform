@@ -1,5 +1,18 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-29-08 — Translate saved source rows only as a staff reading aid
+
+Foreign-language documents should remain literal at the source and extraction
+layers. Offer Karen a separate, on-demand Russian rendering linked to every
+saved row and its available document/page. Detect the source language per row
+as an estimate, allowing mixed-language reports and the distinct Swiss
+languages. Reject incomplete output or changes to numeric/date tokens,
+comparison signs and known units. Do not promote machine translation to a
+verified fact, use it to normalize analytes or units, resolve disputes, create
+trends, or publish a client interpretation. Scope requests to authenticated
+staff and enabled pilot Cases; keep the result ephemeral until accuracy and
+versioned persistence have been reviewed. No new source-of-truth store.
+
 ## PMC-CHAIN-2026-09-29-07 — Describe empty sections without negating source exceptions
 
 The structured-fact contradiction list and Karen's note list are distinct

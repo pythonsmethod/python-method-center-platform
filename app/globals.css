@@ -256,6 +256,11 @@ h3 {
 .case-picture__evidence-review { display: grid; gap: .55rem; margin-top: .75rem; }
 .case-picture__evidence-review textarea { min-height: 4.5rem; width: 100%; }
 .case-picture__reviewed { color: #2f6b45; font-weight: 700; margin: .65rem 0 0; }
+.document-translation__batch form { margin-top: .5rem; }
+.document-translation__rows { display: grid; gap: .65rem; padding-left: 1.25rem; margin-top: .75rem; }
+.document-translation__rows li { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: .6rem; border-top: 1px solid var(--line); padding-top: .6rem; overflow-wrap: anywhere; }
+.document-translation__rows li small { color: var(--muted); }
+.document-translation__rows li p { margin: .3rem 0; white-space: pre-wrap; }
 .case-picture__notes { margin-top: 1rem; }
 .case-picture__notes textarea { box-sizing: border-box; margin-top: .75rem; min-height: 7rem; padding: .8rem; width: 100%; }
 

@@ -1,5 +1,20 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC internal document translation — 2026-09-29 UTC — LOCAL CANDIDATE
+
+An internal staff action now pairs a Russian machine translation with each
+saved literal source row in bounded page batches for an enabled pilot Case.
+The original row and page remain visible; numeric/date tokens, comparison
+symbols, known units, row count/order and the evidence snapshot are checked
+before a translation is shown. The translation is ephemeral and cannot alter
+extractions, lab facts, trust states, trends, Karen decisions or client text.
+No migration or wider pilot enrollment is included. Synthetic Armenian,
+German, Bulgarian, Korean, Swiss French/Italian/Romansh and Spanish cases
+test the boundary, not real OCR or translation accuracy. Release, signed-in
+readback and clinical language acceptance are pending. The selected Case's
+36 source exceptions and Karen decision remain open. See
+`docs/ankh/internal_document_translation_2026_09_29.md`.
+
 ## PMC internal picture readback — 2026-09-29 UTC — RELEASED, KAREN REVIEW PENDING
 
 PR #251 merged as `e26ea6e6cceb0a675a31b2f8bb90aaf73316b2f8`;
