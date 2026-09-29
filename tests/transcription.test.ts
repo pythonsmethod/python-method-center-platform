@@ -563,6 +563,12 @@ describe("what a person is given to settle", () => {
     expect(text).toContain("«25»");
   });
 
+  it("places the stored review ID alongside its literal dispute", () => {
+    const text = formatDisputed([{ file: "synthetic.pdf", section: "LAB", label: "CRP", first: "5", second: "5 mg/L",
+      reason: "единица не подтверждена", note: "VALUE_UNIT_UNCONFIRMED", evidenceId: "11111111-1111-4111-8111-111111111111-disputed-0" }]);
+    expect(text).toContain("[11111111-1111-4111-8111-111111111111-disputed-0] Файл");
+  });
+
   it("says nothing when there is nothing to settle", () => {
     expect(formatDisputed([])).toBe("");
   });
@@ -578,6 +584,11 @@ describe("what the analysis is allowed to work from", () => {
     expect(text).toContain("Биохимия — файл «IMG_6220.jpeg»");
     expect(text).toContain("- Креатинин: 71 мкмоль/л");
     expect(text).toContain("- АЛТ: 24 Ед/л");
+  });
+
+  it("places the stored review ID alongside an agreed but unverified row", () => {
+    const text = formatAgreed([row({ label: "CRP", value: "5", evidenceId: "11111111-1111-4111-8111-111111111111-agreed-0" })]);
+    expect(text).toContain("- [11111111-1111-4111-8111-111111111111-agreed-0] CRP: 5");
   });
 
   it("says plainly when nothing survived both readings", () => {

@@ -28,6 +28,8 @@ export const TRANSCRIPTION_SEPARATOR = " :: ";
 export type TranscribedRowState = "FILLED" | "EMPTY" | "UNSELECTED_TEMPLATE" | "UNCERTAIN";
 
 export type TranscribedValue = {
+  // Attached only when presenting a stored extraction to an internal reviewer.
+  evidenceId?: string;
   collectionDatePrinted?: string | null;
   specimen?: string | null;
   method?: string | null;
@@ -62,6 +64,7 @@ export type TranscribedValue = {
 };
 
 export type DisputedValue = {
+  evidenceId?: string;
   source?: import("@/lib/documents/source").SourceAnchor;
   file: string;
   section: string;
@@ -698,7 +701,7 @@ export function formatAgreed(values: TranscribedValue[]): string {
 
   return [...bySection.entries()]
     .map(([heading, rows]) =>
-      [`### ${heading}`, ...rows.map((row) => `- ${row.label}: ${row.value}${row.unitDisputed ? " (единица не подтверждена вторым чтением; требует проверки Карен)" : ""}${row.contextDisputed?.length ? " (контекст не совпал; источник и дата/материал/метод требуют проверки Карен)" : ""}`)].join("\n")
+      [`### ${heading}`, ...rows.map((row) => `- ${row.evidenceId ? `[${row.evidenceId}] ` : ""}${row.label}: ${row.value}${row.unitDisputed ? " (единица не подтверждена вторым чтением; требует проверки Карен)" : ""}${row.contextDisputed?.length ? " (контекст не совпал; источник и дата/материал/метод требуют проверки Карен)" : ""}`)].join("\n")
     )
     .join("\n\n");
 }
@@ -717,7 +720,7 @@ export function formatDisputed(values: DisputedValue[]): string {
           ? `первое чтение — «${value.first}», второе — «${value.second}»`
           : `прочитано один раз: «${value.first ?? value.second}»`;
 
-      return `- Файл «${value.file}», раздел «${value.section}», строка «${value.label}»: ${value.reason} (${readings}).${
+      return `- ${value.evidenceId ? `[${value.evidenceId}] ` : ""}Файл «${value.file}», раздел «${value.section}», строка «${value.label}»: ${value.reason} (${readings}).${
         value.note && value.note !== "-" ? ` ${value.note}` : ""
       }`;
     })

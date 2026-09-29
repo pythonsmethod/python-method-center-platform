@@ -1,5 +1,19 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC literal evidence IDs for internal draft — 2026-09-29 UTC — LOCAL FOLLOW-UP
+
+PR #250 merged as `81f95d31c8d488c0c519841c8bc26901108fead5` and
+Production deployment `dpl_6e8m6JDojtpBoVvCqwtoUwWBdUsB` reached READY.
+The Case's internal draft now reaches generation without the context-size
+error, but the model output failed the existing exact-source-ID validation.
+No new review was saved; the earlier one remains stale and approval blocked.
+The literal agreed/disputed lists lacked the stable evidence IDs that the
+review validator requires. A local follow-up attaches the stored extraction
+ID and row index to each presented source line, reinforces source citations
+in the prompt and allows sufficient output tokens for the 36-item unresolved
+queue. The exact-ID validation remains fail-closed. Release and signed-in
+readback remain open; no new PDF reading is needed for this change.
+
 ## PMC current internal draft context — 2026-09-29 UTC — LOCAL FOLLOW-UP
 
 PR #249 merged as `979b460daea285b45cb22ab8de00bcb4dfa47864` and its
