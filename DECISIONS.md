@@ -1,5 +1,18 @@
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
+## PMC-CHAIN-2026-09-29-06 — Put stored evidence IDs beside model input rows
+
+The internal draft must cite exact IDs already present in the current Case
+picture. The literal source lists previously carried the row text and file
+but no ID; the model's answer after compaction failed the exact-ID gate.
+Attach `${extraction_id}-agreed-${index}` and
+`${extraction_id}-disputed-${index}` to the corresponding saved rows only when
+building the internal review prompt. The indices must match the stored array
+and Case picture, with no new evidence store or citation invented. Keep the
+validator and refusal for missing/foreign IDs. Provide enough output budget
+for the complete unresolved queue; no partial or uncited clinical draft is
+saved. This changes presentation to the model, not the source or trust state.
+
 ## PMC-CHAIN-2026-09-29-05 — Pass one complete, compact evidence view to the internal draft
 
 The one-Case rerun surfaced a size-limit failure while rebuilding the internal

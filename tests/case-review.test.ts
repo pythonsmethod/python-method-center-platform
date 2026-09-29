@@ -87,6 +87,7 @@ describe("internal synthesis boundaries", () => {
     expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("точным ID свидетельства");
     expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Нельзя угадывать даты, числа, единицы");
     expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("Не скрывай неполные страницы");
+    expect(CASE_REVIEW_SYSTEM_PROMPT).toContain("ID, напечатанные рядом со строками");
   });
 });
 

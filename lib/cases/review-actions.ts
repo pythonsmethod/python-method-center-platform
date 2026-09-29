@@ -94,7 +94,7 @@ export async function generateCaseReview(
 
   const { data: extractions, error: extractionError } = await readAllRows((from, to) => supabase
     .from("document_extractions")
-    .select("document_id, agreed_values, disputed_values")
+    .select("id, document_id, agreed_values, disputed_values")
     .eq("case_id", caseId).order("id").range(from, to));
 
   if (extractionError) {
@@ -122,17 +122,19 @@ export async function generateCaseReview(
 
   const numberedAgreed = (extractions ?? []).filter(row => numberByDocument.has(row.document_id)).flatMap((row) =>
     Array.isArray(row.agreed_values)
-      ? (row.agreed_values as TranscribedValue[]).map((value) => ({
+      ? (row.agreed_values as TranscribedValue[]).map((value, index) => ({
           ...value,
-          file: numberedFile(row.document_id, value.file)
+          file: numberedFile(row.document_id, value.file),
+          evidenceId: `${row.id}-agreed-${index}`
         }))
       : []
   );
   const numberedDisputed = (extractions ?? []).filter(row => numberByDocument.has(row.document_id)).flatMap((row) =>
     Array.isArray(row.disputed_values)
-      ? (row.disputed_values as DisputedValue[]).map((value) => ({
+      ? (row.disputed_values as DisputedValue[]).map((value, index) => ({
           ...value,
-          file: numberedFile(row.document_id, value.file)
+          file: numberedFile(row.document_id, value.file),
+          evidenceId: `${row.id}-disputed-${index}`
         }))
       : []
   );
@@ -182,7 +184,7 @@ export async function generateCaseReview(
         )}${disputedNote}\n\nМАШИННАЯ ПРОВЕРКА (единицы, блокираторы, порог значимости):\n${findings}${oncologyContext}\n\nПОЛНАЯ ВНУТРЕННЯЯ КАРТИНА С ID И ИСТОЧНИКАМИ:\n${evidenceContext}`
       }
     ],
-    4000
+    6500
   ));
 
   if (result.status !== "ok") {

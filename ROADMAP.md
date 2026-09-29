@@ -27,10 +27,12 @@
       from units attached by only one reader (PR #249, `979b460`). Five
       current laboratory numbers are SOURCE_ONLY with separate unit exceptions;
       all 32 numeric rows retain unresolved units and absent usable dates.
-- [ ] Release the compact, complete model context for rebuilding the internal
-      draft. The current full UI picture exceeds its size limit; no partial
-      draft was saved. Then generate and inspect the new draft against the
-      current 36 review items without approving or publishing it.
+- [x] Release the compact, complete model context (PR #250, `81f95d3`). It
+      removes the size-limit failure without truncating evidence.
+- [ ] Release inline stable IDs on every literal row supplied to the internal
+      model. The first post-compaction generation failed the exact citation
+      gate and saved no draft. Then generate and inspect a current draft
+      against 36 review items without approving or publishing it.
 - [ ] Have Karen resolve the remaining source disputes and identity/date/unit
       questions, approve or reject the analytical picture and make the clinical
       decision. Only then validate the separately approved client response

@@ -1,5 +1,22 @@
 # Bounded PMC fact-projection pilot — 2026-09-28/29 UTC
 
+## Internal draft citation follow-up — 2026-09-29 UTC
+
+PR #250 merged as `81f95d31c8d488c0c519841c8bc26901108fead5`;
+Production deployment `dpl_6e8m6JDojtpBoVvCqwtoUwWBdUsB` is READY.
+The bounded Case's internal generation passed the former size gate, then
+failed the exact evidence-ID validation. No new review was saved and the old
+one is still stale. The source lists sent to the model contained literal rows
+without IDs, although the Case picture and validator use stable IDs.
+
+The local candidate prints the saved extraction ID and original row index
+beside every agreed and disputed literal row, strengthens the prompt's exact
+citation instruction and raises the output budget to cover the unresolved
+queue. It does not manufacture citations or weaken the validator. Synthetic
+tests cover the literal ID format; release and one internal draft readback
+remain open. No source-file processing, Karen decision, client message or
+learning is involved.
+
 ## Unit-disagreement release and internal draft follow-up — 2026-09-29 UTC
 
 PR #249 merged as `979b460daea285b45cb22ab8de00bcb4dfa47864`, and
