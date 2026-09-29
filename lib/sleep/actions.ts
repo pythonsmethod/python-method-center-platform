@@ -25,11 +25,28 @@ import {
 import { SLEEP_ADVICE_SYSTEM_PROMPT } from "@/lib/sleep/prompt";
 import { getSleepEntries } from "@/lib/sleep/queries";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getLocale, type Locale } from "@/lib/i18n/locale";
+import { plural } from "@/lib/i18n/plural";
 
 const MAX_IMPORT_BYTES = 3_000_000;
 
 function errorState(message: string): SleepActionState {
   return { status: "error", message };
+}
+
+const localized = (locale: Locale, ru: string, en: string) => locale === "ru" ? ru : en;
+
+function localizedSkipReason(reason: string, locale: Locale): string {
+  if (locale === "ru") return reason;
+  if (reason === "В файле нет строк с данными.") return "The file does not contain any data rows.";
+  if (reason.startsWith("Не нашёл столбец с датой.")) return "No date column was found. Add a “date” column or a wake-time column that includes a date.";
+  if (reason.startsWith("Прочитаны первые ")) return `Only the first ${MAX_IMPORT_ROWS} nights were imported; the remaining rows were skipped.`;
+  if (reason === "Не разобрал дату в этой строке.") return "The date in this row could not be read.";
+  const duplicate = reason.match(/^Ночь (.+) уже была выше в файле — оставил первую\.$/);
+  if (duplicate) return `Night ${duplicate[1]} appears more than once in the file; the first row was kept.`;
+  const empty = reason.match(/^Ночь (.+): в строке нет ни времени сна, ни продолжительности\.$/);
+  if (empty) return `Night ${empty[1]} has neither sleep times nor a duration.`;
+  return "This row could not be imported.";
 }
 
 function refresh(): void {
@@ -55,10 +72,11 @@ export async function saveNight(
   _previous: SleepActionState,
   formData: FormData
 ): Promise<SleepActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return errorState(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   }
 
   const {
@@ -66,7 +84,7 @@ export async function saveNight(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Сессия истекла — войдите заново.");
+    return errorState(localized(locale, "Сессия истекла — войдите заново.", "Your session has expired. Please sign in again."));
   }
 
   const sleptOn = String(formData.get("slept_on") ?? "").trim();
@@ -77,33 +95,31 @@ export async function saveNight(
   const rawAwakenings = String(formData.get("awakenings") ?? "").trim();
 
   if (!isSaneDate(sleptOn)) {
-    return errorState("Укажите дату утра, когда вы проснулись.");
+    return errorState(localized(locale, "Укажите дату утра, когда вы проснулись.", "Enter the date of the morning you woke up."));
   }
 
   if (!isClock(bedtime) || !isClock(wakeTime)) {
-    return errorState("Укажите время отхода ко сну и время подъёма.");
+    return errorState(localized(locale, "Укажите время отхода ко сну и время подъёма.", "Enter both your bedtime and wake-up time."));
   }
 
   const durationMinutes = sleepDuration(bedtime, wakeTime);
 
   if (durationMinutes === null) {
-    return errorState(
-      "Время засыпания и подъёма совпадают — проверьте, пожалуйста."
-    );
+    return errorState(localized(locale, "Время засыпания и подъёма совпадают — проверьте, пожалуйста.", "Bedtime and wake-up time are the same. Please check them."));
   }
 
   const quality = rawQuality ? Number(rawQuality) : null;
   const awakenings = rawAwakenings ? Number(rawAwakenings) : null;
 
   if (quality !== null && (!Number.isInteger(quality) || quality < 1 || quality > 5)) {
-    return errorState("Оценка самочувствия — от 1 до 5.");
+    return errorState(localized(locale, "Оценка самочувствия — от 1 до 5.", "Rate how you feel from 1 to 5."));
   }
 
   if (
     awakenings !== null &&
     (!Number.isInteger(awakenings) || awakenings < 0 || awakenings > 50)
   ) {
-    return errorState("Количество пробуждений указано некорректно.");
+    return errorState(localized(locale, "Количество пробуждений указано некорректно.", "Enter a valid number of awakenings."));
   }
 
   const { error } = await supabase.from("sleep_entries").upsert(
@@ -123,36 +139,35 @@ export async function saveNight(
   );
 
   if (error) {
-    return errorState(
-      "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку."
-    );
+    return errorState(localized(locale, "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку.", "Could not save the night. Try again, and contact support if it happens again."));
   }
 
   refresh();
 
-  return { status: "success", message: "Ночь записана." };
+  return { status: "success", message: localized(locale, "Ночь записана.", "Night saved.") };
 }
 
 export async function removeNight(
   _previous: SleepActionState,
   formData: FormData
 ): Promise<SleepActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return errorState(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   }
 
   const id = String(formData.get("entry_id") ?? "");
   const { error } = await supabase.from("sleep_entries").delete().eq("id", id);
 
   if (error) {
-    return errorState("Не удалось удалить запись.");
+    return errorState(localized(locale, "Не удалось удалить запись.", "Could not delete the entry."));
   }
 
   refresh();
 
-  return { status: "success", message: "Запись удалена." };
+  return { status: "success", message: localized(locale, "Запись удалена.", "Entry deleted.") };
 }
 
 // Bringing in a file a watch, ring or bracelet exported.
@@ -163,6 +178,7 @@ export async function importNights(
   _previous: SleepImportState,
   formData: FormData
 ): Promise<SleepImportState> {
+  const locale = await getLocale();
   const fail = (message: string): SleepImportState => ({
     status: "error",
     message,
@@ -174,7 +190,7 @@ export async function importNights(
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return fail(SERVICE_UNAVAILABLE_MESSAGE);
+    return fail(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   }
 
   const {
@@ -182,34 +198,31 @@ export async function importNights(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return fail("Сессия истекла — войдите заново.");
+    return fail(localized(locale, "Сессия истекла — войдите заново.", "Your session has expired. Please sign in again."));
   }
 
   const file = formData.get("file");
   const device = String(formData.get("device") ?? "").trim().slice(0, 80) || null;
 
   if (!(file instanceof File) || file.size === 0) {
-    return fail("Выберите файл выгрузки из приложения устройства.");
+    return fail(localized(locale, "Выберите файл выгрузки из приложения устройства.", "Choose the export file from your device app."));
   }
 
   if (file.size > MAX_IMPORT_BYTES) {
-    return fail(
-      "Файл слишком большой. Выгрузите период поменьше — например, последний месяц."
-    );
+    return fail(localized(locale, "Файл слишком большой. Выгрузите период поменьше — например, последний месяц.", "The file is too large. Export a shorter period, such as the last month."));
   }
 
   const text = await file.text();
   const parsed = parseSleepCsv(text);
   const nights = parsed.nights.filter(isPlausibleNight);
-  const skipped = parsed.skipped.map(
-    (row) => `Строка ${row.line}: ${row.reason}`
-  );
+  const skipped = parsed.skipped.map((row) => locale === "ru"
+    ? `Строка ${row.line}: ${row.reason}`
+    : `Row ${row.line}: ${localizedSkipReason(row.reason, locale)}`);
 
   if (nights.length === 0) {
     return {
       status: "error",
-      message:
-        "Из этого файла не удалось прочитать ни одной ночи. Проверьте, что это выгрузка сна в формате CSV.",
+      message: localized(locale, "Из этого файла не удалось прочитать ни одной ночи. Проверьте, что это выгрузка сна в формате CSV.", "No nights could be read from this file. Check that it is a sleep export in CSV format."),
       imported: 0,
       skipped,
       recognized: parsed.recognized
@@ -235,7 +248,7 @@ export async function importNights(
   if (error) {
     return {
       status: "error",
-      message: "Не удалось сохранить ночи из файла. Попробуйте ещё раз.",
+      message: localized(locale, "Не удалось сохранить ночи из файла. Попробуйте ещё раз.", "Could not save the nights from this file. Please try again."),
       imported: 0,
       skipped,
       recognized: parsed.recognized
@@ -246,7 +259,9 @@ export async function importNights(
 
   return {
     status: "success",
-    message: `Перенесено ночей: ${nights.length}.`,
+    message: locale === "ru"
+      ? `Перенесено ночей: ${nights.length}.`
+      : `${nights.length} ${plural(nights.length, { rule: "en", one: "night", few: "nights", many: "nights" })} imported.`,
     imported: nights.length,
     skipped,
     recognized: parsed.recognized
@@ -255,9 +270,9 @@ export async function importNights(
 
 export async function getSleepAdvice(
   _previous: SleepAdviceState,
-  formData: FormData
+  _formData: FormData
 ): Promise<SleepAdviceState> {
-  const locale = formData.get("locale") === "en" ? "en" : "ru";
+  const locale = await getLocale();
   const result = await getSleepEntries();
 
   if (result.status !== "ready" || result.entries.length === 0) {

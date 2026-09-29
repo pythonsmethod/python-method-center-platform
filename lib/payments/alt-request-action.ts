@@ -11,6 +11,7 @@ import type { SupportRequestActionState } from "@/lib/support/types";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createSupabaseServiceClient } from "@/lib/supabase/service";
 import { clientIp } from "@/lib/utils/client-ip";
+import { getLocale } from "@/lib/i18n/locale";
 
 const WINDOW_MS = 60 * 60 * 1000;
 const MAX_REQUESTS_PER_WINDOW = 5;
@@ -45,6 +46,8 @@ export async function submitAltPaymentRequest(
   _previousState: SupportRequestActionState,
   formData: FormData
 ): Promise<SupportRequestActionState> {
+  const locale = await getLocale();
+  const error = (ru: string, en: string) => errorState(locale === "ru" ? ru : en);
   const validation = validateAltPaymentInput({
     email: String(formData.get("email") ?? ""),
     country: String(formData.get("country") ?? ""),
@@ -53,7 +56,7 @@ export async function submitAltPaymentRequest(
     comment: String(formData.get("comment") ?? ""),
     consent: formData.get("consent") === "on",
     honeypot: String(formData.get("website") ?? "")
-  });
+  }, locale);
 
   if ("error" in validation) {
     return errorState(validation.error);
@@ -63,17 +66,13 @@ export async function submitAltPaymentRequest(
   const clientKey = clientIp(headerStore);
 
   if (isRateLimited(clientKey)) {
-    return errorState(
-      "Слишком много запросов подряд. Подождите немного и попробуйте ещё раз."
-    );
+    return error("Слишком много запросов подряд. Подождите немного и попробуйте ещё раз.", "Too many requests in a row. Wait a little and try again.");
   }
 
   const supabase = createSupabaseServiceClient();
 
   if (!supabase) {
-    return errorState(
-      "Сервис временно недоступен. Напишите нам через страницу «Поддержка»."
-    );
+    return error("Сервис временно недоступен. Напишите нам через страницу «Поддержка».", "The service is temporarily unavailable. Please contact us through the Support page.");
   }
 
   // Attach the request to the account when the person is signed in, so the
@@ -117,9 +116,7 @@ export async function submitAltPaymentRequest(
     .single();
 
   if (insertError) {
-    return errorState(
-      "Не удалось отправить запрос. Попробуйте ещё раз через минуту."
-    );
+    return error("Не удалось отправить запрос. Попробуйте ещё раз через минуту.", "Could not send your request. Please try again in a minute.");
   }
 
   await notifyTeam({
@@ -139,7 +136,8 @@ export async function submitAltPaymentRequest(
 
   return {
     status: "success",
-    message:
-      "Запрос отправлен. Мы пришлём реквизиты на указанный email в течение 24 часов (в рабочие дни). Если способ из вашей страны нам недоступен — честно напишем об этом и предложим другой."
+    message: locale === "ru"
+      ? "Запрос отправлен. Мы пришлём реквизиты на указанный email в течение 24 часов (в рабочие дни). Если способ из вашей страны нам недоступен — честно напишем об этом и предложим другой."
+      : "Request sent. We’ll email the payment details within 24 hours on business days. If that method is unavailable in your country, we’ll let you know and suggest another option."
   };
 }

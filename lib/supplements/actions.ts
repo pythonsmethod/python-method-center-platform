@@ -13,12 +13,16 @@ import { sanitizeTimes } from "@/lib/supplements/schedule";
 import { SERVICE_UNAVAILABLE_MESSAGE } from "@/lib/i18n/messages";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { MAX_EXTRACTED_SUPPLEMENTS, readExtractedSupplement } from "@/lib/supplements/extraction";
+import type { Locale } from "@/lib/i18n/locale";
+import { plural } from "@/lib/i18n/plural";
 
 
 
 function errorState(message: string): SupplementActionState {
   return { status: "error", message };
 }
+
+const localized = (locale: Locale, ru: string, en: string) => locale === "ru" ? ru : en;
 
 // All client-owned data under the client's own session — RLS scopes every
 // statement to their profile; no service key involved anywhere here.
@@ -27,10 +31,11 @@ export async function addSupplement(
   _previous: SupplementActionState,
   formData: FormData
 ): Promise<SupplementActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return errorState(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   }
 
   const {
@@ -38,7 +43,7 @@ export async function addSupplement(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Сессия истекла — войдите заново.");
+    return errorState(localized(locale, "Сессия истекла — войдите заново.", "Your session has expired. Please sign in again."));
   }
 
   const name = String(formData.get("name") ?? "").trim().replace(/\s+/g, " ");
@@ -47,11 +52,11 @@ export async function addSupplement(
   const times = sanitizeTimes(formData.getAll("times").map(String));
 
   if (!name || name.length > 120) {
-    return errorState("Укажите название — например, «Магний» или «Витамин D».");
+    return errorState(localized(locale, "Укажите название — например, «Магний» или «Витамин D».", "Enter a name, such as “Magnesium” or “Vitamin D.”"));
   }
 
   if (times.length === 0) {
-    return errorState("Добавьте хотя бы одно время приёма.");
+    return errorState(localized(locale, "Добавьте хотя бы одно время приёма.", "Add at least one time of day."));
   }
 
   const { error } = await supabase.from("supplements").insert({
@@ -64,24 +69,22 @@ export async function addSupplement(
   });
 
   if (error) {
-    return errorState(
-      "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку."
-    );
+    return errorState(localized(locale, "Не удалось сохранить. Попробуйте ещё раз — а если повторится, напишите в поддержку.", "Could not save the supplement. Try again, and contact support if it happens again."));
   }
 
   revalidatePath("/cabinet/supplements");
   revalidatePath("/cabinet");
 
-  return { status: "success", message: `«${name}» добавлен в расписание.` };
+  return { status: "success", message: locale === "ru" ? `«${name}» добавлен в расписание.` : `“${name}” added to your schedule.` };
 }
 
 export async function saveExtractedSupplements(
   _previous: SupplementActionState,
   formData: FormData
 ): Promise<SupplementActionState> {
-  const locale = formData.get("locale") === "en" ? "en" : "ru";
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
-  if (!supabase) return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+  if (!supabase) return errorState(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   const { data: { user } } = await supabase.auth.getUser();
   if (!user) return errorState(locale === "en" ? "Your session has expired. Please sign in again." : "Сессия истекла — войдите заново.");
 
@@ -101,30 +104,31 @@ export async function saveExtractedSupplements(
   })));
   if (error) return errorState(locale === "en" ? "Could not save the schedule. Please try again." : "Не удалось сохранить расписание. Попробуйте ещё раз.");
   revalidatePath("/cabinet/supplements"); revalidatePath("/cabinet");
-  return { status: "success", message: locale === "en" ? `Added to schedule: ${rows.length}.` : `Добавлено в расписание: ${rows.length}.` };
+  return { status: "success", message: locale === "en" ? `${rows.length} ${plural(rows.length, { rule: "en", one: "supplement", few: "supplements", many: "supplements" })} added to your schedule.` : `Добавлено в расписание: ${rows.length}.` };
 }
 
 export async function removeSupplement(
   _previous: SupplementActionState,
   formData: FormData
 ): Promise<SupplementActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return errorState(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   }
 
   const id = String(formData.get("supplement_id") ?? "");
   const { error } = await supabase.from("supplements").delete().eq("id", id);
 
   if (error) {
-    return errorState("Не удалось удалить.");
+    return errorState(localized(locale, "Не удалось удалить.", "Could not remove the supplement."));
   }
 
   revalidatePath("/cabinet/supplements");
   revalidatePath("/cabinet");
 
-  return { status: "success", message: "Убрано из расписания." };
+  return { status: "success", message: localized(locale, "Убрано из расписания.", "Removed from your schedule.") };
 }
 
 // The check-off. Pressing an already-taken slot un-checks it — fingers
@@ -134,10 +138,11 @@ export async function toggleIntake(
   _previous: SupplementActionState,
   formData: FormData
 ): Promise<SupplementActionState> {
+  const locale = await getLocale();
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState(SERVICE_UNAVAILABLE_MESSAGE);
+    return errorState(localized(locale, SERVICE_UNAVAILABLE_MESSAGE, "The service is temporarily unavailable."));
   }
 
   const {
@@ -145,7 +150,7 @@ export async function toggleIntake(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Сессия истекла — войдите заново.");
+    return errorState(localized(locale, "Сессия истекла — войдите заново.", "Your session has expired. Please sign in again."));
   }
 
   const supplementId = String(formData.get("supplement_id") ?? "");
@@ -153,7 +158,7 @@ export async function toggleIntake(
   const takenOn = String(formData.get("taken_on") ?? "");
 
   if (!supplementId || !/^\d{4}-\d{2}-\d{2}$/.test(takenOn)) {
-    return errorState("Некорректный запрос.");
+    return errorState(localized(locale, "Некорректный запрос.", "This request is invalid."));
   }
 
   const { data: existing } = await supabase
@@ -174,7 +179,7 @@ export async function toggleIntake(
       });
 
   if (error) {
-    return errorState("Не удалось отметить приём.");
+    return errorState(localized(locale, "Не удалось отметить приём.", "Could not update this dose."));
   }
 
   revalidatePath("/cabinet/supplements");

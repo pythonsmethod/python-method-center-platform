@@ -16,6 +16,8 @@ import {
 } from "@/lib/tokens/queries";
 import type { RedeemState } from "@/lib/tokens/redeem-state";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { getLocale } from "@/lib/i18n/locale";
+import { plural } from "@/lib/i18n/plural";
 
 function errorState(message: string): RedeemState {
   return { status: "error", message };
@@ -28,10 +30,12 @@ export async function redeemTokens(
   _previousState: RedeemState,
   formData: FormData
 ): Promise<RedeemState> {
+  const locale = await getLocale();
+  const error = (ru: string, en: string) => errorState(locale === "ru" ? ru : en);
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return errorState("Сервис временно недоступен. Попробуйте позже.");
+    return error("Сервис временно недоступен. Попробуйте позже.", "The service is temporarily unavailable. Please try again later.");
   }
 
   const {
@@ -39,35 +43,32 @@ export async function redeemTokens(
   } = await supabase.auth.getUser();
 
   if (!user) {
-    return errorState("Войдите в аккаунт, чтобы использовать токены.");
+    return error("Войдите в аккаунт, чтобы использовать токены.", "Sign in to use your tokens.");
   }
 
   const requested = Number(String(formData.get("amount") ?? "").trim());
 
   if (!Number.isInteger(requested) || requested <= 0) {
-    return errorState("Укажите целое количество токенов.");
+    return error("Укажите целое количество токенов.", "Enter a whole number of tokens.");
   }
 
   if (requested < MIN_REDEEM_TOKENS) {
-    return errorState(
-      `Минимальная сумма для скидки — ${MIN_REDEEM_TOKENS} токенов.`
-    );
+    return error(`Минимальная сумма для скидки — ${MIN_REDEEM_TOKENS} токенов.`, `The minimum redemption is ${MIN_REDEEM_TOKENS} tokens.`);
   }
 
   const balance = await getTokenBalance(user.id);
 
   if (requested > balance) {
-    return errorState(
-      `На вашем счету ${balance} токенов — этого недостаточно для скидки на ${requested}.`
+    return error(
+      `На вашем счету ${balance} токенов — этого недостаточно для скидки на ${requested}.`,
+      `Your balance is ${balance} ${plural(balance, { rule: "en", one: "token", few: "tokens", many: "tokens" })}, which is not enough to redeem ${requested}.`
     );
   }
 
   const stripe = getStripe();
 
   if (!stripe) {
-    return errorState(
-      "Скидочные коды временно недоступны. Напишите команде — мы применим скидку вручную."
-    );
+    return error("Скидочные коды временно недоступны. Напишите команде — мы применим скидку вручную.", "Discount codes are temporarily unavailable. Message the team and we’ll apply your discount manually.");
   }
 
   const expiresAt =
@@ -85,7 +86,7 @@ export async function redeemTokens(
       duration: "once",
       max_redemptions: 1,
       redeem_by: expiresAt,
-      name: `Токены Python Method · ${requested}`
+      name: locale === "ru" ? `Токены Python Method · ${requested}` : `Python Method tokens · ${requested}`
     });
 
     const promotionCode = await stripe.promotionCodes.create({
@@ -100,7 +101,7 @@ export async function redeemTokens(
       amount: -requested,
       reason: TOKEN_REASONS.redeemed,
       referenceId: promotionCode.id,
-      note: `Код скидки ${promotionCode.code}`
+      note: locale === "ru" ? `Код скидки ${promotionCode.code}` : `Discount code ${promotionCode.code}`
     });
 
     if (!written.ok) {
@@ -110,9 +111,7 @@ export async function redeemTokens(
         .update(promotionCode.id, { active: false })
         .catch(() => undefined);
 
-      return errorState(
-        "Не удалось списать токены. Код отменён, попробуйте ещё раз."
-      );
+      return error("Не удалось списать токены. Код отменён, попробуйте ещё раз.", "Could not redeem your tokens. The code was cancelled; please try again.");
     }
 
     revalidatePath("/cabinet");
@@ -120,11 +119,11 @@ export async function redeemTokens(
     return {
       status: "success",
       code: promotionCode.code,
-      message: `Код скидки на ${formatUsd(tokensToUsd(requested))} $ создан — это ${requested} ${pluralCapsules(requested)} формулы по сегодняшней цене. Введите его на странице оплаты в поле «Промокод». Код действует ${REDEEM_CODE_VALID_DAYS} дней и работает один раз.`
+      message: locale === "ru"
+        ? `Код скидки на ${formatUsd(tokensToUsd(requested))} $ создан — это ${requested} ${pluralCapsules(requested)} формулы по сегодняшней цене. Введите его на странице оплаты в поле «Промокод». Код действует ${REDEEM_CODE_VALID_DAYS} дней и работает один раз.`
+        : `Your $${formatUsd(tokensToUsd(requested))} discount code is ready — equal to ${requested} ${plural(requested, { rule: "en", one: "formula capsule", few: "formula capsules", many: "formula capsules" })} at today’s price. Enter it in the “Promotion code” field on the payment page. The code is valid for ${REDEEM_CODE_VALID_DAYS} ${plural(REDEEM_CODE_VALID_DAYS, { rule: "en", one: "day", few: "days", many: "days" })} and can be used once.`
     };
   } catch {
-    return errorState(
-      "Не удалось создать код скидки. Попробуйте позже или напишите команде."
-    );
+    return error("Не удалось создать код скидки. Попробуйте позже или напишите команде.", "Could not create a discount code. Try again later or message the team.");
   }
 }
