@@ -3,8 +3,8 @@ import { createHash } from "node:crypto";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
 import { prepareDocumentSource, sourceAnchor } from "@/lib/documents/source";
-import { buildReadPage } from "@/lib/documents/page-reading";
-import { splitValue } from "@/lib/analysis/pipeline";
+import { analysisRowsFromPageReadings, buildReadPage } from "@/lib/documents/page-reading";
+import { runAnalysis, splitValue } from "@/lib/analysis/pipeline";
 import { readAllRows } from "@/lib/documents/read-all";
 const hash = "c".repeat(64);
 const reading = (value = "5 mg/L", quality = "COMPLETE") => `wrong.pdf :: [CONTROL] :: [DOCUMENT COVERAGE] :: ${quality} :: - :: FILLED :: ДА :: -\nwrong.pdf :: LAB :: CRP :: ${value} :: 0-5 :: FILLED :: ДА :: -\n[[PMC_PAGE_END]]`;
@@ -43,6 +43,9 @@ describe("original source and complete page reading", () => {
     expect(sourceAnchor({source:{level:"PAGE",page:2,sourceHash:null,excerpt:null,region:null}}).level).toBe("DOCUMENT");
   });
   it.each(["<5 mg/L","1,234 mg/L","1.234 mg/L","3–5 mg/L","1 234 mg/L"])("does not turn ambiguous/censored/range %s into a precise value", value => { expect(splitValue(value)).toBeNull(); });
+  it.each(["21.04.2026 08:44:05", "02.11.1963", "2026-09-23"])("does not make a laboratory measurement from date %s", value => {
+    expect(splitValue(value)).toBeNull();
+  });
   it("keeps explicit count units and signed/exponential values", () => {
     expect(splitValue("4.5 10^9/L")).toEqual({value:4.5,unit:"10^9/L"}); expect(splitValue("−2.5 mg/L")).toEqual({value:-2.5,unit:"mg/L"}); expect(splitValue("2e-3 mg/L")).toEqual({value:0.002,unit:"mg/L"});
   });
@@ -50,6 +53,37 @@ describe("original source and complete page reading", () => {
     const rows = Array.from({length:1203},(_,id)=>({id}));
     expect((await readAllRows(async (from,to) => ({data:rows.slice(from,to+1),error:null}))).data).toHaveLength(1203);
     expect((await readAllRows(async (from,to) => from ? {data:null,error:{code:"DOWN"}} : {data:rows.slice(from,to+1),error:null})).data).toBeNull();
+  });
+});
+
+describe("laboratory fact projection", () => {
+  it("keeps patient identifiers and dates in the literal reading without promoting them to lab values", () => {
+    const agreed = [
+      { section: "Patient", label: "ИСН/ИНН", value: "00303201010038", reference: "-", referenceConfirmed: true },
+      { section: "Patient", label: "Дата регистрации", value: "21.04.2026 08:44:05", reference: "-", referenceConfirmed: true },
+      { section: "Patient", label: "Дата рождения", value: "02.11.1963", reference: "-", referenceConfirmed: true },
+      { section: "Patient", label: "№ / ФИО", value: "4919 Synthetic Person", reference: "-", referenceConfirmed: true },
+      { section: "Laboratory", label: "CRP", value: "5 mg/L", reference: "0-10", referenceConfirmed: true },
+      { section: "Laboratory", label: "New marker", value: "7 mg/L", reference: "-", referenceConfirmed: true }
+    ];
+    const run = runAnalysis({ documents: [{ documentId: "synthetic-document", collectionDate: "2026-09-23", agreed }],
+      prior: [], questionnaire: null, extractionModelVersion: "synthetic-test" });
+    expect(agreed).toHaveLength(6);
+    expect(run.labValues.map(row => row.label_original)).toEqual(["CRP", "New marker"]);
+    expect(run.labValues[0].measured_on).toBe("2026-09-23");
+    expect(run.humanReview.map(row => row.label_original)).toContain("New marker");
+  });
+
+  it("inherits a document date only when the row prints no separate date", () => {
+    const raw = buildReadPage(reading(), reading(), 1, hash, "synthetic.pdf").agreed.filter(row => row.label === "CRP");
+    const undated = analysisRowsFromPageReadings(raw);
+    expect(undated[0].collectionDate).toBeUndefined();
+    const input = (agreed: typeof undated) => ({ documents: [{ documentId: "synthetic-document", collectionDate: "2026-09-23", agreed }],
+      prior: [], questionnaire: null, extractionModelVersion: "synthetic-test" });
+    expect(runAnalysis(input(undated)).labValues[0].measured_on).toBe("2026-09-23");
+    const ambiguous = analysisRowsFromPageReadings([{ ...raw[0], collectionDatePrinted: "09/10/2026" }]);
+    expect(ambiguous[0].collectionDate).toBeNull();
+    expect(runAnalysis(input(ambiguous)).labValues[0].measured_on).toBeNull();
   });
 });
 

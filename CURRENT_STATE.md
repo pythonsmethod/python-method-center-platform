@@ -1,6 +1,32 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## PMC first real document pilot — 2026-09-28 — SOURCE READ COMPLETE, FACT PROJECTION REPAIR PENDING
+
+The owner authorized the existing Karen account as the Production clinical
+reviewer and selected one real Case for a bounded pilot. `KAREN_PRIMARY_EMAIL`
+was set to that account, PR #242's reprocessing repair was released as
+`1737d2c`, and the signed-in Case UI exposed Karen-only controls. Only the
+selected Case was enabled. Its three existing PDFs completed new one-page
+readings with `COMPLETE` page coverage, immutable analysis snapshots, and
+source hashes. The double readings yielded 56 agreed and 43 disputed rows.
+There was no Karen verification, clinical decision, client publication or
+case-learning event.
+
+The live result exposed a generic projection defect: numeric administrative
+fields from literal source reading entered the laboratory fact timeline. The
+pilot was paused again with its snapshots retained. A source-preserving
+projection repair excludes administrative/date rows and restores document-date
+inheritance only when a row has no printed date. Its synthetic regression and
+release status are tracked in
+`docs/ankh/pmc_fact_projection_pilot_2026_09_28.md`. The pilot must be rerun
+after the repair is released. Most measurements remain unresolved for unit or
+date; neither disputed rows nor the account's weak name-only identity match
+establish a verified clinical fact. No other Case is enrolled.
+
 ## PMC bounded document pilot — 2026-09-28 — LIVE CODE, FIRST CASE PAUSED
+
+Historical pre-processing checkpoint; the newer first-pilot section above
+supersedes its deployment and access status.
 
 PR #237 merged as `bfb5d1a`: the new document chain is deployed to the live
 PMC site behind a per-Case allowlist. The four document-chain migrations, pilot

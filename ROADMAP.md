@@ -7,12 +7,20 @@
 - [x] Identify one Case by its actual source identity, verify the originals,
       and pause the enrolled Case before any reprocessing while Karen access is
       unavailable. Do not put patient identifiers in this public roadmap.
-- [ ] Publish the bounded staff reprocessing-progress repair after review.
-- [ ] Restore the existing Karen account's intended access through a separately
-      authorized Production configuration change and verify the actual UI role.
-- [ ] Resume only the selected pilot Case, re-read its source files, review
-      page coverage and facts with Karen, then separately accept the internal
-      draft, decision and client readback. No automatic trust promotion.
+- [x] Publish the bounded staff reprocessing-progress repair after review
+      (PR #242, released as `1737d2c`).
+- [x] Restore the existing Karen account's intended access through the
+      owner-authorized Production setting and verify its signed-in Case UI.
+- [x] Read only the selected Case's three active PDFs; confirm page coverage,
+      source snapshots and disputed rows. Pause the Case on discovering that
+      administrative numbers entered the laboratory timeline.
+- [ ] Release the generic fact-projection repair and rerun the same three PDFs;
+      read back the source anchors, unit/date uncertainty and the absence of
+      administrative facts in the laboratory timeline.
+- [ ] Have Karen resolve the remaining source disputes and identity/date/unit
+      questions, approve or reject the analytical picture and make the clinical
+      decision. Only then validate the separately approved client response
+      and case-learning path. No automatic trust promotion.
 
 The earlier current-main integration checklist below is historical; PR #237
 supersedes its staging-only deployment entries.
