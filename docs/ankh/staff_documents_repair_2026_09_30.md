@@ -36,7 +36,14 @@ processing status or prioritization to Cases or support requests.
 - Local build was blocked by the environment: Google Fonts network access
   was denied and the system disk ran out of space. Generated dependencies
   and build artifacts were removed from the isolated copy after testing.
-- Vercel build, deployment and signed-in RU → EN → RU acceptance pending.
+- Initial Vercel preview build reached READY for commit `870ccb4`.
+- Initial GitHub checks repeated security, types, lint and all 2333 tests
+  successfully, then stopped on the existing dependency audit findings.
+  Update only three lockfile entries: brace-expansion 5.0.9 → 5.0.12 and
+  1.1.18 → 1.1.21; DOMPurify 3.4.15 → 3.4.16. The package manifest is
+  unchanged and `npm audit fix --package-lock-only` reports zero findings.
+- Repeated GitHub/Vercel checks, production deployment and signed-in
+  RU → EN → RU acceptance pending.
 
 No schema or role changes, new endpoint, original-document read, OCR/model
 request, client publication, evidence decision or automatic trust promotion.

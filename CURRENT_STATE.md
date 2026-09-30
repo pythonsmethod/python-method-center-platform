@@ -14,7 +14,11 @@ Validation: 61 focused checks and full regression (2333 passed, 1 skipped),
 TypeScript, ESLint and diff whitespace checks passed. No schema migration,
 credential, role, source, extraction or clinical-trust change. Production
 service-key query was not executed because automatic approval rejected
-that separate privileged access. Release and signed-in RU → EN → RU
+that separate privileged access. Vercel preview build passed; initial GitHub
+checks repeated all 2333 tests successfully but stopped on existing
+dependency vulnerabilities. Only the three affected lockfile entries are
+updated to patched brace-expansion and DOMPurify versions, with zero local
+audit findings; repeated release checks are pending. Release and signed-in RU → EN → RU
 acceptance through the existing Karen browser session remain open. See
 `docs/ankh/staff_documents_repair_2026_09_30.md`.
 
