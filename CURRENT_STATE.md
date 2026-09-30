@@ -1,8 +1,8 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
-## Karen Today workspace — 2026-09-29 — LOCAL COMPLETE, PUBLICATION PENDING
+## Karen Today workspace — 2026-09-29 — PRODUCTION RELEASED
 
-`/admin` now contains only the factual daily client queue and work assistant, on desktop and mobile. The queue includes Cases with source-record activity in the current America/Los_Angeles calendar day and keeps the full directories/configuration on their dedicated routes. No schema, processing classification, PHI, AI-policy or clinical-trust change. See `docs/ankh/karen_today_workspace_2026_09_29.md`.
+PR #257 merged as `9fa8d95a0473c699442fd87e108206e8ccf3f0d7`; Vercel production deployment `DNLo3a7vzk9xECMh74nfNpXs297D` completed successfully. `/admin` now contains only the factual daily client queue and work assistant, on desktop and mobile. The queue includes Cases with source-record activity in the current America/Los_Angeles calendar day and keeps the full directories/configuration on their dedicated routes. Both production domains reach the protected route correctly; authenticated RU → EN → RU acceptance remains pending. No schema, processing classification, PHI, AI-policy or clinical-trust change. See `docs/ankh/karen_today_workspace_2026_09_29.md`.
 
 ## NEXORA diagnostic catalog for staff ANHAM — 2026-09-29 — LOCAL RELEASE CANDIDATE
 
