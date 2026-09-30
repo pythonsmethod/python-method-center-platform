@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { AuthSetupNotice } from "@/components/AuthSetupNotice";
 import { LogoutButton } from "@/components/LogoutButton";
 import { PageHeader } from "@/components/PageHeader";
 import { getRequiredStaffUser } from "@/lib/auth/require-staff";
@@ -10,13 +9,6 @@ import {
   type StaffDocumentIntakeItem
 } from "@/lib/documents/staff-queries";
 import { getLocale, type Locale } from "@/lib/i18n/locale";
-
-
-
-function formatStatus(value: string): string {
-  return value.replaceAll("_", " ");
-}
-
 function shortId(value: string): string {
   return value.slice(0, 8);
 }
@@ -24,6 +16,26 @@ function shortId(value: string): string {
 function documentCopy(locale: Locale) {
   return locale === "ru"
     ? {
+        eyebrow: "Материалы клиентов",
+        title: "Документы",
+        description: "Загруженные файлы, их состояние и доступ к оригиналам.",
+        setupTitle: "Раздел документов пока недоступен",
+        setupMessage: "Доступ к документам ещё не настроен. Обратитесь в техническую поддержку.",
+        accessFailed: "Не удалось проверить доступ",
+        accessMessage: "Не удалось подтвердить рабочий доступ. Попробуйте обновить страницу. Если ошибка повторится, обратитесь в техническую поддержку.",
+        session: "Рабочий доступ",
+        staff: "Сотрудник центра",
+        role: "Роль",
+        roles: { support: "Поддержка", admin: "Администратор" },
+        logout: "Выйти",
+        scope: "Работа с документами",
+        readOnly: "Просмотр оригиналов",
+        scopeDescription: "Здесь можно просмотреть загруженные документы. Открытие файла не меняет результат разбора или решения по кейсу.",
+        unavailable: "Документы недоступны",
+        loadFailed: "Не удалось загрузить список документов",
+        loadMessage: "Попробуйте обновить страницу. Если ошибка повторится, обратитесь в техническую поддержку. Повторно загружать файлы не нужно.",
+        section: "Загруженные документы",
+        unknownStatus: "Состояние не определено",
         document: "Документ",
         client: "Клиент",
         case: "Кейс",
@@ -39,12 +51,34 @@ function documentCopy(locale: Locale) {
           queued: "В очереди",
           ready: "Обработан",
           processing: "Обрабатывается",
+          identity_mismatch: "Нужно проверить принадлежность документа",
+          failed: "Ошибка обработки",
           accepted: "Принят",
           needs_reupload: "Нужна повторная загрузка",
           archived: "В архиве"
         }
       }
     : {
+        eyebrow: "Client materials",
+        title: "Documents",
+        description: "Uploaded files, their status and access to originals.",
+        setupTitle: "Documents are currently unavailable",
+        setupMessage: "Document access has not been configured yet. Contact technical support.",
+        accessFailed: "Unable to check access",
+        accessMessage: "We could not confirm staff access. Try refreshing the page. If the error persists, contact technical support.",
+        session: "Staff access",
+        staff: "Center staff member",
+        role: "Role",
+        roles: { support: "Support", admin: "Administrator" },
+        logout: "Sign out",
+        scope: "Working with documents",
+        readOnly: "View originals",
+        scopeDescription: "You can view uploaded documents here. Opening a file does not change its analysis or any Case decision.",
+        unavailable: "Documents unavailable",
+        loadFailed: "Unable to load the document list",
+        loadMessage: "Try refreshing the page. If the error persists, contact technical support. You do not need to upload the files again.",
+        section: "Uploaded documents",
+        unknownStatus: "Status unknown",
         document: "Document",
         client: "Client",
         case: "Case",
@@ -60,6 +94,8 @@ function documentCopy(locale: Locale) {
           queued: "Queued",
           ready: "Processed",
           processing: "Processing",
+          identity_mismatch: "Document ownership needs review",
+          failed: "Processing failed",
           accepted: "Accepted",
           needs_reupload: "Re-upload needed",
           archived: "Archived"
@@ -69,7 +105,7 @@ function documentCopy(locale: Locale) {
 
 function statusText(locale: Locale, value: string): string {
   const labels: Record<string, string> = documentCopy(locale).statuses;
-  return labels[value] ?? formatStatus(value);
+  return labels[value] ?? documentCopy(locale).unknownStatus;
 }
 
 function DocumentTable({ documents, locale }: { documents: StaffDocumentIntakeItem[]; locale: Locale }) {
@@ -112,7 +148,7 @@ function DocumentTable({ documents, locale }: { documents: StaffDocumentIntakeIt
                   {statusText(locale, document.document_status)}
                 </span>
               </td>
-              <td>{formatDateTime(document.created_at)}</td>
+              <td>{formatDateTime(document.created_at, locale)}</td>
               <td>
                 <Link
                   className="button button--secondary button--compact"
@@ -178,17 +214,21 @@ function DocumentCards({ documents, locale }: { documents: StaffDocumentIntakeIt
 export default async function StaffDocumentIntakePage() {
   const auth = await getRequiredStaffUser("/admin/documents");
   const locale = await getLocale();
+  const copy = documentCopy(locale);
 
   if (auth.status === "missing-env") {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Internal intake"
-          title="Documents"
-          description="This route requires Supabase Auth before staff access can be evaluated."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.description}
         />
 
-        <AuthSetupNotice title="Staff document intake requires Supabase Auth setup" />
+        <div className="notice notice--warning">
+          <h2>{copy.setupTitle}</h2>
+          <p>{copy.setupMessage}</p>
+        </div>
       </div>
     );
   }
@@ -201,15 +241,15 @@ export default async function StaffDocumentIntakePage() {
     return (
       <div className="page-shell">
         <PageHeader
-          eyebrow="Internal intake"
-          title="Documents"
-          description="Staff access could not be evaluated."
+          eyebrow={copy.eyebrow}
+          title={copy.title}
+          description={copy.description}
         />
 
         <div className="notice notice--warning">
-          <span className="panel__label">Access check failed</span>
-          <h2>Document intake unavailable</h2>
-          <p>{auth.message}</p>
+          <span className="panel__label">{copy.accessFailed}</span>
+          <h2>{copy.unavailable}</h2>
+          <p>{copy.accessMessage}</p>
         </div>
       </div>
     );
@@ -220,31 +260,28 @@ export default async function StaffDocumentIntakePage() {
   return (
     <div className="page-shell">
       <PageHeader
-        eyebrow="Internal intake"
-        title="Documents"
-        description="Read-only staff view of uploaded document metadata and intake lifecycle status."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        description={copy.description}
       />
 
       <section className="panel-grid staff-document-intro">
         <div className="panel">
-          <span className="panel__label">Authorized staff session</span>
-          <h2>{auth.email ?? "Signed-in staff user"}</h2>
-          <p>Role: {auth.role}</p>
+          <span className="panel__label">{copy.session}</span>
+          <h2>{auth.email ?? copy.staff}</h2>
+          <p>{copy.role}: {copy.roles[auth.role]}</p>
           <div className="panel-actions">
-            <LogoutButton />
+            <LogoutButton label={copy.logout} />
           </div>
         </div>
         <div className="panel">
-          <span className="panel__label">Scope</span>
-          <h2>Read-only intake</h2>
-          <p>
-            This view lists uploaded documents and opens private files by signed
-            server URL. It does not change document status or case state.
-          </p>
+          <span className="panel__label">{copy.scope}</span>
+          <h2>{copy.readOnly}</h2>
+          <p>{copy.scopeDescription}</p>
         </div>
       </section>
 
-      <section className="intake-section" aria-label="Uploaded documents">
+      <section className="intake-section" aria-label={copy.section}>
         {documentsResult.status === "ready" ? (
           <>
             <DocumentTable documents={documentsResult.documents} locale={locale} />
@@ -252,9 +289,9 @@ export default async function StaffDocumentIntakePage() {
           </>
         ) : (
           <div className="notice notice--warning">
-            <span className="panel__label">Documents unavailable</span>
-            <h2>Intake cannot load documents</h2>
-            <p>{documentsResult.message}</p>
+            <span className="panel__label">{copy.unavailable}</span>
+            <h2>{documentsResult.status === "missing-service-role" ? copy.setupTitle : copy.loadFailed}</h2>
+            <p>{documentsResult.status === "missing-service-role" ? copy.setupMessage : copy.loadMessage}</p>
           </div>
         )}
       </section>

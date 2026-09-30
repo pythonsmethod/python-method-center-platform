@@ -1,5 +1,23 @@
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
+## Staff Documents list — 2026-09-30 — LOCAL FIX, LIVE ACCEPTANCE PENDING
+
+The authorized staff `/admin/documents` page failed with an ambiguous
+`uploaded_documents` → `profiles` embed after identity-reviewer references
+were added. Select the existing owner foreign key explicitly; keep the
+response shape, staff authorization and 100-row read-only limit. The page
+now localizes its headings, access/configuration/errors, role labels,
+accessibility label, document states and desktop dates in RU and EN. Raw
+database/access errors are replaced by helpful localized messages.
+
+Validation: 61 focused checks and full regression (2333 passed, 1 skipped),
+TypeScript, ESLint and diff whitespace checks passed. No schema migration,
+credential, role, source, extraction or clinical-trust change. Production
+service-key query was not executed because automatic approval rejected
+that separate privileged access. Release and signed-in RU → EN → RU
+acceptance through the existing Karen browser session remain open. See
+`docs/ankh/staff_documents_repair_2026_09_30.md`.
+
 ## Karen Today workspace — 2026-09-29 — PRODUCTION RELEASED
 
 PR #257 merged as `9fa8d95a0473c699442fd87e108206e8ccf3f0d7`; Vercel production deployment `DNLo3a7vzk9xECMh74nfNpXs297D` completed successfully. `/admin` now contains only the factual daily client queue and work assistant, on desktop and mobile. The queue includes Cases with source-record activity in the current America/Los_Angeles calendar day and keeps the full directories/configuration on their dedicated routes. Both production domains reach the protected route correctly; authenticated RU → EN → RU acceptance remains pending. No schema, processing classification, PHI, AI-policy or clinical-trust change. See `docs/ankh/karen_today_workspace_2026_09_29.md`.

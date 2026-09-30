@@ -45,7 +45,7 @@ export async function getStaffDocumentIntakeItems(): Promise<StaffDocumentIntake
   const { data, error } = await supabase
     .from("uploaded_documents")
     .select(
-      "id, profile_id, case_id, original_filename, document_status, created_at, profiles(email, full_name), client_cases(title)"
+      "id, profile_id, case_id, original_filename, document_status, created_at, profiles!uploaded_documents_profile_id_fkey(email, full_name), client_cases(title)"
     )
     .order("created_at", { ascending: false })
     .limit(100);
