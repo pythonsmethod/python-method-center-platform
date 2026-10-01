@@ -49,6 +49,19 @@ export function hasAssistantEnv(): boolean {
   return hasClaudeEnv() || hasOpenAiEnv();
 }
 
+export function documentReadingProvider(): { id: string; model: string } {
+  return { id: "pmc-approved-document-reader", model: "claude-native-attachment" };
+}
+
+export async function readIsolatedDocument(
+  system: string,
+  instruction: string,
+  maxTokens: number,
+  attachment: ChatAttachment
+): Promise<AssistantResult> {
+  return askAssistantWithAttachments(system, [{ role: "user", content: instruction }], maxTokens, [attachment], { timeoutMs: 90000, allowContinuation: false });
+}
+
 // Vision/document extraction currently needs Claude's native attachment
 // blocks. Business routes call this provider-neutral boundary rather than
 // naming the provider themselves, so a future multimodal fallback stays
