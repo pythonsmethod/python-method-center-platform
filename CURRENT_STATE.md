@@ -1,3 +1,8 @@
+
+## VIVENOIA migration — 2026-09-30 — SAFE IDENTITY MIGRATION IN PROGRESS
+
+VIVENOIA is now the canonical shared-core identity. The working PMC document pipeline is preserved; no database, PHI, provider, Case, evidence or trust-state migration is implied by the rename. Existing NEXORA technical identifiers remain compatibility aliases until verified retirement. Canonical entry: docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md. PR #222 is an older draft based on 2026-09-23 main and must not be merged directly over current main; its document.read design/evidence must be reconciled with current main before runtime adoption.
+
 # CURRENT_STATE.md — NEXORA CORE / PMC IMPLEMENTATION
 
 ## Staff Documents list — 2026-09-30 — LOCAL FIX, LIVE ACCEPTANCE PENDING
