@@ -1,3 +1,8 @@
+
+## VIVENOIA-2026-09-30-01 — Canonical core identity
+
+Owner renamed NEXORA to VIVENOIA. This is identity continuity, not a parallel system or rewrite. VIVENOIA inherits the approved shared-core architecture and reusable capabilities. Existing NEXORA runtime/package/environment identifiers remain compatibility aliases until dependency-safe retirement. PMC Case authorization, evidence, PHI boundaries, trust states and Karen workflow are unchanged. New architecture work uses VIVENOIA naming.
+
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
 ## 2026-09-29 — Karen Today is a factual daily projection
