@@ -2,7 +2,7 @@
 
 ## Owner-approved architecture — 2026-09-23
 
-Read `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` (legacy filename; canonical content is VIVENOIA) before new architecture work.
+Read `docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md` first, then its compatibility-backed full master `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` before new architecture work.
 VIVENOIA owns reusable capabilities, including document analysis. ANHAM is the
 AI system within Python Method Center and consumes those capabilities through
 a PMC authorization/domain adapter. External capability commercialization belongs
@@ -87,7 +87,7 @@ Before changing document-analysis code, read:
 2. `CURRENT_STATE.md`
 3. `ROADMAP.md`
 4. `DECISIONS.md`
-5. `docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md` and the ANHAM/PMC application profile; the former `Ankh_Analysis_System_Master_Concept_v1_ru.docx` is a historical reference only
+5. `docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md`, its compatibility-backed full master `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md`, and the ANHAM/PMC application profile; the former `Ankh_Analysis_System_Master_Concept_v1_ru.docx` is a historical reference only
 6. relevant documents under `docs/ankh/`
 7. existing canonical Case / AI / Karen / safety documents referenced by the project
 
