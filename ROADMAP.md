@@ -1,3 +1,14 @@
+
+## VIVENOIA migration — 2026-09-30
+
+- [x] Adopt VIVENOIA as canonical identity without creating a parallel core.
+- [x] Preserve current PMC document intelligence and Case/evidence stores.
+- [x] Keep NEXORA package/env/path identifiers as compatibility aliases during safe migration.
+- [ ] Reconcile the document.read capability from draft PR #222 onto current main rather than merging the stale branch.
+- [ ] Run current full regression/security/build gates on the reconciled candidate.
+- [ ] Complete isolated signed-in RU/EN Case review/save/readback acceptance before runtime promotion.
+- [ ] Retire compatibility identifiers only after dependency scan proves safe.
+
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
 ## Karen daily workspace — 2026-09-29
