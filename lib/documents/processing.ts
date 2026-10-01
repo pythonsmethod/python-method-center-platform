@@ -1,7 +1,6 @@
 import { readAllRows } from "./read-all";
 import { ASSISTANT_MODEL, type AssistantResult } from "@/lib/assistant/claude";
 import { METADATA_SYSTEM_PROMPT, parseMetadata, type DocumentHeader } from "@/lib/assistant/metadata";
-import { askAssistantWithAttachments } from "@/lib/assistant/router";
 import { createPmcVivenoiaDocumentReader } from "./vivenoia-reader";
 import { resolveIdentity, type IdentityVerdict } from "@/lib/analysis/identity";
 import { runAnalysis, type PriorLabValue } from "@/lib/analysis/pipeline";
