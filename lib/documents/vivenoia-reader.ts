@@ -21,7 +21,7 @@ const provider: DocumentReadProvider = {
       outcome: "failed",
       code: result.status === "unavailable"
         ? "PROVIDER_UNAVAILABLE"
-        : result.code === "INCOMPLETE_RESPONSE" || result.code === "INVALID_RESPONSE"
+        : result.code === "emptyReply"
           ? "INCOMPLETE_RESPONSE"
           : "PROVIDER_FAILED",
     };
@@ -62,7 +62,7 @@ export function createPmcVivenoiaDocumentReader(input: {
       receipts.push(result.receipt);
       if (result.outcome === "complete") return { status: "ok", reply: result.text };
       if (result.outcome === "failed" && result.code === "PROVIDER_UNAVAILABLE") return { status: "unavailable", failureClass: "not_configured" };
-      return { status: "error", code: result.outcome === "failed" && result.code === "INCOMPLETE_RESPONSE" ? "INCOMPLETE_RESPONSE" : "INVALID_RESPONSE", message: "VIVENOIA document reading failed" };
+      return { status: "error", code: result.outcome === "failed" && result.code === "INCOMPLETE_RESPONSE" ? "emptyReply" : "temporarilyDown", message: "VIVENOIA document reading failed" };
     },
   };
 }
