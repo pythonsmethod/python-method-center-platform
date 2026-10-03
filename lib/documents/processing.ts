@@ -1,5 +1,5 @@
 import { readAllRows } from "./read-all";
-import { ASSISTANT_MODEL, type AssistantResult } from "@/lib/assistant/claude";
+import { type AssistantResult } from "@/lib/assistant/claude";
 import { METADATA_SYSTEM_PROMPT, parseMetadata, type DocumentHeader } from "@/lib/assistant/metadata";
 import { createPmcVivenoiaDocumentReader } from "./vivenoia-reader";
 import type { ExternalDocumentReceipt } from "@/lib/vivenoia/external-document-analysis";
@@ -107,7 +107,7 @@ async function readLocaleAndFilename(
 ): Promise<{ locale: "ru" | "en"; filename: string }> {
   const { data } = await supabase
     .from("uploaded_documents")
-    .select("original_filename, profiles(locale)")
+    .select("original_filename, profiles!uploaded_documents_profile_id_fkey(locale)")
     .eq("id", documentId)
     .maybeSingle();
   const locale = (data?.profiles as { locale?: string } | null)?.locale === "en" ? "en" : "ru";
@@ -186,15 +186,19 @@ async function claimAndProcess(scope: { profileId?: string; caseId?: string } = 
 }
 export async function processNextDocument(): Promise<ProcessDocumentResult> {
   const pilot = await claimAndProcess();
-  return pilot.status === "idle" ? processNextLegacyDocument() : pilot;
+  return pilot.status === "idle" && !isolatedSyntheticStage() ? processNextLegacyDocument() : pilot;
 }
 export async function processNextCaseDocument(caseId: string): Promise<ProcessDocumentResult> {
   const pilot = await claimAndProcess({ caseId });
-  return pilot.status === "idle" ? processNextLegacyCaseDocument(caseId) : pilot;
+  return pilot.status === "idle" && !isolatedSyntheticStage() ? processNextLegacyCaseDocument(caseId) : pilot;
 }
 export async function processNextOwnerDocument(profileId: string): Promise<ProcessDocumentResult> {
   const pilot = await claimAndProcess({ profileId });
-  return pilot.status === "idle" ? processNextLegacyOwnerDocument(profileId) : pilot;
+  return pilot.status === "idle" && !isolatedSyntheticStage() ? processNextLegacyOwnerDocument(profileId) : pilot;
+}
+
+function isolatedSyntheticStage():boolean {
+  return process.env.VIVENOIA_DOCUMENT_ANALYSIS_ENABLED === "synthetic-staging" && process.env.NEXT_PUBLIC_SUPABASE_URL === "https://thylrayzjczsxlyqhtfc.supabase.co";
 }
 
 async function processClaimedDocument(supabase: NonNullable<ReturnType<typeof createSupabaseServiceClient>>, job: ProcessingJob): Promise<ProcessDocumentResult> {
@@ -288,7 +292,7 @@ async function processClaimedDocument(supabase: NonNullable<ReturnType<typeof cr
     .map(row => ({ ...row, documentId: row.document_id })) as PriorLabValue[];
   const run = runAnalysis({ documents: [{ documentId: job.document_id, collectionDate: header.collectionDate,
     agreed: exactDuplicate || classification === "EMPTY_TEMPLATE" ? [] : analysisRowsFromPageReadings(agreed) }],
-    prior, questionnaire: subjectQuestionnaire, extractionModelVersion: ASSISTANT_MODEL });
+    prior, questionnaire: subjectQuestionnaire, extractionModelVersion: [...new Set(receipts.map(r=>`${r.provider}:${r.model}:${r.processorVersion}`))].sort().join("|") });
   if (!hasAllVersions(run.versions)) return finishFailure(job, "service", "ANALYSIS_VERSION_MISSING");
   const sourceRecord = { source_hash: source.hash, page_count: source.pageCount, pages: pages.map(page => page.coverage), processor_version: DOCUMENT_PROCESSOR_VERSION,
     external_runtime: "VIVENOIA", document_analysis_version: "1", receipts,
