@@ -123,6 +123,13 @@ enabled Case; real client files were not automatically reprocessed.
   regression covers default/string/array/missing globs and Unicode/spaced
   directories. Focused regression, TypeScript and lint passed; fresh CI rerun
   is required for this tooling-only change.
+- Final tooling-repair CI **passed** on
+  `7c4fda34e8d2d76a50ff7aa2611b2f5fc185765a`: 2383 tests passed / 1 skipped,
+  TypeScript, lint, security, full audit, build and diff check;
+  [run 37106480318](https://github.com/pythonsmethod/python-method-center-platform/actions/runs/37106480318).
+  Core's current documentation head `880ccca614143318b52c7c6c98bf699c0d09fd07`
+  passed all three PR CI workflows. Revoked Core session readback returned
+  403 access_denied on the final separate-runtime deployment.
 - Core final candidate: **346 tests passed**, TypeScript and deployed
   build passed; production dependency audit zero findings. Core has no
   standalone ESLint script; no independent Core lint claim.

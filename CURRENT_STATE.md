@@ -20,6 +20,9 @@ on an unpatched braces dependency in lint tooling. A narrow pinned glob adapter
 replacement removes that dependency; full lockfile audit zero and compatibility
 regression passes. Fresh full CI for the tooling repair is pending. No audit
 exception or downgraded framework. Branch protection is unverified (403).
+Final tooling-repair CI on `7c4fda34e8d2d76a50ff7aa2611b2f5fc185765a`
+passed all 2383 tests / 1 skipped, type/lint/security, full audit, build and
+diff check (run 37106480318). This supersedes the pending status above.
 
 PMC 2382 tests passed / 1 skipped, Core 346 passed; TypeScript/security/build,
 PMC lint and zero-finding dependency audits passed. Deployed negative client
