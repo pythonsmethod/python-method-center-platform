@@ -1,68 +1,22 @@
-import { readIsolatedDocument } from "@/lib/assistant/router";
-import type { AssistantResult } from "@/lib/assistant/claude";
-import type { ChatAttachment } from "@/lib/assistant/attachments";
-import {
-  readDocument,
-  DOCUMENT_READ_VERSION,
-  type DocumentReadGrant,
-  type DocumentReadProvider,
-  type DocumentReadReceipt,
-} from "@/lib/vivenoia/document-read";
-
-const provider: DocumentReadProvider = {
-  id: "pmc-approved-document-reader",
-  model: "current-approved-document-reader",
-  async read(input) {
-    const result = await readIsolatedDocument(input.system, input.instruction, input.maxTokens, input.attachment);
-    if (result.status === "ok") {
-      return result.refusal ? { outcome: "refused" } : { outcome: "complete", text: result.reply };
-    }
-    return {
-      outcome: "failed",
-      code: result.status === "unavailable"
-        ? "PROVIDER_UNAVAILABLE"
-        : result.code === "emptyReply"
-          ? "INCOMPLETE_RESPONSE"
-          : "PROVIDER_FAILED",
-    };
-  },
-};
-
-export function createPmcVivenoiaDocumentReader(input: {
-  operationSeed: string;
-  profileId: string;
-  caseId: string;
-  documentId: string;
-  sourceVersion: string;
-  attachment: ChatAttachment;
-}) {
-  const grant: DocumentReadGrant = {
-    scope: {
-      organizationId: "pmc",
-      applicationId: "pmc-document-worker",
-      actorId: "service:pmc-document-worker",
-      subjectId: `${input.profileId}:${input.caseId}`,
-    },
-    source: { id: input.documentId, version: input.sourceVersion },
-    providerId: provider.id,
-    maxBytes: 25 * 1024 * 1024,
-  };
-  const receipts: DocumentReadReceipt[] = [];
-  return {
-    receipts,
-    modelVersion: `vivenoia-document-read-v${DOCUMENT_READ_VERSION};pmc-page-reader-v1`,
-    async read(stage: string, system: string, instruction: string, maxTokens: number): Promise<AssistantResult> {
-      const result = await readDocument({
-        version: DOCUMENT_READ_VERSION,
-        operationId: `${input.operationSeed}:${stage}`,
-        scope: grant.scope,
-        source: { ...grant.source, attachment: input.attachment },
-        policy: { id: `pmc-${stage}`, version: "1", system, instruction, maxTokens },
-      }, grant, provider);
-      receipts.push(result.receipt);
-      if (result.outcome === "complete") return { status: "ok", reply: result.text };
-      if (result.outcome === "failed" && result.code === "PROVIDER_UNAVAILABLE") return { status: "unavailable", failureClass: "not_configured" };
-      return { status: "error", code: result.outcome === "failed" && result.code === "INCOMPLETE_RESPONSE" ? "emptyReply" : "temporarilyDown", message: "VIVENOIA document reading failed" };
-    },
-  };
+import {createHash} from "node:crypto";
+import type {AssistantResult} from "@/lib/assistant/claude";
+import type {ChatAttachment} from "@/lib/assistant/attachments";
+import {readExternalDocument,type ExternalDocumentReceipt} from "@/lib/vivenoia/external-document-analysis";
+/** PMC resolves owner/Case/source. Clinical prompts and history stay in PMC. */
+export function createPmcVivenoiaDocumentReader(input:{operationSeed:string;profileId:string;caseId:string;documentId:string;sourceVersion:string;attachment:ChatAttachment;page:number;pageCount:number;locale:"ru"|"en"}) {
+ const subjectId="subject-"+createHash("sha256").update(`${input.profileId}:${input.caseId}`).digest("hex").slice(0,32);
+ const receipts:ExternalDocumentReceipt[]=[];
+ return {
+  receipts,modelVersion:"vivenoia-external-document-analysis-v1",
+  async read(stage:string,_system:string,_instruction:string,_maxTokens:number):Promise<AssistantResult>{
+   const operationId=createHash("sha256").update(`${input.operationSeed}:${input.sourceVersion}:${input.page}:${stage}`).digest("hex");
+   const result=await readExternalDocument({version:"1",operationId,tenantId:"pmc-synthetic-staging",applicationId:"pmc-document-worker",actorId:"pmc-document-worker",subjectId,locale:input.locale,
+    stage:stage==="header"?"header":stage==="transcription-first"?"literal-first":"literal-second",
+    source:{id:`${subjectId}:${input.documentId}`,version:input.sourceVersion,hash:input.sourceVersion,page:input.page,pageCount:input.pageCount,mediaType:input.attachment.mediaType,
+     contentHash:createHash("sha256").update(Buffer.from(input.attachment.data,"base64")).digest("hex"),data:input.attachment.data}});
+   if(result.receipt)receipts.push(result.receipt);
+   if(result.outcome==="complete")return {status:"ok",reply:result.text.replace(/\[\[DOCUMENT_PAGE_END\]\]/g,"[[PMC_PAGE_END]]")};
+   return {status:"error",code:"temporarilyDown",message:"VIVENOIA document reading is unavailable",failureClass:"provider_api"};
+  }
+ };
 }

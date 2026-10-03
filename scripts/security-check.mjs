@@ -5,6 +5,7 @@ import ts from "typescript";
 
 // Reviewed network boundaries, not a list of providers whose APIs may be called anywhere.
 const fetchSites = {
+  "lib/vivenoia/external-document-analysis.ts": 2, // Fixed-host, server-only, bounded extraction transport; no consumer prompts.
   "lib/security/ai-transport.ts": 1,
   "lib/product-analytics/browser.ts": 1,
   "components/assistant/AssistantOutreachPreference.tsx": 2,
