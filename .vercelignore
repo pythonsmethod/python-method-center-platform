@@ -1,0 +1,10 @@
+.git/
+.vercel/
+node_modules/
+.next/
+.private/
+.env
+.env.*
+!.env.example
+output/pdf/
+tmp/

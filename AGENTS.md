@@ -1,21 +1,21 @@
-# AGENTS.md — NEXORA CORE / PMC APPLICATION OPERATING RULES
+# AGENTS.md — VIVENOIA CORE / PMC APPLICATION OPERATING RULES
 
 ## Owner-approved architecture — 2026-09-23
 
-Read `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` before new architecture work.
-NEXORA owns reusable capabilities, including document analysis. ANHAM is the
+Read `docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md` first, then its compatibility-backed full master `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` before new architecture work.
+VIVENOIA owns reusable capabilities, including document analysis. ANHAM is the
 AI system within Python Method Center and consumes those capabilities through
 a PMC authorization/domain adapter. External capability commercialization belongs
-to NEXORA / NEXORA API. ANKH is retired as a standalone system/product name.
+to VIVENOIA / VIVENOIA API. ANKH is retired as a standalone system/product name.
 
 The implementation is still hosted in this repository; the approved target does
-not prove a separate NEXORA runtime or released API. Do not duplicate Cases,
+not prove a separate VIVENOIA runtime or released API. Do not duplicate Cases,
 source documents, evidence or an entire processing engine to satisfy the naming.
 Keep organization/app/subject authorization and PMC-specific methodology separate.
 
 Legacy `docs/ankh`, harness, script, environment and provider identifiers remain
 compatibility references until a reviewed migration updates their dependants.
-Do not relabel historical benchmark evidence as new NEXORA runtime validation.
+Do not relabel historical benchmark evidence as new VIVENOIA runtime validation.
 
 ## Repository-wide boundaries
 
@@ -25,11 +25,11 @@ Do not relabel historical benchmark evidence as new NEXORA runtime validation.
 - The retired client processing classification remains retired. Client cases and support requests have no processing status, urgency, prioritization, automatic transition, badge or filter. `docs/architecture/CLIENT_PROCESSING_WITHOUT_CLASSIFICATION.md` is authoritative.
 - Every user-facing change must be complete in Russian and English. Visible copy, accessibility labels, validation, metadata, navigation and states must follow the active locale. Language switching must preserve the route and be verified in both directions.
 
-These repository-wide rules remain authoritative for NEXORA capability work inside PMC. The rest of this file preserves the document-analysis operating memory.
+These repository-wide rules remain authoritative for VIVENOIA capability work inside PMC. The rest of this file preserves the document-analysis operating memory.
 
 ## 1. Purpose
 
-This repository contains the PMC application and the existing implementation intended to supply NEXORA document-analysis capabilities.
+This repository contains the PMC application and the existing implementation intended to supply VIVENOIA document-analysis capabilities.
 
 This file defines how Codex must work on document analysis and its PMC integration.
 
@@ -55,7 +55,7 @@ Source Document
 → Canonical Facts / Clinical Evidence
 → Trust Decision
 → Longitudinal Evidence Model
-→ NEXORA Document Analysis + PMC Domain Adapter
+→ VIVENOIA Document Analysis + PMC Domain Adapter
 → Karen Review / Decision
 → Client Response
 
@@ -87,7 +87,7 @@ Before changing document-analysis code, read:
 2. `CURRENT_STATE.md`
 3. `ROADMAP.md`
 4. `DECISIONS.md`
-5. `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md` and the ANHAM/PMC application profile; the former `Ankh_Analysis_System_Master_Concept_v1_ru.docx` is a historical reference only
+5. `docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md`, its compatibility-backed full master `docs/architecture/NEXORA_MASTER_ARCHITECTURE.md`, and the ANHAM/PMC application profile; the former `Ankh_Analysis_System_Master_Concept_v1_ru.docx` is a historical reference only
 6. relevant documents under `docs/ankh/`
 7. existing canonical Case / AI / Karen / safety documents referenced by the project
 
@@ -265,9 +265,9 @@ Use provider adapters.
 
 Do not add Azure/AWS merely to inflate accuracy without a defined validation need.
 
-## 12. NEXORA capability and PMC expert roles
+## 12. VIVENOIA capability and PMC expert roles
 
-NEXORA document analysis (through the PMC adapter):
+VIVENOIA document analysis (through the PMC adapter):
 - extracts;
 - structures;
 - compares;

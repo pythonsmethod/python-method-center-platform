@@ -1,3 +1,32 @@
+
+## PMC-DOC-VIVENOIA-20261002 — 2026-10-03
+
+- [x] Reverify current main/PR, base database/RPC/RLS parity and domain bindings.
+- [x] Continue PR #260 with versioned separate-Core synthetic staging boundary.
+- [x] Implement deterministic derivatives, receipts, private-method prerequisite,
+      published-version PDF and staged report persistence without new source master.
+- [x] Pass final regressions/build/security/audit; deployed client denial and
+      mobile bilingual/reload checks. Preserve failed provider attempts.
+- [ ] Owner approves concrete task-budget aggregate-control change; candidate
+      migration remains unapplied. Resume final synthetic extraction benchmark.
+- [ ] Obtain Karen-approved clinical_protocol in existing private knowledge.
+- [ ] Complete actual picture -> Karen correction/approval -> publication ->
+      client PDF/reload/redelivery -> controlled learning, including live negatives.
+- [ ] Verify provider medical-data terms and role/clinical acceptance before
+      controlled domain release or wider enrollment. Current production NO-GO.
+
+See [exact acceptance record](docs/ankh/pmc_doc_vivenoia_20261002_acceptance.md).
+
+## VIVENOIA migration — 2026-09-30
+
+- [x] Adopt VIVENOIA as canonical identity without creating a parallel core.
+- [x] Preserve current PMC document intelligence and Case/evidence stores.
+- [x] Keep NEXORA package/env/path identifiers as compatibility aliases during safe migration.
+- [ ] Reconcile the document.read capability from draft PR #222 onto current main rather than merging the stale branch.
+- [ ] Run current full regression/security/build gates on the reconciled candidate.
+- [ ] Complete isolated signed-in RU/EN Case review/save/readback acceptance before runtime promotion.
+- [ ] Retire compatibility identifiers only after dependency scan proves safe.
+
 # ROADMAP.md — NEXORA CORE / PMC APPLICATION
 
 ## Karen daily workspace — 2026-09-29

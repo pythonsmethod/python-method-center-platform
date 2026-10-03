@@ -14,7 +14,7 @@ beforeAll(async () => {
  alter table storage.objects enable row level security;
  create table profiles(id uuid primary key,role text not null default 'client');
  create table client_cases(id uuid primary key,profile_id uuid references profiles(id));
- create table uploaded_documents(id uuid primary key,profile_id uuid references profiles(id),case_id uuid references client_cases(id),document_type text,status text,document_status document_intake_status,storage_path text,original_filename text,metadata jsonb,created_at timestamptz default now(),archived_at timestamptz,identity_status text,identity_review_status text,duplicate_of_document_id uuid,version_of_document_id uuid);
+ create table uploaded_documents(id uuid primary key,profile_id uuid references profiles(id),case_id uuid references client_cases(id),document_type text,status text,document_status document_intake_status,storage_path text,original_filename text,header jsonb,metadata jsonb,created_at timestamptz default now(),archived_at timestamptz,identity_status text,identity_review_status text,duplicate_of_document_id uuid,version_of_document_id uuid);
  create table document_processing_jobs(id uuid primary key default gen_random_uuid(),document_id uuid unique references uploaded_documents(id),case_id uuid,profile_id uuid,status text,attempts int default 0,available_at timestamptz default now(),locked_at timestamptz,client_notified_at timestamptz,last_error text,updated_at timestamptz default now(),created_at timestamptz default now());
  create table document_extractions(id uuid primary key default gen_random_uuid(),document_id uuid unique,case_id uuid,profile_id uuid,source_fingerprint text,agreed_values jsonb,disputed_values jsonb,first_reading jsonb,second_reading jsonb,extracted_at timestamptz,content_classification text,content_fingerprint text);
  create table analysis_runs(id uuid primary key default gen_random_uuid(),case_id uuid,profile_id uuid,document_id uuid,extraction_model_version text not null,analysis_engine_version text not null,prompt_version text not null,rule_set_version text not null,threshold_set_version text not null,unit_unresolved boolean,human_review_count int,blocked jsonb,requests text[],trends jsonb,excluded jsonb,created_at timestamptz default now());
@@ -33,6 +33,7 @@ beforeAll(async () => {
  await q("insert into client_cases values($1,$2),($3,$4)",[id(11),id(1),id(12),id(2)]);
  await db.exec(readFileSync("supabase/migrations/20260928200008_pmc_document_chain_focus_pilot.sql", "utf8"));
  await db.exec(readFileSync("supabase/migrations/20260928200100_pmc_document_server_metadata_boundary.sql", "utf8"));
+ await db.exec(readFileSync("supabase/migrations/20261003010000_pmc_published_reports.sql", "utf8"));
  await q("insert into pmc_document_chain_pilot_cases(case_id,enabled) values($1,true),($2,true)",[id(11),id(12)]);
 }, 30000);
 afterAll(async()=>{await db?.close();});
@@ -97,6 +98,13 @@ describe("PMC transaction path with entirely synthetic records",()=>{
    const b=(await q("select publish_pmc_case_review($1,$2,$3) id",[id(11),approval,id(3)]))[0].id;
    expect(a).toBe(b);
    expect((await q("select body,approved_review_event_id from case_messages where id=$1",[a]))[0]).toEqual({body:"Synthetic approved result",approved_review_event_id:approval});
+   const snapshot=(await q("select report_snapshot from case_review_learning_events where id=$1",[approval]))[0].report_snapshot as {documents: {id:string}[]};
+   expect(snapshot.documents.map(d=>d.id)).toEqual([id(21)]);
+   const file={version:"1",path:`${approval}/ru-v1.pdf`,sha256:"d".repeat(64)};
+   expect((await q("select save_pmc_report_file($1,'ru',$2::jsonb) file",[approval,JSON.stringify(file)]))[0].file).toEqual(file);
+   await q("select save_pmc_report_file($1,'ru',$2::jsonb)",[approval,JSON.stringify(file)]);
+   await expect(q("select save_pmc_report_file($1,'ru',$2::jsonb)",[approval,JSON.stringify({...file,sha256:"e".repeat(64)})])).rejects.toThrow("REPORT_CONFLICT");
+   await expect(q("update case_review_learning_events set approved_text='changed' where id=$1",[approval])).rejects.toThrow("APPROVAL_IMMUTABLE");
    await expect(q("update case_messages set body='changed' where id=$1",[a])).rejects.toThrow("APPROVED_RESPONSE_IMMUTABLE");
  });
  it("rejects a different Case/actor and rejects a stale approval after re-extraction",async()=>{

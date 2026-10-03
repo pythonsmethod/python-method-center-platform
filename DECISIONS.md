@@ -1,3 +1,8 @@
+
+## VIVENOIA-2026-09-30-01 — Canonical core identity
+
+Owner renamed NEXORA to VIVENOIA. This is identity continuity, not a parallel system or rewrite. VIVENOIA inherits the approved shared-core architecture and reusable capabilities. Existing NEXORA runtime/package/environment identifiers remain compatibility aliases until dependency-safe retirement. PMC Case authorization, evidence, PHI boundaries, trust states and Karen workflow are unchanged. New architecture work uses VIVENOIA naming.
+
 # DECISIONS.md — ANKH ANALYSIS SYSTEM
 
 ## 2026-09-29 — Karen Today is a factual daily projection
@@ -1708,3 +1713,35 @@ the signed-in account.
 This change is in the draft branch only. A successful local build and unpaid
 Sandbox Elements Session do **not** close Preview UI/payment, paid return or
 Live launch acceptance. Keep sales disabled until end-to-end validation.
+## 2026-10-03 — Separate document runtime and immutable published reports
+
+Keep the full dependency audit mandatory. The unpatched braces dependency
+enters only through Next lint root-directory glob discovery; replace only that
+fast-glob dependency with pinned tinyglobby 0.2.17 and verify the actual Next
+utility on default/string/array/Unicode directory paths. Preserve all lint
+rules, framework versions and runtime dependencies; no audit exclusion.
+
+Continue the existing PMC PR #260; its local identity wrapper alone is not an
+external runtime integration. Enable the separate VIVENOIA contract only for
+the actual isolated staging database and explicit synthetic gate. Derive
+authority/resource/source/version/idempotency on the server, preserve printed
+facts and uncertainties, and never substitute a local fallback on this path.
+Nonpilot production remains on its existing pipeline until acceptance.
+
+Keep Karen's clinical protocol in existing staff-only private knowledge;
+missing protocol denies Anham generation. General philosophy/catalog entries
+are not a replacement. PMC's approved AI transport can send selected private
+context to an external provider; real medical routing terms must be verified,
+not described as “nothing leaves”. No method goes to generic VIVENOIA.
+
+Snapshot sources at approval inside the existing Case lock. PDF delivery is a
+private generated derivative of one published approval, with immutable hash,
+deterministic locale path and unknown-write reconciliation. Reuse existing
+learning events; patient decisions do not automatically become method rules.
+
+The owner approved $1 for this task, but the existing global cap includes old
+reservations. Automatic approval rejected a task-scoped trigger change; keep
+the original cap and pause paid acceptance pending explicit approval of that
+concrete change. Candidate code/deployment is not clinical acceptance or
+permission to promote domains. See
+[implementation evidence](docs/ankh/pmc_doc_vivenoia_20261002_acceptance.md).

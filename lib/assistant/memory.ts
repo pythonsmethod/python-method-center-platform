@@ -38,7 +38,7 @@ export function isMemoryCollection(value: unknown): value is MemoryCollection {
 }
 
 export function audienceForMemory(collection: MemoryCollection): KnowledgeAudience {
-  if (collection === "book") return "staff";
+  if (collection === "book" || collection === "method") return "staff";
   if (collection === "client_answers") return "client";
   return "both";
 }

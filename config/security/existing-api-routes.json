@@ -16,6 +16,7 @@
   "app/api/assistant/realtime/voices/preview/route.ts",
   "app/api/assistant/realtime/voices/route.ts",
   "app/api/assistant/staff/route.ts",
+  "app/api/cases/report/route.ts",
   "app/api/chess/online/route.ts",
   "app/api/chess/state/route.ts",
   "app/api/cron/assistant-outreach/route.ts",

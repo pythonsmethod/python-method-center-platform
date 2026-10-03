@@ -53,18 +53,23 @@ export async function getKnowledgeForPrompt(
     return render("unavailable", null);
   }
 
-  const { data, error } = await supabase
+  let query = supabase
     .from("assistant_knowledge")
-    .select("id, title, content, created_at")
+    .select("id, title, content, collection, created_at")
     .eq("is_active", true)
-    .in("audience", [audience, "both"])
+    .in("audience", [audience, "both"]);
+  // Protect legacy incorrectly classified method entries too. Staff materials
+  // never become client context merely because their audience was set to both.
+  if (audience === "client") query = query.or("collection.is.null,collection.neq.method");
+  const { data, error } = await query
     .order("created_at", { ascending: false })
     .limit(MAX_PROMPT_ENTRIES);
 
   if (error || !data || data.length === 0) {
     return render(error ? "unavailable" : "absent", null);
   }
-  return render("available", data);
+  const visible=audience==="client"?data.filter(row=>row.collection!=="method"):data;
+  return render(visible.length?"available":"absent", visible.length?visible:null);
 }
 
 export type GuidanceEntry = {

@@ -1,8 +1,10 @@
 "use server";
+import { ensurePublishedReport } from "@/lib/cases/published-report";
 
 import { readAllRows } from "@/lib/documents/read-all";
 import { revalidatePath } from "next/cache";
 import { getKnowledgeForPrompt } from "@/lib/assistant/knowledge";
+import {getPrivateClinicalMethodForReview} from "@/lib/assistant/private-clinical-method";
 import { conversationContext } from "@/lib/assistant/conversation-context";
 import { withConversationArchive } from "@/lib/assistant/conversation-archive";
 import { askClaude } from "@/lib/assistant/claude";
@@ -54,6 +56,9 @@ export async function generateCaseReview(
     return errorState(locale === "en" ? "Invalid case." : "Некорректный кейс.");
   }
   if (await getDocumentChainPilotStatus(caseId) !== "enabled") return errorState(locale === "en" ? "The new review is not enabled for this Case." : "Новый разбор для этого кейса не включён.");
+
+  const method=await getPrivateClinicalMethodForReview();
+  if(method.status!=="ready")return errorState(locale==="en"?"Karen's private clinical protocol is missing or unavailable. A general medical prompt cannot replace it.":"Закрытый клинический протокол Карена отсутствует или недоступен. Общий медицинский prompt не может его заменить.");
 
   const supabase = createSupabaseServiceClient();
 
@@ -175,7 +180,7 @@ export async function generateCaseReview(
     : `\n\nСПОРНЫХ МЕСТ НЕТ. После разделителя «${CASE_REVIEW_UNREAD_HEADING}» напиши только «НЕТ».`;
 
   const result = await withConversationArchive(scope, () => askClaude(
-    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write the internal review and unresolved questions in English." : "Русский. Оба раздела пиши по-русски."}\n\n${context ?? ""}\n\n${knowledge}\n\n${history}`,
+    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write the internal review and unresolved questions in English." : "Русский. Оба раздела пиши по-русски."}\n\n${method.context}\n\n${context ?? ""}\n\n${knowledge}\n\n${history}`,
     [
       {
         role: "user",
@@ -289,6 +294,9 @@ export async function publishCaseReview(_previous: CaseReviewActionState, formDa
   if (error || !messageId) return errorState(en ? "The sources or decision changed. Review the latest version before publishing." : "Источники или решение изменились. Проверьте актуальную версию перед отправкой.");
   const saved = await db.from("case_messages").select("id,approved_review_event_id").eq("id", messageId).eq("case_id", caseId).maybeSingle();
   if (saved.error || saved.data?.approved_review_event_id !== approvalId) return errorState(en ? "Publication readback failed. Reload before retrying." : "Не удалось подтвердить публикацию. Обновите страницу перед повтором.");
+  try { await ensurePublishedReport(approvalId, en ? "en" : "ru", caseId); } catch {
+    return errorState(en ? "The text is published. PDF delivery is pending; retry publication to reconcile the same version." : "Текст опубликован. Доставка PDF ожидает проверки; повторите публикацию для сверки той же версии.");
+  }
   revalidatePath(`/admin/cases/${caseId}`); revalidatePath("/cabinet");
   return { status: "success", message: en ? "The approved result is saved in the client's conversation." : "Утверждённый результат сохранён в переписке клиента." };
 }

@@ -289,6 +289,9 @@ export function CaseMessageThread({
                     </span>
                   ) : null}
                   {message.body ? <p>{message.body}</p> : null}
+                  {message.approved_review_event_id && caseId ? <a href={`/api/cases/report?case=${encodeURIComponent(caseId)}&approval=${encodeURIComponent(message.approved_review_event_id)}&locale=${dateLocale.startsWith("en") ? "en" : "ru"}`} download>
+                    {dateLocale.startsWith("en") ? "Download approved assessment (PDF)" : "Скачать утверждённый разбор (PDF)"}
+                  </a> : null}
                   {message.audioUrl ? (
                     <audio controls preload="metadata" src={message.audioUrl} />
                   ) : message.audio_path && !message.audioUrl ? (

@@ -12,6 +12,7 @@ export type CaseMessage = {
   audio_duration_seconds: number | null;
   created_at: string;
   audioUrl: string | null;
+  approved_review_event_id?: string | null;
 };
 
 export type CaseMessagesResult = {
@@ -114,7 +115,7 @@ export async function getCaseMessages(caseId: string): Promise<CaseMessagesResul
   const { data, error } = await supabase
     .from("case_messages")
     .select(
-      "id, sender_role, body, audio_path, audio_duration_seconds, created_at"
+      "id, sender_role, body, audio_path, audio_duration_seconds, created_at, approved_review_event_id"
     )
     .eq("case_id", caseId)
     .order("created_at", { ascending: true })

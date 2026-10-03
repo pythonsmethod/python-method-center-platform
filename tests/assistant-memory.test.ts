@@ -4,7 +4,7 @@ import { audienceForMemory, buildApprovedMemory, isMemoryCollection, memoryColle
 describe("approved assistant memory", () => {
   it("routes each destination to the intended assistants", () => {
     expect(audienceForMemory("book")).toBe("staff");
-    expect(audienceForMemory("method")).toBe("both");
+    expect(audienceForMemory("method")).toBe("staff");
     expect(audienceForMemory("client_answers")).toBe("client");
   });
 
