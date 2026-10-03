@@ -18,3 +18,11 @@ it("denies production database, unknown outcomes and oversized replies without f
  vi.stubEnv("NEXT_PUBLIC_SUPABASE_URL","https://thylrayzjczsxlyqhtfc.supabase.co");expect(await readExternalDocument(r,send)).toEqual({outcome:"failed",code:"REMOTE_OUTCOME_UNKNOWN"});expect(send).toHaveBeenCalledOnce();
  const large=vi.fn<typeof fetch>(async()=>new Response("x".repeat(33000)));expect((await readExternalDocument(r,large)).outcome).toBe("failed");expect(large).toHaveBeenCalledOnce();
 });
+
+it("uses deployment protection only for the exact server-approved owned candidate",async()=>{
+ const endpoint="https://vivenoia-core-staging-7d0gyg9dl-pythonsmethods-projects.vercel.app/api/document-analysis";
+ vi.stubEnv("VIVENOIA_DOCUMENT_ANALYSIS_URL",endpoint);vi.stubEnv("VIVENOIA_DOCUMENT_ANALYSIS_PREVIEW_URL",endpoint);vi.stubEnv("VIVENOIA_DOCUMENT_ANALYSIS_PREVIEW_BYPASS","synthetic-protection-token");
+ const send=vi.fn<typeof fetch>(async()=>Response.json(response()));expect((await readExternalDocument(r,send)).outcome).toBe("complete");
+ expect(send.mock.calls[0][1]?.headers).toHaveProperty("x-vercel-protection-bypass","synthetic-protection-token");
+ send.mockClear();vi.stubEnv("VIVENOIA_DOCUMENT_ANALYSIS_PREVIEW_URL",endpoint.replace("7d0gyg9dl","aaaaaaaaa"));expect((await readExternalDocument(r,send)).outcome).toBe("failed");expect(send).not.toHaveBeenCalled();
+});

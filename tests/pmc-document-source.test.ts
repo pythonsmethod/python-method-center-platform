@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import { createHash } from "node:crypto";
 import { PDFDocument } from "pdf-lib";
 import sharp from "sharp";
@@ -23,6 +23,15 @@ describe("original source and complete page reading", () => {
     const png = await sharp({create:{width:40,height:40,channels:3,background:"white"}}).png().toBuffer();
     await expect(prepareDocumentSource(png, "image/jpeg", "fake.jpg")).rejects.toThrow("SOURCE_FORMAT_MISMATCH");
     const image = await prepareDocumentSource(png, "image/png", "source.png"); expect(image.pageCount).toBe(1); expect((await image.page(1)).mediaType).toBe("image/jpeg");
+  });
+  it("keeps page derivative hashes stable across retry times", async () => {
+    const pdf=await PDFDocument.create();pdf.addPage();const bytes=await pdf.save();
+    vi.useFakeTimers();
+    try {
+      vi.setSystemTime(new Date("2026-10-02T00:00:00Z"));const first=await (await prepareDocumentSource(bytes,"application/pdf","synthetic.pdf")).page(1);
+      vi.setSystemTime(new Date("2026-10-03T00:00:00Z"));const retry=await (await prepareDocumentSource(bytes,"application/pdf","synthetic.pdf")).page(1);
+      expect(retry.data).toBe(first.data);
+    } finally { vi.useRealTimers(); }
   });
   it("binds repeated labels on separate pages to the actual original and server filename", () => {
     const first = buildReadPage(reading(), reading(), 1, hash, "original.pdf");

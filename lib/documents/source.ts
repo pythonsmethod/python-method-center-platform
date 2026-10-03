@@ -39,7 +39,9 @@ export async function prepareDocumentSource(bytes: Uint8Array, mime: string, nam
     if (pageCount < 1 || pageCount > 250) throw new Error("SOURCE_PAGE_LIMIT");
     return { hash, pageCount, mediaType: mime, page: async (page) => {
       if (!Number.isSafeInteger(page) || page < 1 || page > pageCount) throw new Error("SOURCE_PAGE_INVALID");
-      const part = await PDFDocument.create();
+      // Stable derivative bytes are part of the remote idempotency contract.
+      // Automatic creation/modification timestamps would change its hash on retry.
+      const part = await PDFDocument.create({ updateMetadata: false });
       const [copied] = await part.copyPages(pdf, [page - 1]);
       part.addPage(copied);
       return { name: `${name} [page ${page}/${pageCount}]`, mediaType: mime, data: Buffer.from(await part.save()).toString("base64") };
