@@ -113,6 +113,16 @@ enabled Case; real client files were not automatically reprocessed.
   additionally covers the versioned external boundary and PDF/privacy changes.
 - PMC TypeScript, ESLint, security checker/self-tests, diff whitespace and
   deployed build passed. Production dependency audit: zero findings.
+- Initial PR CI repeated all 2382 tests successfully but its full audit found
+  the unpatched lint-only braces advisory
+  [GHSA-vfj7-8cjw-p6xm](https://github.com/advisories/GHSA-vfj7-8cjw-p6xm).
+  Replace only @next/eslint-plugin-next's fast-glob dependency with pinned
+  npm:tinyglobby@0.2.17, whose used globSync/onlyDirectories API is compatible.
+  No lint rule/audit exception, Next version change or force downgrade.
+  Lockfile full audit now reports zero findings; added real Next root discovery
+  regression covers default/string/array/missing globs and Unicode/spaced
+  directories. Focused regression, TypeScript and lint passed; fresh CI rerun
+  is required for this tooling-only change.
 - Core final candidate: **346 tests passed**, TypeScript and deployed
   build passed; production dependency audit zero findings. Core has no
   standalone ESLint script; no independent Core lint claim.
@@ -236,3 +246,10 @@ deployment bindings/configuration. The staging report schema is additive and
 need not be deleted on rollback. No production rollback or data deletion is
 needed. PR #260 continues the existing PMC work; a separate draft Core PR is
 required. No merge/domain promotion is authorized by a green build alone.
+
+Published review candidates: continued [PMC draft PR #260](https://github.com/pythonsmethod/python-method-center-platform/pull/260),
+[Core draft PR #32](https://github.com/pythonsmethod/vivenoia-core/pull/32).
+Core PR CI passed Core, isolated PostgreSQL storage and staging web/owner browser
+jobs; owner browser uses mocked network and does not establish personal MFA or
+clinical acceptance. Branch-protection reads for both repositories returned
+403 from the integration; mandatory PR enforcement is **unverified**.

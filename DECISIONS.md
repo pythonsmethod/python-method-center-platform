@@ -1715,6 +1715,12 @@ Sandbox Elements Session do **not** close Preview UI/payment, paid return or
 Live launch acceptance. Keep sales disabled until end-to-end validation.
 ## 2026-10-03 — Separate document runtime and immutable published reports
 
+Keep the full dependency audit mandatory. The unpatched braces dependency
+enters only through Next lint root-directory glob discovery; replace only that
+fast-glob dependency with pinned tinyglobby 0.2.17 and verify the actual Next
+utility on default/string/array/Unicode directory paths. Preserve all lint
+rules, framework versions and runtime dependencies; no audit exclusion.
+
 Continue the existing PMC PR #260; its local identity wrapper alone is not an
 external runtime integration. Enable the separate VIVENOIA contract only for
 the actual isolated staging database and explicit synthetic gate. Derive

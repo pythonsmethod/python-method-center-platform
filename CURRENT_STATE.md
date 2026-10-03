@@ -14,6 +14,13 @@ provider pass. No new extraction, Anham draft, Karen approval/publication,
 client medical PDF or learning event exists. Stage pilot is disabled and new
 Core authority revoked; original owner binding exists, enabled policies zero.
 
+Published candidates: PMC draft PR #260 and Core draft PR #32. Core's three
+PR CI workflows passed. PMC CI passed all tests/type/lint/security but stopped
+on an unpatched braces dependency in lint tooling. A narrow pinned glob adapter
+replacement removes that dependency; full lockfile audit zero and compatibility
+regression passes. Fresh full CI for the tooling repair is pending. No audit
+exception or downgraded framework. Branch protection is unverified (403).
+
 PMC 2382 tests passed / 1 skipped, Core 346 passed; TypeScript/security/build,
 PMC lint and zero-finding dependency audits passed. Deployed negative client
 rights checks and mobile EN -> RU -> EN/reload passed. Existing synthetic
