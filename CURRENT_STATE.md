@@ -1,4 +1,37 @@
 
+## PMC-DOC-VIVENOIA-20261002 — 2026-10-03 — CANDIDATES DEPLOYED, ACCEPTANCE NOT CLOSED
+
+The isolated PMC continuation of PR #260 now calls a separate VIVENOIA
+document-analysis runtime. Deployed code: PMC `18b459ce6a2968d4a1d2bcbc2693889f95297595`
+and Core `06542f331c3580b73061edcc76fd22877012d2c8`; protected immutable
+staging URLs are READY. Main/custom domain bindings remain unchanged.
+The live PMC database/one enabled production pilot remain unchanged.
+
+One synthetic two-page source and its existing technical job are retained in
+Anham staging. Two real header operations reached Google/OpenAI but failed
+output retention; final imageless/compressed-evidence repair awaits a positive
+provider pass. No new extraction, Anham draft, Karen approval/publication,
+client medical PDF or learning event exists. Stage pilot is disabled and new
+Core authority revoked; original owner binding exists, enabled policies zero.
+
+PMC 2382 tests passed / 1 skipped, Core 346 passed; TypeScript/security/build,
+PMC lint and zero-finding dependency audits passed. Deployed negative client
+rights checks and mobile EN -> RU -> EN/reload passed. Existing synthetic
+benchmark 7/7 does not establish new source or clinical acceptance.
+
+Staging-only published-report migration applied; historical chain migrations
+were not reapplied. Budget-scope migration is NOT APPLIED: automatic approval
+rejected separating the global cap. User-approved new-task ceiling is $1;
+task reserve $0.30, historical reserve $0.30, global remaining $0.40.
+No further paid execution pending that concrete control approval. No approved
+staff clinical_protocol knowledge was found; Karen's protocol and personal
+review/approval are required. Production release NO-GO.
+
+Full exact evidence, affected files/schema, failures, domain bindings, private
+method/provider limits and next dependencies:
+[implementation record](docs/ankh/pmc_doc_vivenoia_20261002_acceptance.md).
+This entry supersedes older runtime/owner-binding claims for this work only.
+
 ## VIVENOIA migration — 2026-09-30 — SAFE IDENTITY MIGRATION IN PROGRESS
 
 VIVENOIA is now the canonical shared-core identity. The working PMC document pipeline is preserved; no database, PHI, provider, Case, evidence or trust-state migration is implied by the rename. Existing NEXORA technical identifiers remain compatibility aliases until verified retirement. Canonical entry: docs/architecture/VIVENOIA_MASTER_ARCHITECTURE.md. PR #222 is an older draft based on 2026-09-23 main and must not be merged directly over current main; its document.read design/evidence must be reconciled with current main before runtime adoption.
