@@ -1,0 +1,8 @@
+import {beforeEach,expect,it,vi} from "vitest";
+const f=vi.hoisted(()=>({rows:[] as Record<string,unknown>[],error:null as unknown}));
+vi.mock("@/lib/supabase/service",()=>({createSupabaseServiceClient:()=>({from:()=>{const q={select:()=>q,eq:()=>q,order:()=>q,limit:async()=>({data:f.rows,error:f.error})};return q;}})}));
+import {getPrivateClinicalMethodForReview} from "@/lib/assistant/private-clinical-method";
+beforeEach(()=>{f.rows=[];f.error=null;});
+it("does not substitute missing private protocol with general knowledge",async()=>{expect(await getPrivateClinicalMethodForReview()).toEqual({status:"missing"});});
+it("fails closed on database errors or non-private method classification",async()=>{f.error={code:"unavailable"};expect(await getPrivateClinicalMethodForReview()).toEqual({status:"unavailable"});f.error=null;f.rows=[{id:"test",content:"private",collection:"method",audience:"both"}];expect(await getPrivateClinicalMethodForReview()).toEqual({status:"unavailable"});});
+it("pins only a designated protocol and invalidates its version after an edit",async()=>{f.rows=[{id:"test",title:"SYNTHETIC",content:"Synthetic protocol; no clinical method",collection:"method",audience:"staff",topic:"general",updated_at:"2026-10-02"}];expect(await getPrivateClinicalMethodForReview()).toEqual({status:"unavailable"});f.rows[0].topic="clinical_protocol";const a=await getPrivateClinicalMethodForReview();expect(a.status).toBe("ready");if(a.status!=="ready")return;expect(a.context).toContain("Private designated method sources");f.rows[0].content="Different synthetic version";const b=await getPrivateClinicalMethodForReview();expect(b.status).toBe("ready");if(b.status==="ready")expect(b.version).not.toBe(a.version);});

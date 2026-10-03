@@ -4,6 +4,7 @@ import { ensurePublishedReport } from "@/lib/cases/published-report";
 import { readAllRows } from "@/lib/documents/read-all";
 import { revalidatePath } from "next/cache";
 import { getKnowledgeForPrompt } from "@/lib/assistant/knowledge";
+import {getPrivateClinicalMethodForReview} from "@/lib/assistant/private-clinical-method";
 import { conversationContext } from "@/lib/assistant/conversation-context";
 import { withConversationArchive } from "@/lib/assistant/conversation-archive";
 import { askClaude } from "@/lib/assistant/claude";
@@ -55,6 +56,9 @@ export async function generateCaseReview(
     return errorState(locale === "en" ? "Invalid case." : "Некорректный кейс.");
   }
   if (await getDocumentChainPilotStatus(caseId) !== "enabled") return errorState(locale === "en" ? "The new review is not enabled for this Case." : "Новый разбор для этого кейса не включён.");
+
+  const method=await getPrivateClinicalMethodForReview();
+  if(method.status!=="ready")return errorState(locale==="en"?"Karen's private clinical protocol is missing or unavailable. A general medical prompt cannot replace it.":"Закрытый клинический протокол Карена отсутствует или недоступен. Общий медицинский prompt не может его заменить.");
 
   const supabase = createSupabaseServiceClient();
 
@@ -176,7 +180,7 @@ export async function generateCaseReview(
     : `\n\nСПОРНЫХ МЕСТ НЕТ. После разделителя «${CASE_REVIEW_UNREAD_HEADING}» напиши только «НЕТ».`;
 
   const result = await withConversationArchive(scope, () => askClaude(
-    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write the internal review and unresolved questions in English." : "Русский. Оба раздела пиши по-русски."}\n\n${context ?? ""}\n\n${knowledge}\n\n${history}`,
+    `${CASE_REVIEW_SYSTEM_PROMPT}\n\nЯЗЫК РЕЗУЛЬТАТА: ${locale === "en" ? "English. Write the internal review and unresolved questions in English." : "Русский. Оба раздела пиши по-русски."}\n\n${method.context}\n\n${context ?? ""}\n\n${knowledge}\n\n${history}`,
     [
       {
         role: "user",
